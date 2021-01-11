@@ -1,0 +1,25 @@
+{
+  "name": "rudi-producer",
+  "version": "1.0.2",
+  "description": "RUDI proxi for producer nodes",
+  "main": "index.js",
+  "scripts": {
+    "prestart": "npm install",
+    "start": "./node_modules/nodemon/bin/nodemon.js ./index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "rudi"
+  ],
+  "author": "Olivier Martineau <olivier.martineau@gmail.com>",
+  "homepage": "https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "@hapi/boom": "^9.1.1",
+    "fastify": "^1.14.6",
+    "fastify-swagger": "^0.15.3",
+    "js-beautify": "^1.13.0",
+    "mongoose": "^5.11.7",
+    "nodemon": "^1.19.4"
+  }
+}
