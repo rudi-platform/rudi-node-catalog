@@ -1,35 +1,38 @@
 // Import our Controllers
-const resourceInfoController = require('../controllers/resourceInfoController')
+const metadataController = require('../controllers/metadataController')
 
 // Import Swagger documentation
-const documentation = require('./documentation/resourceInfoApi')
+const documentation = require('./documentation/metadata-api')
+
+const urlPrefix = "/api/v1/"
+const urlMetadata = `${urlPrefix}resources`
 
 const routes = [
   {
     method: 'GET',
-    url: '/api/ResourceInfos',
-    handler: resourceInfoController.getResourceInfo
+    url: urlMetadata,
+    handler: metadataController.getMetadata
   },
   {
     method: 'GET',
-    url: '/api/ResourceInfos/:id',
-    handler: resourceInfoController.getSingleResourceInfo
+    url: `${urlMetadata}:id`,
+    handler: metadataController.getSingleMetadata
   },
   {
     method: 'POST',
-    url: '/api/ResourceInfos',
-    handler: resourceInfoController.addResourceInfo,
-    // schema: documentation.addResourceInfoSchema
+    url: urlMetadata,
+    handler: metadataController.addMetadata,
+    // schema: documentation.addMetadataSchema
   },
   {
     method: 'PUT',
-    url: '/api/ResourceInfos/:id',
-    handler: resourceInfoController.updateResourceInfo
+    url: `${urlMetadata}:id`,
+    handler: metadataController.updateMetadata
   },
   {
     method: 'DELETE',
-    url: '/api/ResourceInfos/:id',
-    handler: resourceInfoController.deleteResourceInfo
+    url: `${urlMetadata}:id`,
+    handler: metadataController.deleteMetadata
   }
 ]
 

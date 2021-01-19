@@ -31,7 +31,7 @@ const dbUrl = "rudi.kzlag.mongodb.net"
 */
 const dbName = "rudi_prod" 
 const dbPort = 27017
-const url = `mongodb://127.0.0.1/${dbName}:${dbPort}`
+const url = `mongodb://127.0.0.1/${dbName}`
 const mongoConnectOptions = { useUnifiedTopology: true, useNewUrlParser: true }
 
 console.log(`-- Connecting to [${url}]`)
@@ -48,10 +48,20 @@ const promise = mongoose.connect(url, mongoConnectOptions)
 // Import Routes
 const routes = require('./routes')
 
- // Declare a default route
- fastify.get('/', async (request, reply) => {
+// Declare a default route
+fastify.get('/', async (request, reply) => {
   console.log("-- hello")
-  return { hello: "world" }
+  return { server: "RUDI" }
+})
+// Declare a default route
+fastify.get('/api', async (request, reply) => {
+  console.log("-- api")
+  return { API: "RUDI API" }
+})
+// Declare a default route
+fastify.get('/api/v1', async (request, reply) => {
+  console.log("-- api/v1")
+  return { 'API version': "RUDI API v1" }
 })
 
 // Loop over each route  

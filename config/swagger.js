@@ -11,7 +11,7 @@ exports.options = {
       url: 'https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER',
       description: 'OAS3 specifications'
     },
-    host: 'localhost',
+    host: 'localhost/RUDI-PRODUCER/api/v1',
     schemes: ['http'],
     consumes: ['application/json'],
     produces: ['application/json']

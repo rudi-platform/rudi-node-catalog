@@ -2,11 +2,11 @@
 # [- LIST OF CHANGES -]
 
 # [1.0.1]
-#   - corrected typo in Metadata/access_condition: 
+#   - corrected typo in Metadata/access_condition:
 #     'mendatory_mention' -> 'mandatory_mention'
 #   - 'lifespan' was a date, now a couple of dates
-#   - 'producer_name' string has now become a 'producer' object 
-#   - language designations such as 'resource_language' and 'summary'/'lang' are 
+#   - 'producer_name' string has now become a 'producer' object
+#   - language designations such as 'resource_language' and 'summary'/'lang' are
 #     now of type 'en_GB' (cf. '#/components/schemas/Language')
 
 # [1.0.2]
@@ -20,6 +20,17 @@
 
 # [1.0.3]
 #   - 'Metadata' -> 'Metadata'
+#   - RudiID = UUIDv4 only
+#   - added DOI field
+#   - added 'SkosEntry' definition
+#   - added 'ReferenceDates' definition
+#   - changed 'reference_date' field to trace actions on data AND metadata
+#   - renaming HTTP error responses and externalized definitions
+#   - 'mandatory_mention', 'usage_constraint', 'other_constraints' and
+#     'access_constraint' fields are now of type 'DictionaryEntry'
+#   - 'mandatory_mention' is now a property of 'access_condition' field
+#   - 'license' property added to 'access_condition' field
+
 
 #•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
 openapi: 3.0.0
@@ -34,10 +45,12 @@ info:
   license:
     name: GPLv3
     url: 'https://www.gnu.org/licenses/gpl-3.0.html'
-  
+
 #•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
 servers:
-- url: "https://virtserver.swaggerhub.com/OlivierMartineau/RUDI-PRODUCER/api/v1"
+# Added by API Auto Mocking Plugin
+- description: SwaggerHub API Auto Mocking
+  url: https://virtserver.swaggerhub.com/OlivierMartineau/RUDI-PRODUCER/1.0.3
 
 #•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
 # DEFINITIONS
@@ -59,7 +72,7 @@ tags:
 #•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
 paths:
 
-  #=============================================================================          
+  #=============================================================================
   '/resources/{global_id}':
     summary: Access the metadata for one identified resource
     parameters:
@@ -73,7 +86,7 @@ paths:
       tags:
       - Access
       description: Returns the metadata for the identified resource
-      # - links for downloading the resource? 
+      # - links for downloading the resource?
       # - can we access a metadata but not the resource?
       operationId: getMetadata
       responses:
@@ -83,6 +96,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Metadata'
+        # These errors are the standard error responses for every query
         '400':
           $ref: "#/components/responses/Error400BadRequest"
         '401':
@@ -108,7 +122,7 @@ paths:
         '503':
           $ref: "#/components/responses/Error503ServiceUnavailable"
 
-  #=============================================================================          
+  #=============================================================================
   #'/resources/{global_id}':
     'delete':
       tags:
@@ -127,31 +141,7 @@ paths:
                 items:
                   type: string
                   format: url
-        '400':
-          $ref: "#/components/responses/Error400BadRequest"
-        '401':
-          $ref: "#/components/responses/Error401Unauthorized"
-        '403':
-          $ref: "#/components/responses/Error403Forbidden"
-        '404':
-          $ref: "#/components/responses/Error404NotFound"   
-        '405':
-          $ref: "#/components/responses/Error405MethodNotAllowed"   
-        '406':
-          $ref: "#/components/responses/Error406NotAcceptable"   
-        '408':
-          $ref: "#/components/responses/Error408RequestTimeout"   
-        '410':
-          $ref: "#/components/responses/Error410Gone"   
-        '423':
-          $ref: "#/components/responses/Error423Locked"   
-        '429':
-          $ref: "#/components/responses/Error429TooManyRequests"   
-        '500':
-          $ref: "#/components/responses/Error500InternalServerError"            
-        '503':
-          $ref: "#/components/responses/Error503ServiceUnavailable"            
-
+        
   #=============================================================================
   '/resources':
     'get':
@@ -160,7 +150,7 @@ paths:
       #TODO:
       # - add some meta info on the set of metadata?
       # - access the metadata for several *identified* resources?
-      # - links for downloading every resource? 
+      # - links for downloading every resource?
       # - can we access a metadata but not the resource?
       tags:
       - Access
@@ -174,6 +164,7 @@ paths:
           format: int32
           minimum: 1
           maximum: 500 #default MAX to limit the server overload
+        example: 100
       - name: 'offset'
         description: Index of the first line of resources to display
         in: query
@@ -181,6 +172,8 @@ paths:
           type: integer
           format: int32
           minimum: 0
+          example: 1
+
       responses:
         '200':
           description: Metadata for every resource
@@ -194,32 +187,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MetadataList'
-        '400':
-          $ref: "#/components/responses/Error400BadRequest"
-        '401':
-          $ref: "#/components/responses/Error401Unauthorized"
-        '403':
-          $ref: "#/components/responses/Error403Forbidden"
-        '404':
-          $ref: "#/components/responses/Error404NotFound"   
-        '405':
-          $ref: "#/components/responses/Error405MethodNotAllowed"   
-        '406':
-          $ref: "#/components/responses/Error406NotAcceptable"   
-        '408':
-          $ref: "#/components/responses/Error408RequestTimeout"   
-        '410':
-          $ref: "#/components/responses/Error410Gone"   
-        '423':
-          $ref: "#/components/responses/Error423Locked"   
-        '429':
-          $ref: "#/components/responses/Error429TooManyRequests"   
-        '500':
-          $ref: "#/components/responses/Error500InternalServerError"            
-        '503':
-          $ref: "#/components/responses/Error503ServiceUnavailable"            
-
-  #=============================================================================                  
+        
+  #=============================================================================
   #'/resources':
     'post':
       tags:
@@ -228,12 +197,12 @@ paths:
         Create one new resource
       operationId: addResource
         # NOTES:
-        # - the request implies global_id is present in the body, so 
+        # - the request implies global_id is present in the body, so
         #   '/resources/{global_id}' is redundant
         # - the uploader chooses the global_ids!
-        # - the resource global_id should not exist already, or the upload will 
+        # - the resource global_id should not exist already, or the upload will
         #   fail
-        # - data in the proxi/producer node + metadata both on producer node 
+        # - data in the proxi/producer node + metadata both on producer node
         #   AND on RUDI catalog node
       requestBody:
         content:
@@ -244,45 +213,21 @@ paths:
       responses:
         '202':
           description: The creation of the resource has been initiated.
-        '400':
-          $ref: "#/components/responses/Error400BadRequest"
-        '401':
-          $ref: "#/components/responses/Error401Unauthorized"
-        '403':
-          $ref: "#/components/responses/Error403Forbidden"
-        '404':
-          $ref: "#/components/responses/Error404NotFound"   
-        '405':
-          $ref: "#/components/responses/Error405MethodNotAllowed"   
-        '406':
-          $ref: "#/components/responses/Error406NotAcceptable"   
-        '408':
-          $ref: "#/components/responses/Error408RequestTimeout"   
-        '410':
-          $ref: "#/components/responses/Error410Gone"   
-        '423':
-          $ref: "#/components/responses/Error423Locked"   
-        '429':
-          $ref: "#/components/responses/Error429TooManyRequests"   
-        '500':
-          $ref: "#/components/responses/Error500InternalServerError"            
-        '503':
-          $ref: "#/components/responses/Error503ServiceUnavailable"            
-          
-  #=============================================================================          
+        
+  #=============================================================================
   #'/resources':
     'put':
       tags:
       - Update
-      description: 
+      description:
         Update data and metadata on the Proxi/Producer node for one identified
         resource
       operationId: updateResource
         # NOTES:
-        # - the request implies global_id is present in the body, so 
+        # - the request implies global_id is present in the body, so
         #   '/resources/{global_id}' is redundant
         # - the resource global_id should exist already, or the upload will fail
-        # - data in the proxi/producer node + metadata both on producer node 
+        # - data in the proxi/producer node + metadata both on producer node
         #   AND on RUDI catalog node
       requestBody:
         content:
@@ -292,37 +237,13 @@ paths:
       responses:
         '202':
           description: The update of the resources has been initiated
-        '400':
-          $ref: "#/components/responses/Error400BadRequest"
-        '401':
-          $ref: "#/components/responses/Error401Unauthorized"
-        '403':
-          $ref: "#/components/responses/Error403Forbidden"
-        '404':
-          $ref: "#/components/responses/Error404NotFound"   
-        '405':
-          $ref: "#/components/responses/Error405MethodNotAllowed"   
-        '406':
-          $ref: "#/components/responses/Error406NotAcceptable"   
-        '408':
-          $ref: "#/components/responses/Error408RequestTimeout"   
-        '410':
-          $ref: "#/components/responses/Error410Gone"   
-        '423':
-          $ref: "#/components/responses/Error423Locked"   
-        '429':
-          $ref: "#/components/responses/Error429TooManyRequests"   
-        '500':
-          $ref: "#/components/responses/Error500InternalServerError"            
-        '503':
-          $ref: "#/components/responses/Error503ServiceUnavailable"            
-          
-  #=============================================================================          
+        
+  #=============================================================================
   '/resources/deletion':
     'post':
       tags:
       - Delete
-      description: 
+      description:
         Delete data on the Proxi/Producer node for several identified resources
         #TODO: and metadata? After e.g. a year?
       operationId: deleteResources
@@ -331,38 +252,14 @@ paths:
           application/json:
             schema:
               type: array
-              items: 
+              items:
                 $ref: "#/components/schemas/RudiID"
       responses:
         '202':
           description: The deletion of the resources has been initiated.
-        '400':
-          $ref: "#/components/responses/Error400BadRequest"
-        '401':
-          $ref: "#/components/responses/Error401Unauthorized"
-        '403':
-          $ref: "#/components/responses/Error403Forbidden"
-        '404':
-          $ref: "#/components/responses/Error404NotFound"   
-        '405':
-          $ref: "#/components/responses/Error405MethodNotAllowed"   
-        '406':
-          $ref: "#/components/responses/Error406NotAcceptable"   
-        '408':
-          $ref: "#/components/responses/Error408RequestTimeout"   
-        '410':
-          $ref: "#/components/responses/Error410Gone"   
-        '423':
-          $ref: "#/components/responses/Error423Locked"   
-        '429':
-          $ref: "#/components/responses/Error429TooManyRequests"   
-        '500':
-          $ref: "#/components/responses/Error500InternalServerError"            
-        '503':
-          $ref: "#/components/responses/Error503ServiceUnavailable"            
-
-  #=============================================================================          
-  '/resources/report/{global_id}':
+        
+  #=============================================================================
+  '/resources/{global_id}/report':
     parameters:
     - name: 'global_id'
       description: Unique id of the resource
@@ -374,7 +271,7 @@ paths:
       tags:
       - Report
       description: >
-        Action called when receiving an ockowledgement for an integration 
+        Action called when receiving an ockowledgement for an integration
         operation from the Portal
       operationId: addIntegrationReport
       #TODO maybe such operation should stay private
@@ -389,7 +286,7 @@ paths:
     'put':
       tags:
       - Report
-      description: 
+      description:
         Report from the Portal on the result of a previous operation request
       operationId: updateIntegrationReport
       requestBody:
@@ -400,31 +297,7 @@ paths:
       responses:
         '202':
           description: The report has been received.
-        '400':
-          $ref: "#/components/responses/Error400BadRequest"
-        '401':
-          $ref: "#/components/responses/Error401Unauthorized"
-        '403':
-          $ref: "#/components/responses/Error403Forbidden"
-        '404':
-          $ref: "#/components/responses/Error404NotFound"   
-        '406':
-          $ref: "#/components/responses/Error406NotAcceptable"   
-        '408':
-          $ref: "#/components/responses/Error408RequestTimeout"   
-        '410':
-          $ref: "#/components/responses/Error410Gone"   
-        '423':
-          $ref: "#/components/responses/Error423Locked"   
-        '429':
-          $ref: "#/components/responses/Error429TooManyRequests"   
-        '500':
-          $ref: "#/components/responses/Error500InternalServerError"            
-        '503':
-          $ref: "#/components/responses/Error503ServiceUnavailable"           
-
-
-#•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+        #•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
 components:
 
   #=============================================================================
@@ -434,9 +307,9 @@ components:
       description: >
         This API uses OAuth 2 with the implicit grant flow.
         #[More info](https://api.example.com/docs/auth)
-        
+
       flows:
-        implicit: 
+        implicit:
         # <---- OAuth flow(authorizationCode, implicit, password or clientCredentials)
           authorizationUrl: https://api.example.com/oauth2/authorize
           scopes:
@@ -476,7 +349,7 @@ components:
             $ref: 'https://raw.githubusercontent.com/zit0un/HttpErrorsOAS3/main/schemas/HttpError404_NotFound.yaml'
     #---------------------------------------------------------------------------
     'Error405MethodNotAllowed':
-      description: 
+      description:
         Request method is not supported for the requested resource.
       content:
         application/json:
@@ -484,7 +357,7 @@ components:
             $ref: 'https://raw.githubusercontent.com/zit0un/HttpErrorsOAS3/main/schemas/HttpError405_MethodNotAllowed.yaml'
     #---------------------------------------------------------------------------
     'Error406NotAcceptable':
-      description: 
+      description:
         Headers sent in the request are not compatible with the service.
       content:
         application/json:
@@ -493,8 +366,8 @@ components:
     #---------------------------------------------------------------------------
     'Error408RequestTimeout':
       description: >
-        The client did not produce a request within the time that the server was 
-        prepared to wait. The client may repeat the request without 
+        The client did not produce a request within the time that the server was
+        prepared to wait. The client may repeat the request without
         modifications at any later time.
       content:
         application/json:
@@ -503,7 +376,7 @@ components:
     #---------------------------------------------------------------------------
     'Error410Gone':
       description: >
-        The requested resource is no longer available and will not be available 
+        The requested resource is no longer available and will not be available
         again. The resource should be purged from the client system.
       content:
         application/json:
@@ -518,8 +391,7 @@ components:
             $ref: 'https://raw.githubusercontent.com/zit0un/HttpErrorsOAS3/main/schemas/HttpError423_Locked.yaml'
     #---------------------------------------------------------------------------
     'Error429TooManyRequests':
-      description: 
-        The user has sent too many requests in a short period.
+      description: The user has sent too many requests in a short period.
       content:
         application/json:
           schema:
@@ -552,7 +424,7 @@ components:
           type: integer
         'error_message':
           type: string
-        'field_name': 
+        'field_name':
           type: string
 
     #---------------------------------------------------------------------------
@@ -561,15 +433,15 @@ components:
       - report_id
       - global_id
       properties:
-        'report_id': 
+        'report_id':
           allOf:
           - $ref: '#/components/schemas/UUIDv4'
           - type: string
-            description: 
+            description:
               Unique identifier of the integration report
         'global_id':
           $ref: '#/components/schemas/RudiID'
-        'resource_title': 
+        'resource_title':
           type: string
           description: Simple name of the resource
         'submission_date':
@@ -577,41 +449,42 @@ components:
           - $ref: '#/components/schemas/Date'
           - type: string
             description: >
-              Date when the integration request was submitted by the 
+              Date when the integration request was submitted by the
               Producer
         'treatment_date':
           allOf:
           - $ref: '#/components/schemas/Date'
           - type: string
-            description: 
+            description:
               Date when the integration request was processed by the Portal
-        'method' : 
-          description: 
+        'method' :
+          description:
             Method used for the integration request by the Producer
           type: string
           enum: [ POST, PUT, DELETE ]
-        'version' : 
-          type: integer
-          description: 
+        'version' :
+          description:
             Version number of the integration contract used for the file
+          type: integer
+          minimum: 0            
         'integration_status':
-          description: 
+          description:
             State of the integration of the resource in the Portal
           type: string
           enum: [ OK, KO ]
         'comment':
-          description: > 
-            Comment on the state of the integration of the resource in the 
+          description: >
+            Comment on the state of the integration of the resource in the
             Portal
           type: string
         'errors':
           description: >
-            List of all the errors that were encounntered during the 
+            List of all the errors that were encounntered during the
             integration of the resource.
           type: array
           items:
             $ref: '#/components/schemas/IntegrationError'
-            
+
     #---------------------------------------------------------------------------
     'RudiID':
       description:
@@ -619,43 +492,41 @@ components:
       type: string
       oneOf:
       -  $ref: '#/components/schemas/UUIDv4'
-        
+
     #---------------------------------------------------------------------------
     'UUIDv4':
-      description: 
+      description:
         Universally unique identifier v4 format
       type: string
-      pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i'
+      pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
 
     #---------------------------------------------------------------------------
     'DOI':
-      description: 
+      description:
         Digital object identifier (modern Crossref DOIs version)
       type: string
-      pattern: '^10.\d{4,9}/[-.;()/:\w]+$/i'
+      pattern: '^10.\d{4,9}/[-.;()/:\w]+$'
       # \d : digit character == [0-9]
       # \w : word character == [0-9a-zA-Z_]
       # /i (at the end) : expression is case insensitive
       #source: https://www.crossref.org/blog/dois-and-matching-regular-expressions/
       #alternative: https://github.com/regexhq/doi-regex/blob/master/index.js
-      
+
     #---------------------------------------------------------------------------
     'MetadataList':
       type: array
       items:
         $ref: '#/components/schemas/Metadata'
-          
+
     #---------------------------------------------------------------------------
     'Metadata':
-      #TODO (suggestion): identify what relies on the variant of data, and put it
-      #                   on the variant level (e.g. size, checksum)
       type: object
       required:
       - global_id
       - resource_title
       - summary
       - theme
-      - producer_name
+      - producer
       - contact
       - format
       - dataset_size
@@ -664,37 +535,37 @@ components:
       - connector
       - available_format
       - transmission_mode
-      
+
       properties:
         #—•—•—•—•—•—•—•—•—•—•—•—•—•
         # IDENTIFICATION
         #——————————————————————————
         'global_id':
           $ref: '#/components/schemas/RudiID'
-          
+
         #——————————————————————————
         'local_id':
           description: Identifier in the data producer system
           type: string
-          #TODO: Do we restrain this to a certain pattern, avoiding spaces and 
+          #TODO: Do we restrain this to a certain pattern, avoiding spaces and
           #      unusal characters?
-          example: 
+          example:
             "2020.11-Laennec-AQMO-air quality sensors measures"
-          
+
         #——————————————————————————
         'doi':
           $ref: '#/components/schemas/DOI'
-          
+
         #—•—•—•—•—•—•—•—•—•—•—•—•—•
         # DESCRIPTION
         #——————————————————————————
         'resource_title':
           description: Simple name for the resource
           type: string
-          example: 
+          example:
             "Données de capteurs de la qualité de l'air, novembre 2020, Laënnec"
-        # !DICO!  
-        
+        # !DICO!
+
         #——————————————————————————
         'summary':
           description: More precise description for the whole dataset
@@ -702,40 +573,42 @@ components:
           items:
             $ref: '#/components/schemas/DictionaryEntry'
           minimum: 1
-        # !DICO! 
-        
+        # !DICO!
+
         #——————————————————————————
         'purpose':
           description: Context, objectives and final use of the data
+          type: array
           items:
             $ref: '#/components/schemas/DictionaryEntry'
-        
+
         #——————————————————————————
         'resource_language':
           description: Language used in the dataset, if relevant
-          $ref: '#/components/schemas/Language'
-        # !SKOS! 
-        
+          oneOf:
+          - $ref: '#/components/schemas/Language'
+        # !SKOS!
+
         #—•—•—•—•—•—•—•—•—•—•—•—•—•
         # CLASSIFICATION
         #——————————————————————————
         'theme':
           $ref: '#/components/schemas/Theme'
-        # !SKOS! 
-        
+        # !SKOS!
+
         #——————————————————————————
         'sub_theme':
           $ref: '#/components/schemas/SubTheme'
-        # !SKOS! 
-          
+        # !SKOS!
+
         #——————————————————————————
         'keyword':
           description: List of tags that can be used to retrieve the data
           type: array
           items:
             $ref: '#/components/schemas/Keyword'
-        # !SKOS! 
-          
+        # !SKOS!
+
         #—•—•—•—•—•—•—•—•—•—•—•—•—•
         # SPACE & TIME
         #——————————————————————————
@@ -743,13 +616,15 @@ components:
           description: Period of time described by the data
           type: array
           items:
-            oneOf: 
+            oneOf:
             - $ref: '#/components/schemas/Date'
             - $ref: '#/components/schemas/PosixTimeSeconds'
-            - $ref: '#/components/schemas/PosixTimeMs'
+            - $ref: '#/components/schemas/PosixTimeMilli'
+            - $ref: '#/components/schemas/PosixTimeMicro'
+            - $ref: '#/components/schemas/PosixTimeNano'
           minItems: 2
           maxItems: 2
-          
+
         #——————————————————————————
         'bounding_box':
           allOf:
@@ -764,7 +639,7 @@ components:
         #——————————————————————————
         'scale':
           description: >
-            Spatial resolution, i.e. geographic or geometric precision 
+            Spatial resolution, i.e. geographic or geometric precision
             used to describe the resource
           oneOf:
           - $ref: '#/components/schemas/MapScale'
@@ -774,60 +649,77 @@ components:
         'projection':
           description: Cartographic projection used to describe the data
           type: string
-          example: 
+          example:
             'RGF93/Lambert-93 (EPSG:2154)'
             # 'RGF93/CC48 (EPSG:3948)'
           #TODO: 'Projection' thesaurus
-          
+
         #——————————————————————————
         'spatial_representation':
           description: Data topology
           type: string
           example: 'Points' # 'Lines', 'Polygons'
-        # !DICO! 
-        
+        # !DICO!
+
         #—•—•—•—•—•—•—•—•—•—•—•—•—•
         # ACCESS CONSTRAINTS
         #——————————————————————————
-        'use_citation':
-          description: Information that MUST be cited every time the data is used
-          type: object
-          #TODO: to be defined
-          #TODO: possible redundency with 'access_condition/mandatory_mention'
-        # !DICO! 
-        
+
         #——————————————————————————
         'consent':
           description: >
-            Information that describes the level of confidentiality required to 
-            access or use the data. This is a reference to the conset folder, that can 
+            Information that describes the level of confidentiality required to
+            access or use the data. This is a reference to the consent folder, that can
           type: string
           #TODO: to be defined
-        
+
         #——————————————————————————
         'access_condition':
           description: >
-            Access restrictions for the use of data in the form of license, 
-            confidentiality, terms of service, habilitation or required rights, 
+            Access restrictions for the use of data in the form of license,
+            confidentiality, terms of service, habilitation or required rights,
             economical model. Default is open license.
             #TODO: to be defined. Possible redundencies with other fields!
           type: object
           properties:
-            'mandatory_mention': 
-              description: >
-                Mention that must be cited verbatim in every publication that 
-                makes use of the data
-              type: string
-            'licence_label':
-              type: string
-            'licence_url':
-              type: string
+            'bibliographical_reference':
+              description: Information that MUST be cited every time the data is used
+              #TODO: to be defined
+              #TODO: possible redundency with 'access_condition/mandatory_mention'
+            # !DICO!
+            'licence':
+              type: object
+              properties: 
+                'licence_label':
+                  $ref: '#/components/schemas/SkosEntry'
+                'licence_custom':
+                  type: string
+                'licence_uri': 
+                  type: string
+                  format: URI
             'usage_constraint':
-              type: string
+              type: array
+              items:
+                $ref: '#/components/schemas/DictionaryEntry'
+              example: 
+                {"fr_FR": "Usage libre sous réserve des mentions obligatoires sur tout document de diffusion"}
+            'mandatory_mention':
+              description: >
+                Mention that must be cited verbatim in every publication that
+                makes use of the data
+              type: array
+              items:
+                $ref: '#/components/schemas/DictionaryEntry'
+              example: 
+                {"fr_FR": "Source: Région Bretagne"}
             'access_constraint':
-              type: string
+              type: array
+              items:
+                $ref: '#/components/schemas/DictionaryEntry'
             'other_constraints':
-              type: string              
+              type: array
+              items:
+                $ref: '#/components/schemas/DictionaryEntry'
           example:
             {
               mandatory_mention: 'Source : Région Bretagne',
@@ -844,7 +736,7 @@ components:
         'producer':
           description: Entity that produced the data
           type: object
-          required: 
+          required:
             - organization_name
           properties:
             'organization_name':
@@ -870,14 +762,14 @@ components:
               description: Updated status of the contact person
               type: string
               example: Administrator
-            'email': 
+            'email':
               description: >
                 E-mail address, possibly not nominative to be less dependent
                 on changes in the organization, and comply more easily with RGPD rules
               type: string
               format: email
               #TODO: RGPD compliant!
-              
+
         #——————————————————————————
         'sensor':
           allOf:
@@ -886,37 +778,37 @@ components:
           - $ref: 'https://github.com/mariotoffia/OpenAPI-SenML/blob/master/spec/protocol/senml/senml-entry.yaml'
           #'RFC 8428 / SenML - https://tools.ietf.org/html/rfc8428'
           #TODO: see OpenAPI implementation 'https://github.com/mariotoffia/OpenAPI-SenML'
-              
+
         #—•—•—•—•—•—•—•—•—•—•—•—•—•
         # STORAGE
         #——————————————————————————
         'schema':
           description: >
-            Link towards the resource that describes the structure of the data 
+            Link towards the resource that describes the structure of the data
             (language, norm, data structure, JSON schema, OpenAPI, etc.)
           type: string
           format: URI
           #'URI - https://tools.ietf.org/html/rfc2396'
-    
+
         #——————————————————————————
         'format':
           $ref: '#/components/schemas/FileFormat'
-    
+
         #——————————————————————————
         'encoding':
           description: Source encoding of the data
           type: string
-          #format: 
+          #format:
           #ISO/CEI 10646'
           #TODO: thesaurus for encoding
-     
+
         #——————————————————————————
         'available_format':
           description: Available formats
           type: array
           items:
             $ref: '#/components/schemas/FileFormat'
-     
+
         #——————————————————————————
         'dataset_size':
           description: Indicative size of the data
@@ -926,58 +818,68 @@ components:
           - size
           - unit
           properties:
-            'size': 
+            'size':
               type: number
+              minimum: 0
               #TODO: on the specifications, we said 'integer', but isn't decimal number more appropriate?
-            'unit': 
+            'unit':
               $ref: '#/components/schemas/FileSizeUnit'
-            'numbers_of_records':
+            'numbers_of_records':            
               type: integer
+              minimum: 0
             'number_of_fields':
               type: integer
-        
+              minimum: 0
+
         #——————————————————————————
         'reference_date':
           type: object
-          required: 
-          - created
-          - published
+          required:
+          - data
+          - metadata
           properties:
-            'created': 
-              $ref: '#/components/schemas/Date'
-            'published':
-              $ref: '#/components/schemas/Date'
-            'updated':
-              $ref: '#/components/schemas/Date'
-        
+            'data':
+              $ref: '#/components/schemas/ReferenceDates'
+            'metadata':
+              $ref: '#/components/schemas/ReferenceDates'
+
         #——————————————————————————
-        'variant':
+        'dependencies':
           description: >
-            Variant that can be found for this dataset (original brute data, 
+            Variant that can be found for this dataset (original brute data,
             anonymized version, synthetic or statistic version)
             The rule 1 file <=> 1 metadata structure must stay respected.
           type: object
-          #TODO: to be defined more precisely. 
-        
+          properties:
+            parents:
+              type: array
+              items: 
+                $ref: '#/components/schemas/RudiID'
+            children: 
+              type: array
+              items: 
+                $ref: '#/components/schemas/RudiID'
+          #TODO: to be defined more precisely.
+
         #——————————————————————————
         'anonymization':
           description: Method to anonymize data
           type: string
           format: URI
-          
+
         #——————————————————————————
         'update_status':
           description: >-
             Storage state of the data
-            - 'modified'    = the data is in the process of being created but 
+            - 'modified'    = the data is in the process of being created but
                               still incomplete
             - 'updated'     = the data is up to date
             - 'historical'  = ancient data that has been updated
-            - 'obsolete'    = dataset that is too old but cannot be updated or 
+            - 'obsolete'    = dataset that is too old but cannot be updated or
                             replaced with another
           type: string
           enum: [modified, updated, historical, obsolete]
-        # !SKOS! 
+        # !SKOS!
 
         #——————————————————————————
         'storage_status':
@@ -989,30 +891,30 @@ components:
             - unavailable = data were deleted
           type: string
           enum: [online, archived, unavailable]
-        # !SKOS! 
+        # !SKOS!
 
         #——————————————————————————
         'data_genealogy':
           description: >
             Most complete information to estimate the quality of the sources and
             the interoperability of the data.
-            This is not the place to describe all the treatments used to create 
+            This is not the place to describe all the treatments used to create
             or update the resource.
           type: string
           #TODO: introduce examples
-          
+
         #——————————————————————————
         'conformance':
           description: Data specifications that apply to the resource
           type: string
           format: URI
-          
+
         #—•—•—•—•—•—•—•—•—•—•—•—•—•
         # TRANSMISSION
         #——————————————————————————
         'connector':
           description: >
-            Direct access to the whole dataset. 
+            Direct access to the whole dataset.
             In the case of open data without access restriction, this can be e.g. a URI.
           type: object
           #TODO: to be defined more precisely!
@@ -1028,26 +930,28 @@ components:
               $ref: '#/components/schemas/HashAlgorithm'
             'hash':
               type: string
-          
+
         #——————————————————————————
-        'transmission_mode':      
+        'transmission_mode':
           description: Describes if the resource is accessible as a file or a stream
           type: string
           enum: [file, stream]
-        
+
         #——————————————————————————
         'latence':
           description: >
             Theorical delay between the production of the record and its availability,
             in milliseconds. Applies to temporal series of data.
           type: integer
-        
+          minimum: 0
+
         #——————————————————————————
         'period':
           description: >
             Theorical delay between the production of two records, in milliseconds.
             Applies to temporal series of data.
           type: integer
+          minimum: 0
 
     #---------------------------------------------------------------------------
     'FileFormat':
@@ -1058,31 +962,31 @@ components:
       #TODO: is this relevant for streams?
 
     #---------------------------------------------------------------------------
-    'FileSizeUnit':    
+    'FileSizeUnit':
       type: string
       enum: [Ko, Mo, To]
-    # !SKOS! 
-    
+    # !SKOS!
+
     #---------------------------------------------------------------------------
     'HashAlgorithm':
       description: Method for computing the integrity hash of the data
       type: string
       enum: ['MD5', 'SHA-256', 'SHA-512']
       #TODO: define the thesaurus for the hash algorithms
-    
+
     #---------------------------------------------------------------------------
     'Theme':
       description: Category for thematic classification of the data
       type: string
       # TODO: "Theme" thesaurus
-      # !SKOS! 
+      # !SKOS!
 
     #---------------------------------------------------------------------------
     'SubTheme':
       description: Sub-category for thematic classification of the data
       type: string
       # TODO: "Sub-theme" thesaurus
-      # !SKOS! 
+      # !SKOS!
 
     #---------------------------------------------------------------------------
     'Keyword':
@@ -1091,15 +995,30 @@ components:
       items:
         type: string
       # TODO: "Tags" thesaurus
-      # !SKOS! 
+      # !SKOS!
 
     #---------------------------------------------------------------------------
     'Date':
       description: 'Date in the ISO 8601 format'
       type: string
-      format: date
-      #TODO: timezone? millisec? nanosec?
-      
+      format: date-time
+      #TODO: timezone + nanosec?
+
+    #---------------------------------------------------------------------------
+    'ReferenceDates':
+      description: 'Dates of the actions on the file'
+      type: object
+      required:
+      - created
+      - published
+      properties:
+        'created':
+          $ref: '#/components/schemas/Date'
+        'published':
+          $ref: '#/components/schemas/Date'
+        'updated':
+          $ref: '#/components/schemas/Date'
+
     #---------------------------------------------------------------------------
     'PosixTimeSeconds':
       description: EPOCH time in seconds
@@ -1107,10 +1026,22 @@ components:
       pattern: '^[0-9]{10}$'
 
     #---------------------------------------------------------------------------
-    'PosixTimeMs':
+    'PosixTimeMilli':
       description: EPOCH time in milliseconds
       type: integer
       pattern: '^[0-9]{13}$'
+
+    #---------------------------------------------------------------------------
+    'PosixTimeMicro':
+      description: EPOCH time in milcroseconds
+      type: integer
+      pattern: '^[0-9]{16}$'
+
+    #---------------------------------------------------------------------------
+    'PosixTimeNano':
+      description: EPOCH time in nanoseconds
+      type: integer
+      pattern: '^[0-9]{19}$'
 
     #---------------------------------------------------------------------------
     'MapScale':
@@ -1123,12 +1054,39 @@ components:
       description: Smallest distance associated to the data
       type: object
       properties:
-        'distance': 
+        'distance':
           type: integer
         'unit':
           type: string
           enum: [mm, m, km]
-          #TODO: 'Resolution' thesaurus 
+          #TODO: 'Resolution' thesaurus
+
+
+    #---------------------------------------------------------------------------
+    'SkosEntry':
+      type: object
+      required:
+      - skos_value
+      - skos_uri
+      properties:
+        'skos_value':
+          description: 
+            Term used in RUDI system (eg in metadata files), most likely english one
+          type: string
+        'skos_uri':
+          description: 
+            URI of the thesaurus that hosts the traduction of this term
+          type: string
+          format: URI
+        'skos_context':
+          description:  
+            Meaning, explaination of the context of use of this entry
+          type: string
+      example:
+        {
+          value: 'transport',
+          skos_uri: 'https://publications.europa.eu/resource/authority/eurovoc/100237'
+        }
 
     #---------------------------------------------------------------------------
     'DictionaryEntry':
@@ -1143,30 +1101,30 @@ components:
           $ref: '#/components/schemas/Language'
         'text':
           #TODO: possibly set limitations (size, characters allowed, HTML-ready or not)
-          type: string    
+          type: string
       example:
         {
           lang: 'fr_FR',
           text: "Données de capteurs de la qualité de l'air, nov. 2020, Laënnec, Rennes, France"
         }
-      
+
     #---------------------------------------------------------------------------
     'Language':
       description: >
-        Lowercase ISO-639 language code followed by the 
-        uppercase 2 letter ISO 3166-1 alpha-2 country code, 
+        Lowercase ISO-639 language code followed by the
+        uppercase 2 letter ISO 3166-1 alpha-2 country code,
         both joined by an underscore
       type: string
-      pattern: '^[a-z]{2}_[A-Z]{2}$' 
-      enum: [cs_CZ, da_DK, de_CH, de_DE, en_GB, en_US, el_GR, es_ES, fr_FR, 
+      pattern: '^[a-z]{2}_[A-Z]{2}$'
+      enum: [cs_CZ, da_DK, de_CH, de_DE, en_GB, en_US, el_GR, es_ES, fr_FR,
         hu_HU, it_IT, no_NO, pl_PL, pt_PT, ro_RO, ru_RU, sk_SK]
       # TODO: thesaurus of language (ISO-639) and country codes (ISO-3166) couples
       #url: 'https://app.swaggerhub.com/apis/nologo/thesaurus/1.0.0#/default/get_thesaurus_v1'
-      
-      # !SKOS! 
-  
 
-#TODO : thesaurus : tableau de valeurs simples ou couples {label: "Texte à 
+      # !SKOS!
+
+
+#TODO : thesaurus : tableau de valeurs simples ou couples {label: "Texte à
 #       afficher pour l'utilisateur", "valeur": "ValeurAssociee"}
 
 #•••••••••••••••••••••••••••••••••••[ EOF ]••••••••••••••••••••••••••••••••••••#
