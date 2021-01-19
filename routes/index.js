@@ -2,7 +2,7 @@
 const metadataController = require('../controllers/metadataController')
 
 // Import Swagger documentation
-const documentation = require('./documentation/metadata-api')
+const documentation = require('./documentation/metadataApi')
 
 const urlPrefix = "/api/v1/"
 const urlMetadata = `${urlPrefix}resources`
