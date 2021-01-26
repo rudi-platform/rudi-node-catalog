@@ -7,7 +7,7 @@ const regexDOI = /^10.\d{4,9}\/[-.;()\/:\w]+$/i;
   // source: https://www.crossref.org/blog/dois-and-matching-regular-expressions/
   // alternative: https://github.com/regexhq/doi-regex/blob/master/index.js
 
-
+const regexURI = /(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/;
 
 function validateSchema(schemaStr, regExPattern) {
   const regExp = new RegExp(regExPattern)
@@ -26,11 +26,13 @@ function isRudiID(idStr) {
   return isUUIDv4(idStr) // || isDOI(idStr)
 }
 
-module.exports.isUUIDv4 = isUUIDv4
-module.exports.isDOI = isDOI
-module.exports.isRudiID = isRudiID
+function isURI(uriStr) {
+  return schemaStr.match(new RegExp(regexURI))
+}
+
 module.exports = {
   validateSchema,
   isDOI, 
-  isRudiID
+  isRudiID,
+  isURI
 }

@@ -19,7 +19,7 @@
 #   - renamed 'storage_state' -> 'update_status'
 
 # [1.0.3]
-#   - 'Metadata' -> 'Metadata'
+#   - renamed 'ResourceInfo' -> 'Metadata'
 #   - RudiID = UUIDv4 only
 #   - added DOI field
 #   - added 'SkosEntry' definition
@@ -30,6 +30,8 @@
 #     'access_constraint' fields are now of type 'DictionaryEntry'
 #   - 'mandatory_mention' is now a property of 'access_condition' field
 #   - 'license' property added to 'access_condition' field
+#   - renamed 'schema' -> 'structure'
+#   - renamed 'latence' -> 'latency'
 
 
 #•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
@@ -660,6 +662,7 @@ components:
           type: string
           example: 'Points' # 'Lines', 'Polygons'
         # !DICO!
+        # Thesaurus ?
 
         #—•—•—•—•—•—•—•—•—•—•—•—•—•
         # ACCESS CONSTRAINTS
@@ -676,9 +679,9 @@ components:
         #——————————————————————————
         'access_condition':
           description: >
-            Access restrictions for the use of data in the form of license,
+            Access restrictions for the use of data in the form of licence,
             confidentiality, terms of service, habilitation or required rights,
-            economical model. Default is open license.
+            economical model. Default is open licence.
             #TODO: to be defined. Possible redundencies with other fields!
           type: object
           properties:
@@ -778,11 +781,12 @@ components:
           - $ref: 'https://github.com/mariotoffia/OpenAPI-SenML/blob/master/spec/protocol/senml/senml-entry.yaml'
           #'RFC 8428 / SenML - https://tools.ietf.org/html/rfc8428'
           #TODO: see OpenAPI implementation 'https://github.com/mariotoffia/OpenAPI-SenML'
-
+          # https://www.iana.org/assignments/senml/senml.xml#senml-units
+          
         #—•—•—•—•—•—•—•—•—•—•—•—•—•
         # STORAGE
         #——————————————————————————
-        'schema':
+        'structure':
           description: >
             Link towards the resource that describes the structure of the data
             (language, norm, data structure, JSON schema, OpenAPI, etc.)
@@ -846,31 +850,47 @@ components:
         #——————————————————————————
         'dependencies':
           description: >
-            Variant that can be found for this dataset (original brute data,
-            anonymized version, synthetic or statistic version)
-            The rule 1 file <=> 1 metadata structure must stay respected.
+            Dependecies are other resources that were used as sources for the 
+            present resource (such ones are listed as parents) or that use
+            the present resource as source (these are listed as children)
           type: object
           properties:
-            parents:
+            'parents':
+              description:
+                Resources that were used as sources by the present resource
               type: array
               items: 
                 $ref: '#/components/schemas/RudiID'
-            children: 
+            'children': 
+              description:
+                Resources that use the present resource as a source
               type: array
               items: 
                 $ref: '#/components/schemas/RudiID'
-          #TODO: to be defined more precisely.
+          #TODO: unite with data_genealogy that would explain 
+          #      how the sources were used
+
+        #——————————————————————————
+        'data_genealogy':
+          description: >
+            Most complete information to estimate the quality of the sources and
+            the interoperability of the data.
+            This is not the place to describe all the treatments used to create
+            or update the resource.
+          type: string
+          #TODO: introduce examples
 
         #——————————————————————————
         'anonymization':
           description: Method to anonymize data
           type: string
           format: URI
+          # !SKOS! ?
 
         #——————————————————————————
         'update_status':
           description: >-
-            Storage state of the data
+            Relevance status of the data
             - 'modified'    = the data is in the process of being created but
                               still incomplete
             - 'updated'     = the data is up to date
@@ -894,20 +914,11 @@ components:
         # !SKOS!
 
         #——————————————————————————
-        'data_genealogy':
-          description: >
-            Most complete information to estimate the quality of the sources and
-            the interoperability of the data.
-            This is not the place to describe all the treatments used to create
-            or update the resource.
-          type: string
-          #TODO: introduce examples
-
-        #——————————————————————————
         'conformance':
           description: Data specifications that apply to the resource
           type: string
           format: URI
+        # !SKOS! ?
 
         #—•—•—•—•—•—•—•—•—•—•—•—•—•
         # TRANSMISSION
@@ -918,8 +929,10 @@ components:
             In the case of open data without access restriction, this can be e.g. a URI.
           type: object
           #TODO: to be defined more precisely!
+          # besoin : afficher les données dans un tableau
 
         #——————————————————————————
+        # Makes it possible to check data integrity
         'checksum':
           type: object
           required:
@@ -938,7 +951,7 @@ components:
           enum: [file, stream]
 
         #——————————————————————————
-        'latence':
+        'latency':
           description: >
             Theorical delay between the production of the record and its availability,
             in milliseconds. Applies to temporal series of data.

@@ -1,6 +1,8 @@
 //———————————————————————————————————————————————————————————————
 // LIBRARIES 
 //———————————————————————————————————————————————————————————————
+const log = require('./utils/logging')
+const fName = 'main'
 
 // Require the fastify framework and instantiate it
 const fastify = require('fastify')({
@@ -17,6 +19,10 @@ const swagger = require('./config/swagger')
 // Register Swagger
 fastify.register(require('fastify-swagger'), swagger.options)
 
+//———————————————————————————————————————————————————————————————
+// Setting flags to avoid deprecation warnings
+//———————————————————————————————————————————————————————————————
+mongoose.set('useFindAndModify', false);
 
 //———————————————————————————————————————————————————————————————
 // DB connection
@@ -32,13 +38,13 @@ const dbUrl = "rudi.kzlag.mongodb.net"
 const dbName = "rudi_prod" 
 const dbPort = 27017
 const url = `mongodb://127.0.0.1/${dbName}`
-const mongoConnectOptions = { useUnifiedTopology: true, useNewUrlParser: true }
+const mongoConnectOptions = { useUnifiedTopology: true, useCreateIndex: true, useNewUrlParser: true }
 
-console.log(`-- Connecting to [${url}]`)
+log.d(fName, `Connecting to [${url}]`)
 const promise = mongoose.connect(url, mongoConnectOptions)
-  .then(() => console.log('-- MongoDB connected'))
-  .catch(err => console.log(err))
-// console.log("-- connection ok")
+  .then(() => log.d(fName, 'MongoDB connected'))
+  .catch(err => log.d(fName, err))
+// log.d(fName, "connection ok")
 
 
 //———————————————————————————————————————————————————————————————
@@ -50,31 +56,29 @@ const routes = require('./routes')
 
 // Declare a default route
 fastify.get('/', async (request, reply) => {
-  console.log("-- hello")
+  log.d(fName, "hello")
   return { server: "RUDI" }
 })
 // Declare a default route
 fastify.get('/api', async (request, reply) => {
-  console.log("-- api")
+  log.d(fName, "api")
   return { API: "RUDI API" }
 })
 // Declare a default route
 fastify.get('/api/v1', async (request, reply) => {
-  console.log("-- api/v1")
+  log.d(fName, "api/v1")
   return { 'API version': "RUDI API v1" }
 })
 
 // Loop over each route  
 routes.forEach((route, index) => {
   fastify.route(route) 
-  // console.log(`-- route ${index}: ${route}`)
+  log.d(fName, `route #${index} = ${route.method} ${route.url}`)
 })
-
 
 //———————————————————————————————————————————————————————————————
 // SERVER 
 //———————————————————————————————————————————————————————————————
-
 const start = async () => {
   try {
     await fastify.listen(3000)

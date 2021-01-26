@@ -11,27 +11,27 @@ const routes = [
   {
     method: 'GET',
     url: urlMetadata,
-    handler: metadataController.getMetadata
+    handler: metadataController.getEveryMetadata
   },
   {
     method: 'GET',
-    url: `${urlMetadata}:id`,
+    url: `${urlMetadata}/:id`,
     handler: metadataController.getSingleMetadata
   },
   {
     method: 'POST',
-    url: urlMetadata,
+    url: `${urlMetadata}`,
     handler: metadataController.addMetadata,
     // schema: documentation.addMetadataSchema
   },
   {
     method: 'PUT',
-    url: `${urlMetadata}:id`,
+    url: `${urlMetadata}`,
     handler: metadataController.updateMetadata
   },
   {
     method: 'DELETE',
-    url: `${urlMetadata}:id`,
+    url: `${urlMetadata}/:id`,
     handler: metadataController.deleteMetadata
   }
 ]

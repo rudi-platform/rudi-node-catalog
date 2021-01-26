@@ -1,8 +1,8 @@
 // External Dependancies
 const mongoose = require('mongoose')
 
-const Dico = require('./DictionaryEntry')
-const Validation = require('./schemaValidators')
+const Dico = require('./dictionary-entry').DictionaryEntry
+const Validation = require('./schema-validators')
 
 
 const metadataSchema = new mongoose.Schema({
@@ -24,7 +24,7 @@ const metadataSchema = new mongoose.Schema({
 
   // DESCRIPTION
   resource_title: String,
-  // summary: [Dico.DictionaryEntry],
+  summary: [DictionaryEntry],
   purpose: String,
   resource_language: String,
 
