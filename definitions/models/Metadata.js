@@ -299,11 +299,9 @@ const MetadataSchema = new mongoose.Schema({
   checksum: {
     algo: {
       type: [Object.values(HashAlgorithms)],
-      required: true
     },
     hash: {
       type: String,
-      required: true
     }
   },
 
@@ -319,7 +317,7 @@ const MetadataSchema = new mongoose.Schema({
     type: Int32,
     min: 0
   },
-  
+
   // Theorical delay between the production of two records, in 
   // milliseconds. Applies to temporal series of data.
   period: {

@@ -29,11 +29,16 @@ const routes = [
     url: `${urlMetadata}`,
     handler: metadataController.updateMetadata
   },
+    {
+    method: 'DELETE',
+    url: `${urlMetadata}`,
+    handler: metadataController.deleteManyMetadata
+  },
   {
     method: 'DELETE',
     url: `${urlMetadata}/:id`,
     handler: metadataController.deleteMetadata
-  }
+  },
 ]
 
 module.exports = routes
