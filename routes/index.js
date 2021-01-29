@@ -5,7 +5,7 @@ const metadataController = require('../controllers/metadataController')
 const documentation = require('./documentation/metadataApi')
 
 const urlPrefix = "/api/v1/"
-const urlMetadata = `${urlPrefix}resources`
+const urlMetadata = `${urlPrefix}:lang/resources`
 
 const routes = [
   {

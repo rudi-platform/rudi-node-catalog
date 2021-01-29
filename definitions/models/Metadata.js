@@ -3,19 +3,20 @@
 //———————————————————————————————————————————————————————————————
 const mongoose = require('mongoose')
 
-const GeoJSON = require('mongoose-geojson-schema');
-
 const Validation = require('../schemaValidators')
 
-var Int32 = require('mongoose-int32');
 
 //———————————————————————————————————————————————————————————————
 // External schema definitions
 //———————————————————————————————————————————————————————————————
+const GeoJSON = require('mongoose-geojson-schema');
+var Int32 = require('mongoose-int32');
+
 const DictionaryEntry = require('../schemas/DictionaryEntry')
 const SkosEntry = require('../schemas/SkosEntry')
 const AccessCondition = require('../schemas/AccessCondition')
 const ReferenceDates = require('../schemas/ReferenceDates')
+const Ids = require('../schemas/Identifiers')
 
 
 //———————————————————————————————————————————————————————————————
@@ -35,19 +36,7 @@ const HashAlgo = require('../thesaurus/HashAlgos');
 //———————————————————————————————————————————————————————————————
 // Constants
 //———————————————————————————————————————————————————————————————
-const RudiID = {
-  type: String,
-  trim: true,
-  required: true,
-  unique: true,
-  dropDups: true,
-  // index: true,
-  lowercase: true,
-  validate: {
-    validator: Validation.isRudiID,
-    message: '{VALUE} does not appear to be a valid RUDI ID (UUID v4)'
-  }
-}
+
 
 const FileFormats = {
   json: 'json',
@@ -85,8 +74,13 @@ const TransmissionModes = {
 // Custom schema definitions
 //———————————————————————————————————————————————————————————————
 const MetadataSchema = new mongoose.Schema({
+
+  //---------------------------
+  // Resource identifiers
+  //---------------------------
+
   // Unique and permanent identifier for the ressource in RUDI system (required)
-  global_id: RudiID,
+  global_id: Ids.RudiID,
 
   // Identifier for the ressource in the producer system (optional)
   local_id: {
@@ -96,25 +90,25 @@ const MetadataSchema = new mongoose.Schema({
   },
 
   // Digital Object Identifier for the ressource (optional)
-  doi: {
-    type: String,
-    trim: true,
-    unique: true,
-    lowercase: true,
-    validate: {
-      validator: Validation.isDOI,
-      message: '{VALUE} does not appear to be a valid DOI'
-    }
-  },
+  doi: Ids.DOI,
+
+  //---------------------------
+  // Resource description
+  //---------------------------
 
   // Simple name for the resource
-  resource_title: String,
+  resource_title: {
+    type: String,
+    maxlength: 50
+  },
 
   // More precise description for the whole dataset
   summary: [DictionaryEntry],
 
   // Context, objectives and final use of the data
-  purpose: String,
+  purpose: {
+    type: String
+  },
 
   // Language used in the dataset, if relevant
   resource_language: {
@@ -122,6 +116,10 @@ const MetadataSchema = new mongoose.Schema({
     default: Language.fr_FR,
     enum: Object.values(Language)
   },
+
+  //---------------------------
+  // Resource classification
+  //---------------------------
 
   // Category for thematic classification of the data
   theme: {
@@ -247,10 +245,10 @@ const MetadataSchema = new mongoose.Schema({
   // resource as source (children) 
   dependencies: {
     // Resources that were used as sources by the present resource
-    parents: [RudiID],
+    parents: [Ids.RudiID],
 
     // Resources that use the present resource as a source
-    children: [RudiID]
+    children: [Ids.RudiID]
   },
 
   // Method to anonymize data

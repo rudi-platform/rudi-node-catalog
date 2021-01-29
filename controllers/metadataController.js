@@ -17,6 +17,7 @@ exports.addMetadata = async (req, reply) => {
   const fun = 'addMetadata'
   log.d(fun, '')
   try {
+    const lang = req.params.lang
     const id = req.body.global_id
     log.d(fun, `id: ${id}`)
 
@@ -43,6 +44,7 @@ exports.getEveryMetadata = async (req, reply) => {
   const fun = 'getEveryMetadata'
   log.d(fun, '')
   try {
+    const lang = req.params.lang
     const metadata = await Metadata.find()
     log.d(fun, 'all metadata found')
     return metadata
@@ -57,6 +59,7 @@ exports.getSingleMetadata = async (req, reply) => {
   const fun = 'getSingleMetadata'
   log.d(fun, '')
   try {
+    const lang = req.params.lang
     const id = req.params.id
     const metadata = await Metadata.find({
       'global_id': id
@@ -77,6 +80,7 @@ exports.updateMetadata = async (req, reply) => {
   const fun = 'updateMetadata'
   log.d(fun, '')
   try {
+    const lang = req.params.lang
     const newMetadata = req.body
     const {
       ...updateData
