@@ -36,7 +36,8 @@
 #   - languages are now described either by <2-letter language>-<2-letter country>
 #     for specific language variations such as 'en-GB'.
 #     Simply <2-letter language> is also accepted 
-#     (cf. '#/components/schemas/Language')
+#   (cf. '#/components/schemas/Language')
+#   - added proprety 'encryption' with id to retrieve the encryption parameters
 
 
 #•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
@@ -642,6 +643,17 @@ components:
         # !SKOS!
 
         #—•—•—•—•—•—•—•—•—•—•—•—•—•
+        # SECURITY
+        #——————————————————————————
+        'encryption':
+          allOf:
+          - $ref: '#/components/schemas/UUIDv4'
+          - type: string
+            description: >
+              This field is empty if the data are not encrypted.
+              Contains a mean to retrieve the encryption method otherwise.
+
+        #—•—•—•—•—•—•—•—•—•—•—•—•—•
         # SPACE & TIME
         #——————————————————————————
         'lifespan':
@@ -1158,12 +1170,15 @@ components:
       description: >
         Lowercase ISO-639 language code followed by the
         uppercase 2 letter ISO 3166-1 alpha-2 country code,
-        both joined by an underscore
+        both joined by an hyphen-minus sign, or alternatively the 
+        lowercase ISO-639 language code alone
       type: string
-      pattern: '^[a-z]{2}_[A-Z]{2}$'
-      enum: [cs_CZ, da_DK, de_CH, de_DE, en_GB, en_US, el_GR, es_ES, fr-FR,
-        hu_HU, it_IT, no_NO, pl_PL, pt_PT, ro_RO, ru_RU, sk_SK]
-      # TODO: thesaurus of language (ISO-639) and country codes (ISO-3166) couples
+      pattern: '^[a-z]{2}(-[A-Z]{2})?$'
+      enum: ['cs-CZ', 'da-DK', 'de-CH', 'de-DE', 'en-GB', 'en-US', 'el-GR', 
+        'es-ES', 'fr-FR', 'hu-HU', 'it-IT', 'no-NO', 'pl-PL', 'pt-PT', 'ro-RO', 
+        'ru-RU', 'sk-SK', 'cs', 'da', 'de', 'en', 'el', 'es', 'fr', 'hu', 'it', 
+        'no', 'pl', 'pt', 'ro', 'ru', 'sk']
+      
       #url: 'https://app.swaggerhub.com/apis/nologo/thesaurus/1.0.0#/default/get_thesaurus_v1'
 
       # !SKOS!
