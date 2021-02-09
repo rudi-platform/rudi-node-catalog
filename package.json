@@ -1,7 +1,7 @@
 {
   "name": "rudi-producer",
   "version": "1.0.3",
-  "private": "true",  
+  "private": "true",
   "description": "RUDI proxi for producer nodes",
   "main": "index.js",
   "scripts": {
@@ -31,4 +31,3 @@
     "npm": "^6.14.11"
   }
 }
-/rudi_data0/producer
