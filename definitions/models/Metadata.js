@@ -1,34 +1,41 @@
 //———————————————————————————————————————————————————————————————
-// External dependancies
+// API version
 //———————————————————————————————————————————————————————————————
-const mongoose = require('mongoose')
+const MetadataVersion = '1.1.0';
 
-const Validation = require('../schemaValidators')
+//———————————————————————————————————————————————————————————————
+// External dependencies
+//———————————————————————————————————————————————————————————————
+const mongoose = require('mongoose');
 
+const Validation = require('../schemaValidators');
 
 //———————————————————————————————————————————————————————————————
 // External schema definitions
 //———————————————————————————————————————————————————————————————
-const GeoJSON = require('mongoose-geojson-schema');
 var Int32 = require('mongoose-int32');
 
-const DictionaryEntry = require('../schemas/DictionaryEntry')
-const SkosEntry = require('../schemas/SkosEntry')
-const AccessCondition = require('../schemas/AccessCondition')
-const ReferenceDates = require('../schemas/ReferenceDates')
-const Ids = require('../schemas/Identifiers')
+const GeoJSON = require('mongoose-geojson-schema');
 
+const Ids = require('../schemas/Identifiers');
+const DictionaryEntry = require('../schemas/DictionaryEntry');
+const SkosEntry = require('../schemas/SkosEntry');
+const AccessCondition = require('../schemas/AccessCondition');
+const ReferenceDates = require('../schemas/ReferenceDates');
+
+const Media = require('./Media');
 
 //———————————————————————————————————————————————————————————————
 // External model definitions
 //———————————————————————————————————————————————————————————————
-const Producer = require('./Producer');
+const Organization = require('./Organization');
 const Contact = require('./Contact');
 
 //———————————————————————————————————————————————————————————————
 // Thesaurus definiitons
 //———————————————————————————————————————————————————————————————
 const Language = require('../thesaurus/Languages');
+const Themes = require('../thesaurus/Themes');
 const Projection = require('../thesaurus/Projections');
 const Encoding = require('../thesaurus/Encodings');
 const HashAlgo = require('../thesaurus/HashAlgos');
@@ -36,39 +43,29 @@ const HashAlgo = require('../thesaurus/HashAlgos');
 //———————————————————————————————————————————————————————————————
 // Constants
 //———————————————————————————————————————————————————————————————
-
-
-const FileFormats = {
-  json: 'json',
-  xml: 'xml',
-  csv: 'csv',
-  xlsx: 'xlsx',
-  txt: 'txt'
-}
-
 const UpdateStatus = {
   modified: 'modified',
   updated: 'updated',
   historical: 'historical',
   obsolete: 'obsolete'
-}
+};
 
 const StorageStatus = {
   online: 'online',
   archived: 'archived',
   unavailable: 'unavailable'
-}
+};
 
 const HashAlgorithms = {
   MD5: 'MD5',
   SHA256: 'SHA-256',
   SHA512: 'SHA-512'
-}
+};
 
 const TransmissionModes = {
-  file: 'file',
-  stream: 'stream'
-}
+  file: 'FILE',
+  series: 'SERIES'
+};
 
 //———————————————————————————————————————————————————————————————
 // Custom schema definitions
@@ -80,7 +77,7 @@ const MetadataSchema = new mongoose.Schema({
   //---------------------------
 
   // Unique and permanent identifier for the ressource in RUDI system (required)
-  global_id: Ids.RudiID,
+  global_id: Ids.UUIDv4,
 
   // Identifier for the ressource in the producer system (optional)
   local_id: {
@@ -93,141 +90,150 @@ const MetadataSchema = new mongoose.Schema({
   doi: Ids.DOI,
 
   //---------------------------
-  // Resource description
+  // Dataset description
   //---------------------------
 
   // Simple name for the resource
   resource_title: {
     type: String,
-    maxlength: 50
+    maxlength: 150
   },
+
+  // Short description for the whole dataset
+  abstract: [DictionaryEntry],
 
   // More precise description for the whole dataset
   summary: [DictionaryEntry],
 
-  // Context, objectives and final use of the data
-  purpose: {
-    type: String
-  },
-
-  // Language used in the dataset, if relevant
-  resource_language: {
-    type: String,
-    default: Language.fr_FR,
-    enum: Object.values(Language)
-  },
-
   //---------------------------
-  // Resource classification
+  // Dataset classification
   //---------------------------
 
   // Category for thematic classification of the data
   theme: {
-    type: SkosEntry
-  },
-
-  // Sub-category for thematic classification of the data
-  sub_theme: {
-    type: SkosEntry
+    type: String,
+    enum: Object.values(Themes)
   },
 
   // List of tags that can be used to retrieve the data
-  keyword: [SkosEntry],
+  keywords: [SkosEntry],
 
-  // Period of time described by the data
-  lifespan: [Date],
-
-  // Geographic distribution of the data. Particularly relevant in the case of located sensors.
-  bounding_box: {
-    type: mongoose.SchemaTypes.GeoJSON
-  },
-
-  // Spatial resolution, i.e. geographic or geometric precision used to describe the resource
-  // scale: 
-
-  // Cartographic projection used to describe the data
-  projection: {
-    type: String,
-    enum: Object.values(Projection)
-  },
-
-  // Data topology
-  spatial_representation: {
-    type: String
-  },
-
-  // Information that describes the level of confidentiality required to access or use the data. 
-  // This is a reference to the consent folder
-  consent: {
-    type: String
-  },
-
-  // Access restrictions for the use of data in the form of licence,
-  // confidentiality, terms of service, habilitation or required rights,
-  // economical model. Default is open licence.
-  access_condition: {
-    type: AccessCondition,
-  },
+  //---------------------------
+  // Involved parties
+  //---------------------------
 
   // Entity that produced the resource
   producer: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Producer'
+    ref: 'Organization',
+    required: true
   },
 
-  // Person in charge of maintaining the resource
-  contact: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Contact'
+  // Persons in charge of maintaining the resource
+  contacts: {
+    type: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Contact'
+    }],
+    minlength: 1,
+    required: true
   },
 
-  // Sensor that was used to produce the resource (SenML definition)
-  sensor: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Sensor'
+  //---------------------------
+  // Container description
+  //---------------------------
+
+  available_formats: {
+    type: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Media'
+    }],
+    required: true
   },
 
-  // Link towards the resource that describes the structure of the data
-  // (language, norm, data structure, JSON schema, OpenAPI, etc.)
-  structure: {
-    type: String,
-    validate: {
-      validator: Validation.isURI,
-      message: '{VALUE} is not a valid URI'
+  //---------------------------
+  // Dataset info
+  //---------------------------
+
+  // Language used in the dataset, if relevant
+  resource_languages: {
+    type: [{
+      type: String,
+      enum: Object.values(Language)
+    }],
+    default: [Language.fr_FR],
+  },
+
+  // Period of time described by the data
+  temporal_spread: {
+    start_date: {
+      type: Date,
+      required: true
+    },
+    end_date: {
+      type: Date
     }
   },
 
-  // Native format of the resource
-  format: {
-    type: String,
-    enum: Object.values(FileFormats)
+  // Geographic distribution of the data. Particularly relevant in the case of located sensors.
+  geography: {
+
+    // Geographic distribution of the data as a rectangle.
+    // The 4 parameters are given as decimal as described in the
+    // norm ISO 6709
+    bounding_box: {
+      type: Object,
+      required: true,
+
+      // Northernmost latitude given as a decimal number
+      north_latitude: {
+        type: Number,
+        min: -90,
+        max: 90,
+      },
+      // Southernmost latitude given as a decimal number
+      south_latitude: {
+        type: Number,
+        min: -90,
+        max: 90,
+      },
+      // Westernmost latitude given as a decimal number
+      west_longitude: {
+        type: Number,
+        min: -180,
+        max: 180,
+      },
+      // Easternmost latitude given as a decimal number
+      east_longitude: {
+        type: Number,
+        min: -180,
+        max: 180,
+      },
+    },
+
+    // Precise geographic distribution of the data 
+    geographic_distribution: {
+      type: mongoose.SchemaTypes.GeoJSON
+    },
+
+    // Cartographic projection used to describe the data
+    projection: {
+      type: String,
+      enum: Object.values(Projection)
+    },
+
+    // Data topology
+    spatial_representation: {
+      type: String
+    },
+
   },
 
-  // Source encoding of the data
-  encoding: {
-    type: String,
-    default: Encoding.Unicode,
-    enum: Object.values(Encoding)
-  },
-
-  // Available alternative formats
-  available_format: {
-    type: [Object.values(FileFormats)]
-  },
-
+  // Indicative total size of the data
   dataset_size: {
-    type: Object,
-    size: {
-      type: Number,
-      min: 0
-    },
-    unit: {
-      type: SkosEntry
-    },
     numbers_of_records: {
       type: Int32,
-      min: 0,
-      max: 500
+      min: 0
     },
     number_of_fields: {
       type: Int32,
@@ -235,41 +241,8 @@ const MetadataSchema = new mongoose.Schema({
     },
   },
 
-  reference_date: {
-    data: ReferenceDates,
-    metadata: ReferenceDates
-  },
-
-  // Dependecies are other resources that were used as sources
-  // for the present resource (parents) or that use the present 
-  // resource as source (children) 
-  dependencies: {
-    // Resources that were used as sources by the present resource
-    parents: [Ids.RudiID],
-
-    // Resources that use the present resource as a source
-    children: [Ids.RudiID]
-  },
-
-  // Method to anonymize data
-  anonymization: {
-    type: String,
-    validate: {
-      validator: Validation.isURI,
-      message: '{VALUE} is not a valid URI'
-    }
-  },
-
-  // Relevance status of the data
-  //   - 'modified'   = the data is in the process of being created
-  //                    but still incomplete
-  //   - 'updated'    = the data is up to date
-  //   - 'historical' = ancient data that has been updated
-  //   - 'obsolete'   = dataset that is too old but cannot be updated 
-  //                    or replaced with another
-  update_status: {
-    type: [Object.values(UpdateStatus)]
-  },
+  // Dates of the actions performed on the data (creation, publishing, update, deletion...)
+  dataset_dates: ReferenceDates,
 
   // Status of the storage of the dataset
   // Metadata can exist without the data
@@ -277,58 +250,40 @@ const MetadataSchema = new mongoose.Schema({
   //   - archived = data are not immediately available, access is not automatic 
   //   - unavailable = data were deleted
   storage_status: {
-    type: [Object.values(StorageStatus)]
+    type: Object.values(StorageStatus)
   },
 
-  // Data specifications that apply to the resource
-  conformance: {
-    type: String,
-    validate: {
-      validator: Validation.isURI,
-      message: '{VALUE} is not a valid URI'
-    }
-  },
+  // Metadata on the metadata
+  medatata_info: {
 
-  connector: {
-    type: Object
-  },
-
-  // Makes it possible to check data integrity
-  checksum: {
-    algo: {
-      type: [Object.values(HashAlgorithms)],
-    },
-    hash: {
+    // API version number (used for retro-compatibility)
+    api_version: {
       type: String,
-    }
-  },
+      validate: {
+        validator: Validation.isVersion,
+        message: '{VALUE} does not appear to be a valid version number (0.0.0)'
+      }
+    },
 
-  // Describes if the resource is accessible as a file or a stream
-  transmission_mode: {
-    type: [Object.values(TransmissionModes)]
-  },
+    // Dates of the actions performed on the metadata (creation, publishing, update...)
+    metadata_dates: ReferenceDates,
 
-  // Theorical delay between the production of the record and its 
-  // availability, in milliseconds. 
-  // Applies to temporal series of data.
-  latency: {
-    type: Int32,
-    min: 0
-  },
+    // Description of the organization that produced the metadata
+    metadata_provider: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Organization'
+    },
 
-  // Theorical delay between the production of two records, in 
-  // milliseconds. Applies to temporal series of data.
-  period: {
-    type: Int32,
-    min: 0
-  },
-
-})
-
-
+    // Addresses to get further information on the metadata
+    metadata_contact: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Contact'
+    }]
+  }
+});
 
 
 //———————————————————————————————————————————————————————————————
 // Exports
 //———————————————————————————————————————————————————————————————
-module.exports = mongoose.model('Metadata', MetadataSchema)
+module.exports = mongoose.model('Metadata', MetadataSchema);

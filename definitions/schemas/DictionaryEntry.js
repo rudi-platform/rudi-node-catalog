@@ -8,7 +8,7 @@ const Language = require('../thesaurus/Languages')
 // Custom schema definition
 //———————————————————————————————————————————————————————————————
 const DictionaryEntrySchema = new mongoose.Schema({
-  lang: { 
+  lang: {
     type: String,
     default: Language.fr_FR,
     enum: Object.values(Language),
@@ -18,6 +18,8 @@ const DictionaryEntrySchema = new mongoose.Schema({
     type: String,
     required: true
   }
+}, {
+  _id: false
 })
 
 //———————————————————————————————————————————————————————————————

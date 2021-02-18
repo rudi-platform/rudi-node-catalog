@@ -7,33 +7,46 @@ const regexDOI = /^10.\d{4,9}\/[-.;()\/:\w]+$/i;
 // source: https://www.crossref.org/blog/dois-and-matching-regular-expressions/
 // alternative: https://github.com/regexhq/doi-regex/blob/master/index.js
 
-const regexURI = /(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/;
+const regexURI = /^(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?$/;
+const regexEmail = /^([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 function validateSchema(schemaStr, regExPattern) {
   const regExp = new RegExp(regExPattern)
   return schemaStr.match(regExp)
 }
 
-function isUUIDv4(idStr) {
-  return validateSchema(idStr, regexUUIDv4)
+function isUUIDv4(str) {
+  return validateSchema(str, regexUUIDv4)
 }
 
-function isDOI(idStr) {
-  return validateSchema(idStr, regexDOI)
+function isDOI(str) {
+  return validateSchema(str, regexDOI)
 }
 
-function isRudiID(idStr) {
-  return isUUIDv4(idStr) // || isDOI(idStr)
+function isRudiID(str) {
+  return isUUIDv4(str) // || isDOI(idStr)
 }
 
-function isURI(uriStr) {
-  return schemaStr.match(new RegExp(regexURI))
+function isURI(str) {
+  return str.match(new RegExp(regexURI))
 }
+
+function isEmail(str) {
+  return str.match(new RegExp(regexEmail))
+}
+
+function isVersion(str) {
+  return str.match(new RegExp(
+    /^([0-9]{1,2}\.){2}[0-9]{1,2}[a-z]*$/
+  ))
+}
+
 
 module.exports = {
   validateSchema,
   isDOI,
-  isRudiID,
   isUUIDv4,
-  isURI
+  isURI,
+  isEmail,
+  isVersion
 }

@@ -2,6 +2,9 @@
 // External dependancies
 //———————————————————————————————————————————————————————————————
 const mongoose = require('mongoose')
+const {
+  v4: uuidv4
+} = require('uuid');
 
 const Validation = require('../schemaValidators')
 
@@ -9,13 +12,14 @@ const Validation = require('../schemaValidators')
 // Constants
 //———————————————————————————————————————————————————————————————
 
-exports.UUIDv4 = {
+const UUIDv4 = {
   type: String,
+  default: _ => uuidv4(),
   trim: true,
   required: true,
   unique: true,
   dropDups: true,
-  // index: true,
+  index: true,
   lowercase: true,
   validate: {
     validator: Validation.isUUIDv4,
@@ -23,8 +27,9 @@ exports.UUIDv4 = {
   }
 }
 
-exports.RudiID = {
+RudiID = {
   type: String,
+  default: _ => uuidv4(),
   trim: true,
   required: true,
   unique: true,
@@ -37,7 +42,7 @@ exports.RudiID = {
   }
 }
 
-exports.DOI = {
+const DOI = {
   type: String,
   trim: true,
   unique: true,
@@ -46,4 +51,9 @@ exports.DOI = {
     validator: Validation.isDOI,
     message: '{VALUE} does not appear to be a valid DOI'
   }
+}
+
+module.exports = {
+  UUIDv4,
+  DOI
 }

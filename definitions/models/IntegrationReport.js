@@ -41,7 +41,7 @@ const IntegrationReportSchema = new mongoose.Schema({
 
   // Unique and permanent identifier for the ressource in RUDI 
   // system (required)
-  global_id: Ids.RudiID,
+  global_id: Ids.UUIDv4,
 
   resource_title: {
     type: String,

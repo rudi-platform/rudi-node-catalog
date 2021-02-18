@@ -11,6 +11,9 @@ const ReferenceDatesSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
+  validated: {
+    type: Date
+  },
   published: {
     type: Date,
     required: true
