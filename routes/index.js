@@ -1,113 +1,137 @@
-// Import our Controllers
+//———————————————————————————————————————————————————————————————
+// Swagger documentation
+//———————————————————————————————————————————————————————————————
+const documentation = require('./documentation/metadataApi')
+
+//———————————————————————————————————————————————————————————————
+// API request constants
+//———————————————————————————————————————————————————————————————
+const {
+  URL_PREFIX,
+  URL_METADATA,
+  URL_ORGANIZATIONS,
+  URL_CONTACTS,
+  REQ_ID
+} = require('./apiUrl')
+
+//———————————————————————————————————————————————————————————————
+// Controllers
+//———————————————————————————————————————————————————————————————
 const metadataController = require('../controllers/metadataController')
 const organizationController = require('../controllers/organizationController')
 const contactController = require('../controllers/contactController')
 
-// Import Swagger documentation
-const documentation = require('./documentation/metadataApi')
-
-const urlPrefix = "/api/v1/"
-const urlMetadata = `${urlPrefix}:lang/resources`
-const urlOrganization = `${urlPrefix}organizations`
-const urlContact = `${urlPrefix}contacts`
 
 const routes = [
-  //————————————— METADATA ———————————————
+
+  //———————————————————————————————————————————————————————————————
+  // METADATA
+  //———————————————————————————————————————————————————————————————
   {
     method: 'GET',
-    url: `${urlMetadata}`,
+    url: `${URL_METADATA}`,
     handler: metadataController.getEveryMetadata
   },
   {
     method: 'GET',
-    url: `${urlMetadata}/:id`,
+    url: `${URL_METADATA}/:${REQ_ID}`,
     handler: metadataController.getSingleMetadata
   },
   {
     method: 'POST',
-    url: `${urlMetadata}`,
+    url: `${URL_METADATA}`,
     handler: metadataController.addMetadata,
     // schema: documentation.addMetadataSchema
   },
   {
     method: 'PUT',
-    url: `${urlMetadata}`,
+    url: `${URL_METADATA}`,
     handler: metadataController.updateMetadata
   },
   {
     method: 'DELETE',
-    url: `${urlMetadata}`,
+    url: `${URL_METADATA}`,
     handler: metadataController.deleteManyMetadata
   },
   {
     method: 'DELETE',
-    url: `${urlMetadata}/:id`,
+    url: `${URL_METADATA}/:${REQ_ID}`,
     handler: metadataController.deleteMetadata
   },
-  //————————————— ORGANIZATIONS ———————————————
+
+  //———————————————————————————————————————————————————————————————
+  // ORGANIZATIONS
+  //———————————————————————————————————————————————————————————————
   {
     method: 'GET',
-    url: urlOrganization,
+    url: URL_ORGANIZATIONS,
     handler: organizationController.getEveryOrganization
   },
   {
     method: 'GET',
-    url: `${urlOrganization}/:id`,
+    url: `${URL_ORGANIZATIONS}/:${REQ_ID}`,
     handler: organizationController.getSingleOrganization
   },
   {
     method: 'POST',
-    url: `${urlOrganization}`,
+    url: `${URL_ORGANIZATIONS}`,
     handler: organizationController.addOrganization,
     // schema: documentation.addOrganizationSchema
   },
   {
     method: 'PUT',
-    url: `${urlOrganization}`,
+    url: `${URL_ORGANIZATIONS}`,
     handler: organizationController.updateOrganization
   },
-    {
+  {
     method: 'DELETE',
-    url: `${urlOrganization}`,
+    url: `${URL_ORGANIZATIONS}`,
     handler: organizationController.deleteManyOrganization
   },
   {
     method: 'DELETE',
-    url: `${urlOrganization}/:id`,
+    url: `${URL_ORGANIZATIONS}/:${REQ_ID}`,
     handler: organizationController.deleteOrganization
-  }, 
-  //————————————— CONTACTS ———————————————
+  },
+
+  //———————————————————————————————————————————————————————————————
+  // CONTACTS
+  //———————————————————————————————————————————————————————————————
   {
     method: 'GET',
-    url: urlContact,
+    url: URL_CONTACTS,
     handler: contactController.getEveryContact
   },
   {
     method: 'GET',
-    url: `${urlContact}/:id`,
+    url: `${URL_CONTACTS}/:${REQ_ID}`,
     handler: contactController.getSingleContact
   },
   {
     method: 'POST',
-    url: `${urlContact}`,
+    url: `${URL_CONTACTS}`,
     handler: contactController.addContact,
     // schema: documentation.addContactSchema
   },
   {
     method: 'PUT',
-    url: `${urlContact}`,
+    url: `${URL_CONTACTS}`,
     handler: contactController.updateContact
   },
-    {
+  {
     method: 'DELETE',
-    url: `${urlContact}`,
+    url: `${URL_CONTACTS}`,
     handler: contactController.deleteManyContact
   },
   {
     method: 'DELETE',
-    url: `${urlContact}/:id`,
+    url: `${URL_CONTACTS}/:${REQ_ID}`,
     handler: contactController.deleteContact
   },
+
+  //———————————————————————————————————————————————————————————————
+  // CONTACTS
+  //———————————————————————————————————————————————————————————————
 ]
 
 module.exports = routes

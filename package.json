@@ -18,17 +18,20 @@
   "dependencies": {
     "@hapi/boom": "^9.1.1",
     "cli-color": "^2.0.0",
-    "fastify": "^3.10.1",
-    "fastify-swagger": "^3.5.0",
+    "fastify": "^3.12.0",
+    "fastify-swagger": "^4.3.1",
     "ipso-pub": "^1.0.0",
-    "js-beautify": "^1.13.4",
-    "mongoose": "^5.11.12",
+    "js-beautify": "^1.13.5",
+    "mongoose": "^5.11.17",
     "mongoose-geojson-schema": "^2.1.5",
     "mongoose-int32": "^0.4.1",
     "mongoose-long": "^0.3.2",
     "mongoose-validator": "^2.1.0",
     "nodemon": "^2.0.7",
-    "npm": "^6.14.11",
+    "npm": "^7.5.4",
     "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "jest": "^26.6.3"
   }
 }

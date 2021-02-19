@@ -2,11 +2,54 @@
 // External dependancies 
 //———————————————————————————————————————————————————————————————
 const boom = require('@hapi/boom')
+
 const log = require('../utils/logging')
+const msg = require('../utils/msg')
+
+const db = require('../db/dbQueries')
+
+//———————————————————————————————————————————————————————————————
+// Constants
+//———————————————————————————————————————————————————————————————
+const {
+  DB_ID,
+  API_METADATA_ID,
+  API_ORGANIZATION_ID,
+  API_CONTACT_ID,
+  API_PRODUCER_PROPERTY,
+  API_CONTACTS_PROPERTY
+} = require('../db/dbFields')
+
+const {
+  REQ_LANG,
+  REQ_ID
+} = require('../routes/apiUrl')
+
 //———————————————————————————————————————————————————————————————
 // Data models
 //———————————————————————————————————————————————————————————————
 const Organization = require('../definitions/models/Organization')
+
+//———————————————————————————————————————————————————————————————
+// Helper functions
+//———————————————————————————————————————————————————————————————
+async function updateOrganizationJson(organizationJson) {
+  const fun = 'updateOrganizationJson'
+
+  // Retrieveing full info for the organization
+  // TODO[VALIDATE]: we assume the organization has previously been created!
+  const organizationInfo = await db.getOrganizationFromJson(organizationJson)
+  if ('' == organizationInfo) {
+    throw new Error(`${msg.organizationNotFound(organizationJson[API_ORGANIZATION_ID])}`)
+  }
+
+  // Updating incoming data with the full info of the organization
+  // TODO[VALIDATE]: The organization info already in database is not updated with possible new data, 
+  //                 and only the organization RUDI id is really necessary in the request body
+  organizationJson = organizationInfo
+  log.d(fun, `Updated organization: ${organizationJson}`)
+}
+
 
 //———————————————————————————————————————————————————————————————
 // Controllers
@@ -17,7 +60,6 @@ exports.addOrganization = async (req, reply) => {
   const fun = 'addOrganization'
   log.d(fun, '')
   try {
-    const lang = req.params.lang
     const id = req.body.organization_id
     log.d(fun, `id: ${id}`)
 
