@@ -1,3 +1,8 @@
+/*
+ * In this file are made the different steps followed for each 
+ * action on the metadata
+ */
+
 //———————————————————————————————————————————————————————————————
 // External dependancies 
 //———————————————————————————————————————————————————————————————
@@ -11,11 +16,7 @@ const msg = require('../utils/msg')
 const lang = require('../utils/lang')
 
 const db = require('../db/dbQueries')
-
-//———————————————————————————————————————————————————————————————
-// Helping functions
-//———————————————————————————————————————————————————————————————
-const organizationController = require('./organizationController')
+const dbRwk = require('../db/dbReworkData')
 
 //———————————————————————————————————————————————————————————————
 // Constants
@@ -41,149 +42,7 @@ const Metadata = require('../definitions/models/Metadata')
 const Organization = require('../definitions/models/Organization')
 const Contact = require('../definitions/models/Contact')
 
-//———————————————————————————————————————————————————————————————
-// Helper functions
-//———————————————————————————————————————————————————————————————
-async function updateOrganizationJson(organizationJson) {
-  const fun = 'updateOrganizationJson'
-  log.d(fun, `organizationJson: ${organizationJson}`)
 
-  // Retrieveing full info for the organization
-  const producerInfo = await db.getOrganizationFromJson(organizationJson)
-
-  // TODO[VALIDATE]: we assume the organization has previously been created!
-  if ('' == producerInfo) {
-    throw new Error(`${msg.organizationNotFound(organizationJson[API_ORGANIZATION_ID])}`)
-  }
-
-  return producerInfo
-}
-
-async function updateContactJson(contactJson) {
-  const fun = 'updateContactJson'
-  log.d(fun, ``)
-  let updatedContact = await db.getContactFromJson(contactJson)
-
-  // TODO[VALIDATE]: we assume the contact has previously been created!
-  if ('' == updatedContact) {
-    throw new Error(`${msg.contactNotFound(contactsJson[API_CONTACT_ID])}`)
-  }
-
-  return updatedContact
-}
-
-async function updateContactListJson(contactsJson) {
-  const fun = 'updateContactListJson'
-  log.d(fun, ``)
-
-  // Retrieveing full info for the contacts
-  let fullContacts = []
-  for (const contact of contactsJson) {
-    fullContacts.push(await updateContactJson(contact))
-  }
-
-  return fullContacts
-}
-
-async function updateMetadataPropertiesFromDb(metadata) {
-  const fun = 'updateMetadataProperties'
-  log.d(fun, `metadata: ${metadata}`)
-
-  /* beautify ignore:start */
-  let updatedMetadata = metadata;
-  /* beautify ignore:end */
-
-  //————— Updating Producer info
-  // Note : here we are updating data as they are stored in DB
-  //        So 'producer' field is in reality a producer mongo _id!
-  const producerId = metadata[API_PRODUCER_PROPERTY]
-  const updatedProducer = await db.getOrganizationFromDbId(producerId)
-  if ('' == updatedProducer) {
-    throw new Error(`${msg.organizationNotFound(producerId)}`)
-  }
-
-  //————— Updating Contacts info
-  // Note : here we are updating data as they are stored in DB
-  //        So 'contacts' field is actually an array of contact mongo _ids!
-  const contacts = metadata[API_CONTACTS_PROPERTY]
-
-  let updatedContacts = []
-  for (const contactId of contacts) {
-    // const contactId = contact[API_CONTACT_ID]
-
-    const updatedContact = await db.getContactFromDbId(contactId)
-    if ('' == updatedContact) {
-      throw new Error(`${msg.contactNotFound(producerId)}`)
-    }
-    updatedContacts.push(updatedContact)
-  }
-
-  updatedMetadata[API_PRODUCER_PROPERTY] = updatedProducer
-  updatedMetadata[API_CONTACTS_PROPERTY] = updatedContacts
-
-  return updatedMetadata
-}
-
-async function updateMetadataListPropertiesFromDb(metadataList) {
-  const fun = 'updateMetadataListPropertiesFromDb'
-  // log.d(fun, `metadataList: ${metadataList}`)
-
-  let producerCache = new Map()
-  let contactCache = new Map()
-  let updatedMetadataList = []
-
-  for (const metadata of metadataList) {
-    // log.d(fun, `metadata: ${metadata}`)
-
-    /* beautify ignore:start */
-    let updatedMetadata = metadata;
-    /* beautify ignore:end */
-    // log.d(fun, `metadata clone: ${updatedMetadata}`)
-
-    //————— Updating Producer info
-    // Note : here we are updating data as they are stored in DB
-    //        So 'producer' field is in reality a producer mongo _id!
-    const producerId = metadata[API_PRODUCER_PROPERTY]
-
-    let updatedProducer = producerCache.get(producerId)
-    if (!updatedProducer) {
-      updatedProducer = await db.getOrganizationFromDbId(producerId)
-      if ('' == updatedProducer) {
-        throw new Error(`${msg.organizationNotFound(producerId)}`)
-      }
-
-      producerCache.set(producerId, updatedProducer)
-    }
-
-    //————— Updating Contacts info
-    // Note : here we are updating data as they are stored in DB
-    //        So 'contacts' field is actually an array of contact mongo _ids!
-    const contacts = metadata[API_CONTACTS_PROPERTY]
-
-    let updatedContacts = []
-    for (const contactId of contacts) {
-      // const contactId = contact[API_CONTACT_ID]
-
-      let updatedContact = contactCache.get(contactId)
-      if (!updatedContact) {
-        updatedContact = await db.getContactFromDbId(contactId)
-        if ('' == updatedContact) {
-          throw new Error(`${msg.contactNotFound(producerId)}`)
-        }
-        contactCache.set(contactId, updatedContact)
-      }
-
-      updatedContacts.push(updatedContact)
-    }
-
-    updatedMetadata[API_PRODUCER_PROPERTY] = updatedProducer
-    updatedMetadata[API_CONTACTS_PROPERTY] = updatedContacts
-    updatedMetadataList.push(updatedMetadata)
-    // log.d(fun, `updatedMetadata: ${updatedMetadata}`)
-  }
-
-  return updatedMetadataList
-}
 //———————————————————————————————————————————————————————————————
 // Controllers
 //———————————————————————————————————————————————————————————————
@@ -199,22 +58,27 @@ exports.addMetadata = async (req, reply) => {
     let incomingData = {...req.body}
     /* beautify ignore:end */
 
+    const id = incomingData[API_METADATA_ID]
+    if (!id || '' == id) {
+      throw new Error(`${msg.missingProperty(incomingData, API_METADATA_ID)}`)
+    }
+
     // First: we make sure id isn't used already
     const existingMetadata = await db.getMetadataFromJson(incomingData)
-    if (null != existingMetadata && '' != existingMetadata) {
-      throw new Error(`${msg.metadataAlreadyExists(incomingData[API_METADATA_ID])}`)
+    if (existingMetadata && '' != existingMetadata) {
+      throw new Error(`${msg.metadataAlreadyExists(id)}`)
     }
 
     // Updating incoming data with the full info of the organization
     // TODO[VALIDATE]: The organization info already in database is not updated with possible new data, 
     //                 and only the organization RUDI id is really necessary in the request body
-    incomingData[API_PRODUCER_PROPERTY] = await updateOrganizationJson(incomingData[API_PRODUCER_PROPERTY])
+    incomingData[API_PRODUCER_PROPERTY] = await dbRwk.updateJsonOrganization(incomingData[API_PRODUCER_PROPERTY])
 
 
     // Updating incoming data with the full info of the organization
     // TODO[VALIDATE]: The contact info already in database is not updated with possible new data, 
     //                 and only the contact RUDI id is really necessary in the request body
-    incomingData[API_CONTACTS_PROPERTY] = await updateContactListJson(incomingData[API_CONTACTS_PROPERTY])
+    incomingData[API_CONTACTS_PROPERTY] = await dbRwk.updateJsonContactList(incomingData[API_CONTACTS_PROPERTY])
 
     // Creating new metadata
     const newMetadata = new Metadata(incomingData)
@@ -231,13 +95,14 @@ exports.addMetadata = async (req, reply) => {
 exports.getEveryMetadata = async (req, reply) => {
   const fun = 'getEveryMetadata'
   log.d(fun, ``)
-  lang.setLanguage(req.params[REQ_LANG])
 
   try {
+    lang.setLanguage(req.params[REQ_LANG])
+
     const metadataList = await db.getAllMetadata()
     // log.d(fun, `metadataList: ${metadataList}`)
 
-    const updatedMetadataList = await updateMetadataListPropertiesFromDb(metadataList)
+    const updatedMetadataList = await dbRwk.updateMetadataListPropertiesFromDb(metadataList)
     return updatedMetadataList
   } catch (err) {
     log.e(fun, err)
@@ -255,22 +120,20 @@ exports.getSingleMetadata = async (req, reply) => {
 
     // Checking if the parameter is ok
     const id = req.params[REQ_ID]
-    if ('' == id) {
+    if (!id || '' == id) {
       throw new Error(`${msg.parameterExpected(REQ_ID)}`)
     }
 
     let metadata = await db.getMetadataFromRudiId(id)
 
     // If the metadata doesn't exist in the db => error
-    if ('' == metadata) {
+    if (!metadata || '' == metadata) {
       throw new Error(`${msg.metadataNotFound(id)}`)
     }
 
-    log.d(fun, `found metadata with id ${id}:\n${metadata}`)
+    let updatedMetadata = await dbRwk.updateMetadataPropertiesFromDb(metadata)
 
-    let updatedMetadata = await updateMetadataPropertiesFromDb(metadata)
-
-    log.d(fun, `updated metadata:\n${updatedMetadata}`)
+    log.d(fun, msg.metadataUpdated(id))
 
     return updatedMetadata
   } catch (err) {
@@ -291,15 +154,13 @@ exports.updateMetadata = async (req, reply) => {
     /* beautify ignore:end */
 
     const id = incomingData[API_METADATA_ID]
-    if ('' == id) {
+    if (!id || '' == id) {
       throw new Error(`Body should define the property '${API_METADATA_ID}'`)
     }
 
     // First: we make sure some data exists with input JSON id
-    const existingMetadata = await Metadata.find({
-      [API_METADATA_ID]: id
-    })
-    if ('' == existingMetadata) {
+    const existingMetadata = await db.getMetadataFromJson(incomingData)
+    if (!existingMetadata || '' == existingMetadata) {
       throw new Error(`${msg.metadataNotFound(id)}`)
     }
 
@@ -312,21 +173,12 @@ exports.updateMetadata = async (req, reply) => {
 
     // TODO[VALIDATE]: the contact info already in database is not updated with possible new data
     // TODO[VALIDATE]: this means only the RUDI id for the contact is necessary (and taken into account)
-    incomingData[API_CONTACTS_PROPERTY] = await updateContactListJson(incomingData[API_CONTACTS_PROPERTY])
+    incomingData[API_CONTACTS_PROPERTY] = await dbRwk.updateJsonContactList(incomingData[API_CONTACTS_PROPERTY])
 
-    const updatedMetadata = await Metadata.findOneAndUpdate({
-      [API_METADATA_ID]: id
-    }, incomingData, {
-      new: true
-    })
+    const updatedMetadata = await db.updateInfo(Metadata, API_METADATA_ID, incomingData)
 
-    if (null == updatedMetadata) {
-      const errMsg = `couldn't find metadata with id ${id}`
-      err = new Error(errMsg)
-      throw boom.boomify(err)
-    }
-    log.d(fun, `updated metadata with id ${id}`)
-    return incomingData
+    log.d(fun, msg.metadataUpdated(id))
+    return updatedMetadata
   } catch (err) {
     log.e(fun, err)
     throw boom.boomify(err)
@@ -338,14 +190,16 @@ exports.deleteMetadata = async (req, reply) => {
   const fun = 'deleteMetadata'
   log.d(fun, ``)
   try {
+    lang.setLanguage(req.params[REQ_LANG])
+
     const id = req.params[REQ_ID]
     const metadata = await Metadata.findOneAndRemove({
       [API_METADATA_ID]: id
     })
     if (null == metadata) {
-      throw new Error(`couldn't find metadata with id ${id}`)
+      throw new Error(msg.metadataNotFound(id))
     }
-    log.d(fun, `deleted metadata with id ${id})`)
+    log.d(fun, msg.metadataDeleted(id))
     return metadata
   } catch (err) {
     log.e(fun, err)
@@ -359,13 +213,17 @@ exports.deleteManyMetadata = async (req, reply) => {
   const fun = 'deleteManyMetadata'
   log.d(fun, ``)
   try {
-    const {
-      ...conditions
-    } = req.body
+    lang.setLanguage(req.params[REQ_LANG])
+
+    /* beautify ignore:start */
+    const {...conditions} = req.body
+    /* beautify ignore:end */
+    
     log.d(fun, conditions)
-    const metadata = await Metadata.deleteMany(conditions)
-    log.d(fun, `deleted metadata with condition ${conditions})`)
-    return metadata
+    const actionReturn = await Metadata.deleteMany(conditions)
+    log.d(fun, msg.metadataDeletedWithCondition(conditions))
+    log.d(fun, `actionReturn: ${actionReturn}`)
+    return actionReturn
   } catch (err) {
     log.e(fun, err)
     throw boom.boomify(err)
