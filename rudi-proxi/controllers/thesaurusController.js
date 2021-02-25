@@ -1,4 +1,9 @@
-//———————————————————————————————————————————————————————————————
+/*
+ * In this file are made the different steps followed for each 
+ * action on the thesaurus
+ */
+
+ //———————————————————————————————————————————————————————————————
 // External dependancies 
 //———————————————————————————————————————————————————————————————
 const boom = require('@hapi/boom')

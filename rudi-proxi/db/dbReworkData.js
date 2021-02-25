@@ -1,3 +1,12 @@
+/*
+ * In this file are a set of functions that rework the data 
+ * - hide mongoose fields '_id' and '__v': they are not permanent
+ *   so irrelevant
+ * - replace attributes that link a mongoose document id by its
+ *   attributes values, ie 'producer', 'contacts', and the ones 
+ *   that can be found in 'metadata_info'.
+ */
+
 //———————————————————————————————————————————————————————————————
 // External dependancies 
 //———————————————————————————————————————————————————————————————

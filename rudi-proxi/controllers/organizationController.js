@@ -1,4 +1,9 @@
-//———————————————————————————————————————————————————————————————
+/*
+ * In this file are made the different steps followed for each 
+ * action on the organizations (producer or publisher)
+ */
+
+ //———————————————————————————————————————————————————————————————
 // External dependancies 
 //———————————————————————————————————————————————————————————————
 const boom = require('@hapi/boom')
