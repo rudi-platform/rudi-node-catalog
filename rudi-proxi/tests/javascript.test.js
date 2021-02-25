@@ -75,19 +75,19 @@ let METADATA_MOCKUP = {
   }
 }
 
-function mutingFun() {
+function mutingFunc() {
   METADATA_MOCKUP['geography'] = 'panpan'
   // log.d('mutingFun', METADATA_MOCKUP)
   return METADATA_MOCKUP
 }
 
 test('muting function', () => {
-  expect(mutingFun()['geography'])
+  expect(mutingFunc()['geography'])
     .toBe('panpan')
 })
 
 function mutingFun2() {
-  METADATA_MOCKUP = mutingFun();
+  METADATA_MOCKUP = mutingFunc();
   return METADATA_MOCKUP
 }
 
