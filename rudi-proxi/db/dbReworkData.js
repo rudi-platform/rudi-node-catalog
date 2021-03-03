@@ -19,7 +19,7 @@ const log = require('../utils/logging')
 const msg = require('../utils/msg')
 const lang = require('../utils/lang')
 
-const db = require('../db/dbQueries')
+const db = require('./dbQueries')
 const json = require('../utils/jsonAccess')
 
 //———————————————————————————————————————————————————————————————
@@ -27,12 +27,13 @@ const json = require('../utils/jsonAccess')
 //———————————————————————————————————————————————————————————————
 const {
   DB_ID,
+  DB_V,
   API_METADATA_ID,
   API_ORGANIZATION_ID,
   API_CONTACT_ID,
   API_PRODUCER_PROPERTY,
   API_CONTACTS_PROPERTY
-} = require('../db/dbFields')
+} = require('./dbFields')
 
 const {
   REQ_LANG,
@@ -47,7 +48,23 @@ const Organization = require('../definitions/models/Organization')
 const Contact = require('../definitions/models/Contact')
 
 //———————————————————————————————————————————————————————————————
-// Helper functions
+// Unmongoozify functions
+//———————————————————————————————————————————————————————————————
+
+exports.unmongoozify = async (jsonObject) => {
+
+  /* beautify ignore:start */
+  let jsonClone = {...jsonObject}
+  /* beautify ignore:end */
+
+  delete jsonClone[DB_ID]
+  delete jsonClone[DB_V]
+
+  return jsonClone
+}
+
+//———————————————————————————————————————————————————————————————
+// Producer/contacts functions
 //———————————————————————————————————————————————————————————————
 
 exports.updateJsonOrganization = async (organizationJson) => {

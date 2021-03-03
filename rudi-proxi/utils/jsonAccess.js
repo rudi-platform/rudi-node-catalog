@@ -9,6 +9,16 @@ const msg = require('./msg')
 // Functions
 //———————————————————————————————————————————————————————————————
 
+exports.accessParam = (jsonObject, jsonProperty) => {
+  const fun = 'accessParam'
+
+  const value = jsonObject[jsonProperty]
+  if (!value || '' == value) {
+    throw new Error(`${msg.parameterExpected(jsonObject, jsonProperty)}`)
+  }
+  return value
+}
+
 exports.accessProperty = (jsonObject, jsonProperty) => {
   const fun = 'accessProperty'
 

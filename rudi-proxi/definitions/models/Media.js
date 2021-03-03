@@ -6,6 +6,9 @@ const mongoose = require('mongoose')
 const Ids = require('../schemas/Identifiers')
 const Validation = require('../schemaValidators')
 
+const FileSchema = require('./MediaFile')
+const SeriesSchema = require('./MediaSeries')
+
 //———————————————————————————————————————————————————————————————
 // Custom schema definition
 //———————————————————————————————————————————————————————————————
@@ -29,26 +32,19 @@ const MediaSchema = new mongoose.Schema({
       type: String,
       required: true
     },
+    // TODO: define this properly. 
+    // Most likely an enum defined in Rudi that can be handled in 
+    // a known manner
     interface_contract: String
   },
+}, { discriminatorKey: 'media_type' })
 
-  // Updated status of the contact person
-  role: {
-    type: String
-  },
+const Media = mongoose.model('Media', MediaSchema)
 
-  // Updated offical postal address of the organization
-  email: {
-    type: String,
-    required: true,
-    validate: {
-      validator: Validation.isEmail,
-      message: '{VALUE} is not a valid e-mail'
-    }
-  }
-})
+const MediaFile = Media.discriminator('FILE', FileSchema)
+const MediaSeries = Media.discriminator('SERIES', SeriesSchema)
 
 //———————————————————————————————————————————————————————————————
 // Exports
 //———————————————————————————————————————————————————————————————
-module.exports = mongoose.model('Media', MediaSchema)
+module.exports = {Media, MediaFile, MediaSeries}

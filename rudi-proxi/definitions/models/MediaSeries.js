@@ -1,64 +1,66 @@
 //———————————————————————————————————————————————————————————————
-// API version
+// External dependancies
 //———————————————————————————————————————————————————————————————
-const API_VERSION = '1.1.0';
+const mongoose = require('mongoose')
+const Int32 = require('mongoose-int32')
 
-//———————————————————————————————————————————————————————————————
-// REQ methods
-//———————————————————————————————————————————————————————————————
-const Request = [
-  'POST',
-  'PUT',
-  'DELETE'
-]
+const Ids = require('../schemas/Identifiers')
+const Validation = require('../schemaValidators')
+
 
 //———————————————————————————————————————————————————————————————
-// REQ parameters
+// Constants
 //———————————————————————————————————————————————————————————————
-const DEFAULT_LANG = 'fr'
 
-//--- "In query" parameters
-const REQ_ID = 'id';
-const REQ_LANG = 'lang';
-const REQ_REPORT_ID = 'irid';
-
-//--- "In path" parameters
-const REQ_SUBJECT = 'subject'; 
+// const FileTypes = require('../thesaurus/FileTypes')
 
 //———————————————————————————————————————————————————————————————
-// REQ URL
+// Custom schema definition
 //———————————————————————————————————————————————————————————————
-const DB_NAME = "rudi_prod"
-const DB_PORT = 27017
-const DB_URL = `mongodb://127.0.0.1/${DB_NAME}`
+const SeriesSchema = new mongoose.Schema({
 
-const URL_PREFIX = '/api/v1/';
-const URL_SUFIX_METADATA = 'resources'
-const URL_SUFIX_ORGANIZATIONS = 'organizations'
-const URL_SUFIX_CONTACTS = 'contacts'
-const URL_SUFIX_REPORT = 'report'
+  // Theorical delay between the production of the record and its availability,
+  // in milliseconds.
+  latency: {
+    type: Int32,
+    minimum: 0
+  },
 
-const URL_METADATA = `${URL_PREFIX}${URL_SUFIX_METADATA}`
-const URL_ORGANIZATIONS = `${URL_PREFIX}${URL_SUFIX_ORGANIZATIONS}`
-const URL_CONTACTS = `${URL_PREFIX}${URL_SUFIX_CONTACTS}`
-const URL_SUBJECT = `${URL_PREFIX}:${REQ_SUBJECT}`
+  // Theorical delay between the production of two records, in milliseconds.
+  period: {
+    type: Int32,
+    minimum: 0
+  },
+
+  // Actual number of records
+  current_number_of_records: {
+    type: Int32,
+    minimum: 0
+  },
+
+  // Actual size of the data, in bytes (refreshed automatically)
+  current_size: {
+    type: Int32,
+    minimum: 0
+  },
+
+  // Estimated total number of records
+  total_number_of_records: {
+    type: Int32,
+    minimum: 0
+  },
+
+  // Estimated total size of the data, in bytes 
+  total_size: {
+    type: Int32,
+    minimum: 0
+  },
+
+})
 
 
-module.exports = {
-  Request,
-  API_VERSION,
-  DB_NAME,
-  DB_PORT,
-  DB_URL,
-  URL_PREFIX,
-  URL_SUFIX_REPORT,
-  DEFAULT_LANG,
-  REQ_LANG,
-  REQ_ID,
-  REQ_SUBJECT,
-  REQ_REPORT_ID,
-  URL_METADATA,
-  URL_ORGANIZATIONS,
-  URL_CONTACTS,
-  URL_SUBJECT
-}
+
+//———————————————————————————————————————————————————————————————
+// Exports
+//———————————————————————————————————————————————————————————————
+module.exports = SeriesSchema

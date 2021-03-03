@@ -17,6 +17,7 @@ const lang = require('../utils/lang')
 
 const db = require('../db/dbQueries')
 const dbRwk = require('../db/dbReworkData')
+const json = require('../utils/jsonAccess')
 
 //———————————————————————————————————————————————————————————————
 // Constants
@@ -58,33 +59,31 @@ exports.addMetadata = async (req, reply) => {
     let incomingData = {...req.body}
     /* beautify ignore:end */
 
-    const id = incomingData[API_METADATA_ID]
-    if (!id || '' == id) {
-      throw new Error(`${msg.missingProperty(incomingData, API_METADATA_ID)}`)
-    }
+    const id = json.accessProperty(incomingData, API_METADATA_ID)
 
     // First: we make sure id isn't used already
-    const existingMetadata = await db.getMetadataFromJson(incomingData)
-    if (existingMetadata && '' != existingMetadata) {
+    if (await db.doesInfoExistFromRudiId(Metadata, API_METADATA_ID, id)) {
       throw new Error(`${msg.metadataAlreadyExists(id)}`)
     }
 
+    const producer = json.accessProperty(incomingData, API_PRODUCER_PROPERTY)
+    const contacts = json.accessProperty(incomingData, API_CONTACTS_PROPERTY)
+
     // Updating incoming data with the full info of the organization
     // TODO[VALIDATE]: The organization info already in database is not updated with possible new data, 
-    //                 and only the organization RUDI id is really necessary in the request body
-    incomingData[API_PRODUCER_PROPERTY] = await dbRwk.updateJsonOrganization(incomingData[API_PRODUCER_PROPERTY])
-
+    //                 and only the organization RUDI id is really necessary in the request body    
+    incomingData[API_PRODUCER_PROPERTY] = await dbRwk.updateJsonOrganization(producer)
 
     // Updating incoming data with the full info of the organization
     // TODO[VALIDATE]: The contact info already in database is not updated with possible new data, 
     //                 and only the contact RUDI id is really necessary in the request body
-    incomingData[API_CONTACTS_PROPERTY] = await dbRwk.updateJsonContactList(incomingData[API_CONTACTS_PROPERTY])
+    incomingData[API_CONTACTS_PROPERTY] = await dbRwk.updateJsonContactList(contacts)
 
     // Creating new metadata
     const newMetadata = new Metadata(incomingData)
-    const dbActionresult = await newMetadata.save()
+    const metadata = await newMetadata.save()
     log.d(fun, `${msg.metadataAdded(incomingData[API_METADATA_ID])}`)
-    return dbActionresult
+    return metadata
   } catch (err) {
     log.e(fun, err)
     throw boom.boomify(err)
@@ -116,13 +115,10 @@ exports.getSingleMetadata = async (req, reply) => {
   log.d(fun, ``)
 
   try {
-    lang.setLanguage(req.params[REQ_LANG])
+    lang.setLanguage(json.accessParam(req.params, REQ_LANG))
 
     // Checking if the parameter is ok
-    const id = req.params[REQ_ID]
-    if (!id || '' == id) {
-      throw new Error(`${msg.parameterExpected(REQ_ID)}`)
-    }
+    const id = json.accessParam(req.params, REQ_ID)
 
     let metadata = await db.getMetadataFromRudiId(id)
 
@@ -147,16 +143,13 @@ exports.updateMetadata = async (req, reply) => {
   const fun = 'updateMetadata'
   log.d(fun, ``)
   try {
-    lang.setLanguage(req.params[REQ_LANG])
+    lang.setLanguage(json.accessParam(req.params, REQ_LANG))
 
     /* beautify ignore:start */
     let incomingData = {...req.body}
     /* beautify ignore:end */
 
-    const id = incomingData[API_METADATA_ID]
-    if (!id || '' == id) {
-      throw new Error(`Body should define the property '${API_METADATA_ID}'`)
-    }
+    const id = json.accessProperty(incomingData, API_METADATA_ID)
 
     // First: we make sure some data exists with input JSON id
     const existingMetadata = await db.getMetadataFromJson(incomingData)
@@ -164,16 +157,15 @@ exports.updateMetadata = async (req, reply) => {
       throw new Error(`${msg.metadataNotFound(id)}`)
     }
 
-    // Retrieveing full info for the organization
-    if (!incomingData[API_PRODUCER_PROPERTY] || '' == incomingData[API_PRODUCER_PROPERTY]) {
-      throw new Error(`${msg.missingProperty( incomingData, API_PRODUCER_PROPERTY)}`)
-    }
+    const producer = json.accessProperty(incomingData, API_PRODUCER_PROPERTY)
+    const contacts = json.accessProperty(incomingData, API_CONTACTS_PROPERTY)
+
     // TODO[VALIDATE]: this means only the RUDI id for the contact is necessary (and taken into account)
-    incomingData[API_PRODUCER_PROPERTY] = await db.getOrganizationFromJson(incomingData[API_PRODUCER_PROPERTY])
+    incomingData[API_PRODUCER_PROPERTY] = await db.getOrganizationFromJson(producer)
 
     // TODO[VALIDATE]: the contact info already in database is not updated with possible new data
     // TODO[VALIDATE]: this means only the RUDI id for the contact is necessary (and taken into account)
-    incomingData[API_CONTACTS_PROPERTY] = await dbRwk.updateJsonContactList(incomingData[API_CONTACTS_PROPERTY])
+    incomingData[API_CONTACTS_PROPERTY] = await dbRwk.updateJsonContactList(contacts)
 
     const updatedMetadata = await db.updateInfo(Metadata, API_METADATA_ID, incomingData)
 
@@ -190,17 +182,14 @@ exports.deleteMetadata = async (req, reply) => {
   const fun = 'deleteMetadata'
   log.d(fun, ``)
   try {
-    lang.setLanguage(req.params[REQ_LANG])
+    lang.setLanguage(json.accessParam(req.params, REQ_LANG))
 
-    const id = req.params[REQ_ID]
-    const metadata = await Metadata.findOneAndRemove({
-      [API_METADATA_ID]: id
-    })
-    if (null == metadata) {
-      throw new Error(msg.metadataNotFound(id))
-    }
-    log.d(fun, msg.metadataDeleted(id))
-    return metadata
+    const id = json.accessParam(req.params, REQ_ID)
+
+    const deletedMetadata = await db.deleteMetadata(id)
+
+    // log.d(fun, msg.metadataDeleted(id))
+    return deletedMetadata
   } catch (err) {
     log.e(fun, err)
     throw boom.boomify(err)
@@ -213,7 +202,7 @@ exports.deleteManyMetadata = async (req, reply) => {
   const fun = 'deleteManyMetadata'
   log.d(fun, ``)
   try {
-    lang.setLanguage(req.params[REQ_LANG])
+    lang.setLanguage(json.accessParam(req.params, REQ_LANG))
 
     /* beautify ignore:start */
     const {...conditions} = req.body

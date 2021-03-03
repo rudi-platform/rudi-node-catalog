@@ -1,20 +1,25 @@
 //———————————————————————————————————————————————————————————————
 // API version
 //———————————————————————————————————————————————————————————————
-const MetadataVersion = '1.1.0';
+const {
+  API_VERSION
+} = require('../../routes/apiUrl');
 
 //———————————————————————————————————————————————————————————————
 // External dependencies
 //———————————————————————————————————————————————————————————————
 const mongoose = require('mongoose');
 
+const Int32 = require('mongoose-int32');
+
+//———————————————————————————————————————————————————————————————
+// Internal dependencies
+//———————————————————————————————————————————————————————————————
 const Validation = require('../schemaValidators');
 
 //———————————————————————————————————————————————————————————————
-// External schema definitions
+// Schema definitions
 //———————————————————————————————————————————————————————————————
-var Int32 = require('mongoose-int32');
-
 const GeoJSON = require('mongoose-geojson-schema');
 
 const Ids = require('../schemas/Identifiers');
@@ -26,7 +31,7 @@ const ReferenceDates = require('../schemas/ReferenceDates');
 const Media = require('./Media');
 
 //———————————————————————————————————————————————————————————————
-// External model definitions
+// Model definitions
 //———————————————————————————————————————————————————————————————
 const Organization = require('./Organization');
 const Contact = require('./Contact');
@@ -35,10 +40,11 @@ const Contact = require('./Contact');
 // Thesaurus definiitons
 //———————————————————————————————————————————————————————————————
 const Language = require('../thesaurus/Languages');
+const Keywords = require('../thesaurus/Keywords');
 const Themes = require('../thesaurus/Themes');
 const Projection = require('../thesaurus/Projections');
 const Encoding = require('../thesaurus/Encodings');
-const HashAlgo = require('../thesaurus/HashAlgos');
+const HashAlgo = require('../thesaurus/HashAlgorithms');
 
 //———————————————————————————————————————————————————————————————
 // Constants
@@ -96,14 +102,21 @@ const MetadataSchema = new mongoose.Schema({
   // Simple name for the resource
   resource_title: {
     type: String,
-    maxlength: 150
+    maxlength: 150,
+    required: true
   },
 
   // Short description for the whole dataset
-  abstract: [DictionaryEntry],
+  abstract: {
+    type: [DictionaryEntry],
+    required: true
+  },
 
   // More precise description for the whole dataset
-  summary: [DictionaryEntry],
+  summary: {
+    type: [DictionaryEntry],
+    required: true
+  },
 
   //---------------------------
   // Dataset classification
@@ -112,11 +125,18 @@ const MetadataSchema = new mongoose.Schema({
   // Category for thematic classification of the data
   theme: {
     type: String,
-    enum: Object.values(Themes)
+    enum: Object.values(Themes),
+    required: true
   },
 
   // List of tags that can be used to retrieve the data
-  keywords: [SkosEntry],
+  keywords: {
+    type: [{
+      type: String,
+      enum: Object.values(Keywords)
+    }],
+    required: true
+  },
 
   //---------------------------
   // Involved parties
@@ -161,7 +181,7 @@ const MetadataSchema = new mongoose.Schema({
       type: String,
       enum: Object.values(Language)
     }],
-    default: [Language.fr_FR],
+    default: [Language.fr],
   },
 
   // Period of time described by the data
@@ -259,14 +279,18 @@ const MetadataSchema = new mongoose.Schema({
     // API version number (used for retro-compatibility)
     api_version: {
       type: String,
+      required: true,
       validate: {
         validator: Validation.isVersion,
-        message: '{VALUE} does not appear to be a valid version number (0.0.0)'
+        message: '{VALUE} does not appear to be a valid version number (0.0.0abc)'
       }
     },
 
     // Dates of the actions performed on the metadata (creation, publishing, update...)
-    metadata_dates: ReferenceDates,
+    metadata_dates: {
+      type: ReferenceDates,
+      required: true
+    },
 
     // Description of the organization that produced the metadata
     metadata_provider: {

@@ -2,7 +2,7 @@
  * In this file are made the different calls to the database
  */
 
- //———————————————————————————————————————————————————————————————
+//———————————————————————————————————————————————————————————————
 // External dependancies 
 //———————————————————————————————————————————————————————————————
 const boom = require('@hapi/boom')
@@ -28,9 +28,11 @@ const {
   API_METADATA_ID,
   API_ORGANIZATION_ID,
   API_CONTACT_ID,
+  API_REPORT_ID,
+  API_RESOURCE_ID,
   API_PRODUCER_PROPERTY,
   API_CONTACTS_PROPERTY
-} = require('../db/dbFields')
+} = require('./dbFields')
 
 //———————————————————————————————————————————————————————————————
 // Data models
@@ -95,6 +97,18 @@ exports.getInfoFromDbId = async (dbModel, id) => {
   return dbModel.findOne({[DB_ID]: id})
   /* beautify ignore:end */
 }
+
+exports.doesInfoExistFromRudiId = async (dbModel, labelIdField, id) => {
+  const existingInfo = await this.getInfoFromRudiId(dbModel, labelIdField, id)
+  return (existingInfo && '' != existingInfo)
+}
+
+
+exports.doesInfoExistFromJson = async (dbModel, labelIdField, infoJson) => {
+  const existingInfo = await this.getInfoFromJson(dbModel, labelIdField, infoJson)
+  return (existingInfo && '' != existingInfo)
+}
+
 
 exports.updateInfo = async (dbModel, labelIdField, jsonUpdateData) => {
   const fun = 'updateInfo'
@@ -203,6 +217,27 @@ exports.updateMetadata = async (jsonMetadata) => {
   return updatedMetadata
 }
 
+
+exports.deleteMetadata = async (metadataRudiId) => {
+  const fun = 'deleteOrganization'
+  log.d(fun, ``)
+
+  // Checking the id parameter
+  if (!metadataRudiId || '' == metadataRudiId) {
+    throw new Error(`${msg.parameterExpected(fun, API_METADATA_ID)}`)
+  }
+
+  // Checking that the organization already exists
+  if (! await this.doesInfoExistFromRudiId(Metadata, API_METADATA_ID, metadataRudiId)) {
+    throw new Error(`${msg.metadataNotFound(metadataRudiId)}`)
+  }
+
+  // Deleting the organization
+  const deletedOrganization = await this.deleteInfo(Metadata, API_METADATA_ID, metadataRudiId)
+  log.d(fun, `${msg.organizationDeleted(metadataRudiId)}`)
+
+  return deletedOrganization
+}
 //---------------------------------------- 
 // - Organization
 //---------------------------------------- 

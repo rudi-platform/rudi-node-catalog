@@ -12,7 +12,10 @@ const DictionaryEntry = require('./DictionaryEntry')
 //———————————————————————————————————————————————————————————————
 const SkosEntrySchema = new mongoose.Schema({
   // Term used in RUDI system (eg in metadata files), most likely english one
-  skos_value: String,
+  skos_value: {
+    type: String,
+    required: true
+  },
   
   // URI of the thesaurus that hosts the traduction of this term
   skos_uri: {

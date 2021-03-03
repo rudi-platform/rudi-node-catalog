@@ -50,7 +50,6 @@ exports.addContact = async (req, reply) => {
 
     const id = json.accessProperty(incomingData, API_CONTACT_ID)
 
-
     // First: we make sure id isn't used already
     const existingContact = await db.getContactFromRudiId(id)
     if (existingContact && '' != existingContact) {

@@ -45,6 +45,20 @@ exports.missingProperty = (jsonObject, property) => {
   }
 }
 
+exports.parametersMismatch = (paramUrl, paramBody) => {
+  switch (getLanguage()) {
+    case 'en':
+    case 'en-GB':
+    case 'en-US':
+      return `Parameters should be the same between body and URL call!\n- URL parameter: '${paramUrl}'\n- body parameter: '${paramBody}' `;
+    case 'fr':
+    case 'fr-FR':
+    case 'fr-BE':
+      return `Les paramètres doivent être identiques entre le corps de la requête et l'URL\n- URL: '${paramUrl}'\n- requête: '${paramBody}' `;
+    default:
+      return `${DEFAULT_MSG}: ${getLanguage()}`;
+  }
+}
 
 //———————————————————————————————————————————————————————————————
 // Metadata
@@ -154,6 +168,8 @@ exports.metadataDeletedWithCondition = (condition) => {
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
 }
+
+
 //———————————————————————————————————————————————————————————————
 // Organization
 //———————————————————————————————————————————————————————————————
@@ -305,6 +321,85 @@ exports.contactNotFound = (id) => {
     case 'fr-FR':
     case 'fr-BE':
       return `Aucun contact trouvé avec l'identifiant: ${id} `;
+    default:
+      return `${DEFAULT_MSG}: ${getLanguage()}`;
+  }
+}
+
+
+//———————————————————————————————————————————————————————————————
+// Report
+//———————————————————————————————————————————————————————————————
+exports.reportAdded = (id) => {
+  switch (getLanguage()) {
+    case 'en':
+    case 'en-GB':
+    case 'en-US':
+      return `New report added with id: ${id} `;
+    case 'fr':
+    case 'fr-FR':
+    case 'fr-BE':
+      return `Rapport créé avec l'identifiant: ${id} `;
+    default:
+      return `${DEFAULT_MSG}: ${getLanguage()}`;
+  }
+}
+
+exports.reportAlreadyExists = (id) => {
+  switch (getLanguage()) {
+    case 'en':
+    case 'en-GB':
+    case 'en-US':
+      return `A report already exists for id: ${id} `;
+    case 'fr':
+    case 'fr-FR':
+    case 'fr-BE':
+      return `Un rapport existe déjà pour l'identifiant: ${id} `;
+    default:
+      return `${DEFAULT_MSG}: ${getLanguage()}`;
+  }
+}
+
+exports.reportUpdated = (id) => {
+  switch (getLanguage()) {
+    case 'en':
+    case 'en-GB':
+    case 'en-US':
+      return `Report updated for id: ${id} `;
+    case 'fr':
+    case 'fr-FR':
+    case 'fr-BE':
+      return `Rapport mis à jour pour l'identifiant: ${id} `;
+    default:
+      return `${DEFAULT_MSG}: ${getLanguage()}`;
+  }
+}
+
+
+exports.reportDeleted = (id) => {
+  switch (getLanguage()) {
+    case 'en':
+    case 'en-GB':
+    case 'en-US':
+      return `Report deleted for id: ${id} `;
+    case 'fr':
+    case 'fr-FR':
+    case 'fr-BE':
+      return `Rapport supprimé pour l'identifiant: ${id} `;
+    default:
+      return `${DEFAULT_MSG}: ${getLanguage()}`;
+  }
+}
+exports.reportNotFound = (id) => {
+  switch (getLanguage()) {
+    case 'en':
+    case 'en-GB':
+    case 'en-US':
+      return `No report was found with id: ${id} `;
+    case 'fr':
+    case 'fr-FR':
+    case 'fr-BE':
+      return `Aucun rapport trouvé avec l'identifiant: ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }

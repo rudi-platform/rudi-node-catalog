@@ -5,15 +5,15 @@
 //———————————————————————————————————————————————————————————————
 // Custom schema definition
 //———————————————————————————————————————————————————————————————
-const Encodings = {
-  Unicode: 'ISO/IEC 10646',
-  UTF8: 'UTF-8',
-  UTF16: 'UTF-16',
-  Latin1: 'ISO/CEI 8859-1',
-  MacRoman: 'MacRoman',
-  Windows1252: 'Windows-1252',
-  ASCII: 'ASCII'
-}
+const Encodings = [
+  'ISO/IEC 10646',
+  'UTF-8',
+  'UTF-16',
+  'ISO/CEI 8859-1',
+  'MacRoman',
+  'Windows-1252',
+  'ASCII'
+]
 
 
 //———————————————————————————————————————————————————————————————

@@ -1,83 +1,67 @@
-
-// \d : digit character == [0-9]
-// \w : word character == [0-9a-zA-Z_]
-// /i (at the end) : expression is case insensitive
-
-
-//———————————————————————————————————————————————————————————————
-// Generic functions
-//———————————————————————————————————————————————————————————————
-function validateSchema(schemaStr, regExPattern) {
-  const regExp = new RegExp(regExPattern)
-  return schemaStr.match(regExp)
-}
-
-//———————————————————————————————————————————————————————————————
-// UUID
-//———————————————————————————————————————————————————————————————
-
-const regexUUIDv4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
-function isUUIDv4(str) {
-  return validateSchema(str, regexUUIDv4)
-}
-
-function isRudiID(str) {
-  return isUUIDv4(str) // || isDOI(idStr)
-}
-
-//———————————————————————————————————————————————————————————————
-// DOI
-//———————————————————————————————————————————————————————————————
-
-// source: https://www.crossref.org/blog/dois-and-matching-regular-expressions/
-// alternative: https://github.com/regexhq/doi-regex/blob/master/index.js
-const regexDOI = /^10.\d{4,9}\/[-.;()\/:\w]+$/i;
-
-function isDOI(str) {
-  return validateSchema(str, regexDOI)
-}
-
-//———————————————————————————————————————————————————————————————
-// URI
-//———————————————————————————————————————————————————————————————
-
-const regexURI = /^(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?$/;
-
-function isURI(str) {
-  return str.match(new RegExp(regexURI))
-}
-
-//———————————————————————————————————————————————————————————————
-// E-mail
-//———————————————————————————————————————————————————————————————
-
-const regexEmail = /^([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-function isEmail(str) {
-  return str.match(new RegExp(regexEmail))
-}
-
 //———————————————————————————————————————————————————————————————
 // API version
 //———————————————————————————————————————————————————————————————
+const {
+  API_VERSION
+} = require('../../routes/apiUrl');
 
-function isVersion(str) {
-  return str.match(new RegExp(
-    /^([0-9]{1,2}\.){2}[0-9]{1,2}[a-z]*$/
-  ))
-}
+//———————————————————————————————————————————————————————————————
+// External dependencies
+//———————————————————————————————————————————————————————————————
+const mongoose = require('mongoose');
+
+//———————————————————————————————————————————————————————————————
+// Internal dependencies
+//———————————————————————————————————————————————————————————————
+const Validation = require('../schemaValidators');
+
+
+//———————————————————————————————————————————————————————————————
+// Schema definitions
+//———————————————————————————————————————————————————————————————
+const ReferenceDates = require('../schemas/ReferenceDates');
+
+//———————————————————————————————————————————————————————————————
+// Model definitions
+//———————————————————————————————————————————————————————————————
+const Organization = require('./Organization');
+const Contact = require('./Contact');
+
+
+//———————————————————————————————————————————————————————————————
+// Custom schema definitions
+//———————————————————————————————————————————————————————————————
+const MetadataInfoSchema = new mongoose.Schema({
+  // API version number (used for retro-compatibility)
+  api_version: {
+    type: String,
+    required: true,
+    validate: {
+      validator: Validation.isVersion,
+      message: '{VALUE} does not appear to be a valid version number (0.0.0abc)'
+    }
+  },
+
+  // Dates of the actions performed on the metadata (creation, publishing, update...)
+  metadata_dates: {
+    type: ReferenceDates,
+    required: true
+  },
+
+  // Description of the organization that produced the metadata
+  metadata_provider: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Organization'
+  },
+
+  // Addresses to get further information on the metadata
+  metadata_contacts: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Contact'
+  }]
+});
 
 //———————————————————————————————————————————————————————————————
 // Exports
 //———————————————————————————————————————————————————————————————
-
-
-module.exports = {
-  validateSchema,
-  isDOI,
-  isUUIDv4,
-  isURI,
-  isEmail,
-  isVersion
-}
+module.exports = mongoose.model('MetadataInfo', MetadataInfoSchema);

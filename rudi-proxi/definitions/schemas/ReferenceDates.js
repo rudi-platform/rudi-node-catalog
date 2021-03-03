@@ -24,7 +24,7 @@ const ReferenceDatesSchema = new mongoose.Schema({
   deleted: {
     type: Date
   }
-})
+}, { _id: false })
 
 
 //———————————————————————————————————————————————————————————————

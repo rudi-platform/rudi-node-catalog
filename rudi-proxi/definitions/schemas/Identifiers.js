@@ -14,7 +14,7 @@ const Validation = require('../schemaValidators')
 
 const UUIDv4 = {
   type: String,
-  default: _ => uuidv4(),
+  // default: _ => uuidv4(),
   trim: true,
   required: true,
   unique: true,

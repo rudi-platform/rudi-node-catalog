@@ -1,5 +1,5 @@
 /*
- * In this file are made the different steps followed for each 
+ * This file describes the steps followed for each 
  * action on the organizations (producer or publisher)
  */
 
