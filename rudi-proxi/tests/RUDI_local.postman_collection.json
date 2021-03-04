@@ -1,0 +1,616 @@
+{
+	"info": {
+		"_postman_id": "516d5505-6ec3-4a6f-91b2-2bc97686a24d",
+		"name": "RUDI local",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "resources",
+			"item": [
+				{
+					"name": "Get all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{data}}?limit=1&offset=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{data}}"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "1"
+								},
+								{
+									"key": "offset",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add 1st",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"global_id\": \"{{metaId1}}\",\n    \"local_id\": \"testingID 4 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-444\",\n    \"resource_title\": \"Test de RUDI en local 4444\",\n    \"abstract\": {\n        \"lang\": \"fr\",\n        \"text\": \"Courte description de RUDI en local 4444\"\n    },\n    \"summary\": {\n        \"lang\": \"fr\",\n        \"text\": \"Mon résumé chg 4\"\n    },\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"wind\",\n        \"research\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"M. Fazo\",\n            \"email\": \"gpizj@pzorjeg.gt\"\n        },\n        {\n            \"contact_id\": \"{{contId2}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"medatata_info\": {\n        \"api_version\": \"1.1.0\",\n        \"metadata_dates\": {\n            \"created\": \"{{now}}\",\n            \"published\": \"{{now}}\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{data}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{data}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add 2nd",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"global_id\": \"{{metaId1}}\",\n    \"local_id\": \"testingID 4 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-444\",\n    \"resource_title\": \"Test de RUDI en local 4444\",\n    \"abstract\": {\n        \"lang\": \"fr\",\n        \"text\": \"Courte description de RUDI en local 4444\"\n    },\n    \"summary\": {\n        \"lang\": \"fr\",\n        \"text\": \"Mon résumé chg 4\"\n    },\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"wind\",\n        \"research\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"M. Fazo\",\n            \"email\": \"gpizj@pzorjeg.gt\"\n        },\n        {\n            \"contact_id\": \"{{contId2}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"medatata_info\": {\n        \"api_version\": \"1.1.0\",\n        \"metadata_dates\": {\n            \"created\": \"{{now}}\",\n            \"published\": \"{{now}}\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{data}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{data}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get 1",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{data}}/{{metaId1}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{data}}",
+								"{{metaId1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete 1",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{data}}/{{metaId1}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{data}}",
+								"{{metaId1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete many",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"__v\": 0}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{data}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{data}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"global_id\": \"{{metaId1}}\",\n    \"resource_title\": \"Test de RUDI en local 44\",\n    \"summary\": {\n        \"lang\": \"fr-FR\",\n        \"text\": \"Mon résumé chg 444\"\n    },\n    \"producer\": {\n        \"organization_id\": \"68763948-0033-403a-a083-64dce70c6044\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"50e2c58a-3b50-4fc0-bd27-82e88cb3e878\"\n        }\n    ],\n    \"medatata_info\": {\n        \"metadata_dates\": {\n            \"updated\": \"{{now}}\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{data}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{data}}"
+							],
+							"query": [
+								{
+									"key": "global_id",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "organization",
+			"item": [
+				{
+					"name": "Get all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{org}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{org}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add 1",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"organization_id\": \"68763948-0033-403a-a083-64dce70c6044\",\n    \"organization_name\": \"IRISA\",\n    \"organization_address\": \"Campus de Beaulieu, 263 avenue du Général Leclerc, Bâtiment 12 F, allée Jean Perrin, 35042 RENNES Cedex\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/organizations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"organizations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add 2nd",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"organization_id\": \"68763948-0033-403a-a083-64dce70c6044\",\n    \"organization_name\": \"IRISA\",\n    \"organization_address\": \"Campus de Beaulieu, 263 avenue du Général Leclerc, Bâtiment 12 F, allée Jean Perrin, 35042 RENNES Cedex\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/organizations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"organizations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get 1 identified",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/organizations/68763948-0033-403a-a083-64dce70c6044",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"organizations",
+								"68763948-0033-403a-a083-64dce70c6044"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete 1",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/organizations/68763948-0033-403a-a083-64dce70c6044",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"organizations",
+								"68763948-0033-403a-a083-64dce70c6044"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete many",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"organization_name\": \"IRISA\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/organizations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"organizations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"organization_id\": \"68763948-0033-403a-a083-64dce70c6044\",\n    \"organization_name\": \"IRISA\",\n    \"organization_address\": \"Campus de Beaulieu, 263 avenue du Général Leclerc, Bâtiment 12 F, Allée Jean Perrin, 35042 RENNES Cedex\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/organizations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"organizations"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "contact",
+			"item": [
+				{
+					"name": "Get all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/contacts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"contacts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add 1st",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"contact_id\": \"47763948-0033-403a-a083-64dce70c6044\",\n    \"contact_name\": \"M. Fazo\",\n    \"email\": \"fazo@irisa.fr\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/contacts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"contacts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add 2nd",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"contact_id\": \"33363948-0033-403a-a083-64dce70c6044\",\n    \"contact_name\": \"Mme. Feya\",\n    \"email\": \"feya@irisa.fr\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/contacts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"contacts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get 1",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/contacts/50e2c58a-3b50-4fc0-bd27-82e88cb3e878",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"contacts",
+								"50e2c58a-3b50-4fc0-bd27-82e88cb3e878"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete 1",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/contacts/68763948-0033-403a-a083-64dce70c6044",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"contacts",
+								"68763948-0033-403a-a083-64dce70c6044"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete many",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"__v\": 0}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/contacts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"contacts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"contact_id\": \"0ea7d773-0cb4-4149-b444-8ac53439816b\",\n    \"contact_name\": \"M. Fazo Gres\",\n    \"email\": \"fazo@irisa.fr\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/contacts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"contacts"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "reports",
+			"item": [
+				{
+					"name": "Add 1st (org 1)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"report_id\": \"17f0182e-4d69-48c4-98ef-9fc9adac9415\",\n    \"resource_id\": \"{{orgId1}}\",\n    \"integration_status\": \"OK\",\n    \"version\": \"{{apiVersion}}\"\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{lang}}/resources/{{metaId1}}/report",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{lang}}",
+								"resources",
+								"{{metaId1}}",
+								"report"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit 1st (org 1)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"report_id\": \"17f0182e-4d69-48c4-98ef-9fc9adac9415\",\n    \"resource_id\": \"{{metaId1}}\",\n    \"integration_status\": \"OK\",\n    \"version\": \"1\",\n    \"comment\": \"edit\",\n    \"method\": \"POST\"\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{lang}}/resources/{{metaId1}}/report",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{lang}}",
+								"resources",
+								"{{metaId1}}",
+								"report"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"pm.globals.set(\"now\", new Date().toISOString());",
+					"pm.globals.set(\"timezone\", new Date().getTimezoneOffset());"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
