@@ -6,59 +6,73 @@ const API_VERSION = '1.1.0';
 //———————————————————————————————————————————————————————————————
 // REQ methods
 //———————————————————————————————————————————————————————————————
-const Request = [
-  'POST',
-  'PUT',
-  'DELETE'
-]
+const HttpMethods = {
+  POST: 'POST',
+  PUT: 'PUT',
+  DELETE: 'DELETE'
+}
 
 //———————————————————————————————————————————————————————————————
 // REQ parameters
 //———————————————————————————————————————————————————————————————
 const DEFAULT_LANG = 'fr'
 
-//--- "In query" parameters
-const REQ_ID = 'id';
-const REQ_LANG = 'lang';
-const REQ_REPORT_ID = 'irid';
-
 //--- "In path" parameters
-const REQ_SUBJECT = 'subject'; 
+const PARAM_LANG = 'lang';
+const PARAM_OBJECT = 'object';
+const PARAM_ID = 'id';
+const PARAM_REPORT_ID = 'irid';
+
+//--- "In query" parameters
+const QUERY_LIMIT = 'limit'
+const QUERY_OFFSET = 'offset'
 
 //———————————————————————————————————————————————————————————————
 // REQ URL
 //———————————————————————————————————————————————————————————————
-const DB_NAME = "rudi_prod"
-const DB_PORT = 27017
-const DB_URL = `mongodb://127.0.0.1/${DB_NAME}`
-
 const URL_PREFIX = '/api/v1/';
-const URL_SUFIX_METADATA = 'resources'
-const URL_SUFIX_ORGANIZATIONS = 'organizations'
-const URL_SUFIX_CONTACTS = 'contacts'
-const URL_SUFIX_REPORT = 'report'
 
+// This generic URL will be used to factorize the treatments on resources, organizations and contacts!
+const URL_OBJECT = `${URL_PREFIX}:${PARAM_OBJECT}`
+
+const URL_OBJECT_METADATA = 'resources'
+const URL_OBJECT_ORGANIZATIONS = 'organizations'
+const URL_OBJECT_CONTACTS = 'contacts'
+
+const URL_ACTION_DELETION = 'deletion'
+const URL_ACTION_REPORT = 'report'
+
+/*
 const URL_METADATA = `${URL_PREFIX}${URL_SUFIX_METADATA}`
 const URL_ORGANIZATIONS = `${URL_PREFIX}${URL_SUFIX_ORGANIZATIONS}`
 const URL_CONTACTS = `${URL_PREFIX}${URL_SUFIX_CONTACTS}`
-const URL_SUBJECT = `${URL_PREFIX}:${REQ_SUBJECT}`
+ */
 
 
+//———————————————————————————————————————————————————————————————
+// Exports
+//———————————————————————————————————————————————————————————————
 module.exports = {
-  Request,
+  HttpMethods,
+
   API_VERSION,
-  DB_NAME,
-  DB_PORT,
-  DB_URL,
+
   URL_PREFIX,
-  URL_SUFIX_REPORT,
+
+  URL_OBJECT,
+  URL_OBJECT_METADATA,
+  URL_OBJECT_ORGANIZATIONS,
+  URL_OBJECT_CONTACTS,
+
+  URL_ACTION_DELETION,
+  URL_ACTION_REPORT,
+
   DEFAULT_LANG,
-  REQ_LANG,
-  REQ_ID,
-  REQ_SUBJECT,
-  REQ_REPORT_ID,
-  URL_METADATA,
-  URL_ORGANIZATIONS,
-  URL_CONTACTS,
-  URL_SUBJECT
+  PARAM_LANG,
+  PARAM_ID,
+  PARAM_OBJECT,
+  PARAM_REPORT_ID,
+
+  QUERY_LIMIT,
+  QUERY_OFFSET
 }

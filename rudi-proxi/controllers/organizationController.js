@@ -28,9 +28,9 @@ const {
 } = require('../db/dbFields')
 
 const {
-  REQ_LANG,
-  REQ_ID
-} = require('../routes/apiUrl')
+  PARAM_LANG: REQ_LANG,
+  PARAM_ID: REQ_ID
+} = require('../config/confApi')
 
 //———————————————————————————————————————————————————————————————
 // Data models
@@ -55,7 +55,7 @@ exports.addOrganization = async (req, reply) => {
     const id = json.accessProperty(incomingData, API_ORGANIZATION_ID)
 
     // First: we make sure id isn't used already
-    const existingOrganization = await db.getOrganizationFromJson(incomingData)
+    const existingOrganization = await db.getOrganizationWithJson(incomingData)
     if (existingOrganization && '' != existingOrganization) {
       throw new Error(`${msg.organizationAlreadyExists(id)}`)
     }
@@ -98,7 +98,7 @@ exports.getSingleOrganization = async (req, reply) => {
       throw new Error(`${msg.parameterExpected(REQ_ID)}`)
     }
 
-    const organization = await db.getOrganizationFromRudiId(id)
+    const organization = await db.getOrganizationWithRudiId(id)
     if (!organization || '' == organization) {
       throw new Error(`${msg.organizationNotFound(id)}`)
     }

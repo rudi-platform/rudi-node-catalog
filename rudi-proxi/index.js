@@ -23,11 +23,14 @@ fastify.register(require('fastify-swagger'), swagger.options)
 // Constants 
 //———————————————————————————————————————————————————————————————
 const {
+  URL_PREFIX,
+} = require('./config/confApi')
+
+const {
   DB_NAME,
   DB_PORT,
   DB_URL,
-  URL_PREFIX,
-} = require('./routes/apiUrl')
+} = require('./config/confSystem')
 
 //———————————————————————————————————————————————————————————————
 // DB connection

@@ -36,9 +36,9 @@ const {
 } = require('./dbFields')
 
 const {
-  REQ_LANG,
-  REQ_ID
-} = require('../routes/apiUrl')
+  PARAM_LANG: REQ_LANG,
+  PARAM_ID: REQ_ID
+} = require('../config/confApi')
 
 //———————————————————————————————————————————————————————————————
 // Data models
@@ -69,11 +69,11 @@ exports.unmongoozify = async (jsonObject) => {
 
 exports.updateJsonOrganization = async (organizationJson) => {
   const fun = 'updateJsonOrganization'
-  // log.d(fun, `organizationJson: ${organizationJson}`)
+  log.d(fun, `organizationJson: ${organizationJson}`)
 
   // Retrieveing full info for the organization
   const id = json.accessProperty(organizationJson, API_ORGANIZATION_ID)
-  const organizationInfo = await db.getOrganizationFromJson(organizationJson)
+  const organizationInfo = await db.getOrganizationWithJson(organizationJson)
 
   // TODO[VALIDATE]: we assume the organization has previously been created!
   if (!organizationInfo || '' == organizationInfo) {
@@ -88,7 +88,7 @@ exports.updateJsonContact = async (contactJson) => {
   log.d(fun, ``)
 
   const contactRudiId = json.accessProperty(contactJson, API_CONTACT_ID)
-  const updatedContact = await db.getContactFromRudiId(contactRudiId)
+  const updatedContact = await db.getContactWithRudiId(contactRudiId)
 
   // TODO[VALIDATE]: we assume the contact has previously been created!
   if (!updatedContact || '' == updatedContact) {
@@ -123,7 +123,7 @@ exports.updateMetadataPropertiesFromDb = async (metadata) => {
   // Note : here we are updating data as they are stored in DB
   //        So 'producer' field is in reality a producer mongo _id!
   const producerId = json.accessProperty(metadata, API_PRODUCER_PROPERTY)
-  const updatedProducer = await db.getOrganizationFromDbId(producerId)
+  const updatedProducer = await db.getOrganizationWithDbId(producerId)
   if ('' == updatedProducer) {
     throw new Error(`${msg.organizationNotFound(producerId)}`)
   }
@@ -137,7 +137,7 @@ exports.updateMetadataPropertiesFromDb = async (metadata) => {
   for (const contactId of contacts) {
     // const contactId = contact[API_CONTACT_ID]
 
-    const updatedContact = await db.getContactFromDbId(contactId)
+    const updatedContact = await db.getContactWithDbId(contactId)
     if ('' == updatedContact) {
       throw new Error(`${msg.contactNotFound(producerId)}`)
     }
@@ -173,7 +173,7 @@ exports.updateMetadataListPropertiesFromDb = async (metadataList) => {
 
     let updatedProducer = producerCache.get(producerId)
     if (!updatedProducer) {
-      updatedProducer = await db.getOrganizationFromDbId(producerId)
+      updatedProducer = await db.getOrganizationWithDbId(producerId)
       if ('' == updatedProducer) {
         throw new Error(`${msg.organizationNotFound(producerId)}`)
       }
@@ -192,7 +192,7 @@ exports.updateMetadataListPropertiesFromDb = async (metadataList) => {
 
       let updatedContact = contactCache.get(contactId)
       if (!updatedContact) {
-        updatedContact = await db.getContactFromDbId(contactId)
+        updatedContact = await db.getContactWithDbId(contactId)
         if ('' == updatedContact) {
           throw new Error(`${msg.contactNotFound(producerId)}`)
         }

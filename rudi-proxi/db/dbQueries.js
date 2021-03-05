@@ -19,8 +19,11 @@ const json = require('../utils/jsonAccess')
 // Constants
 //———————————————————————————————————————————————————————————————
 const {
-  REQ_ID
-} = require('../routes/apiUrl')
+  PARAM_ID,
+  URL_OBJECT_METADATA,
+  URL_OBJECT_ORGANIZATIONS,
+  URL_OBJECT_CONTACTS,
+} = require('../config/confApi')
 
 // Fields from the JSON as definied in the API
 const {
@@ -42,132 +45,245 @@ const Organization = require('../definitions/models/Organization')
 const Contact = require('../definitions/models/Contact')
 
 
+
 //———————————————————————————————————————————————————————————————
-// Factorized functions
+// Generic functions
 //———————————————————————————————————————————————————————————————
-exports.getInfoFromRudiId = async (dbModel, labelIdField, rudiId) => {
-  const fun = 'getInfoFromRudiId'
+exports.getEnsuredDbIdWithRudiId = async (objectType, Model, idField, rudiId) => {
+  const fun = 'getDbIdWithRudiId'
+  log.d(fun, ``)
+  // log.d(fun, `objectType: ${objectType}`)
+  // log.d(fun, `idField: ${idField}`)
+  // log.d(fun, `rudiId: ${rudiId}`)
+  try {
+    /* beautify ignore:start */
+    const dbObject = await Model.findOne({[idField]: rudiId})
+    /* beautify ignore:end */
+    if (!dbObject) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
+    const dbId = json.accessProperty(dbObject, DB_ID)
+    return dbId
+  } catch (err) {
+    log.e(fun, err)
+    throw boom.boomify(err)
+  }
+}
+
+exports.getEnsuredDbIdWithJson = async (objectType, Model, idField, jsonObject) => {
+  const fun = 'getDbIdWithJson'
+  log.d(fun, ``)
+  // log.d(fun, `objectType: ${objectType}`)
+  // log.d(fun, `idField: ${idField}`)
+  // log.d(fun, `jsonObject: ${JSON.stringify(jsonObject)}`)
+  try {
+    const rudiId = json.accessProperty(jsonObject, idField)
+    return await this.getEnsuredDbIdWithRudiId(objectType, Model, idField, rudiId)
+  } catch (err) {
+    log.e(fun, err)
+    throw boom.boomify(err)
+  }
+}
+
+exports.getObjectWithRudiId = async (Model, idField, rudiId) => {
+  const fun = 'getObjectWithRudiId'
   log.d(fun, ``)
 
-  let fullInfo = ''
   try {
-
-    if (!rudiId || '' == rudiId) {
-      throw new Error(`${msg.parameterExpected(fun, REQ_ID)}`)
+    if (!rudiId) {
+      throw new Error(`${msg.parameterExpected(fun, PARAM_ID)}`)
     } else {
       log.d(fun, `RUDI id: ${rudiId}`)
     }
 
-    fullInfo = await dbModel.findOne({
-      [labelIdField]: rudiId
+    const dbObject = await Model.findOne({
+      [idField]: rudiId
     })
+    return dbObject
   } catch (err) {
     log.e(fun, err)
     throw boom.boomify(err)
   }
-  /* 
-    if (!fullInfo || '' == fullInfo) {
-      throw new Error(`Object not found for ${labelIdField}: ${rudiId}`)
-    }
-  */
-  log.d(fun, `full info: ${fullInfo}`)
-  return fullInfo
 }
 
-exports.getInfoFromJson = async (dbModel, labelIdField, jsonObject) => {
-  const fun = 'getInfoFromJson'
+exports.getEnsuredObjectWithRudiId = async (objectType, Model, idField, rudiId) => {
+  const fun = 'getEnsuredObjectWithRudiId'
+  log.d(fun, ``)
+  try {
+    if (!rudiId) throw new Error(`${msg.parameterExpected(fun, PARAM_ID)}`)
+    else log.d(fun, `RUDI id: ${rudiId}`)
+
+    /* beautify ignore:start */
+    const dbObject = await Model.findOne({[idField]: rudiId})
+    /* beautify ignore:end */
+
+    if (!dbObject) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
+
+    return dbObject
+  } catch (err) {
+    log.e(fun, err)
+    throw boom.boomify(err)
+  }
+}
+
+exports.getObjectWithJson = async (Model, idField, jsonObject) => {
+  const fun = 'getObjectWithJson'
   log.d(fun, ``)
 
-  let fullInfo = ''
+  const rudiId = json.accessProperty(jsonObject, idField)
+  return this.getObjectWithRudiId(Model, idField, rudiId)
+}
 
-  const id = jsonObject[labelIdField]
-  if (!id || '' == id) {
-    throw new Error(`${msg.missingProperty(jsonObject, labelIdField)}`)
-  }
+exports.getEnsuredObjectWithJson = async (objectType, Model, idField, jsonObject) => {
+  const fun = 'getEnsuredObjectWithJson'
+  log.d(fun, ``)
 
-  return this.getInfoFromRudiId(dbModel, labelIdField, id)
-  // log.d(fun, `full info: ${fullInfo}`)
+  const rudiId = json.accessProperty(jsonObject, idField)
+  const dbObject = this.getObjectWithRudiId(Model, idField, rudiId)
+  if (!dbObject) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
+  return dbObject
 }
 
 
-exports.getInfoFromDbId = async (dbModel, id) => {
-  const fun = 'getInfoFromDbId'
+exports.getObjectWithDbId = async (Model, id) => {
+  const fun = 'getObjectWithDbId'
 
   /* beautify ignore:start */
-  return dbModel.findOne({[DB_ID]: id})
+  return Model.findOne({[DB_ID]: id})
   /* beautify ignore:end */
 }
 
-exports.doesInfoExistFromRudiId = async (dbModel, labelIdField, id) => {
-  const existingInfo = await this.getInfoFromRudiId(dbModel, labelIdField, id)
-  return (existingInfo && '' != existingInfo)
+exports.getEnsuredObjectWithDbId = async (objectType, Model, id) => {
+  const fun = 'getEnsuredObjectWithDbId'
+
+  /* beautify ignore:start */
+  const dbObject = Model.findOne({[DB_ID]: id})
+  /* beautify ignore:end */
+  if (!dbObject) throw new Error(`${msg.objectNotFound(objectType, id)}`)
+
 }
 
-
-exports.doesInfoExistFromJson = async (dbModel, labelIdField, infoJson) => {
-  const existingInfo = await this.getInfoFromJson(dbModel, labelIdField, infoJson)
-  return (existingInfo && '' != existingInfo)
-}
-
-
-exports.updateInfo = async (dbModel, labelIdField, jsonUpdateData) => {
-  const fun = 'updateInfo'
+exports.doesObjectExistWithRudiId = async (Model, idField, id) => {
+  const fun = 'doesObjectExistWithRudiId'
   log.d(fun, ``)
 
-  const id = jsonUpdateData[labelIdField]
-  if (!id || '' == id) {
-    throw new Error(`${msg.missingProperty(jsonUpdateData, labelIdField)}`)
-  }
+  const existingInfo = await this.getObjectWithRudiId(Model, idField, id)
+  return (!!existingInfo)
+}
 
-  let fullInfo = ''
+exports.doesObjectExistWithJson = async (Model, idField, infoJson) => {
+  const fun = 'doesObjectExistWithJson'
+  log.d(fun, ``)
+
+  const dbObject = await this.getObjectWithJson(Model, idField, infoJson)
+  return (dbObject && '' != dbObject)
+}
+
+exports.getObjectList = async (Model, limit, offset) => {
+  const fun = 'getObjectList'
+  // log.d(fun, `filter.limit: ${filter.limit}, filter.offset: ${filter.skip}`)
+
+  const objectList = await Model.find({}).limit(limit).skip(offset)
+
+  return objectList
+}
+
+exports.updateObject = async (Model, idField, jsonUpdateData) => {
+  const fun = 'updateObject'
+  log.d(fun, ``)
+
+  const id = json.accessProperty(jsonUpdateData, idField)
+
+  let updatedObject = ''
   try {
-    fullInfo = await dbModel.findOneAndUpdate({
-      [labelIdField]: jsonUpdateData[labelIdField]
+    updatedObject = await Model.findOneAndUpdate({
+      [idField]: jsonUpdateData[idField]
     }, jsonUpdateData, {
       new: true
     })
-    return fullInfo
+    return updatedObject
   } catch (err) {
     log.e(fun, err)
     throw boom.boomify(err)
   }
   /* 
     if ('' == fullInfo) {
-      throw new Error(`Object doesn't exist with ${labelIdField}: ${id}`)
+      throw new Error(`Object doesn't exist with ${idField}: ${id}`)
     }
    */
-  log.d(fun, `full info: ${fullInfo}`)
-  return fullInfo
+  log.d(fun, `full info: ${updatedObject}`)
+  return updatedObject
 }
 
-exports.deleteInfo = async (dbModel, labelIdField, id) => {
-  const fun = 'deleteInfo'
+exports.deleteObject = async (Model, idField, id) => {
+  const fun = 'deleteObject'
   log.d(fun, ``)
 
-  if (!id || '' == id) {
-    throw new Error(`${msg.parameterExpected(fun, labelIdField)}`)
+  if (!id) {
+    throw new Error(`${msg.parameterExpected(fun, idField)}`)
   }
 
   try {
-    let deletedInfo = await dbModel.findOneAndRemove({
-      [labelIdField]: id
+    let deletionInfo = await Model.findOneAndRemove({
+      [idField]: id
     })
-    return deletedInfo
+    return deletionInfo
   } catch (err) {
     log.e(fun, err)
     throw boom.boomify(err)
   }
   /* 
     if ('' == fullInfo) {
-      throw new Error(`Object doesn't exist with ${labelIdField}: ${id}`)
+      throw new Error(`Object doesn't exist with ${idField}: ${id}`)
     }
    */
   // log.d(fun, `full info: ${fullInfo}`)
   return fullInfo
 }
 
+exports.deleteAll = async (Model) => {
+  const fun = 'deleteAll'
+  // log.d(fun, `Model: ${Model}`)
+
+  try {
+    let deletionInfo = await Model.deleteMany()
+    return deletionInfo
+  } catch (err) {
+    log.e(fun, err)
+    throw boom.boomify(err)
+  }
+}
+
+exports.deleteMany = async (Model, conditions) => {
+  const fun = 'deleteMany'
+  // log.d(fun, `conditions: ${conditions}`)
+
+  // TODO: to be consolidated!
+  if (typeof(conditions) == 'string')
+  conditions = changeConditionsIntoRegex(conditions)
+
+  try {
+    let deletionInfo = await Model.deleteMany(conditions)
+    return deletionInfo
+  } catch (err) {
+    log.e(fun, err)
+    throw boom.boomify(err)
+  }
+}
+
+function changeConditionsIntoRegex(conditions) {
+  const fun = 'changeConditionsIntoRegex'
+
+  let regexConditions = {}
+  Object.keys(conditions).forEach(key => {
+    let regexp = new RegExp(conditions[key])
+    log.d(fun, regexp)
+    regexConditions[key] = new RegExp(`^${conditions[key]}$`)
+  })
+
+  return regexConditions
+}
+
 //———————————————————————————————————————————————————————————————
-// Access to specific fields
+// Specific functions
 //———————————————————————————————————————————————————————————————
 
 //---------------------------------------- 
@@ -176,13 +292,13 @@ exports.deleteInfo = async (dbModel, labelIdField, id) => {
 exports.getMetadataFromJson = async (metadataJson) => {
   const fun = 'getMetadataFromJson'
   log.d(fun, ``)
-  return this.getInfoFromJson(Metadata, API_METADATA_ID, metadataJson)
+  return this.getObjectWithJson(Metadata, API_METADATA_ID, metadataJson)
 }
 
 exports.getMetadataFromRudiId = async (rudiId) => {
   const fun = 'getMetadataFromRudiId'
   log.d(fun, ``)
-  return this.getInfoFromRudiId(Metadata, API_METADATA_ID, rudiId)
+  return this.getObjectWithRudiId(Metadata, API_METADATA_ID, rudiId)
 }
 
 exports.getAllMetadata = async () => {
@@ -201,18 +317,18 @@ exports.updateMetadata = async (jsonMetadata) => {
 
   // Checking incoming data for an id
   const id = jsonMetadata[API_METADATA_ID]
-  if (!id || '' == id) {
+  if (!id) {
     throw new Error(`${msg.missingProperty(jsonMetadata, API_METADATA_ID)}`)
   }
 
   // Checking that the metadata already exists
   const existingMetadata = await this.getMetadataFromRudiId(id)
-  if (!existingMetadata || '' == existingMetadata) {
+  if (!existingMetadata) {
     throw new Error(`${msg.metadataNotFound(id)}`)
   }
 
   // Updating the organization
-  const updatedMetadata = await this.updateInfo(Metadata, API_METADATA_ID, jsonMetadata)
+  const updatedMetadata = await this.updateObject(Metadata, API_METADATA_ID, jsonMetadata)
 
   return updatedMetadata
 }
@@ -223,17 +339,17 @@ exports.deleteMetadata = async (metadataRudiId) => {
   log.d(fun, ``)
 
   // Checking the id parameter
-  if (!metadataRudiId || '' == metadataRudiId) {
+  if (!metadataRudiId) {
     throw new Error(`${msg.parameterExpected(fun, API_METADATA_ID)}`)
   }
 
   // Checking that the organization already exists
-  if (! await this.doesInfoExistFromRudiId(Metadata, API_METADATA_ID, metadataRudiId)) {
+  if (!await this.doesObjectExistWithRudiId(Metadata, API_METADATA_ID, metadataRudiId)) {
     throw new Error(`${msg.metadataNotFound(metadataRudiId)}`)
   }
 
   // Deleting the organization
-  const deletedOrganization = await this.deleteInfo(Metadata, API_METADATA_ID, metadataRudiId)
+  const deletedOrganization = await this.deleteObject(Metadata, API_METADATA_ID, metadataRudiId)
   log.d(fun, `${msg.organizationDeleted(metadataRudiId)}`)
 
   return deletedOrganization
@@ -241,22 +357,45 @@ exports.deleteMetadata = async (metadataRudiId) => {
 //---------------------------------------- 
 // - Organization
 //---------------------------------------- 
-exports.getOrganizationFromJson = async (organizationJson) => {
-  const fun = 'getOrganizationFromJson'
+exports.getOrganizationWithJson = async (organizationJson) => {
+  const fun = 'getOrganizationWithJson'
   log.d(fun, ``)
-  return this.getInfoFromJson(Organization, API_ORGANIZATION_ID, organizationJson)
+  return this.getObjectWithJson(Organization, API_ORGANIZATION_ID, organizationJson)
+}
+exports.getEnsuredOrganizationWithJson = async (organizationJson) => {
+  const fun = 'getEnsuredOrganizationWithJson'
+  log.d(fun, ``)
+  const rudiId = json.accessProperty(organizationJson, API_ORGANIZATION_ID)
+  return this.getEnsuredOrganizationWithRudiId(rudiId)
 }
 
-exports.getOrganizationFromRudiId = async (rudiId) => {
-  const fun = 'getMetadataFromRudiId'
+exports.getOrganizationWithRudiId = async (rudiId) => {
+  const fun = 'getOrganizationWithRudiId'
   log.d(fun, ``)
-  return this.getInfoFromRudiId(Organization, API_ORGANIZATION_ID, rudiId)
+  return this.getObjectWithRudiId(Organization, API_ORGANIZATION_ID, rudiId)
+}
+exports.getEnsuredOrganizationWithRudiId = async (rudiId) => {
+  const fun = 'getEnsuredOrganizationWithRudiId'
+  log.d(fun, ``)
+  return this.getEnsuredObjectWithRudiId(URL_OBJECT_ORGANIZATIONS, Organization, API_ORGANIZATION_ID, rudiId)
 }
 
-exports.getOrganizationFromDbId = async (id) => {
-  const fun = 'getOrganizationFromId'
+exports.getOrganizationWithDbId = async (id) => {
+  const fun = 'getOrganizationWithDbId'
   log.d(fun, ``)
-  return this.getInfoFromDbId(Organization, id)
+  return this.getObjectWithDbId(Organization, id)
+}
+
+exports.getEnsuredOrganizationWithDbId = async (dbId) => {
+  const fun = 'getOrganizationWithDbId'
+  log.d(fun, ``)
+  return this.getEnsuredObjectWithDbId(URL_OBJECT_ORGANIZATIONS, Organization, dbId)
+}
+
+exports.getEnsuredOrganizationDbIdWithJson = async (organizationJson) => {
+  const fun = 'getEnsuredOrganizationDbIdWithJson'
+  log.d(fun, ``)
+  return this.getEnsuredDbIdWithJson(URL_OBJECT_ORGANIZATIONS, Organization, API_ORGANIZATION_ID, organizationJson)
 }
 
 exports.getAllOrganizations = async () => {
@@ -275,18 +414,18 @@ exports.updateOrganization = async (jsonOrganization) => {
 
   // Checking incoming data for an id
   const id = jsonOrganization[API_ORGANIZATION_ID]
-  if (!id || '' == id) {
+  if (!id) {
     throw new Error(`${msg.missingProperty(jsonOrganization, API_ORGANIZATION_ID)}`)
   }
 
   // Checking that the organization already exists
-  const existingOrganization = await this.getOrganizationFromRudiId(id)
-  if (!existingOrganization || '' == existingOrganization) {
+  const existingOrganization = await this.getOrganizationWithRudiId(id)
+  if (!existingOrganization) {
     throw new Error(`${msg.organizationNotFound(id)}`)
   }
 
   // Updating the organization
-  const updatedOrganization = await this.updateInfo(Organization, API_ORGANIZATION_ID, jsonOrganization)
+  const updatedOrganization = await this.updateObject(Organization, API_ORGANIZATION_ID, jsonOrganization)
   log.d(fun, `${msg.organizationUpdated(id)}`)
 
   return updatedOrganization
@@ -297,18 +436,15 @@ exports.deleteOrganization = async (organizationRudiId) => {
   log.d(fun, ``)
 
   // Checking the id parameter
-  if (!organizationRudiId || '' == organizationRudiId) {
+  if (!organizationRudiId) {
     throw new Error(`${msg.parameterExpected(fun, API_ORGANIZATION_ID)}`)
   }
 
   // Checking that the organization already exists
-  const existingOrganization = await this.getOrganizationFromRudiId(organizationRudiId)
-  if (!existingOrganization || '' == existingOrganization) {
-    throw new Error(`${msg.organizationNotFound(organizationRudiId)}`)
-  }
+  const existingOrganization = await this.getEnsuredOrganizationWithRudiId(organizationRudiId)
 
   // Deleting the organization
-  const deletedOrganization = await this.deleteInfo(Organization, API_ORGANIZATION_ID, organizationRudiId)
+  const deletedOrganization = await this.deleteObject(Organization, API_ORGANIZATION_ID, organizationRudiId)
   log.d(fun, `${msg.organizationDeleted(organizationRudiId)}`)
 
   return deletedOrganization
@@ -317,22 +453,46 @@ exports.deleteOrganization = async (organizationRudiId) => {
 //---------------------------------------- 
 // - Contacts
 //---------------------------------------- 
-exports.getContactFromRudiId = async (contactRudiId) => {
-  const fun = 'getContactFromRudiId'
+exports.getContactWithRudiId = async (contactRudiId) => {
+  const fun = 'getContactWithRudiId'
   log.d(fun, ``)
-  return this.getInfoFromRudiId(Contact, API_CONTACT_ID, contactRudiId)
+  return this.getObjectWithRudiId(Contact, API_CONTACT_ID, contactRudiId)
 }
 
-exports.getContactFromJson = async (contactJson) => {
-  const fun = 'getContactFromJson'
+exports.getEnsuredContactWithRudiId = async (contactRudiId) => {
+  const fun = 'getEnsuredContactWithRudiId'
   log.d(fun, ``)
-  return this.getInfoFromJson(Contact, API_CONTACT_ID, contactJson)
+  return this.getEnsuredObjectWithRudiId(URL_OBJECT_CONTACTS, Contact, API_CONTACT_ID, contactRudiId)
 }
 
-exports.getContactFromDbId = async (id) => {
+exports.getContactWithJson = async (contactJson) => {
+  const fun = 'getContactWithJson'
+  log.d(fun, ``)
+  return this.getObjectWithJson(Contact, API_CONTACT_ID, contactJson)
+}
+
+exports.getEnsuredContactWithJson = async (contactJson) => {
+  const fun = 'getEnsuredContactWithJson'
+  log.d(fun, ``)
+  return this.getEnsuredObjectWithJson(URL_OBJECT_CONTACTS, Contact, API_CONTACT_ID, contactJson)
+}
+
+exports.getContactWithDbId = async (contactDbId) => {
   const fun = 'getContactFromDbId'
   log.d(fun, ``)
-  return this.getInfoFromDbId(Contact, id)
+  return this.getObjectWithDbId(Contact, contactDbId)
+}
+
+exports.getEnsuredContactWithDbId = async (contactDbId) => {
+  const fun = 'getContactFromDbId'
+  log.d(fun, ``)
+  return this.getEnsuredObjectWithDbId(URL_OBJECT_CONTACTS, Contact, contactDbId)
+}
+
+exports.getEnsuredContactDbIdWithJson = async (contactDbId) => {
+  const fun = 'getContactFromDbId'
+  log.d(fun, ``)
+  return this.getEnsuredDbIdWithJson(URL_OBJECT_CONTACTS, Contact, API_CONTACT_ID, contactDbId)
 }
 
 exports.getAllContacts = async () => {
@@ -349,17 +509,14 @@ exports.updateContact = async (jsonContact) => {
   log.d(fun, ``)
 
   // Checking incoming data for an id
-  const id = json.accessProperty(jsonContact, API_CONTACT_ID)
+  const rudiId = json.accessProperty(jsonContact, API_CONTACT_ID)
 
   // Checking that the contact already exists
-  const existingContact = await this.getContactFromRudiId(id)
-  if (!existingContact || '' == existingContact) {
-    throw new Error(`${msg.contactNotFound(id)}`)
-  }
+  this.getEnsuredContactWithRudiId(rudiId)
 
   // Updating the contact
-  const updatedcontact = await this.updateInfo(Contact, API_CONTACT_ID, jsonContact)
-  log.d(fun, `${msg.contactUpdated(id)}`)
+  const updatedcontact = await this.updateObject(Contact, API_CONTACT_ID, jsonContact)
+  log.d(fun, `${msg.contactUpdated(rudiId)}`)
 
   return updatedcontact
 }
@@ -370,18 +527,15 @@ exports.deleteContact = async (contactRudiId) => {
   log.d(fun, ``)
 
   // Checking the id parameter
-  if (!contactRudiId || '' == contactRudiId) {
+  if (!contactRudiId) {
     throw new Error(`${msg.parameterExpected(fun, API_CONTACT_ID)}`)
   }
 
   // Checking that the contact already exists
-  const existingContact = await this.getContactFromRudiId(contactRudiId)
-  if (!existingContact || '' == existingContact) {
-    throw new Error(`${msg.contactNotFound(contactRudiId)}`)
-  }
-
+  await this.getEnsuredContactWithRudiId(contactRudiId)
+  
   // Deleting the contact
-  const deletedContact = await this.deleteInfo(Contact, API_CONTACT_ID, contactRudiId)
+  const deletedContact = await this.deleteObject(Contact, API_CONTACT_ID, contactRudiId)
   log.d(fun, `${msg.contactDeleted(contactRudiId)}`)
 
   return deletedContact

@@ -24,17 +24,25 @@ const json = require('../utils/jsonAccess')
 //———————————————————————————————————————————————————————————————
 const {
   DB_ID,
+  DB_V,
   API_METADATA_ID,
   API_ORGANIZATION_ID,
   API_CONTACT_ID,
   API_PRODUCER_PROPERTY,
-  API_CONTACTS_PROPERTY
+  API_CONTACTS_PROPERTY,
+  API_METAINFO_PROPERTY,
+  API_METAINFO_PROVIDER_PROPERTY,
+  API_METAINFO_CONTACTS_PROPERTY,
+  API_METAINFO_DATES_PROPERTY,
+  API_METAINFO_DATES_CREATED_PROPERTY,
 } = require('../db/dbFields')
 
 const {
-  REQ_LANG,
-  REQ_ID
-} = require('../routes/apiUrl')
+  PARAM_LANG: REQ_LANG,
+  PARAM_ID: REQ_ID,
+  URL_OBJECT_ORGANIZATIONS,
+  URL_OBJECT_CONTACTS
+} = require('../config/confApi')
 
 //———————————————————————————————————————————————————————————————
 // Data models
@@ -45,177 +53,199 @@ const Contact = require('../definitions/models/Contact')
 
 
 //———————————————————————————————————————————————————————————————
-// Controllers
+// Atomic treatments of properties: RUDI -> DB
 //———————————————————————————————————————————————————————————————
 
-// Add a new metadata
-exports.addMetadata = async (req, reply) => {
-  const fun = 'addMetadata'
+exports.producerRudiToDbFormat = async (rudiProducer) => {
+  const fun = 'producerRudiToDbFormat'
   log.d(fun, ``)
+  if (!rudiProducer) throw new Error(`${msg.parameterExpected(fun, 'rudiProducer')}`)
+
+  const organizationDbId = await db.getEnsuredOrganizationDbIdWithJson(rudiProducer)
+  log.d(fun, `organizationDbId: ${organizationDbId}`)
+  return organizationDbId
+}
+
+exports.contactsRudiToDbFormat = async (rudiContactList) => {
+  const fun = 'contactsRudiToDbFormat'
+  log.d(fun, ``)
+  if (!rudiContactList) throw new Error(`${msg.parameterExpected(fun, 'rudiContactList')}`)
+
+  let contactDbIds = []
+  await Promise.all(rudiContactList.map(
+    async (rudiContact) => {
+      log.d(fun, `contact: ${JSON.stringify(rudiContact)}`)
+      const contactDbId = await db.getEnsuredContactDbIdWithJson(rudiContact)
+      contactDbIds.push(contactDbId)
+    }));
+  return contactDbIds
+}
+
+
+exports.setCreationDate = async (rudiMetadata) => {
+  const fun = 'setCreationDate'
+  log.d(fun, ``)
+  if (!rudiMetadata) throw new Error(`${msg.parameterExpected(fun, 'rudiMetadata')}`)
+
+  let metaInfo = json.accessProperty(rudiMetadata, API_METAINFO_PROPERTY)
+  let metaInfoDates = json.accessProperty(rudiMetadata, API_METAINFO_DATES_PROPERTY)
+  let metaInfoDateCreated = json.accessProperty(rudiMetadata, API_METAINFO_DATES_CREATED_PROPERTY)
+
+  rudiMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_METAINFO_DATES_CREATED_PROPERTY] = new Date().toISOString()
+}
+
+//———————————————————————————————————————————————————————————————
+// Atomic treatments of properties: DB -> RUDI
+//———————————————————————————————————————————————————————————————
+
+exports.producerDbToRudiFormat = async (producerDbId) => {
+  const fun = 'producerDbToRudiFormat'
+  log.d(fun, ``)
+  if (!producerDbId) throw new Error(`${msg.parameterExpected(fun, 'producerDbId')}`)
+
+  const organization = await db.getEnsuredOrganizationWithDbId(producerDbId)
+  log.d(fun, `organizationDbId: ${JSON.stringify(organization)}`)
+  return organization
+}
+
+exports.contactsDbToRudiFormat = async (contactsDbIds) => {
+  const fun = 'contactsDbToRudiFormat'
+  log.d(fun, ``)
+  if (!contactsDbIds) throw new Error(`${msg.parameterExpected(fun, 'contactsDbIds')}`)
+
+  let contacts = []
+  await Promise.all(contactsDbIds.map(
+    async (contactDbId) => {
+      const contact = await db.getEnsuredContactWithDbId(contactDbId)
+      log.d(fun, `contact: ${JSON.stringify(contact)}`)
+      contacts.push(contact)
+    }));
+  return contacts
+}
+
+//———————————————————————————————————————————————————————————————
+// Global treatments of properties: RUDI -> DB
+//———————————————————————————————————————————————————————————————
+
+/** 
+ * Format a RUDI Metadata document (JSON):
+ * @param rudiMetadata: the RUDI Metadata JSON object
+ * @param shouldBeStrict: if required fields presence should be ensured (e.g. yes for creation, no for update)
+ */
+exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict) => {
+  const fun = 'rudiToDbFormat'
+  log.d(fun, ``)
+
+  /* beautify ignore:start */
+  let dbReadyMetadata = {...rudiMetadata}
+  /* beautify ignore:end */
+
   try {
-    lang.setLanguage(req.params[REQ_LANG])
-
-    /* beautify ignore:start */
-    let incomingData = {...req.body}
-    /* beautify ignore:end */
-
-    const id = json.accessProperty(incomingData, API_METADATA_ID)
-
-    // First: we make sure id isn't used already
-    if (await db.doesInfoExistFromRudiId(Metadata, API_METADATA_ID, id)) {
-      throw new Error(`${msg.metadataAlreadyExists(id)}`)
-    }
-
-    const producer = json.accessProperty(incomingData, API_PRODUCER_PROPERTY)
-    const contacts = json.accessProperty(incomingData, API_CONTACTS_PROPERTY)
-
-    // Updating incoming data with the full info of the organization
+    //----- Updating producer field with db instead of incoming data
     // TODO[VALIDATE]: The organization info already in database is not updated with possible new data, 
     //                 and only the organization RUDI id is really necessary in the request body    
-    incomingData[API_PRODUCER_PROPERTY] = await dbRwk.updateJsonOrganization(producer)
+    let producer
+    if (shouldBeStrict) {
+      producer = json.accessProperty(rudiMetadata, API_PRODUCER_PROPERTY)
+    } else {
+      producer = rudiMetadata[API_PRODUCER_PROPERTY]
+    }
+    if (!!producer) {
+      dbReadyMetadata[API_PRODUCER_PROPERTY] = await this.producerRudiToDbFormat(producer)
+    }
 
-    // Updating incoming data with the full info of the organization
+    //----- Updating contacts field with db instead of incoming data
     // TODO[VALIDATE]: The contact info already in database is not updated with possible new data, 
     //                 and only the contact RUDI id is really necessary in the request body
-    incomingData[API_CONTACTS_PROPERTY] = await dbRwk.updateJsonContactList(contacts)
+    let contacts
+    if (shouldBeStrict) {
+      contacts = json.accessProperty(rudiMetadata, API_CONTACTS_PROPERTY)
+    } else {
+      contacts = rudiMetadata[API_CONTACTS_PROPERTY]
+    }
+    if (!!contacts) {
+      dbReadyMetadata[API_CONTACTS_PROPERTY] = await this.contactsRudiToDbFormat(contacts)
+    }
+    // log.d(fun, `objectData: ${JSON.stringify(objectData)}`)
 
-    // Creating new metadata
-    const newMetadata = new Metadata(incomingData)
-    const metadata = await newMetadata.save()
-    log.d(fun, `${msg.metadataAdded(incomingData[API_METADATA_ID])}`)
-    return metadata
-  } catch (err) {
-    log.e(fun, err)
-    throw boom.boomify(err)
-  }
-}
 
-// Get all metadata
-exports.getEveryMetadata = async (req, reply) => {
-  const fun = 'getEveryMetadata'
-  log.d(fun, ``)
+    //----- Updating metadataInfo.metadata_provider field (same as above producer organization) with db instead of incoming data
+    // TODO[VALIDATE]: The organization info already in database is not updated with possible new data, 
+    //                 and only the contact RUDI id is really necessary in the request body  
+    let metaInfo
+    if (shouldBeStrict) {
+      metaInfo = json.accessProperty(rudiMetadata, API_METAINFO_PROPERTY)
+    } else {
+      metaInfo = rudiMetadata[API_METAINFO_PROPERTY]
+    }
+    if (!!metaInfo) {
+      let metaInfoProvider = metaInfo[API_METAINFO_PROVIDER_PROPERTY]
+      if (!!metaInfoProvider) {
+        dbReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_PROVIDER_PROPERTY] = await this.producerRudiToDbFormat(metaInfoProvider)
+      }
 
-  try {
-    lang.setLanguage(req.params[REQ_LANG])
+      let metaInfoContacts = metaInfo[API_METAINFO_CONTACTS_PROPERTY]
+      if (!!metaInfoContacts) {
+        dbReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_PROVIDER_PROPERTY] = await this.contactsRudiToDbFormat(metaInfoContacts)
+      }
 
-    const metadataList = await db.getAllMetadata()
-    // log.d(fun, `metadataList: ${metadataList}`)
+      // let metaInfoDates = metaInfo[API_METAINFO_DATES_PROPERTY]
 
-    const updatedMetadataList = await dbRwk.updateMetadataListPropertiesFromDb(metadataList)
-    return updatedMetadataList
-  } catch (err) {
-    log.e(fun, err)
-    throw boom.boomify(err)
-  }
-}
-
-// Get single metadata by ID
-exports.getSingleMetadata = async (req, reply) => {
-  const fun = 'getSingleMetadata'
-  log.d(fun, ``)
-
-  try {
-    lang.setLanguage(json.accessParam(req.params, REQ_LANG))
-
-    // Checking if the parameter is ok
-    const id = json.accessParam(req.params, REQ_ID)
-
-    let metadata = await db.getMetadataFromRudiId(id)
-
-    // If the metadata doesn't exist in the db => error
-    if (!metadata || '' == metadata) {
-      throw new Error(`${msg.metadataNotFound(id)}`)
     }
 
-    let updatedMetadata = await dbRwk.updateMetadataPropertiesFromDb(metadata)
-
-    log.d(fun, msg.metadataUpdated(id))
-
-    return updatedMetadata
+    return dbReadyMetadata
   } catch (err) {
     log.e(fun, err)
     throw boom.boomify(err)
   }
 }
 
-// Update an existing metadata
-exports.updateMetadata = async (req, reply) => {
-  const fun = 'updateMetadata'
+
+exports.createMetadata = async (rudiMetadata) => {
+  const fun = 'newMetadata'
   log.d(fun, ``)
-  try {
-    lang.setLanguage(json.accessParam(req.params, REQ_LANG))
+  if (!rudiMetadata) throw new Error(`${msg.parameterExpected(fun, rudiMetadata)}`)
 
-    /* beautify ignore:start */
-    let incomingData = {...req.body}
-    /* beautify ignore:end */
+  // Special treatment!
+  log.d(fun, `incoming object: ${JSON.stringify(rudiMetadata)}`)
 
-    const id = json.accessProperty(incomingData, API_METADATA_ID)
+  let dbReadyObject = await this.rudiToDbFormat(rudiMetadata, true)
+  log.d(fun, `DB ready object: ${JSON.stringify(dbReadyObject)}`)
 
-    // First: we make sure some data exists with input JSON id
-    const existingMetadata = await db.getMetadataFromJson(incomingData)
-    if (!existingMetadata || '' == existingMetadata) {
-      throw new Error(`${msg.metadataNotFound(id)}`)
-    }
 
-    const producer = json.accessProperty(incomingData, API_PRODUCER_PROPERTY)
-    const contacts = json.accessProperty(incomingData, API_CONTACTS_PROPERTY)
-
-    // TODO[VALIDATE]: this means only the RUDI id for the contact is necessary (and taken into account)
-    incomingData[API_PRODUCER_PROPERTY] = await db.getOrganizationFromJson(producer)
-
-    // TODO[VALIDATE]: the contact info already in database is not updated with possible new data
-    // TODO[VALIDATE]: this means only the RUDI id for the contact is necessary (and taken into account)
-    incomingData[API_CONTACTS_PROPERTY] = await dbRwk.updateJsonContactList(contacts)
-
-    const updatedMetadata = await db.updateInfo(Metadata, API_METADATA_ID, incomingData)
-
-    log.d(fun, msg.metadataUpdated(id))
-    return updatedMetadata
-  } catch (err) {
-    log.e(fun, err)
-    throw boom.boomify(err)
-  }
+  const newMetadata = new Metadata(dbReadyObject)
+  return newMetadata
 }
 
-// Delete a metadata
-exports.deleteMetadata = async (req, reply) => {
-  const fun = 'deleteMetadata'
+//———————————————————————————————————————————————————————————————
+// Global treatments of properties: DB -> RUDI
+//———————————————————————————————————————————————————————————————
+
+exports.dbToRudiFormat = async (dbMetadata) => {
+  const fun = 'dbToRudiFormat'
   log.d(fun, ``)
-  try {
-    lang.setLanguage(json.accessParam(req.params, REQ_LANG))
 
-    const id = json.accessParam(req.params, REQ_ID)
+  /* beautify ignore:start */
+  let rudyMetadata = {...dbMetadata}
+  /* beautify ignore:end */
 
-    const deletedMetadata = await db.deleteMetadata(id)
+  // ad hoc Metadata treatments: retrieve Producer and Contact info
+  const organizationDbId = json.accessProperty(dbMetadata, API_PRODUCER_PROPERTY)
+  const contactsDbIds = json.accessProperty(dbMetadata, API_CONTACTS_PROPERTY)
 
-    // log.d(fun, msg.metadataDeleted(id))
-    return deletedMetadata
-  } catch (err) {
-    log.e(fun, err)
-    throw boom.boomify(err)
-  }
+  // Updating incoming data with the full info of the organization
+  // TODO[VALIDATE]: The organization info already in database is not updated with possible new data, 
+  //                 and only the organization RUDI id is really necessary in the request body    
+  rudyMetadata[API_PRODUCER_PROPERTY] = await this.producerDbToRudiFormat(organizationDbId)
 
+  // Updating incoming data with the full info of the organization
+  // TODO[VALIDATE]: The contact info already in database is not updated with possible new data, 
+  //                 and only the contact RUDI id is really necessary in the request body
+  rudyMetadata[API_CONTACTS_PROPERTY] = await this.contactsDbToRudiFormat(contactsDbIds)
+
+  // objectData[API_CONTACTS_PROPERTY] = await dbRwk.updateJsonContactList(contacts)
+
+  // TODO: treat metadataInfo
+  return rudyMetadata
 }
 
-// Delete every metadata
-exports.deleteManyMetadata = async (req, reply) => {
-  const fun = 'deleteManyMetadata'
-  log.d(fun, ``)
-  try {
-    lang.setLanguage(json.accessParam(req.params, REQ_LANG))
-
-    /* beautify ignore:start */
-    const {...conditions} = req.body
-    /* beautify ignore:end */
-    
-    log.d(fun, conditions)
-    const actionReturn = await Metadata.deleteMany(conditions)
-    log.d(fun, msg.metadataDeletedWithCondition(conditions))
-    log.d(fun, `actionReturn: ${actionReturn}`)
-    return actionReturn
-  } catch (err) {
-    log.e(fun, err)
-    throw boom.boomify(err)
-  }
-
-}

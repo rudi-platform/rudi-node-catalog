@@ -26,9 +26,9 @@ const {
 } = require('../db/dbFields')
 
 const {
-  REQ_LANG,
-  REQ_ID
-} = require('../routes/apiUrl')
+  PARAM_LANG: REQ_LANG,
+  PARAM_ID: REQ_ID
+} = require('../config/confApi')
 
 //———————————————————————————————————————————————————————————————
 // Data models
@@ -51,7 +51,7 @@ exports.addContact = async (req, reply) => {
     const id = json.accessProperty(incomingData, API_CONTACT_ID)
 
     // First: we make sure id isn't used already
-    const existingContact = await db.getContactFromRudiId(id)
+    const existingContact = await db.getContactWithRudiId(id)
     if (existingContact && '' != existingContact) {
       throw new Error(`${msg.contactAlreadyExists(id)}`)
     }
@@ -90,7 +90,7 @@ exports.getSingleContact = async (req, reply) => {
       throw new Error(`${msg.parameterExpected(REQ_ID)}`)
     }
 
-    const contact = await db.getContactFromRudiId(id)
+    const contact = await db.getContactWithRudiId(id)
 
     if (!contact || '' == contact) {
       throw new Error(`${msg.contactNotFound(id)}`)

@@ -120,3 +120,12 @@ test('spread provider', () => {
       "demon": "doudou"
     })
 })
+
+function testBangBang() {
+  return !!'' && !!0 && !!{}
+}
+
+test('test bang bang', () => {
+  expect(testBangBang())
+    .toBe(false)
+})

@@ -15,6 +15,26 @@ const DEFAULT_MSG = 'Language not found'
 //———————————————————————————————————————————————————————————————
 //TODO: store all this in a db
 
+exports.requestParameterExpected = (req, param) => {
+  try {
+    switch (getLanguage()) {
+      case 'en':
+      case 'en-GB':
+      case 'en-US':
+        return `The parameter '${param}' should define in url '${req.url}' `;
+      case 'fr':
+      case 'fr-FR':
+      case 'fr-BE':
+        return `Le paramètre '${param}' devrait être défini dans l'url '${req.url}' `;
+      default:
+        return `${DEFAULT_MSG}: ${getLanguage()}`;
+    }
+  } catch (err) {
+    log.e(fun, err)
+    throw boom.boomify(err)
+  }
+}
+
 exports.parameterExpected = (fun, param) => {
   switch (getLanguage()) {
     case 'en':
@@ -35,11 +55,11 @@ exports.missingProperty = (jsonObject, property) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `The property '${property}' must be defined for object:\n${jsonObject} `;
+      return `The property '${property}' must be defined for object:\n${JSON.stringify(jsonObject)} `;
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `La propriété '${property}' doit être définie pour l'object:\n${jsonObject} `;
+      return `La propriété '${property}' doit être définie pour l'object:\n${JSON.stringify(jsonObject)} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -55,6 +75,70 @@ exports.parametersMismatch = (paramUrl, paramBody) => {
     case 'fr-FR':
     case 'fr-BE':
       return `Les paramètres doivent être identiques entre le corps de la requête et l'URL\n- URL: '${paramUrl}'\n- requête: '${paramBody}' `;
+    default:
+      return `${DEFAULT_MSG}: ${getLanguage()}`;
+  }
+}
+
+//———————————————————————————————————————————————————————————————
+// Generic
+//———————————————————————————————————————————————————————————————
+
+exports.objectTypeNotFound = (objectType)=>{
+  switch (getLanguage()) {
+    case 'en':
+    case 'en-GB':
+    case 'en-US':
+      return `This object type is not recognized: '${objectType}' `;
+    case 'fr':
+    case 'fr-FR':
+    case 'fr-BE':
+      return `Ce type d'objet n'est pas reconnu : '${objectType}' `;
+    default:
+      return `${DEFAULT_MSG}: ${getLanguage()}`;
+  }
+}
+
+exports.objectNotFound = (objectType, objectId)=>{
+  switch (getLanguage()) {
+    case 'en':
+    case 'en-GB':
+    case 'en-US':
+      return `No object of type '${objectType}' was found with id'${objectId}' `;
+    case 'fr':
+    case 'fr-FR':
+    case 'fr-BE':
+      return `Aucun objet de type '${objectType}' n'a été trouvé pour l'id : ${objectId} `;
+    default:
+      return `${DEFAULT_MSG}: ${getLanguage()}`;
+  }
+}
+
+exports.objectAlreadyExists = (objectType, id) => {
+  switch (getLanguage()) {
+    case 'en':
+    case 'en-GB':
+    case 'en-US':
+      return `An object of type '${objectType}' already exists for id: ${id} `;
+    case 'fr':
+    case 'fr-FR':
+    case 'fr-BE':
+      return `Un objet de type '${objectType}' existe déjà pour l'identifiant : ${id} `;
+    default:
+      return `${DEFAULT_MSG}: ${getLanguage()}`;
+  }
+}
+
+exports.objectAdded = (objectType, id) => {
+  switch (getLanguage()) {
+    case 'en':
+    case 'en-GB':
+    case 'en-US':
+      return `New object of type '${objectType}' added with id: ${id} `;
+    case 'fr':
+    case 'fr-FR':
+    case 'fr-BE':
+      return `Objet de type '${objectType}' créé avec l'identifiant: ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }

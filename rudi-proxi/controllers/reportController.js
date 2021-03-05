@@ -32,11 +32,11 @@ const {
 } = require('../db/dbFields')
 
 const {
-  REQ_LANG,
-  REQ_ID,
-  REQ_SUBJECT,
-  REQ_REPORT_ID,
-} = require('../routes/apiUrl')
+  PARAM_LANG: REQ_LANG,
+  PARAM_ID: REQ_ID,
+  REQ_OBJECT: REQ_SUBJECT,
+  PARAM_REPORT_ID: REQ_REPORT_ID,
+} = require('../config/confApi')
 
 //———————————————————————————————————————————————————————————————
 // Data models
@@ -74,12 +74,12 @@ exports.addReportForSingleMetadata = async (req, reply) => {
     }
 
     // ensure metadata exists
-    if (! await db.doesInfoExistFromRudiId(Metadata, API_METADATA_ID, bodyDataId)) {
+    if (! await db.doesObjectExistWithRudiId(Metadata, API_METADATA_ID, bodyDataId)) {
       throw new Error(`${msg.metadataNotFound(bodyDataId)}`)
     }
 
     // ensure report doesn't exist
-    if (await db.doesInfoExistFromRudiId(IntegrationReport, API_REPORT_ID, reportId)) {
+    if (await db.doesObjectExistWithRudiId(IntegrationReport, API_REPORT_ID, reportId)) {
       throw new Error(`${msg.reportAlreadyExists(reportId)}`)
     }
 

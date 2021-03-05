@@ -8,26 +8,67 @@ const documentation = require('./documentation/metadataApi')
 //———————————————————————————————————————————————————————————————
 const {
   URL_PREFIX,
-  URL_SUFIX_REPORT,
-  URL_METADATA,
-  URL_ORGANIZATIONS,
-  URL_CONTACTS,
-  URL_SUBJECT,
-  REQ_ID,
-  REQ_SUBJECT,
-  REQ_REPORT_ID
-} = require('./apiUrl')
+  URL_OBJECT,
+  PARAM_OBJECT,
+  PARAM_ID,
+  PARAM_REPORT_ID,
+  URL_ACTION_DELETION,
+  URL_ACTION_REPORT,
+} = require('../config/confApi')
 
 
 //———————————————————————————————————————————————————————————————
 // Controllers
 //———————————————————————————————————————————————————————————————
+const genericController = require('../controllers/genericController')
 const metadataController = require('../controllers/metadataController')
 const organizationController = require('../controllers/organizationController')
 const contactController = require('../controllers/contactController')
 const reportController = require('../controllers/reportController')
 
 const routes = [
+  //———————————————————————————————————————————————————————————————
+  // METADATA
+  //———————————————————————————————————————————————————————————————
+
+  {
+    method: 'GET',
+    url: `${URL_OBJECT}/:${PARAM_ID}`,
+    handler: genericController.getSingleObject
+  },
+  {
+    method: 'DELETE',
+    url: `${URL_OBJECT}/:${PARAM_ID}`,
+    handler: genericController.deleteSingleObject
+  },
+  {
+    method: 'GET',
+    url: URL_OBJECT,
+    handler: genericController.getObjectList
+  },
+  {
+    method: 'POST',
+    url: URL_OBJECT,
+    handler: genericController.addSingleObject
+    // schema: documentation.addMetadataSchema
+  },
+  {
+    method: 'PUT',
+    url: URL_OBJECT,
+    handler: genericController.updateSingleObject
+  },
+  {
+    method: 'DELETE',
+    url: URL_OBJECT,
+    handler: genericController.deleteEveryObject
+  },
+  {
+    method: 'POST',
+    url: `${URL_OBJECT}/${URL_ACTION_DELETION}`,
+    handler: genericController.deleteObjectList
+  },
+]
+/*
   //———————————————————————————————————————————————————————————————
   // METADATA
   //———————————————————————————————————————————————————————————————
@@ -220,7 +261,7 @@ const routes = [
     url: `${URL_SUBJECT}/${URL_SUFIX_REPORT}`,
     handler: reportController.deleteEveryReportForEverySubject
   },
+*/
 
-]
 
 module.exports = routes

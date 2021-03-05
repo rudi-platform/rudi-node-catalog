@@ -1,30 +1,16 @@
-/*
- * In this file are defined the attributes of the JSON API
- * (= mongoose db documents properties)
- */
-
 //———————————————————————————————————————————————————————————————
-// DB fields
+// Mongoose DB parameters
 //———————————————————————————————————————————————————————————————
-exports.DB_ID = '_id';
-exports.DB_V = '__v';
-
-exports.API_METADATA_ID = 'global_id';
-exports.API_ORGANIZATION_ID = 'organization_id';
-exports.API_CONTACT_ID = 'contact_id';
-
-exports.API_PRODUCER_PROPERTY = 'producer';
-exports.API_CONTACTS_PROPERTY = 'contacts';
-
-exports.API_METAINFO_PROPERTY = 'medatata_info';
-exports.API_METAINFO_PROVIDER_PROPERTY = 'metadata_provider';
-exports.API_METAINFO_CONTACTS_PROPERTY = 'metadata_contacts';
-exports.API_METAINFO_DATES_PROPERTY = 'metadata_dates';
-exports.API_METAINFO_DATES_CREATED_PROPERTY = 'created';
+const DB_NAME = "rudi_prod"
+const DB_PORT = 27017
+const DB_URL = `mongodb://127.0.0.1/${DB_NAME}`
 
 
 //———————————————————————————————————————————————————————————————
-// Integration reports
+// Exports
 //———————————————————————————————————————————————————————————————
-exports.API_REPORT_ID = 'report_id';
-exports.API_RESOURCE_ID = 'resource_id';
+module.exports = {
+  DB_NAME,
+  DB_PORT,
+  DB_URL,
+}
