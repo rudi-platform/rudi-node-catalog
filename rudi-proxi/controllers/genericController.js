@@ -96,7 +96,7 @@ async function newObject(objectType, objectData) {
   try {
     switch (objectType) {
       case URL_OBJECT_METADATA:
-        return metadataController.createMetadata(objectData)
+        return metadataController.newMetadata(objectData)
         break
       case URL_OBJECT_ORGANIZATIONS:
         return new Organization(objectData)

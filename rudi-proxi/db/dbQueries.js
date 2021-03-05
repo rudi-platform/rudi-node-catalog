@@ -68,14 +68,14 @@ exports.getEnsuredDbIdWithRudiId = async (objectType, Model, idField, rudiId) =>
   }
 }
 
-exports.getEnsuredDbIdWithJson = async (objectType, Model, idField, jsonObject) => {
+exports.getEnsuredDbIdWithJson = async (objectType, Model, idField, rudiObject) => {
   const fun = 'getDbIdWithJson'
   log.d(fun, ``)
   // log.d(fun, `objectType: ${objectType}`)
   // log.d(fun, `idField: ${idField}`)
   // log.d(fun, `jsonObject: ${JSON.stringify(jsonObject)}`)
   try {
-    const rudiId = json.accessProperty(jsonObject, idField)
+    const rudiId = json.accessProperty(rudiObject, idField)
     return await this.getEnsuredDbIdWithRudiId(objectType, Model, idField, rudiId)
   } catch (err) {
     log.e(fun, err)
@@ -86,17 +86,12 @@ exports.getEnsuredDbIdWithJson = async (objectType, Model, idField, jsonObject) 
 exports.getObjectWithRudiId = async (Model, idField, rudiId) => {
   const fun = 'getObjectWithRudiId'
   log.d(fun, ``)
-
   try {
-    if (!rudiId) {
-      throw new Error(`${msg.parameterExpected(fun, PARAM_ID)}`)
-    } else {
-      log.d(fun, `RUDI id: ${rudiId}`)
-    }
-
-    const dbObject = await Model.findOne({
-      [idField]: rudiId
-    })
+    if (!rudiId) throw new Error(`${msg.parameterExpected(fun, PARAM_ID)}`)
+    log.d(fun, `RUDI id: ${rudiId}`)
+    /* beautify ignore:start */
+    const dbObject = await Model.findOne({[idField]: rudiId})
+    /* beautify ignore:end */
     return dbObject
   } catch (err) {
     log.e(fun, err)
@@ -110,13 +105,8 @@ exports.getEnsuredObjectWithRudiId = async (objectType, Model, idField, rudiId) 
   try {
     if (!rudiId) throw new Error(`${msg.parameterExpected(fun, PARAM_ID)}`)
     else log.d(fun, `RUDI id: ${rudiId}`)
-
-    /* beautify ignore:start */
-    const dbObject = await Model.findOne({[idField]: rudiId})
-    /* beautify ignore:end */
-
+    const dbObject = await this.getObjectWithRudiId(Model, idField, rudiId)
     if (!dbObject) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
-
     return dbObject
   } catch (err) {
     log.e(fun, err)
@@ -124,66 +114,96 @@ exports.getEnsuredObjectWithRudiId = async (objectType, Model, idField, rudiId) 
   }
 }
 
-exports.getObjectWithJson = async (Model, idField, jsonObject) => {
+exports.getObjectWithJson = async (Model, idField, rudiObject) => {
   const fun = 'getObjectWithJson'
   log.d(fun, ``)
-
-  const rudiId = json.accessProperty(jsonObject, idField)
-  return this.getObjectWithRudiId(Model, idField, rudiId)
+  try {
+    const rudiId = json.accessProperty(rudiObject, idField)
+    const dbObject = await this.getObjectWithRudiId(Model, idField, rudiId)
+    return dbObject
+  } catch (err) {
+    log.e(fun, err)
+    throw boom.boomify(err)
+  }
 }
 
-exports.getEnsuredObjectWithJson = async (objectType, Model, idField, jsonObject) => {
+exports.getEnsuredObjectWithJson = async (objectType, Model, idField, rudiObject) => {
   const fun = 'getEnsuredObjectWithJson'
   log.d(fun, ``)
-
-  const rudiId = json.accessProperty(jsonObject, idField)
-  const dbObject = this.getObjectWithRudiId(Model, idField, rudiId)
-  if (!dbObject) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
-  return dbObject
+  try {
+    const rudiId = json.accessProperty(rudiObject, idField)
+    const dbObject = await this.getObjectWithRudiId(Model, idField, rudiId)
+    if (!dbObject) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
+    return dbObject
+  } catch (err) {
+    log.e(fun, err)
+    throw boom.boomify(err)
+  }
 }
 
 
-exports.getObjectWithDbId = async (Model, id) => {
+exports.getObjectWithDbId = async (Model, dbId) => {
   const fun = 'getObjectWithDbId'
-
-  /* beautify ignore:start */
-  return Model.findOne({[DB_ID]: id})
-  /* beautify ignore:end */
+  log.d(fun, ``)
+  try {
+    /* beautify ignore:start */
+    const dbObject = await Model.findOne({[DB_ID]: dbId})
+    /* beautify ignore:end */
+    return dbObject
+  } catch (err) {
+    log.e(fun, err)
+    throw boom.boomify(err)
+  }
 }
 
-exports.getEnsuredObjectWithDbId = async (objectType, Model, id) => {
+exports.getEnsuredObjectWithDbId = async (objectType, Model, dbId) => {
   const fun = 'getEnsuredObjectWithDbId'
-
-  /* beautify ignore:start */
-  const dbObject = Model.findOne({[DB_ID]: id})
-  /* beautify ignore:end */
-  if (!dbObject) throw new Error(`${msg.objectNotFound(objectType, id)}`)
-
+  log.d(fun, ``)
+  try {
+    const dbObject = await this.getObjectWithDbId(Model, dbId)
+    if (!dbObject) throw new Error(`${msg.objectNotFound(objectType, dbId)}`)
+    return dbObject
+  } catch (err) {
+    log.e(fun, err)
+    throw boom.boomify(err)
+  }
 }
 
-exports.doesObjectExistWithRudiId = async (Model, idField, id) => {
+exports.doesObjectExistWithRudiId = async (Model, idField, rudiId) => {
   const fun = 'doesObjectExistWithRudiId'
   log.d(fun, ``)
-
-  const existingInfo = await this.getObjectWithRudiId(Model, idField, id)
-  return (!!existingInfo)
+  try {
+    const existingInfo = await this.getObjectWithRudiId(Model, idField, rudiId)
+    return (!!existingInfo)
+  } catch (err) {
+    log.e(fun, err)
+    throw boom.boomify(err)
+  }
 }
 
-exports.doesObjectExistWithJson = async (Model, idField, infoJson) => {
+exports.doesObjectExistWithJson = async (Model, idField, rudiObject) => {
   const fun = 'doesObjectExistWithJson'
   log.d(fun, ``)
-
-  const dbObject = await this.getObjectWithJson(Model, idField, infoJson)
-  return (dbObject && '' != dbObject)
+  try {
+    const dbObject = await this.getObjectWithJson(Model, idField, rudiObject)
+    return (!!dbObject)
+  } catch (err) {
+    log.e(fun, err)
+    throw boom.boomify(err)
+  }
 }
 
 exports.getObjectList = async (Model, limit, offset) => {
   const fun = 'getObjectList'
+  log.d(fun, ``)
   // log.d(fun, `filter.limit: ${filter.limit}, filter.offset: ${filter.skip}`)
-
-  const objectList = await Model.find({}).limit(limit).skip(offset)
-
-  return objectList
+  try {
+    const objectList = await Model.find({}).limit(limit).skip(offset)
+    return objectList
+  } catch (err) {
+    log.e(fun, err)
+    throw boom.boomify(err)
+  }
 }
 
 exports.updateObject = async (Model, idField, jsonUpdateData) => {
@@ -204,38 +224,26 @@ exports.updateObject = async (Model, idField, jsonUpdateData) => {
     log.e(fun, err)
     throw boom.boomify(err)
   }
-  /* 
-    if ('' == fullInfo) {
-      throw new Error(`Object doesn't exist with ${idField}: ${id}`)
-    }
-   */
-  log.d(fun, `full info: ${updatedObject}`)
+  log.d(fun, `updatedObject: ${JSON.stringify(updatedObject)}`)
   return updatedObject
 }
 
 exports.deleteObject = async (Model, idField, id) => {
   const fun = 'deleteObject'
   log.d(fun, ``)
-
   if (!id) {
     throw new Error(`${msg.parameterExpected(fun, idField)}`)
   }
 
   try {
-    let deletionInfo = await Model.findOneAndRemove({
-      [idField]: id
-    })
+    /* beautify ignore:start */
+    let deletionInfo = await Model.findOneAndRemove({[idField]: id})
+    /* beautify ignore:end */
     return deletionInfo
   } catch (err) {
     log.e(fun, err)
     throw boom.boomify(err)
   }
-  /* 
-    if ('' == fullInfo) {
-      throw new Error(`Object doesn't exist with ${idField}: ${id}`)
-    }
-   */
-  // log.d(fun, `full info: ${fullInfo}`)
   return fullInfo
 }
 
@@ -257,8 +265,8 @@ exports.deleteMany = async (Model, conditions) => {
   // log.d(fun, `conditions: ${conditions}`)
 
   // TODO: to be consolidated!
-  if (typeof(conditions) == 'string')
-  conditions = changeConditionsIntoRegex(conditions)
+  if (typeof (conditions) == 'string')
+    conditions = changeConditionsIntoRegex(conditions)
 
   try {
     let deletionInfo = await Model.deleteMany(conditions)
@@ -478,19 +486,19 @@ exports.getEnsuredContactWithJson = async (contactJson) => {
 }
 
 exports.getContactWithDbId = async (contactDbId) => {
-  const fun = 'getContactFromDbId'
+  const fun = 'getContactWithDbId'
   log.d(fun, ``)
   return this.getObjectWithDbId(Contact, contactDbId)
 }
 
 exports.getEnsuredContactWithDbId = async (contactDbId) => {
-  const fun = 'getContactFromDbId'
+  const fun = 'getEnsuredContactWithDbId'
   log.d(fun, ``)
   return this.getEnsuredObjectWithDbId(URL_OBJECT_CONTACTS, Contact, contactDbId)
 }
 
 exports.getEnsuredContactDbIdWithJson = async (contactDbId) => {
-  const fun = 'getContactFromDbId'
+  const fun = 'getEnsuredContactDbIdWithJson'
   log.d(fun, ``)
   return this.getEnsuredDbIdWithJson(URL_OBJECT_CONTACTS, Contact, API_CONTACT_ID, contactDbId)
 }
@@ -533,7 +541,7 @@ exports.deleteContact = async (contactRudiId) => {
 
   // Checking that the contact already exists
   await this.getEnsuredContactWithRudiId(contactRudiId)
-  
+
   // Deleting the contact
   const deletedContact = await this.deleteObject(Contact, API_CONTACT_ID, contactRudiId)
   log.d(fun, `${msg.contactDeleted(contactRudiId)}`)

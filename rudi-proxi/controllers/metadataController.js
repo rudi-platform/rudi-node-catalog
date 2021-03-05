@@ -56,17 +56,17 @@ const Contact = require('../definitions/models/Contact')
 // Atomic treatments of properties: RUDI -> DB
 //———————————————————————————————————————————————————————————————
 
-exports.producerRudiToDbFormat = async (rudiProducer) => {
+exports.organizationRudiToDbFormat = async (rudiProducer) => {
   const fun = 'producerRudiToDbFormat'
   log.d(fun, ``)
   if (!rudiProducer) throw new Error(`${msg.parameterExpected(fun, 'rudiProducer')}`)
 
   const organizationDbId = await db.getEnsuredOrganizationDbIdWithJson(rudiProducer)
-  log.d(fun, `organizationDbId: ${organizationDbId}`)
+  log.d(fun, `${JSON.stringify(rudiProducer)} -> ${organizationDbId} `)
   return organizationDbId
 }
 
-exports.contactsRudiToDbFormat = async (rudiContactList) => {
+exports.contactListRudiToDbFormat = async (rudiContactList) => {
   const fun = 'contactsRudiToDbFormat'
   log.d(fun, ``)
   if (!rudiContactList) throw new Error(`${msg.parameterExpected(fun, 'rudiContactList')}`)
@@ -74,13 +74,12 @@ exports.contactsRudiToDbFormat = async (rudiContactList) => {
   let contactDbIds = []
   await Promise.all(rudiContactList.map(
     async (rudiContact) => {
-      log.d(fun, `contact: ${JSON.stringify(rudiContact)}`)
       const contactDbId = await db.getEnsuredContactDbIdWithJson(rudiContact)
       contactDbIds.push(contactDbId)
+      log.d(fun, `${JSON.stringify(rudiContact)} -> ${contactDbId}`)
     }));
   return contactDbIds
 }
-
 
 exports.setCreationDate = async (rudiMetadata) => {
   const fun = 'setCreationDate'
@@ -98,18 +97,18 @@ exports.setCreationDate = async (rudiMetadata) => {
 // Atomic treatments of properties: DB -> RUDI
 //———————————————————————————————————————————————————————————————
 
-exports.producerDbToRudiFormat = async (producerDbId) => {
-  const fun = 'producerDbToRudiFormat'
+exports.organizationDbToRudiFormat = async (producerDbId) => {
+  const fun = 'organizationDbToRudiFormat'
   log.d(fun, ``)
   if (!producerDbId) throw new Error(`${msg.parameterExpected(fun, 'producerDbId')}`)
 
   const organization = await db.getEnsuredOrganizationWithDbId(producerDbId)
-  log.d(fun, `organizationDbId: ${JSON.stringify(organization)}`)
+  log.d(fun, `${producerDbId} -> ${JSON.stringify(organization)}`)
   return organization
 }
 
-exports.contactsDbToRudiFormat = async (contactsDbIds) => {
-  const fun = 'contactsDbToRudiFormat'
+exports.contactListDbToRudiFormat = async (contactsDbIds) => {
+  const fun = 'contactListDbToRudiFormat'
   log.d(fun, ``)
   if (!contactsDbIds) throw new Error(`${msg.parameterExpected(fun, 'contactsDbIds')}`)
 
@@ -117,8 +116,8 @@ exports.contactsDbToRudiFormat = async (contactsDbIds) => {
   await Promise.all(contactsDbIds.map(
     async (contactDbId) => {
       const contact = await db.getEnsuredContactWithDbId(contactDbId)
-      log.d(fun, `contact: ${JSON.stringify(contact)}`)
       contacts.push(contact)
+      log.d(fun, `${contactDbId} -> ${JSON.stringify(contact)}`)
     }));
   return contacts
 }
@@ -151,7 +150,7 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict) => {
       producer = rudiMetadata[API_PRODUCER_PROPERTY]
     }
     if (!!producer) {
-      dbReadyMetadata[API_PRODUCER_PROPERTY] = await this.producerRudiToDbFormat(producer)
+      dbReadyMetadata[API_PRODUCER_PROPERTY] = await this.organizationRudiToDbFormat(producer)
     }
 
     //----- Updating contacts field with db instead of incoming data
@@ -164,7 +163,7 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict) => {
       contacts = rudiMetadata[API_CONTACTS_PROPERTY]
     }
     if (!!contacts) {
-      dbReadyMetadata[API_CONTACTS_PROPERTY] = await this.contactsRudiToDbFormat(contacts)
+      dbReadyMetadata[API_CONTACTS_PROPERTY] = await this.contactListRudiToDbFormat(contacts)
     }
     // log.d(fun, `objectData: ${JSON.stringify(objectData)}`)
 
@@ -181,12 +180,12 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict) => {
     if (!!metaInfo) {
       let metaInfoProvider = metaInfo[API_METAINFO_PROVIDER_PROPERTY]
       if (!!metaInfoProvider) {
-        dbReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_PROVIDER_PROPERTY] = await this.producerRudiToDbFormat(metaInfoProvider)
+        dbReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_PROVIDER_PROPERTY] = await this.organizationRudiToDbFormat(metaInfoProvider)
       }
 
       let metaInfoContacts = metaInfo[API_METAINFO_CONTACTS_PROPERTY]
       if (!!metaInfoContacts) {
-        dbReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_PROVIDER_PROPERTY] = await this.contactsRudiToDbFormat(metaInfoContacts)
+        dbReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_PROVIDER_PROPERTY] = await this.contactListRudiToDbFormat(metaInfoContacts)
       }
 
       // let metaInfoDates = metaInfo[API_METAINFO_DATES_PROPERTY]
@@ -200,8 +199,49 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict) => {
   }
 }
 
+//———————————————————————————————————————————————————————————————
+// Global treatments of properties: DB -> RUDI
+//———————————————————————————————————————————————————————————————
 
-exports.createMetadata = async (rudiMetadata) => {
+exports.dbToRudiFormat = async (dbMetadata) => {
+  const fun = 'dbToRudiFormat'
+  log.d(fun, ``)
+
+  /* beautify ignore:start */
+  let rudyMetadata = dbMetadata
+  /* beautify ignore:end */
+  log.d(fun, `rudyMetadata: ${JSON.stringify(rudyMetadata)}`)
+
+  // Updating incoming data with the full info of the producer
+  // TODO[VALIDATE]: The organization info already in database is not updated with possible new data, 
+  //                 and only the organization RUDI id is really necessary in the request body    
+  const organizationDbId = json.accessProperty(dbMetadata, API_PRODUCER_PROPERTY)
+  rudyMetadata[API_PRODUCER_PROPERTY] = await this.organizationDbToRudiFormat(organizationDbId)
+  
+  // Updating incoming data with the full info of each contact
+  // TODO[VALIDATE]: The contact info already in database is not updated with possible new data, 
+  //                 and only the contact RUDI id is really necessary in the request body
+  const contactsDbIds = json.accessProperty(dbMetadata, API_CONTACTS_PROPERTY)
+  rudyMetadata[API_CONTACTS_PROPERTY] = await this.contactListDbToRudiFormat(contactsDbIds)
+
+  // Updating incoming data with the full info of the metadata info provider organization
+  const metaInfo = json.accessProperty(dbMetadata, API_METAINFO_PROPERTY)
+  const metaInfoProviderDbId = json.accessProperty(metaInfo, API_METAINFO_PROVIDER_PROPERTY)
+  rudyMetadata[API_METAINFO_PROPERTY][API_METAINFO_PROVIDER_PROPERTY] = await this.organizationDbToRudiFormat(metaInfoProviderDbId)
+  
+  // Updating incoming data with the full info of each of the metadata info contacts
+  const metaInfoContactsDbIds = json.accessProperty(metaInfo, API_METAINFO_CONTACTS_PROPERTY)
+  rudyMetadata[API_METAINFO_PROPERTY][API_METAINFO_CONTACTS_PROPERTY] = await this.contactListDbToRudiFormat(metaInfoContactsDbIds)
+
+  return rudyMetadata
+}
+
+
+//———————————————————————————————————————————————————————————————
+// High level actions
+//———————————————————————————————————————————————————————————————
+
+exports.newMetadata = async (rudiMetadata) => {
   const fun = 'newMetadata'
   log.d(fun, ``)
   if (!rudiMetadata) throw new Error(`${msg.parameterExpected(fun, rudiMetadata)}`)
@@ -213,39 +253,6 @@ exports.createMetadata = async (rudiMetadata) => {
   log.d(fun, `DB ready object: ${JSON.stringify(dbReadyObject)}`)
 
 
-  const newMetadata = new Metadata(dbReadyObject)
-  return newMetadata
+  const dbMetadata = new Metadata(dbReadyObject)
+  return dbMetadata
 }
-
-//———————————————————————————————————————————————————————————————
-// Global treatments of properties: DB -> RUDI
-//———————————————————————————————————————————————————————————————
-
-exports.dbToRudiFormat = async (dbMetadata) => {
-  const fun = 'dbToRudiFormat'
-  log.d(fun, ``)
-
-  /* beautify ignore:start */
-  let rudyMetadata = {...dbMetadata}
-  /* beautify ignore:end */
-
-  // ad hoc Metadata treatments: retrieve Producer and Contact info
-  const organizationDbId = json.accessProperty(dbMetadata, API_PRODUCER_PROPERTY)
-  const contactsDbIds = json.accessProperty(dbMetadata, API_CONTACTS_PROPERTY)
-
-  // Updating incoming data with the full info of the organization
-  // TODO[VALIDATE]: The organization info already in database is not updated with possible new data, 
-  //                 and only the organization RUDI id is really necessary in the request body    
-  rudyMetadata[API_PRODUCER_PROPERTY] = await this.producerDbToRudiFormat(organizationDbId)
-
-  // Updating incoming data with the full info of the organization
-  // TODO[VALIDATE]: The contact info already in database is not updated with possible new data, 
-  //                 and only the contact RUDI id is really necessary in the request body
-  rudyMetadata[API_CONTACTS_PROPERTY] = await this.contactsDbToRudiFormat(contactsDbIds)
-
-  // objectData[API_CONTACTS_PROPERTY] = await dbRwk.updateJsonContactList(contacts)
-
-  // TODO: treat metadataInfo
-  return rudyMetadata
-}
-
