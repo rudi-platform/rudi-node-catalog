@@ -3,7 +3,7 @@
 //———————————————————————————————————————————————————————————————
 const {
   API_VERSION
-} = require('../../routes/apiUrl');
+} = require('../../config/confApi');
 
 //———————————————————————————————————————————————————————————————
 // External dependencies
@@ -299,7 +299,7 @@ const MetadataSchema = new mongoose.Schema({
     },
 
     // Addresses to get further information on the metadata
-    metadata_contact: [{
+    metadata_contacts: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Contact'
     }]

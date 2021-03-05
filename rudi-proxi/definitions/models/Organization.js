@@ -12,9 +12,7 @@ const Validation = require('../schemaValidators')
 const OrganizationSchema = new mongoose.Schema({
   // Unique and permanent identifier for the organization in RUDI 
   // system (required)
-  organization_id: {
-    type: Ids.UUIDv4,
-  },
+  organization_id: Ids.UUIDv4,
 
   // Updated offical name of the organization
   organization_name: {

@@ -10,8 +10,8 @@ const Int32 = require('mongoose-int32');
 
 const Ids = require('../schemas/Identifiers')
 const {
-  Request
-} = require('../../routes/apiUrl')
+  HttpMethods: Request
+} = require('../../config/confApi')
 
 
 //———————————————————————————————————————————————————————————————

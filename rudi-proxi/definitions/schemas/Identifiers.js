@@ -18,7 +18,6 @@ const UUIDv4 = {
   trim: true,
   required: true,
   unique: true,
-  dropDups: true,
   index: true,
   lowercase: true,
   validate: {
