@@ -1,3 +1,5 @@
+'use strict';
+const mod = 'genCtrl'
 /*
  * In this file are made the different steps followed for each 
  * action on the objects (producer or publisher)
@@ -30,7 +32,8 @@ const {
   PARAM_ID,
   PARAM_OBJECT,
   QUERY_LIMIT,
-  QUERY_OFFSET
+  QUERY_OFFSET,
+  URL_ACTION_REPORT
 } = require('../config/confApi')
 
 const {
@@ -38,9 +41,10 @@ const {
   API_METADATA_ID,
   API_ORGANIZATION_ID,
   API_CONTACT_ID,
-  API_PRODUCER_PROPERTY,
-  API_CONTACTS_PROPERTY,
-  API_METAINFO_PROPERTY
+  API_DATA_PRODUCER_PROPERTY,
+  API_DATA_CONTACTS_PROPERTY,
+  API_METAINFO_PROPERTY,
+  API_REPORT_ID
 } = require('../db/dbFields')
 
 const Metadata = require('../definitions/models/Metadata')
@@ -52,37 +56,37 @@ const organizationController = require('../controllers/organizationController')
 const contactController = require('../controllers/contactController')
 const {
   stringify
-} = require('uuid')
+} = require('uuid');
+const Report = require('../definitions/models/Report');
 
 //———————————————————————————————————————————————————————————————
 // Specific object type helper functions
-//———————————————————————————————————————————————————————————————
+//——————————————————————————————————————————————————————————————— 
 
-function getObjectAccesses(objectType) {
+exports.getObjectAccesses = (objectType) => {
   const fun = 'getObjectAccesses'
-  log.d(fun, ``)
+  // log.d(mod, fun, ``)
 
   switch (objectType) {
     case URL_OBJECT_METADATA:
       return {
         Model: Metadata, idField: API_METADATA_ID
       }
-      // accesses[DB_MODEL] = Metadata
-      // accesses[DB_ID_FIELD] = API_METADATA_ID
       break;
     case URL_OBJECT_ORGANIZATIONS:
       return {
         Model: Organization, idField: API_ORGANIZATION_ID
       }
-      // accesses[DB_MODEL] = Organization
-      // accesses[DB_ID_FIELD] = API_ORGANIZATION_ID
       break;
     case URL_OBJECT_CONTACTS:
       return {
         Model: Contact, idField: API_CONTACT_ID
       }
-      // accesses[DB_MODEL] = Contact
-      // accesses[DB_ID_FIELD] = API_CONTACT_ID
+      break;
+    case URL_ACTION_REPORT:
+      return {
+        Model: Report, idField: API_REPORT_ID
+      }
       break;
     default:
       throw new Error(msg.objectTypeNotFound(objectType))
@@ -91,15 +95,20 @@ function getObjectAccesses(objectType) {
 
 async function newObject(objectType, objectData) {
   const fun = 'newObject'
-  log.d(fun, `objectType: ${objectType}`)
-  log.d(fun, `incoming objectData: ${JSON.stringify(objectData)}`)
+  log.d(mod, fun, `objectType: ${objectType}`)
+  log.d(mod, fun, `incoming objectData: ${json.beautify(objectData)}`)
   try {
     switch (objectType) {
       case URL_OBJECT_METADATA:
         return metadataController.newMetadata(objectData)
         break
       case URL_OBJECT_ORGANIZATIONS:
-        return new Organization(objectData)
+        try {
+          log.d(mod, fun, `! new Organization(objectData)`)
+          return new Organization(objectData)
+        } catch (err) {
+          log.e(mod, fun, `! ${err}`)
+        }
         break
       case URL_OBJECT_CONTACTS:
         return new Contact(objectData)
@@ -108,65 +117,70 @@ async function newObject(objectType, objectData) {
         throw new Error(msg.objectTypeNotFound(objectType))
     }
   } catch (err) {
-    log.e(fun, err)
+    log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 }
 
-
-async function editObject(objectType, objectData) {
+async function editObject(objectType, editedObjectData) {
   const fun = 'editObject'
-  log.d(fun, `objectType: ${objectType}`)
-  log.d(fun, `incoming objectData: ${JSON.stringify(objectData)}`)
+  log.d(mod, fun, `objectType: ${objectType}`)
+  log.d(mod, fun, `incoming objectData: ${json.beautify(editedObjectData)}`)
+  let dbReadyObject
+  switch (objectType) {
+    case URL_OBJECT_METADATA:
+      dbReadyObject = await metadataController.updateMetadata(editedObjectData)
+      break
+    case URL_OBJECT_ORGANIZATIONS:
+    case URL_OBJECT_CONTACTS:
+      const {
+        Model, idField
+      } = this.getObjectAccesses(objectType)
+      dbReadyObject = await db.updateObject(Model, idField, editedObjectData)
+      break
+    default:
+      throw new Error(msg.objectTypeNotFound(objectType))
+  }
+  return dbReadyObject
+}
+
+
+//———————————————————————————————————————————————————————————————
+// Treatments of properties: DB -> RUDI
+//———————————————————————————————————————————————————————————————
+
+async function treatDbObject(objectType, dbObject) {
+  const fun = 'treatDbObject'
+  // log.d(mod, fun, `objectType: ${objectType}\nobjectData: ${json.beautify(dbObject)}`)
 
   switch (objectType) {
     case URL_OBJECT_METADATA:
-      // TODONOW
-
-      // Metadata:
-      // 1. get the organization dbId, and update incoming data.
-      const producer = objectData[API_PRODUCER_PROPERTY]
-      if (!!producer) {
-
-      }
-
-      // 2. get the contacts dbIds, and update incoming data.
-
-      // Metadata.metadataInfo:
-      // 1. get the organization and contacts dbIds, and update incoming data.
-      // 2. special update for metadataInfo.referenceDates: keep 'createdDate' untouched and update 'updateDate'
-
-      const dbReadyObject = await metadataController.rudiToDbFormat(objectData, false)
-      log.d(fun, `db ready objectData: ${JSON.stringify(objectData)}`)
-      const newMetadata = new Metadata(dbReadyObject)
-      return newMetadata
+      return await metadataController.dbToRudiFormat(dbObject)
       break
     case URL_OBJECT_ORGANIZATIONS:
-      return new Organization(objectData)
-      break
     case URL_OBJECT_CONTACTS:
-      return new Contact(objectData)
+    case URL_ACTION_REPORT:
+      return dbObject
       break
     default:
       throw new Error(msg.objectTypeNotFound(objectType))
   }
 }
 
-
-async function specialTreatments(objectType, objectData) {
-  const fun = 'specialTreatments'
-  log.d(fun, `objectType: ${objectType}\nobjectData: ${JSON.stringify(objectData)}`)
+async function treatDbObjectList(objectType, dbObjectList) {
+  const fun = 'treatDbObjectList'
+  // log.d(mod, fun, `objectType: ${objectType}\nobjectData: ${json.beautify(rudiObjectList)}`)
 
   switch (objectType) {
     case URL_OBJECT_METADATA:
-      return await metadataController.dbToRudiFormat(objectData)
-      break
+      const rudiMetadataList = await metadataController.dbToRudiFormatList(dbObjectList)
+      return rudiMetadataList
+      break;
     case URL_OBJECT_ORGANIZATIONS:
-      return objectData
-      break
     case URL_OBJECT_CONTACTS:
-      return objectData
-      break
+    case URL_ACTION_REPORT:
+      return dbObjectList
+      break;
     default:
       throw new Error(msg.objectTypeNotFound(objectType))
   }
@@ -181,34 +195,39 @@ async function specialTreatments(objectType, objectData) {
 // => POST /{object}/{id}
 exports.addSingleObject = async (req, reply) => {
   const fun = 'addSingleObject'
-  log.d(fun, ``)
+  log.d(mod, fun, ``)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
 
     /* beautify ignore:start */
     // identify object model
-    const {Model, idField} = getObjectAccesses(objectType)
+    const {Model, idField} = this.getObjectAccesses(objectType)
     // accessing the request body
-    let incomingData = {...req.body}
+    let rudiObject = {...req.body}
     /* beautify ignore:end */
 
     // retrieving the id
-    log.d(fun, `objectType: '${objectType}', incomingData: '${incomingData}' `)
-    const id = json.accessProperty(incomingData, idField)
+    log.d(mod, fun, `objectType: '${objectType}', incomingData: '${json.beautify(rudiObject)}' `)
+    const rudiId = json.accessProperty(rudiObject, idField)
 
     // First: we make sure object doesn't exist already
-    const existsObject = await db.getObjectWithRudiId(Model, idField, id)
-    if (!!existsObject) throw new Error(`${msg.objectAlreadyExists(objectType, id)}`)
+    const existsObject = await db.doesObjectExistWithRudiId(Model, idField, rudiId)
+    if (existsObject) throw new Error(`${msg.objectAlreadyExists(objectType, rudiId)}`)
 
     // Creating new object + specific treatments
-    const object = await newObject(objectType, incomingData)
+    const dbReadyObject = await newObject(objectType, rudiObject)
+    // const dbReadyObject = await new Model(rudiObject)
+    log.d(mod, fun, `created dbReadyObject: ${json.beautify(dbReadyObject)}`)
 
-    const dbActionResult = await object.save()
-    log.d(fun, `${msg.objectAdded(id)}`)
-    return dbActionResult
+    const dbActionResult = await dbReadyObject.save()
+    // log.d(mod, fun, `saved, dbActionResult: ${json.beautify(dbActionResult)}`)
+
+    log.i(mod, fun, `${msg.objectAdded(objectType, rudiId)}`)
+    const refinedObject = await treatDbObject(objectType, dbReadyObject)
+    return refinedObject
   } catch (err) {
-    log.e(fun, err)
+    log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 }
@@ -217,7 +236,7 @@ exports.addSingleObject = async (req, reply) => {
 // => GET /{object}/{id}
 exports.getSingleObject = async (req, reply) => {
   const fun = 'getSingleObject'
-  log.d(fun, ``)
+  log.d(mod, fun, ``)
   try {
 
     // retrieve url parameters: object type, object id
@@ -226,21 +245,22 @@ exports.getSingleObject = async (req, reply) => {
 
     // identify object model
     /* beautify ignore:start */
-    const {Model, idField} = getObjectAccesses(objectType)
+    const {Model, idField} = this.getObjectAccesses(objectType)
     /* beautify ignore:end */
 
-    // log.d(fun, `objectType: '${objectType}', idFieldLabel: '${idFieldLabel}' `)
+    // log.d(mod, fun, `objectType: '${objectType}', idFieldLabel: '${idFieldLabel}' `)
 
     // ensure the object exists
     const dbObject = await db.getEnsuredObjectWithRudiId(objectType, Model, idField, objectId)
+    log.d(mod, fun, `dbObject: ${json.beautify(dbObject)}`)
 
     // special treatments
-    const treatedObject = specialTreatments(objectType, dbObject)
+    const refinedObject = await treatDbObject(objectType, dbObject)
 
     // return the object
-    return treatedObject
+    return refinedObject
   } catch (err) {
-    log.e(fun, err)
+    log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 }
@@ -249,17 +269,17 @@ exports.getSingleObject = async (req, reply) => {
 // => GET /{object}
 exports.getObjectList = async (req, reply) => {
   const fun = 'getObjectList'
-  log.d(fun, ``)
+  log.d(mod, fun, ``)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
 
     // identify object model
     /* beautify ignore:start */
-    const {Model, idField} = getObjectAccesses(objectType)
+    const {Model, idField} = this.getObjectAccesses(objectType)
     /* beautify ignore:end */
 
-    // log.d(fun, `objectType: '${objectType}', dbModel: ${dbModel}, idFieldLabel: '${idFieldLabel}' `)
+    // log.d(mod, fun, `objectType: '${objectType}', dbModel: ${dbModel}, idFieldLabel: '${idFieldLabel}' `)
 
     // retrieve query parameters: 'limit' and 'offset'
     const limit = parseInt(req.query[QUERY_LIMIT]) || 0
@@ -267,9 +287,13 @@ exports.getObjectList = async (req, reply) => {
 
     // accessing the objects
     const objectList = await db.getObjectList(Model, limit, offset)
-    return objectList
+
+    // special treatments
+    const refinedObjectList = await treatDbObjectList(objectType, objectList)
+
+    return refinedObjectList
   } catch (err) {
-    log.e(fun, err)
+    log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 }
@@ -278,38 +302,39 @@ exports.getObjectList = async (req, reply) => {
 // => PUT /{object}
 exports.updateSingleObject = async (req, reply) => {
   const fun = 'updateSingleObject'
-  log.d(fun, ``)
+  log.d(mod, fun, ``)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
 
     /* beautify ignore:start */
     // identify object model
-    const {Model, idField} = getObjectAccesses(objectType)
+    const {Model, idField} = this.getObjectAccesses(objectType)
     // retrieve incoming data
-    const {...incomingData} = req.body
+    const {...incomingPartialRudiObject} = req.body
     /* beautify ignore:end */
+    log.d(mod, fun, `incomingPartialRudiObject: ${json.beautify(incomingPartialRudiObject)}`)
 
     // retrieve url parameters: object type, object id
     const rudiId = json.accessProperty(req.body, idField)
 
-    // ensure the object exists
-    await db.getEnsuredObjectWithRudiId(objectType, Model, idField, rudiId)
+    const existsObject = await db.doesObjectExistWithRudiId(Model, idField, rudiId)
+    if (!existsObject) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
 
-    return await editObject(objectType, incomingData)
-
+    // const dbReadyObject = await db.updateObject(Model, idField, incomingPartialRudiObject)
+    const dbReadyObject = await editObject(objectType, incomingPartialRudiObject)
+    return dbReadyObject
   } catch (err) {
-    log.e(fun, err)
+    log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 }
-
 
 // Delete a single object
 // => DELETE /{object}/{id}
 exports.deleteSingleObject = async (req, reply) => {
   const fun = 'deleteSingleObject'
-  log.d(fun, ``)
+  log.d(mod, fun, ``)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -317,7 +342,7 @@ exports.deleteSingleObject = async (req, reply) => {
 
     /* beautify ignore:start */
     // identify object model
-    const {Model, idField} = getObjectAccesses(objectType)
+    const {Model, idField} = this.getObjectAccesses(objectType)
     /* beautify ignore:end */
 
     // ensure the object exists
@@ -327,7 +352,7 @@ exports.deleteSingleObject = async (req, reply) => {
 
     return deletedObject
   } catch (err) {
-    log.e(fun, err)
+    log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 }
@@ -337,23 +362,23 @@ exports.deleteSingleObject = async (req, reply) => {
 // => POST /{object}/deletion
 exports.deleteObjectList = async (req, reply) => {
   const fun = 'deleteObjectList'
-  log.d(fun, ``)
+  log.d(mod, fun, ``)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
 
     /* beautify ignore:start */
     // identify object model
-    const {Model, idField} = getObjectAccesses(objectType)
+    const {Model, idField} = this.getObjectAccesses(objectType)
     // retrieve incoming data
     const {...conditions} = req.body
     /* beautify ignore:end */
-    log.d(fun, JSON.stringify(conditions))
+    log.d(mod, fun, json.beautify(conditions))
 
     const object = await db.deleteMany(Model, conditions)
     return object
   } catch (err) {
-    log.e(fun, err)
+    log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 }
@@ -363,20 +388,20 @@ exports.deleteObjectList = async (req, reply) => {
 // => DELETE /{object}
 exports.deleteEveryObject = async (req, reply) => {
   const fun = 'deleteEveryObject'
-  log.d(fun, ``)
+  log.d(mod, fun, ``)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
 
     /* beautify ignore:start */
     // identify object model
-    const {Model, idField} = getObjectAccesses(objectType)
+    const {Model, idField} = this.getObjectAccesses(objectType)
     /* beautify ignore:end */
 
     const object = await db.deleteAll(Model)
     return object
   } catch (err) {
-    log.e(fun, err)
+    log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 }

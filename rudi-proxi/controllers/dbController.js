@@ -1,15 +1,15 @@
 'use strict';
 
+const mod = 'dbCtrl'
 /*
- * This file describes the steps followed for each 
- * action on the organizations (producer or publisher)
+ * In this file are made the different steps followed for each 
+ * action on the contacts (producer or publisher)
  */
 
- //———————————————————————————————————————————————————————————————
+//———————————————————————————————————————————————————————————————
 // External dependancies 
 //———————————————————————————————————————————————————————————————
 const boom = require('@hapi/boom')
-
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
 
@@ -30,11 +30,41 @@ const {
 } = require('../db/dbFields')
 
 const {
-  PARAM_LANG: REQ_LANG,
-  PARAM_ID: REQ_ID
+  PARAM_ID
 } = require('../config/confApi')
 
+const {
+  DB_NAME
+} = require('../config/confSystem')
+
+
 //———————————————————————————————————————————————————————————————
-// Data models
+// Controllers
 //———————————————————————————————————————————————————————————————
-const Organization = require('../definitions/models/Organization')
+
+exports.getCollections = async (req, reply) => {
+  const fun = 'getCollections'
+  log.d(mod, fun, ``)
+  try {
+
+    const dbActionResult = await db.getCollections(DB_NAME)
+    return dbActionResult
+
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw boom.boomify(err)
+  }
+}
+exports.dropDB = async (req, reply) => {
+  const fun = 'dropDB'
+  log.d(mod, fun, ``)
+  try {
+
+    const dbActionResult = await db.dropDB(DB_NAME)
+    return dbActionResult
+
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw boom.boomify(err)
+  }
+}

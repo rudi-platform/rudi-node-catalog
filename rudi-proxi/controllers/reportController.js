@@ -1,3 +1,6 @@
+'use strict';
+
+const mod = 'repCtrl'
 /*
  * This file describes the different steps followed for each 
  * action on the intergration reports submitted by the Portal
@@ -25,436 +28,279 @@ const {
   API_METADATA_ID,
   API_ORGANIZATION_ID,
   API_CONTACT_ID,
-  API_PRODUCER_PROPERTY,
-  API_CONTACTS_PROPERTY,
+  API_DATA_PRODUCER_PROPERTY,
+  API_DATA_CONTACTS_PROPERTY,
   API_REPORT_ID,
   API_RESOURCE_ID
 } = require('../db/dbFields')
 
 const {
-  PARAM_LANG: REQ_LANG,
-  PARAM_ID: REQ_ID,
-  REQ_OBJECT: REQ_SUBJECT,
-  PARAM_REPORT_ID: REQ_REPORT_ID,
+  PARAM_OBJECT,
+  PARAM_ID,
+  PARAM_REPORT_ID,
+  QUERY_LIMIT,
+  QUERY_OFFSET,
+  URL_ACTION_REPORT
 } = require('../config/confApi')
 
 //———————————————————————————————————————————————————————————————
 // Data models
 //———————————————————————————————————————————————————————————————
-const IntegrationReport = require('../definitions/models/IntegrationReport')
-const Metadata = require('../definitions/models/Metadata')
+const Metadata = require('../definitions/models/Metadata');
+const Report = require('../definitions/models/Report');
+
+
+const {
+  getObjectAccesses
+} = require('./genericController');
+
 
 
 //———————————————————————————————————————————————————————————————
-// Controllers: integration report for metadata 
+// Controllers: integration report for any object 
 //———————————————————————————————————————————————————————————————
 
-// Add a new report for one metadata integration
-exports.addReportForSingleMetadata = async (req, reply) => {
-  const fun = 'addReportForSingleMetadata'
-  log.d(fun, ``)
+// Add a new report for one object integration
+exports.addSingleReportForObject = async (req, reply) => {
+  const fun = 'addSingleReportForObject'
+  log.d(mod, fun, ``)
   try {
-    // retrieve url parameters: lang, metadata id
-    lang.setLanguage(json.accessParam(req.params, REQ_LANG))
-
-    const dataId = json.accessParam(req.params, REQ_ID)
-
-    // retrieve body parameters: metadata id, report id
+    // retrieve url parameters: object type, object id
+    const objectType = json.accessReqParam(req, PARAM_OBJECT)
+    const urlObjectId = json.accessReqParam(req, PARAM_ID)
 
     /* beautify ignore:start */
-    const incomingData = {...req.body}
+    // identify object model
+    const {Model, idField} = getObjectAccesses(objectType)
+    // accessing the request body
+    let reportBody = {...req.body}
     /* beautify ignore:end */
 
-    const bodyDataId = json.accessProperty(incomingData,API_RESOURCE_ID)
-    const reportId = json.accessProperty(incomingData,API_REPORT_ID)
 
-    // ensure url metadata id and body metadata id match
-    if(dataId != bodyDataId){
-      throw new Error(msg.parametersMismatch(dataId, bodyDataId))
-    }
+    // retrieve body parameters: object id, report id
+    const reportId = json.accessProperty(reportBody, API_REPORT_ID)
+    const bodyObjectId = json.accessProperty(reportBody, API_RESOURCE_ID)
 
-    // ensure metadata exists
-    if (! await db.doesObjectExistWithRudiId(Metadata, API_METADATA_ID, bodyDataId)) {
-      throw new Error(`${msg.metadataNotFound(bodyDataId)}`)
-    }
+    log.d(mod, fun, `Report for objectType: '${objectType}', report: '${json.beautify(reportBody)}'\n`)
+
+    // ensure url object id and body object id match
+    if (urlObjectId != bodyObjectId) throw new Error(`${msg.parametersMismatch(urlObjectId, bodyObjectId)}`)
+
+    // ensure object exists
+    const existsObject = await db.doesObjectExistWithRudiId(Model, idField, urlObjectId)
+    if (!existsObject) throw new Error(`${msg.objectNotFound(objectType, urlObjectId)}`)
 
     // ensure report doesn't exist
-    if (await db.doesObjectExistWithRudiId(IntegrationReport, API_REPORT_ID, reportId)) {
-      throw new Error(`${msg.reportAlreadyExists(reportId)}`)
-    }
+    const existsReport = await db.doesObjectExistWithRudiId(Report, API_REPORT_ID, reportId)
+    if (existsReport) throw new Error(`${msg.objectAlreadyExists(URL_ACTION_REPORT, reportId)}`)
 
     // add new integration report
-    const newReport = new IntegrationReport(incomingData)
-    const report = await newReport.save()
-
-    return report
+    const dbReadyReport = await new Report(reportBody)
+    const dbActionResult = await dbReadyReport.save()
+    log.i(mod, fun, `Report saved: ${json.beautify(dbReadyReport)}`)
+    return dbReadyReport
   } catch (err) {
-    log.e(fun, err)
+    log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 }
 
-// Update an existing report for one metadata integration
-exports.updateReportForSingleMetadata = async (req, reply) => {
-  const fun = 'updateReportForSingleMetadata'
-  log.d(fun, ``)
+// Update an existing report for one object integration
+exports.addOrEditSingleReportForObject = async (req, reply) => {
+  const fun = 'addOrEditSingleReportForObject'
+  log.d(mod, fun, ``)
   try {
-    lang.setLanguage(req.params[REQ_LANG])
+    // retrieve url parameters: object type, object id
+    const objectType = json.accessReqParam(req, PARAM_OBJECT)
+    const urlObjectId = json.accessReqParam(req, PARAM_ID)
 
     /* beautify ignore:start */
-    let incomingData = {...req.body}
+    // identify object model
+    const {Model, idField} = getObjectAccesses(objectType)
+    // accessing the request body
+    let reportBody = {...req.body}
     /* beautify ignore:end */
 
-    // retrieve url parameters: lang, metadata id
-    // retrieve body parameters: metadata id, report id
+    // retrieve body parameters: object id, report id
+    const reportId = json.accessProperty(reportBody, API_REPORT_ID)
+    const bodyObjectId = json.accessProperty(reportBody, API_RESOURCE_ID)
 
-    // ensure url metadata id and body metadata id match
-    // ensure metadata exists
+    // ensure url object id and body object id match
+    if (urlObjectId != bodyObjectId) throw new Error(`${msg.parametersMismatch(urlObjectId, bodyObjectId)}`)
+
+    // ensure object exists
+    const existsObject = await db.doesObjectExistWithRudiId(Model, idField, urlObjectId)
+    if (!existsObject) throw new Error(`${msg.objectNotFound(objectType, urlObjectId)}`)
+
+    // check if the report exists 
+    const dbReport = await db.getObjectWithRudiId(Report, API_REPORT_ID, reportId)
+
+    let dbReadyReport
+    if (!dbReport) { // adding new report
+      // add new integration report
+      dbReadyReport = await new Report(reportBody)
+      const dbActionResult = await dbReadyReport.save()
+      log.i(mod, fun, `Report created: ${json.beautify(dbReadyReport)}`)
+
+    } else { // updating existing report
+      dbReadyReport = await db.updateObject(Report, API_REPORT_ID, reportBody)
+      log.i(mod, fun, `Report edited: ${json.beautify(dbReadyReport)}`)
+    }
+
+    return dbReadyReport
+    // retrieve url parameters: object id
+    // retrieve body parameters: object id, report id
+
+    // ensure url object id and body object id match
+    // ensure object exists
     // ensure report doesn't exist
 
     // update new integration report
-    return `Function '${fun}' still needs to be implemented`
+    return `Function '${fun}' still needs to be implemented in module ${mod}`
 
   } catch (err) {
-    log.e(fun, err)
+    log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 }
 
-// Get every reports for one metadata integration
-exports.getEveryReportForSingleMetadata = async (req, reply) => {
-  const fun = 'getEveryReportForSingleMetadata'
-  log.d(fun, ``)
+// Get every reports for one object integration
+exports.getReportListForObject = async (req, reply) => {
+  const fun = 'getReportListForObject'
+  log.d(mod, fun, ``)
   try {
-    lang.setLanguage(req.params[REQ_LANG])
+    // retrieve url parameters: object type, object id
+    const objectType = json.accessReqParam(req, PARAM_OBJECT)
+    const urlObjectId = json.accessReqParam(req, PARAM_ID)
+
+    // retrieve query parameters: 'limit' and 'offset'
+    const limit = parseInt(req.query[QUERY_LIMIT]) || 0
+    const offset = parseInt(req.query[QUERY_OFFSET]) || 0
 
     /* beautify ignore:start */
-    let incomingData = {...req.body}
+    // identify object model
+    const {Model, idField} = getObjectAccesses(objectType)
     /* beautify ignore:end */
 
-    // retrieve url parameters: lang, metadata id
+    // ensure object exists
+    const existsObject = await db.doesObjectExistWithRudiId(Model, idField, urlObjectId)
+    if (!existsObject) throw new Error(`${msg.objectNotFound(objectType, urlObjectId)}`)
 
-    // ensure metadata exists
-
-    // get all reports for this metadata
-    return `Function '${fun}' still needs to be implemented`
-
+    // get all reports for this object
+    /* beautify ignore:start */
+    const dbReportList = await db.getObjectListFiltered(Report, {[API_RESOURCE_ID]: urlObjectId}, limit, offset)
+    /* beautify ignore:end */
+    return dbReportList
   } catch (err) {
-    log.e(fun, err)
+    log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 }
 
-// Get every reports for one metadata integration
-exports.getSingleReportForSingleMetadata = async (req, reply) => {
-  const fun = 'getSingleReportForSingleMetadata'
-  log.d(fun, ``)
+// Get every reports for one object integration
+exports.getSingleReportForObject = async (req, reply) => {
+  const fun = 'getSingleReportForObject'
+  log.d(mod, fun, ``)
   try {
-    lang.setLanguage(req.params[REQ_LANG])
+
+    // retrieve url parameters: object type, object id
+    const objectType = json.accessReqParam(req, PARAM_OBJECT)
+    const urlObjectId = json.accessReqParam(req, PARAM_ID)
+    const reportId = json.accessReqParam(req, PARAM_REPORT_ID)
 
     /* beautify ignore:start */
-    let incomingData = {...req.body}
+    // identify object model
+    const {Model, idField} = getObjectAccesses(objectType)
     /* beautify ignore:end */
 
-    // retrieve url parameters: lang, metadata id, report id
+    // ensure object exists
+    const existsObject = await db.doesObjectExistWithRudiId(Model, idField, urlObjectId)
+    if (!existsObject) throw new Error(`${msg.objectNotFound(objectType, urlObjectId)}`)
 
-    // ensure metadata exists
-    // ensure report exists
+    // ensure report doesn't exist
+    const dbReport = await db.getEnsuredObjectWithRudiId(URL_ACTION_REPORT, Report, API_REPORT_ID, reportId)
 
-    // get this report for this metadata
-    return `Function '${fun}' still needs to be implemented`
+    // ensure report is for the object
+    const resourceId = json.accessProperty(dbReport, API_RESOURCE_ID)
+    if (resourceId != urlObjectId) throw new Error(`${msg.objectNotFound(objectType, urlObjectId)}`)
 
+    return dbReport
   } catch (err) {
-    log.e(fun, err)
+    log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 }
 
-// Get every reports for one metadata integration
-exports.getEveryReportForEveryMetadata = async (req, reply) => {
-  const fun = 'getEveryReportForEveryMetadata'
-  log.d(fun, ``)
+// Get every reports for one object integration
+exports.deleteSingleReportForObject = async (req, reply) => {
+  const fun = 'deleteSingleReportForObject'
+  log.d(mod, fun, ``)
   try {
-    lang.setLanguage(req.params[REQ_LANG])
 
-    /* beautify ignore:start */
-    let incomingData = {...req.body}
-    /* beautify ignore:end */
-
-    // retrieve url parameters: lang
-
-    // get every integration report for all metadata
-    return `Function '${fun}' still needs to be implemented`
-
-  } catch (err) {
-    log.e(fun, err)
-    throw boom.boomify(err)
-  }
-}
-
-// Get every reports for one metadata integration
-exports.deleteEveryReportForSingleMetadata = async (req, reply) => {
-  const fun = 'deleteEveryReportForSingleMetadata'
-  log.d(fun, ``)
-  try {
-    lang.setLanguage(req.params[REQ_LANG])
-
-    /* beautify ignore:start */
-    let incomingData = {...req.body}
-    /* beautify ignore:end */
-
-    // retrieve url parameters: lang, metadata id
-
-    // ensure metadata exists
-
-    // delete every integration report for this metadata
-    return `Function '${fun}' still needs to be implemented`
-
-  } catch (err) {
-    log.e(fun, err)
-    throw boom.boomify(err)
-  }
-}
-
-// Get every reports for one metadata integration
-exports.deleteSingleReportForSingleMetadata = async (req, reply) => {
-  const fun = 'deleteSingleReportForSingleMetadata'
-  log.d(fun, ``)
-  try {
-    lang.setLanguage(req.params[REQ_LANG])
-
-    /* beautify ignore:start */
-    let incomingData = {...req.body}
-    /* beautify ignore:end */
-
-    // retrieve url parameters: lang, metadata id
+    // retrieve url parameters: object id
     // retrieve body parameters: report id
 
-    // ensure metadata exists
+    // ensure object exists
     // ensure report exists
 
-    // delete this integration report for this metadata
-    return `Function '${fun}' still needs to be implemented`
+    // delete this integration report for this object
+    return `Function '${fun}' still needs to be implemented in module ${mod}`
 
   } catch (err) {
-    log.e(fun, err)
+    log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 }
 
-// Get every reports for one metadata integration
-exports.deleteEveryReportForEveryMetadata = async (req, reply) => {
-  const fun = 'deleteEveryReportForEveryMetadata'
-  log.d(fun, ``)
+// Get every reports for one object integration
+exports.deleteEveryReportForObject = async (req, reply) => {
+  const fun = 'deleteEveryReportForObject'
+  log.d(mod, fun, ``)
   try {
-    lang.setLanguage(req.params[REQ_LANG])
 
-    /* beautify ignore:start */
-    let incomingData = {...req.body}
-    /* beautify ignore:end */
+    // retrieve url parameters: object id
 
-    // delete every integration report for all metadata
-    return `Function '${fun}' still needs to be implemented`
+    // ensure object exists
+
+    // delete every integration report for this object
+    return `Function '${fun}' still needs to be implemented in module ${mod}`
 
   } catch (err) {
-    log.e(fun, err)
+    log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 }
 
-
-//———————————————————————————————————————————————————————————————
-// Controllers: integration report for any subject 
-//———————————————————————————————————————————————————————————————
-
-// Add a new report for one subject integration
-exports.addReportForSingleSubject = async (req, reply) => {
-  const fun = 'addReportForSingleSubject'
-  log.d(fun, ``)
+// Get every reports for one object integration
+exports.deleteManyReportForObject = async (req, reply) => {
+  const fun = 'deleteManyReportForObject'
+  log.d(mod, fun, ``)
   try {
-    lang.setLanguage(req.params[REQ_LANG])
 
-    /* beautify ignore:start */
-    let incomingData = {...req.body}
-    /* beautify ignore:end */
+    // retrieve url parameters: object id
 
-    // retrieve url parameters: subject id
-    // retrieve body parameters: subject id, report id
+    // ensure object exists
 
-    // ensure url subject id and body subject id match
-    // ensure subject exists
-    // ensure report doesn't exist
+    // delete every integration report for this object
+    return `Function '${fun}' still needs to be implemented in module ${mod}`
 
-    // add new integration report
-    return `Function '${fun}' still needs to be implemented`
   } catch (err) {
-    log.e(fun, err)
+    log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 }
 
-// Update an existing report for one subject integration
-exports.updateReportForSingleSubject = async (req, reply) => {
-  const fun = 'updateReportForSingleSubject'
-  log.d(fun, ``)
+// Get every reports for one object integration
+exports.getReportListForObjectType = async (req, reply) => {
+  const fun = 'getReportListForObjectType'
+  log.d(mod, fun, ``)
   try {
-    lang.setLanguage(req.params[REQ_LANG])
 
-    /* beautify ignore:start */
-    let incomingData = {...req.body}
-    /* beautify ignore:end */
-
-    // retrieve url parameters: subject id
-    // retrieve body parameters: subject id, report id
-
-    // ensure url subject id and body subject id match
-    // ensure subject exists
-    // ensure report doesn't exist
-
-    // update new integration report
-    return `Function '${fun}' still needs to be implemented`
+    // delete every integration report for all objects
+    return `Function '${fun}' still needs to be implemented in module ${mod}`
 
   } catch (err) {
-    log.e(fun, err)
-    throw boom.boomify(err)
-  }
-}
-
-// Get every reports for one subject integration
-exports.getEveryReportForSingleSubject = async (req, reply) => {
-  const fun = 'getEveryReportForSingleSubject'
-  log.d(fun, ``)
-  try {
-    lang.setLanguage(req.params[REQ_LANG])
-
-    /* beautify ignore:start */
-    let incomingData = {...req.body}
-    /* beautify ignore:end */
-
-    // retrieve url parameters: subject id
-
-    // ensure subject exists
-
-    // get all reports for this subject
-    return `Function '${fun}' still needs to be implemented`
-
-  } catch (err) {
-    log.e(fun, err)
-    throw boom.boomify(err)
-  }
-}
-
-// Get every reports for one subject integration
-exports.getSingleReportForSingleSubject = async (req, reply) => {
-  const fun = 'getSingleReportForSingleSubject'
-  log.d(fun, ``)
-  try {
-    lang.setLanguage(req.params[REQ_LANG])
-
-    /* beautify ignore:start */
-    let incomingData = {...req.body}
-    /* beautify ignore:end */
-
-    // retrieve url parameters: subject id, report id
-
-    // ensure subject exists
-    // ensure report exists
-
-    // get this report for this subject
-    return `Function '${fun}' still needs to be implemented`
-
-  } catch (err) {
-    log.e(fun, err)
-    throw boom.boomify(err)
-  }
-}
-
-// Get every reports for one subject integration
-exports.getEveryReportForEverySubject = async (req, reply) => {
-  const fun = 'getEveryReportForEverySubject'
-  log.d(fun, ``)
-  try {
-    lang.setLanguage(req.params[REQ_LANG])
-
-    /* beautify ignore:start */
-    let incomingData = {...req.body}
-    /* beautify ignore:end */
-
-    // get every integration report for all subjects
-    return `Function '${fun}' still needs to be implemented`
-
-  } catch (err) {
-    log.e(fun, err)
-    throw boom.boomify(err)
-  }
-}
-
-// Get every reports for one subject integration
-exports.deleteEveryReportForSingleSubject = async (req, reply) => {
-  const fun = 'deleteEveryReportForSingleSubject'
-  log.d(fun, ``)
-  try {
-    lang.setLanguage(req.params[REQ_LANG])
-
-    /* beautify ignore:start */
-    let incomingData = {...req.body}
-    /* beautify ignore:end */
-
-    // retrieve url parameters: subject id
-
-    // ensure subject exists
-
-    // delete every integration report for this subject
-    return `Function '${fun}' still needs to be implemented`
-
-  } catch (err) {
-    log.e(fun, err)
-    throw boom.boomify(err)
-  }
-}
-
-// Get every reports for one subject integration
-exports.deleteSingleReportForSingleSubject = async (req, reply) => {
-  const fun = 'deleteSingleReportForSingleSubject'
-  log.d(fun, ``)
-  try {
-    lang.setLanguage(req.params[REQ_LANG])
-
-    /* beautify ignore:start */
-    let incomingData = {...req.body}
-    /* beautify ignore:end */
-
-    // retrieve url parameters: subject id
-    // retrieve body parameters: report id
-
-    // ensure subject exists
-    // ensure report exists
-
-    // delete this integration report for this subject
-    return `Function '${fun}' still needs to be implemented`
-
-  } catch (err) {
-    log.e(fun, err)
-    throw boom.boomify(err)
-  }
-}
-
-// Get every reports for one subject integration
-exports.deleteEveryReportForEverySubject = async (req, reply) => {
-  const fun = 'deleteEveryReportForEverySubject'
-  log.d(fun, ``)
-  try {
-    lang.setLanguage(req.params[REQ_LANG])
-
-    /* beautify ignore:start */
-    let incomingData = {...req.body}
-    /* beautify ignore:end */
-
-    // delete every integration report for all subjects
-    return `Function '${fun}' still needs to be implemented`
-
-  } catch (err) {
-    log.e(fun, err)
+    log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 }

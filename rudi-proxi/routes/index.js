@@ -1,3 +1,5 @@
+'use strict';
+
 //———————————————————————————————————————————————————————————————
 // Swagger documentation
 //———————————————————————————————————————————————————————————————
@@ -7,14 +9,27 @@ const documentation = require('./documentation/metadataApi')
 // API request constants
 //———————————————————————————————————————————————————————————————
 const {
-  URL_PREFIX,
+  URL_PREFIX_PUBLIC: URL_PREFIX,
   URL_OBJECT,
   PARAM_OBJECT,
   PARAM_ID,
   PARAM_REPORT_ID,
   URL_ACTION_DELETION,
   URL_ACTION_REPORT,
+  URL_DB_ACCESS,
+  URL_LOGS_SUFFIX,
+  URL_LOGS_ACCESS,
+  URL_APP_ID_ACCESS
 } = require('../config/confApi')
+
+const {
+  DB_NAME
+} = require('../config/confSystem')
+
+const {
+  LOG_PATH: LOG_DIR,
+  APP_NAME
+} = require('../config/confLogs');
 
 
 //———————————————————————————————————————————————————————————————
@@ -26,242 +41,154 @@ const organizationController = require('../controllers/organizationController')
 const contactController = require('../controllers/contactController')
 const reportController = require('../controllers/reportController')
 
-const routes = [
-  //———————————————————————————————————————————————————————————————
-  // METADATA
-  //———————————————————————————————————————————————————————————————
+const dbController = require('../controllers/dbController');
+const sysController = require('../controllers/logController');
 
-  {
-    method: 'GET',
-    url: `${URL_OBJECT}/:${PARAM_ID}`,
-    handler: genericController.getSingleObject
-  },
-  {
-    method: 'DELETE',
-    url: `${URL_OBJECT}/:${PARAM_ID}`,
-    handler: genericController.deleteSingleObject
-  },
-  {
-    method: 'GET',
-    url: URL_OBJECT,
-    handler: genericController.getObjectList
-  },
+exports.publicRoutes = [
+
+  // Routes accessed by RUDI Portal:
+  // /resources POST/PUT/GET
+  // /resources/{id} GET/DELETE
+  // /resources/{id}/report PUT
+
+  //———————————————————————————————————————————————————————————————
+  // Generic routes for accessing any object
+  // ('Metadata', 'Organizations' and 'Contacts')
+  //———————————————————————————————————————————————————————————————
+  // Add 1
   {
     method: 'POST',
     url: URL_OBJECT,
     handler: genericController.addSingleObject
     // schema: documentation.addMetadataSchema
   },
+  // Edit 1
   {
     method: 'PUT',
     url: URL_OBJECT,
     handler: genericController.updateSingleObject
   },
+  // Get all
+  {
+    method: 'GET',
+    url: URL_OBJECT,
+    handler: genericController.getObjectList
+  },
+  // Get 1
+  {
+    method: 'GET',
+    url: `${URL_OBJECT}/:${PARAM_ID}`,
+    handler: genericController.getSingleObject
+  },
+
+  // Delete 1
+  {
+    method: 'DELETE',
+    url: `${URL_OBJECT}/:${PARAM_ID}`,
+    handler: genericController.deleteSingleObject
+  },
+  // Delete all
   {
     method: 'DELETE',
     url: URL_OBJECT,
     handler: genericController.deleteEveryObject
   },
+  // Delete many
   {
     method: 'POST',
     url: `${URL_OBJECT}/${URL_ACTION_DELETION}`,
     handler: genericController.deleteObjectList
   },
+
+  //———————————————————————————————————————————————————————————————
+  // Integration reports for one particular object
+  //———————————————————————————————————————————————————————————————
+  // Add 1 report for one object integration
+  {
+    method: 'POST',
+    url: `${URL_OBJECT}/:${PARAM_ID}/${URL_ACTION_REPORT}`,
+    handler: reportController.addSingleReportForObject
+  },
+  // Add/edit 1 report for one object integration
+  {
+    method: 'PUT',
+    url: `${URL_OBJECT}/:${PARAM_ID}/${URL_ACTION_REPORT}`,
+    handler: reportController.addOrEditSingleReportForObject
+  },
+  // Get all reports for one object integration
+  {
+    method: 'GET',
+    url: `${URL_OBJECT}/:${PARAM_ID}/${URL_ACTION_REPORT}`,
+    handler: reportController.getReportListForObject
+  },
+  // Get 1 report for one object integration
+  {
+    method: 'GET',
+    url: `${URL_OBJECT}/:${PARAM_ID}/${URL_ACTION_REPORT}/:${PARAM_REPORT_ID}`,
+    handler: reportController.getSingleReportForObject
+  },
+  // Delete 1 report for one object integration
+  {
+    method: 'DELETE',
+    url: `${URL_OBJECT}/:${PARAM_ID}/${URL_ACTION_REPORT}/:${PARAM_REPORT_ID}`,
+    handler: reportController.deleteSingleReportForObject
+  },
+  // Delete all reports for one object integration
+  {
+    method: 'DELETE',
+    url: `${URL_OBJECT}/:${PARAM_ID}/${URL_ACTION_REPORT}`,
+    handler: reportController.deleteEveryReportForObject
+  },
+  // Delete many reports for one object integration
+  {
+    method: 'POST',
+    url: `${URL_OBJECT}/:${PARAM_ID}/${URL_ACTION_REPORT}/${URL_ACTION_DELETION}`,
+    handler: reportController.deleteManyReportForObject
+  },
+  //———————————————————————————————————————————————————————————————
+  // Integration reports for one object type
+  //———————————————————————————————————————————————————————————————
+  // Get all reports for one object integration
+  {
+    method: 'GET',
+    url: `${URL_OBJECT}/${URL_ACTION_REPORT}`,
+    handler: reportController.getReportListForObjectType
+  },
+
 ]
-/*
+
+exports.backOfficeRoutes = [
   //———————————————————————————————————————————————————————————————
-  // METADATA
+  // (distant dev) Route for accessing logs
   //———————————————————————————————————————————————————————————————
   {
     method: 'GET',
-    url: URL_METADATA,
-    handler: metadataController.getEveryMetadata
-  },
-  {
-    method: 'GET',
-    url: `${URL_METADATA}/:${REQ_ID}`,
-    handler: metadataController.getSingleMetadata
-  },
-  {
-    method: 'POST',
-    url: URL_METADATA,
-    handler: metadataController.addMetadata,
-    // schema: documentation.addMetadataSchema
-  },
-  {
-    method: 'PUT',
-    url: URL_METADATA,
-    handler: metadataController.updateMetadata
-  },
-  {
-    method: 'DELETE',
-    url: URL_METADATA,
-    handler: metadataController.deleteManyMetadata
-  },
-  {
-    method: 'DELETE',
-    url: `${URL_METADATA}/:${REQ_ID}`,
-    handler: metadataController.deleteMetadata
+    url: `${URL_LOGS_ACCESS}`,
+    handler: sysController.getLogs
   },
 
   //———————————————————————————————————————————————————————————————
-  // ORGANIZATIONS
+  // (distant dev) Route for accessing 
   //———————————————————————————————————————————————————————————————
   {
     method: 'GET',
-    url: URL_ORGANIZATIONS,
-    handler: organizationController.getEveryOrganization
+    url: `${URL_APP_ID_ACCESS}`,
+    handler: sysController.getAppId
   },
+  //———————————————————————————————————————————————————————————————
+  // (distant dev) Routes for actions on DB
+  //———————————————————————————————————————————————————————————————
+  // Get all collections
   {
     method: 'GET',
-    url: `${URL_ORGANIZATIONS}/:${REQ_ID}`,
-    handler: organizationController.getSingleOrganization
+    url: `${URL_DB_ACCESS}`,
+    handler: dbController.getCollections
   },
-  {
-    method: 'POST',
-    url: URL_ORGANIZATIONS,
-    handler: organizationController.addOrganization,
-    // schema: documentation.addOrganizationSchema
-  },
-  {
-    method: 'PUT',
-    url: URL_ORGANIZATIONS,
-    handler: organizationController.updateOrganization
-  },
+  // Drop DB
   {
     method: 'DELETE',
-    url: URL_ORGANIZATIONS,
-    handler: organizationController.deleteManyOrganization
-  },
-  {
-    method: 'DELETE',
-    url: `${URL_ORGANIZATIONS}/:${REQ_ID}`,
-    handler: organizationController.deleteOrganization
+    url: `${URL_DB_ACCESS}`,
+    handler: dbController.dropDB
   },
 
-  //———————————————————————————————————————————————————————————————
-  // CONTACTS
-  //———————————————————————————————————————————————————————————————
-  {
-    method: 'GET',
-    url: URL_CONTACTS,
-    handler: contactController.getEveryContact
-  },
-  {
-    method: 'GET',
-    url: `${URL_CONTACTS}/:${REQ_ID}`,
-    handler: contactController.getSingleContact
-  },
-  {
-    method: 'POST',
-    url: URL_CONTACTS,
-    handler: contactController.addContact,
-    // schema: documentation.addContactSchema
-  },
-  {
-    method: 'PUT',
-    url: URL_CONTACTS,
-    handler: contactController.updateContact
-  },
-  {
-    method: 'DELETE',
-    url: URL_CONTACTS,
-    handler: contactController.deleteManyContact
-  },
-  {
-    method: 'DELETE',
-    url: `${URL_CONTACTS}/:${REQ_ID}`,
-    handler: contactController.deleteContact
-  },
-
-  //———————————————————————————————————————————————————————————————
-  // INTEGRATION REPORTS: Metadata
-  //———————————————————————————————————————————————————————————————
-  {
-    method: 'POST',
-    url: `${URL_METADATA}/:${REQ_ID}/${URL_SUFIX_REPORT}`,
-    handler: reportController.addReportForSingleMetadata
-  },
-  {
-    method: 'PUT',
-    url: `${URL_METADATA}/:${REQ_ID}/${URL_SUFIX_REPORT}`,
-    handler: reportController.updateReportForSingleMetadata
-  },
-  {
-    method: 'GET',
-    url: `${URL_METADATA}/:${REQ_ID}/${URL_SUFIX_REPORT}`,
-    handler: reportController.getEveryReportForSingleMetadata
-  },
-  {
-    method: 'GET',
-    url: `${URL_METADATA}/:${REQ_ID}/${URL_SUFIX_REPORT}/:${REQ_REPORT_ID}`,
-    handler: reportController.getSingleReportForSingleMetadata
-  },
-  {
-    method: 'GET',
-    url: `${URL_METADATA}/${URL_SUFIX_REPORT}`,
-    handler: reportController.getEveryReportForEveryMetadata
-  },
-  {
-    method: 'DELETE',
-    url: `${URL_METADATA}/:${REQ_ID}/${URL_SUFIX_REPORT}`,
-    handler: reportController.deleteEveryReportForSingleMetadata
-  },
-  {
-    method: 'DELETE',
-    url: `${URL_METADATA}/:${REQ_ID}/${URL_SUFIX_REPORT}/:${REQ_REPORT_ID}`,
-    handler: reportController.deleteSingleReportForSingleMetadata
-  },
-  {
-    method: 'DELETE',
-    url: `${URL_METADATA}/${URL_SUFIX_REPORT}`,
-    handler: reportController.deleteEveryReportForEveryMetadata
-  },
-
-  //———————————————————————————————————————————————————————————————
-  // INTEGRATION REPORTS: others
-  //———————————————————————————————————————————————————————————————
-  {
-    method: 'POST',
-    url: `${URL_SUBJECT}/:${REQ_ID}/${URL_SUFIX_REPORT}`,
-    handler: reportController.addReportForSingleSubject
-  },
-  {
-    method: 'PUT',
-    url: `${URL_SUBJECT}/:${REQ_ID}/${URL_SUFIX_REPORT}`,
-    handler: reportController.updateReportForSingleSubject
-  },
-  {
-    method: 'GET',
-    url: `${URL_SUBJECT}/:${REQ_ID}/${URL_SUFIX_REPORT}`,
-    handler: reportController.getEveryReportForSingleSubject
-  },
-  {
-    method: 'GET',
-    url: `${URL_SUBJECT}/:${REQ_ID}/${URL_SUFIX_REPORT}/:${REQ_REPORT_ID}`,
-    handler: reportController.getSingleReportForSingleSubject
-  },
-  {
-    method: 'GET',
-    url: `${URL_SUBJECT}/${URL_SUFIX_REPORT}`,
-    handler: reportController.getEveryReportForEverySubject
-  },
-  {
-    method: 'DELETE',
-    url: `${URL_SUBJECT}/:${REQ_ID}/${URL_SUFIX_REPORT}`,
-    handler: reportController.deleteEveryReportForSingleSubject
-  },
-  {
-    method: 'DELETE',
-    url: `${URL_SUBJECT}/:${REQ_ID}/${URL_SUFIX_REPORT}/:${REQ_REPORT_ID}`,
-    handler: reportController.deleteSingleReportForSingleSubject
-  },
-  {
-    method: 'DELETE',
-    url: `${URL_SUBJECT}/${URL_SUFIX_REPORT}`,
-    handler: reportController.deleteEveryReportForEverySubject
-  },
-*/
-
-
-module.exports = routes
+]

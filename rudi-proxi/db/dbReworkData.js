@@ -1,3 +1,6 @@
+'use strict';
+
+const mod = 'dbRwk'
 /*
  * In this file are a set of functions that rework the data 
  * - hide mongoose fields '_id' and '__v': they are not permanent
@@ -31,14 +34,9 @@ const {
   API_METADATA_ID,
   API_ORGANIZATION_ID,
   API_CONTACT_ID,
-  API_PRODUCER_PROPERTY,
-  API_CONTACTS_PROPERTY
+  API_DATA_PRODUCER_PROPERTY,
+  API_DATA_CONTACTS_PROPERTY
 } = require('./dbFields')
-
-const {
-  PARAM_LANG: REQ_LANG,
-  PARAM_ID: REQ_ID
-} = require('../config/confApi')
 
 //———————————————————————————————————————————————————————————————
 // Data models
@@ -51,16 +49,20 @@ const Contact = require('../definitions/models/Contact')
 // Unmongoozify functions
 //———————————————————————————————————————————————————————————————
 
-exports.unmongoozify = async (jsonObject) => {
-
-  /* beautify ignore:start */
-  let jsonClone = {...jsonObject}
-  /* beautify ignore:end */
-
-  delete jsonClone[DB_ID]
-  delete jsonClone[DB_V]
-
-  return jsonClone
+exports.unmongoosify = (dbObject) => {
+  const fun = 'unmongoosify'
+  log.d(mod, fun, ``)
+  try {
+    if (!dbObject) throw new Error(`${msg.parameterExpected(fun, 'dbObject')}`)
+    let cleanObject = json.deepClone(dbObject)
+    delete cleanObject[DB_ID]
+    delete cleanObject[DB_V]
+    // log.d(mod, fun, `${dbObject}\n=>\n${json.beautify(cleanObject, 2)}`)
+    return cleanObject
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw boom.boomify(err)
+  }
 }
 
 //———————————————————————————————————————————————————————————————
@@ -69,7 +71,7 @@ exports.unmongoozify = async (jsonObject) => {
 
 exports.updateJsonOrganization = async (organizationJson) => {
   const fun = 'updateJsonOrganization'
-  log.d(fun, `organizationJson: ${organizationJson}`)
+  log.d(mod, fun, `organizationJson: ${organizationJson}`)
 
   // Retrieveing full info for the organization
   const id = json.accessProperty(organizationJson, API_ORGANIZATION_ID)
@@ -85,7 +87,7 @@ exports.updateJsonOrganization = async (organizationJson) => {
 
 exports.updateJsonContact = async (contactJson) => {
   const fun = 'updateJsonContact'
-  log.d(fun, ``)
+  log.d(mod, fun, ``)
 
   const contactRudiId = json.accessProperty(contactJson, API_CONTACT_ID)
   const updatedContact = await db.getContactWithRudiId(contactRudiId)
@@ -99,7 +101,7 @@ exports.updateJsonContact = async (contactJson) => {
 
 exports.updateJsonContactList = async (contactsJson) => {
   const fun = 'updateContactListJson'
-  log.d(fun, ``)
+  log.d(mod, fun, ``)
 
   // Retrieveing full info for the contacts
   let fullContacts = []
@@ -112,7 +114,7 @@ exports.updateJsonContactList = async (contactsJson) => {
 
 exports.updateMetadataPropertiesFromDb = async (metadata) => {
   const fun = 'updateMetadataProperties'
-  log.d(fun, `metadata: ${metadata}`)
+  log.d(mod, fun, `metadata: ${metadata}`)
 
   /* beautify ignore:start */
   // TODO: clone the metadata (to avoid mutating an external object)
@@ -122,7 +124,7 @@ exports.updateMetadataPropertiesFromDb = async (metadata) => {
   //————— Updating Producer info
   // Note : here we are updating data as they are stored in DB
   //        So 'producer' field is in reality a producer mongo _id!
-  const producerId = json.accessProperty(metadata, API_PRODUCER_PROPERTY)
+  const producerId = json.accessProperty(metadata, API_DATA_PRODUCER_PROPERTY)
   const updatedProducer = await db.getOrganizationWithDbId(producerId)
   if ('' == updatedProducer) {
     throw new Error(`${msg.organizationNotFound(producerId)}`)
@@ -131,7 +133,7 @@ exports.updateMetadataPropertiesFromDb = async (metadata) => {
   //————— Updating Contacts info
   // Note : here we are updating data as they are stored in DB
   //        So 'contacts' field is actually an array of contact mongo _ids!
-  const contacts = json.accessProperty(metadata, API_CONTACTS_PROPERTY)
+  const contacts = json.accessProperty(metadata, API_DATA_CONTACTS_PROPERTY)
 
   let updatedContacts = []
   for (const contactId of contacts) {
@@ -144,32 +146,32 @@ exports.updateMetadataPropertiesFromDb = async (metadata) => {
     updatedContacts.push(updatedContact)
   }
 
-  updatedMetadata[API_PRODUCER_PROPERTY] = updatedProducer
-  updatedMetadata[API_CONTACTS_PROPERTY] = updatedContacts
+  updatedMetadata[API_DATA_PRODUCER_PROPERTY] = updatedProducer
+  updatedMetadata[API_DATA_CONTACTS_PROPERTY] = updatedContacts
 
   return updatedMetadata
 }
 
 exports.updateMetadataListPropertiesFromDb = async (metadataList) => {
   const fun = 'updateMetadataListPropertiesFromDb'
-  // log.d(fun, `metadataList: ${metadataList}`)
+  // log.d(mod, fun, `metadataList: ${metadataList}`)
 
   let producerCache = new Map()
   let contactCache = new Map()
   let updatedMetadataList = []
 
   for (const metadata of metadataList) {
-    // log.d(fun, `metadata: ${metadata}`)
+    // log.d(mod, fun, `metadata: ${metadata}`)
 
     /* beautify ignore:start */
     let updatedMetadata = metadata;
     /* beautify ignore:end */
-    // log.d(fun, `metadata clone: ${updatedMetadata}`)
+    // log.d(mod, fun, `metadata clone: ${updatedMetadata}`)
 
     //————— Updating Producer info
     // Note : here we are updating data as they are stored in DB
     //        So 'producer' field is in reality a producer mongo _id!
-    const producerId = metadata[API_PRODUCER_PROPERTY]
+    const producerId = metadata[API_DATA_PRODUCER_PROPERTY]
 
     let updatedProducer = producerCache.get(producerId)
     if (!updatedProducer) {
@@ -184,7 +186,7 @@ exports.updateMetadataListPropertiesFromDb = async (metadataList) => {
     //————— Updating Contacts info
     // Note : here we are updating data as they are stored in DB
     //        So 'contacts' field is actually an array of contact mongo _ids!
-    const contacts = metadata[API_CONTACTS_PROPERTY]
+    const contacts = metadata[API_DATA_CONTACTS_PROPERTY]
 
     let updatedContacts = []
     for (const contactId of contacts) {
@@ -202,10 +204,10 @@ exports.updateMetadataListPropertiesFromDb = async (metadataList) => {
       updatedContacts.push(updatedContact)
     }
 
-    updatedMetadata[API_PRODUCER_PROPERTY] = updatedProducer
-    updatedMetadata[API_CONTACTS_PROPERTY] = updatedContacts
+    updatedMetadata[API_DATA_PRODUCER_PROPERTY] = updatedProducer
+    updatedMetadata[API_DATA_CONTACTS_PROPERTY] = updatedContacts
     updatedMetadataList.push(updatedMetadata)
-    // log.d(fun, `updatedMetadata: ${updatedMetadata}`)
+    // log.d(mod, fun, `updatedMetadata: ${updatedMetadata}`)
   }
 
   return updatedMetadataList

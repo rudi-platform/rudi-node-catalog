@@ -1,3 +1,5 @@
+'use strict';
+const mod = 'metaSch'
 //———————————————————————————————————————————————————————————————
 // API version
 //———————————————————————————————————————————————————————————————
@@ -8,6 +10,7 @@ const {
 //———————————————————————————————————————————————————————————————
 // External dependencies
 //———————————————————————————————————————————————————————————————
+const boom = require('@hapi/boom')
 const mongoose = require('mongoose');
 
 const Int32 = require('mongoose-int32');
@@ -15,6 +18,21 @@ const Int32 = require('mongoose-int32');
 //———————————————————————————————————————————————————————————————
 // Internal dependencies
 //———————————————————————————————————————————————————————————————
+const db = require('../../db/dbQueries')
+const {
+  API_ORGANIZATION_ID,
+  API_CONTACT_ID,
+  DB_ID,
+  API_METAINFO_PROPERTY,
+  API_METAINFO_DATES_PROPERTY,
+  API_DATES_CREATED_PROPERTY,
+  API_DATES_EDITED_PROPERTY
+} = require('../../db/dbFields');
+
+const log = require('../../utils/logging')
+const msg = require('../../utils/msg')
+const json = require('../../utils/jsonAccess');
+
 const Validation = require('../schemaValidators');
 
 //———————————————————————————————————————————————————————————————
@@ -22,7 +40,7 @@ const Validation = require('../schemaValidators');
 //———————————————————————————————————————————————————————————————
 const GeoJSON = require('mongoose-geojson-schema');
 
-const Ids = require('../schemas/Identifiers');
+const {DOI, UUIDv4} = require('../schemas/Identifiers');
 const DictionaryEntry = require('../schemas/DictionaryEntry');
 const SkosEntry = require('../schemas/SkosEntry');
 const AccessCondition = require('../schemas/AccessCondition');
@@ -45,6 +63,7 @@ const Themes = require('../thesaurus/Themes');
 const Projection = require('../thesaurus/Projections');
 const Encoding = require('../thesaurus/Encodings');
 const HashAlgo = require('../thesaurus/HashAlgorithms');
+
 
 //———————————————————————————————————————————————————————————————
 // Constants
@@ -73,6 +92,7 @@ const TransmissionModes = {
   series: 'SERIES'
 };
 
+
 //———————————————————————————————————————————————————————————————
 // Custom schema definitions
 //———————————————————————————————————————————————————————————————
@@ -83,7 +103,7 @@ const MetadataSchema = new mongoose.Schema({
   //---------------------------
 
   // Unique and permanent identifier for the ressource in RUDI system (required)
-  global_id: Ids.UUIDv4,
+  global_id: UUIDv4,
 
   // Identifier for the ressource in the producer system (optional)
   local_id: {
@@ -93,7 +113,7 @@ const MetadataSchema = new mongoose.Schema({
   },
 
   // Digital Object Identifier for the ressource (optional)
-  doi: Ids.DOI,
+  doi: DOI,
 
   //---------------------------
   // Dataset description
@@ -109,7 +129,7 @@ const MetadataSchema = new mongoose.Schema({
   // Short description for the whole dataset
   abstract: {
     type: [DictionaryEntry],
-    required: true
+    required: true,
   },
 
   // More precise description for the whole dataset
@@ -146,14 +166,14 @@ const MetadataSchema = new mongoose.Schema({
   producer: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Organization',
-    required: true
+    required: true,
   },
 
   // Persons in charge of maintaining the resource
   contacts: {
     type: [{
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Contact'
+      ref: 'Contact',
     }],
     minlength: 1,
     required: true
@@ -262,7 +282,10 @@ const MetadataSchema = new mongoose.Schema({
   },
 
   // Dates of the actions performed on the data (creation, publishing, update, deletion...)
-  dataset_dates: ReferenceDates,
+  dataset_dates: {
+    type: ReferenceDates,
+    required: true
+  },
 
   // Status of the storage of the dataset
   // Metadata can exist without the data
@@ -295,16 +318,178 @@ const MetadataSchema = new mongoose.Schema({
     // Description of the organization that produced the metadata
     metadata_provider: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Organization'
+      ref: 'Organization',
     },
 
     // Addresses to get further information on the metadata
     metadata_contacts: [{
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Contact'
+      ref: 'Contact',
     }]
   }
+}, {
+  timestamps: true,
+  optimisticConcurrency: true,
+  useNestedStrict: true,
+  // toObject: {
+  //   getters: true,
+  //   setters: true,
+  //   virtuals: false
+  // },
+  // toJSON: {
+  //   getters: true,
+  //   setters: true,
+  //   virtuals: true
+  // },
 });
+
+
+//———————————————————————————————————————————————————————————————
+// Schema refinements
+//———————————————————————————————————————————————————————————————
+
+//----- toJSON cleanup
+MetadataSchema.methods.toJSON = function () {
+  var metadata = this.toObject()
+  // metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_CREATED_PROPERTY] = metadata.createdAt
+  // metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_EDITED_PROPERTY] = metadata.updatedAt
+  delete metadata._id
+  delete metadata.__v
+  delete metadata.createdAt
+  delete metadata.updatedAt
+  return metadata
+};
+
+//----- Virtuals
+MetadataSchema.virtual('metadata_dates.created').get(function () {
+  return this.createdAt;
+});
+MetadataSchema.virtual('metadata_dates.updated').get(function () {
+  return this.updatedAt;
+});
+
+
+//----- Get/set organization
+function getOrganization(organizationDbId) {
+  const fun = 'getOrganization'
+  log.d(mod, fun, `orgRudiId: ${organizationDbId}`)
+  if (null == organizationDbId) return
+  try {
+    // const rudiOrganization = await db.getEnsuredOrganizationWithDbId(organizationDbId)
+    const existingOrganization = Organization.findOne({
+      [DB_ID]: organizationDbId
+    }, function (err, dbOrganization) {
+      if (err) {
+        const errMsg = `${msg.organizationNotFound(organizationDbId)}`
+        log.e(mod, fun, errMsg)
+        throw new Error(errMsg)
+      } else {
+        log.d(mod, fun, `dbOrganization: ${json.beautify(dbOrganization)}`)
+        return dbOrganization
+      }
+    })
+
+    log.d(mod, fun, `existingOrganization: ${json.beautif(existingOrganization)}`)
+
+    return existingOrganization
+
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw boom.boomify(err)
+  }
+}
+
+async function setOrganization(organizationRudiJson) {
+
+  const fun = 'setOrganization'
+  log.d(mod, fun, `organizationRudiJson: ${json.beautify(organizationRudiJson)}`)
+  if (null == organizationRudiJson) return
+  try {
+    const organizationRudiId = json.accessProperty(organizationRudiJson, API_ORGANIZATION_ID)
+    const existingOrganization = await Organization.findOne({
+      [API_ORGANIZATION_ID]: organizationRudiId
+    })
+    if (null == existingOrganization) {
+      const errMsg = `${msg.organizationNotFound(organizationRudiId)}`
+      log.e(mod, fun, errMsg)
+      throw new Error(errMsg)
+    } else {
+      log.d(mod, fun, `dbOrganization: ${json.beautify(existingOrganization)}`)
+      return existingOrganization
+    }
+
+    // await db.getEnsuredOrganizationWithRudiId(organizationRudiId)
+    log.d(mod, fun, `existingOrganization: ${json.beautify(existingOrganization)}`)
+    return existingOrganization
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw boom.boomify(err)
+  }
+}
+
+//----- Get/set contact
+function getContact(contactDbId) {
+  const fun = 'getContact'
+  log.d(mod, fun, `contactDbId: ${contactDbId}`)
+  if (null == contactDbId) return
+  try {
+    // const rudiContact = await db.getEnsuredContactWithDbId(contactDbId)
+    // log.d(mod, fun, `rudiContact: ${rudiContact}`)
+    // return rudiContact
+    const existingContact = Contact.findOne({
+      [DB_ID]: contactDbId
+    }, null, null, function (err, rudiContact) {
+      if (err) {
+        const errMsg = `${msg.contactNotFound(contactDbId)}`
+        log.e(mod, fun, errMsg)
+        throw new Error(errMsg)
+      } else {
+        log.d(mod, fun, `rudiContact: ${json.beautify(rudiContact)}`)
+        return rudiContact
+      }
+    })
+
+    log.d(mod, fun, `existingContact: ${json.beautify(existingContact)}`)
+
+    return existingContact
+
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw boom.boomify(err)
+  }
+}
+
+function setContact(contactRudiJson) {
+  const fun = 'setContact'
+  log.d(mod, fun, `contactRudiJson: ${json.beautify(contactRudiJson)}`)
+  if (null == contactRudiJson) return
+  try {
+    /* 
+        const contactRudiId = json.accessProperty(contactRudiJson, API_CONTACT_ID)
+        const dbReadyContact = await db.getEnsuredContactWithRudiId(contactRudiId)
+        log.d(mod, fun, `dbReadyContact: ${dbReadyContact}`)
+        return dbReadyContact
+     */
+    const contactRudiId = json.accessProperty(contactRudiJson, API_CONTACT_ID)
+    const existingContact = Contact.findOne({
+      [API_CONTACT_ID]: contactRudiId
+    }, function (err, dbContact) {
+      if (err) {
+        const errMsg = `${msg.contactNotFound(contactRudiId)}`
+        log.e(mod, fun, errMsg)
+        throw new Error(errMsg)
+      } else {
+        log.d(mod, fun, `dbContact: ${json.beautify(dbContact)}`)
+        return dbContact
+      }
+    })
+    log.d(mod, fun, `existingContact: ${json.beautify(existingContact)}`)
+    return existingContact
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw boom.boomify(err)
+  }
+}
 
 
 //———————————————————————————————————————————————————————————————

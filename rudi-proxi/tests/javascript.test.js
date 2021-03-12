@@ -1,5 +1,7 @@
 // const log = require('../utils/logging')
 
+const { log } = require("winston")
+
 
 
 let METADATA_MOCKUP = {
@@ -122,10 +124,20 @@ test('spread provider', () => {
 })
 
 function testBangBang() {
-  return !!'' && !!0 && !!{}
+  return !!'' || !!0 // || !!{}// || !![]
 }
 
 test('test bang bang', () => {
   expect(testBangBang())
+    .toBe(false)
+})
+
+function testArray(arg) {
+  const fun = 'testBangBangArg'
+  return Array.isArray(arg) && arg.length == 0
+}
+
+test('test bang bang arg', () => {
+  expect(testArray(null))
     .toBe(false)
 })

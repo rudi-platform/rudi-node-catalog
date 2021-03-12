@@ -1,3 +1,5 @@
+'use strict';
+
 /*
  * In this file are made the different steps followed for each 
  * action on the contacts (producer or publisher)
@@ -21,8 +23,8 @@ const {
   API_METADATA_ID,
   API_ORGANIZATION_ID,
   API_CONTACT_ID,
-  API_PRODUCER_PROPERTY,
-  API_CONTACTS_PROPERTY
+  API_DATA_PRODUCER_PROPERTY: API_PRODUCER_PROPERTY,
+  API_DATA_CONTACTS_PROPERTY: API_CONTACTS_PROPERTY
 } = require('../db/dbFields')
 
 const {

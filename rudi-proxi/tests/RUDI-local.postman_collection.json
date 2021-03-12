@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "516d5505-6ec3-4a6f-91b2-2bc97686a24d",
-		"name": "RUDI local",
+		"name": "RUDI-local",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -9,30 +9,13 @@
 			"name": "resources",
 			"item": [
 				{
-					"name": "Get all",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{data}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{data}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Add 1st",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"global_id\": \"{{metaId1}}\",\n    \"local_id\": \"testingID 4 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-444\",\n    \"resource_title\": \"Test de RUDI en local 4444\",\n    \"abstract\": {\n        \"lang\": \"fr\",\n        \"text\": \"Courte description de RUDI en local 4444\"\n    },\n    \"summary\": {\n        \"lang\": \"fr\",\n        \"text\": \"Mon résumé chg 4\"\n    },\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"wind\",\n        \"research\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"M. Fazo\",\n            \"email\": \"gpizj@pzorjeg.gt\"\n        },\n        {\n            \"contact_id\": \"{{contId2}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"medatata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_dates\": {\n            \"created\": \"{{now}}\",\n            \"published\": \"{{now}}\"\n        },\n        \"metadata_provider\": {\n            \"organization_id\": \"{{orgId1}}\"\n        }\n    }\n}",
+							"raw": "{\n    \"global_id\": \"{{metaId1}}\",\n    \"local_id\": \"testingID 4 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-444\",\n    \"resource_title\": \"Test de RUDI en local 4444\",\n    \"abstract\": {\n        \"lang\": \"fr\",\n        \"text\": \"Courte description de RUDI en local 4444\"\n    },\n    \"summary\": {\n        \"lang\": \"fr\",\n        \"text\": \"Mon résumé chg 4\"\n    },\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"energy_consommation\",\n        \"electricity\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"M. Fazo\",\n            \"email\": \"gpizj@pzorjeg.gt\"\n        },\n        {\n            \"contact_id\": \"{{contId2}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"medatata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_dates\": {\n            \"created\": \"{{now}}\",\n            \"published\": \"{{now}}\"\n        },\n        \"metadata_provider\": {\n            \"organization_id\": \"{{orgId1}}\"\n        }\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -58,96 +41,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"global_id\": \"{{metaId2}}\",\n    \"local_id\": \"testingID 3 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-333\",\n    \"resource_title\": \"Test de RUDI en local 33\",\n    \"abstract\": {\n        \"lang\": \"fr\",\n        \"text\": \"Courte description de RUDI en local 33\"\n    },\n    \"summary\": {\n        \"lang\": \"fr\",\n        \"text\": \"Mon résumé chg 3\"\n    },\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"wind\",\n        \"research\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId2}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"medatata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_dates\": {\n            \"created\": \"{{now}}\",\n            \"published\": \"{{now}}\"\n        }\n    }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/{{data}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{data}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get 1",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{data}}/{{metaId1}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{data}}",
-								"{{metaId1}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete 1",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{data}}/{{metaId1}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{data}}",
-								"{{metaId1}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete many",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"local_id\": \"testingID 4 lg\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/{{data}}/{{deletion}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{data}}",
-								"{{deletion}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete all",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"__v\": 0}",
+							"raw": "{\n    \"global_id\": \"{{metaId2}}\",\n    \"local_id\": \"testingID 3 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-333\",\n    \"resource_title\": \"Test de RUDI en local 33\",\n    \"abstract\": {\n        \"lang\": \"fr\",\n        \"text\": \"Courte description de RUDI en local 33\"\n    },\n    \"summary\": {\n        \"lang\": \"fr\",\n        \"text\": \"Mon résumé chg 3\"\n    },\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"plu\",\n        \"municipality\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId2}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"medatata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_dates\": {\n            \"created\": \"{{now}}\",\n            \"published\": \"{{now}}\"\n        }\n    },\n       \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -218,29 +112,118 @@
 						}
 					},
 					"response": []
-				}
-			]
-		},
-		{
-			"name": "organization",
-			"item": [
+				},
 				{
 					"name": "Get all",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{org}}",
+							"raw": "{{baseUrl}}/{{data}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{org}}"
+								"{{data}}"
 							]
 						}
 					},
 					"response": []
 				},
+				{
+					"name": "Get 1",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{data}}/{{metaId1}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{data}}",
+								"{{metaId1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete 1",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{data}}/{{metaId1}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{data}}",
+								"{{metaId1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete all",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"__v\": 0}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{data}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{data}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete many",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"local_id\": \"testingID 4 lg\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{data}}/{{deletion}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{data}}",
+								"{{deletion}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "organization",
+			"item": [
 				{
 					"name": "Add 1",
 					"request": {
@@ -294,6 +277,49 @@
 					"response": []
 				},
 				{
+					"name": "Edit",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"organization_id\": \"{{orgId2}}\",\n    \"organization_address\": \"2 rue du Thabor - CS 46510, 35065 Rennes CEDEX\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{org}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{org}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{org}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{org}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get 1 identified",
 					"request": {
 						"method": "GET",
@@ -330,33 +356,6 @@
 					"response": []
 				},
 				{
-					"name": "Delete many",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"organization_name\": \"IRISA\"}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/{{org}}/{{deletion}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{org}}",
-								"{{deletion}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Delete all",
 					"request": {
 						"method": "DELETE",
@@ -383,13 +382,13 @@
 					"response": []
 				},
 				{
-					"name": "Edit",
+					"name": "Delete many",
 					"request": {
-						"method": "PUT",
+						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"organization_id\": \"{{orgId2}}\",\n    \"organization_address\": \"2 rue du Thabor - CS 46510, 35065 Rennes CEDEX\"\n}",
+							"raw": "{\"organization_name\": \"IRISA\"}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -397,12 +396,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{org}}",
+							"raw": "{{baseUrl}}/{{org}}/{{deletion}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{org}}"
+								"{{org}}",
+								"{{deletion}}"
 							]
 						}
 					},
@@ -413,23 +413,6 @@
 		{
 			"name": "contact",
 			"item": [
-				{
-					"name": "Get all",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{cont}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{cont}}"
-							]
-						}
-					},
-					"response": []
-				},
 				{
 					"name": "Add 1st",
 					"request": {
@@ -483,6 +466,49 @@
 					"response": []
 				},
 				{
+					"name": "Edit",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"contact_id\": \"{{contId1}}\",\n    \"contact_name\": \"M. Fazo Gres\",\n    \"email\": \"fazo@univ-rennes1.fr\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{cont}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{cont}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{cont}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{cont}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get 1",
 					"request": {
 						"method": "GET",
@@ -519,33 +545,6 @@
 					"response": []
 				},
 				{
-					"name": "Delete many",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"{{regexEmail}}\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/{{cont}}/{{deletion}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{cont}}",
-								"{{deletion}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Delete all",
 					"request": {
 						"method": "DELETE",
@@ -572,13 +571,13 @@
 					"response": []
 				},
 				{
-					"name": "Edit",
+					"name": "Delete many",
 					"request": {
-						"method": "PUT",
+						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"contact_id\": \"{{contId1}}\",\n    \"contact_name\": \"M. Fazo Gres\",\n    \"email\": \"fazo@univ-rennes1.fr\"\n}",
+							"raw": "{\n    \"email\": \"{{regexEmail}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -586,12 +585,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{cont}}",
+							"raw": "{{baseUrl}}/{{cont}}/{{deletion}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{cont}}"
+								"{{cont}}",
+								"{{deletion}}"
 							]
 						}
 					},
@@ -603,13 +603,13 @@
 			"name": "reports",
 			"item": [
 				{
-					"name": "Add 1st (org 1)",
+					"name": "Add 1st (meta 1)",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"report_id\": \"17f0182e-4d69-48c4-98ef-9fc9adac9415\",\n    \"resource_id\": \"{{orgId1}}\",\n    \"integration_status\": \"OK\",\n    \"version\": \"{{apiVersion}}\"\n\n}",
+							"raw": "{\n    \"report_id\": \"{{reportId1}}\",\n    \"resource_id\": \"{{metaId1}}\",\n    \"integration_status\": \"OK\",\n    \"version\": \"1\"\n\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -631,13 +631,13 @@
 					"response": []
 				},
 				{
-					"name": "Edit 1st (org 1)",
+					"name": "Add 2nd (meta 1)",
 					"request": {
-						"method": "PUT",
+						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"report_id\": \"17f0182e-4d69-48c4-98ef-9fc9adac9415\",\n    \"resource_id\": \"{{metaId1}}\",\n    \"integration_status\": \"OK\",\n    \"version\": \"1\",\n    \"comment\": \"edit\",\n    \"method\": \"POST\"\n\n}",
+							"raw": "{\n    \"report_id\": \"{{reportId2}}\",\n    \"resource_id\": \"{{metaId1}}\",\n    \"integration_status\": \"OK\",\n    \"version\": \"1\"\n\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -645,15 +645,256 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{lang}}/{{data}}/{{metaId1}}/{{reports}}",
+							"raw": "{{baseUrl}}/{{data}}/{{metaId1}}/{{reports}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{lang}}",
 								"{{data}}",
 								"{{metaId1}}",
 								"{{reports}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit 1st (meta 1)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"report_id\": \"{{reportId2}}\",\n    \"resource_id\": \"{{metaId1}}\",\n    \"integration_status\": \"OK\",\n    \"version\": \"1\",\n    \"comment\": \"edit\",\n    \"method\": \"POST\"\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{data}}/{{metaId1}}/{{reports}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{data}}",
+								"{{metaId1}}",
+								"{{reports}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get 1st (meta 1)",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{data}}/{{metaId1}}/{{reports}}/{{reportId1}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{data}}",
+								"{{metaId1}}",
+								"{{reports}}",
+								"{{reportId1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All (meta 1)",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{data}}/{{metaId1}}/{{reports}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{data}}",
+								"{{metaId1}}",
+								"{{reports}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get 1",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{reports}}/{{reportId1}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{reports}}",
+								"{{reportId1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{reports}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{reports}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete all",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{reports}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{reports}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "DB",
+			"item": [
+				{
+					"name": "get all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{adminUrl}}/{{db}}",
+							"host": [
+								"{{adminUrl}}"
+							],
+							"path": [
+								"{{db}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "clean",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{adminUrl}}/{{db}}",
+							"host": [
+								"{{adminUrl}}"
+							],
+							"path": [
+								"{{db}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "getLogs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{adminUrl}}/{{logs}}",
+							"host": [
+								"{{adminUrl}}"
+							],
+							"path": [
+								"{{logs}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAppId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{adminUrl}}/{{appId}}",
+							"host": [
+								"{{adminUrl}}"
+							],
+							"path": [
+								"{{appId}}"
 							]
 						}
 					},

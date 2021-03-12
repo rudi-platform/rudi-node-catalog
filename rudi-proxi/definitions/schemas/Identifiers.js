@@ -1,3 +1,5 @@
+'use strict';
+
 //———————————————————————————————————————————————————————————————
 // External dependancies
 //———————————————————————————————————————————————————————————————
@@ -12,7 +14,7 @@ const Validation = require('../schemaValidators')
 // Constants
 //———————————————————————————————————————————————————————————————
 
-const UUIDv4 = {
+exports.UUIDv4 = {
   type: String,
   // default: _ => uuidv4(),
   trim: true,
@@ -26,7 +28,18 @@ const UUIDv4 = {
   }
 }
 
-RudiID = {
+exports.UUID = {
+  type: String,
+  // default: _ => uuidv4(),
+  trim: true,
+  lowercase: true,
+  validate: {
+    validator: Validation.isUUIDv4,
+    message: '{VALUE} does not appear to be a valid UUID v4'
+  }
+}
+
+const RudiID = {
   type: String,
   default: _ => uuidv4(),
   trim: true,
@@ -41,7 +54,7 @@ RudiID = {
   }
 }
 
-const DOI = {
+exports.DOI = {
   type: String,
   trim: true,
   unique: true,
@@ -50,9 +63,4 @@ const DOI = {
     validator: Validation.isDOI,
     message: '{VALUE} does not appear to be a valid DOI'
   }
-}
-
-module.exports = {
-  UUIDv4,
-  DOI
 }

@@ -1,3 +1,5 @@
+'use strict';
+
 
 // \d : digit character == [0-9]
 // \w : word character == [0-9a-zA-Z_]
@@ -7,9 +9,8 @@
 //———————————————————————————————————————————————————————————————
 // Generic functions
 //———————————————————————————————————————————————————————————————
-function validateSchema(schemaStr, regExPattern) {
-  const regExp = new RegExp(regExPattern)
-  return schemaStr.match(regExp)
+exports.validateSchema = (schemaStr, regExPattern) => {
+  return schemaStr.match(new RegExp(regExPattern))
 }
 
 //———————————————————————————————————————————————————————————————
@@ -18,12 +19,12 @@ function validateSchema(schemaStr, regExPattern) {
 
 const regexUUIDv4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-function isUUIDv4(str) {
-  return validateSchema(str, regexUUIDv4)
+exports.isUUIDv4 = (str) => {
+  return this.validateSchema(str, regexUUIDv4)
 }
 
-function isRudiID(str) {
-  return isUUIDv4(str) // || isDOI(idStr)
+exports.isRudiID = (str) => {
+  return this.isUUIDv4(str) // || isDOI(idStr)
 }
 
 //———————————————————————————————————————————————————————————————
@@ -33,9 +34,8 @@ function isRudiID(str) {
 // source: https://www.crossref.org/blog/dois-and-matching-regular-expressions/
 // alternative: https://github.com/regexhq/doi-regex/blob/master/index.js
 const regexDOI = /^10.\d{4,9}\/[-.;()\/:\w]+$/i;
-
-function isDOI(str) {
-  return validateSchema(str, regexDOI)
+exports.isDOI = (str) => {
+  return this.validateSchema(str, regexDOI)
 }
 
 //———————————————————————————————————————————————————————————————
@@ -43,9 +43,8 @@ function isDOI(str) {
 //———————————————————————————————————————————————————————————————
 
 const regexURI = /^(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?$/;
-
-function isURI(str) {
-  return str.match(new RegExp(regexURI))
+exports.isURI = (str) => {
+  return this.validateSchema(str, regexURI)
 }
 
 //———————————————————————————————————————————————————————————————
@@ -53,31 +52,14 @@ function isURI(str) {
 //———————————————————————————————————————————————————————————————
 
 const regexEmail = /^([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-function isEmail(str) {
-  return str.match(new RegExp(regexEmail))
+exports.isEmail = (str) => {
+  return this.validateSchema(str, regexEmail)
 }
 
 //———————————————————————————————————————————————————————————————
 // API version
 //———————————————————————————————————————————————————————————————
-
-function isVersion(str) {
-  return str.match(new RegExp(
-    /^([0-9]{1,2}\.){2}[0-9]{1,2}[a-z]*$/
-  ))
-}
-
-//———————————————————————————————————————————————————————————————
-// Exports
-//———————————————————————————————————————————————————————————————
-
-
-module.exports = {
-  validateSchema,
-  isDOI,
-  isUUIDv4,
-  isURI,
-  isEmail,
-  isVersion
+const regexVersionRudi = /^([0-9]{1,2}\.){2}[0-9]{1,2}[a-z]*$/
+exports.isVersion = (str) => {
+  return this.validateSchema(str, regexVersionRudi)
 }

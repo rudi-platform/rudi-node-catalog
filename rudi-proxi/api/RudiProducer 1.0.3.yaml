@@ -44,7 +44,7 @@
 openapi: 3.0.0
 info:
   version: 1.0.3
-  title: rudy-catalog-api
+  title: rudi-catalog-api
   description: "API pour l'accès aux données au niveau du nœud producteur RUDI"
   termsOfService: "no"
   contact:

@@ -1,3 +1,5 @@
+'use strict';
+
 //———————————————————————————————————————————————————————————————
 // External dependancies
 //———————————————————————————————————————————————————————————————
@@ -9,15 +11,16 @@ const Validation = require('../schemaValidators');
 //———————————————————————————————————————————————————————————————
 // External schema definitions
 //———————————————————————————————————————————————————————————————
-const Ids = require('../schemas/Identifiers');
+const ids = require('../schemas/Identifiers');
 const Contact = require('./Contact');
 const ConceptScheme = require('./ConceptScheme');
+const DictionaryEntry = require('../Schemas/DictionaryEntry');
 
 
 //———————————————————————————————————————————————————————————————
 // Constants
 //———————————————————————————————————————————————————————————————
-const ConceptId = Ids.UUIDv4;
+const ConceptId = ids.UUIDv4;
 
 
 //———————————————————————————————————————————————————————————————

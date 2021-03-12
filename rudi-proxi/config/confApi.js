@@ -1,12 +1,12 @@
 //———————————————————————————————————————————————————————————————
 // API version
 //———————————————————————————————————————————————————————————————
-const API_VERSION = '1.1.0';
+exports.API_VERSION = '1.1.0';
 
 //———————————————————————————————————————————————————————————————
 // REQ methods
 //———————————————————————————————————————————————————————————————
-const HttpMethods = {
+exports.HttpMethods = {
   POST: 'POST',
   PUT: 'PUT',
   DELETE: 'DELETE'
@@ -15,64 +15,44 @@ const HttpMethods = {
 //———————————————————————————————————————————————————————————————
 // REQ parameters
 //———————————————————————————————————————————————————————————————
-const DEFAULT_LANG = 'fr'
+exports.DEFAULT_LANG = 'fr'
 
 //--- "In path" parameters
-const PARAM_LANG = 'lang';
-const PARAM_OBJECT = 'object';
-const PARAM_ID = 'id';
-const PARAM_REPORT_ID = 'irid';
+exports.PARAM_LANG = 'lang';
+exports.PARAM_OBJECT = 'object';
+exports.PARAM_ID = 'id';
+exports.PARAM_REPORT_ID = 'irid';
 
 //--- "In query" parameters
-const QUERY_LIMIT = 'limit'
-const QUERY_OFFSET = 'offset'
+exports.QUERY_LIMIT = 'limit'
+exports.QUERY_OFFSET = 'offset'
 
 //———————————————————————————————————————————————————————————————
 // REQ URL
 //———————————————————————————————————————————————————————————————
-const URL_PREFIX = '/api/v1/';
+exports.URL_PREFIX_PUBLIC = '/api/v1';
 
 // This generic URL will be used to factorize the treatments on resources, organizations and contacts!
-const URL_OBJECT = `${URL_PREFIX}:${PARAM_OBJECT}`
+exports.URL_OBJECT = `${this.URL_PREFIX_PUBLIC}/:${this.PARAM_OBJECT}`
 
-const URL_OBJECT_METADATA = 'resources'
-const URL_OBJECT_ORGANIZATIONS = 'organizations'
-const URL_OBJECT_CONTACTS = 'contacts'
+exports.URL_OBJECT_METADATA = 'resources'
+exports.URL_OBJECT_ORGANIZATIONS = 'organizations'
+exports.URL_OBJECT_CONTACTS = 'contacts'
 
-const URL_ACTION_DELETION = 'deletion'
-const URL_ACTION_REPORT = 'report'
-
-/*
-const URL_METADATA = `${URL_PREFIX}${URL_SUFIX_METADATA}`
-const URL_ORGANIZATIONS = `${URL_PREFIX}${URL_SUFIX_ORGANIZATIONS}`
-const URL_CONTACTS = `${URL_PREFIX}${URL_SUFIX_CONTACTS}`
- */
+exports.URL_ACTION_DELETION = 'deletion'
+exports.URL_ACTION_REPORT = 'report'
 
 
 //———————————————————————————————————————————————————————————————
-// Exports
+// DB actions
 //———————————————————————————————————————————————————————————————
-module.exports = {
-  HttpMethods,
+exports.URL_PREFIX_PRIVATE = '/api/admin';
 
-  API_VERSION,
+exports.URL_LOGS_SUFFIX = 'logs'
+exports.URL_LOGS_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_LOGS_SUFFIX}`
 
-  URL_PREFIX,
+exports.URL_APP_ID = 'hash'
+exports.URL_APP_ID_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_APP_ID}`
 
-  URL_OBJECT,
-  URL_OBJECT_METADATA,
-  URL_OBJECT_ORGANIZATIONS,
-  URL_OBJECT_CONTACTS,
-
-  URL_ACTION_DELETION,
-  URL_ACTION_REPORT,
-
-  DEFAULT_LANG,
-  PARAM_LANG,
-  PARAM_ID,
-  PARAM_OBJECT,
-  PARAM_REPORT_ID,
-
-  QUERY_LIMIT,
-  QUERY_OFFSET
-}
+exports.URL_DB_SUFFIX = 'db'
+exports.URL_DB_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_DB_SUFFIX}`

@@ -1,8 +1,11 @@
+'use strict';
+
 //———————————————————————————————————————————————————————————————
 // LIBRARIES 
 //———————————————————————————————————————————————————————————————
 const log = require('./utils/logging')
-const fName = 'main'
+const mod = ''
+const fun = 'main'
 
 // Require the fastify framework and instantiate it
 const fastify = require('fastify')({
@@ -23,7 +26,7 @@ fastify.register(require('fastify-swagger'), swagger.options)
 // Constants 
 //———————————————————————————————————————————————————————————————
 const {
-  URL_PREFIX,
+  URL_PREFIX_PUBLIC: URL_PREFIX,
 } = require('./config/confApi')
 
 const {
@@ -52,11 +55,10 @@ const mongoConnectOptions = {
   useNewUrlParser: true
 }
 
-log.d(fName, `Connecting to [${DB_URL}]`)
+log.i(mod, fun, `Connecting to [${DB_URL}]`)
 const promise = mongoose.connect(DB_URL, mongoConnectOptions)
-  .then(() => log.d(fName, 'MongoDB connected'))
-  .catch(err => log.d(fName, err))
-// log.d(fName, "connection ok")
+  .then(() => log.i(mod, fun, 'MongoDB connected'))
+  .catch(err => log.e(mod, fun, err))
 
 
 //———————————————————————————————————————————————————————————————
@@ -64,34 +66,46 @@ const promise = mongoose.connect(DB_URL, mongoConnectOptions)
 //———————————————————————————————————————————————————————————————
 
 // Import Routes
-const routes = require('./routes')
+const {publicRoutes, backOfficeRoutes} = require('./routes')
 
 // Declare a default route
 fastify.get('/', async (request, reply) => {
-  log.d(fName, "hello")
+  log.d(mod, fun, "hello")
   return {
     server: "RUDI"
   }
 })
 // Declare a default route
 fastify.get('/api', async (request, reply) => {
-  log.d(fName, "api")
+  log.d(mod, fun, "api")
   return {
     API: "RUDI API"
   }
 })
 // Declare a default route
-fastify.get(URL_PREFIX, async (request, reply) => {
-  log.d(fName, URL_PREFIX)
+// Declare a default route
+fastify.get(`${URL_PREFIX}/`, async (request, reply) => {
+  log.d(mod, fun, URL_PREFIX)
   return {
     'API version': "RUDI API v1"
   }
 })
+fastify.get(URL_PREFIX, async (request, reply) => {
+  log.d(mod, fun, `${URL_PREFIX}/`)
+  return {
+    'API version': "RUDI API v1"
+  }
+})
+// Loop over each public route  
+publicRoutes.forEach((pubRoute, index) => {
+  fastify.route(pubRoute)
+  log.v(mod, fun, `route #${index} = ${pubRoute.method} ${pubRoute.url}`)
+})
 
-// Loop over each route  
-routes.forEach((route, index) => {
-  fastify.route(route)
-  log.d(fName, `route #${index} = ${route.method} ${route.url}`)
+// Loop over each backoffice route  
+backOfficeRoutes.forEach((boRoute, index) => {
+  fastify.route(boRoute)
+  log.d(mod, fun, `route #${index} = ${boRoute.method} ${boRoute.url}`)
 })
 
 //———————————————————————————————————————————————————————————————

@@ -1,3 +1,5 @@
+'use strict';
+
 //———————————————————————————————————————————————————————————————
 // External dependancies
 //———————————————————————————————————————————————————————————————
@@ -9,14 +11,13 @@ const mongoose = require('mongoose')
 const ReferenceDatesSchema = new mongoose.Schema({
   created: {
     type: Date,
-    required: true
+    required: [true, `Creation date is required`]
   },
   validated: {
     type: Date
   },
   published: {
     type: Date,
-    required: true
   },
   updated: {
     type: Date

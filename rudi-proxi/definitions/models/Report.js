@@ -1,3 +1,5 @@
+'use strict';
+
 //———————————————————————————————————————————————————————————————
 // External dependancies
 //———————————————————————————————————————————————————————————————
@@ -8,43 +10,59 @@ const Int32 = require('mongoose-int32');
 // Internal dependancies
 //———————————————————————————————————————————————————————————————
 
-const Ids = require('../schemas/Identifiers')
-const {
-  HttpMethods: Request
-} = require('../../config/confApi')
+const ids = require('../schemas/Identifiers')
+const api = require('../../config/confApi')
 
 
 //———————————————————————————————————————————————————————————————
 // Constants
 //———————————————————————————————————————————————————————————————
-
 const IntegrationResults = {
   OK: 'OK',
   KO: 'KO'
 }
 
-
 const IntegrationError = new mongoose.Schema({
   error_code: {
     type: Int32,
-    min: 0
+    min: 0,
+    required: true
   },
-  error_message: String,
-  field_name: String
+  error_message: {
+    type: String,
+    required: true
+  },
+  field_name: {
+    type: String
+  },
+}, {
+  timestamps: true
 });
+
+//----- toJSON cleanup
+IntegrationError.methods.toJSON = function () {
+  var doc = this.toObject()
+  // metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_CREATED_PROPERTY] = metadata.createdAt
+  // metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_EDITED_PROPERTY] = metadata.updatedAt
+  delete doc._id
+  delete doc.__v
+  delete doc.createdAt
+  delete doc.updatedAt
+  return doc
+};
 
 //———————————————————————————————————————————————————————————————
 // Custom schema definitions
 //———————————————————————————————————————————————————————————————
 
-const IntegrationReportSchema = new mongoose.Schema({
+const ReportSchema = new mongoose.Schema({
 
   // Unique identifier of the integration report (required)
-  report_id: Ids.UUIDv4,
+  report_id: ids.UUIDv4,
 
   // Unique and permanent identifier for the resource in RUDI 
   // system (required)
-  resource_id: Ids.UUIDv4,
+  resource_id: ids.UUID,
 
   resource_title: String,
 
@@ -55,7 +73,10 @@ const IntegrationReportSchema = new mongoose.Schema({
   treatment_date: Date,
 
   // Method used for the integration request by the Producer
-  method: Object.values(Request),
+  method: {
+    type: String,
+    enum: Object.values(api.HttpMethods)
+  },
 
   // Version number of the integration contract used for the file
   version: {
@@ -65,22 +86,37 @@ const IntegrationReportSchema = new mongoose.Schema({
 
   // State of the integration of the resource in the Portal
   integration_status: {
-    method: Object.values(IntegrationResults),
+    type: String,
+    enum: Object.values(IntegrationResults),
   },
 
   // Comment on the state of the integration of the resource in the
   // Portal
-  comment: String,
+  comment: {
+    type: String
+  },
 
   // List of all the errors that were encounntered during the
   // integration of the resource.
   integration_errors: [IntegrationError]
-
+}, {
+  timestamps: true
 });
 
 
+//----- toJSON cleanup
+ReportSchema.methods.toJSON = function () {
+  var doc = this.toObject()
+  // metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_CREATED_PROPERTY] = metadata.createdAt
+  // metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_EDITED_PROPERTY] = metadata.updatedAt
+  delete doc._id
+  delete doc.__v
+  delete doc.createdAt
+  delete doc.updatedAt
+  return doc
+};
 
 //———————————————————————————————————————————————————————————————
 // Exports
 //———————————————————————————————————————————————————————————————
-module.exports = mongoose.model('IntegrationReport', IntegrationReportSchema)
+module.exports = mongoose.model('Report', ReportSchema)

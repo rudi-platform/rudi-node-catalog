@@ -1,3 +1,6 @@
+'use strict';
+
+const mod = 'thsCtrl'
 /*
  * In this file are made the different steps followed for each 
  * action on the thesaurus
@@ -20,10 +23,10 @@ const Thesaurus = require('../definitions/models/ConceptScheme')
 // Add a new thesaurus
 exports.addThesaurus = async (req, reply) => {
   const fun = 'addThesaurus'
-  log.d(fun, '')
+  log.d(mod, fun, '')
   try {
     const id = req.body.thesaurus_id
-    log.d(fun, `id: ${id}`)
+    log.d(mod, fun, `id: ${id}`)
 
     // First: we make sure id isn't used already
     const oldThesaurus = await Thesaurus.find({
@@ -35,10 +38,10 @@ exports.addThesaurus = async (req, reply) => {
 
     // Creating new thesaurus
     const newThesaurus = new Thesaurus(req.body)
-    log.d(fun, `new thesaurus added with id ${id}`)
+    log.d(mod, fun, `new thesaurus added with id ${id}`)
     return newThesaurus.save()
   } catch (err) {
-    log.e(fun, err)
+    log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 }
@@ -46,13 +49,13 @@ exports.addThesaurus = async (req, reply) => {
 // Get all thesaurus
 exports.getEveryThesaurus = async (req, reply) => {
   const fun = 'getEveryThesaurus'
-  log.d(fun, '')
+  log.d(mod, fun, '')
   try {
     const thesaurus = await Thesaurus.find()
-    log.d(fun, 'all thesaurus found')
+    log.d(mod, fun, 'all thesaurus found')
     return thesaurus
   } catch (err) {
-    log.e(fun, err)
+    log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 }
@@ -60,7 +63,7 @@ exports.getEveryThesaurus = async (req, reply) => {
 // Get single thesaurus by ID
 exports.getSingleThesaurus = async (req, reply) => {
   const fun = 'getSingleThesaurus'
-  log.d(fun, '')
+  log.d(mod, fun, '')
   try {
     const id = req.params.id
     const thesaurus = await Thesaurus.find({
@@ -69,10 +72,10 @@ exports.getSingleThesaurus = async (req, reply) => {
     if ('' == thesaurus) {
       throw new Error(`no thesaurus found for id ${id}`)
     }
-    log.d(fun, `found thesaurus with id ${id}`)
+    log.d(mod, fun, `found thesaurus with id ${id}`)
     return thesaurus
   } catch (err) {
-    log.e(fun, err)
+    log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 }
@@ -80,7 +83,7 @@ exports.getSingleThesaurus = async (req, reply) => {
 // Update an existing thesaurus
 exports.updateThesaurus = async (req, reply) => {
   const fun = 'updateThesaurus'
-  log.d(fun, '')
+  log.d(mod, fun, '')
   try {
     const newThesaurus = req.body
     const {
@@ -100,10 +103,10 @@ exports.updateThesaurus = async (req, reply) => {
       err = new Error(errMsg)
       throw boom.boomify(err)
     }
-    log.d(fun, `updated thesaurus with id ${id}`)
+    log.d(mod, fun, `updated thesaurus with id ${id}`)
     return thesaurus
   } catch (err) {
-    log.e(fun, err)
+    log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 }
@@ -111,7 +114,7 @@ exports.updateThesaurus = async (req, reply) => {
 // Delete a thesaurus
 exports.deleteThesaurus = async (req, reply) => {
   const fun = 'deleteThesaurus'
-  log.d(fun, '')
+  log.d(mod, fun, '')
   try {
     const id = req.params.id
     const thesaurus = await Thesaurus.findOneAndRemove({
@@ -120,10 +123,10 @@ exports.deleteThesaurus = async (req, reply) => {
     if (null == thesaurus) {
       throw new Error(`couldn't find thesaurus with id ${id}`)
     }
-    log.d(fun, `deleted thesaurus with id ${id})`)
+    log.d(mod, fun, `deleted thesaurus with id ${id})`)
     return thesaurus
   } catch (err) {
-    log.e(fun, err)
+    log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 
@@ -132,17 +135,17 @@ exports.deleteThesaurus = async (req, reply) => {
 // Delete every thesaurus
 exports.deleteManyThesaurus = async (req, reply) => {
   const fun = 'deleteManyThesaurus'
-  log.d(fun, '')
+  log.d(mod, fun, '')
   try {
     const {
       ...conditions
     } = req.body
-    log.d(fun, conditions)
+    log.d(mod, fun, conditions)
     const thesaurus = await Thesaurus.deleteMany(conditions)
-    log.d(fun, `deleted thesaurus with condition ${conditions})`)
+    log.d(mod, fun, `deleted thesaurus with condition ${conditions})`)
     return thesaurus
   } catch (err) {
-    log.e(fun, err)
+    log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 

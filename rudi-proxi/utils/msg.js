@@ -1,9 +1,13 @@
+'use strict';
+const mod = 'msg'
 //———————————————————————————————————————————————————————————————
 // Internal dependancies 
 //———————————————————————————————————————————————————————————————
 const {
   getLanguage
 } = require('../utils/lang')
+
+const json = require('../utils/jsonAccess')
 
 //———————————————————————————————————————————————————————————————
 // Constants
@@ -15,7 +19,7 @@ const DEFAULT_MSG = 'Language not found'
 //———————————————————————————————————————————————————————————————
 //TODO: store all this in a db
 
-exports.requestParameterExpected = (req, param) => {
+exports.missingRequestParameter = (req, param) => {
   try {
     switch (getLanguage()) {
       case 'en':
@@ -30,7 +34,7 @@ exports.requestParameterExpected = (req, param) => {
         return `${DEFAULT_MSG}: ${getLanguage()}`;
     }
   } catch (err) {
-    log.e(fun, err)
+    log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 }
@@ -50,16 +54,16 @@ exports.parameterExpected = (fun, param) => {
   }
 }
 
-exports.missingProperty = (jsonObject, property) => {
+exports.missingObjectProperty = (jsonObject, property) => {
   switch (getLanguage()) {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `The property '${property}' must be defined for object:\n${JSON.stringify(jsonObject)} `;
+      return `The property '${property}' must be defined for object:\n${json.beautify(jsonObject)} `;
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `La propriété '${property}' doit être définie pour l'object:\n${JSON.stringify(jsonObject)} `;
+      return `La propriété '${property}' doit être définie pour l'object :\n${json.beautify(jsonObject)} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -74,17 +78,31 @@ exports.parametersMismatch = (paramUrl, paramBody) => {
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Les paramètres doivent être identiques entre le corps de la requête et l'URL\n- URL: '${paramUrl}'\n- requête: '${paramBody}' `;
+      return `Les paramètres doivent être identiques entre le corps de la requête et l'URL\n- URL : '${paramUrl}'\n- requête : '${paramBody}' `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
 }
 
+exports.missingField=(fieldName) => {
+  switch (getLanguage()) {
+    case 'en':
+    case 'en-GB':
+    case 'en-US':
+      return `The field '${fieldName}' must be defined `;
+    case 'fr':
+    case 'fr-FR':
+    case 'fr-BE':
+      return `La propriété '${fieldName}' est requise `;
+    default:
+      return `${DEFAULT_MSG}: ${getLanguage()}`;
+  }
+}
 //———————————————————————————————————————————————————————————————
 // Generic
 //———————————————————————————————————————————————————————————————
 
-exports.objectTypeNotFound = (objectType)=>{
+exports.objectTypeNotFound = (objectType) => {
   switch (getLanguage()) {
     case 'en':
     case 'en-GB':
@@ -99,7 +117,7 @@ exports.objectTypeNotFound = (objectType)=>{
   }
 }
 
-exports.objectNotFound = (objectType, objectId)=>{
+exports.objectNotFound = (objectType, objectId) => {
   switch (getLanguage()) {
     case 'en':
     case 'en-GB':
@@ -108,7 +126,7 @@ exports.objectNotFound = (objectType, objectId)=>{
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Aucun objet de type '${objectType}' n'a été trouvé pour l'id : ${objectId} `;
+      return `Aucun objet de type '${objectType}' n'a été trouvé pour l'identifiant : ${objectId} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -138,7 +156,7 @@ exports.objectAdded = (objectType, id) => {
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Objet de type '${objectType}' créé avec l'identifiant: ${id} `;
+      return `Objet de type '${objectType}' créé avec l'identifiant : ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -156,7 +174,7 @@ exports.metadataAlreadyExists = (id) => {
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Une metadonnée existe déjà pour l'identifiant: ${id} `;
+      return `Une metadonnée existe déjà pour l'identifiant : ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -171,7 +189,7 @@ exports.metadataAdded = (id) => {
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Metadonnée ajoutée avec l'identifiant: ${id} `;
+      return `Metadonnée ajoutée avec l'identifiant : ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -186,7 +204,7 @@ exports.metadataUpdated = (id) => {
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Metadonée mise à jour pour l'identifiant: ${id} `;
+      return `Metadonée mise à jour pour l'identifiant : ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -201,7 +219,7 @@ exports.metadataFound = (id) => {
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Une metadonnée a été trouvée avec l'identifiant: ${id} `;
+      return `Une metadonnée a été trouvée avec l'identifiant : ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -216,7 +234,7 @@ exports.metadataNotFound = (id) => {
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Aucune metadonnée trouvée avec l'identifiant: ${id} `;
+      return `Aucune metadonnée trouvée avec l'identifiant : ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -232,7 +250,7 @@ exports.metadataDeleted = (id) => {
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Métadonnée supprimée pour l'identifiant: ${id} `;
+      return `Métadonnée supprimée pour l'identifiant : ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -247,7 +265,7 @@ exports.metadataDeletedWithCondition = (condition) => {
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Métadonnées supprimées pour la condition: '${condition}'`;
+      return `Métadonnées supprimées pour la condition : '${condition}'`;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -266,7 +284,7 @@ exports.organizationAdded = (id) => {
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Organisation créée avec l'identifiant: ${id} `;
+      return `Organisation créée avec l'identifiant : ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -280,7 +298,7 @@ exports.organizationAlreadyExists = (id) => {
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Une organisation existe déjà pour l'identifiant: ${id} `;
+      return `Une organisation existe déjà pour l'identifiant : ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -295,7 +313,7 @@ exports.organizationUpdated = (id) => {
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Organisation mise à jour pour l'identifiant: ${id} `;
+      return `Organisation mise à jour pour l'identifiant : ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -310,7 +328,7 @@ exports.organizationDeleted = (id) => {
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Organisation supprimée pour l'identifiant: ${id} `;
+      return `Organisation supprimée pour l'identifiant : ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -325,7 +343,7 @@ exports.organizationNotFound = (id) => {
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Aucune organisation trouvée avec l'identifiant: ${id} `;
+      return `Aucune organisation trouvée avec l'identifiant : ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -344,7 +362,7 @@ exports.contactAdded = (id) => {
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Contact créé avec l'identifiant: ${id} `;
+      return `Contact créé avec l'identifiant : ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -359,7 +377,7 @@ exports.contactAlreadyExists = (id) => {
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Un contact existe déjà pour l'identifiant: ${id} `;
+      return `Un contact existe déjà pour l'identifiant : ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -374,7 +392,7 @@ exports.contactUpdated = (id) => {
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Contact mis à jour pour l'identifiant: ${id} `;
+      return `Contact mis à jour pour l'identifiant : ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -390,7 +408,7 @@ exports.contactDeleted = (id) => {
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Contact supprimé pour l'identifiant: ${id} `;
+      return `Contact supprimé pour l'identifiant : ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -404,7 +422,7 @@ exports.contactNotFound = (id) => {
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Aucun contact trouvé avec l'identifiant: ${id} `;
+      return `Aucun contact trouvé avec l'identifiant : ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -423,7 +441,7 @@ exports.reportAdded = (id) => {
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Rapport créé avec l'identifiant: ${id} `;
+      return `Rapport créé avec l'identifiant : ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -438,7 +456,7 @@ exports.reportAlreadyExists = (id) => {
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Un rapport existe déjà pour l'identifiant: ${id} `;
+      return `Un rapport existe déjà pour l'identifiant : ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -453,7 +471,7 @@ exports.reportUpdated = (id) => {
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Rapport mis à jour pour l'identifiant: ${id} `;
+      return `Rapport mis à jour pour l'identifiant : ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -469,7 +487,7 @@ exports.reportDeleted = (id) => {
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Rapport supprimé pour l'identifiant: ${id} `;
+      return `Rapport supprimé pour l'identifiant : ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -483,7 +501,21 @@ exports.reportNotFound = (id) => {
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Aucun rapport trouvé avec l'identifiant: ${id} `;
+      return `Aucun rapport trouvé avec l'identifiant : ${id} `;
+    default:
+      return `${DEFAULT_MSG}: ${getLanguage()}`;
+  }
+}
+exports.reportMismatch = (reportId, urlObjectId, reportObjectId) => {
+  switch (getLanguage()) {
+    case 'en':
+    case 'en-GB':
+    case 'en-US':
+      return `Resource identifier doesn't match the URL call for report ${reportId} \nURL resource id: ${urlObjectId} != report.resource_id: ${reportObjectId} `;
+    case 'fr':
+    case 'fr-FR':
+    case 'fr-BE':
+      return `L'identifiant de la resource associée est incohérente avec celle utilisée dans l'URL pour le rapport ${reportId}\nURL id: ${urlObjectId} != report.resource_id: ${reportObjectId} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }

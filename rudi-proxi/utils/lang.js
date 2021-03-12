@@ -1,3 +1,5 @@
+'use strict';
+
 const {DEFAULT_LANG} = require(`../config/confApi`)
 
 let currentLanguage = DEFAULT_LANG
