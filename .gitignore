@@ -6,3 +6,4 @@
 **/.*-audit.json
 **/javascript.test.js
 **/*.zip
+**/*.gz

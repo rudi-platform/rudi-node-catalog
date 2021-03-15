@@ -25,11 +25,17 @@ const {
   OUT_LOG
 } = require('../config/confLogs');
 
+const {
+  URL_LOGS_ACCESS,
+  URL_APP_ID_ACCESS
+} = require('../config/confApi');
+
 //———————————————————————————————————————————————————————————————
 // App ID
 //———————————————————————————————————————————————————————————————
 exports.getAppId = () => {
   const fun = 'getAppId'
+  log.d(mod, fun, ` GET ${URL_APP_ID_ACCESS}`)
   const hashId = require('child_process').execSync('git rev-parse --short HEAD')
   log.d(mod, fun, `${hashId}`)
 
@@ -43,13 +49,16 @@ exports.getAppId = () => {
 
 exports.getLogs = () => {
   const fun = 'getLogs'
-  log.d(mod, fun, ``)
+  log.d(mod, fun, `GET ${URL_LOGS_ACCESS}`)
 
   // The filename is simple the local directory and tacks on the requested url
   const filename = `./${OUT_LOG}`
 
   // This line opens the file as a readable stream
-  const logs = fs.readFileSync(filename, {encoding:'utf8', flag:'r'});
+  const logs = fs.readFileSync(filename, {
+    encoding: 'utf8',
+    flag: 'r'
+  });
 
   return logs
 }

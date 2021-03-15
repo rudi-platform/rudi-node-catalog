@@ -33,7 +33,9 @@ const {
   PARAM_OBJECT,
   QUERY_LIMIT,
   QUERY_OFFSET,
-  URL_ACTION_REPORT
+  URL_ACTION_REPORT,
+  URL_OBJECT,
+  URL_ACTION_DELETION
 } = require('../config/confApi')
 
 const {
@@ -195,7 +197,7 @@ async function treatDbObjectList(objectType, dbObjectList) {
 // => POST /{object}/{id}
 exports.addSingleObject = async (req, reply) => {
   const fun = 'addSingleObject'
-  log.d(mod, fun, ``)
+  log.d(mod, fun, `< POST ${URL_OBJECT}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -236,7 +238,7 @@ exports.addSingleObject = async (req, reply) => {
 // => GET /{object}/{id}
 exports.getSingleObject = async (req, reply) => {
   const fun = 'getSingleObject'
-  log.d(mod, fun, ``)
+  log.d(mod, fun, `< GET ${URL_OBJECT}/:${PARAM_ID}`)
   try {
 
     // retrieve url parameters: object type, object id
@@ -269,7 +271,7 @@ exports.getSingleObject = async (req, reply) => {
 // => GET /{object}
 exports.getObjectList = async (req, reply) => {
   const fun = 'getObjectList'
-  log.d(mod, fun, ``)
+  log.d(mod, fun, `< GET ${URL_OBJECT}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -302,7 +304,7 @@ exports.getObjectList = async (req, reply) => {
 // => PUT /{object}
 exports.updateSingleObject = async (req, reply) => {
   const fun = 'updateSingleObject'
-  log.d(mod, fun, ``)
+  log.d(mod, fun, `< PUT ${URL_OBJECT}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -334,7 +336,7 @@ exports.updateSingleObject = async (req, reply) => {
 // => DELETE /{object}/{id}
 exports.deleteSingleObject = async (req, reply) => {
   const fun = 'deleteSingleObject'
-  log.d(mod, fun, ``)
+  log.d(mod, fun, `< DELETE ${URL_OBJECT}/:${PARAM_ID}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -362,7 +364,7 @@ exports.deleteSingleObject = async (req, reply) => {
 // => POST /{object}/deletion
 exports.deleteObjectList = async (req, reply) => {
   const fun = 'deleteObjectList'
-  log.d(mod, fun, ``)
+  log.d(mod, fun, `< POST ${URL_OBJECT}/${URL_ACTION_DELETION}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -388,7 +390,7 @@ exports.deleteObjectList = async (req, reply) => {
 // => DELETE /{object}
 exports.deleteEveryObject = async (req, reply) => {
   const fun = 'deleteEveryObject'
-  log.d(mod, fun, ``)
+  log.d(mod, fun, `< DELETE ${URL_OBJECT}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)

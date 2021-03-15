@@ -265,9 +265,9 @@ exports.dbToRudiFormat = async (dbMetadata) => {
   const fun = 'dbToRudiFormat'
   log.d(mod, fun, ``)
 
-  log.d(mod, fun, `dbMetadata: ${json.beautify(dbMetadata)}`)
+  // log.d(mod, fun, `dbMetadata: ${json.beautify(dbMetadata)}`)
   let rudiMetadata = dbRwk.unmongoosify(dbMetadata)
-  log.d(mod, fun, `rudiMetadata: ${json.beautify(rudiMetadata)}`)
+  // log.d(mod, fun, `rudiMetadata: ${json.beautify(rudiMetadata)}`)
 
   // Updating incoming data with the full info of the producer
   // TODO[VALIDATE]: The organization info already in database is not updated with possible new data, 
@@ -283,7 +283,7 @@ exports.dbToRudiFormat = async (dbMetadata) => {
 
   // Updating incoming data with the full info of the metadata info
   const cleanMetaInfo = json.accessProperty(rudiMetadata, API_METAINFO_PROPERTY)
-  log.d(mod, fun, `metaInfo: ${json.beautify(cleanMetaInfo)}`)
+  // log.d(mod, fun, `metaInfo: ${json.beautify(cleanMetaInfo)}`)
   // const cleanMetaInfo = dbRwk.unmongoosify(metaInfo)
   // log.d(mod, fun, `cleanMetaInfo: ${json.beautify(cleanMetaInfo)}`)
 
@@ -298,7 +298,7 @@ exports.dbToRudiFormat = async (dbMetadata) => {
     cleanMetaInfo[API_METAINFO_CONTACTS_PROPERTY] = await this.contactListDbToRudiFormat(metaInfoContactsDbIds)
   }
   rudiMetadata[API_METAINFO_PROPERTY] = cleanMetaInfo
-  log.d(mod, fun, `rudiMetadata: ${json.beautify(rudiMetadata)}`)
+  // log.d(mod, fun, `rudiMetadata: ${json.beautify(rudiMetadata)}`)
 
   return rudiMetadata
 }

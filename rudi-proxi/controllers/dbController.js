@@ -30,7 +30,7 @@ const {
 } = require('../db/dbFields')
 
 const {
-  PARAM_ID
+  PARAM_ID, URL_DB_ACCESS
 } = require('../config/confApi')
 
 const {
@@ -44,7 +44,7 @@ const {
 
 exports.getCollections = async (req, reply) => {
   const fun = 'getCollections'
-  log.d(mod, fun, ``)
+  log.d(mod, fun, `< GET ${URL_DB_ACCESS}`)
   try {
 
     const dbActionResult = await db.getCollections(DB_NAME)
@@ -57,7 +57,7 @@ exports.getCollections = async (req, reply) => {
 }
 exports.dropDB = async (req, reply) => {
   const fun = 'dropDB'
-  log.d(mod, fun, ``)
+  log.d(mod, fun, `< DELETE ${URL_DB_ACCESS}`)
   try {
 
     const dbActionResult = await db.dropDB(DB_NAME)
