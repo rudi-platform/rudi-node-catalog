@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "prestart": "npm install",
-    "start": "export RUDI_PROXI_APP_VERSION=$(git rev-parse HEAD) && ./node_modules/nodemon/bin/nodemon.js ./index.js",
+    "start": "./node_modules/nodemon/bin/nodemon.js ./index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
