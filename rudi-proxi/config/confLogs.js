@@ -18,9 +18,11 @@ const sys = require('../config/confSystem')
 exports.APP_NAME = 'rudiProxi'
 exports.LOG_DIR = 'logs'
 exports.LOG_PATH = `./${this.LOG_DIR}`
+exports.OUT_LOGFILE = 'rudiProxi.log'
+
+exports.OUT_LOG = `${this.LOG_DIR}/${this.OUT_LOGFILE}`
 
 const errorLogsFileName = 'error.log'
-exports.OUT_LOGFILE = 'rudiProxi.log'
 
 const logsTimestamp = 'YYYY/MM/DD HH:mm:ss'
 const fileTimestamp = 'YYYY-MM-DD-HH'
@@ -64,12 +66,8 @@ winston.addColors({
   debug: 'cyan'
 });
 
-exports.logger = winston.createLogger({
-  level: 'debug',
-  defaultMeta: {
-    service: 'user-service'
-  },
-  format: winston.format.combine(
+const formatConsoleLogs =
+  winston.format.combine(
     winston.format.json(),
     winston.format.colorize({
       all: true
@@ -78,30 +76,55 @@ exports.logger = winston.createLogger({
       format: `${logsTimestamp}`
     }),
     winston.format.printf(info => `${info.timestamp} .${info.level}. ${info.message}`)
-  ),
+  )
+
+const formatFileLogs =
+  winston.format.combine(
+    winston.format.simple(),
+    winston.format.timestamp({
+      format: `${logsTimestamp}`
+    }),
+    winston.format.printf(info => `${info.timestamp} .${info.level}. ${info.message}`)
+  )
+
+exports.logger = winston.createLogger({
+  level: 'debug',
+  defaultMeta: {
+    service: 'user-service'
+  },
+
   transports: [
     // - Write to the console
-    new(winston.transports.Console)(),
+    new(winston.transports.Console)({
+      name: 'consoleLogs',
+      format: formatConsoleLogs
+    }),
     // - Write to the web
     // new(winston.transports.Http)({host: 'localhost', port: 3000, path: '/logs'}),
     // - Write all logs with logger level to a dated file
     new winston.transports.DailyRotateFile({
+      name: 'datedLogs',
       filename: `${this.LOG_PATH}/${this.APP_NAME}-%DATE%.log`,
       datePattern: `${fileTimestamp}`,
       zippedArchive: true,
       maxSize: '20m',
-      maxFiles: '7d'
+      maxFiles: '7d',
+      format: formatFileLogs
     }),
     // - Write all logs with level `error` and below to `error.log`
     new winston.transports.File({
+      name: 'errorLogs',
       filename: `${this.LOG_PATH}/${errorLogsFileName}`,
-      level: 'error'
+      level: 'error',
+      format: formatFileLogs
     }),
     // - Write all logs with level `info` and below to `combined.log`
     new winston.transports.File({
-      filename: `${this.LOG_PATH}/${this.MAIN}`,
+      name: 'outlogs',
+      filename: `./${this.OUT_LOG}`,
       level: 'debug',
-      maxSize: '10m',
+      maxSize: '1m',
+      format: formatFileLogs
     }),
   ],
 });

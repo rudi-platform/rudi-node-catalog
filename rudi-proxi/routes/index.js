@@ -9,7 +9,7 @@ const documentation = require('./documentation/metadataApi')
 // API request constants
 //———————————————————————————————————————————————————————————————
 const {
-  URL_PREFIX_PUBLIC: URL_PREFIX,
+  URL_PREFIX_PUBLIC,
   URL_OBJECT,
   PARAM_OBJECT,
   PARAM_ID,

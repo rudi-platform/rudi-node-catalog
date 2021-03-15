@@ -11,10 +11,7 @@ const mod = 'sysCtrl'
 //———————————————————————————————————————————————————————————————
 const boom = require('@hapi/boom')
 const fs = require('fs');
-const {
-  LOG_DIR,
-  OUT_LOGFILE
-} = require('../config/confLogs');
+
 
 //———————————————————————————————————————————————————————————————
 // Internal dependancies 
@@ -22,18 +19,37 @@ const {
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
 
-exports.getLogs = () => {
-  const fun = 'getLogs'
-  log.d(mod, fun, ``)
+const {
+  LOG_DIR,
+  OUT_LOGFILE,
+  OUT_LOG
+} = require('../config/confLogs');
 
-  // let stream = fs.createReadStream(`${LOG_DIR}/${OUT_LOGFILE}`);
-  return 'to be implemented'
-}
-
+//———————————————————————————————————————————————————————————————
+// App ID
+//———————————————————————————————————————————————————————————————
 exports.getAppId = () => {
   const fun = 'getAppId'
   const hashId = require('child_process').execSync('git rev-parse --short HEAD')
   log.d(mod, fun, `${hashId}`)
 
   return hashId
+}
+
+
+//———————————————————————————————————————————————————————————————
+// Logs
+//———————————————————————————————————————————————————————————————
+
+exports.getLogs = () => {
+  const fun = 'getLogs'
+  log.d(mod, fun, ``)
+
+  // The filename is simple the local directory and tacks on the requested url
+  const filename = `./${OUT_LOG}`
+
+  // This line opens the file as a readable stream
+  const logs = fs.readFileSync(filename, {encoding:'utf8', flag:'r'});
+
+  return logs
 }
