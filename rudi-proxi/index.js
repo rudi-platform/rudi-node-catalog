@@ -84,13 +84,13 @@ fastify.get('/api', async (request, reply) => {
 })
 // Declare a default route
 // Declare a default route
-fastify.get(`${URL_PREFIX}/`, async (request, reply) => {
+fastify.get(URL_PREFIX, async (request, reply) => {
   log.d(mod, fun, URL_PREFIX)
   return {
     'API version': "RUDI API v1"
   }
 })
-fastify.get(URL_PREFIX, async (request, reply) => {
+fastify.get(`${URL_PREFIX}/`, async (request, reply) => {
   log.d(mod, fun, `${URL_PREFIX}/`)
   return {
     'API version': "RUDI API v1"
