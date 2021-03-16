@@ -19,7 +19,8 @@ const {
   URL_DB_ACCESS,
   URL_LOGS_SUFFIX,
   URL_LOGS_ACCESS,
-  URL_APP_ID_ACCESS
+  URL_APP_ID_ACCESS,
+  URL_NODE_VERSION_ACCESS
 } = require('../config/confApi')
 
 const {
@@ -42,7 +43,7 @@ const contactController = require('../controllers/contactController')
 const reportController = require('../controllers/reportController')
 
 const dbController = require('../controllers/dbController');
-const sysController = require('../controllers/logController');
+const sysController = require('../controllers/sysController');
 
 exports.publicRoutes = [
 
@@ -174,6 +175,11 @@ exports.backOfficeRoutes = [
     method: 'GET',
     url: `${URL_APP_ID_ACCESS}`,
     handler: sysController.getAppId
+  },
+  {
+    method: 'GET',
+    url: `${URL_NODE_VERSION_ACCESS}`,
+    handler: sysController.getNodeVersion
   },
   //———————————————————————————————————————————————————————————————
   // (distant dev) Routes for actions on DB

@@ -11,7 +11,7 @@ const mod = 'sysCtrl'
 //———————————————————————————————————————————————————————————————
 const boom = require('@hapi/boom')
 const fs = require('fs');
-
+const pr = require('child_process')
 
 //———————————————————————————————————————————————————————————————
 // Internal dependancies 
@@ -27,21 +27,48 @@ const {
 
 const {
   URL_LOGS_ACCESS,
-  URL_APP_ID_ACCESS
+  URL_APP_ID_ACCESS,
+  URL_NODE_VERSION_ACCESS
 } = require('../config/confApi');
+const {
+  beautify
+} = require('../utils/jsonAccess');
 
 //———————————————————————————————————————————————————————————————
 // App ID
 //———————————————————————————————————————————————————————————————
 exports.getAppId = () => {
   const fun = 'getAppId'
-  log.d(mod, fun, ` GET ${URL_APP_ID_ACCESS}`)
-  const hashId = require('child_process').execSync('git rev-parse --short HEAD')
-  log.d(mod, fun, `${hashId}`)
+  try {
+    log.d(mod, fun, ` GET ${URL_APP_ID_ACCESS}`)
+    const hashId = require('child_process').execSync('git rev-parse --short HEAD')
+    log.d(mod, fun, `${hashId}`)
 
-  return hashId
+    return hashId
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw boom.boomify(err)
+  }
 }
 
+exports.getNodeVersion = () => {
+  const fun = 'getNodeVersion'
+  try {
+    log.d(mod, fun, ` GET ${URL_NODE_VERSION_ACCESS}`)
+    const nodeVersion = pr.execSync('node -v')
+    const npmVersion = pr.execSync('npm -v')
+    const nVersions = {
+      'node version': `${nodeVersion}`.trim(),
+      'npm version': `${npmVersion}`.trim()
+    }
+    log.d(mod, fun, `${beautify(nVersions)}`)
+
+    return nVersions
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw boom.boomify(err)
+  }
+}
 
 //———————————————————————————————————————————————————————————————
 // Logs
@@ -49,16 +76,15 @@ exports.getAppId = () => {
 
 exports.getLogs = () => {
   const fun = 'getLogs'
-  log.d(mod, fun, `GET ${URL_LOGS_ACCESS}`)
+  try {
+    log.d(mod, fun, `GET ${URL_LOGS_ACCESS}`)
 
-  // The filename is simple the local directory and tacks on the requested url
-  const filename = `./${OUT_LOG}`
-
-  // This line opens the file as a readable stream
-  const logs = fs.readFileSync(filename, {
-    encoding: 'utf8',
-    flag: 'r'
-  });
-
-  return logs
+    /* beautify ignore:start */
+    const logs = fs.readFileSync(`./${OUT_LOG}`, {encoding: 'utf8', flag: 'r'});
+    /* beautify ignore:end */
+    return logs
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw boom.boomify(err)
+  }
 }

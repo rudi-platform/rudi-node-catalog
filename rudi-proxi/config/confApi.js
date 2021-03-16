@@ -51,8 +51,11 @@ exports.URL_PREFIX_PRIVATE = '/api/admin';
 exports.URL_LOGS_SUFFIX = 'logs'
 exports.URL_LOGS_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_LOGS_SUFFIX}`
 
-exports.URL_APP_ID = 'hash'
-exports.URL_APP_ID_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_APP_ID}`
+exports.URL_APP_ID_SUFFIX = 'hash'
+exports.URL_APP_ID_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_APP_ID_SUFFIX}`
+
+exports.URL_NODE_VERSION_SUFFIX = 'nv'
+exports.URL_NODE_VERSION_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_NODE_VERSION_SUFFIX}`
 
 exports.URL_DB_SUFFIX = 'db'
 exports.URL_DB_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_DB_SUFFIX}`
