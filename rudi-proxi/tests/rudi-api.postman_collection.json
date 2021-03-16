@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "516d5505-6ec3-4a6f-91b2-2bc97686a24d",
-		"name": "RUDI-local",
+		"name": "rudi-api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -878,6 +878,23 @@
 							],
 							"path": [
 								"{{logs}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getNodeVersion",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{adminUrl}}/nv",
+							"host": [
+								"{{adminUrl}}"
+							],
+							"path": [
+								"nv"
 							]
 						}
 					},
