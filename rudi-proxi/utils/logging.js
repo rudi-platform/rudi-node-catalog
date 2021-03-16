@@ -98,7 +98,7 @@ exports.e = (mod, fun, msg) => {
 }
 
 exports.w = (mod, fun, msg) => {
-  logger.warning(displayStr(mod, fun, msg))
+  logger.warn(displayStr(mod, fun, msg))
 
   // if (LOG_LVL < levels.warning) return
   // displayFunc(WARNING, fun, msg)

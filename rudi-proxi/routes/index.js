@@ -23,15 +23,6 @@ const {
   URL_NODE_VERSION_ACCESS
 } = require('../config/confApi')
 
-const {
-  DB_NAME
-} = require('../config/confSystem')
-
-const {
-  LOG_PATH: LOG_DIR,
-  APP_NAME
-} = require('../config/confLogs');
-
 
 //———————————————————————————————————————————————————————————————
 // Controllers

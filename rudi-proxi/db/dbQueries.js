@@ -201,11 +201,9 @@ exports.getEnsuredObjectWithJson = async (objectType, Model, idField, rudiObject
   const fun = `getEnsuredObjectWithJson`
   log.d(mod, fun, ``)
   try {
-    const {
-      Model,
-      idField
-    } = this.getObjectAccesses(objectType)
-
+    /* beautify ignore:start */
+    const {Model, idField} = this.getObjectAccesses(objectType)
+    /* beautify ignore:end */
     const rudiId = json.accessProperty(rudiObject, idField)
     const dbObject = await this.getObjectWithRudiId(Model, idField, rudiId)
     if (!dbObject) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)

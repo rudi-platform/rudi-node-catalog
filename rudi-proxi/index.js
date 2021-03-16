@@ -1,11 +1,18 @@
 'use strict';
 
-//———————————————————————————————————————————————————————————————
-// LIBRARIES 
-//———————————————————————————————————————————————————————————————
-const log = require('./utils/logging')
 const mod = ''
 const fun = 'main'
+
+//———————————————————————————————————————————————————————————————
+// Internal dependancies 
+//———————————————————————————————————————————————————————————————
+const sys = require('./config/confSystem')
+const api = require('./config/confApi')
+const log = require('./utils/logging')
+
+//———————————————————————————————————————————————————————————————
+// External dependancies  
+//———————————————————————————————————————————————————————————————
 
 // Require the fastify framework and instantiate it
 const fastify = require('fastify')({
@@ -15,25 +22,11 @@ const fastify = require('fastify')({
 // Require external modules
 const mongoose = require('mongoose')
 
-
 // Import Swagger Options
 const swagger = require('./config/swagger')
 
 // Register Swagger
 fastify.register(require('fastify-swagger'), swagger.options)
-
-//———————————————————————————————————————————————————————————————
-// Constants 
-//———————————————————————————————————————————————————————————————
-const {
-  URL_PREFIX_PUBLIC: URL_PREFIX,
-} = require('./config/confApi')
-
-const {
-  DB_NAME,
-  DB_PORT,
-  DB_URL,
-} = require('./config/confSystem')
 
 //———————————————————————————————————————————————————————————————
 // DB connection
@@ -55,18 +48,21 @@ const mongoConnectOptions = {
   useNewUrlParser: true
 }
 
-log.i(mod, fun, `Connecting to [${DB_URL}]`)
-const promise = mongoose.connect(DB_URL, mongoConnectOptions)
+log.i(mod, fun, `Connecting to [${sys.DB_URL}]`)
+const promise = mongoose.connect(sys.DB_URL, mongoConnectOptions)
   .then(() => log.i(mod, fun, 'MongoDB connected'))
   .catch(err => log.e(mod, fun, err))
-
+ 
 
 //———————————————————————————————————————————————————————————————
 // ROUTES 
 //———————————————————————————————————————————————————————————————
 
 // Import Routes
-const {publicRoutes, backOfficeRoutes} = require('./routes')
+const {
+  publicRoutes,
+  backOfficeRoutes
+} = require('./routes')
 
 // Declare a default route
 fastify.get('/', async (request, reply) => {
@@ -84,14 +80,14 @@ fastify.get('/api', async (request, reply) => {
 })
 // Declare a default route
 // Declare a default route
-fastify.get(URL_PREFIX, async (request, reply) => {
-  log.d(mod, fun, URL_PREFIX)
+fastify.get(api.URL_PREFIX_PUBLIC, async (request, reply) => {
+  log.d(mod, fun, api.URL_PREFIX_PUBLIC)
   return {
     'API version': "RUDI API v1"
   }
 })
-fastify.get(`${URL_PREFIX}/`, async (request, reply) => {
-  log.d(mod, fun, `${URL_PREFIX}/`)
+fastify.get(`${api.URL_PREFIX_PUBLIC}/`, async (request, reply) => {
+  log.d(mod, fun, `${api.URL_PREFIX_PUBLIC}/`)
   return {
     'API version': "RUDI API v1"
   }
@@ -113,7 +109,7 @@ backOfficeRoutes.forEach((boRoute, index) => {
 //———————————————————————————————————————————————————————————————
 const start = async () => {
   try {
-    await fastify.listen(3000,'0.0.0.0')
+    await fastify.listen(3000, '0.0.0.0')
     fastify.swagger()
     // fastify.log.info(`Listening on ${fastify.server.address().address}:${fastify.server.address().port}`)
   } catch (err) {

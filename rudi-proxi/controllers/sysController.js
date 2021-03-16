@@ -20,10 +20,8 @@ const log = require('../utils/logging')
 const msg = require('../utils/msg')
 
 const {
-  LOG_DIR,
-  OUT_LOGFILE,
   OUT_LOG
-} = require('../config/confLogs');
+} = require('../config/confSystem');
 
 const {
   URL_LOGS_ACCESS,

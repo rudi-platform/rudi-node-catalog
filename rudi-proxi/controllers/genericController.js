@@ -135,9 +135,9 @@ async function editObject(objectType, editedObjectData) {
       break
     case URL_OBJECT_ORGANIZATIONS:
     case URL_OBJECT_CONTACTS:
-      const {
-        Model, idField
-      } = this.getObjectAccesses(objectType)
+      /* beautify ignore:start */
+      const {Model, idField} = db.getObjectAccesses(objectType)
+      /* beautify ignore:start */
       dbReadyObject = await db.updateObject(Model, idField, editedObjectData)
       break
     default:
@@ -209,25 +209,25 @@ exports.addSingleObject = async (req, reply) => {
     let rudiObject = {...req.body}
     /* beautify ignore:end */
 
-    // retrieving the id
-    log.d(mod, fun, `objectType: '${objectType}', incomingData: '${json.beautify(rudiObject)}' `)
-    const rudiId = json.accessProperty(rudiObject, idField)
+      // retrieving the id
+      log.d(mod, fun, `objectType: '${objectType}', incomingData: '${json.beautify(rudiObject)}' `)
+      const rudiId = json.accessProperty(rudiObject, idField)
 
-    // First: we make sure object doesn't exist already
-    const existsObject = await db.doesObjectExistWithRudiId(Model, idField, rudiId)
-    if (existsObject) throw new Error(`${msg.objectAlreadyExists(objectType, rudiId)}`)
+      // First: we make sure object doesn't exist already
+      const existsObject = await db.doesObjectExistWithRudiId(Model, idField, rudiId)
+      if (existsObject) throw new Error(`${msg.objectAlreadyExists(objectType, rudiId)}`)
 
-    // Creating new object + specific treatments
-    const dbReadyObject = await newObject(objectType, rudiObject)
-    // const dbReadyObject = await new Model(rudiObject)
-    log.d(mod, fun, `created dbReadyObject: ${json.beautify(dbReadyObject)}`)
+      // Creating new object + specific treatments
+      const dbReadyObject = await newObject(objectType, rudiObject)
+      // const dbReadyObject = await new Model(rudiObject)
+      log.d(mod, fun, `created dbReadyObject: ${json.beautify(dbReadyObject)}`)
 
-    const dbActionResult = await dbReadyObject.save()
-    // log.d(mod, fun, `saved, dbActionResult: ${json.beautify(dbActionResult)}`)
+      const dbActionResult = await dbReadyObject.save()
+      // log.d(mod, fun, `saved, dbActionResult: ${json.beautify(dbActionResult)}`)
 
-    log.i(mod, fun, `${msg.objectAdded(objectType, rudiId)}`)
-    const refinedObject = await treatDbObject(objectType, dbReadyObject)
-    return refinedObject
+      log.i(mod, fun, `${msg.objectAdded(objectType, rudiId)}`)
+      const refinedObject = await treatDbObject(objectType, dbReadyObject)
+      return refinedObject
   } catch (err) {
     log.e(mod, fun, err)
     throw boom.boomify(err)
