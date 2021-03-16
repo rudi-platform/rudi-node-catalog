@@ -40,7 +40,10 @@ const Validation = require('../schemaValidators');
 //———————————————————————————————————————————————————————————————
 const GeoJSON = require('mongoose-geojson-schema');
 
-const {DOI, UUIDv4} = require('../schemas/Identifiers');
+const {
+  DOI,
+  UUIDv4
+} = require('../schemas/Identifiers');
 const DictionaryEntry = require('../schemas/DictionaryEntry');
 const SkosEntry = require('../schemas/SkosEntry');
 const AccessCondition = require('../schemas/AccessCondition');
@@ -326,6 +329,10 @@ const MetadataSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Contact',
     }]
+  },
+  // Time when this orgnization was published on RUDI portal
+  publishedAt: {
+    type: Date
   }
 }, {
   timestamps: true,
@@ -356,7 +363,7 @@ MetadataSchema.methods.toJSON = function () {
   delete metadata._id
   delete metadata.__v
   delete metadata.createdAt
-  delete metadata.updatedAt
+  // delete metadata.updatedAt
   return metadata
 };
 

@@ -17,6 +17,7 @@ const log = require('../utils/logging')
 const msg = require('../utils/msg')
 
 const json = require('../utils/jsonAccess')
+const smpl = require('../utils/jsShortcuts')
 
 //———————————————————————————————————————————————————————————————
 // Constants
@@ -26,6 +27,7 @@ const {
   URL_OBJECT_METADATA,
   URL_OBJECT_ORGANIZATIONS,
   URL_OBJECT_CONTACTS,
+  URL_ACTION_REPORT,
 } = require('../config/confApi')
 
 const {
@@ -49,9 +51,43 @@ const {
 //———————————————————————————————————————————————————————————————
 const Metadata = require('../definitions/models/Metadata')
 const Organization = require('../definitions/models/Organization')
-const Contact = require('../definitions/models/Contact')
+const Contact = require('../definitions/models/Contact');
+const Report = require('../definitions/models/Report');
+const {
+  OK
+} = require('../definitions/thesaurus/IntegrationStatus');
 
 
+
+exports.getObjectAccesses = (objectType) => {
+  const fun = 'getObjectAccesses'
+  // log.d(mod, fun, ``)
+
+  switch (objectType) {
+    case URL_OBJECT_METADATA:
+      return {
+        Model: Metadata, idField: API_METADATA_ID
+      }
+      break;
+    case URL_OBJECT_ORGANIZATIONS:
+      return {
+        Model: Organization, idField: API_ORGANIZATION_ID
+      }
+      break;
+    case URL_OBJECT_CONTACTS:
+      return {
+        Model: Contact, idField: API_CONTACT_ID
+      }
+      break;
+    case URL_ACTION_REPORT:
+      return {
+        Model: Report, idField: API_REPORT_ID
+      }
+      break;
+    default:
+      throw new Error(msg.objectTypeNotFound(objectType))
+  }
+}
 
 //———————————————————————————————————————————————————————————————
 // Actions on DB tables
@@ -165,6 +201,11 @@ exports.getEnsuredObjectWithJson = async (objectType, Model, idField, rudiObject
   const fun = `getEnsuredObjectWithJson`
   log.d(mod, fun, ``)
   try {
+    const {
+      Model,
+      idField
+    } = this.getObjectAccesses(objectType)
+
     const rudiId = json.accessProperty(rudiObject, idField)
     const dbObject = await this.getObjectWithRudiId(Model, idField, rudiId)
     if (!dbObject) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
@@ -339,6 +380,21 @@ function changeConditionsIntoRegex(conditions) {
   })
 
   return regexConditions
+}
+
+exports.setPublishedFlag = async (Model, idField, rudiId) => {
+  const fun = `setPublishedFlag`
+  log.d(mod, fun, `rudiId: ${rudiId}`)
+
+  /* beautify ignore:start */
+  const filter = {[idField]: rudiId}
+  const update = {'publishedAt': smpl.nowISO()}
+  const options = {new: true}
+  /* beautify ignore:end */
+
+  const updatedObject = await Model.findOneAndUpdate(filter, update, options)
+  log.d(mod, fun, `updatedObject: ${json.beautify(updatedObject)}`)
+  return updatedObject
 }
 
 //———————————————————————————————————————————————————————————————

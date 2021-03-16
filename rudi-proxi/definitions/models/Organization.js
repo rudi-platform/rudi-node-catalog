@@ -29,9 +29,16 @@ const OrganizationSchema = new mongoose.Schema({
   organization_address: {
     type: String,
     required: true
+  },
+
+  // Time when this organization was published on RUDI portal
+  publishedAt: {
+    type: Date
   }
 }, {
+  // Adds mongoose fields 'updatedAt' and 'createdAt'
   timestamps: true,
+
   // optimisticConcurrency: true,
   // strict: true,
   // runSettersOnQuery: true,
@@ -56,6 +63,7 @@ OrganizationSchema.methods.toJSON = function () {
   delete orga.__v
   delete orga.createdAt
   delete orga.updatedAt
+  delete orga.publishedAt
   return orga
 };
 //———————————————————————————————————————————————————————————————

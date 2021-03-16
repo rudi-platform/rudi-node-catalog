@@ -12,15 +12,12 @@ const Int32 = require('mongoose-int32');
 
 const ids = require('../schemas/Identifiers')
 const api = require('../../config/confApi')
+const IntegrationStatus = require('../thesaurus/IntegrationStatus')
 
 
 //———————————————————————————————————————————————————————————————
 // Constants
 //———————————————————————————————————————————————————————————————
-const IntegrationResults = {
-  OK: 'OK',
-  KO: 'KO'
-}
 
 const IntegrationError = new mongoose.Schema({
   error_code: {
@@ -87,7 +84,7 @@ const ReportSchema = new mongoose.Schema({
   // State of the integration of the resource in the Portal
   integration_status: {
     type: String,
-    enum: Object.values(IntegrationResults),
+    enum: Object.values(IntegrationStatus),
   },
 
   // Comment on the state of the integration of the resource in the

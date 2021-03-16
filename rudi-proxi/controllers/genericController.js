@@ -204,7 +204,7 @@ exports.addSingleObject = async (req, reply) => {
 
     /* beautify ignore:start */
     // identify object model
-    const {Model, idField} = this.getObjectAccesses(objectType)
+    const {Model, idField} = db.getObjectAccesses(objectType)
     // accessing the request body
     let rudiObject = {...req.body}
     /* beautify ignore:end */
@@ -247,7 +247,7 @@ exports.getSingleObject = async (req, reply) => {
 
     // identify object model
     /* beautify ignore:start */
-    const {Model, idField} = this.getObjectAccesses(objectType)
+    const {Model, idField} = db.getObjectAccesses(objectType)
     /* beautify ignore:end */
 
     // log.d(mod, fun, `objectType: '${objectType}', idFieldLabel: '${idFieldLabel}' `)
@@ -278,7 +278,7 @@ exports.getObjectList = async (req, reply) => {
 
     // identify object model
     /* beautify ignore:start */
-    const {Model, idField} = this.getObjectAccesses(objectType)
+    const {Model, idField} = db.getObjectAccesses(objectType)
     /* beautify ignore:end */
 
     // log.d(mod, fun, `objectType: '${objectType}', dbModel: ${dbModel}, idFieldLabel: '${idFieldLabel}' `)
@@ -311,7 +311,7 @@ exports.updateSingleObject = async (req, reply) => {
 
     /* beautify ignore:start */
     // identify object model
-    const {Model, idField} = this.getObjectAccesses(objectType)
+    const {Model, idField} = db.getObjectAccesses(objectType)
     // retrieve incoming data
     const {...incomingPartialRudiObject} = req.body
     /* beautify ignore:end */
@@ -344,7 +344,7 @@ exports.deleteSingleObject = async (req, reply) => {
 
     /* beautify ignore:start */
     // identify object model
-    const {Model, idField} = this.getObjectAccesses(objectType)
+    const {Model, idField} = db.getObjectAccesses(objectType)
     /* beautify ignore:end */
 
     // ensure the object exists
@@ -371,7 +371,7 @@ exports.deleteObjectList = async (req, reply) => {
 
     /* beautify ignore:start */
     // identify object model
-    const {Model, idField} = this.getObjectAccesses(objectType)
+    const {Model, idField} = db.getObjectAccesses(objectType)
     // retrieve incoming data
     const {...conditions} = req.body
     /* beautify ignore:end */
@@ -397,7 +397,7 @@ exports.deleteEveryObject = async (req, reply) => {
 
     /* beautify ignore:start */
     // identify object model
-    const {Model, idField} = this.getObjectAccesses(objectType)
+    const {Model, idField} = db.getObjectAccesses(objectType)
     /* beautify ignore:end */
 
     const object = await db.deleteAll(Model)

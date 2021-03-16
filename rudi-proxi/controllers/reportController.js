@@ -12,6 +12,9 @@ const mod = 'repCtrl'
 //———————————————————————————————————————————————————————————————
 const boom = require('@hapi/boom')
 
+//———————————————————————————————————————————————————————————————
+// Internal dependancies 
+//———————————————————————————————————————————————————————————————
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
 
@@ -19,6 +22,8 @@ const db = require('../db/dbQueries')
 const dbRwk = require('../db/dbReworkData')
 const json = require('../utils/jsonAccess')
 const lang = require('../utils/lang')
+
+const status = require('../definitions/thesaurus/IntegrationStatus')
 
 //———————————————————————————————————————————————————————————————
 // Constants
@@ -52,12 +57,6 @@ const Metadata = require('../definitions/models/Metadata');
 const Report = require('../definitions/models/Report');
 
 
-const {
-  getObjectAccesses
-} = require('./genericController');
-
-
-
 //———————————————————————————————————————————————————————————————
 // Controllers: integration report for any object 
 //———————————————————————————————————————————————————————————————
@@ -73,7 +72,7 @@ exports.addSingleReportForObject = async (req, reply) => {
 
     /* beautify ignore:start */
     // identify object model
-    const {Model, idField} = getObjectAccesses(objectType)
+    const {Model, idField} = db.getObjectAccesses(objectType)
     // accessing the request body
     let reportBody = {...req.body}
     /* beautify ignore:end */
@@ -89,8 +88,8 @@ exports.addSingleReportForObject = async (req, reply) => {
     if (urlObjectId != bodyObjectId) throw new Error(`${msg.parametersMismatch(urlObjectId, bodyObjectId)}`)
 
     // ensure object exists
-    const existsObject = await db.doesObjectExistWithRudiId(Model, idField, urlObjectId)
-    if (!existsObject) throw new Error(`${msg.objectNotFound(objectType, urlObjectId)}`)
+    const dbObject = await db.getObjectWithRudiId(Model, idField, urlObjectId)
+    if (!dbObject) throw new Error(`${msg.objectNotFound(objectType, urlObjectId)}`)
 
     // ensure report doesn't exist
     const existsReport = await db.doesObjectExistWithRudiId(Report, API_REPORT_ID, reportId)
@@ -100,6 +99,9 @@ exports.addSingleReportForObject = async (req, reply) => {
     const dbReadyReport = await new Report(reportBody)
     const dbActionResult = await dbReadyReport.save()
     log.i(mod, fun, `Report saved: ${json.beautify(dbReadyReport)}`)
+
+    db.setPublishedFlag(Model, idField, urlObjectId)
+
     return dbReadyReport
   } catch (err) {
     log.e(mod, fun, err)
@@ -118,7 +120,7 @@ exports.addOrEditSingleReportForObject = async (req, reply) => {
 
     /* beautify ignore:start */
     // identify object model
-    const {Model, idField} = getObjectAccesses(objectType)
+    const {Model, idField} = db.getObjectAccesses(objectType)
     // accessing the request body
     let reportBody = {...req.body}
     /* beautify ignore:end */
@@ -181,7 +183,7 @@ exports.getReportListForObject = async (req, reply) => {
 
     /* beautify ignore:start */
     // identify object model
-    const {Model, idField} = getObjectAccesses(objectType)
+    const {Model, idField} = db.getObjectAccesses(objectType)
     /* beautify ignore:end */
 
     // ensure object exists
@@ -212,7 +214,7 @@ exports.getSingleReportForObject = async (req, reply) => {
 
     /* beautify ignore:start */
     // identify object model
-    const {Model, idField} = getObjectAccesses(objectType)
+    const {Model, idField} = db.getObjectAccesses(objectType)
     /* beautify ignore:end */
 
     // ensure object exists

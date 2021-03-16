@@ -44,6 +44,11 @@ const ContactSchema = new mongoose.Schema({
       validator: Validation.isEmail,
       message: '{VALUE} is not a valid e-mail'
     }
+  },
+
+  // Time when this contact was published on RUDI portal
+  publishedAt: {
+    type: Date
   }
 }, {
   timestamps: true,
@@ -65,6 +70,7 @@ ContactSchema.methods.toJSON = function () {
   delete contact.__v
   delete contact.createdAt
   delete contact.updatedAt
+  delete contact.publishedAt
   return contact
 };
 
