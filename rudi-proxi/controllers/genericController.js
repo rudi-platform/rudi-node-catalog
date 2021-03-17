@@ -137,7 +137,7 @@ async function editObject(objectType, editedObjectData) {
     case URL_OBJECT_CONTACTS:
       /* beautify ignore:start */
       const {Model, idField} = db.getObjectAccesses(objectType)
-      /* beautify ignore:start */
+      /* beautify ignore:end */
       dbReadyObject = await db.updateObject(Model, idField, editedObjectData)
       break
     default:
@@ -146,7 +146,34 @@ async function editObject(objectType, editedObjectData) {
   return dbReadyObject
 }
 
-
+async function deleteObject(objectType, objectId) {
+  const fun = 'deleteObject'
+  log.d(mod, fun, `objectType: ${objectType}`)
+  /* beautify ignore:start */
+  const {Model, idField} = db.getObjectAccesses(objectType)
+  /* beautify ignore:end */
+  let actionResult
+  switch (objectType) {
+    case URL_OBJECT_METADATA:
+      actionResult = await db.deleteObject(Model, idField, objectId)
+      break
+    case URL_OBJECT_ORGANIZATIONS:
+      // ensure the organization is not in metadata.producer
+      // ensure the organization is not in metadata.metainfo.provider
+      // delete
+      return
+      break
+    case URL_OBJECT_CONTACTS:
+      // ensure the contact is not in metadata.contacts
+      // ensure the contact is not in metadata.metainfo.contacts
+      // delete
+      return
+      break
+    default:
+      throw new Error(msg.objectTypeNotFound(objectType))
+  }
+  return actionResult
+}
 //———————————————————————————————————————————————————————————————
 // Treatments of properties: DB -> RUDI
 //———————————————————————————————————————————————————————————————
@@ -209,25 +236,25 @@ exports.addSingleObject = async (req, reply) => {
     let rudiObject = {...req.body}
     /* beautify ignore:end */
 
-      // retrieving the id
-      log.d(mod, fun, `objectType: '${objectType}', incomingData: '${json.beautify(rudiObject)}' `)
-      const rudiId = json.accessProperty(rudiObject, idField)
+    // retrieving the id
+    log.d(mod, fun, `objectType: '${objectType}', incomingData: '${json.beautify(rudiObject)}' `)
+    const rudiId = json.accessProperty(rudiObject, idField)
 
-      // First: we make sure object doesn't exist already
-      const existsObject = await db.doesObjectExistWithRudiId(Model, idField, rudiId)
-      if (existsObject) throw new Error(`${msg.objectAlreadyExists(objectType, rudiId)}`)
+    // First: we make sure object doesn't exist already
+    const existsObject = await db.doesObjectExistWithRudiId(Model, idField, rudiId)
+    if (existsObject) throw new Error(`${msg.objectAlreadyExists(objectType, rudiId)}`)
 
-      // Creating new object + specific treatments
-      const dbReadyObject = await newObject(objectType, rudiObject)
-      // const dbReadyObject = await new Model(rudiObject)
-      log.d(mod, fun, `created dbReadyObject: ${json.beautify(dbReadyObject)}`)
+    // Creating new object + specific treatments
+    const dbReadyObject = await newObject(objectType, rudiObject)
+    // const dbReadyObject = await new Model(rudiObject)
+    log.d(mod, fun, `created dbReadyObject: ${json.beautify(dbReadyObject)}`)
 
-      const dbActionResult = await dbReadyObject.save()
-      // log.d(mod, fun, `saved, dbActionResult: ${json.beautify(dbActionResult)}`)
+    const dbActionResult = await dbReadyObject.save()
+    // log.d(mod, fun, `saved, dbActionResult: ${json.beautify(dbActionResult)}`)
 
-      log.i(mod, fun, `${msg.objectAdded(objectType, rudiId)}`)
-      const refinedObject = await treatDbObject(objectType, dbReadyObject)
-      return refinedObject
+    log.i(mod, fun, `${msg.objectAdded(objectType, rudiId)}`)
+    const refinedObject = await treatDbObject(objectType, dbReadyObject)
+    return refinedObject
   } catch (err) {
     log.e(mod, fun, err)
     throw boom.boomify(err)
@@ -350,7 +377,13 @@ exports.deleteSingleObject = async (req, reply) => {
     // ensure the object exists
     await db.getEnsuredObjectWithRudiId(objectType, Model, idField, objectId)
 
-    const deletedObject = db.deleteObject(Model, idField, objectId)
+    // const deletedObject = await deleteObject(objectType, Model, idField, objectId)
+/* 
+    const isOrgUsed = await db.isOrgUsedInMetadata(objectId)
+    log.d(mod, fun, `isOrgUsed: ${isOrgUsed}`)
+    return
+ */
+    const deletedObject = await db.deleteObject(Model, idField, objectId)
 
     return deletedObject
   } catch (err) {

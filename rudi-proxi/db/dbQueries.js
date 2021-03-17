@@ -43,7 +43,9 @@ const {
   API_REPORT_ID,
   API_RESOURCE_ID,
   API_DATA_PRODUCER_PROPERTY,
-  API_DATA_CONTACTS_PROPERTY
+  API_DATA_CONTACTS_PROPERTY,
+  API_METAINFO_PROPERTY,
+  API_METAINFO_PROVIDER_PROPERTY
 } = require('./dbFields')
 
 //———————————————————————————————————————————————————————————————
@@ -213,7 +215,6 @@ exports.getEnsuredObjectWithJson = async (objectType, Model, idField, rudiObject
     throw boom.boomify(err)
   }
 }
-
 
 exports.getObjectWithDbId = async (Model, dbId) => {
   const fun = `getObjectWithDbId`
@@ -457,7 +458,6 @@ exports.updateMetadata = async (jsonMetadata) => {
   return updatedMetadata
 }
 
-
 exports.deleteMetadata = async (metadataRudiId) => {
   const fun = `deleteOrganization`
   log.d(mod, fun, ``)
@@ -478,6 +478,7 @@ exports.deleteMetadata = async (metadataRudiId) => {
 
   return deletedOrganization
 }
+
 //---------------------------------------- 
 // - Organization
 //---------------------------------------- 
@@ -663,4 +664,31 @@ exports.deleteContact = async (contactRudiId) => {
   log.d(mod, fun, `${msg.contactDeleted(contactRudiId)}`)
 
   return deletedContact
+}
+
+
+//---------------------------------------- 
+// - Filters
+//---------------------------------------- 
+exports.isOrgUsedInMetadata = async (orgRudiId) => {
+  const fun = `getMetadataListWithOrg`
+  log.d(mod, fun, `orgRudiId: ${orgRudiId}`)
+  const org = await Organization.findOne({
+    [API_ORGANIZATION_ID]: orgRudiId
+  })
+  const orgDbId = org[DB_ID]
+  if (!orgDbId) return false
+  log.d(mod, fun, `orgDbId: ${orgDbId}`)
+  const dbObjectWithProducer = await Metadata.findOne({
+    [API_DATA_PRODUCER_PROPERTY]: orgDbId
+  })
+  log.d(mod, fun, `dbObjectWithProducer: ${json.beautify(dbObjectWithProducer)}`)
+
+  const testedField = `${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`
+  const dbObjectWithMetaInfoProvider = await Metadata.findOne({
+    testedField: orgDbId
+  })
+  log.d(mod, fun, `dbObjectWithMetaInfoProvider: ${json.beautify(dbObjectWithMetaInfoProvider)}`)
+
+  return (!!dbObjectWithProducer || !!dbObjectWithMetaInfoProvider)
 }
