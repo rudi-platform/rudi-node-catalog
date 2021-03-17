@@ -17,23 +17,19 @@ const sys = require('../config/confSystem')
 //———————————————————————————————————————————————————————————————
 // Constants
 //———————————————————————————————————————————————————————————————
-const LOG_PATH = `${sys.LOG_DIR}`
-console.log(`[confLogs] LOG_PATH: ${LOG_PATH}`)
-const OUT_LOG = `${sys.LOG_DIR}/${sys.OUT_LOGFILE}`
-
 const errorLogsFileName = 'error.log'
 
 const logsTimestamp = 'YYYY/MM/DD HH:mm:ss'
 const fileTimestamp = 'YYYY-MM-DD-HH'
-const fileDatestamp = 'YYYY-MM-DD'
+const fileDatestamp = 'YYYY-MM-DD' 
 
 //———————————————————————————————————————————————————————————————
 // Creating local log dir
 //———————————————————————————————————————————————————————————————
 try {
   // first check if directory already exists
-  if (!fs.existsSync(LOG_PATH)) {
-    fs.mkdirSync(LOG_PATH);
+  if (!fs.existsSync(sys.LOG_DIR)) {
+    fs.mkdirSync(sys.LOG_DIR);
     console.log("Log directory has been created.");
   } else {
     console.log("Log directory exists.");
@@ -68,7 +64,7 @@ winston.addColors({
 
 const formatConsoleLogs =
   winston.format.combine(
-    winston.format.json(),
+    winston.format.json(), 
     winston.format.colorize({
       all: true
     }),
@@ -104,7 +100,7 @@ exports.logger = winston.createLogger({
     // - Write all logs with logger level to a dated file
     new winston.transports.DailyRotateFile({
       name: 'datedLogs',
-      filename: `${LOG_PATH}/${sys.APP_NAME}-%DATE%.log`,
+      filename: `${sys.LOG_DIR}/${sys.APP_NAME}-%DATE%.log`,
       datePattern: `${fileTimestamp}`,
       zippedArchive: true,
       maxSize: '20m',
@@ -114,14 +110,14 @@ exports.logger = winston.createLogger({
     // - Write all logs with level `error` and below to `error.log`
     new winston.transports.File({
       name: 'errorLogs',
-      filename: `${LOG_PATH}/${errorLogsFileName}`,
+      filename: `${sys.LOG_DIR}/${errorLogsFileName}`,
       level: 'error',
       format: formatFileLogs
     }),
     // - Write all logs with level `info` and below to `combined.log`
     new winston.transports.File({
       name: 'outlogs',
-      filename: `./${OUT_LOG}`,
+      filename: `${sys.LOG_DIR}/${sys.LOG_FILE}`,
       level: 'debug',
       maxSize: '1m',
       format: formatFileLogs

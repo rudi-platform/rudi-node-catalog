@@ -104,7 +104,7 @@ function getProducer() {
 
 test('no spread provider', () => {
   expect(getProducer()._id)
-    .toEqual("602cda86700a260c91d52a06")
+    .toEqual("u602cda86700a260c91d52a06")
 })
 
 function getSpreadProducer() {

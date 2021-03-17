@@ -47,6 +47,12 @@ exports.publicRoutes = [
   // Generic routes for accessing any object
   // ('Metadata', 'Organizations' and 'Contacts')
   //———————————————————————————————————————————————————————————————
+  // Delete many
+  {
+    method: 'POST',
+    url: `${URL_OBJECT}/${URL_ACTION_DELETION}`,
+    handler: genericController.deleteObjectList
+  },
   // Add 1
   {
     method: 'POST',
@@ -85,16 +91,16 @@ exports.publicRoutes = [
     url: URL_OBJECT,
     handler: genericController.deleteEveryObject
   },
-  // Delete many
-  {
-    method: 'POST',
-    url: `${URL_OBJECT}/${URL_ACTION_DELETION}`,
-    handler: genericController.deleteObjectList
-  },
 
   //———————————————————————————————————————————————————————————————
   // Integration reports for one particular object
   //———————————————————————————————————————————————————————————————
+  // Delete many reports for one object integration
+  {
+    method: 'POST',
+    url: `${URL_OBJECT}/:${PARAM_ID}/${URL_ACTION_REPORT}/${URL_ACTION_DELETION}`,
+    handler: reportController.deleteManyReportForObject
+  },
   // Add 1 report for one object integration
   {
     method: 'POST',
@@ -131,12 +137,7 @@ exports.publicRoutes = [
     url: `${URL_OBJECT}/:${PARAM_ID}/${URL_ACTION_REPORT}`,
     handler: reportController.deleteEveryReportForObject
   },
-  // Delete many reports for one object integration
-  {
-    method: 'POST',
-    url: `${URL_OBJECT}/:${PARAM_ID}/${URL_ACTION_REPORT}/${URL_ACTION_DELETION}`,
-    handler: reportController.deleteManyReportForObject
-  },
+
   //———————————————————————————————————————————————————————————————
   // Integration reports for one object type
   //———————————————————————————————————————————————————————————————
@@ -146,7 +147,6 @@ exports.publicRoutes = [
     url: `${URL_OBJECT}/${URL_ACTION_REPORT}`,
     handler: reportController.getReportListForObjectType
   },
-
 ]
 
 exports.backOfficeRoutes = [
