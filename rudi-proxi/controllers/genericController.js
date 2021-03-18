@@ -300,6 +300,8 @@ exports.getObjectList = async (req, reply) => {
   const fun = 'getObjectList'
   log.d(mod, fun, `< GET ${URL_OBJECT}`)
   try {
+
+
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
 
@@ -378,11 +380,11 @@ exports.deleteSingleObject = async (req, reply) => {
     await db.getEnsuredObjectWithRudiId(objectType, Model, idField, objectId)
 
     // const deletedObject = await deleteObject(objectType, Model, idField, objectId)
-/* 
-    const isOrgUsed = await db.isOrgUsedInMetadata(objectId)
-    log.d(mod, fun, `isOrgUsed: ${isOrgUsed}`)
-    return
- */
+    /* 
+        const isOrgUsed = await db.isOrgUsedInMetadata(objectId)
+        log.d(mod, fun, `isOrgUsed: ${isOrgUsed}`)
+        return
+     */
     const deletedObject = await db.deleteObject(Model, idField, objectId)
 
     return deletedObject
