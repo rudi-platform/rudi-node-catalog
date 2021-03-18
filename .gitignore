@@ -8,3 +8,4 @@
 **/*.zip
 **/*.gz
 **/rudi_proxi.ini
+**/logs

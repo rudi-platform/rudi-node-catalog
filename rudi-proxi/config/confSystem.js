@@ -41,21 +41,17 @@ let DEFAULT_CONF = {}
 // Node.js server
 DEFAULT_CONF[serverSection] = {}
 DEFAULT_CONF[serverSection][_serverPort] = 3000
-
 // DB
 DEFAULT_CONF[dbSection] = {}
 DEFAULT_CONF[dbSection][_dbUrl] = 'mongodb://127.0.0.1/'
 DEFAULT_CONF[dbSection][_dbName] = 'rudi_prod'
 DEFAULT_CONF[dbSection][_dbPort] = 27017
-
 // Logs
 DEFAULT_CONF[logSection] = {}
 DEFAULT_CONF[logSection][_appName] = 'rudiProxi'
 
 DEFAULT_CONF[logSection][_logDir] = 'logs'
-DEFAULT_CONF[logSection][_logFileName] = 'log_file'
-
-const DEFAULT_OUT_LOGFILE = `${DEFAULT_CONF[logSection][_appName]}.log`
+DEFAULT_CONF[logSection][_logFileName] = 'rudiProxi.log'
 
 
 //———————————————————————————————————————————————————————————————
@@ -115,7 +111,6 @@ exports.LISTENING_PORT = getValue(conf, DEFAULT_CONF, serverSection, _serverPort
 
 // DB
 exports.DB_NAME = getValue(conf, DEFAULT_CONF, dbSection, _dbName)
-exports.DB_PORT = getValue(conf, DEFAULT_CONF, dbSection, _dbPort)
 const DB_URL_PREFIX = getValue(conf, DEFAULT_CONF, dbSection, _dbUrl)
 exports.DB_URL = `${ DB_URL_PREFIX }${ this.DB_NAME }`
 
@@ -124,13 +119,11 @@ exports.APP_NAME = getValue(conf, DEFAULT_CONF, logSection, _appName)
 exports.LOG_DIR = getValue(conf, DEFAULT_CONF, logSection, _logDir)
 exports.LOG_FILE = getValue(conf, DEFAULT_CONF, logSection, _logFileName)
 exports.OUT_LOG = `${this.LOG_DIR}/${this.LOG_FILE}`
-
+ 
 const fun = '[export]'
 
 console.log(mod, fun, `APP_NAME: ${this.APP_NAME}`)
 console.log(mod, fun, `LISTENING_PORT: ${this.LISTENING_PORT}`)
-console.log(mod, fun, `LOG_DIR: ${this.LOG_DIR}`)
-console.log(mod, fun, `LOG_FILE: ${this.LOG_FILE}`)
+console.log(mod, fun, `OUT_LOG: ${this.OUT_LOG}`)
 console.log(mod, fun, `DB_NAME: ${this.DB_NAME}`)
-console.log(mod, fun, `DB_PORT: ${this.DB_PORT}`)
-console.log(mod, fun, `DB_URL: ${this.DB_URL}`)
+console.log(mod, fun, `DB_URL: ${this.DB_URL}`) 
