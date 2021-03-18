@@ -53,6 +53,7 @@ const sysController = require('../controllers/sysController');
 //———————————————————————————————————————————————————————————————
 exports.inspectRequest = async (req, reply) => {
   const fun = 'inspectRequest'
+  return
   log.d(mod, fun, `method: ${json.beautify(req.method)}`)
   log.d(mod, fun, `url: ${json.beautify(req.url)}`)
   log.d(mod, fun, `routerMethod: ${json.beautify(req.routerMethod)}`)

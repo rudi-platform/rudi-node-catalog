@@ -155,10 +155,10 @@ async function isDeletionPermitted(objectType, Model, idField, objectId) {
       return true
       break
     case URL_OBJECT_ORGANIZATIONS:
-      return !db.isOrgUsedInMetadata(objectId)
+      return !await db.isOrgUsedInMetadata(objectId)
       break
     case URL_OBJECT_CONTACTS:
-      return !db.isContactUsedInMetadata(objectId)
+      return !await db.isContactUsedInMetadata(objectId)
       // ensure the contact is not in metadata.contacts
       // ensure the contact is not in metadata.metainfo.contacts
       // delete

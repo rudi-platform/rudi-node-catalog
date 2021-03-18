@@ -682,12 +682,13 @@ exports.isOrgUsedInMetadata = async (orgRudiId) => {
   const orgDbId = org[DB_ID]
   if (!orgDbId) return false
   log.d(mod, fun, `orgDbId: ${orgDbId}`)
+  let testedField = `${API_DATA_PRODUCER_PROPERTY}`
   const dbObjectWithProducer = await Metadata.findOne({
-    [API_DATA_PRODUCER_PROPERTY]: orgDbId
+    testedField: orgDbId
   })
   log.d(mod, fun, `dbObjectWithProducer: ${json.beautify(dbObjectWithProducer)}`)
 
-  const testedField = `${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`
+  testedField = `${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`
   const dbObjectWithMetaInfoProvider = await Metadata.findOne({
     testedField: orgDbId
   })
