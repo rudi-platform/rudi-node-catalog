@@ -62,7 +62,7 @@ exports.deepClone = (jsonObject) => {
     return JSON.parse(JSON.stringify(jsonObject));
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 

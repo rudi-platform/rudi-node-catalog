@@ -35,7 +35,7 @@ exports.missingRequestParameter = (req, param) => {
     }
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -157,6 +157,21 @@ exports.objectAdded = (objectType, id) => {
     case 'fr-FR':
     case 'fr-BE':
       return `Objet de type '${objectType}' créé avec l'identifiant : ${id} `;
+    default:
+      return `${DEFAULT_MSG}: ${getLanguage()}`;
+  }
+}
+
+exports.objectNotDeletedBecauseUsed = (objectType, id) => {
+  switch (getLanguage()) {
+    case 'en':
+    case 'en-GB':
+    case 'en-US':
+      return `The object of type '${objectType}' couldn't be deleted. The following id was found in other documents: ${id} `;
+    case 'fr':
+    case 'fr-FR':
+    case 'fr-BE':
+      return `L'objet de type '${objectType}' n'a pas pu être supprimé. L'identifiant suivant a été trouvé dans d'autres documents : ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }

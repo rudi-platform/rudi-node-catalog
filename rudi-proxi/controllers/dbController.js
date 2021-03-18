@@ -52,7 +52,7 @@ exports.getCollections = async (req, reply) => {
 
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 exports.dropDB = async (req, reply) => {
@@ -65,6 +65,6 @@ exports.dropDB = async (req, reply) => {
 
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }

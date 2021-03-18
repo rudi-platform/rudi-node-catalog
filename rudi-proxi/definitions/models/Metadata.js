@@ -402,7 +402,7 @@ function getOrganization(organizationDbId) {
 
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -430,7 +430,7 @@ async function setOrganization(organizationRudiJson) {
     return existingOrganization
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -462,7 +462,7 @@ function getContact(contactDbId) {
 
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -494,7 +494,7 @@ function setContact(contactRudiJson) {
     return existingContact
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 

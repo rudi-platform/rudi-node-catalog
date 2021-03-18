@@ -42,7 +42,7 @@ exports.addThesaurus = async (req, reply) => {
     return newThesaurus.save()
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -56,7 +56,7 @@ exports.getEveryThesaurus = async (req, reply) => {
     return thesaurus
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -76,7 +76,7 @@ exports.getSingleThesaurus = async (req, reply) => {
     return thesaurus
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -101,13 +101,13 @@ exports.updateThesaurus = async (req, reply) => {
     if (null == thesaurus) {
       const errMsg = `couldn't find thesaurus with id ${id}`
       err = new Error(errMsg)
-      throw boom.boomify(err)
+      throw err
     }
     log.d(mod, fun, `updated thesaurus with id ${id}`)
     return thesaurus
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -127,7 +127,7 @@ exports.deleteThesaurus = async (req, reply) => {
     return thesaurus
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 
 }
@@ -146,7 +146,7 @@ exports.deleteManyThesaurus = async (req, reply) => {
     return thesaurus
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 
 }

@@ -61,7 +61,7 @@ exports.unmongoosify = (dbObject) => {
     return cleanObject
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 

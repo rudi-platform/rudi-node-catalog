@@ -105,7 +105,7 @@ exports.addSingleReportForObject = async (req, reply) => {
     return dbReadyReport
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -164,7 +164,7 @@ exports.addOrEditSingleReportForObject = async (req, reply) => {
 
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -197,7 +197,7 @@ exports.getReportListForObject = async (req, reply) => {
     return dbReportList
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -231,7 +231,7 @@ exports.getSingleReportForObject = async (req, reply) => {
     return dbReport
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -252,7 +252,7 @@ exports.deleteSingleReportForObject = async (req, reply) => {
 
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -271,7 +271,7 @@ exports.deleteEveryReportForObject = async (req, reply) => {
 
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -290,7 +290,7 @@ exports.deleteManyReportForObject = async (req, reply) => {
 
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -305,6 +305,6 @@ exports.getReportListForObjectType = async (req, reply) => {
 
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }

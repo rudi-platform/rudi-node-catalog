@@ -45,7 +45,7 @@ exports.getAppId = () => {
     return hashId
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -64,7 +64,7 @@ exports.getNodeVersion = () => {
     return nVersions
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -83,6 +83,6 @@ exports.getLogs = () => {
     return logs
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }

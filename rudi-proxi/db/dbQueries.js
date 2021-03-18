@@ -105,7 +105,7 @@ exports.getCollections = async () => {
     return collections
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -118,7 +118,7 @@ exports.dropDB = async () => {
     return dbActionResult
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 //———————————————————————————————————————————————————————————————
@@ -139,7 +139,7 @@ exports.getEnsuredDbIdWithRudiId = async (objectType, Model, idField, rudiId) =>
     return dbId
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -154,7 +154,7 @@ exports.getEnsuredDbIdWithJson = async (objectType, Model, idField, rudiObject) 
     return await this.getEnsuredDbIdWithRudiId(objectType, Model, idField, rudiId)
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -171,7 +171,7 @@ exports.getObjectWithRudiId = async (Model, idField, rudiId) => {
     return dbObject
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -195,7 +195,7 @@ exports.getObjectWithJson = async (Model, idField, rudiObject) => {
     return dbObject
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -212,7 +212,7 @@ exports.getEnsuredObjectWithJson = async (objectType, Model, idField, rudiObject
     return dbObject
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -226,7 +226,7 @@ exports.getObjectWithDbId = async (Model, dbId) => {
     return dbObject
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -239,7 +239,7 @@ exports.getEnsuredObjectWithDbId = async (objectType, Model, dbId) => {
     return dbObject
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -251,7 +251,7 @@ exports.doesObjectExistWithRudiId = async (Model, idField, rudiId) => {
     return (!!dbObject)
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -263,7 +263,7 @@ exports.doesObjectExistWithJson = async (Model, idField, rudiObject) => {
     return (!!dbObject)
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -278,7 +278,7 @@ exports.getObjectList = async (Model, limit, offset) => {
     return objectList
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -293,7 +293,7 @@ exports.getObjectListFiltered = async (Model, filter, limit, offset) => {
     return objectList
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -313,7 +313,7 @@ exports.updateObject = async (Model, idField, jsonUpdateData) => {
     return updatedObject
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
   log.d(mod, fun, `updatedObject: ${json.beautify(updatedObject)}`)
   return updatedObject
@@ -333,7 +333,7 @@ exports.deleteObject = async (Model, idField, id) => {
     return deletionInfo
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
   return fullInfo
 }
@@ -347,7 +347,7 @@ exports.deleteAll = async (Model) => {
     return deletionInfo
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -364,7 +364,7 @@ exports.deleteMany = async (Model, conditions) => {
     return deletionInfo
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -670,8 +670,11 @@ exports.deleteContact = async (contactRudiId) => {
 //---------------------------------------- 
 // - Filters
 //---------------------------------------- 
+
+// ensure the organization is not in metadata.producer
+// ensure the organization is not in metadata.metainfo.provider
 exports.isOrgUsedInMetadata = async (orgRudiId) => {
-  const fun = `getMetadataListWithOrg`
+  const fun = `isOrgUsedInMetadata`
   log.d(mod, fun, `orgRudiId: ${orgRudiId}`)
   const org = await Organization.findOne({
     [API_ORGANIZATION_ID]: orgRudiId
@@ -690,5 +693,16 @@ exports.isOrgUsedInMetadata = async (orgRudiId) => {
   })
   log.d(mod, fun, `dbObjectWithMetaInfoProvider: ${json.beautify(dbObjectWithMetaInfoProvider)}`)
 
+  return true
+
   return (!!dbObjectWithProducer || !!dbObjectWithMetaInfoProvider)
+}
+
+// ensure the contact is not in metadata.contacts
+// ensure the contact is not in metadata.metainfo.contacts
+exports.isContactUsedInMetadata = async (contactRudiId) => {
+  const fun = `isContactUsedInMetadata`
+  log.d(mod, fun, `contactRudiId: ${contactRudiId}`)
+  
+  return true
 }

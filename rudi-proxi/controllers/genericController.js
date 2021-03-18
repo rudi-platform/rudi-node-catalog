@@ -146,24 +146,19 @@ async function editObject(objectType, editedObjectData) {
   return dbReadyObject
 }
 
-async function deleteObject(objectType, objectId) {
-  const fun = 'deleteObject'
+async function isDeletionPermitted(objectType, Model, idField, objectId) {
+  const fun = 'isDeletionPermitted'
   log.d(mod, fun, `objectType: ${objectType}`)
-  /* beautify ignore:start */
-  const {Model, idField} = db.getObjectAccesses(objectType)
-  /* beautify ignore:end */
-  let actionResult
+
   switch (objectType) {
     case URL_OBJECT_METADATA:
-      actionResult = await db.deleteObject(Model, idField, objectId)
+      return true
       break
     case URL_OBJECT_ORGANIZATIONS:
-      // ensure the organization is not in metadata.producer
-      // ensure the organization is not in metadata.metainfo.provider
-      // delete
-      return
+      return !db.isOrgUsedInMetadata(objectId)
       break
     case URL_OBJECT_CONTACTS:
+      return !db.isContactUsedInMetadata(objectId)
       // ensure the contact is not in metadata.contacts
       // ensure the contact is not in metadata.metainfo.contacts
       // delete
@@ -385,6 +380,8 @@ exports.deleteSingleObject = async (req, reply) => {
         log.d(mod, fun, `isOrgUsed: ${isOrgUsed}`)
         return
      */
+    const deletionOK = await isDeletionPermitted(objectType, Model, idField, objectId)
+    if (!deletionOK) throw new Error(msg.objectNotDeletedBecauseUsed(objectType, objectId))
     const deletedObject = await db.deleteObject(Model, idField, objectId)
 
     return deletedObject

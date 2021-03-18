@@ -130,7 +130,7 @@ exports.setEditDateInRudiObject = async (rudiMetadata, editDate) => {
     return rudiMetadata
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
@@ -148,7 +148,7 @@ exports.getDbCreateDateWithRudiId = async (rudiId) => {
     return rudiMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_CREATED_PROPERTY]
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 //———————————————————————————————————————————————————————————————
@@ -253,7 +253,7 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict) => {
     return dbReadyMetadata
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw err
   }
 }
 
