@@ -9,26 +9,14 @@ const fs = require('fs')
 const ini = require('ini');
 
 //———————————————————————————————————————————————————————————————
-// Default configuration
-//———————————————————————————————————————————————————————————————
-
-// DB
-const DEFAULT_DB_NAME = 'rudi_prod'
-const DEFAULT_DB_PORT = 27017
-const DEFAULT_DB_URL = 'mongodb://127.0.0.1/'
-
-// Logs
-const DEFAULT_APP_NAME = 'rudiProxi'
-
-const DEFAULT_LOG_DIR = 'logs'
-const DEFAULT_LOG_PATH = `./${DEFAULT_LOG_DIR}`
-const DEFAULT_OUT_LOGFILE = `${DEFAULT_APP_NAME}.log`
-
-
-//———————————————————————————————————————————————————————————————
-// Local configuration file settings
+// Local ini file configuration settings
 //———————————————————————————————————————————————————————————————
 const confFileName = 'rudi_proxi.ini'
+
+// Node Server section
+const serverSection = 'server'
+
+const _serverPort = 'listening_port'
 
 // DB section
 const dbSection = 'database'
@@ -41,10 +29,35 @@ const _dbPort = 'db_port'
 const logSection = 'logging'
 
 const _appName = 'app_name'
-
-const _logFileName = 'log_file'
 const _logDir = 'log_dir'
+const _logFileName = 'log_file'
 
+
+//———————————————————————————————————————————————————————————————
+// Default configuration
+//———————————————————————————————————————————————————————————————
+let DEFAULT_CONF = {}
+
+// Node.js server
+DEFAULT_CONF[serverSection] = {}
+DEFAULT_CONF[serverSection][_serverPort] = 3000
+
+// DB
+DEFAULT_CONF[dbSection] = {}
+DEFAULT_CONF[dbSection][_dbUrl] = 'mongodb://127.0.0.1/'
+DEFAULT_CONF[dbSection][_dbName] = 'rudi_prod'
+DEFAULT_CONF[dbSection][_dbPort] = 27017
+
+// Logs
+DEFAULT_CONF[logSection] = {}
+DEFAULT_CONF[logSection][_appName] = 'rudiProxi'
+
+DEFAULT_CONF[logSection][_logDir] = 'logs'
+DEFAULT_CONF[logSection][_logFileName] = 'log_file'
+
+const DEFAULT_OUT_LOGFILE = `${DEFAULT_CONF[logSection][_appName]}.log`
+
+ 
 //———————————————————————————————————————————————————————————————
 // Local configuration file extraction
 //———————————————————————————————————————————————————————————————
@@ -84,27 +97,35 @@ function quietAccess(obj, prop, alt) {
   }
 }
 
+function getValue(localConf, defaultConf, section, field) {
+  const localSection = quietAccess(localConf, section, {})
+  return quietAccess(localSection, field, defaultConf[section][field])
+}
+
 //———————————————————————————————————————————————————————————————
 // Exporting sys configuration
 //———————————————————————————————————————————————————————————————
 var conf = this.readIniFile()
 
+// SERVER
+exports.LISTENING_PORT = getValue(conf, DEFAULT_CONF, serverSection, _serverPort)
+
 // DB
-const dbSec = quietAccess(conf, dbSection, {})
-exports.DB_NAME = dbSec[_dbName] || DEFAULT_DB_NAME
-exports.DB_PORT = dbSec[_dbPort] || DEFAULT_DB_PORT
-exports.DB_URL = `${ dbSec[_dbUrl] || DEFAULT_DB_URL }${this.DB_NAME}`
+exports.DB_NAME = getValue(conf, DEFAULT_CONF, dbSection, _dbName)
+exports.DB_PORT = getValue(conf, DEFAULT_CONF, dbSection, _dbPort)
+const DB_URL_PREFIX = getValue(conf, DEFAULT_CONF, dbSection, _dbUrl)
+exports.DB_URL = `${ DB_URL_PREFIX }${ this.DB_NAME }`
 
 // Logs
-const loggingSec = quietAccess(conf, logSection, {})
-exports.APP_NAME = loggingSec[_appName] || DEFAULT_APP_NAME
-exports.LOG_DIR = loggingSec[_logDir] || DEFAULT_LOG_DIR
-exports.LOG_FILE = loggingSec[_logFileName] || DEFAULT_OUT_LOGFILE
+exports.APP_NAME = getValue(conf, DEFAULT_CONF, logSection, _appName)
+exports.LOG_DIR = getValue(conf, DEFAULT_CONF, logSection, _logDir)
+exports.LOG_FILE = getValue(conf, DEFAULT_CONF, logSection, _logFileName)
 exports.OUT_LOG = `${this.LOG_DIR}/${this.LOG_FILE}`
 
 const fun = '[export]'
 
 console.log(mod, fun, `APP_NAME: ${this.APP_NAME}`)
+console.log(mod, fun, `LISTENING_PORT: ${this.LISTENING_PORT}`)
 console.log(mod, fun, `LOG_DIR: ${this.LOG_DIR}`)
 console.log(mod, fun, `LOG_FILE: ${this.LOG_FILE}`)
 console.log(mod, fun, `DB_NAME: ${this.DB_NAME}`)

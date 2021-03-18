@@ -109,7 +109,7 @@ backOfficeRoutes.forEach((boRoute, index) => {
 //———————————————————————————————————————————————————————————————
 const start = async () => {
   try {
-    await fastify.listen(3000, '0.0.0.0')
+    await fastify.listen(sys.LISTENING_PORT, '0.0.0.0')
     fastify.swagger()
     // fastify.log.info(`Listening on ${fastify.server.address().address}:${fastify.server.address().port}`)
   } catch (err) {
