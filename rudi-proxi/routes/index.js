@@ -5,7 +5,6 @@ const mod = 'routes'
 //———————————————————————————————————————————————————————————————
 // External dependencies
 //———————————————————————————————————————————————————————————————
-var util = require('util');
 
 //———————————————————————————————————————————————————————————————
 // Internal dependencies
@@ -67,7 +66,7 @@ exports.inspectRequest = async (req, reply) => {
   log.d(mod, fun, `ips: ${json.beautify(req.ips)}`)
   log.d(mod, fun, `hostname: ${json.beautify(req.hostname)}`)
   log.d(mod, fun, `protocol: ${json.beautify(req.protocol)}`)
-  log.d(mod, fun, `raw: ${util.inspect(req.req)}`)
+  // log.d(mod, fun, `raw: ${json.beautify(req.req)}`)
   // log.d(mod, fun, `socket: ${util.inspect(req.socket)}`)
 }
 //———————————————————————————————————————————————————————————————

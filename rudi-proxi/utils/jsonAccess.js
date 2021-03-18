@@ -4,6 +4,10 @@ const mod = 'json'
 // External dependancies 
 //———————————————————————————————————————————————————————————————
 const boom = require('@hapi/boom')
+const util = require('util')
+//———————————————————————————————————————————————————————————————
+// Internal dependancies 
+//———————————————————————————————————————————————————————————————
 const log = require('./logging')
 const msg = require('./msg')
 
@@ -71,5 +75,10 @@ exports.deepClone = (jsonObject) => {
  * @returns {String} JSON.stringify options
  */
 exports.beautify = (jsonObject, option) => {
+  try{
   return `${JSON.stringify(jsonObject, null, option)}${option!=null?'\n':''}`
+  } catch (err) {
+    return `${util.inspect(jsonObject)}`
+
+  }
 }

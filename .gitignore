@@ -7,6 +7,6 @@
 **/javascript.test.js
 **/*.zip
 **/*.gz
-**/rudi_proxi.ini
+**/rudi_proxi_custom.ini
 **/logs
 todo
