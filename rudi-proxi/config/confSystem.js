@@ -57,7 +57,7 @@ DEFAULT_CONF[logSection][_logFileName] = 'log_file'
 
 const DEFAULT_OUT_LOGFILE = `${DEFAULT_CONF[logSection][_appName]}.log`
 
- 
+
 //———————————————————————————————————————————————————————————————
 // Local configuration file extraction
 //———————————————————————————————————————————————————————————————
@@ -98,10 +98,13 @@ function quietAccess(obj, prop, alt) {
 }
 
 function getValue(localConf, defaultConf, section, field) {
+  const fun = '[getValue]'
   const localSection = quietAccess(localConf, section, {})
-  return quietAccess(localSection, field, defaultConf[section][field])
+  const confValue = quietAccess(localSection, field, {})
+  // console.log(mod, fun, confValue)
+  return confValue || defaultConf[section][field]
 }
-
+ 
 //———————————————————————————————————————————————————————————————
 // Exporting sys configuration
 //———————————————————————————————————————————————————————————————
