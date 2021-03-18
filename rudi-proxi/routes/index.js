@@ -3,6 +3,11 @@
 const mod = 'routes'
 
 //———————————————————————————————————————————————————————————————
+// External dependencies
+//———————————————————————————————————————————————————————————————
+var util = require('util');
+
+//———————————————————————————————————————————————————————————————
 // Internal dependencies
 //———————————————————————————————————————————————————————————————
 const log = require('../utils/logging')
@@ -57,13 +62,13 @@ exports.inspectRequest = async (req, reply) => {
   log.d(mod, fun, `body: ${json.beautify(req.body)}`)
   log.d(mod, fun, `query: ${json.beautify(req.query)}`)
   log.d(mod, fun, `headers: ${json.beautify(req.headers)}`)
-  // log.d(mod, fun, `raw: ${json.beautify(req.raw)}`)
   log.d(mod, fun, `id: ${json.beautify(req.id)}`)
   log.d(mod, fun, `ip: ${json.beautify(req.ip)}`)
   log.d(mod, fun, `ips: ${json.beautify(req.ips)}`)
   log.d(mod, fun, `hostname: ${json.beautify(req.hostname)}`)
   log.d(mod, fun, `protocol: ${json.beautify(req.protocol)}`)
-  // log.d(mod, fun, `socket: ${json.beautify(req.socket)}`)
+  log.d(mod, fun, `raw: ${util.inspect(req.req)}`)
+  // log.d(mod, fun, `socket: ${util.inspect(req.socket)}`)
 }
 //———————————————————————————————————————————————————————————————
 // Public routes
