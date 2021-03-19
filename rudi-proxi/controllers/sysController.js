@@ -11,24 +11,21 @@ const mod = 'sysCtrl'
 //———————————————————————————————————————————————————————————————
 const boom = require('@hapi/boom')
 const fs = require('fs');
-const pr = require('child_process')
+const prcs = require('child_process')
 
 //———————————————————————————————————————————————————————————————
 // Internal dependancies 
 //———————————————————————————————————————————————————————————————
+const sys = require('../config/confSystem');
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
-
-const sys = require('../config/confSystem');
+const json = require('../utils/jsonAccess');
 
 const {
   URL_LOGS_ACCESS,
   URL_APP_ID_ACCESS,
   URL_NODE_VERSION_ACCESS
 } = require('../config/confApi');
-const {
-  beautify
-} = require('../utils/jsonAccess');
 
 //———————————————————————————————————————————————————————————————
 // App ID
@@ -51,13 +48,13 @@ exports.getNodeVersion = () => {
   const fun = 'getNodeVersion'
   try {
     log.d(mod, fun, ` GET ${URL_NODE_VERSION_ACCESS}`)
-    const nodeVersion = pr.execSync('node -v')
-    const npmVersion = pr.execSync('npm -v')
+    const nodeVersion = prcs.execSync('node -v')
+    const npmVersion = prcs.execSync('npm -v')
     const nVersions = {
       'node version': `${nodeVersion}`.trim(),
       'npm version': `${npmVersion}`.trim()
     }
-    log.d(mod, fun, `${beautify(nVersions)}`)
+    log.d(mod, fun, `${json.beautify(nVersions)}`)
 
     return nVersions
   } catch (err) {

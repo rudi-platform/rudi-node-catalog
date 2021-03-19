@@ -53,7 +53,7 @@ DEFAULT_CONF[DB_SECTION][_dbPort] = 27017
 // Logs
 DEFAULT_CONF[LOG_SECTION] = {}
 DEFAULT_CONF[LOG_SECTION][_appName] = 'rudiProxi'
-DEFAULT_CONF[LOG_SECTION][_logDir] = 'logs'
+DEFAULT_CONF[LOG_SECTION][_logDir] = './logs'
 DEFAULT_CONF[LOG_SECTION][_logFileName] = 'rudiProxi.log'
 
 

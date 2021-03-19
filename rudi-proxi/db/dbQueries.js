@@ -692,7 +692,7 @@ exports.isOrgUsedInMetadata = async (dbOrg) => {
 
   // checking if the organization is referenced by a metadata in field API_METAINFO_PROPERTY.API_METAINFO_PROVIDER_PROPERTY
   const metaInfoOrgQuery = {}
-  metaInfoOrgQuery[`${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`] = orgDbId
+  metaInfoOrgQuery[`${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}.${API_ORGANIZATION_ID}`] = dbOrg[API_ORGANIZATION_ID]
   log.d(mod, fun, `metaInfoOrgQuery: ${json.beautify(metaInfoOrgQuery)}`)
 
   const metadataWithMetaInfoProvider = await Metadata.findOne({'medatata_info.metadata_provider': '60547051d24d67640aafd581'})
