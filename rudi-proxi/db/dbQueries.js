@@ -45,7 +45,8 @@ const {
   API_DATA_PRODUCER_PROPERTY,
   API_DATA_CONTACTS_PROPERTY,
   API_METAINFO_PROPERTY,
-  API_METAINFO_PROVIDER_PROPERTY
+  API_METAINFO_PROVIDER_PROPERTY,
+  API_METAINFO_CONTACTS_PROPERTY
 } = require('./dbFields')
 
 //———————————————————————————————————————————————————————————————
@@ -673,37 +674,67 @@ exports.deleteContact = async (contactRudiId) => {
 
 // ensure the organization is not in metadata.producer
 // ensure the organization is not in metadata.metainfo.provider
-exports.isOrgUsedInMetadata = async (orgRudiId) => {
+exports.isOrgUsedInMetadata = async (dbOrg) => {
   const fun = `isOrgUsedInMetadata`
-  log.d(mod, fun, `orgRudiId: ${orgRudiId}`)
-  const org = await Organization.findOne({
-    [API_ORGANIZATION_ID]: orgRudiId
-  })
-  const orgDbId = org[DB_ID]
-  if (!orgDbId) return false
+  log.d(mod, fun, `dbOrg: ${json.beautify(dbOrg)}`)
+
+  // retrieving the DB id for the organization
+  const orgDbId = dbOrg[DB_ID]
   log.d(mod, fun, `orgDbId: ${orgDbId}`)
-  let testedField = `${API_DATA_PRODUCER_PROPERTY}`
-  const dbObjectWithProducer = await Metadata.findOne({
-    testedField: orgDbId
-  })
-  log.d(mod, fun, `dbObjectWithProducer: ${json.beautify(dbObjectWithProducer)}`)
 
-  testedField = `${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`
-  const dbObjectWithMetaInfoProvider = await Metadata.findOne({
-    testedField: orgDbId
+  // checking if the organization is referenced by a metadata in field API_DATA_PRODUCER_PROPERTY
+  const metadataWithProducer = await Metadata.findOne({
+    [API_DATA_PRODUCER_PROPERTY]: orgDbId
   })
-  log.d(mod, fun, `dbObjectWithMetaInfoProvider: ${json.beautify(dbObjectWithMetaInfoProvider)}`)
 
+  log.d(mod, fun, `metadataWithProducer: ${json.beautify(metadataWithProducer)}`)
+  if (null != metadataWithProducer) return true
+
+  // checking if the organization is referenced by a metadata in field API_METAINFO_PROPERTY.API_METAINFO_PROVIDER_PROPERTY
+  const metaInfoOrgQuery = {}
+  metaInfoOrgQuery[`${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`] = orgDbId
+  log.d(mod, fun, `metaInfoOrgQuery: ${json.beautify(metaInfoOrgQuery)}`)
+
+  const metadataWithMetaInfoProvider = await Metadata.findOne({'medatata_info.metadata_provider': '60547051d24d67640aafd581'})
+  log.d(mod, fun, `metadataWithMetaInfoProvider: ${json.beautify(metadataWithMetaInfoProvider)}`)
+  // return (null != metadataWithMetaInfoProvider)
+  if (null != metadataWithMetaInfoProvider) return true
   return true
-
-  return (!!dbObjectWithProducer || !!dbObjectWithMetaInfoProvider)
 }
+
+
+// what? filtering nested array
+// how-> https://www.devsbedevin.net/mongodb-find-findone-with-nested-array-filtering-finally/
 
 // ensure the contact is not in metadata.contacts
 // ensure the contact is not in metadata.metainfo.contacts
-exports.isContactUsedInMetadata = async (contactRudiId) => {
+exports.isContactUsedInMetadata = async (dbContact) => {
   const fun = `isContactUsedInMetadata`
+  log.d(mod, fun, `dbContact: ${json.beautify(dbContact)}`)
+
+  // retrieving the DB id for the organization
+  const contactDbId = dbContact[DB_ID]
+  log.d(mod, fun, `contactDbId: ${contactDbId}`)
+
+  const contactRudiId = dbContact[API_CONTACT_ID]
   log.d(mod, fun, `contactRudiId: ${contactRudiId}`)
-  
+
+  // checking if the contact is referenced by a metadata in field API_DATA_CONTACTS_PROPERTY
+  const contactsQuery = {}
+  contactsQuery[`${API_DATA_CONTACTS_PROPERTY}.${DB_ID}`] = contactDbId
+  log.d(mod, fun, `contactsQuery: ${json.beautify(contactsQuery)}`)
+
+  const metadataWithContact = await Metadata.findOne(contactsQuery)
+  log.d(mod, fun, `metadataWithContact: ${json.beautify(metadataWithContact)}`)
+  if (null != metadataWithContact) return true
+
+  // checking if the contact is referenced by a metadata in field API_METAINFO_PROPERTY.API_METAINFO_CONTACTS_PROPERTY
+  const metaInfoContactsProperty = `${API_METAINFO_PROPERTY}.${API_METAINFO_CONTACTS_PROPERTY}`
+  const metadataWithMetaInfoContact = await Metadata.findOne({
+    [metaInfoContactsProperty]: contactDbId
+  })
+  log.d(mod, fun, `dbObjectWithMetaInfoContact: ${json.beautify(metadataWithMetaInfoContact)}`)
+  if (null != metadataWithMetaInfoContact) return true
+
   return true
 }

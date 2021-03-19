@@ -146,7 +146,7 @@ async function editObject(objectType, editedObjectData) {
   return dbReadyObject
 }
 
-async function isDeletionPermitted(objectType, Model, idField, objectId) {
+async function isDeletionPermitted(objectType, Model, objectToDelete) {
   const fun = 'isDeletionPermitted'
   log.d(mod, fun, `objectType: ${objectType}`)
 
@@ -155,14 +155,10 @@ async function isDeletionPermitted(objectType, Model, idField, objectId) {
       return true
       break
     case URL_OBJECT_ORGANIZATIONS:
-      return !await db.isOrgUsedInMetadata(objectId)
+      return !await db.isOrgUsedInMetadata(objectToDelete)
       break
     case URL_OBJECT_CONTACTS:
-      return !await db.isContactUsedInMetadata(objectId)
-      // ensure the contact is not in metadata.contacts
-      // ensure the contact is not in metadata.metainfo.contacts
-      // delete
-      return
+      return !await db.isContactUsedInMetadata(objectToDelete)
       break
     default:
       throw new Error(msg.objectTypeNotFound(objectType))
@@ -364,7 +360,7 @@ exports.deleteSingleObject = async (req, reply) => {
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
-    const objectId = json.accessReqParam(req, PARAM_ID)
+    const objectRudiId = json.accessReqParam(req, PARAM_ID)
 
     /* beautify ignore:start */
     // identify object model
@@ -372,7 +368,7 @@ exports.deleteSingleObject = async (req, reply) => {
     /* beautify ignore:end */
 
     // ensure the object exists
-    await db.getEnsuredObjectWithRudiId(objectType, Model, idField, objectId)
+    const objectToDelete = await db.getEnsuredObjectWithRudiId(objectType, Model, idField, objectRudiId)
 
     // const deletedObject = await deleteObject(objectType, Model, idField, objectId)
     /* 
@@ -380,9 +376,9 @@ exports.deleteSingleObject = async (req, reply) => {
         log.d(mod, fun, `isOrgUsed: ${isOrgUsed}`)
         return
      */
-    const deletionOK = await isDeletionPermitted(objectType, Model, idField, objectId)
-    if (!deletionOK) throw new Error(msg.objectNotDeletedBecauseUsed(objectType, objectId))
-    const deletedObject = await db.deleteObject(Model, idField, objectId)
+    const deletionOK = await isDeletionPermitted(objectType, Model, objectToDelete)
+    if (!deletionOK) throw new Error(msg.objectNotDeletedBecauseUsed(objectType, objectRudiId))
+    const deletedObject = await db.deleteObject(Model, idField, objectRudiId)
 
     return deletedObject
   } catch (err) {

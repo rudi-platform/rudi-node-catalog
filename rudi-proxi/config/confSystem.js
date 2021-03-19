@@ -3,57 +3,21 @@
 const mod = '[sysConf]'
 
 //———————————————————————————————————————————————————————————————
-// External dependecies
+// Internal dependecies
 //———————————————————————————————————————————————————————————————
-const fs = require('fs')
-const ini = require('ini');
+const fa = require('../utils/fileActions')
 
-//———————————————————————————————————————————————————————————————
-// Helper functions
-//———————————————————————————————————————————————————————————————
-
-// Local configuration file extraction
-exports.readIniFile = (confFile) => {
-  const fun = '[readIniFile]'
-  try {
-    const fileContent = fs.readFileSync(`./${confFile}`, 'utf-8')
-    console.log(mod, fun, `Conf file found at ./${confFile}`)
-    const conf = ini.parse(fileContent)
-    return conf
-  } catch (err) {
-    console.error(mod, fun, `${err}`)
-  }
-}
-
-// Accessing properties without raising errors
-function quietAccess(obj, prop, alt) {
-  try {
-    return obj[prop] 
-  } catch {
-    return {}
-  }
-}
-
-// Getting user conf file value
-// if null, local conf file value
-// if null , default value
-function getValue(section, field) {
-  const fun = '[getVal]'
-  const userSection = quietAccess(USER_CONF, section)
-  const userValue = quietAccess(userSection, field)
-
-  const localSection = quietAccess(LOCAL_CONF, section)
-  const localValue = quietAccess(localSection, field)
-
-  // console.log(mod, fun, confValue)
-  return userValue || localValue || DEFAULT_CONF[section][field]
-}
 
 //———————————————————————————————————————————————————————————————
-// Local ini file configuration settings
+// Constants: local ini file configuration settings
 //———————————————————————————————————————————————————————————————
+
+// Conf files name
+// - user conf
 const userConfFile = 'rudi_proxi_custom.ini'
+// - default conf
 const defConfFile = 'rudi_proxi_default.ini'
+
 // Node Server section
 const SERVER_SECTION = 'server'
 const _serverAddress = 'listening_address'
@@ -74,7 +38,7 @@ const _logDir = 'log_dir'
 const _logFileName = 'log_file'
 
 //———————————————————————————————————————————————————————————————
-// Default configuration
+// Constants: default configuration
 //———————————————————————————————————————————————————————————————
 var DEFAULT_CONF = {}
 // Node.js server
@@ -92,17 +56,54 @@ DEFAULT_CONF[LOG_SECTION][_appName] = 'rudiProxi'
 DEFAULT_CONF[LOG_SECTION][_logDir] = 'logs'
 DEFAULT_CONF[LOG_SECTION][_logFileName] = 'rudiProxi.log'
 
+
+//———————————————————————————————————————————————————————————————
+// Constants: user and local configuration
+//———————————————————————————————————————————————————————————————
+// Getting user conf file value
+// if null, local conf file value
+// if null , default value
+const USER_CONF = fa.readIniFile(userConfFile)
+const LOCAL_CONF = fa.readIniFile(defConfFile)
+
+
+//———————————————————————————————————————————————————————————————
+// Helper functions
+//———————————————————————————————————————————————————————————————
+// Accessing properties without raising errors
+function quietAccess(obj, prop, alt) {
+  try {
+    return obj[prop]
+  } catch {
+    return {}
+  }
+}
+
+// Get values from global constants
+// -> gets user conf file value
+//    if null get local conf file value
+//    if null get default value
+function getValue(section, field) {
+  const fun = '[getVal]'
+  const userSection = quietAccess(USER_CONF, section)
+  const userValue = quietAccess(userSection, field)
+
+  const localSection = quietAccess(LOCAL_CONF, section)
+  const localValue = quietAccess(localSection, field)
+
+  // console.log(mod, fun, confValue)
+  return userValue || localValue || DEFAULT_CONF[section][field]
+}
+
 //———————————————————————————————————————————————————————————————
 // Extracting and exporting sys configuration
 //———————————————————————————————————————————————————————————————
-const USER_CONF = this.readIniFile(userConfFile)
-const LOCAL_CONF = this.readIniFile(defConfFile)
 
-// SERVER
+// Server
 exports.LISTENING_ADDR = getValue(SERVER_SECTION, _serverAddress)
 exports.LISTENING_PORT = getValue(SERVER_SECTION, _serverPort)
-
-// DB
+ 
+// DB 
 exports.DB_NAME = getValue(DB_SECTION, _dbName)
 const DB_URL_PREFIX = getValue(DB_SECTION, _dbUrl)
 exports.DB_URL = `${ DB_URL_PREFIX }${ this.DB_NAME }`

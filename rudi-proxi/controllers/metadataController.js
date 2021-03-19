@@ -395,8 +395,10 @@ exports.updateMetadata = async (editedRudiMetadata) => {
   log.d(mod, fun, `DB ready object: ${json.beautify(dbReadyEditedMetadata)}`)
 
   const completeRudiMetadata = await this.dbToRudiFormat(dbReadyEditedMetadata)
-
-  log.d(mod, fun, `returned object: ${completeRudiMetadata}`)
+  const dbUpdatedMetadata = Metadata.update(completeRudiMetadata)
+  dbUpdatedMetadata.save()
+  
+  log.d(mod, fun, `returned object: ${json.beautify(completeRudiMetadata)}`)
 
   return completeRudiMetadata
 }
