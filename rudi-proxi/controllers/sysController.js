@@ -11,17 +11,15 @@ const mod = 'sysCtrl'
 //———————————————————————————————————————————————————————————————
 const boom = require('@hapi/boom')
 const fs = require('fs');
-const pr = require('child_process')
+const prcs = require('child_process')
 
 //———————————————————————————————————————————————————————————————
 // Internal dependancies 
 //———————————————————————————————————————————————————————————————
+const sys = require('../config/confSystem');
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
 
-const {
-  OUT_LOG
-} = require('../config/confSystem');
 
 const {
   URL_LOGS_ACCESS,
@@ -53,8 +51,8 @@ exports.getNodeVersion = () => {
   const fun = 'getNodeVersion'
   try {
     log.d(mod, fun, ` GET ${URL_NODE_VERSION_ACCESS}`)
-    const nodeVersion = pr.execSync('node -v')
-    const npmVersion = pr.execSync('npm -v')
+    const nodeVersion = prcs.execSync('node -v')
+    const npmVersion = prcs.execSync('npm -v')
     const nVersions = {
       'node version': `${nodeVersion}`.trim(),
       'npm version': `${npmVersion}`.trim()
@@ -78,7 +76,7 @@ exports.getLogs = () => {
     log.d(mod, fun, `GET ${URL_LOGS_ACCESS}`)
 
     /* beautify ignore:start */
-    const logs = fs.readFileSync(`./${OUT_LOG}`, {encoding: 'utf8', flag: 'r'});
+    const logs = fs.readFileSync(`${sys.OUT_LOG}`, {encoding: 'utf8', flag: 'r'});
     /* beautify ignore:end */
     return logs
   } catch (err) {

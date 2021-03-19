@@ -151,6 +151,36 @@ exports.getDbCreateDateWithRudiId = async (rudiId) => {
     throw err
   }
 }
+
+exports.preserveDates = async (modifiedMetadata, origDataDates, origMetaDates) => {
+  const fun = 'preserveDates'
+  log.d(mod, fun, ``)
+
+}
+
+// Parameter 'dbMetadata' gets mutated!
+function metadataMerge(dbMetadata, dbReadyModMetadata) {
+  const fun = 'customMerger'
+  log.d(mod, fun, `dbMetadata: ${json.beautify(dbMetadata)}`)
+
+  let dataDates = json.deepClone(dbMetadata[API_DATA_DATES_PROPERTY])
+  let metaDates = json.deepClone(dbMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY])
+  log.d(mod, fun, `original data dates: ${json.beautify(dataDates)}`)
+  log.d(mod, fun, `original meta dates: ${json.beautify(metaDates)}`)
+  const modDataDates = dbReadyModMetadata[API_DATA_DATES_PROPERTY]
+  const modMetaDates = (!dbReadyModMetadata[API_METAINFO_PROPERTY]?{}:dbReadyModMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY])
+
+  _.extend(dataDates, modDataDates)
+  _.extend(metaDates, modMetaDates)
+  log.d(mod, fun, `modified data dates: ${json.beautify(dataDates)}`)
+  log.d(mod, fun, `modified meta dates: ${json.beautify(metaDates)}`)
+
+  _.merge(dbMetadata, dbReadyModMetadata )
+
+  dbMetadata[API_DATA_DATES_PROPERTY] = dataDates
+  dbMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY] = metaDates
+  
+}
 //———————————————————————————————————————————————————————————————
 // Atomic treatments of properties: DB -> RUDI
 //———————————————————————————————————————————————————————————————
@@ -192,13 +222,22 @@ exports.contactListDbToRudiFormat = async (contactsDbIds) => {
 /** 
  * Format a RUDI Metadata document (JSON):
  * @param rudiMetadata: the RUDI Metadata JSON object
- * @param shouldBeStrict: if required fields presence should be ensured (e.g. yes for creation, no for update)
+ * @param shouldBeStrict: if required fields presence should be ensured (e.g. true for creation, false for update)
+ * @param shouldBeStrict: if original metadata should be cloned (== no more a db object)
  */
-exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict) => {
+exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
   const fun = 'rudiToDbFormat'
   log.d(mod, fun, ``)
 
-  let dbReadyMetadata = json.deepClone(rudiMetadata)
+  if (!rudiMetadata) throw new Error(msg.parameterExpected(fun, 'rudiMetadata'))
+
+  // let dbReadyMetadata = json.deepClone(rudiMetadata)
+  let dbReadyMetadata
+  if (shouldClone) {
+    dbReadyMetadata = json.deepClone(rudiMetadata)
+  } else {
+    dbReadyMetadata = rudiMetadata
+  }
 
   try {
     //----- Updating producer field with db instead of incoming data
@@ -341,26 +380,35 @@ exports.newMetadata = async (rudiMetadata) => {
   return dbReadyMetadata
 }
 
-exports.updateMetadata = async (editedRudiMetadata) => {
+// parameter incomingRudiMetadata can be partial metadata
+exports.updateMetadata = async (incomingRudiMetadata) => {
   const fun = 'editMetadata'
   log.d(mod, fun, ``)
 
-  if (null == editedRudiMetadata) throw new Error(`${msg.parameterExpected(fun, 'editedRudiMetadata')}`)
-  log.d(mod, fun, `edited metadata: ${json.beautify(editedRudiMetadata)}\n`)
+  if (null == incomingRudiMetadata) throw new Error(`${msg.parameterExpected(fun, 'incomingRudiMetadata')}`)
+  log.d(mod, fun, `edited metadata: ${json.beautify(incomingRudiMetadata)}\n`)
 
-  // ensure the object exists
-  const rudiId = json.accessProperty(editedRudiMetadata, API_METADATA_ID)
-  let existingDbMetadata = await db.getEnsuredMetadataWithRudiId(rudiId)
-  log.v(mod, fun, `corresponding db object: ${json.beautify(existingDbMetadata)}\n`)
+  // ensure the metadata already exist
+  const rudiId = json.accessProperty(incomingRudiMetadata, API_METADATA_ID)
+  let dbMetadata = await db.getEnsuredMetadataWithRudiId(rudiId)
+  log.v(mod, fun, `corresponding db object: ${json.beautify(dbMetadata)}\n`)
 
-  let dbReadyEditedMetadata = await this.rudiToDbFormat(editedRudiMetadata, true)
+  let dbReadyEditedMetadata = await this.rudiToDbFormat(incomingRudiMetadata)
   log.v(mod, fun, `dbReadyEditedMetadata: ${json.beautify(dbReadyEditedMetadata)}\n`)
 
-  // Updating 'dataset_dates' field with changed ones while keeping other dates
-  const existingDataDates = existingDbMetadata[API_DATA_DATES_PROPERTY]
-  log.d(mod, fun, `existingDataDates: ${json.beautify(existingDataDates)}`)
+  // Backing up existing dates ('dataset_dates' and 'metadata_info.meadatada_dates' properties)
+  
+  metadataMerge(dbMetadata, dbReadyEditedMetadata)
 
-  const updatedDataDates = editedRudiMetadata[API_DATA_DATES_PROPERTY]
+  log.d(mod, fun, `modified metadata: ${json.beautify(dbMetadata)}`)
+
+  dbMetadata.save()
+
+  return this.dbToRudiFormat(dbMetadata)
+  /* 
+
+  // Updating 'dataset_dates' field with changed ones while keeping other dates
+  const updatedDataDates = dbReadyEditedMetadata[API_DATA_DATES_PROPERTY]
   log.d(mod, fun, `updatedDataDates: ${json.beautify(updatedDataDates)}`)
 
   if (!updatedDataDates) {
@@ -377,7 +425,7 @@ exports.updateMetadata = async (editedRudiMetadata) => {
   // Special : 
   // - 'metadata_info.reference_dates.created' must not be updated!
   // - 'metadata_info.reference_dates.updated' must be updated!
-  const existingMetaDates = existingDbMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY]
+  const existingMetaDates = dbMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY]
   const existingMetaCreateDate = existingMetaDates[API_DATES_CREATED_PROPERTY]
   const updatedMetaDates = dbReadyEditedMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY]
 
@@ -388,17 +436,15 @@ exports.updateMetadata = async (editedRudiMetadata) => {
     metaDates[dateField] = refDate
   }
   dbReadyEditedMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY] = metaDates
-
   // - 'metadata_info.reference_dates.updated' must be updated!
   this.setEditDateInRudiObject(dbReadyEditedMetadata) // metainfo 'updated' is updated to now
 
   log.d(mod, fun, `DB ready object: ${json.beautify(dbReadyEditedMetadata)}`)
 
   const completeRudiMetadata = await this.dbToRudiFormat(dbReadyEditedMetadata)
-  const dbUpdatedMetadata = Metadata.update(completeRudiMetadata)
-  dbUpdatedMetadata.save()
-  
   log.d(mod, fun, `returned object: ${json.beautify(completeRudiMetadata)}`)
 
   return completeRudiMetadata
+   */
+
 }

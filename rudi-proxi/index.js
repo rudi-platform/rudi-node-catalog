@@ -113,7 +113,8 @@ const start = async () => {
     fastify.swagger()
     // fastify.log.info(`Listening on ${fastify.server.address().address}:${fastify.server.address().port}`)
   } catch (err) {
-    fastify.log.error(err)
+    // fastify.log.error(err)
+    log.e(err)
     process.exit(1)
   }
 }
