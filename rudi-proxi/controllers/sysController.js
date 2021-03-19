@@ -19,9 +19,7 @@ const pr = require('child_process')
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
 
-const {
-  OUT_LOG
-} = require('../config/confSystem');
+const sys = require('../config/confSystem');
 
 const {
   URL_LOGS_ACCESS,
@@ -78,7 +76,7 @@ exports.getLogs = () => {
     log.d(mod, fun, `GET ${URL_LOGS_ACCESS}`)
 
     /* beautify ignore:start */
-    const logs = fs.readFileSync(`./${OUT_LOG}`, {encoding: 'utf8', flag: 'r'});
+    const logs = fs.readFileSync(`${sys.OUT_LOG}`, {encoding: 'utf8', flag: 'r'});
     /* beautify ignore:end */
     return logs
   } catch (err) {
