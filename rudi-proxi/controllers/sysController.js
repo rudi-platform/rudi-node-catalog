@@ -78,6 +78,6 @@ exports.getLogs = () => {
     return logs
   } catch (err) {
     log.e(mod, fun, err)
-    throw err
+    throw err 
   }
 }
