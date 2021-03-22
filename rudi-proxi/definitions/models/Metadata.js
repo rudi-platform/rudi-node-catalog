@@ -130,7 +130,7 @@ const MetadataSchema = new mongoose.Schema({
   },
 
   // Short description for the whole dataset
-  abstract: {
+  synopsis: {
     type: [DictionaryEntry],
     required: true,
   },
@@ -140,7 +140,7 @@ const MetadataSchema = new mongoose.Schema({
     type: [DictionaryEntry],
     required: true
   },
-
+ 
   //---------------------------
   // Dataset classification
   //---------------------------
@@ -374,129 +374,6 @@ MetadataSchema.virtual('metadata_dates.created').get(function () {
 MetadataSchema.virtual('metadata_dates.updated').get(function () {
   return this.updatedAt;
 });
-
-
-//----- Get/set organization
-function getOrganization(organizationDbId) {
-  const fun = 'getOrganization'
-  log.d(mod, fun, `orgRudiId: ${organizationDbId}`)
-  if (null == organizationDbId) return
-  try {
-    // const rudiOrganization = await db.getEnsuredOrganizationWithDbId(organizationDbId)
-    const existingOrganization = Organization.findOne({
-      [DB_ID]: organizationDbId
-    }, function (err, dbOrganization) {
-      if (err) {
-        const errMsg = `${msg.organizationNotFound(organizationDbId)}`
-        log.e(mod, fun, errMsg)
-        throw new Error(errMsg)
-      } else {
-        log.d(mod, fun, `dbOrganization: ${json.beautify(dbOrganization)}`)
-        return dbOrganization
-      }
-    })
-
-    log.d(mod, fun, `existingOrganization: ${json.beautif(existingOrganization)}`)
-
-    return existingOrganization
-
-  } catch (err) {
-    log.e(mod, fun, err)
-    throw err
-  }
-}
-
-async function setOrganization(organizationRudiJson) {
-
-  const fun = 'setOrganization'
-  log.d(mod, fun, `organizationRudiJson: ${json.beautify(organizationRudiJson)}`)
-  if (null == organizationRudiJson) return
-  try {
-    const organizationRudiId = json.accessProperty(organizationRudiJson, API_ORGANIZATION_ID)
-    const existingOrganization = await Organization.findOne({
-      [API_ORGANIZATION_ID]: organizationRudiId
-    })
-    if (null == existingOrganization) {
-      const errMsg = `${msg.organizationNotFound(organizationRudiId)}`
-      log.e(mod, fun, errMsg)
-      throw new Error(errMsg)
-    } else {
-      log.d(mod, fun, `dbOrganization: ${json.beautify(existingOrganization)}`)
-      return existingOrganization
-    }
-
-    // await db.getEnsuredOrganizationWithRudiId(organizationRudiId)
-    log.d(mod, fun, `existingOrganization: ${json.beautify(existingOrganization)}`)
-    return existingOrganization
-  } catch (err) {
-    log.e(mod, fun, err)
-    throw err
-  }
-}
-
-//----- Get/set contact
-function getContact(contactDbId) {
-  const fun = 'getContact'
-  log.d(mod, fun, `contactDbId: ${contactDbId}`)
-  if (null == contactDbId) return
-  try {
-    // const rudiContact = await db.getEnsuredContactWithDbId(contactDbId)
-    // log.d(mod, fun, `rudiContact: ${rudiContact}`)
-    // return rudiContact
-    const existingContact = Contact.findOne({
-      [DB_ID]: contactDbId
-    }, null, null, function (err, rudiContact) {
-      if (err) {
-        const errMsg = `${msg.contactNotFound(contactDbId)}`
-        log.e(mod, fun, errMsg)
-        throw new Error(errMsg)
-      } else {
-        log.d(mod, fun, `rudiContact: ${json.beautify(rudiContact)}`)
-        return rudiContact
-      }
-    })
-
-    log.d(mod, fun, `existingContact: ${json.beautify(existingContact)}`)
-
-    return existingContact
-
-  } catch (err) {
-    log.e(mod, fun, err)
-    throw err
-  }
-}
-
-function setContact(contactRudiJson) {
-  const fun = 'setContact'
-  log.d(mod, fun, `contactRudiJson: ${json.beautify(contactRudiJson)}`)
-  if (null == contactRudiJson) return
-  try {
-    /* 
-        const contactRudiId = json.accessProperty(contactRudiJson, API_CONTACT_ID)
-        const dbReadyContact = await db.getEnsuredContactWithRudiId(contactRudiId)
-        log.d(mod, fun, `dbReadyContact: ${dbReadyContact}`)
-        return dbReadyContact
-     */
-    const contactRudiId = json.accessProperty(contactRudiJson, API_CONTACT_ID)
-    const existingContact = Contact.findOne({
-      [API_CONTACT_ID]: contactRudiId
-    }, function (err, dbContact) {
-      if (err) {
-        const errMsg = `${msg.contactNotFound(contactRudiId)}`
-        log.e(mod, fun, errMsg)
-        throw new Error(errMsg)
-      } else {
-        log.d(mod, fun, `dbContact: ${json.beautify(dbContact)}`)
-        return dbContact
-      }
-    })
-    log.d(mod, fun, `existingContact: ${json.beautify(existingContact)}`)
-    return existingContact
-  } catch (err) {
-    log.e(mod, fun, err)
-    throw err
-  }
-}
 
 
 //———————————————————————————————————————————————————————————————
