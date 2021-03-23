@@ -357,8 +357,8 @@ exports.deleteMany = async (Model, conditions) => {
   // log.d(mod, fun, `conditions: ${conditions}`)
 
   // TODO: to be consolidated!
-  if (typeof (conditions) == 'string')
-    conditions = changeConditionsIntoRegex(conditions)
+  // if (typeof (conditions) == 'string')
+  conditions = changeConditionsIntoRegex(conditions)
 
   try {
     let deletionInfo = await Model.deleteMany(conditions)
@@ -683,23 +683,23 @@ exports.isOrgUsedInMetadata = async (dbOrg) => {
   log.d(mod, fun, `orgDbId: ${orgDbId}`)
 
   // checking if the organization is referenced by a metadata in field API_DATA_PRODUCER_PROPERTY
-  const metadataWithProducer = await Metadata.findOne({
-    [API_DATA_PRODUCER_PROPERTY]: orgDbId
-  })
+  const orgQuery = {}
+  orgQuery[`${API_DATA_PRODUCER_PROPERTY}`] = mongoose.Types.ObjectId(orgDbId)
+  // log.d(mod, fun, `orgQuery: ${json.beautify(orgQuery)}`)
+  const metadataWithProducer = await Metadata.findOne(orgQuery)
 
   log.d(mod, fun, `metadataWithProducer: ${json.beautify(metadataWithProducer)}`)
   if (null != metadataWithProducer) return true
 
   // checking if the organization is referenced by a metadata in field API_METAINFO_PROPERTY.API_METAINFO_PROVIDER_PROPERTY
   const metaInfoOrgQuery = {}
-  metaInfoOrgQuery[`${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}.${API_ORGANIZATION_ID}`] = dbOrg[API_ORGANIZATION_ID]
-  log.d(mod, fun, `metaInfoOrgQuery: ${json.beautify(metaInfoOrgQuery)}`)
+  metaInfoOrgQuery[`${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`] = mongoose.Types.ObjectId(orgDbId)
+  // log.d(mod, fun, `metaInfoOrgQuery: ${json.beautify(metaInfoOrgQuery)}`)
 
-  const metadataWithMetaInfoProvider = await Metadata.findOne({'medatata_info.metadata_provider': '60547051d24d67640aafd581'})
+  const metadataWithMetaInfoProvider = await Metadata.findOne(metaInfoOrgQuery)
   log.d(mod, fun, `metadataWithMetaInfoProvider: ${json.beautify(metadataWithMetaInfoProvider)}`)
   // return (null != metadataWithMetaInfoProvider)
-  if (null != metadataWithMetaInfoProvider) return true
-  return true
+  return (null != metadataWithMetaInfoProvider)
 }
 
 
@@ -716,12 +716,9 @@ exports.isContactUsedInMetadata = async (dbContact) => {
   const contactDbId = dbContact[DB_ID]
   log.d(mod, fun, `contactDbId: ${contactDbId}`)
 
-  const contactRudiId = dbContact[API_CONTACT_ID]
-  log.d(mod, fun, `contactRudiId: ${contactRudiId}`)
-
   // checking if the contact is referenced by a metadata in field API_DATA_CONTACTS_PROPERTY
   const contactsQuery = {}
-  contactsQuery[`${API_DATA_CONTACTS_PROPERTY}.${DB_ID}`] = contactDbId
+  contactsQuery[`${API_DATA_CONTACTS_PROPERTY}`] = mongoose.Types.ObjectId(contactDbId)
   log.d(mod, fun, `contactsQuery: ${json.beautify(contactsQuery)}`)
 
   const metadataWithContact = await Metadata.findOne(contactsQuery)
@@ -729,12 +726,11 @@ exports.isContactUsedInMetadata = async (dbContact) => {
   if (null != metadataWithContact) return true
 
   // checking if the contact is referenced by a metadata in field API_METAINFO_PROPERTY.API_METAINFO_CONTACTS_PROPERTY
-  const metaInfoContactsProperty = `${API_METAINFO_PROPERTY}.${API_METAINFO_CONTACTS_PROPERTY}`
-  const metadataWithMetaInfoContact = await Metadata.findOne({
-    [metaInfoContactsProperty]: contactDbId
-  })
-  log.d(mod, fun, `dbObjectWithMetaInfoContact: ${json.beautify(metadataWithMetaInfoContact)}`)
-  if (null != metadataWithMetaInfoContact) return true
+  const metaInfoContactsQuery = {}
+  metaInfoContactsQuery[`${API_METAINFO_PROPERTY}.${API_METAINFO_CONTACTS_PROPERTY}`] = mongoose.Types.ObjectId(contactDbId)
+  // log.d(mod, fun, `metaInfoContactsQuery: ${json.beautify(metaInfoContactsQuery)}`)
 
-  return true
+  const metadataWithMetaInfoContact = await Metadata.findOne(metaInfoContactsQuery)
+  log.d(mod, fun, `dbObjectWithMetaInfoContact: ${json.beautify(metadataWithMetaInfoContact)}`)
+  return (null != metadataWithMetaInfoContact)
 }

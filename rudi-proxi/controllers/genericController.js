@@ -155,10 +155,10 @@ async function isDeletionPermitted(objectType, Model, objectToDelete) {
       return true
       break
     case URL_OBJECT_ORGANIZATIONS:
-      return !await db.isOrgUsedInMetadata(objectToDelete)
+      return !(await db.isOrgUsedInMetadata(objectToDelete))
       break
     case URL_OBJECT_CONTACTS:
-      return !await db.isContactUsedInMetadata(objectToDelete)
+      return !(await db.isContactUsedInMetadata(objectToDelete))
       break
     default:
       throw new Error(msg.objectTypeNotFound(objectType))
@@ -379,8 +379,18 @@ exports.deleteSingleObject = async (req, reply) => {
     const deletionOK = await isDeletionPermitted(objectType, Model, objectToDelete)
     if (!deletionOK) throw new Error(msg.objectNotDeletedBecauseUsed(objectType, objectRudiId))
     const deletedObject = await db.deleteObject(Model, idField, objectRudiId)
+    // return: dbToRudi?
+    let returnedObject = deletedObject
+    if(objectType == URL_OBJECT_METADATA){
+      try{
+      returnedObject = metadataController.dbToRudiFormat(deletedObject)
+      } catch(err){
+        log.w(err)
+      }
 
-    return deletedObject
+    }
+
+    return returnedObject
   } catch (err) {
     log.e(mod, fun, err)
     throw boom.boomify(err)

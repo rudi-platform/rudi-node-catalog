@@ -158,6 +158,10 @@ exports.preserveDates = async (modifiedMetadata, origDataDates, origMetaDates) =
 
 }
 
+function customMerger(a, b) {
+  return _.isArray(b) ? b : undefined
+}
+
 // Parameter 'dbMetadata' gets mutated!
 function metadataMerge(dbMetadata, dbReadyModMetadata) {
   const fun = 'customMerger'
@@ -168,18 +172,18 @@ function metadataMerge(dbMetadata, dbReadyModMetadata) {
   log.d(mod, fun, `original data dates: ${json.beautify(dataDates)}`)
   log.d(mod, fun, `original meta dates: ${json.beautify(metaDates)}`)
   const modDataDates = dbReadyModMetadata[API_DATA_DATES_PROPERTY]
-  const modMetaDates = (!dbReadyModMetadata[API_METAINFO_PROPERTY]?{}:dbReadyModMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY])
+  const modMetaDates = (!dbReadyModMetadata[API_METAINFO_PROPERTY] ? {} : dbReadyModMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY])
 
   _.extend(dataDates, modDataDates)
   _.extend(metaDates, modMetaDates)
   log.d(mod, fun, `modified data dates: ${json.beautify(dataDates)}`)
   log.d(mod, fun, `modified meta dates: ${json.beautify(metaDates)}`)
 
-  _.merge(dbMetadata, dbReadyModMetadata )
+  _.mergeWith(dbMetadata, dbReadyModMetadata, customMerger)
 
   dbMetadata[API_DATA_DATES_PROPERTY] = dataDates
   dbMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY] = metaDates
-  
+
 }
 //———————————————————————————————————————————————————————————————
 // Atomic treatments of properties: DB -> RUDI
@@ -397,7 +401,7 @@ exports.updateMetadata = async (incomingRudiMetadata) => {
   log.v(mod, fun, `dbReadyEditedMetadata: ${json.beautify(dbReadyEditedMetadata)}\n`)
 
   // Backing up existing dates ('dataset_dates' and 'metadata_info.meadatada_dates' properties)
-  
+
   metadataMerge(dbMetadata, dbReadyEditedMetadata)
 
   log.d(mod, fun, `modified metadata: ${json.beautify(dbMetadata)}`)

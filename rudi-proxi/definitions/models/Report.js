@@ -12,6 +12,8 @@ const Int32 = require('mongoose-int32');
 
 const ids = require('../schemas/Identifiers')
 const api = require('../../config/confApi')
+
+const Validation = require('../schemaValidators');
 const IntegrationStatus = require('../thesaurus/IntegrationStatus')
 
 
@@ -77,8 +79,12 @@ const ReportSchema = new mongoose.Schema({
 
   // Version number of the integration contract used for the file
   version: {
-    type: Int32,
-    min: 0
+    type: String,
+    required: true,
+    validate: {
+      validator: Validation.isVersion,
+      message: '{VALUE} does not appear to be a valid version number (0.0.0abc)'
+    }
   },
 
   // State of the integration of the resource in the Portal

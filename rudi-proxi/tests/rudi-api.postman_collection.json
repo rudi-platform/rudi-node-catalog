@@ -4,18 +4,16 @@
 		"name": "rudi-api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
-	"item": [
-		{
+	"item": [{
 			"name": "resources",
-			"item": [
-				{
+			"item": [{
 					"name": "Add 1st",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"global_id\": \"{{metaId1}}\",\n    \"local_id\": \"testingID 4 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-444\",\n    \"resource_title\": \"Test de RUDI en local 4444\",\n    \"abstract\": {\n        \"lang\": \"fr\",\n        \"text\": \"Courte description de RUDI en local 4444\"\n    },\n    \"summary\": {\n        \"lang\": \"fr\",\n        \"text\": \"Mon résumé chg 4\"\n    },\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"energy_consommation\",\n        \"electricity\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"M. Fazo\",\n            \"email\": \"gpizj@pzorjeg.gt\"\n        },\n        {\n            \"contact_id\": \"{{contId2}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"medatata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_dates\": {\n            \"created\": \"{{now}}\",\n            \"published\": \"{{now}}\"\n        },\n        \"metadata_provider\": {\n            \"organization_id\": \"{{orgId1}}\"\n        }\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    }\n}",
+							"raw": "{\n    \"global_id\": \"{{metaId1}}\",\n    \"local_id\": \"testingID 4 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-444\",\n    \"resource_title\": \"Test de RUDI en local 4444\",\n    \"synopsis\": {\n        \"lang\": \"fr\",\n        \"text\": \"Courte description de RUDI en local 4444\"\n    },\n    \"summary\": {\n        \"lang\": \"fr\",\n        \"text\": \"Mon résumé chg 4\"\n    },\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"energy_consommation\",\n        \"electricity\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"M. Fazo\",\n            \"email\": \"gpizj@pzorjeg.gt\"\n        },\n        {\n            \"contact_id\": \"{{contId2}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"medatata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_dates\": {\n            \"created\": \"{{now}}\",\n            \"published\": \"{{now}}\"\n        },\n        \"metadata_provider\": {\n            \"organization_id\": \"{{orgId1}}\"\n        }\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -23,11 +21,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{data}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{data}}"
 							]
 						}
@@ -41,7 +40,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"global_id\": \"{{metaId2}}\",\n    \"local_id\": \"testingID 3 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-333\",\n    \"resource_title\": \"Test de RUDI en local 33\",\n    \"abstract\": {\n        \"lang\": \"fr\",\n        \"text\": \"Courte description de RUDI en local 33\"\n    },\n    \"summary\": {\n        \"lang\": \"fr\",\n        \"text\": \"Mon résumé chg 3\"\n    },\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"plu\",\n        \"municipality\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId2}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"medatata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_dates\": {\n            \"created\": \"{{now}}\",\n            \"published\": \"{{now}}\"\n        }\n    },\n       \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    }\n}",
+							"raw": "{\n    \"global_id\": \"{{metaId2}}\",\n    \"local_id\": \"testingID 3 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-333\",\n    \"resource_title\": \"Test de RUDI en local 33\",\n    \"synopsis\": {\n        \"lang\": \"fr\",\n        \"text\": \"Courte description de RUDI en local 33\"\n    },\n    \"summary\": {\n        \"lang\": \"fr\",\n        \"text\": \"Mon résumé chg 3\"\n    },\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"plu\",\n        \"municipality\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId2}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"medatata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_dates\": {\n            \"created\": \"{{now}}\",\n            \"published\": \"{{now}}\"\n        }\n    },\n       \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -49,11 +48,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{data}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{data}}"
 							]
 						}
@@ -62,8 +62,7 @@
 				},
 				{
 					"name": "Edit",
-					"event": [
-						{
+					"event": [{
 							"listen": "prerequest",
 							"script": {
 								"exec": [
@@ -87,7 +86,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"global_id\": \"{{metaId1}}\",\n    \"resource_title\": \"Test de RUDI en local 44\",\n    \"summary\": {\n        \"lang\": \"fr-FR\",\n        \"text\": \"Mon résumé chg 444\"\n    },\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\"\n        }\n    ],\n    \"medatata_info\": {\n        \"metadata_dates\": {\n            \"updated\": \"{{now}}\"\n        },\n        \"metadata_provider\": {\n            \"organization_id\": \"{{orgId2}}\"\n        },\n        \"metadata_contacts\": [\n            {\n                \"contact_id\": \"{{contId2}}\"\n            }\n        ]\n    }\n}",
+							"raw": "{\n    \"global_id\": \"{{metaId1}}\",\n    \"resource_title\": \"Test de RUDI en local 44\",\n    \"summary\": {\n        \"lang\": \"fr-FR\",\n        \"text\": \"Mon résumé chg 444\"\n    },\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\"\n        },\n        {\n            \"contact_id\": \"{{contId3}}\"\n        }\n    ],\n    \"medatata_info\": {\n        \"metadata_dates\": {\n            \"updated\": \"{{now}}\"\n        },\n        \"metadata_provider\": {\n            \"organization_id\": \"{{orgId2}}\"\n        },\n        \"metadata_contacts\": [\n            {\n                \"contact_id\": \"{{contId2}}\"\n            }\n        ]\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -95,20 +94,19 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{data}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{data}}"
 							],
-							"query": [
-								{
-									"key": "global_id",
-									"value": null,
-									"disabled": true
-								}
-							]
+							"query": [{
+								"key": "global_id",
+								"value": null,
+								"disabled": true
+							}]
 						}
 					},
 					"response": []
@@ -119,11 +117,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{data}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{data}}"
 							]
 						}
@@ -136,11 +135,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{data}}/{{metaId1}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{metaId1}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{data}}",
 								"{{metaId1}}"
 							]
@@ -154,13 +154,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{data}}/{{metaId1}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{metaId2}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{data}}",
-								"{{metaId1}}"
+								"{{metaId2}}"
 							]
 						}
 					},
@@ -181,11 +182,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{data}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{data}}"
 							]
 						}
@@ -207,11 +209,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{data}}/{{deletion}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{deletion}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{data}}",
 								"{{deletion}}"
 							]
@@ -223,8 +226,7 @@
 		},
 		{
 			"name": "organization",
-			"item": [
-				{
+			"item": [{
 					"name": "Add 1",
 					"request": {
 						"method": "POST",
@@ -239,11 +241,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{org}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{org}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{org}}"
 							]
 						}
@@ -265,11 +268,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{org}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{org}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{org}}"
 							]
 						}
@@ -291,11 +295,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{org}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{org}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{org}}"
 							]
 						}
@@ -308,11 +313,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{org}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{org}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{org}}"
 							]
 						}
@@ -325,13 +331,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{org}}/{{orgId1}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{org}}/{{orgId2}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{org}}",
-								"{{orgId1}}"
+								"{{orgId2}}"
 							]
 						}
 					},
@@ -343,11 +350,12 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{org}}/{{orgId1}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{org}}/{{orgId1}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{org}}",
 								"{{orgId1}}"
 							]
@@ -370,11 +378,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{org}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{org}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{org}}"
 							]
 						}
@@ -396,11 +405,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{org}}/{{deletion}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{org}}/{{deletion}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{org}}",
 								"{{deletion}}"
 							]
@@ -412,8 +422,7 @@
 		},
 		{
 			"name": "contact",
-			"item": [
-				{
+			"item": [{
 					"name": "Add 1st",
 					"request": {
 						"method": "POST",
@@ -428,11 +437,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{cont}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{cont}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{cont}}"
 							]
 						}
@@ -454,11 +464,39 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{cont}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{cont}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
+								"{{cont}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add 3rd",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"contact_id\": \"{{contId3}}\",\n   \"contact_name\": \"Mme. Areio\",\n    \"email\": \"areio@irisa.fr\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{cont}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
 								"{{cont}}"
 							]
 						}
@@ -480,11 +518,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{cont}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{cont}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{cont}}"
 							]
 						}
@@ -497,11 +536,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{cont}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{cont}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{cont}}"
 							]
 						}
@@ -514,11 +554,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{cont}}/{{contId1}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{cont}}/{{contId1}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{cont}}",
 								"{{contId1}}"
 							]
@@ -532,13 +573,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{cont}}/{{contId1}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{cont}}/{{contId3}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{cont}}",
-								"{{contId1}}"
+								"{{contId3}}"
 							]
 						}
 					},
@@ -559,11 +601,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{cont}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{cont}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{cont}}"
 							]
 						}
@@ -585,11 +628,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{cont}}/{{deletion}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{cont}}/{{deletion}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{cont}}",
 								"{{deletion}}"
 							]
@@ -601,8 +645,7 @@
 		},
 		{
 			"name": "reports",
-			"item": [
-				{
+			"item": [{
 					"name": "Add 1st (meta 1)",
 					"request": {
 						"method": "POST",
@@ -617,11 +660,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{data}}/{{metaId1}}/{{reports}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{metaId1}}/{{reports}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{data}}",
 								"{{metaId1}}",
 								"{{reports}}"
@@ -645,11 +689,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{data}}/{{metaId1}}/{{reports}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{metaId1}}/{{reports}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{data}}",
 								"{{metaId1}}",
 								"{{reports}}"
@@ -673,11 +718,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{data}}/{{metaId1}}/{{reports}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{metaId1}}/{{reports}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{data}}",
 								"{{metaId1}}",
 								"{{reports}}"
@@ -704,11 +750,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{data}}/{{metaId1}}/{{reports}}/{{reportId1}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{metaId1}}/{{reports}}/{{reportId1}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{data}}",
 								"{{metaId1}}",
 								"{{reports}}",
@@ -736,11 +783,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{data}}/{{metaId1}}/{{reports}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{metaId1}}/{{reports}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{data}}",
 								"{{metaId1}}",
 								"{{reports}}"
@@ -755,7 +803,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{reports}}/{{reportId1}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{reports}}/{{reportId1}}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -785,11 +833,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{reports}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{reports}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{reports}}"
 							]
 						}
@@ -811,11 +860,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{reports}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{reports}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"{{apiUrl}}",
 								"{{reports}}"
 							]
 						}
@@ -826,18 +876,18 @@
 		},
 		{
 			"name": "DB",
-			"item": [
-				{
+			"item": [{
 					"name": "get all",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{adminUrl}}/{{db}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{db}}",
 							"host": [
-								"{{adminUrl}}"
+								"{{baseUrl}}"
 							],
 							"path": [
+								"{{adminUrl}}",
 								"{{db}}"
 							]
 						}
@@ -850,11 +900,12 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{adminUrl}}/{{db}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{db}}",
 							"host": [
-								"{{adminUrl}}"
+								"{{baseUrl}}"
 							],
 							"path": [
+								"{{adminUrl}}",
 								"{{db}}"
 							]
 						}
@@ -865,18 +916,18 @@
 		},
 		{
 			"name": "Admin",
-			"item": [
-				{
+			"item": [{
 					"name": "getLogs",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{adminUrl}}/{{logs}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{logs}}",
 							"host": [
-								"{{adminUrl}}"
+								"{{baseUrl}}"
 							],
 							"path": [
+								"{{adminUrl}}",
 								"{{logs}}"
 							]
 						}
@@ -889,11 +940,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{adminUrl}}/nv",
+							"raw": "{{baseUrl}}/{{adminUrl}}/nv",
 							"host": [
-								"{{adminUrl}}"
+								"{{baseUrl}}"
 							],
 							"path": [
+								"{{adminUrl}}",
 								"nv"
 							]
 						}
@@ -906,11 +958,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{adminUrl}}/{{appId}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{appId}}",
 							"host": [
-								"{{adminUrl}}"
+								"{{baseUrl}}"
 							],
 							"path": [
+								"{{adminUrl}}",
 								"{{appId}}"
 							]
 						}
@@ -920,8 +973,7 @@
 			]
 		}
 	],
-	"event": [
-		{
+	"event": [{
 			"listen": "prerequest",
 			"script": {
 				"type": "text/javascript",

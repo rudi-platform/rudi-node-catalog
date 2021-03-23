@@ -37,7 +37,7 @@ exports.getAppId = () => {
     const hashId = require('child_process').execSync('git rev-parse --short HEAD')
     log.d(mod, fun, `${hashId}`.trim())
 
-    return hashId
+    return `${hashId}`.trim()
   } catch (err) {
     log.e(mod, fun, err)
     throw err

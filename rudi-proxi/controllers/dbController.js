@@ -10,6 +10,12 @@ const mod = 'dbCtrl'
 // External dependancies 
 //———————————————————————————————————————————————————————————————
 const boom = require('@hapi/boom')
+const _ = require('lodash')
+
+
+//———————————————————————————————————————————————————————————————
+// Internal dependancies 
+//———————————————————————————————————————————————————————————————
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
 
@@ -30,7 +36,8 @@ const {
 } = require('../db/dbFields')
 
 const {
-  PARAM_ID, URL_DB_ACCESS
+  PARAM_ID,
+  URL_DB_ACCESS
 } = require('../config/confApi')
 
 const {
@@ -48,7 +55,7 @@ exports.getCollections = async (req, reply) => {
   try {
 
     const dbActionResult = await db.getCollections(DB_NAME)
-    return dbActionResult
+    return _.map(dbActionResult, 'name')
 
   } catch (err) {
     log.e(mod, fun, err)
