@@ -5,7 +5,6 @@
 //———————————————————————————————————————————————————————————————
 const winston = require('winston');
 require('winston-daily-rotate-file');
-require('winston-mongodb');
 
 const fs = require('fs');
 

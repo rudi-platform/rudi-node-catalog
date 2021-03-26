@@ -6,7 +6,7 @@ const mod = '[files]'
 // External dependecies
 //———————————————————————————————————————————————————————————————
 const fs = require('fs')
-const ini = require('ini');
+const ini = require('ini'); 
 
 //———————————————————————————————————————————————————————————————
 // Functions

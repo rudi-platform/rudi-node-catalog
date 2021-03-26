@@ -24,6 +24,7 @@ const json = require('../utils/jsonAccess')
 const lang = require('../utils/lang')
 
 const status = require('../definitions/thesaurus/IntegrationStatus')
+const genericController = require('../controllers/genericController')
 
 //———————————————————————————————————————————————————————————————
 // Constants
@@ -36,7 +37,8 @@ const {
   API_DATA_PRODUCER_PROPERTY,
   API_DATA_CONTACTS_PROPERTY,
   API_REPORT_ID,
-  API_RESOURCE_ID
+  API_REPORT_RESOURCE_ID,
+  API_REPORT_STATUS
 } = require('../db/dbFields')
 
 const {
@@ -55,6 +57,7 @@ const {
 //———————————————————————————————————————————————————————————————
 const Metadata = require('../definitions/models/Metadata');
 const Report = require('../definitions/models/Report');
+const IntegrationStatus = require('../definitions/thesaurus/IntegrationStatus');
 
 
 //———————————————————————————————————————————————————————————————
@@ -80,7 +83,7 @@ exports.addSingleReportForObject = async (req, reply) => {
 
     // retrieve body parameters: object id, report id
     const reportId = json.accessProperty(reportBody, API_REPORT_ID)
-    const bodyObjectId = json.accessProperty(reportBody, API_RESOURCE_ID)
+    const bodyObjectId = json.accessProperty(reportBody, API_REPORT_RESOURCE_ID)
 
     log.d(mod, fun, `Report for objectType: '${objectType}', report: '${json.beautify(reportBody)}'\n`)
 
@@ -100,7 +103,8 @@ exports.addSingleReportForObject = async (req, reply) => {
     const dbActionResult = await dbReadyReport.save()
     log.i(mod, fun, `Report saved: ${json.beautify(dbReadyReport)}`)
 
-    db.setPublishedFlag(Model, idField, urlObjectId)
+    if (IntegrationStatus.OK == reportBody[API_REPORT_STATUS])
+      await genericController.setPublishedFlag(dbObject)
 
     return dbReadyReport
   } catch (err) {
@@ -127,7 +131,7 @@ exports.addOrEditSingleReportForObject = async (req, reply) => {
 
     // retrieve body parameters: object id, report id
     const reportId = json.accessProperty(reportBody, API_REPORT_ID)
-    const bodyObjectId = json.accessProperty(reportBody, API_RESOURCE_ID)
+    const bodyObjectId = json.accessProperty(reportBody, API_REPORT_RESOURCE_ID)
 
     // ensure url object id and body object id match
     if (urlObjectId != bodyObjectId) throw new Error(`${msg.parametersMismatch(urlObjectId, bodyObjectId)}`)
@@ -192,7 +196,7 @@ exports.getReportListForObject = async (req, reply) => {
 
     // get all reports for this object
     /* beautify ignore:start */
-    const dbReportList = await db.getObjectListFiltered(Report, {[API_RESOURCE_ID]: urlObjectId}, limit, offset)
+    const dbReportList = await db.getObjectListFiltered(Report, {[API_REPORT_RESOURCE_ID]: urlObjectId}, limit, offset)
     /* beautify ignore:end */
     return dbReportList
   } catch (err) {
@@ -225,7 +229,7 @@ exports.getSingleReportForObject = async (req, reply) => {
     const dbReport = await db.getEnsuredObjectWithRudiId(URL_ACTION_REPORT, Report, API_REPORT_ID, reportId)
 
     // ensure report is for the object
-    const resourceId = json.accessProperty(dbReport, API_RESOURCE_ID)
+    const resourceId = json.accessProperty(dbReport, API_REPORT_RESOURCE_ID)
     if (resourceId != urlObjectId) throw new Error(`${msg.objectNotFound(objectType, urlObjectId)}`)
 
     return dbReport

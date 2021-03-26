@@ -28,7 +28,7 @@ const OrganizationSchema = new mongoose.Schema({
     required: true
   },
 
-  // Time when this organization was published on RUDI portal
+  // Time when this organization was succesfully published on RUDI portal
   publishedAt: {
     type: Date
   }

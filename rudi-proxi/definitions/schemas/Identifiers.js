@@ -4,9 +4,7 @@
 // External dependancies
 //———————————————————————————————————————————————————————————————
 const mongoose = require('mongoose')
-const {
-  v4: uuidv4
-} = require('uuid');
+// const uuid = require('uuid');
 
 const Validation = require('../schemaValidators')
 
@@ -16,7 +14,7 @@ const Validation = require('../schemaValidators')
 
 exports.UUIDv4 = {
   type: String,
-  // default: _ => uuidv4(),
+  // default: _ => uuid.v4(),
   trim: true,
   required: true,
   unique: true,
@@ -30,27 +28,12 @@ exports.UUIDv4 = {
 
 exports.UUID = {
   type: String,
-  // default: _ => uuidv4(),
+  // default: _ => uuid.v4(),
   trim: true,
   lowercase: true,
   validate: {
     validator: Validation.isUUIDv4,
     message: '{VALUE} does not appear to be a valid UUID v4'
-  }
-}
-
-const RudiID = {
-  type: String,
-  default: _ => uuidv4(),
-  trim: true,
-  required: true,
-  unique: true,
-  dropDups: true,
-  // index: true,
-  lowercase: true,
-  validate: {
-    validator: Validation.isRudiID,
-    message: '{VALUE} does not appear to be a valid RUDI ID (UUID v4)'
   }
 }
 

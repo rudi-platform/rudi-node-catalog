@@ -26,9 +26,12 @@ exports.API_METAINFO_DATES_PROPERTY = 'metadata_dates';
 
 exports.API_DATES_CREATED_PROPERTY = 'created';
 exports.API_DATES_EDITED_PROPERTY = 'updated';
+exports.API_DATES_PUBLISHED_PROPERTY = 'published';
 
 //———————————————————————————————————————————————————————————————
 // Integration reports
 //———————————————————————————————————————————————————————————————
 exports.API_REPORT_ID = 'report_id';
-exports.API_RESOURCE_ID = 'resource_id';
+exports.API_REPORT_RESOURCE_ID = 'resource_id';
+exports.API_REPORT_STATUS = 'integration_status';
+

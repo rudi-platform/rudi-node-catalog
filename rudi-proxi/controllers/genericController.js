@@ -19,6 +19,7 @@ const msg = require('../utils/msg')
 const db = require('../db/dbQueries')
 const dbRwk = require('../db/dbReworkData')
 const json = require('../utils/jsonAccess')
+const smpl = require('../utils/jsShortcuts')
 
 //———————————————————————————————————————————————————————————————
 // Constants
@@ -46,20 +47,18 @@ const {
   API_DATA_PRODUCER_PROPERTY,
   API_DATA_CONTACTS_PROPERTY,
   API_METAINFO_PROPERTY,
-  API_REPORT_ID
+  API_REPORT_ID,
+  API_DATES_PUBLISHED_PROPERTY
 } = require('../db/dbFields')
 
 const Metadata = require('../definitions/models/Metadata')
 const Organization = require('../definitions/models/Organization')
 const Contact = require('../definitions/models/Contact')
+const Report = require('../definitions/models/Report');
 
 const metadataController = require('../controllers/metadataController')
 const organizationController = require('../controllers/organizationController')
 const contactController = require('../controllers/contactController')
-const {
-  stringify
-} = require('uuid');
-const Report = require('../definitions/models/Report');
 
 //———————————————————————————————————————————————————————————————
 // Specific object type helper functions
@@ -152,6 +151,7 @@ async function isDeletionPermitted(objectType, Model, objectToDelete) {
 
   switch (objectType) {
     case URL_OBJECT_METADATA:
+    case URL_ACTION_REPORT:
       return true
       break
     case URL_OBJECT_ORGANIZATIONS:
@@ -165,6 +165,11 @@ async function isDeletionPermitted(objectType, Model, objectToDelete) {
   }
   return actionResult
 }
+
+exports.setPublishedFlag = async (dbObject) => {
+  if (!dbObject.publishedAt) dbObject.publishedAt = smpl.nowISO()
+}
+
 //———————————————————————————————————————————————————————————————
 // Treatments of properties: DB -> RUDI
 //———————————————————————————————————————————————————————————————

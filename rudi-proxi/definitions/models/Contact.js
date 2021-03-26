@@ -46,7 +46,7 @@ const ContactSchema = new mongoose.Schema({
     }
   },
 
-  // Time when this contact was published on RUDI portal
+  // Time when this contact was successfully published on RUDI portal
   publishedAt: {
     type: Date
   }

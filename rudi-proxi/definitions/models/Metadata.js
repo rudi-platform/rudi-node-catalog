@@ -26,7 +26,8 @@ const {
   API_METAINFO_PROPERTY,
   API_METAINFO_DATES_PROPERTY,
   API_DATES_CREATED_PROPERTY,
-  API_DATES_EDITED_PROPERTY
+  API_DATES_EDITED_PROPERTY,
+  API_DATES_PUBLISHED_PROPERTY,
 } = require('../../db/dbFields');
 
 const log = require('../../utils/logging')
@@ -140,7 +141,7 @@ const MetadataSchema = new mongoose.Schema({
     type: [DictionaryEntry],
     required: true
   },
- 
+
   //---------------------------
   // Dataset classification
   //---------------------------
@@ -314,8 +315,12 @@ const MetadataSchema = new mongoose.Schema({
 
     // Dates of the actions performed on the metadata (creation, publishing, update...)
     metadata_dates: {
-      type: ReferenceDates,
-      required: true
+      validated: {
+        type: Date
+      },
+      deleted: {
+        type: Date
+      }
     },
 
     // Description of the organization that produced the metadata
@@ -330,7 +335,8 @@ const MetadataSchema = new mongoose.Schema({
       ref: 'Contact',
     }]
   },
-  // Time when this orgnization was published on RUDI portal
+  
+  // Date when the resource has been successfully integrated on Rudi Portal for the first time
   publishedAt: {
     type: Date
   }
@@ -338,16 +344,16 @@ const MetadataSchema = new mongoose.Schema({
   timestamps: true,
   optimisticConcurrency: true,
   useNestedStrict: true,
-  // toObject: {
-  //   getters: true,
-  //   setters: true,
-  //   virtuals: false
-  // },
-  // toJSON: {
-  //   getters: true,
-  //   setters: true,
-  //   virtuals: true
-  // },
+  toObject: {
+    getters: true,
+    setters: true,
+    virtuals: true
+  },
+  toJSON: {
+    getters: true,
+    setters: true,
+    virtuals: true
+  },
 });
 
 
@@ -363,16 +369,20 @@ MetadataSchema.methods.toJSON = function () {
   delete metadata._id
   delete metadata.__v
   delete metadata.createdAt
-  // delete metadata.updatedAt
+  delete metadata.updatedAt
+  delete metadata.publishedAt
   return metadata
 };
 
 //----- Virtuals
-MetadataSchema.virtual('metadata_dates.created').get(function () {
+MetadataSchema.virtual(`${API_METAINFO_PROPERTY}.${API_METAINFO_DATES_PROPERTY}.${API_DATES_CREATED_PROPERTY}`).get(function () {
   return this.createdAt;
 });
-MetadataSchema.virtual('metadata_dates.updated').get(function () {
+MetadataSchema.virtual(`${API_METAINFO_PROPERTY}.${API_METAINFO_DATES_PROPERTY}.${API_DATES_EDITED_PROPERTY}`).get(function () {
   return this.updatedAt;
+});
+MetadataSchema.virtual(`${API_METAINFO_PROPERTY}.${API_METAINFO_DATES_PROPERTY}.${API_DATES_PUBLISHED_PROPERTY}`).get(function () {
+  return this.publishedAt;
 });
 
 

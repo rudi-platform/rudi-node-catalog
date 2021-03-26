@@ -41,7 +41,6 @@ const {
   API_ORGANIZATION_ID,
   API_CONTACT_ID,
   API_REPORT_ID,
-  API_RESOURCE_ID,
   API_DATA_PRODUCER_PROPERTY,
   API_DATA_CONTACTS_PROPERTY,
   API_METAINFO_PROPERTY,
@@ -382,6 +381,7 @@ function changeConditionsIntoRegex(conditions) {
   return regexConditions
 }
 
+// Depleted
 exports.setPublishedFlag = async (Model, idField, rudiId) => {
   const fun = `setPublishedFlag`
   log.d(mod, fun, `rudiId: ${rudiId}`)

@@ -98,6 +98,8 @@ exports.setCreateDateInRudiObject = async (rudiMetadata, createDate) => {
     let metaInfoDates = json.accessProperty(rudiMetadata, API_METAINFO_DATES_PROPERTY)
     let metaInfoDateCreated = json.accessProperty(rudiMetadata, API_METAINFO_DATES_CREATED_PROPERTY)
    */
+
+  // TODO: check if create date already set?
   rudiMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_CREATED_PROPERTY] = createDate
   return rudiMetadata
 }
@@ -111,7 +113,10 @@ exports.getCreateDateInRudiObject = async (rudiMetadata) => {
     let metaInfoDates = json.accessProperty(rudiMetadata, API_METAINFO_DATES_PROPERTY)
     let metaInfoDateCreated = json.accessProperty(rudiMetadata, API_METAINFO_DATES_CREATED_PROPERTY)
    */
-  return rudiMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_CREATED_PROPERTY]
+  let metaInfo = json.accessProperty(rudiMetadata, API_METAINFO_PROPERTY)
+  return (!metaInfo[API_METAINFO_DATES_PROPERTY]) ? undefined :
+    rudiMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_CREATED_PROPERTY]
+
 }
 
 exports.setEditDateInRudiObject = async (rudiMetadata, editDate) => {
@@ -126,6 +131,7 @@ exports.setEditDateInRudiObject = async (rudiMetadata, editDate) => {
       let metaInfoDates = json.accessProperty(rudiMetadata, API_METAINFO_DATES_PROPERTY)
       let metaInfoDateCreated = json.accessProperty(rudiMetadata, API_METAINFO_DATES_CREATED_PROPERTY)
      */
+
     rudiMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_EDITED_PROPERTY] = editDate
     return rudiMetadata
   } catch (err) {
@@ -150,12 +156,6 @@ exports.getDbCreateDateWithRudiId = async (rudiId) => {
     log.e(mod, fun, err)
     throw err
   }
-}
-
-exports.preserveDates = async (modifiedMetadata, origDataDates, origMetaDates) => {
-  const fun = 'preserveDates'
-  log.d(mod, fun, ``)
-
 }
 
 function customMerger(a, b) {
