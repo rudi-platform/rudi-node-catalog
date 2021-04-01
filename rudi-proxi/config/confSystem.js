@@ -1,13 +1,14 @@
 'use strict';
 
-const mod = '[sysConf]'
+const mod = 'sysConf'
 
 //———————————————————————————————————————————————————————————————
 // Internal dependecies
 //———————————————————————————————————————————————————————————————
-const fa = require('../utils/fileActions')
+const fa = require('../utils/fileActions');
+const utils = require('../utils/jsUtils');
 
-
+utils.separateLogs()
 //———————————————————————————————————————————————————————————————
 // Constants: local ini file configuration settings
 //———————————————————————————————————————————————————————————————
@@ -36,6 +37,7 @@ const LOG_SECTION = 'logging'
 const _appName = 'app_name'
 const _logDir = 'log_dir'
 const _logFileName = 'log_file'
+const _logLevel = 'log_level'
 
 //———————————————————————————————————————————————————————————————
 // Constants: default configuration
@@ -55,6 +57,7 @@ DEFAULT_CONF[LOG_SECTION] = {}
 DEFAULT_CONF[LOG_SECTION][_appName] = 'rudiProxi'
 DEFAULT_CONF[LOG_SECTION][_logDir] = './logs'
 DEFAULT_CONF[LOG_SECTION][_logFileName] = 'rudiProxi.log'
+DEFAULT_CONF[LOG_SECTION][_logLevel] = 'debug'
 
 
 //———————————————————————————————————————————————————————————————
@@ -102,7 +105,7 @@ function getValue(section, field) {
 // Server
 exports.LISTENING_ADDR = getValue(SERVER_SECTION, _serverAddress)
 exports.LISTENING_PORT = getValue(SERVER_SECTION, _serverPort)
- 
+
 // DB 
 exports.DB_NAME = getValue(DB_SECTION, _dbName)
 const DB_URL_PREFIX = getValue(DB_SECTION, _dbUrl)
@@ -113,11 +116,14 @@ exports.APP_NAME = getValue(LOG_SECTION, _appName)
 exports.LOG_DIR = getValue(LOG_SECTION, _logDir)
 exports.LOG_FILE = getValue(LOG_SECTION, _logFileName)
 exports.OUT_LOG = `${this.LOG_DIR}/${this.LOG_FILE}`
+exports.LOG_LVL = getValue(LOG_SECTION, _logLevel)
 
-const fun = '[export]'
+const fun = 'export'
+const now = utils.nowLocaleFormatted()
 
-console.log(mod, fun, `APP_NAME: ${this.APP_NAME}`)
-console.log(mod, fun, `LISTENING_PORT: ${this.LISTENING_PORT}`)
-console.log(mod, fun, `OUT_LOG: ${this.OUT_LOG}`)
-console.log(mod, fun, `DB_NAME: ${this.DB_NAME}`)
-console.log(mod, fun, `DB_URL: ${this.DB_URL}`)
+utils.consoleLog(mod, fun, `APP_NAME: ${this.APP_NAME}`)
+utils.consoleLog(mod, fun, `LISTENING_PORT: ${this.LISTENING_PORT}`)
+utils.consoleLog(mod, fun, `OUT_LOG: ${this.OUT_LOG}`)
+utils.consoleLog(mod, fun, `LOG_LVL: ${this.LOG_LVL}`)
+utils.consoleLog(mod, fun, `DB_NAME: ${this.DB_NAME}`)
+utils.consoleLog(mod, fun, `DB_URL: ${this.DB_URL}`)

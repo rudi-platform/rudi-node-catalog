@@ -297,7 +297,8 @@ const MetadataSchema = new mongoose.Schema({
   //   - archived = data are not immediately available, access is not automatic 
   //   - unavailable = data were deleted
   storage_status: {
-    type: Object.values(StorageStatus)
+    type: Object.values(StorageStatus),
+    required: true
   },
 
   // Metadata on the metadata
@@ -366,6 +367,7 @@ MetadataSchema.methods.toJSON = function () {
   var metadata = this.toObject()
   // metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_CREATED_PROPERTY] = metadata.createdAt
   // metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_EDITED_PROPERTY] = metadata.updatedAt
+  delete metadata.id
   delete metadata._id
   delete metadata.__v
   delete metadata.createdAt

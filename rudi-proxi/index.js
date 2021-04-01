@@ -6,21 +6,33 @@ const fun = 'main'
 //———————————————————————————————————————————————————————————————
 // Internal dependancies 
 //———————————————————————————————————————————————————————————————
+const utils = require('./utils/jsUtils')
 const sys = require('./config/confSystem')
-const api = require('./config/confApi')
+const logConf = require('./config/confLogs')
 const log = require('./utils/logging')
+
+const api = require('./config/confApi')
 
 //———————————————————————————————————————————————————————————————
 // External dependancies  
 //———————————————————————————————————————————————————————————————
 
-// Require the fastify framework and instantiate it
-const fastify = require('fastify')({
-  logger: true
-})
 
 // Require external modules
 const mongoose = require('mongoose')
+
+// Require the fastify framework and instantiate it
+const fastify = require('fastify')({
+  logger: {
+    level: 'warn',
+    logger: logConf.initFFLogger("rudiProxi")
+    // file: sys.OUT_LOG
+  }
+})
+fastify.addHook('onRequest', (req, res, next) => {
+  log.logRequest(req)
+  next()
+})
 
 // Import Swagger Options
 const swagger = require('./config/swagger')
@@ -49,10 +61,8 @@ const mongoConnectOptions = {
 }
 
 log.i(mod, fun, `Connecting to [${sys.DB_URL}]`)
-const promise = mongoose.connect(sys.DB_URL, mongoConnectOptions)
-  .then(() => log.i(mod, fun, 'MongoDB connected'))
-  .catch(err => log.e(mod, fun, err))
- 
+const mongoConnection = mongoose.connect(sys.DB_URL, mongoConnectOptions)
+
 
 //———————————————————————————————————————————————————————————————
 // ROUTES 
@@ -61,19 +71,27 @@ const promise = mongoose.connect(sys.DB_URL, mongoConnectOptions)
 // Import Routes
 const {
   publicRoutes,
-  backOfficeRoutes
-} = require('./routes')
+  backOfficeRoutes,
+  inspectRequest
+} = require('./routes/routes');
+const {
+  initFFLogger: initLogger
+} = require('./config/confLogs');
+const {
+  consoleErr
+} = require('./utils/jsUtils');
 
 // Declare a default route
 fastify.get('/', async (request, reply) => {
-  log.d(mod, fun, "hello")
+  log.i(mod, fun, "GET /")
   return {
     server: "RUDI"
   }
 })
 // Declare a default route
 fastify.get('/api', async (request, reply) => {
-  log.d(mod, fun, "api")
+  // request.log.info(`GET /api`)
+  log.i(mod, fun, "GET /api")
   return {
     API: "RUDI API"
   }
@@ -81,13 +99,13 @@ fastify.get('/api', async (request, reply) => {
 // Declare a default route
 // Declare a default route
 fastify.get(api.URL_PREFIX_PUBLIC, async (request, reply) => {
-  log.d(mod, fun, api.URL_PREFIX_PUBLIC)
+  log.i(mod, fun, `GET ${api.URL_PREFIX_PUBLIC}`)
   return {
     'API version': "RUDI API v1"
   }
 })
 fastify.get(`${api.URL_PREFIX_PUBLIC}/`, async (request, reply) => {
-  log.d(mod, fun, `${api.URL_PREFIX_PUBLIC}/`)
+  log.i(mod, fun, `GET ${api.URL_PREFIX_PUBLIC}/`)
   return {
     'API version': "RUDI API v1"
   }
@@ -109,14 +127,21 @@ backOfficeRoutes.forEach((boRoute, index) => {
 //———————————————————————————————————————————————————————————————
 const start = async () => {
   try {
-    await fastify.listen(sys.LISTENING_PORT, '0.0.0.0')
+    await fastify.listen(sys.LISTENING_PORT, sys.LISTENING_ADDR)
     fastify.swagger()
     // fastify.log.info(`Listening on ${fastify.server.address().address}:${fastify.server.address().port}`)
   } catch (err) {
     // fastify.log.error(err)
-    log.e(err)
+    log.e(mod, 'startServer', err)
     process.exit(1)
   }
 }
 
 start()
+
+mongoConnection
+  .then(() => {
+    log.i(mod, fun, 'MongoDB connected')
+    utils.separateLogs('Init OK')
+  })
+  .catch(err => log.e(mod, fun, err))

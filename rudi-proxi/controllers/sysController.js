@@ -73,7 +73,7 @@ exports.getLogs = () => {
     log.d(mod, fun, `GET ${URL_LOGS_ACCESS}`)
 
     /* beautify ignore:start */
-    const logs = fs.readFileSync(`${sys.OUT_LOG}`, {encoding: 'utf8', flag: 'r'});
+    const logs = fs.readFileSync(sys.OUT_LOG, {encoding: 'utf8', flag: 'r'});
     /* beautify ignore:end */
     return logs
   } catch (err) {

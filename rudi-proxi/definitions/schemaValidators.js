@@ -59,7 +59,8 @@ exports.isEmail = (str) => {
 //———————————————————————————————————————————————————————————————
 // API version
 //———————————————————————————————————————————————————————————————
-const regexVersionRudi = /^([0-9]{1,2}\.){2}[0-9]{1,2}[a-z]*$/
+const regexVersionRudi = /^[0-9]{1,2}\.[0-9]{1,2}(\.[0-9]{1,2})?[a-z]*$/
 exports.isVersion = (str) => {
   return this.validateSchema(str, regexVersionRudi)
 }
+

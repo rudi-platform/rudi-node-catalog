@@ -1,0 +1,74 @@
+{
+    "temporal_spread": {
+        "start_date": "2021-02-12T10:33:15.000Z"
+    },
+    "geography": {
+        "bounding_box": {
+            "west_longitude": -1.677803,
+            "east_longitude": -1.677803,
+            "north_latitude": 48.112834,
+            "south_latitude": 48.112834
+        }
+    },
+    "medatata_info": {
+        "metadata_contacts": [
+            {
+                "contact_id": "50e2c58a-3b50-4fc0-bd27-82e88cb3e878",
+                "contact_name": "Mme. Feya",
+                "email": "feya@irisa.fr"
+            }
+        ],
+        "api_version": "1.1.0",
+        "metadata_provider": {
+            "organization_id": "25a8ea2b-13c5-4140-bc09-a60ba255fda7",
+            "organization_name": "UR1",
+            "organization_address": "2 rue du Thabor - CS 46510, 35065 Rennes CEDEX"
+        },
+        "metadata_dates": {
+            "created": "2021-03-30T12:19:12.254Z",
+            "updated": "2021-03-30T13:30:00.547Z"
+        }
+    },
+    "keywords": [
+        "energy_consommation",
+        "electricity"
+    ],
+    "contacts": [
+        {
+            "contact_id": "a5e8ea3f-a587-4140-bc09-a60ba255f18a",
+            "contact_name": "M. Fazo Gres",
+            "email": "fazo@univ-rennes1.fr"
+        }
+    ],
+    "available_formats": [],
+    "resource_languages": [
+        "fr"
+    ],
+    "storage_status": "online",
+    "global_id": "62763948-0087-403a-a083-64dce70c6044",
+    "local_id": "testingID 4 lg",
+    "doi": "10.1007/s00223-003-0070-444",
+    "resource_title": "Test de RUDI en local 44",
+    "synopsis": [
+        {
+            "lang": "fr",
+            "text": "Courte description de RUDI en local 4444"
+        }
+    ],
+    "summary": [
+        {
+            "lang": "fr-FR",
+            "text": "Mon résumé chg 444"
+        }
+    ],
+    "theme": "oceans",
+    "producer": {
+        "organization_id": "96763948-0a33-403a-a083-64dce70c7898",
+        "organization_name": "IRISA",
+        "organization_address": "Campus de Beaulieu, 263 avenue du Général Leclerc, Bâtiment 12 F, allée Jean Perrin, 35042 RENNES Cedex"
+    },
+    "dataset_dates": {
+        "created": "2021-03-30T12:19:12.212Z",
+        "published": "2021-03-30T12:19:12.212Z"
+    }
+}

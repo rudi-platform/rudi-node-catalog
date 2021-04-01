@@ -18,7 +18,7 @@ const _ = require('lodash')
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
 const lang = require('../utils/lang')
-const smpl = require('../utils/jsShortcuts')
+const utils = require('../utils/jsUtils')
 
 const db = require('../db/dbQueries')
 const dbRwk = require('../db/dbReworkData')
@@ -92,7 +92,7 @@ exports.setCreateDateInRudiObject = async (rudiMetadata, createDate) => {
   const fun = 'setCreateDateInRudiObject'
   log.d(mod, fun, ``)
   if (null == rudiMetadata) throw new Error(`${msg.parameterExpected(fun, 'rudiMetadata')}`)
-  if (null == createDate) createDate == smpl.nowISO()
+  if (null == createDate) createDate == utils.nowISO()
   /* 
     let metaInfo = json.accessProperty(rudiMetadata, API_METAINFO_PROPERTY)
     let metaInfoDates = json.accessProperty(rudiMetadata, API_METAINFO_DATES_PROPERTY)
@@ -124,7 +124,7 @@ exports.setEditDateInRudiObject = async (rudiMetadata, editDate) => {
   log.d(mod, fun, ``)
   try {
     if (null == rudiMetadata) throw new Error(`${msg.parameterExpected(fun, 'rudiMetadata')}`)
-    if (null == editDate) editDate == smpl.nowISO()
+    if (null == editDate) editDate == utils.nowISO()
 
     /* 
       let metaInfo = json.accessProperty(rudiMetadata, API_METAINFO_PROPERTY)

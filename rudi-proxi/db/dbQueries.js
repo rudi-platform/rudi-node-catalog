@@ -17,7 +17,7 @@ const log = require('../utils/logging')
 const msg = require('../utils/msg')
 
 const json = require('../utils/jsonAccess')
-const smpl = require('../utils/jsShortcuts')
+const utils = require('../utils/jsUtils')
 
 //———————————————————————————————————————————————————————————————
 // Constants
@@ -325,11 +325,12 @@ exports.deleteObject = async (Model, idField, id) => {
   if (!id) {
     throw new Error(`${msg.parameterExpected(fun, idField)}`)
   }
-
+  let condition = {}
+  condition[idField] = id
   try {
-    /* beautify ignore:start */
-    let deletionInfo = await Model.findOneAndRemove({[idField]: id})
-    /* beautify ignore:end */
+
+    let deletionInfo = await Model.findOneAndRemove(condition)
+
     return deletionInfo
   } catch (err) {
     log.e(mod, fun, err)
@@ -351,8 +352,38 @@ exports.deleteAll = async (Model) => {
   }
 }
 
-exports.deleteMany = async (Model, conditions) => {
-  const fun = `deleteMany`
+exports.deleteManyWithRudiIds = async (Model, idField, rudiIdList) => {
+  const fun = `deleteManyWithRudiIds`
+  // log.d(mod, fun, `conditions: ${conditions}`)
+
+  // TODO: to be consolidated!
+  // if (typeof (conditions) == 'string')
+
+  if (!Array.isArray(rudiIdList)) {
+    log.i(mod, fun, msg.parameterExpected(fun, 'rudiIdList'))
+    return {
+      "n": 0,
+      "ok": 0,
+      "deletedCount": 0
+    }
+  }
+  let filter = {}
+  /* beautify ignore:start */
+  filter[idField] = {$in: rudiIdList}
+  /* beautify ignore:end */
+  log.d(mod, fun, json.beautify(filter))
+
+  try {
+    let deletionInfo = await Model.deleteMany(filter)
+    return deletionInfo
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw err
+  }
+}
+
+exports.deleteManyWithFilter = async (Model, conditions) => {
+  const fun = `deleteManyWithFilter`
   // log.d(mod, fun, `conditions: ${conditions}`)
 
   // TODO: to be consolidated!
@@ -388,7 +419,7 @@ exports.setPublishedFlag = async (Model, idField, rudiId) => {
 
   /* beautify ignore:start */
   const filter = {[idField]: rudiId}
-  const update = {'publishedAt': smpl.nowISO()}
+  const update = {'publishedAt': utils.nowISO()}
   const options = {new: true}
   /* beautify ignore:end */
 

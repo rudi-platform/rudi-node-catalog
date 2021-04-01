@@ -19,7 +19,7 @@ const msg = require('../utils/msg')
 const db = require('../db/dbQueries')
 const dbRwk = require('../db/dbReworkData')
 const json = require('../utils/jsonAccess')
-const smpl = require('../utils/jsShortcuts')
+const utils = require('../utils/jsUtils')
 
 //———————————————————————————————————————————————————————————————
 // Constants
@@ -167,7 +167,7 @@ async function isDeletionPermitted(objectType, Model, objectToDelete) {
 }
 
 exports.setPublishedFlag = async (dbObject) => {
-  if (!dbObject.publishedAt) dbObject.publishedAt = smpl.nowISO()
+  if (!dbObject.publishedAt) dbObject.publishedAt = utils.nowISO()
 }
 
 //———————————————————————————————————————————————————————————————
@@ -220,7 +220,7 @@ async function treatDbObjectList(objectType, dbObjectList) {
 // => POST /{object}/{id}
 exports.addSingleObject = async (req, reply) => {
   const fun = 'addSingleObject'
-  log.d(mod, fun, `< POST ${URL_OBJECT}`)
+  log.v(mod, fun, `< POST ${URL_OBJECT}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -261,7 +261,7 @@ exports.addSingleObject = async (req, reply) => {
 // => GET /{object}/{id}
 exports.getSingleObject = async (req, reply) => {
   const fun = 'getSingleObject'
-  log.d(mod, fun, `< GET ${URL_OBJECT}/:${PARAM_ID}`)
+  log.v(mod, fun, `< GET ${URL_OBJECT}/:${PARAM_ID}`)
   try {
 
     // retrieve url parameters: object type, object id
@@ -294,7 +294,7 @@ exports.getSingleObject = async (req, reply) => {
 // => GET /{object}
 exports.getObjectList = async (req, reply) => {
   const fun = 'getObjectList'
-  log.d(mod, fun, `< GET ${URL_OBJECT}`)
+  log.v(mod, fun, `< GET ${URL_OBJECT}`)
   try {
 
 
@@ -329,7 +329,7 @@ exports.getObjectList = async (req, reply) => {
 // => PUT /{object}
 exports.updateSingleObject = async (req, reply) => {
   const fun = 'updateSingleObject'
-  log.d(mod, fun, `< PUT ${URL_OBJECT}`)
+  log.v(mod, fun, `< PUT ${URL_OBJECT}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -361,7 +361,7 @@ exports.updateSingleObject = async (req, reply) => {
 // => DELETE /{object}/{id}
 exports.deleteSingleObject = async (req, reply) => {
   const fun = 'deleteSingleObject'
-  log.d(mod, fun, `< DELETE ${URL_OBJECT}/:${PARAM_ID}`)
+  log.v(mod, fun, `< DELETE ${URL_OBJECT}/:${PARAM_ID}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -386,10 +386,10 @@ exports.deleteSingleObject = async (req, reply) => {
     const deletedObject = await db.deleteObject(Model, idField, objectRudiId)
     // return: dbToRudi?
     let returnedObject = deletedObject
-    if(objectType == URL_OBJECT_METADATA){
-      try{
-      returnedObject = metadataController.dbToRudiFormat(deletedObject)
-      } catch(err){
+    if (objectType == URL_OBJECT_METADATA) {
+      try {
+        returnedObject = metadataController.dbToRudiFormat(deletedObject)
+      } catch (err) {
         log.w(err)
       }
 
@@ -407,7 +407,7 @@ exports.deleteSingleObject = async (req, reply) => {
 // => POST /{object}/deletion
 exports.deleteObjectList = async (req, reply) => {
   const fun = 'deleteObjectList'
-  log.d(mod, fun, `< POST ${URL_OBJECT}/${URL_ACTION_DELETION}`)
+  log.v(mod, fun, `< POST ${URL_OBJECT}/${URL_ACTION_DELETION}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -415,15 +415,20 @@ exports.deleteObjectList = async (req, reply) => {
     /* beautify ignore:start */
     // identify object model
     const {Model, idField} = db.getObjectAccesses(objectType)
-    // retrieve incoming data
-    const {...conditions} = req.body
     /* beautify ignore:end */
-    log.d(mod, fun, json.beautify(conditions))
+    
+    // retrieve incoming data
+    const rudiIdList = req.body
+    log.d(mod, fun, json.beautify(rudiIdList))
 
-    const object = await db.deleteMany(Model, conditions)
-    return object
+    const deletionResult = await db.deleteManyWithRudiIds(Model, idField, rudiIdList)
+    return deletionResult
   } catch (err) {
     log.e(mod, fun, err)
+    log.e(mod, fun, `method: ${json.beautify(req.method)}`)
+    log.e(mod, fun, `url: ${json.beautify(req.url)}`)
+    log.e(mod, fun, `params: ${json.beautify(req.params)}`)
+    log.e(mod, fun, `body: ${json.beautify(req.body)}`)
     throw boom.boomify(err)
   }
 }
@@ -433,7 +438,7 @@ exports.deleteObjectList = async (req, reply) => {
 // => DELETE /{object}
 exports.deleteEveryObject = async (req, reply) => {
   const fun = 'deleteEveryObject'
-  log.d(mod, fun, `< DELETE ${URL_OBJECT}`)
+  log.v(mod, fun, `< DELETE ${URL_OBJECT}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
