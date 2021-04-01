@@ -1270,6 +1270,51 @@
 					"response": []
 				},
 				{
+					"name": "Delete media 1 & 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Delete metadata 1 & 2\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.n).to.eq(2);",
+									"    pm.expect(responseJson.ok).to.eq(1);",
+									"    pm.expect(responseJson.deletedCount).to.eq(2);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    \"{{mediaId1}}\",\n    \"{{mediaId2}}\"\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{media}}/{{deletion}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{media}}",
+								"{{deletion}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Delete org 1 & 2",
 					"event": [
 						{
