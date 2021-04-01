@@ -1,6 +1,4 @@
-const IntegrationStatus = {
+exports.IntegrationStatus = {
   OK: 'OK',
   KO: 'KO'
 }
-
-module.exports = IntegrationStatus

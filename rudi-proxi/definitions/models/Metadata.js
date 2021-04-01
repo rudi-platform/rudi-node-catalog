@@ -1,23 +1,23 @@
 'use strict';
 const mod = 'metaSch'
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // API version
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 const {
   API_VERSION
 } = require('../../config/confApi');
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // External dependencies
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 const boom = require('@hapi/boom')
 const mongoose = require('mongoose');
 
 const Int32 = require('mongoose-int32');
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Internal dependencies
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 const db = require('../../db/dbQueries')
 const {
   API_ORGANIZATION_ID,
@@ -36,9 +36,9 @@ const json = require('../../utils/jsonAccess');
 
 const Validation = require('../schemaValidators');
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Schema definitions
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 const GeoJSON = require('mongoose-geojson-schema');
 
 const {
@@ -50,17 +50,19 @@ const SkosEntry = require('../schemas/SkosEntry');
 const AccessCondition = require('../schemas/AccessCondition');
 const ReferenceDates = require('../schemas/ReferenceDates');
 
-const Media = require('./Media');
+const {
+  Media
+} = require('./Media');
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Model definitions
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 const Organization = require('./Organization');
 const Contact = require('./Contact');
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Thesaurus definiitons
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 const Language = require('../thesaurus/Languages');
 const Keywords = require('../thesaurus/Keywords');
 const Themes = require('../thesaurus/Themes');
@@ -69,9 +71,9 @@ const Encoding = require('../thesaurus/Encodings');
 const HashAlgo = require('../thesaurus/HashAlgorithms');
 
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Constants
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 const UpdateStatus = {
   modified: 'modified',
   updated: 'updated',
@@ -96,10 +98,13 @@ const TransmissionModes = {
   series: 'SERIES'
 };
 
-
-//———————————————————————————————————————————————————————————————
+const validArrayNotNull = {
+  validator: Validation.isNotEmptyArray,
+  message: `'{PATH}' property should not be empty`
+}
+//---------------------------------------------------------------
 // Custom schema definitions
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 const MetadataSchema = new mongoose.Schema({
 
   //---------------------------
@@ -159,7 +164,8 @@ const MetadataSchema = new mongoose.Schema({
       type: String,
       enum: Object.values(Keywords)
     }],
-    required: true
+    required: true,
+    validate: validArrayNotNull
   },
 
   //---------------------------
@@ -179,8 +185,8 @@ const MetadataSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Contact',
     }],
-    minlength: 1,
-    required: true
+    required: true,
+    validate: validArrayNotNull
   },
 
   //---------------------------
@@ -190,9 +196,10 @@ const MetadataSchema = new mongoose.Schema({
   available_formats: {
     type: [{
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Media'
+      ref: 'Media',
     }],
-    required: true
+    required: true,
+    validate: validArrayNotNull
   },
 
   //---------------------------
@@ -297,12 +304,13 @@ const MetadataSchema = new mongoose.Schema({
   //   - archived = data are not immediately available, access is not automatic 
   //   - unavailable = data were deleted
   storage_status: {
-    type: Object.values(StorageStatus),
+    type: String,
+    enum: Object.values(StorageStatus),
     required: true
   },
 
   // Metadata on the metadata
-  medatata_info: {
+  metadata_info: {
 
     // API version number (used for retro-compatibility)
     api_version: {
@@ -336,7 +344,7 @@ const MetadataSchema = new mongoose.Schema({
       ref: 'Contact',
     }]
   },
-  
+
   // Date when the resource has been successfully integrated on Rudi Portal for the first time
   publishedAt: {
     type: Date
@@ -358,9 +366,9 @@ const MetadataSchema = new mongoose.Schema({
 });
 
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Schema refinements
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 
 //----- toJSON cleanup
 MetadataSchema.methods.toJSON = function () {
@@ -388,7 +396,7 @@ MetadataSchema.virtual(`${API_METAINFO_PROPERTY}.${API_METAINFO_DATES_PROPERTY}.
 });
 
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Exports
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 module.exports = mongoose.model('Metadata', MetadataSchema);

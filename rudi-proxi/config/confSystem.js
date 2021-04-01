@@ -2,16 +2,16 @@
 
 const mod = 'sysConf'
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Internal dependecies
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 const fa = require('../utils/fileActions');
 const utils = require('../utils/jsUtils');
 
 utils.separateLogs()
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Constants: local ini file configuration settings
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 
 // Conf files name
 // - user conf
@@ -39,9 +39,9 @@ const _logDir = 'log_dir'
 const _logFileName = 'log_file'
 const _logLevel = 'log_level'
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Constants: default configuration
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 var DEFAULT_CONF = {}
 // Node.js server
 DEFAULT_CONF[SERVER_SECTION] = {}
@@ -60,9 +60,9 @@ DEFAULT_CONF[LOG_SECTION][_logFileName] = 'rudiProxi.log'
 DEFAULT_CONF[LOG_SECTION][_logLevel] = 'debug'
 
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Constants: user and local configuration
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Getting user conf file value
 // if null, local conf file value
 // if null , default value
@@ -70,9 +70,9 @@ const USER_CONF = fa.readIniFile(userConfFile)
 const LOCAL_CONF = fa.readIniFile(defConfFile)
 
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Helper functions
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Accessing properties without raising errors
 function quietAccess(obj, prop, alt) {
   try {
@@ -98,9 +98,9 @@ function getValue(section, field) {
   return userValue || localValue || DEFAULT_CONF[section][field]
 }
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Extracting and exporting sys configuration
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 
 // Server
 exports.LISTENING_ADDR = getValue(SERVER_SECTION, _serverAddress)

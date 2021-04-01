@@ -25,8 +25,8 @@
             "organization_address": "2 rue du Thabor - CS 46510, 35065 Rennes CEDEX"
         },
         "metadata_dates": {
-            "created": "2021-03-30T12:19:12.254Z",
-            "updated": "2021-03-30T13:30:00.547Z"
+            "created": "2021-04-01T15:44:50.989Z",
+            "updated": "2021-04-01T15:44:50.989Z"
         }
     },
     "keywords": [
@@ -40,11 +40,24 @@
             "email": "fazo@univ-rennes1.fr"
         }
     ],
-    "available_formats": [],
+    "available_formats": [
+        {
+            "checksum": {
+                "algo": "MD5",
+                "hash": "4c9ee0f14e835927a1bbafde0eb89fb3"
+            },
+            "connector": {
+                "url": "https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.1.0"
+            },
+            "media_type": "FILE",
+            "media_id": "b1f1a3b6-87c1-43f9-bacd-a19065c14949",
+            "file_type": "application/json",
+            "file_size": 59016
+        }
+    ],
     "resource_languages": [
         "fr"
     ],
-    "storage_status": "online",
     "global_id": "62763948-0087-403a-a083-64dce70c6044",
     "local_id": "testingID 4 lg",
     "doi": "10.1007/s00223-003-0070-444",
@@ -68,7 +81,8 @@
         "organization_address": "Campus de Beaulieu, 263 avenue du Général Leclerc, Bâtiment 12 F, allée Jean Perrin, 35042 RENNES Cedex"
     },
     "dataset_dates": {
-        "created": "2021-03-30T12:19:12.212Z",
-        "published": "2021-03-30T12:19:12.212Z"
-    }
+        "created": "2021-04-01T14:24:32.373Z",
+        "published": "2021-04-01T14:24:32.373Z"
+    },
+    "storage_status": "online"
 }

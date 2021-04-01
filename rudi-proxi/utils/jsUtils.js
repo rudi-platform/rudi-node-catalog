@@ -3,9 +3,9 @@
 const mod = 'utils'
 
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Dates
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 exports.nowISO = () => {
   return new Date().toISOString()
 }
@@ -15,9 +15,9 @@ exports.nowLocaleFormatted = () => {
   return `${year}/${month}/${date} ${h}:${m}:${s}`
 }
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Basic logging
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 exports.separateLogs = (insertStr) => {
   console.log(this.nowLocaleFormatted(), 
   !insertStr?
@@ -25,17 +25,11 @@ exports.separateLogs = (insertStr) => {
   `---------------------------------------------------------------[${insertStr}]--`
   )
 }
-exports.consoleLog = (mod, fun, action) => {
+exports.consoleLog = (mod, fun, msg) => {
   const where = !mod?fun:(!fun?mod:`${mod} • ${fun}`)
-  console.log(this.nowLocaleFormatted(), 'debug', `[${where}]`, action)
+  console.log(this.nowLocaleFormatted(), 'debug', `[${where}]`, msg)
 }
-exports.consoleErr = (mod, fun, action) => {
+exports.consoleErr = (mod, fun, msg) => {
   const where = !mod?fun:(!fun?mod:`${mod} • ${fun}`)
-  console.err(this.nowLocaleFormatted(), 'error', `[${where}]`, action)
-}
-//———————————————————————————————————————————————————————————————
-// Tests
-//———————————————————————————————————————————————————————————————
-exports.isNotEmptyArray = (anArray) => {
-  return Array.isArray(anArray) && anArray.length > 0
+  console.error(this.nowLocaleFormatted(), 'error', `[${where}]`, msg.err)
 }

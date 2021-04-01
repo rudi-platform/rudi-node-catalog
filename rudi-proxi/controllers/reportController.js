@@ -7,14 +7,14 @@ const mod = 'repCtrl'
  * (for metadata as well as organizations and contacts integration)
  */
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // External dependancies 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 const boom = require('@hapi/boom')
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Internal dependancies 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
 
@@ -26,9 +26,9 @@ const lang = require('../utils/lang')
 const status = require('../definitions/thesaurus/IntegrationStatus')
 const genericController = require('../controllers/genericController')
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Constants
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 const {
   DB_ID,
   API_METADATA_ID,
@@ -52,17 +52,17 @@ const {
   URL_ACTION_DELETION
 } = require('../config/confApi')
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Data models
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 const Metadata = require('../definitions/models/Metadata');
 const Report = require('../definitions/models/Report');
 const IntegrationStatus = require('../definitions/thesaurus/IntegrationStatus');
 
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Controllers: integration report for any object 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 
 // Add a new report for one object integration
 exports.addSingleReportForObject = async (req, reply) => {

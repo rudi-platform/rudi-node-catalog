@@ -5,14 +5,14 @@ const mod = 'genCtrl'
  * action on the objects (producer or publisher)
  */
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // External dependancies 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 const boom = require('@hapi/boom')
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Internal dependancies 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
 
@@ -21,22 +21,22 @@ const dbRwk = require('../db/dbReworkData')
 const json = require('../utils/jsonAccess')
 const utils = require('../utils/jsUtils')
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Constants
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 
 const {
   URL_OBJECT_METADATA,
   URL_OBJECT_ORGANIZATIONS,
   URL_OBJECT_CONTACTS,
-
+  URL_OBJECT_MEDIA,
   PARAM_ID,
   PARAM_OBJECT,
   QUERY_LIMIT,
   QUERY_OFFSET,
   URL_ACTION_REPORT,
   URL_OBJECT,
-  URL_ACTION_DELETION
+  URL_ACTION_DELETION,
 } = require('../config/confApi')
 
 const {
@@ -48,51 +48,27 @@ const {
   API_DATA_CONTACTS_PROPERTY,
   API_METAINFO_PROPERTY,
   API_REPORT_ID,
-  API_DATES_PUBLISHED_PROPERTY
+  API_DATES_PUBLISHED_PROPERTY,
+  API_MEDIA_ID
 } = require('../db/dbFields')
 
 const Metadata = require('../definitions/models/Metadata')
 const Organization = require('../definitions/models/Organization')
 const Contact = require('../definitions/models/Contact')
 const Report = require('../definitions/models/Report');
+/* beautify ignore:start */
+// const { MediaTypes } = require('../definitions/thesaurus/MediaTypes');
+const { Media, MediaFile, MediaSeries } = require('../definitions/models/Media');
+/* beautify ignore:end */
 
 const metadataController = require('../controllers/metadataController')
 const organizationController = require('../controllers/organizationController')
-const contactController = require('../controllers/contactController')
+const contactController = require('../controllers/contactController');
 
-//———————————————————————————————————————————————————————————————
+
+//---------------------------------------------------------------
 // Specific object type helper functions
-//——————————————————————————————————————————————————————————————— 
-
-exports.getObjectAccesses = (objectType) => {
-  const fun = 'getObjectAccesses'
-  // log.d(mod, fun, ``)
-
-  switch (objectType) {
-    case URL_OBJECT_METADATA:
-      return {
-        Model: Metadata, idField: API_METADATA_ID
-      }
-      break;
-    case URL_OBJECT_ORGANIZATIONS:
-      return {
-        Model: Organization, idField: API_ORGANIZATION_ID
-      }
-      break;
-    case URL_OBJECT_CONTACTS:
-      return {
-        Model: Contact, idField: API_CONTACT_ID
-      }
-      break;
-    case URL_ACTION_REPORT:
-      return {
-        Model: Report, idField: API_REPORT_ID
-      }
-      break;
-    default:
-      throw new Error(msg.objectTypeNotFound(objectType))
-  }
-}
+//---------------------------------------------------------------
 
 async function newObject(objectType, objectData) {
   const fun = 'newObject'
@@ -170,9 +146,9 @@ exports.setPublishedFlag = async (dbObject) => {
   if (!dbObject.publishedAt) dbObject.publishedAt = utils.nowISO()
 }
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Treatments of properties: DB -> RUDI
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 
 async function treatDbObject(objectType, dbObject) {
   const fun = 'treatDbObject'
@@ -203,6 +179,7 @@ async function treatDbObjectList(objectType, dbObjectList) {
       break;
     case URL_OBJECT_ORGANIZATIONS:
     case URL_OBJECT_CONTACTS:
+    case URL_OBJECT_MEDIA:
     case URL_ACTION_REPORT:
       return dbObjectList
       break;
@@ -212,9 +189,9 @@ async function treatDbObjectList(objectType, dbObjectList) {
 }
 
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Controllers
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 
 // Add a new object
 // => POST /{object}/{id}
@@ -296,13 +273,11 @@ exports.getObjectList = async (req, reply) => {
   const fun = 'getObjectList'
   log.v(mod, fun, `< GET ${URL_OBJECT}`)
   try {
-
-
-    // retrieve url parameters: object type, object id
+    // retrieve url parameter: object type
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
 
-    // identify object model
     /* beautify ignore:start */
+    // identify object model
     const {Model, idField} = db.getObjectAccesses(objectType)
     /* beautify ignore:end */
 
@@ -314,7 +289,7 @@ exports.getObjectList = async (req, reply) => {
 
     // accessing the objects
     const objectList = await db.getObjectList(Model, limit, offset)
-
+    log.d(mod, fun, `objectList: ${json.beautify(objectList)}`)
     // special treatments
     const refinedObjectList = await treatDbObjectList(objectType, objectList)
 
@@ -416,7 +391,7 @@ exports.deleteObjectList = async (req, reply) => {
     // identify object model
     const {Model, idField} = db.getObjectAccesses(objectType)
     /* beautify ignore:end */
-    
+
     // retrieve incoming data
     const rudiIdList = req.body
     log.d(mod, fun, json.beautify(rudiIdList))

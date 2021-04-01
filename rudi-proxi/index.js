@@ -3,9 +3,9 @@
 const mod = ''
 const fun = 'main'
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Internal dependancies 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 const utils = require('./utils/jsUtils')
 const sys = require('./config/confSystem')
 const logConf = require('./config/confLogs')
@@ -13,9 +13,9 @@ const log = require('./utils/logging')
 
 const api = require('./config/confApi')
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // External dependancies  
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 
 
 // Require external modules
@@ -40,9 +40,9 @@ const swagger = require('./config/swagger')
 // Register Swagger
 fastify.register(require('fastify-swagger'), swagger.options)
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // DB connection
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 
 // Setting flags to avoid deprecation warnings
 mongoose.set('useFindAndModify', false);
@@ -64,9 +64,9 @@ log.i(mod, fun, `Connecting to [${sys.DB_URL}]`)
 const mongoConnection = mongoose.connect(sys.DB_URL, mongoConnectOptions)
 
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // ROUTES 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 
 // Import Routes
 const {
@@ -122,9 +122,9 @@ backOfficeRoutes.forEach((boRoute, index) => {
   log.d(mod, fun, `route #${index} = ${boRoute.method} ${boRoute.url}`)
 })
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // SERVER 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 const start = async () => {
   try {
     await fastify.listen(sys.LISTENING_PORT, sys.LISTENING_ADDR)
@@ -144,4 +144,4 @@ mongoConnection
     log.i(mod, fun, 'MongoDB connected')
     utils.separateLogs('Init OK')
   })
-  .catch(err => log.e(mod, fun, err))
+  .catch(err => log.e(mod, 'mongoConnection', err))

@@ -4,29 +4,31 @@ const mod = 'db'
  * In this file are made the different calls to the database
  */
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
+//---------------------------------------------------------------
 // External dependancies 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 const boom = require('@hapi/boom')
 const mongoose = require('mongoose')
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Internal dependencies
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
 
 const json = require('../utils/jsonAccess')
 const utils = require('../utils/jsUtils')
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Constants
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 const {
   PARAM_ID,
   URL_OBJECT_METADATA,
   URL_OBJECT_ORGANIZATIONS,
   URL_OBJECT_CONTACTS,
+  URL_OBJECT_MEDIA,
   URL_ACTION_REPORT,
 } = require('../config/confApi')
 
@@ -40,27 +42,32 @@ const {
   API_METADATA_ID,
   API_ORGANIZATION_ID,
   API_CONTACT_ID,
+  API_MEDIA_ID,
   API_REPORT_ID,
   API_DATA_PRODUCER_PROPERTY,
   API_DATA_CONTACTS_PROPERTY,
   API_METAINFO_PROPERTY,
   API_METAINFO_PROVIDER_PROPERTY,
-  API_METAINFO_CONTACTS_PROPERTY
+  API_METAINFO_CONTACTS_PROPERTY,
+  API_MEDIA_TYPE_PROPERTY
 } = require('./dbFields')
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Data models
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 const Metadata = require('../definitions/models/Metadata')
 const Organization = require('../definitions/models/Organization')
 const Contact = require('../definitions/models/Contact');
-const Report = require('../definitions/models/Report');
 const {
-  OK
-} = require('../definitions/thesaurus/IntegrationStatus');
+  Media
+} = require('../definitions/models/Media');
+const Report = require('../definitions/models/Report');
 
 
 
+//---------------------------------------------------------------
+// Specific object accesses
+//---------------------------------------------------------------
 exports.getObjectAccesses = (objectType) => {
   const fun = 'getObjectAccesses'
   // log.d(mod, fun, ``)
@@ -81,6 +88,11 @@ exports.getObjectAccesses = (objectType) => {
         Model: Contact, idField: API_CONTACT_ID
       }
       break;
+    case URL_OBJECT_MEDIA:
+      return {
+        Model: Media, idField: API_MEDIA_ID
+      }
+      break;
     case URL_ACTION_REPORT:
       return {
         Model: Report, idField: API_REPORT_ID
@@ -91,9 +103,9 @@ exports.getObjectAccesses = (objectType) => {
   }
 }
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Actions on DB tables
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 exports.getCollections = async () => {
   const fun = `getCollections`
   try {
@@ -121,9 +133,26 @@ exports.dropDB = async () => {
     throw err
   }
 }
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Generic functions
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
+exports.getDbIdWithRudiId = async (objectType, Model, idField, rudiId) => {
+  const fun = `getDbIdWithRudiId`
+  log.d(mod, fun, ``)
+  // log.d(mod, fun, `objectType: ${objectType}`)
+  // log.d(mod, fun, `idField: ${idField}`)
+  // log.d(mod, fun, `rudiId: ${rudiId}`)
+  try {
+    /* beautify ignore:start */
+    const dbObject = await Model.findOne({[idField]: rudiId})
+    /* beautify ignore:end */
+    return !dbObject ? null : json.accessProperty(dbObject, DB_ID)
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw err
+  }
+}
+
 exports.getEnsuredDbIdWithRudiId = async (objectType, Model, idField, rudiId) => {
   const fun = `getEnsuredDbIdWithRudiId`
   log.d(mod, fun, ``)
@@ -137,6 +166,21 @@ exports.getEnsuredDbIdWithRudiId = async (objectType, Model, idField, rudiId) =>
     if (!dbObject) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
     const dbId = json.accessProperty(dbObject, DB_ID)
     return dbId
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw err
+  }
+}
+
+exports.getDbIdWithJson = async (objectType, Model, idField, rudiObject) => {
+  const fun = `getDbIdWithJson`
+  log.d(mod, fun, ``)
+  // log.d(mod, fun, `objectType: ${objectType}`)
+  // log.d(mod, fun, `idField: ${idField}`)
+  // log.d(mod, fun, `jsonObject: ${json.beautify(jsonObject)}`)
+  try {
+    const rudiId = json.accessProperty(rudiObject, idField)
+    return await this.getDbIdWithRudiId(objectType, Model, idField, rudiId)
   } catch (err) {
     log.e(mod, fun, err)
     throw err
@@ -428,9 +472,9 @@ exports.setPublishedFlag = async (Model, idField, rudiId) => {
   return updatedObject
 }
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Specific functions
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 
 //---------------------------------------- 
 // - Metadata
@@ -555,6 +599,12 @@ exports.getEnsuredOrganizationDbIdWithJson = async (organizationJson) => {
   return this.getEnsuredDbIdWithJson(URL_OBJECT_ORGANIZATIONS, Organization, API_ORGANIZATION_ID, organizationJson)
 }
 
+exports.getOrganizationDbIdWithJson = async (organizationJson) => {
+  const fun = `getEnsuredOrganizationDbIdWithJson`
+  log.d(mod, fun, ``)
+  return this.getDbIdWithJson(URL_OBJECT_ORGANIZATIONS, Organization, API_ORGANIZATION_ID, organizationJson)
+}
+
 exports.getAllOrganizations = async () => {
   const fun = `getAllOrganizations`
   log.d(mod, fun, ``)
@@ -610,6 +660,7 @@ exports.deleteOrganization = async (organizationRudiId) => {
 //---------------------------------------- 
 // - Contacts
 //---------------------------------------- 
+
 exports.getContactWithRudiId = async (contactRudiId) => {
   const fun = `getContactWithRudiId`
   log.d(mod, fun, ``)
@@ -644,6 +695,12 @@ exports.getEnsuredContactWithDbId = async (contactDbId) => {
   const fun = `getEnsuredContactWithDbId`
   log.d(mod, fun, ``)
   return this.getEnsuredObjectWithDbId(URL_OBJECT_CONTACTS, Contact, contactDbId)
+}
+
+exports.getContactDbIdWithJson = async (contactDbId) => {
+  const fun = `getEnsuredContactDbIdWithJson`
+  log.d(mod, fun, ``)
+  return this.getDbIdWithJson(URL_OBJECT_CONTACTS, Contact, API_CONTACT_ID, contactDbId)
 }
 
 exports.getEnsuredContactDbIdWithJson = async (contactDbId) => {
@@ -698,6 +755,41 @@ exports.deleteContact = async (contactRudiId) => {
   return deletedContact
 }
 
+//---------------------------------------- 
+// - Media
+//---------------------------------------- 
+
+exports.getMediaDbIdWithJson = async (mediaJson) => {
+  const fun = `getMediaDbIdWithJson`
+  log.d(mod, fun, ``)
+  // log.d(mod, fun, `URL_OBJECT_MEDIA: ${URL_OBJECT_MEDIA}`)
+  // log.d(mod, fun, `API_MEDIA_ID: ${API_MEDIA_ID}`)
+  // log.d(mod, fun, `mediaJson: ${json.beautify(mediaJson)}`)
+  // log.d(mod, fun, `media dbType: ${json.beautify(mediaJson[API_MEDIA_TYPE_PROPERTY])}`)
+  return this.getDbIdWithJson(URL_OBJECT_MEDIA, Media, API_MEDIA_ID, mediaJson)
+}
+
+exports.getEnsuredMediaDbIdWithJson = async (mediaJson) => {
+  const fun = `getEnsuredMediaDbIdWithJson`
+  log.d(mod, fun, ``)
+  // log.d(mod, fun, `URL_OBJECT_MEDIA: ${URL_OBJECT_MEDIA}`)
+  // log.d(mod, fun, `API_MEDIA_ID: ${API_MEDIA_ID}`)
+  // log.d(mod, fun, `mediaJson: ${json.beautify(mediaJson)}`)
+  // log.d(mod, fun, `media dbType: ${json.beautify(mediaJson[API_MEDIA_TYPE_PROPERTY])}`)
+  return this.getEnsuredDbIdWithJson(URL_OBJECT_MEDIA, Media, API_MEDIA_ID, mediaJson)
+}
+
+exports.getMediaWithDbId = async (mediaDbId) => {
+  const fun = `getMediaWithDbId`
+  log.d(mod, fun, ``)
+  return this.getObjectWithDbId(URL_OBJECT_MEDIA, Media, mediaDbId)
+}
+
+exports.getEnsuredMediaWithDbId = async (mediaDbId) => {
+  const fun = `getEnsuredMediaWithDbId`
+  log.d(mod, fun, ``)
+  return this.getEnsuredObjectWithDbId(URL_OBJECT_MEDIA, Media, mediaDbId)
+}
 
 //---------------------------------------- 
 // - Filters

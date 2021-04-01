@@ -2,9 +2,9 @@
 
 const mod = 'logConf'
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // External dependencies
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 const winston = require('winston');
 require('winston-daily-rotate-file');
 
@@ -21,27 +21,27 @@ const {
 
 const fs = require('fs');
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Internal dependencies
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 const sys = require('../config/confSystem');
 const utils = require('../utils/jsUtils');
 const {
   log
 } = require('winston');
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Constants
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 const errorLogsFileName = 'error.log'
 
 const logsTimestamp = 'YYYY/MM/DD HH:mm:ss'
 const fileTimestamp = 'YYYY-MM-DD-HH'
 const fileDatestamp = 'YYYY-MM-DD'
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Creating local log dir
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 
 try {
   // first check if directory already exists
@@ -56,9 +56,9 @@ try {
   console.error(utils.nowLocaleFormatted(), `[${mod}]`, err);
 }
 
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 // Winston logger creation
-//———————————————————————————————————————————————————————————————
+//---------------------------------------------------------------
 
 // datedRotatingFile.on('rotate', function (oldFilename, newFilename) {
 //   // perform an action when rotation takes place
@@ -92,15 +92,6 @@ const formatConsoleLogs =
     winston.format.timestamp(FORMAT_TIMESTAMP),
     winston.format.printf(FORMAT_PRINTF)
   )
-
-const formatConsoleFastifyLogs =
-  winston.format.combine(
-    winston.format.json(),
-    winston.format.colorize(COLORIZE_ALL),
-    winston.format.timestamp(FORMAT_TIMESTAMP),
-    winston.format.printf(FORMAT_PRINTF)
-  )
-
 
 const formatFileLogs =
   winston.format.combine(
@@ -152,6 +143,23 @@ exports.logger = winston.createLogger({
     }),
   ],
 });
+ 
+function extractErrorFromFastifyMsg(msg) {
+  try {
+    return msg.split('err: ')[1].split('\n')
+  } catch (err) {
+    return msg
+  }
+}
+let FORMAT_PRINTFF = info => `!${info.timestamp} .${info.level}. ${extractErrorFromFastifyMsg(info.message)}`
+
+const formatConsoleFastifyLogs =
+  winston.format.combine(
+    winston.format.json(),
+    winston.format.colorize(COLORIZE_ALL),
+    winston.format.timestamp(FORMAT_TIMESTAMP),
+    winston.format.printf(FORMAT_PRINTFF)
+  )
 
 exports.initFFLogger = (appname) => {
   const fun = 'initFFLogger'
