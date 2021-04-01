@@ -1557,7 +1557,7 @@
 					"response": []
 				},
 				{
-					"name": "Delete many metadata Copy",
+					"name": "Delete media 1 & 2",
 					"event": [
 						{
 							"listen": "test",
