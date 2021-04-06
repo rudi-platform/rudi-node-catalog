@@ -707,7 +707,7 @@
 					"response": []
 				},
 				{
-					"name": "Add meta 2 fails",
+					"name": "Add meta 2 fails 'bounding_box\"",
 					"event": [
 						{
 							"listen": "test",
@@ -750,7 +750,7 @@
 					"response": []
 				},
 				{
-					"name": "Add meta 2 fails",
+					"name": "Add meta 2 fails 'start_date'",
 					"event": [
 						{
 							"listen": "test",
