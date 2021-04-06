@@ -12,8 +12,10 @@
 #   - 'minimum' is incorrect for arrays -> 'minItems'
 #   - IntegrationReport.version is now a string
 #
-# [1.1.0]
-#   - 
+# [1.2.0]
+#   - Schemas 'SkosConcept' and 'SkosConceptScheme'
+#   - Metadata.access_condition
+#
 #•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
 openapi: 3.0.0
 info:
@@ -923,9 +925,10 @@ components:
                   maximum: 180
             #......................
             'geographic_distribution':
-              description: Precise geographic distribution of the data 
-              #  type: object  
-              $ref: 'https://app.swaggerhub.com/apis/OlivierMartineau/GeoJSON/#/schemas/GeoJsonObject'
+              allOf:
+              - description: Precise geographic distribution of the data 
+                type: object  
+              - $ref: 'https://app.swaggerhub.com/apis/OlivierMartineau/GeoJSON/#/schemas/GeoJsonObject'
             #......................
             'projection':
               description: Cartographic projection used to describe the data
@@ -968,6 +971,108 @@ components:
           enum: [online, archived, unavailable]
         # !SKOS!
 
+        #—•—•—•—•—•—•—•—•—•—•—•—•—•
+        # ACCESS CONSTRAINTS
+        #——————————————————————————
+        'access_condition':
+          description: >
+            Access restrictions for the use of data in the form of licence,
+            confidentiality, terms of service, habilitation or required rights,
+            economical model. Default is open licence.
+            #TODO: to be defined. Possible redundencies with other fields!
+          type: object
+          required:
+          - confidentiality
+          - licence
+          properties:
+            'confidentiality':
+              type: object
+              properties:
+                'restricted_access': 
+                  description: >
+                    True if the dataset has a restricted access.
+                    False for open data
+                  type: boolean
+                'gdpr_sensitive':
+                  description: >
+                    True if the dataset embeds personal data
+                  type: boolean
+            'licence':
+              oneOf:
+              - type: object
+                required:
+                - licence_label
+                properties: 
+                  'licence_label':
+                    $ref: '#/components/schemas/SkosConcept'
+              - type: object
+                required: 
+                - licence_custom
+                - licence_uri
+                properties: 
+                  'licence_custom':
+                    $ref: '#/components/schemas/DictionaryEntry'
+                  'licence_uri':
+                    type: string
+                    format: URI
+            'usage_constraint':
+              type: array
+              items:
+                $ref: '#/components/schemas/DictionaryEntry'
+              example: 
+                {
+                  "lang": "fr",
+                  "text": "Usage libre sous réserve des mentions obligatoires sur tout document de diffusion"
+                }
+            'bibliographical_reference':
+              allOf:
+              - description: >
+                  Information that MUST be cited every time the data is used, 
+                  most likely a BibTeX entry
+                type: object
+              - $ref: '#/components/schemas/DictionaryEntry'
+            'mandatory_mention':
+              description: >
+                Mention that must be cited verbatim in every publication that
+                makes use of the data
+              type: array
+              items:
+                $ref: '#/components/schemas/DictionaryEntry'
+              minItems: 1
+              example: 
+                {
+                  "lang": "fr-FR",
+                  "text": "Source: Région Bretagne"
+                }
+            'access_constraint':
+              type: array
+              items:
+                $ref: '#/components/schemas/DictionaryEntry'
+              minItems: 1
+            'other_constraints':
+              type: array
+              items:
+                $ref: '#/components/schemas/DictionaryEntry'
+              minItems: 1
+              example: 
+                {
+                  "lang": "fr",
+                  "text": "Pas de restriction d'accès public"
+                }
+            'subscription_for_application':
+              type: string
+              enum: ['free']
+              #TODO: lien vers tarification ? Vers conditions ?
+              # Quel est l'usage de ce champ ?
+          example:
+            {
+              licence_label: 'Licence ouverte v2.0',
+              licence_url: 'https://www.etalab.gouv.fr/wp-content/uploads/2017/04/ETALAB-Licence-Ouverte-v2.0.pdf',
+              usage_constraint: "Licence",
+              access_constraint: "Autres restrictions",
+              other_constraints: "Pas de restriction d'accès public",
+            }
+        
         #—•—•—•—•—•—•—•—•—•—•—•—•—•
         # METADATA INFO
         #——————————————————————————
@@ -1429,6 +1534,26 @@ components:
           $ref: '#/components/schemas/Date'
 
     #---------------------------------------------------------------------------
+    'DictionaryList':
+      type: object
+      required:
+      - lang
+      - text
+      properties:
+        'lang':
+          $ref: '#/components/schemas/Language'
+        'text':
+          type: array
+          items: 
+            type: string
+            #TODO: possibly set limitations (size, characters allowed, HTML-ready or not)
+      example:
+        {
+          lang: 'fr-FR',
+          text: ["abeilles", "Apis"]
+        }
+
+    #---------------------------------------------------------------------------
     'DictionaryEntry':
       type: object
       required:
@@ -1438,14 +1563,156 @@ components:
         'lang':
           $ref: '#/components/schemas/Language'
         'text':
-          #TODO: possibly set limitations (size, characters allowed, HTML-ready or not)
           type: string
+          #TODO: possibly set limitations (size, characters allowed, HTML-ready or not)
       example:
         {
           lang: 'fr-FR',
-          text: "Données de capteurs de la qualité de l'air, nov. 2020, Laënnec, Rennes, France"
+          text: "abeilles"
         }
 
+    #---------------------------------------------------------------------------
+    'SkosConceptScheme':
+      description: >
+        Set of SKOS concepts gathered in a transversal and hierarchical 
+        relationships.
+      type: object
+      required:
+      - concept_scheme_id
+      - concept_scheme_label
+      properties:
+        'concept_scheme_id':
+          description: 'ID of the SKOS concept scheme'
+          type: string
+          format: uuid
+        'concept_scheme_label':
+          $ref: '#/components/schemas/DictionaryEntry'
+        'concept_scheme_uri':
+          description: 'Short code for the concept'
+          type: string
+          format: uri
+        'top_concepts':
+          description: 'List of the highest level concepts in the concept scheme'
+          type: array
+          items: 
+            $ref: '#/components/schemas/SkosConcept'
+          
+          
+    #---------------------------------------------------------------------------
+    'SkosConcept':
+      description: >
+        A SKOS concept is an element in a controlled vocabulary such as a 
+        thesaurus. It offers to link concepts in hierarchical (broader/narrower) 
+        or neighbouring relationships.
+        A set of SKOS concepts is gathered in one concept scheme.
+        If a SKOS concept appears in two different concept schemes, it should be
+        duplicated as there are chances the context is slightly different and the
+        meaning will be hard to unify.
+      type: object
+      required:
+      - concept_id
+      - concept_scheme_class
+      - pref_label
+      properties:
+        #—•—•—•—•—•—•—•—•—•—•—•—•—•
+        # Identification
+        #——————————————————————————
+        'concept_id':
+          description: 'ID of the SKOS concept'
+          type: string
+          format: uuid
+        'concept_code':
+          description: 'Short abstract code for the concept'
+          type: string
+          minLength: 2
+          maxLength: 30
+        'concept_uri':
+          description: 'Web page that document the SKOS concept'
+          type: string
+          format: uri
+        #—•—•—•—•—•—•—•—•—•—•—•—•—•
+        # Labels
+        #——————————————————————————
+        'pref_label':
+          allOf:
+          - description: 'Preferred lexical label for the resource, one for each language'
+            type: object
+          - $ref: '#/components/schemas/DictionaryEntry'
+        'alt_labels':
+          allOf:
+          - description: 'List of alternative labels (in each language)'
+            type: object
+          - $ref: '#/components/schemas/DictionaryList'
+        'hidden_labels':
+          allOf:
+          - description: 'List of alternative orthographs for the label (in each language)'
+            type: object
+          - $ref: '#/components/schemas/DictionaryList'
+        #—•—•—•—•—•—•—•—•—•—•—•—•—•
+        # Classification
+        #——————————————————————————
+        'concept_scheme_class':
+          allOf:
+          - description: >
+              Reference of the compiled vocabulary, thesaurus or classification scheme
+            type: object
+          - $ref: '#/components/schemas/SkosConceptScheme'
+        'top_concept_of':
+          $ref: '#/components/schemas/SkosConceptScheme'
+        #—•—•—•—•—•—•—•—•—•—•—•—•—•
+        # Relationships
+        #——————————————————————————
+        'broader_concepts':
+          description: >
+            References to the 'parent' SKOS concepts with a broader scope 
+            than the current concept
+          type: array
+          items:
+            $ref: '#/components/schemas/SkosConcept'
+          # beware to avoid graph loops with narrower (children) concepts or siblings (neighbours) !
+        'narrower_concepts':
+          description: >
+            References to the 'children' SKOS concepts with a narrower scope 
+            than the current concept
+          type: array
+          items:
+            $ref: '#/components/schemas/SkosConcept'
+          # beware to avoid graph loops with narrower (children) concepts or siblings (neighbours) !
+        'siblings_concepts':
+          description: >
+            References to the SKOS concepts that are neighbouring meanings 
+            of the current concept
+          type: array
+          items:
+            $ref: '#/components/schemas/SkosConcept'
+          # beware to avoid graph loops with narrower (children) concepts or siblings (neighbours) !
+        'relative_concepts':
+          description: >
+            References to the SKOS concepts that can be associated in a non-transitive relationship 
+          type: array
+          items:
+            $ref: '#/components/schemas/SkosConcept'
+        #—•—•—•—•—•—•—•—•—•—•—•—•—•
+        # Documentation
+        #——————————————————————————
+        'scope_note':
+          allOf:
+          - description: >
+             Contextual information about the intended meaning of the concept, 
+             especially as an indication of how the use of the concept
+            type: object
+          - $ref: '#/components/schemas/DictionaryEntry'
+        'concept_definition':
+          allOf:
+          - description: 'Complete explanation of the intended meaning of a concept'
+            type: object
+          - $ref: '#/components/schemas/DictionaryEntry'
+        'concept_example':
+          allOf:
+          - description: 'Example of the use of a concept'
+            type: object
+          - $ref: '#/components/schemas/DictionaryEntry'
+      
     #---------------------------------------------------------------------------
     'Language':
       description: >
@@ -1468,6 +1735,7 @@ components:
 #TODO : thesaurus : tableau de valeurs simples ou couples {label: "Texte à
 #       afficher pour l'utilisateur", "valeur": "ValeurAssociee"}
 
+  #=============================================================================
   responses:
 
     #---------------------------------------------------------------------------

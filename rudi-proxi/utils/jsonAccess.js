@@ -5,6 +5,7 @@ const mod = 'json'
 //---------------------------------------------------------------
 const boom = require('@hapi/boom')
 const util = require('util')
+const _ = require('lodash')
 //---------------------------------------------------------------
 // Internal dependancies 
 //---------------------------------------------------------------
@@ -14,6 +15,32 @@ const msg = require('./msg')
 //---------------------------------------------------------------
 // Functions
 //---------------------------------------------------------------
+exports.isEmpty = (prop) => {
+  const fun = 'isEmpty'
+  const str = JSON.stringify(prop)
+  log.d(mod, fun, `prop: ${str}`)
+  return str == '' || str == '{}' || str == '[]'
+}
+
+exports.isNothing = (prop) => {
+  const fun = 'isNothing'
+  const result = (!prop || this.isEmpty(prop))
+
+  log.d(mod, fun, `===`)
+  log.d(mod, fun, `prop: ${prop}`)
+  log.d(mod, fun, `!prop: ${!prop}`)
+  log.d(mod, fun, `!!!prop: ${!!!prop}`)
+  log.d(mod, fun, `prop == null: ${prop == null}`)
+  log.d(mod, fun, `prop == undefined: ${prop == undefined}`)
+  log.d(mod, fun, `prop == {}: ${prop == {}}`)
+  log.d(mod, fun, `prop == '{}': ${prop == '{}'}`)
+  log.d(mod, fun, `prop == []: ${prop == []}`)
+  log.d(mod, fun, `_.isEmpty(prop): ${_.isEmpty(prop)}`)
+  log.d(mod, fun, `this.isEmpty(prop): ${this.isEmpty(prop)}`)
+  log.d(mod, fun, `isNothing prop: ${result}`)
+
+  return result
+}
 
 /**
  * Safe access to a property of a JSON object: ensures the property is defined
@@ -75,8 +102,8 @@ exports.deepClone = (jsonObject) => {
  * @returns {String} JSON.stringify options
  */
 exports.beautify = (jsonObject, option) => {
-  try{
-  return `${JSON.stringify(jsonObject, null, option)}${option!=null?'\n':''}`
+  try {
+    return `${JSON.stringify(jsonObject, null, option)}${option!=null?'\n':''}`
   } catch (err) {
     return `${util.inspect(jsonObject)}`
 

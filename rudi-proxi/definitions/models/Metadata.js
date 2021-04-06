@@ -219,7 +219,6 @@ const MetadataSchema = new mongoose.Schema({
   temporal_spread: {
     start_date: {
       type: Date,
-      required: true
     },
     end_date: {
       type: Date
@@ -234,7 +233,6 @@ const MetadataSchema = new mongoose.Schema({
     // norm ISO 6709
     bounding_box: {
       type: Object,
-      required: true,
 
       // Northernmost latitude given as a decimal number
       north_latitude: {
@@ -365,6 +363,30 @@ const MetadataSchema = new mongoose.Schema({
   },
 });
 
+
+//---------------------------------------------------------------
+// Validation
+//---------------------------------------------------------------
+function requireSubProperty(metadata, prop, subProp) {
+  const fun = 'requireSubProperty'
+  if (!json.isNothing(metadata[prop]) && json.isNothing(metadata[prop][subProp])) {
+    log.d(mod, fun, `${prop}.${subProp}`)
+    log.d(mod, fun, `metadata[prop]: ${metadata[prop]}`)
+    log.d(mod, fun, `metadata[prop][subProp]: ${metadata[prop][subProp]}`)
+    throw (new Error(`'${prop}.${subProp}' is required when '${prop}' is set`))
+  }
+}
+
+MetadataSchema.pre('save', function (next) {
+  const fun = 'pre hook'
+  try {
+    requireSubProperty(this, 'geography', 'bounding_box', next)
+    requireSubProperty(this, 'temporal_spread', 'start_date', next)
+  } catch (err) {
+    next(err)
+  }
+  next()
+});
 
 //---------------------------------------------------------------
 // Schema refinements

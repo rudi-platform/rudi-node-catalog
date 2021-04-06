@@ -25,7 +25,6 @@ const OrganizationSchema = new mongoose.Schema({
   // Updated offical postal address of the organization
   organization_address: {
     type: String,
-    required: true
   },
 
   // Time when this organization was succesfully published on RUDI portal

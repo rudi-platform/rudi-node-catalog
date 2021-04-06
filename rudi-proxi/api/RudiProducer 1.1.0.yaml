@@ -1466,6 +1466,7 @@ components:
 #TODO : thesaurus : tableau de valeurs simples ou couples {label: "Texte à
 #       afficher pour l'utilisateur", "valeur": "ValeurAssociee"}
 
+  #=============================================================================
   responses:
 
     #---------------------------------------------------------------------------
