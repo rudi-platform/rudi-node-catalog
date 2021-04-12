@@ -118,7 +118,8 @@ const MetadataSchema = new mongoose.Schema({
   local_id: {
     type: String,
     trim: true,
-    unique: true
+    unique: true,
+    sparse: true, // accept null values as non-duplicates 
   },
 
   // Digital Object Identifier for the ressource (optional)
