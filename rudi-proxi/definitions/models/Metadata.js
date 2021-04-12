@@ -119,7 +119,8 @@ const MetadataSchema = new mongoose.Schema({
     type: String,
     trim: true,
     unique: true,
-    sparse: true, // accept null values as non-duplicates 
+    index: true,
+    sparse: true, // accept empty values as non-duplicates 
   },
 
   // Digital Object Identifier for the ressource (optional)
