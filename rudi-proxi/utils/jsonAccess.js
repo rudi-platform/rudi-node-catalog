@@ -18,27 +18,27 @@ const msg = require('./msg')
 exports.isEmpty = (prop) => {
   const fun = 'isEmpty'
   const str = JSON.stringify(prop)
-  log.d(mod, fun, `prop: ${str}`)
+  // log.d(mod, fun, `prop: ${str}`)
   return str == '' || str == '{}' || str == '[]'
 }
 
 exports.isNothing = (prop) => {
   const fun = 'isNothing'
   const result = (!prop || this.isEmpty(prop))
-
-  log.d(mod, fun, `===`)
-  log.d(mod, fun, `prop: ${prop}`)
-  log.d(mod, fun, `!prop: ${!prop}`)
-  log.d(mod, fun, `!!!prop: ${!!!prop}`)
-  log.d(mod, fun, `prop == null: ${prop == null}`)
-  log.d(mod, fun, `prop == undefined: ${prop == undefined}`)
-  log.d(mod, fun, `prop == {}: ${prop == {}}`)
-  log.d(mod, fun, `prop == '{}': ${prop == '{}'}`)
-  log.d(mod, fun, `prop == []: ${prop == []}`)
-  log.d(mod, fun, `_.isEmpty(prop): ${_.isEmpty(prop)}`)
-  log.d(mod, fun, `this.isEmpty(prop): ${this.isEmpty(prop)}`)
-  log.d(mod, fun, `isNothing prop: ${result}`)
-
+  /* 
+    log.d(mod, fun, `===`)
+    log.d(mod, fun, `prop: ${prop}`)
+    log.d(mod, fun, `!prop: ${!prop}`)
+    log.d(mod, fun, `!!!prop: ${!!!prop}`)
+    log.d(mod, fun, `prop == null: ${prop == null}`)
+    log.d(mod, fun, `prop == undefined: ${prop == undefined}`)
+    log.d(mod, fun, `prop == {}: ${prop == {}}`)
+    log.d(mod, fun, `prop == '{}': ${prop == '{}'}`)
+    log.d(mod, fun, `prop == []: ${prop == []}`)
+    log.d(mod, fun, `_.isEmpty(prop): ${_.isEmpty(prop)}`)
+    log.d(mod, fun, `this.isEmpty(prop): ${this.isEmpty(prop)}`)
+    log.d(mod, fun, `isNothing prop: ${result}`)
+   */
   return result
 }
 
@@ -85,7 +85,10 @@ exports.deepClone = (jsonObject) => {
   const fun = 'deepClone'
   log.d(mod, fun, ``)
   try {
-    if (!jsonObject) throw new Error(`${msg.parameterExpected(fun, 'jsonObject')}`)
+    if (!jsonObject) {
+      log.e(mod, fun, `Input parameter should not be null nor undefined: ${this.beautify(jsonObject)}`)
+      throw new Error(`${msg.parameterExpected(fun, 'jsonObject')}`)
+    }
     return JSON.parse(JSON.stringify(jsonObject));
   } catch (err) {
     log.e(mod, fun, err)

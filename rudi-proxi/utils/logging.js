@@ -5,6 +5,8 @@
 // Internal dependencies
 //---------------------------------------------------------------
 const logger = require('../config/confLogs').logger
+const json = require('../utils/jsonAccess')
+
 //---------------------------------------------------------------
 // Colors
 //---------------------------------------------------------------
@@ -129,21 +131,21 @@ exports.d = (mod, fun, msg) => {
 //---------------------------------------------------------------
 exports.logRequest = (req, res) => {
   const fun = 'request'
-  this.i('', fun,`${req.method} ${req.url}`)
+  this.i('', fun,`${req.method} ${req.url} <- ${req.ip} `)
   return
-  this.d(mod, fun, `method: ${json.beautify(req.method)}`)
-  this.d(mod, fun, `url: ${json.beautify(req.url)}`)
-  this.d(mod, fun, `routerMethod: ${json.beautify(req.routerMethod)}`)
-  this.d(mod, fun, `routerPath: ${json.beautify(req.routerPath)}`)
-  this.d(mod, fun, `params: ${json.beautify(req.params)}`)
-  this.d(mod, fun, `body: ${json.beautify(req.body)}`)
-  this.d(mod, fun, `query: ${json.beautify(req.query)}`)
-  this.d(mod, fun, `headers: ${json.beautify(req.headers)}`)
-  this.d(mod, fun, `id: ${json.beautify(req.id)}`)
-  this.d(mod, fun, `ip: ${json.beautify(req.ip)}`)
-  this.d(mod, fun, `ips: ${json.beautify(req.ips)}`)
-  this.d(mod, fun, `hostname: ${json.beautify(req.hostname)}`)
-  this.d(mod, fun, `protocol: ${json.beautify(req.protocol)}`)
+  // this.d(mod, fun, `method: ${json.beautify(req.method)}`)
+  // this.d(mod, fun, `url: ${json.beautify(req.url)}`)
+  // this.d(mod, fun, `routerMethod: ${json.beautify(req.routerMethod)}`)
+  // this.d(mod, fun, `routerPath: ${json.beautify(req.routerPath)}`)
+  // this.d(mod, fun, `params: ${json.beautify(req.params)}`)
+  // this.d(mod, fun, `body: ${json.beautify(req.body)}`)
+  // this.d(mod, fun, `query: ${json.beautify(req.query)}`)
+  // this.d(mod, fun, `headers: ${json.beautify(req.headers)}`)
+  // this.d(mod, fun, `id: ${json.beautify(req.id)}`)
+  // this.d(mod, fun, `ip: ${json.beautify(req.ip)}`)
+  // this.d(mod, fun, `ips: ${json.beautify(req.ips)}`)
+  // this.d(mod, fun, `hostname: ${json.beautify(req.hostname)}`)
+  // this.d(mod, fun, `protocol: ${json.beautify(req.protocol)}`)
   // this.d(mod, fun, `raw: ${json.beautify(req.req)}`)
   // this.d(mod, fun, `socket: ${util.inspect(req.socket)}`)
 }

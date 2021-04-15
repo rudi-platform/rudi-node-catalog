@@ -13,14 +13,16 @@
 #   - IntegrationReport.version is now a string
 #
 # [1.2.0]
-#   - Schemas 'SkosConcept' and 'SkosConceptScheme'
+#   - Schemas 'SkosConcept' and 'SkosScheme'
 #   - Metadata.access_condition
+#   - $ref: 'UUIDv4' replaced by {type: string; format: uuid}. 
+#   - 'UUIDv4' schema deleted
 #
 #•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
 openapi: 3.0.0
 info:
   version: 1.2.0
-  title: rudi-catalog-api
+  title: rudi-proxi-api
   description: "API pour l'accès aux données au niveau du nœud producteur RUDI"
   termsOfService: "no"
   contact:
@@ -66,7 +68,8 @@ paths:
       in: path
       required: true
       schema:
-        $ref: '#/components/schemas/UUIDv4'
+        type: string   
+        format: uuid
     'get':
       tags:
       - Metadata
@@ -274,7 +277,8 @@ paths:
             schema:
               type: array
               items:
-                $ref: "#/components/schemas/UUIDv4"
+                type: string
+                format: uuid
       responses:
         '202':
           description: The deletion of the resources has been initiated.
@@ -290,7 +294,8 @@ paths:
       in: path
       required: true
       schema:
-        $ref: '#/components/schemas/UUIDv4'    
+        type: string      
+        format: uuid    
     'get':
       tags:
       - Organization
@@ -432,7 +437,8 @@ paths:
             schema:
               type: array
               items:
-                $ref: "#/components/schemas/UUIDv4"
+                type: string
+                format: uuid
       responses:
         '202':
           description: The deletion of the organizations has been initiated
@@ -448,7 +454,8 @@ paths:
       in: path
       required: true
       schema:
-        $ref: '#/components/schemas/UUIDv4'    
+        type: string    
+        format: uuid    
     'get':
       tags:
       - Contact
@@ -590,7 +597,8 @@ paths:
             schema:
               type: array
               items:
-                $ref: "#/components/schemas/UUIDv4"
+                type: string
+                format: uuid
       responses:
         '202':
           description: The deletion of the contacts has been initiated.
@@ -605,7 +613,8 @@ paths:
       in: path
       required: true
       schema:
-        $ref: '#/components/schemas/UUIDv4'
+        type: string   
+        format: uuid
     'post':
       tags:
       - Report
@@ -649,7 +658,8 @@ paths:
       in: path
       required: true
       schema:
-        $ref: '#/components/schemas/UUIDv4'
+        type: string        
+        format: uuid
     'post':
       tags:
       - Report
@@ -692,7 +702,8 @@ paths:
       in: path
       required: true
       schema:
-        $ref: '#/components/schemas/UUIDv4'
+        type: string        
+        format: uuid
     'post':
       tags:
       - Report
@@ -760,6 +771,8 @@ components:
       #- geography
       - dataset_dates
       - storage_status
+      
+      - access_condition
       
       - metadata_info
 
@@ -982,10 +995,11 @@ components:
             #TODO: to be defined. Possible redundencies with other fields!
           type: object
           required:
-          - confidentiality
           - licence
           properties:
+            #......................
             'confidentiality':
+              description: Restriction level for the resource
               type: object
               properties:
                 'restricted_access': 
@@ -997,25 +1011,37 @@ components:
                   description: >
                     True if the dataset embeds personal data
                   type: boolean
+            #......................
             'licence':
               oneOf:
-              - type: object
+              - description: Standard license (recognized by RUDI system)
+                type: object
                 required:
                 - licence_label
                 properties: 
                   'licence_label':
-                    $ref: '#/components/schemas/SkosConcept'
-              - type: object
+                    description: Value of the field SkosConcept.concept_code
+                    type: string
+                    format: skosConceptCode
+              - description: Custom license
+                type: object
                 required: 
-                - licence_custom
-                - licence_uri
+                - custom_licence_label
+                - custom_licence_uri
                 properties: 
-                  'licence_custom':
-                    $ref: '#/components/schemas/DictionaryEntry'
-                  'licence_uri':
+                  'custom_licence_label':
+                    description: Title of the custom licence
+                    type: array
+                    items: 
+                      $ref: '#/components/schemas/DictionaryEntry'
+                  'custom_licence_uri':
+                    description: URL towards the custom licence
                     type: string
                     format: URI
+            #......................
             'usage_constraint':
+              description: >
+                Describes how constrained is the use of the resource
               type: array
               items:
                 $ref: '#/components/schemas/DictionaryEntry'
@@ -1024,13 +1050,15 @@ components:
                   "lang": "fr",
                   "text": "Usage libre sous réserve des mentions obligatoires sur tout document de diffusion"
                 }
+            #......................
             'bibliographical_reference':
-              allOf:
-              - description: >
+              description: >
                   Information that MUST be cited every time the data is used, 
                   most likely a BibTeX entry
-                type: object
-              - $ref: '#/components/schemas/DictionaryEntry'
+              type: array
+              items: 
+                $ref: '#/components/schemas/DictionaryEntry'
+            #......................
             'mandatory_mention':
               description: >
                 Mention that must be cited verbatim in every publication that
@@ -1044,35 +1072,22 @@ components:
                   "lang": "fr-FR",
                   "text": "Source: Région Bretagne"
                 }
+            #......................
             'access_constraint':
               type: array
               items:
                 $ref: '#/components/schemas/DictionaryEntry'
-              minItems: 1
+            #......................
             'other_constraints':
               type: array
               items:
                 $ref: '#/components/schemas/DictionaryEntry'
-              minItems: 1
               example: 
                 {
                   "lang": "fr",
                   "text": "Pas de restriction d'accès public"
                 }
-            'subscription_for_application':
-              type: string
-              enum: ['free']
-              #TODO: lien vers tarification ? Vers conditions ?
-              # Quel est l'usage de ce champ ?
-          example:
-            {
-              licence_label: 'Licence ouverte v2.0',
-              licence_url: 'https://www.etalab.gouv.fr/wp-content/uploads/2017/04/ETALAB-Licence-Ouverte-v2.0.pdf',
-              usage_constraint: "Licence",
-              access_constraint: "Autres restrictions",
-              other_constraints: "Pas de restriction d'accès public",
-            }
-        
+           
         #—•—•—•—•—•—•—•—•—•—•—•—•—•
         # METADATA INFO
         #——————————————————————————
@@ -1403,14 +1418,6 @@ components:
           items:
             $ref: '#/components/schemas/IntegrationError'
 
-   #---------------------------------------------------------------------------
-    'UUIDv4':
-      description:
-        Universally unique identifier v4 format
-      type: string
-      pattern: 
-        '^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
-
     #---------------------------------------------------------------------------
     'DOI':
       description:
@@ -1572,31 +1579,46 @@ components:
         }
 
     #---------------------------------------------------------------------------
-    'SkosConceptScheme':
+    'SkosScheme':
       description: >
         Set of SKOS concepts gathered in a transversal and hierarchical 
         relationships.
       type: object
       required:
-      - concept_scheme_id
-      - concept_scheme_label
+      - scheme_id
+      - scheme_label
       properties:
-        'concept_scheme_id':
+        #——————————————————————————
+        'scheme_id':
           description: 'ID of the SKOS concept scheme'
           type: string
           format: uuid
-        'concept_scheme_label':
-          $ref: '#/components/schemas/DictionaryEntry'
-        'concept_scheme_uri':
-          description: 'Short code for the concept'
+        #——————————————————————————
+        'scheme_code':
+          description: 
+            'Short abstract code that identifies uniquely the concept scheme'
+          type: string
+          minLength: 2
+          maxLength: 30
+        #——————————————————————————
+        'scheme_label':
+          description: 'Short code for the concept scheme'
+          type: array
+          items: 
+            $ref: '#/components/schemas/DictionaryEntry'
+          minItems: 1
+        #——————————————————————————
+        'scheme_icon':
+          description: 
+            'URI towards a graphical resource that describes the concept scheme'
           type: string
           format: uri
+        #——————————————————————————
         'top_concepts':
           description: 'List of the highest level concepts in the concept scheme'
           type: array
           items: 
             $ref: '#/components/schemas/SkosConcept'
-          
           
     #---------------------------------------------------------------------------
     'SkosConcept':
@@ -1611,7 +1633,8 @@ components:
       type: object
       required:
       - concept_id
-      - concept_scheme_class
+      - concept_code
+      - skos_scheme_class
       - pref_label
       properties:
         #—•—•—•—•—•—•—•—•—•—•—•—•—•
@@ -1621,44 +1644,60 @@ components:
           description: 'ID of the SKOS concept'
           type: string
           format: uuid
+        #——————————————————————————
         'concept_code':
-          description: 'Short abstract code for the concept'
+          description: 'Short abstract code that identifies uniquely the concept'
           type: string
           minLength: 2
           maxLength: 30
+        #——————————————————————————
         'concept_uri':
           description: 'Web page that document the SKOS concept'
+          type: string
+          format: uri
+        #——————————————————————————
+        'concept_icon':
+          description: 
+            'URI towards a graphical resource that describes the concept'
           type: string
           format: uri
         #—•—•—•—•—•—•—•—•—•—•—•—•—•
         # Labels
         #——————————————————————————
         'pref_label':
-          allOf:
-          - description: 'Preferred lexical label for the resource, one for each language'
-            type: object
-          - $ref: '#/components/schemas/DictionaryEntry'
+          description: 'Preferred lexical label for the resource, one for each language'
+          type: array
+          items: 
+            $ref: '#/components/schemas/DictionaryEntry'
+          minItems: 1
+        #——————————————————————————
         'alt_labels':
-          allOf:
-          - description: 'List of alternative labels (in each language)'
-            type: object
-          - $ref: '#/components/schemas/DictionaryList'
+          description: 'List of alternative labels (in each language)'
+          type: array
+          items: 
+            $ref: '#/components/schemas/DictionaryList'
+        #——————————————————————————
         'hidden_labels':
-          allOf:
-          - description: 'List of alternative orthographs for the label (in each language)'
-            type: object
-          - $ref: '#/components/schemas/DictionaryList'
+          description: 'List of alternative orthographs for the label (in each language)'
+          type: array
+          items: 
+            $ref: '#/components/schemas/DictionaryList'
         #—•—•—•—•—•—•—•—•—•—•—•—•—•
         # Classification
         #——————————————————————————
-        'concept_scheme_class':
+        'of_scheme':
           allOf:
           - description: >
-              Reference of the compiled vocabulary, thesaurus or classification scheme
+              Reference to the constrained vocabulary, thesaurus or classification scheme
             type: object
-          - $ref: '#/components/schemas/SkosConceptScheme'
-        'top_concept_of':
-          $ref: '#/components/schemas/SkosConceptScheme'
+          - $ref: '#/components/schemas/SkosScheme'
+        #——————————————————————————
+        'concept_role':
+          description: >
+              Underlines a particular use for this Concept, e.g. a potential
+              value for a property (e.g. "metadata.theme", "metadata.keywords", 
+              "metadata.licence")
+          type: string
         #—•—•—•—•—•—•—•—•—•—•—•—•—•
         # Relationships
         #——————————————————————————
@@ -1669,7 +1708,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SkosConcept'
-          # beware to avoid graph loops with narrower (children) concepts or siblings (neighbours) !
+          # beware to avoid graph loops with narrower (children) or 
+          # siblingly (neighbours) concepts !
+        #——————————————————————————
         'narrower_concepts':
           description: >
             References to the 'children' SKOS concepts with a narrower scope 
@@ -1677,7 +1718,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SkosConcept'
-          # beware to avoid graph loops with narrower (children) concepts or siblings (neighbours) !
+          # beware to avoid graph loops with broader (parents) or 
+          # siblingly (neighbours) concepts !
+        #——————————————————————————
         'siblings_concepts':
           description: >
             References to the SKOS concepts that are neighbouring meanings 
@@ -1685,10 +1728,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SkosConcept'
-          # beware to avoid graph loops with narrower (children) concepts or siblings (neighbours) !
+          # beware to avoid graph loops with broader (children) or 
+          # narrower (children) concepts !
+        #——————————————————————————
         'relative_concepts':
           description: >
-            References to the SKOS concepts that can be associated in a non-transitive relationship 
+            References to the SKOS concepts that can be associated in a 
+            non-transitive relationship 
           type: array
           items:
             $ref: '#/components/schemas/SkosConcept'
@@ -1696,22 +1742,24 @@ components:
         # Documentation
         #——————————————————————————
         'scope_note':
-          allOf:
-          - description: >
+          description: >
              Contextual information about the intended meaning of the concept, 
              especially as an indication of how the use of the concept
-            type: object
-          - $ref: '#/components/schemas/DictionaryEntry'
+          type: array
+          items: 
+            $ref: '#/components/schemas/DictionaryEntry'
+        #——————————————————————————
         'concept_definition':
-          allOf:
-          - description: 'Complete explanation of the intended meaning of a concept'
-            type: object
-          - $ref: '#/components/schemas/DictionaryEntry'
+          description: 'Complete explanation of the intended meaning of a concept'
+          type: array
+          items: 
+            $ref: '#/components/schemas/DictionaryEntry'
+        #——————————————————————————
         'concept_example':
-          allOf:
-          - description: 'Example of the use of a concept'
-            type: object
-          - $ref: '#/components/schemas/DictionaryEntry'
+          description: 'Example of the use of a concept'
+          type: array
+          items: 
+            $ref: '#/components/schemas/DictionaryEntry'
       
     #---------------------------------------------------------------------------
     'Language':

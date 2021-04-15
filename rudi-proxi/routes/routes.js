@@ -9,8 +9,8 @@ const mod = 'routes'
 //---------------------------------------------------------------
 // Internal dependencies
 //---------------------------------------------------------------
+const utils = require('../utils/jsUtils');
 const log = require('../utils/logging')
-const json = require('../utils/jsonAccess');
 
 //---------------------------------------------------------------
 // Swagger documentation
@@ -28,6 +28,7 @@ const {
   PARAM_REPORT_ID,
   URL_ACTION_DELETION,
   URL_ACTION_REPORT,
+  URL_ACTION_UUID_GEN,
   URL_DB_ACCESS,
   URL_LOGS_SUFFIX,
   URL_LOGS_ACCESS,
@@ -47,6 +48,13 @@ const reportController = require('../controllers/reportController')
 const dbController = require('../controllers/dbController');
 const sysController = require('../controllers/sysController');
 
+//---------------------------------------------------------------
+// Helper functions
+//---------------------------------------------------------------
+function logRequest(req, res){
+  const fun = 'logRequest'
+  utils.consoleLog('', fun,`${req.ip}: ${req.method} ${req.url} `)
+}
 
 //---------------------------------------------------------------
 // Public routes
@@ -57,7 +65,12 @@ exports.publicRoutes = [
   // /resources POST/PUT/GET
   // /resources/{id} GET/DELETE
   // /resources/{id}/report PUT
-
+  {
+    method: 'GET',
+    url: `${URL_PREFIX_PUBLIC}/${URL_ACTION_UUID_GEN}`,
+    // preHandler: logRequest,
+    handler: genericController.generateUUID
+  },
   //---------------------------------------------------------------
   // Generic routes for accessing any object
   // ('Metadata', 'Organizations' and 'Contacts')
@@ -66,14 +79,14 @@ exports.publicRoutes = [
   {
     method: 'POST',
     url: `${URL_OBJECT}/${URL_ACTION_DELETION}`,
-    // preHandler: log.logRequest,
+    // preHandler: logRequest,
     handler: genericController.deleteObjectList
   },
   // Add 1
   {
     method: 'POST',
     url: URL_OBJECT,
-    // preHandler: log.logRequest,
+    // preHandler: logRequest,
     handler: genericController.addSingleObject
     // schema: documentation.addMetadataSchema
   },
@@ -81,21 +94,21 @@ exports.publicRoutes = [
   {
     method: 'PUT',
     url: URL_OBJECT,
-    // preHandler: log.logRequest,
+    // preHandler: logRequest,
     handler: genericController.updateSingleObject
   },
   // Get all
   {
     method: 'GET',
     url: URL_OBJECT,
-    // preHandler: log.logRequest,
+    // preHandler: logRequest,
     handler: genericController.getObjectList,
   },
   // Get 1
   {
     method: 'GET',
     url: `${URL_OBJECT}/:${PARAM_ID}`,
-    // preHandler: log.logRequest,
+    // preHandler: logRequest,
     handler: genericController.getSingleObject
   },
 
@@ -103,14 +116,14 @@ exports.publicRoutes = [
   {
     method: 'DELETE',
     url: `${URL_OBJECT}/:${PARAM_ID}`,
-    // preHandler: log.logRequest,
+    // preHandler: logRequest,
     handler: genericController.deleteSingleObject
   },
   // Delete all
   {
     method: 'DELETE',
     url: URL_OBJECT,
-    // preHandler: log.logRequest,
+    // preHandler: logRequest,
     handler: genericController.deleteEveryObject
   },
 
@@ -121,49 +134,49 @@ exports.publicRoutes = [
   {
     method: 'POST',
     url: `${URL_OBJECT}/:${PARAM_ID}/${URL_ACTION_REPORT}/${URL_ACTION_DELETION}`,
-    // preHandler: log.logRequest,
+    // preHandler: logRequest,
     handler: reportController.deleteManyReportForObject
   },
   // Add 1 report for one object integration
   {
     method: 'POST',
     url: `${URL_OBJECT}/:${PARAM_ID}/${URL_ACTION_REPORT}`,
-    // preHandler: log.logRequest,
+    // preHandler: logRequest,
     handler: reportController.addSingleReportForObject
   },
   // Add/edit 1 report for one object integration
   {
     method: 'PUT',
     url: `${URL_OBJECT}/:${PARAM_ID}/${URL_ACTION_REPORT}`,
-    // preHandler: log.logRequest,
+    // preHandler: logRequest,
     handler: reportController.addOrEditSingleReportForObject
   },
   // Get all reports for one object integration
   {
     method: 'GET',
     url: `${URL_OBJECT}/:${PARAM_ID}/${URL_ACTION_REPORT}`,
-    // preHandler: log.logRequest,
+    // preHandler: logRequest,
     handler: reportController.getReportListForObject
   },
   // Get 1 report for one object integration
   {
     method: 'GET',
     url: `${URL_OBJECT}/:${PARAM_ID}/${URL_ACTION_REPORT}/:${PARAM_REPORT_ID}`,
-    // preHandler: log.logRequest,
+    // preHandler: logRequest,
     handler: reportController.getSingleReportForObject
   },
   // Delete 1 report for one object integration
   {
     method: 'DELETE',
     url: `${URL_OBJECT}/:${PARAM_ID}/${URL_ACTION_REPORT}/:${PARAM_REPORT_ID}`,
-    // preHandler: log.logRequest,
+    // preHandler: logRequest,
     handler: reportController.deleteSingleReportForObject
   },
   // Delete all reports for one object integration
   {
     method: 'DELETE',
     url: `${URL_OBJECT}/:${PARAM_ID}/${URL_ACTION_REPORT}`,
-    // preHandler: log.logRequest,
+    // preHandler: logRequest,
     handler: reportController.deleteEveryReportForObject
   },
 
@@ -174,11 +187,10 @@ exports.publicRoutes = [
   {
     method: 'GET',
     url: `${URL_OBJECT}/${URL_ACTION_REPORT}`,
-    // preHandler: log.logRequest,
+    // preHandler: logRequest,
     handler: reportController.getReportListForObjectType
   },
 ]
-
 
 //---------------------------------------------------------------
 // Private routes
@@ -190,7 +202,7 @@ exports.backOfficeRoutes = [
   {
     method: 'GET',
     url: `${URL_LOGS_ACCESS}`,
-    // preHandler: log.logRequest,
+    // preHandler: logRequest,
     handler: sysController.getLogs
   },
 
@@ -200,13 +212,13 @@ exports.backOfficeRoutes = [
   {
     method: 'GET',
     url: `${URL_APP_ID_ACCESS}`,
-    // preHandler: log.logRequest,
+    // preHandler: logRequest,
     handler: sysController.getAppId
   },
   {
     method: 'GET',
     url: `${URL_NODE_VERSION_ACCESS}`,
-    // preHandler: log.logRequest,
+    // preHandler: logRequest,
     handler: sysController.getNodeVersion
   },
   //---------------------------------------------------------------
@@ -216,14 +228,14 @@ exports.backOfficeRoutes = [
   {
     method: 'GET',
     url: `${URL_DB_ACCESS}`,
-    // preHandler: log.logRequest,
+    // preHandler: logRequest,
     handler: dbController.getCollections
   },
   // Drop DB
   {
     method: 'DELETE',
     url: `${URL_DB_ACCESS}`,
-    // preHandler: log.logRequest,
+    // preHandler: logRequest,
     handler: dbController.dropDB
   },
 

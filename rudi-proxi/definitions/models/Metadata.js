@@ -33,6 +33,7 @@ const {
 const log = require('../../utils/logging')
 const msg = require('../../utils/msg')
 const json = require('../../utils/jsonAccess');
+const utils = require('../../utils/jsUtils');
 
 const Validation = require('../schemaValidators');
 
@@ -41,24 +42,22 @@ const Validation = require('../schemaValidators');
 //---------------------------------------------------------------
 const GeoJSON = require('mongoose-geojson-schema');
 
-const {
-  DOI,
-  UUIDv4
-} = require('../schemas/Identifiers');
+/* beautify ignore:start */
+const {DOI,UUIDv4} = require('../schemas/Identifiers');
+/* beautify ignore:end */
 const DictionaryEntry = require('../schemas/DictionaryEntry');
-const SkosEntry = require('../schemas/SkosEntry');
-const AccessCondition = require('../schemas/AccessCondition');
 const ReferenceDates = require('../schemas/ReferenceDates');
 
-const {
-  Media
-} = require('./Media');
 
 //---------------------------------------------------------------
 // Model definitions
 //---------------------------------------------------------------
 const Organization = require('./Organization');
 const Contact = require('./Contact');
+/* beautify ignore:start */
+const { Media, MediaFile, MediaSeries } = require('./Media');
+/* beautify ignore:end */
+const Licence = require('./Licence');
 
 //---------------------------------------------------------------
 // Thesaurus definiitons
@@ -99,7 +98,11 @@ const TransmissionModes = {
 };
 
 const validArrayNotNull = {
-  validator: Validation.isNotEmptyArray,
+  validator: utils.isNotEmptyArray,
+  message: `'{PATH}' property should not be empty`
+}
+const validObjectNotEmpty = {
+  validator: utils.isNotEmptyObject,
   message: `'{PATH}' property should not be empty`
 }
 //---------------------------------------------------------------
@@ -118,7 +121,14 @@ const MetadataSchema = new mongoose.Schema({
   local_id: {
     type: String,
     trim: true,
-    unique: true
+    index: {
+      unique: true,
+      partialFilterExpression: {
+        local_id: {
+          $type: "string"
+        }
+      }
+    },
   },
 
   // Digital Object Identifier for the ressource (optional)
@@ -139,12 +149,14 @@ const MetadataSchema = new mongoose.Schema({
   synopsis: {
     type: [DictionaryEntry],
     required: true,
+    validate: validArrayNotNull
   },
 
   // More precise description for the whole dataset
   summary: {
     type: [DictionaryEntry],
-    required: true
+    required: true,
+    validate: validArrayNotNull
   },
 
   //---------------------------
@@ -172,14 +184,14 @@ const MetadataSchema = new mongoose.Schema({
   // Involved parties
   //---------------------------
 
-  // Entity that produced the resource
+  /** Entity that produced the resource */
   producer: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Organization',
     required: true,
   },
 
-  // Persons in charge of maintaining the resource
+  /** Persons in charge of maintaining the resource */
   contacts: {
     type: [{
       type: mongoose.Schema.Types.ObjectId,
@@ -193,6 +205,7 @@ const MetadataSchema = new mongoose.Schema({
   // Container description
   //---------------------------
 
+  /** List of files containing the data */
   available_formats: {
     type: [{
       type: mongoose.Schema.Types.ObjectId,
@@ -206,7 +219,7 @@ const MetadataSchema = new mongoose.Schema({
   // Dataset info
   //---------------------------
 
-  // Language used in the dataset, if relevant
+  /** Language used in the dataset, if relevant */
   resource_languages: {
     type: [{
       type: String,
@@ -215,44 +228,50 @@ const MetadataSchema = new mongoose.Schema({
     default: [Language.fr],
   },
 
-  // Period of time described by the data
+  /** Period of time described by the data */
   temporal_spread: {
     start_date: {
       type: Date,
+      // Custom validation in pre-save hook: required if 'temporal_spread' is defined !
     },
     end_date: {
       type: Date
     }
   },
 
-  // Geographic distribution of the data. Particularly relevant in the case of located sensors.
+  /** 
+   * Geographic distribution of the data. 
+   * Particularly relevant in the case of located sensors. 
+   */
   geography: {
 
-    // Geographic distribution of the data as a rectangle.
-    // The 4 parameters are given as decimal as described in the
-    // norm ISO 6709
+    /**
+     * Geographic distribution of the data as a rectangle.
+     * The 4 parameters are given as decimal as described in the norm ISO 6709
+     */
     bounding_box: {
       type: Object,
+      // Custom validation in pre-save hook: required if 'geography' is defined !
 
-      // Northernmost latitude given as a decimal number
+      /** Northernmost latitude given as a decimal number */
       north_latitude: {
         type: Number,
         min: -90,
         max: 90,
       },
-      // Southernmost latitude given as a decimal number
+      /** Southernmost latitude given as a decimal number */
       south_latitude: {
         type: Number,
         min: -90,
         max: 90,
       },
-      // Westernmost latitude given as a decimal number
+      /** Westernmost latitude given as a decimal number */
       west_longitude: {
         type: Number,
         min: -180,
         max: 180,
       },
-      // Easternmost latitude given as a decimal number
+      /* Easternmost latitude given as a decimal number */
       east_longitude: {
         type: Number,
         min: -180,
@@ -260,25 +279,33 @@ const MetadataSchema = new mongoose.Schema({
       },
     },
 
-    // Precise geographic distribution of the data 
+    /**
+     * Precise geographic distribution of the data   
+     */
     geographic_distribution: {
       type: mongoose.SchemaTypes.GeoJSON
     },
 
-    // Cartographic projection used to describe the data
+    /**
+     * Cartographic projection used to describe the data  
+     */
     projection: {
       type: String,
       enum: Object.values(Projection)
     },
 
-    // Data topology
+    /** 
+     * Data topology 
+     */
     spatial_representation: {
       type: String
     },
 
   },
 
-  // Indicative total size of the data
+  /** 
+   * Indicative total size of the data 
+   */
   dataset_size: {
     numbers_of_records: {
       type: Int32,
@@ -290,7 +317,9 @@ const MetadataSchema = new mongoose.Schema({
     },
   },
 
-  // Dates of the actions performed on the data (creation, publishing, update, deletion...)
+  /** 
+   * Dates of the actions performed on the data (creation, publishing, update, deletion...) 
+   */
   dataset_dates: {
     type: ReferenceDates,
     required: true
@@ -305,6 +334,65 @@ const MetadataSchema = new mongoose.Schema({
     type: String,
     enum: Object.values(StorageStatus),
     required: true
+  },
+
+  access_condition: {
+    required: true, 
+    validate: validObjectNotEmpty,
+    type: {
+      /** Restriction level for the resource */
+      confidentiality: {
+        /**
+         * True if the dataset has a restricted access. 
+         * False for open data 
+         * */
+        restricted_access: {
+          type: Boolean,
+          default: false
+        },
+
+        /** True if the dataset embeds personal data */
+        gdpr_sensitive: {
+          type: Boolean,
+          default: false
+        },
+      },
+
+      /**
+       * Standard license (recognized by RUDI system) 
+       */
+      licence: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Licence',
+        required: true
+      },
+
+      /** Describes how constrained is the use of the resource */
+      usage_constraint: {
+        type: [DictionaryEntry]
+      },
+
+      /** Information that MUST be cited every time the data is used */
+      bibliographical_reference: {
+        type: [DictionaryEntry]
+      },
+
+      /** 
+       * Mention that must be cited verbatim in every publication that
+       * makes use of the data
+       */
+      mandatory_mention: {
+        type: [DictionaryEntry]
+      },
+
+      access_constraint: {
+        type: [DictionaryEntry]
+      },
+
+      other_constraints: {
+        type: [DictionaryEntry]
+      }
+    },
   },
 
   // Metadata on the metadata
@@ -349,6 +437,7 @@ const MetadataSchema = new mongoose.Schema({
   }
 }, {
   timestamps: true,
+  id: false,
   optimisticConcurrency: true,
   useNestedStrict: true,
   toObject: {
@@ -394,16 +483,16 @@ MetadataSchema.pre('save', function (next) {
 
 //----- toJSON cleanup
 MetadataSchema.methods.toJSON = function () {
-  var metadata = this.toObject()
+  var obj = this.toObject()
   // metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_CREATED_PROPERTY] = metadata.createdAt
   // metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_EDITED_PROPERTY] = metadata.updatedAt
-  delete metadata.id
-  delete metadata._id
-  delete metadata.__v
-  delete metadata.createdAt
-  delete metadata.updatedAt
-  delete metadata.publishedAt
-  return metadata
+  delete obj.id
+  delete obj._id
+  delete obj.__v
+  delete obj.createdAt
+  delete obj.updatedAt
+  delete obj.publishedAt
+  return obj
 };
 
 //----- Virtuals

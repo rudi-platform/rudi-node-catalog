@@ -52,6 +52,7 @@ const ContactSchema = new mongoose.Schema({
   }
 }, {
   timestamps: true,
+  id: false,
   // optimisticConcurrency: true,
   // strict: true,
 });
@@ -63,15 +64,13 @@ const ContactSchema = new mongoose.Schema({
 
 //----- toJSON cleanup
 ContactSchema.methods.toJSON = function () {
-  var contact = this.toObject()
-  // metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_CREATED_PROPERTY] = metadata.createdAt
-  // metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_EDITED_PROPERTY] = metadata.updatedAt
-  delete contact._id
-  delete contact.__v
-  delete contact.createdAt
-  delete contact.updatedAt
-  delete contact.publishedAt
-  return contact
+  var obj = this.toObject()
+  delete obj._id
+  delete obj.__v
+  delete obj.createdAt
+  delete obj.updatedAt
+  delete obj.publishedAt
+  return obj
 };
 
 //---------------------------------------------------------------

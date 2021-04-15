@@ -16,42 +16,8 @@ const api = require('../../config/confApi')
 const Validation = require('../schemaValidators');
 const IntegrationStatus = require('../thesaurus/IntegrationStatus')
 
-
 //---------------------------------------------------------------
-// Constants
-//---------------------------------------------------------------
-
-const IntegrationError = new mongoose.Schema({
-  error_code: {
-    type: Int32,
-    min: 0,
-    required: true
-  },
-  error_message: {
-    type: String,
-    required: true
-  },
-  field_name: {
-    type: String
-  },
-}, {
-  timestamps: true
-});
-
-//----- toJSON cleanup
-IntegrationError.methods.toJSON = function () {
-  var doc = this.toObject()
-  // metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_CREATED_PROPERTY] = metadata.createdAt
-  // metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_EDITED_PROPERTY] = metadata.updatedAt
-  delete doc._id
-  delete doc.__v
-  delete doc.createdAt
-  delete doc.updatedAt
-  return doc
-};
-
-//---------------------------------------------------------------
-// Custom schema definitions
+// Custom schema definition: Report
 //---------------------------------------------------------------
 
 const ReportSchema = new mongoose.Schema({
@@ -101,22 +67,36 @@ const ReportSchema = new mongoose.Schema({
 
   // List of all the errors that were encounntered during the
   // integration of the resource.
-  integration_errors: [IntegrationError]
+  integration_errors: {
+    type: [{
+      error_code: {
+        type: Int32,
+        min: 0,
+        required: true
+      },
+      error_message: {
+        type: String,
+        required: true
+      },
+      field_name: {
+        type: String
+      },
+    }]
+  }
 }, {
-  timestamps: true
+  timestamps: true,
+  id: false,
 });
 
 
 //----- toJSON cleanup
 ReportSchema.methods.toJSON = function () {
-  var doc = this.toObject()
-  // metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_CREATED_PROPERTY] = metadata.createdAt
-  // metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_EDITED_PROPERTY] = metadata.updatedAt
-  delete doc._id
-  delete doc.__v
-  delete doc.createdAt
-  delete doc.updatedAt
-  return doc
+  var obj = this.toObject()
+  delete obj._id
+  delete obj.__v
+  delete obj.createdAt
+  delete obj.updatedAt
+  return obj
 };
 
 //---------------------------------------------------------------

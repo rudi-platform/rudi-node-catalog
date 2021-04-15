@@ -9,7 +9,7 @@ const Language = require('../thesaurus/Languages')
 //---------------------------------------------------------------
 // Custom schema definition
 //---------------------------------------------------------------
-const DictionaryEntrySchema = new mongoose.Schema({
+const DictionaryEntry = new mongoose.Schema({
   lang: {
     type: String,
     default: Language.fr_FR,
@@ -27,4 +27,4 @@ const DictionaryEntrySchema = new mongoose.Schema({
 //---------------------------------------------------------------
 // Exports
 //---------------------------------------------------------------
-module.exports = DictionaryEntrySchema
+module.exports = DictionaryEntry

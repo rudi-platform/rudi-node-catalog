@@ -5,6 +5,9 @@
 //---------------------------------------------------------------
 const mongoose = require('mongoose');
 
+//---------------------------------------------------------------
+// Internal dependancies
+//---------------------------------------------------------------
 const ids = require('../schemas/Identifiers');
 const Validation = require('../schemaValidators');
 
@@ -34,6 +37,7 @@ const OrganizationSchema = new mongoose.Schema({
 }, {
   // Adds mongoose fields 'updatedAt' and 'createdAt'
   timestamps: true,
+  id: false,
 
   // optimisticConcurrency: true,
   // strict: true,
@@ -52,16 +56,15 @@ const OrganizationSchema = new mongoose.Schema({
 
 //----- toJSON cleanup
 OrganizationSchema.methods.toJSON = function () {
-  var orga = this.toObject()
-  // metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_CREATED_PROPERTY] = metadata.createdAt
-  // metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_EDITED_PROPERTY] = metadata.updatedAt
-  delete orga._id
-  delete orga.__v
-  delete orga.createdAt
-  delete orga.updatedAt
-  delete orga.publishedAt
-  return orga
+  var obj = this.toObject()
+  delete obj._id
+  delete obj.__v
+  delete obj.createdAt
+  delete obj.updatedAt
+  delete obj.publishedAt
+  return obj
 };
+
 //---------------------------------------------------------------
 // Exports
 //---------------------------------------------------------------

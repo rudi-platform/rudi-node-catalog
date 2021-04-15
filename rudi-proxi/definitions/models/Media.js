@@ -28,6 +28,7 @@ const UpdateStatus = [
 const options = {
   discriminatorKey: 'media_type',
   timestamps: true,
+  id: false,
 };
 
 //---------------------------------------------------------------

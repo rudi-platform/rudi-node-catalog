@@ -1,5 +1,6 @@
 'use strict';
 
+const mod = 'orgCtrl'
 /*
  * This file describes the steps followed for each 
  * action on the organizations (producer or publisher)
@@ -38,3 +39,13 @@ const {
 // Data models
 //---------------------------------------------------------------
 const Organization = require('../definitions/models/Organization')
+
+exports.newOrganization = async (orgJson) => {
+  const fun = 'newOrganization'
+  log.d(mod, fun, ``)
+
+  const dbOrganization = await new Organization(orgJson)
+  await dbOrganization.save()
+
+  return dbOrganization
+}

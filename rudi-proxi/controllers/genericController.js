@@ -9,6 +9,7 @@ const mod = 'genCtrl'
 // External dependancies 
 //---------------------------------------------------------------
 const boom = require('@hapi/boom')
+const uuid = require('uuid')
 
 //---------------------------------------------------------------
 // Internal dependancies 
@@ -30,6 +31,8 @@ const {
   URL_OBJECT_ORGANIZATIONS,
   URL_OBJECT_CONTACTS,
   URL_OBJECT_MEDIA,
+  URL_OBJECT_SKOS_CONCEPT,
+  URL_OBJECT_SKOS_SCHEME,
   PARAM_ID,
   PARAM_OBJECT,
   QUERY_LIMIT,
@@ -49,22 +52,33 @@ const {
   API_METAINFO_PROPERTY,
   API_REPORT_ID,
   API_DATES_PUBLISHED_PROPERTY,
-  API_MEDIA_ID
+  API_MEDIA_ID,
+  API_CONCEPT_PARENTS_PROPERTY
 } = require('../db/dbFields')
 
-const Metadata = require('../definitions/models/Metadata')
-const Organization = require('../definitions/models/Organization')
-const Contact = require('../definitions/models/Contact')
+
+//---------------------------------------------------------------
+// Models
+//---------------------------------------------------------------
+
+const Metadata = require('../definitions/models/Metadata');
+const Organization = require('../definitions/models/Organization');
+const Contact = require('../definitions/models/Contact');
 const Report = require('../definitions/models/Report');
+const SkosConcept = require('../definitions/models/SkosConcept');
+const SkosScheme = require('../definitions/models/SkosScheme');
 /* beautify ignore:start */
-// const { MediaTypes } = require('../definitions/thesaurus/MediaTypes');
 const { Media, MediaFile, MediaSeries } = require('../definitions/models/Media');
 /* beautify ignore:end */
+
+//---------------------------------------------------------------
+// Specific controlelrs
+//---------------------------------------------------------------
 
 const metadataController = require('../controllers/metadataController')
 const organizationController = require('../controllers/organizationController')
 const contactController = require('../controllers/contactController');
-
+const skosController = require('./skosController');
 
 //---------------------------------------------------------------
 // Specific object type helper functions
@@ -77,18 +91,20 @@ async function newObject(objectType, objectData) {
   try {
     switch (objectType) {
       case URL_OBJECT_METADATA:
-        return metadataController.newMetadata(objectData)
+        return await metadataController.newMetadata(objectData)
         break
       case URL_OBJECT_ORGANIZATIONS:
-        try {
-          log.d(mod, fun, `! new Organization(objectData)`)
-          return new Organization(objectData)
-        } catch (err) {
-          log.e(mod, fun, `! ${err}`)
-        }
+        return await organizationController.newOrganization(objectData)
         break
       case URL_OBJECT_CONTACTS:
-        return new Contact(objectData)
+        return await contactController.newContact(objectData)
+        break
+      case URL_OBJECT_SKOS_CONCEPT:
+        return await skosController.newSkosConcept(objectData)
+        break
+      case URL_OBJECT_SKOS_SCHEME:
+        // Custom creation to create the children scheme concepts
+        return await skosController.newSkosScheme(objectData)
         break
       default:
         throw new Error(msg.objectTypeNotFound(objectType))
@@ -110,6 +126,8 @@ async function editObject(objectType, editedObjectData) {
       break
     case URL_OBJECT_ORGANIZATIONS:
     case URL_OBJECT_CONTACTS:
+    case URL_OBJECT_SKOS_CONCEPT:
+    case URL_OBJECT_SKOS_SCHEME:
       /* beautify ignore:start */
       const {Model, idField} = db.getObjectAccesses(objectType)
       /* beautify ignore:end */
@@ -127,7 +145,9 @@ async function isDeletionPermitted(objectType, Model, objectToDelete) {
 
   switch (objectType) {
     case URL_OBJECT_METADATA:
+    case URL_OBJECT_SKOS_CONCEPT:
     case URL_ACTION_REPORT:
+    case URL_OBJECT_SKOS_SCHEME:
       return true
       break
     case URL_OBJECT_ORGANIZATIONS:
@@ -156,10 +176,14 @@ async function treatDbObject(objectType, dbObject) {
 
   switch (objectType) {
     case URL_OBJECT_METADATA:
-      return await metadataController.dbToRudiFormat(dbObject)
+      return await metadataController.dbMetadataToRudi(dbObject)
       break
     case URL_OBJECT_ORGANIZATIONS:
     case URL_OBJECT_CONTACTS:
+    case URL_OBJECT_SKOS_SCHEME:
+      return await skosController.dbSchemeToRudi(dbObject)
+      case URL_OBJECT_SKOS_CONCEPT:
+      return await skosController.dbConceptToRudiMinimal(dbObject)
     case URL_ACTION_REPORT:
       return dbObject
       break
@@ -174,12 +198,17 @@ async function treatDbObjectList(objectType, dbObjectList) {
 
   switch (objectType) {
     case URL_OBJECT_METADATA:
-      const rudiMetadataList = await metadataController.dbToRudiFormatList(dbObjectList)
+      const rudiMetadataList = await metadataController.dbMetadataListToRudi(dbObjectList)
       return rudiMetadataList
+      break;
+    case URL_OBJECT_SKOS_CONCEPT:
+      const conceptList = await skosController.dbConceptListToRudiRecursive(dbObjectList)
+      return conceptList
       break;
     case URL_OBJECT_ORGANIZATIONS:
     case URL_OBJECT_CONTACTS:
     case URL_OBJECT_MEDIA:
+    case URL_OBJECT_SKOS_SCHEME:
     case URL_ACTION_REPORT:
       return dbObjectList
       break;
@@ -193,8 +222,10 @@ async function treatDbObjectList(objectType, dbObjectList) {
 // Controllers
 //---------------------------------------------------------------
 
-// Add a new object
-// => POST /{object}/{id}
+/**
+ * Add a new object
+ * => POST /{object}/{id}
+ */
 exports.addSingleObject = async (req, reply) => {
   const fun = 'addSingleObject'
   log.v(mod, fun, `< POST ${URL_OBJECT}`)
@@ -218,24 +249,27 @@ exports.addSingleObject = async (req, reply) => {
     if (existsObject) throw new Error(`${msg.objectAlreadyExists(objectType, rudiId)}`)
 
     // Creating new object + specific treatments
-    const dbReadyObject = await newObject(objectType, rudiObject)
+    const createdObject = await newObject(objectType, rudiObject)
     // const dbReadyObject = await new Model(rudiObject)
-    log.d(mod, fun, `created dbReadyObject: ${json.beautify(dbReadyObject)}`)
+    // log.d(mod, fun, `created dbReadyObject: ${json.beautify(dbReadyObject)}`)
 
-    const dbActionResult = await dbReadyObject.save()
+    // const dbActionResult = await dbReadyObject.save()
     // log.d(mod, fun, `saved, dbActionResult: ${json.beautify(dbActionResult)}`)
 
     log.i(mod, fun, `${msg.objectAdded(objectType, rudiId)}`)
-    const refinedObject = await treatDbObject(objectType, dbReadyObject)
-    return refinedObject
+    // const refinedObject = await treatDbObject(objectType, dbReadyObject)
+    // return refinedObject
+    return createdObject
   } catch (err) {
     log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 }
 
-// Get single object by ID
-// => GET /{object}/{id}
+/** 
+ * Get single object by ID 
+ * => GET /{object}/{id}
+ */
 exports.getSingleObject = async (req, reply) => {
   const fun = 'getSingleObject'
   log.v(mod, fun, `< GET ${URL_OBJECT}/:${PARAM_ID}`)
@@ -267,8 +301,10 @@ exports.getSingleObject = async (req, reply) => {
   }
 }
 
-// Get several object
-// => GET /{object}
+/** 
+ * Get several objects
+ * => GET /{object}
+ */
 exports.getObjectList = async (req, reply) => {
   const fun = 'getObjectList'
   log.v(mod, fun, `< GET ${URL_OBJECT}`)
@@ -300,8 +336,10 @@ exports.getObjectList = async (req, reply) => {
   }
 }
 
-// Update an existing object
-// => PUT /{object}
+/**
+ * Update an existing object
+ * => PUT /{object}
+ */
 exports.updateSingleObject = async (req, reply) => {
   const fun = 'updateSingleObject'
   log.v(mod, fun, `< PUT ${URL_OBJECT}`)
@@ -332,8 +370,10 @@ exports.updateSingleObject = async (req, reply) => {
   }
 }
 
-// Delete a single object
-// => DELETE /{object}/{id}
+/** 
+ * Delete a single object 
+ * => DELETE /{object}/{id}
+ */
 exports.deleteSingleObject = async (req, reply) => {
   const fun = 'deleteSingleObject'
   log.v(mod, fun, `< DELETE ${URL_OBJECT}/:${PARAM_ID}`)
@@ -358,12 +398,15 @@ exports.deleteSingleObject = async (req, reply) => {
      */
     const deletionOK = await isDeletionPermitted(objectType, Model, objectToDelete)
     if (!deletionOK) throw new Error(msg.objectNotDeletedBecauseUsed(objectType, objectRudiId))
+
+    // TODO: if SkosScheme: delete all SkosConcepts that reference it
+    // TODO: if SkosConcept: update all other SkosConcepts that reference it (parents/children/siblings/relatives)
     const deletedObject = await db.deleteObject(Model, idField, objectRudiId)
     // return: dbToRudi?
     let returnedObject = deletedObject
     if (objectType == URL_OBJECT_METADATA) {
       try {
-        returnedObject = metadataController.dbToRudiFormat(deletedObject)
+        returnedObject = metadataController.dbMetadataToRudi(deletedObject)
       } catch (err) {
         log.w(err)
       }
@@ -378,8 +421,10 @@ exports.deleteSingleObject = async (req, reply) => {
 }
 
 
-// Delete several objects
-// => POST /{object}/deletion
+/** 
+ * Delete several objects 
+ * => POST /{object}/deletion
+ */
 exports.deleteObjectList = async (req, reply) => {
   const fun = 'deleteObjectList'
   log.v(mod, fun, `< POST ${URL_OBJECT}/${URL_ACTION_DELETION}`)
@@ -409,8 +454,10 @@ exports.deleteObjectList = async (req, reply) => {
 }
 
 
-// Delete every object
-// => DELETE /{object}
+/** 
+ * Delete every object 
+ * => DELETE /{object}
+ */
 exports.deleteEveryObject = async (req, reply) => {
   const fun = 'deleteEveryObject'
   log.v(mod, fun, `< DELETE ${URL_OBJECT}`)
@@ -425,6 +472,20 @@ exports.deleteEveryObject = async (req, reply) => {
 
     const object = await db.deleteAll(Model)
     return object
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw boom.boomify(err)
+  }
+}
+
+/** 
+ * Generate an UUID v4 
+ */
+exports.generateUUID = async (req, reply) => {
+  const fun = 'generateUUID'
+  log.d(mod, fun, ``)
+  try {
+    return uuid.v4()
   } catch (err) {
     log.e(mod, fun, err)
     throw boom.boomify(err)

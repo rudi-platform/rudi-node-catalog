@@ -57,7 +57,11 @@ const SeriesSchema = new mongoose.Schema({
     type: Int32,
     minimum: 0
   },
-
+}, {
+  timestamps: true,
+  id: false,
+  // optimisticConcurrency: true,
+  // strict: true,
 })
 
 

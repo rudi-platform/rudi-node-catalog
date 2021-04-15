@@ -16,6 +16,20 @@ exports.nowLocaleFormatted = () => {
 }
 
 //---------------------------------------------------------------
+// Arrays
+//---------------------------------------------------------------
+exports.isNotEmptyArray = (anArray) => {
+  return Array.isArray(anArray) && anArray.length > 0
+}
+
+//---------------------------------------------------------------
+// Objects
+//---------------------------------------------------------------
+exports.isNotEmptyObject = (obj) => {
+  return Object.keys(obj).length > 0
+}
+
+//---------------------------------------------------------------
 // Basic logging
 //---------------------------------------------------------------
 exports.separateLogs = (insertStr) => {
@@ -27,7 +41,8 @@ exports.separateLogs = (insertStr) => {
 }
 exports.consoleLog = (mod, fun, msg) => {
   const where = !mod?fun:(!fun?mod:`${mod} • ${fun}`)
-  console.log(this.nowLocaleFormatted(), 'debug', `[${where}]`, msg)
+  const what = (!msg || '' == msg)?'<-':msg
+  console.log(this.nowLocaleFormatted(), 'debug', `[${where}]`, what)
 }
 exports.consoleErr = (mod, fun, msg) => {
   const where = !mod?fun:(!fun?mod:`${mod} • ${fun}`)

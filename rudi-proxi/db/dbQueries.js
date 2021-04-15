@@ -29,6 +29,8 @@ const {
   URL_OBJECT_ORGANIZATIONS,
   URL_OBJECT_CONTACTS,
   URL_OBJECT_MEDIA,
+  URL_OBJECT_SKOS_SCHEME,
+  URL_OBJECT_SKOS_CONCEPT,
   URL_ACTION_REPORT,
 } = require('../config/confApi')
 
@@ -49,7 +51,9 @@ const {
   API_METAINFO_PROPERTY,
   API_METAINFO_PROVIDER_PROPERTY,
   API_METAINFO_CONTACTS_PROPERTY,
-  API_MEDIA_TYPE_PROPERTY
+  API_MEDIA_TYPE_PROPERTY,
+  API_SKOS_SCHEME_ID,
+  API_SKOS_CONCEPT_ID
 } = require('./dbFields')
 
 //---------------------------------------------------------------
@@ -62,6 +66,8 @@ const {
   Media
 } = require('../definitions/models/Media');
 const Report = require('../definitions/models/Report');
+const SkosScheme = require('../definitions/models/SkosScheme');
+const SkosConcept = require('../definitions/models/SkosConcept');
 
 
 
@@ -93,11 +99,22 @@ exports.getObjectAccesses = (objectType) => {
         Model: Media, idField: API_MEDIA_ID
       }
       break;
+    case URL_OBJECT_SKOS_SCHEME:
+      return {
+        Model: SkosScheme, idField: API_SKOS_SCHEME_ID
+      }
+      break;
+    case URL_OBJECT_SKOS_CONCEPT:
+      return {
+        Model: SkosConcept, idField: API_SKOS_CONCEPT_ID
+      }
+      break;
     case URL_ACTION_REPORT:
       return {
         Model: Report, idField: API_REPORT_ID
       }
       break;
+
     default:
       throw new Error(msg.objectTypeNotFound(objectType))
   }
@@ -210,7 +227,7 @@ exports.getObjectWithRudiId = async (Model, idField, rudiId) => {
     /* beautify ignore:start */
     const dbObject = await Model.findOne({[idField]: rudiId})
     /* beautify ignore:end */
-    log.d(mod, fun, `${rudiId} -> ${json.beautify(dbObject)}\n`)
+    // log.d(mod, fun, `${rudiId} -> ${json.beautify(dbObject)}\n`)
 
     return dbObject
   } catch (err) {
@@ -226,6 +243,7 @@ exports.getEnsuredObjectWithRudiId = async (objectType, Model, idField, rudiId) 
   if (!rudiId) throw new Error(`${msg.parameterExpected(fun, PARAM_ID)}`)
   else log.d(mod, fun, `RUDI id: ${rudiId}`)
   const dbObject = await this.getObjectWithRudiId(Model, idField, rudiId)
+  log.d(mod, fun, `${rudiId} -> ${json.beautify(dbObject)}`)
   if (!dbObject) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
   return dbObject
 }
@@ -247,9 +265,11 @@ exports.getEnsuredObjectWithJson = async (objectType, Model, idField, rudiObject
   const fun = `getEnsuredObjectWithJson`
   log.d(mod, fun, ``)
   try {
-    /* beautify ignore:start */
-    const {Model, idField} = this.getObjectAccesses(objectType)
-    /* beautify ignore:end */
+    if (!Model || !idField) {
+      /* beautify ignore:start */
+      const {Model, idField} = this.getObjectAccesses(objectType)
+      /* beautify ignore:end */
+    }
     const rudiId = json.accessProperty(rudiObject, idField)
     const dbObject = await this.getObjectWithRudiId(Model, idField, rudiId)
     if (!dbObject) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
@@ -274,6 +294,21 @@ exports.getObjectWithDbId = async (Model, dbId) => {
   }
 }
 
+exports.getObjectPropertyWithDbId = async (Model, dbId, prop) => {
+  const fun = `getObjectWithDbId`
+  log.d(mod, fun, ``)
+  try {
+    /* beautify ignore:start */
+    const dbObject = await Model.findOne({[DB_ID]: dbId})
+    /* beautify ignore:end */
+    if (!dbObject) return {}
+    return dbObject[prop]
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw err
+  }
+}
+
 exports.getEnsuredObjectWithDbId = async (objectType, Model, dbId) => {
   const fun = `getEnsuredObjectWithDbId`
   log.d(mod, fun, ``)
@@ -292,6 +327,7 @@ exports.doesObjectExistWithRudiId = async (Model, idField, rudiId) => {
   log.d(mod, fun, ``)
   try {
     const dbObject = await this.getObjectWithRudiId(Model, idField, rudiId)
+    log.d(mod, fun, `existingObject: ${json.beautify(dbObject)}`)
     return (!!dbObject)
   } catch (err) {
     log.e(mod, fun, err)
@@ -484,10 +520,11 @@ exports.getMetadataWithJson = async (metadataJson) => {
   log.d(mod, fun, ``)
   return this.getObjectWithJson(Metadata, API_METADATA_ID, metadataJson)
 }
+
 exports.getEnsuredMetadataWithJson = async (metadataJson) => {
   const fun = `getEnsuredMetadataFromJson`
   log.d(mod, fun, ``)
-  return this.getEnsuredObjectWithJson(Metadata, API_METADATA_ID, metadataJson)
+  return this.getEnsuredObjectWithJson(URL_OBJECT_METADATA, Metadata, API_METADATA_ID, metadataJson)
 }
 
 exports.getMetadataWithRudiId = async (rudiId) => {
@@ -563,6 +600,7 @@ exports.getOrganizationWithJson = async (organizationJson) => {
   log.d(mod, fun, ``)
   return this.getObjectWithJson(Organization, API_ORGANIZATION_ID, organizationJson)
 }
+
 exports.getEnsuredOrganizationWithJson = async (organizationJson) => {
   const fun = `getEnsuredOrganizationWithJson`
   log.d(mod, fun, ``)
@@ -575,6 +613,7 @@ exports.getOrganizationWithRudiId = async (rudiId) => {
   log.d(mod, fun, ``)
   return this.getObjectWithRudiId(Organization, API_ORGANIZATION_ID, rudiId)
 }
+
 exports.getEnsuredOrganizationWithRudiId = async (rudiId) => {
   const fun = `getEnsuredOrganizationWithRudiId`
   log.d(mod, fun, ``)
@@ -697,16 +736,16 @@ exports.getEnsuredContactWithDbId = async (contactDbId) => {
   return this.getEnsuredObjectWithDbId(URL_OBJECT_CONTACTS, Contact, contactDbId)
 }
 
-exports.getContactDbIdWithJson = async (contactDbId) => {
-  const fun = `getEnsuredContactDbIdWithJson`
+exports.getContactDbIdWithJson = async (contactJson) => {
+  const fun = `getContactDbIdWithJson`
   log.d(mod, fun, ``)
-  return this.getDbIdWithJson(URL_OBJECT_CONTACTS, Contact, API_CONTACT_ID, contactDbId)
+  return this.getDbIdWithJson(URL_OBJECT_CONTACTS, Contact, API_CONTACT_ID, contactJson)
 }
 
-exports.getEnsuredContactDbIdWithJson = async (contactDbId) => {
+exports.getEnsuredContactDbIdWithJson = async (contactJson) => {
   const fun = `getEnsuredContactDbIdWithJson`
   log.d(mod, fun, ``)
-  return this.getEnsuredDbIdWithJson(URL_OBJECT_CONTACTS, Contact, API_CONTACT_ID, contactDbId)
+  return this.getEnsuredDbIdWithJson(URL_OBJECT_CONTACTS, Contact, API_CONTACT_ID, contactJson)
 }
 
 exports.getAllContacts = async () => {
@@ -735,7 +774,6 @@ exports.updateContact = async (jsonContact) => {
   return updatedcontact
 }
 
-
 exports.deleteContact = async (contactRudiId) => {
   const fun = `deleteContact`
   log.d(mod, fun, ``)
@@ -758,7 +796,6 @@ exports.deleteContact = async (contactRudiId) => {
 //---------------------------------------- 
 // - Media
 //---------------------------------------- 
-
 exports.getMediaDbIdWithJson = async (mediaJson) => {
   const fun = `getMediaDbIdWithJson`
   log.d(mod, fun, ``)
@@ -790,6 +827,80 @@ exports.getEnsuredMediaWithDbId = async (mediaDbId) => {
   log.d(mod, fun, ``)
   return this.getEnsuredObjectWithDbId(URL_OBJECT_MEDIA, Media, mediaDbId)
 }
+
+//---------------------------------------- 
+// - SKOS: Scheme
+//---------------------------------------- 
+exports.getSchemeDbIdWithJson = async (schemeJson) => {
+  const fun = `getSchemeDbIdWithJson`
+  log.d(mod, fun, ``)
+  return this.getDbIdWithJson(URL_OBJECT_SKOS_SCHEME, SkosScheme, API_SKOS_SCHEME_ID, schemeJson)
+}
+
+exports.getSchemeDbIdWithRudiId = async (schemeRudiId) => {
+  const fun = `getSchemeDbIdWithRudiId`
+  log.d(mod, fun, ``)
+  return this.getDbIdWithRudiId(URL_OBJECT_SKOS_SCHEME, SkosScheme, API_SKOS_SCHEME_ID, schemeRudiId)
+}
+
+exports.getEnsuredSchemeDbIdWithRudiId = async (schemeRudiId) => {
+  const fun = `getEnsuredSchemeDbIdWithRudiId`
+  log.d(mod, fun, ``)
+  return this.getEnsuredDbIdWithRudiId(URL_OBJECT_SKOS_SCHEME, SkosScheme, API_SKOS_SCHEME_ID, schemeRudiId)
+}
+
+exports.getSchemeRudiIdWithDbId = async (schemeDbId) => {
+  const fun = `getEnsuredSchemeDbIdWithRudiId`
+  log.d(mod, fun, ``)
+  return this.getObjectPropertyWithDbId(SkosScheme, schemeDbId, API_SKOS_SCHEME_ID)
+}
+
+exports.getSchemeWithDbId = async (schemeDbId) => {
+  const fun = `getSchemeWithDbId`
+  log.d(mod, fun, ``)
+  return this.getObjectWithDbId(SkosScheme, schemeDbId)
+}
+
+exports.getEnsuredSchemeWithDbId = async (schemeDbId) => {
+  const fun = `getSchemeJsonIdWithDbId`
+  log.d(mod, fun, ``)
+  return this.getEnsuredObjectWithDbId(URL_OBJECT_SKOS_SCHEME, SkosScheme, schemeDbId)
+}
+
+//---------------------------------------- 
+// - SKOS: Concept
+//---------------------------------------- 
+
+exports.getConceptWithDbId = async (conceptDbId) => {
+  const fun = `getConceptWithDbId`
+  log.d(mod, fun, ``)
+  return this.getObjectWithDbId(SkosConcept, conceptDbId)
+}
+
+exports.getConceptRudiIdWithDbId = async (conceptDbId) => {
+  const fun = `getConceptRudiIdWithDbId`
+  log.d(mod, fun, ``)
+  return this.getObjectPropertyWithDbId(SkosConcept, conceptDbId, API_SKOS_CONCEPT_ID)
+}
+
+exports.getConceptWithJson = async (conceptJson) => {
+  const fun = `getConceptWithJson`
+  log.d(mod, fun, ``)
+  return this.getObjectWithJson(SkosConcept, API_SKOS_CONCEPT_ID, conceptJson)
+}
+
+exports.getConceptDbIdWithJson = async (conceptJson) => {
+  const fun = `getConceptDbIdWithJson`
+  log.d(mod, fun, ``)
+  return this.getDbIdWithJson(URL_OBJECT_SKOS_CONCEPT, SkosConcept, API_SKOS_CONCEPT_ID, conceptJson)
+}
+
+exports.getConceptDbIdWithRudiId = async (conceptRudiId) => {
+  const fun = `getConceptDbIdWithRudiId`
+  log.d(mod, fun, ``)
+  return this.getDbIdWithRudiId(URL_OBJECT_SKOS_CONCEPT, SkosConcept, API_SKOS_CONCEPT_ID, conceptRudiId)
+}
+
 
 //---------------------------------------- 
 // - Filters

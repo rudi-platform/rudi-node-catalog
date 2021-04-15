@@ -4,20 +4,28 @@
 // External dependancies
 //---------------------------------------------------------------
 const mongoose = require('mongoose')
+const Language = require('../thesaurus/Languages')
 
 //---------------------------------------------------------------
 // Custom schema definition
 //---------------------------------------------------------------
-const SensorSchema = new mongoose.Schema({
-   sensor: {
-      type: string
-   }
+const DictionaryList = new mongoose.Schema({
+  lang: {
+    type: String,
+    default: Language.fr_FR,
+    enum: Object.values(Language),
+    required: true
+  },
+  text: {
+    type: [String],
+    required: true
+  }
 }, {
-   timestamps: true,
-   id: false,
+  _id: false
 })
+
 
 //---------------------------------------------------------------
 // Exports
 //---------------------------------------------------------------
-module.exports = mongoose.model('Sensor', SensorSchema)
+module.exports = DictionaryList

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------
 // API version
 //---------------------------------------------------------------
-exports.API_VERSION = '1.1.0';
+exports.API_VERSION = '1.2.0';
 
 //---------------------------------------------------------------
 // REQ methods
@@ -39,7 +39,10 @@ exports.URL_OBJECT_METADATA = 'resources'
 exports.URL_OBJECT_ORGANIZATIONS = 'organizations'
 exports.URL_OBJECT_CONTACTS = 'contacts'
 exports.URL_OBJECT_MEDIA = 'media'
+exports.URL_OBJECT_SKOS_SCHEME = 'skos_schemes'
+exports.URL_OBJECT_SKOS_CONCEPT = 'skos_concepts'
 
+exports.URL_ACTION_UUID_GEN = 'id_generation'
 exports.URL_ACTION_DELETION = 'deletion'
 exports.URL_ACTION_REPORT = 'report'
 

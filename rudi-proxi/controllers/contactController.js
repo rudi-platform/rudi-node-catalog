@@ -1,11 +1,12 @@
 'use strict';
 
+const mod = 'contCtrl'
 /*
  * In this file are made the different steps followed for each 
  * action on the contacts (producer or publisher)
  */
 
- //---------------------------------------------------------------
+//---------------------------------------------------------------
 // External dependancies 
 //---------------------------------------------------------------
 const boom = require('@hapi/boom')
@@ -37,3 +38,13 @@ const {
 //---------------------------------------------------------------
 const Contact = require('../definitions/models/Contact')
 
+
+exports.newContact = async (contactJson) => {
+  const fun = 'newContact'
+  log.d(mod, fun, ``)
+
+  const dbContact = await new Contact(contactJson)
+  await dbContact.save()
+
+  return dbContact
+}

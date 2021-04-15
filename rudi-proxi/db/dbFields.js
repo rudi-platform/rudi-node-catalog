@@ -11,23 +11,38 @@
 exports.DB_ID = '_id';
 exports.DB_V = '__v';
 
+//---------------------------------------------------------------
+// ID properties
+//---------------------------------------------------------------
 exports.API_METADATA_ID = 'global_id';
 exports.API_ORGANIZATION_ID = 'organization_id';
 exports.API_CONTACT_ID = 'contact_id';
 exports.API_MEDIA_ID = 'media_id';
 
+//---------------------------------------------------------------
+// Metadata properties
+//---------------------------------------------------------------
 exports.API_DATA_PRODUCER_PROPERTY = 'producer';
 exports.API_DATA_CONTACTS_PROPERTY = 'contacts';
 exports.API_DATA_DATES_PROPERTY = 'dataset_dates';
 
+//---------------------------------------------------------------
+// Metadata properties: media
+//---------------------------------------------------------------
 exports.API_MEDIA_PROPERTY = 'available_formats';
 exports.API_MEDIA_TYPE_PROPERTY = 'media_type';
 
+//---------------------------------------------------------------
+// Metadata properties: metadata info
+//---------------------------------------------------------------
 exports.API_METAINFO_PROPERTY = 'metadata_info';
 exports.API_METAINFO_PROVIDER_PROPERTY = 'metadata_provider';
 exports.API_METAINFO_CONTACTS_PROPERTY = 'metadata_contacts';
 exports.API_METAINFO_DATES_PROPERTY = 'metadata_dates';
 
+//---------------------------------------------------------------
+// Dates
+//---------------------------------------------------------------
 exports.API_DATES_CREATED_PROPERTY = 'created';
 exports.API_DATES_EDITED_PROPERTY = 'updated';
 exports.API_DATES_PUBLISHED_PROPERTY = 'published';
@@ -39,3 +54,24 @@ exports.API_REPORT_ID = 'report_id';
 exports.API_REPORT_RESOURCE_ID = 'resource_id';
 exports.API_REPORT_STATUS = 'integration_status';
 
+//---------------------------------------------------------------
+// SKOS
+//---------------------------------------------------------------
+// ID properties
+exports.API_SKOS_SCHEME_ID = 'scheme_id';
+exports.API_SKOS_SCHEME_CODE = 'scheme_code';
+
+exports.API_SKOS_CONCEPT_ID = 'concept_id';
+exports.API_SKOS_CONCEPT_CODE = 'concept_code';
+
+// Scheme fields referencing Concepts
+exports.API_SCHEME_TOPS_PROPERTY = 'top_concepts'
+
+// Concept fields referencing a Scheme
+exports.API_CONCEPT_CLASS_PROPERTY = 'of_scheme';
+
+// Concept fields referencing other Concepts
+exports.API_CONCEPT_PARENTS_PROPERTY = 'broader_concepts';
+exports.API_CONCEPT_CHILDREN_PROPERTY = 'narrower_concepts';
+exports.API_CONCEPT_SIBLINGS_PROPERTY = 'siblings_concepts';
+exports.API_CONCEPT_RELATIVE_PROPERTY = 'relative_concepts';

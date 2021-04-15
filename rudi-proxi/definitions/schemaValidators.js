@@ -62,11 +62,3 @@ const regexVersionRudi = /^[0-9]{1,2}\.[0-9]{1,2}(\.[0-9]{1,2})?[a-z]*$/
 exports.isVersion = (str) => {
   return this.validateSchema(str, regexVersionRudi)
 }
-
-
-//---------------------------------------------------------------
-// Arrays
-//---------------------------------------------------------------
-exports.isNotEmptyArray = (anArray) => {
-  return Array.isArray(anArray) && anArray.length > 0
-}

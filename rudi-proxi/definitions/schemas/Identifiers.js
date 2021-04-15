@@ -41,6 +41,7 @@ exports.DOI = {
   type: String,
   trim: true,
   unique: true,
+  sparse: true, // accept empty values as non-duplicates 
   lowercase: true,
   validate: {
     validator: Validation.isDOI,
