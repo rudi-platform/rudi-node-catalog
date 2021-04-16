@@ -185,13 +185,17 @@ exports.createConceptHierarchy = async (listConcepts, schemeDbId, parentConcept)
     }
 
     // Update parents property
-    if (!!parentConcept) {
+    if (!parentConcept) {
+      delete dbConcept[API_CONCEPT_PARENTS_PROPERTY]
+    } else {
+      const parents = dbConcept[API_CONCEPT_PARENTS_PROPERTY]
       log.d(mod, fun, `Updating 'parents' property`)
-      if (!utils.isNotEmptyArray(dbConcept[API_CONCEPT_PARENTS_PROPERTY])) {
+      if (!utils.isNotEmptyArray(parents)) {
         // log.d(mod, fun, `dbConcept[API_CONCEPT_PARENTS_PROPERTY]: ${json.beautify(dbConcept[API_CONCEPT_PARENTS_PROPERTY])}`)
         dbConcept[API_CONCEPT_PARENTS_PROPERTY] = []
       }
-      dbConcept[API_CONCEPT_PARENTS_PROPERTY].push(parentConcept)
+      if (parents.indexOf(parentConcept) == -1)
+        dbConcept[API_CONCEPT_PARENTS_PROPERTY].push(parentConcept)
     }
 
     try {

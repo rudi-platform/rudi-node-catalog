@@ -26,14 +26,15 @@ const {
   PARAM_OBJECT,
   PARAM_ID,
   PARAM_REPORT_ID,
+  PARAM_THESAURUS_CODE,
   URL_ACTION_DELETION,
   URL_ACTION_REPORT,
   URL_ACTION_UUID_GEN,
   URL_DB_ACCESS,
-  URL_LOGS_SUFFIX,
   URL_LOGS_ACCESS,
+  URL_THESAURUS_ACCESS,
   URL_APP_ID_ACCESS,
-  URL_NODE_VERSION_ACCESS
+  URL_NODE_VERSION_ACCESS,
 } = require('../config/confApi')
 
 //---------------------------------------------------------------
@@ -51,9 +52,9 @@ const sysController = require('../controllers/sysController');
 //---------------------------------------------------------------
 // Helper functions
 //---------------------------------------------------------------
-function logRequest(req, res){
+function logRequest(req, res) {
   const fun = 'logRequest'
-  utils.consoleLog('', fun,`${req.ip}: ${req.method} ${req.url} `)
+  utils.consoleLog('', fun, `${req.ip}: ${req.method} ${req.url} `)
 }
 
 //---------------------------------------------------------------
@@ -204,6 +205,22 @@ exports.backOfficeRoutes = [
     url: `${URL_LOGS_ACCESS}`,
     // preHandler: logRequest,
     handler: sysController.getLogs
+  },
+
+  //---------------------------------------------------------------
+  // (distant dev) Route for accessing thesaurus
+  //---------------------------------------------------------------
+  {
+    method: 'GET',
+    url: `${URL_THESAURUS_ACCESS}`,
+    // preHandler: logRequest,
+    handler: sysController.getEveryThesaurus
+  },
+{
+    method: 'GET',
+    url: `${URL_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}`,
+    // preHandler: logRequest,
+    handler: sysController.getSingleThesaurus
   },
 
   //---------------------------------------------------------------

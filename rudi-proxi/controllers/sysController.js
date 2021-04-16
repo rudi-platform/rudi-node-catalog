@@ -24,8 +24,22 @@ const json = require('../utils/jsonAccess');
 const {
   URL_LOGS_ACCESS,
   URL_APP_ID_ACCESS,
-  URL_NODE_VERSION_ACCESS
+  URL_NODE_VERSION_ACCESS,
+  URL_THESAURUS_ACCESS,
+  PARAM_THESAURUS_CODE,
 } = require('../config/confApi');
+
+
+//---------------------------------------------------------------
+// Thesauri
+//---------------------------------------------------------------
+const Encodings = require('../definitions/thesaurus/Encodings');
+const FileTypes = require('../definitions/thesaurus/FileTypes');
+const HashAlgorithms = require('../definitions/thesaurus/HashAlgorithms');
+const Keywords = require('../definitions/thesaurus/Keywords');
+const Languages = require('../definitions/thesaurus/Languages');
+const Projections = require('../definitions/thesaurus/Projections');
+const Themes = require('../definitions/thesaurus/Themes');
 
 //---------------------------------------------------------------
 // App ID
@@ -78,6 +92,38 @@ exports.getLogs = () => {
     return logs
   } catch (err) {
     log.e(mod, fun, err)
-    throw err 
+    throw err
   }
+}
+
+//---------------------------------------------------------------
+// Thesaurus
+//---------------------------------------------------------------
+const THESAURI = {
+  "Encodings": Encodings,
+  "FileTypes": FileTypes,
+  "HashAlgorithms": HashAlgorithms,
+  "Keywords": Keywords,
+  "Languages": Languages,
+  "Projections": Projections,
+  "Themes": Themes
+}
+
+exports.getEveryThesaurus = (req, reply) => {
+  const fun = 'getEveryThesaurus'
+  log.v(mod, fun, `< GET ${URL_THESAURUS_ACCESS}`)
+  log.d(mod, fun, ``)
+  return THESAURI
+}
+
+exports.getSingleThesaurus = (req, reply) => {
+  const fun = 'getSingleThesaurus'
+  log.v(mod, fun, `< GET ${URL_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}`)
+
+  const thesaurusCode = json.accessReqParam(req, PARAM_THESAURUS_CODE)
+  log.d(mod, fun, `thesaurusCode: ${thesaurusCode}`)
+
+  const thesaurus = THESAURI[thesaurusCode]
+  if (!thesaurus) throw new Error(`Thesaurus not found for such required code: ${json.beautify(thesaurusCode)}`)
+  return thesaurus
 }

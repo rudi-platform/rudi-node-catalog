@@ -59,7 +59,6 @@ const Metadata = require('../definitions/models/Metadata');
 const Report = require('../definitions/models/Report');
 const IntegrationStatus = require('../definitions/thesaurus/IntegrationStatus');
 
-
 //---------------------------------------------------------------
 // Controllers: integration report for any object 
 //---------------------------------------------------------------

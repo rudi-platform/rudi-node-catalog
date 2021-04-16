@@ -32,7 +32,7 @@ exports.QUERY_OFFSET = 'offset'
 //---------------------------------------------------------------
 exports.URL_PREFIX_PUBLIC = '/api/v1';
 
-// This generic URL will be used to factorize the treatments on resources, organizations and contacts!
+// This generic URL will be used to factorize the treatments on resources, organizations, contacts, etc.
 exports.URL_OBJECT = `${this.URL_PREFIX_PUBLIC}/:${this.PARAM_OBJECT}`
 
 exports.URL_OBJECT_METADATA = 'resources'
@@ -63,3 +63,7 @@ exports.URL_NODE_VERSION_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_NODE_VE
 
 exports.URL_DB_SUFFIX = 'db'
 exports.URL_DB_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_DB_SUFFIX}`
+
+exports.URL_THESAURUS_SUFFIX = 'enum'
+exports.URL_THESAURUS_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_THESAURUS_SUFFIX}`
+exports.PARAM_THESAURUS_CODE = `code`

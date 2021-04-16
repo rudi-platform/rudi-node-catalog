@@ -472,7 +472,7 @@ exports.deleteEveryObject = async (req, reply) => {
 
     const object = await db.deleteAll(Model)
     return object
-  } catch (err) {
+  } catch (err) { 
     log.e(mod, fun, err)
     throw boom.boomify(err)
   }
