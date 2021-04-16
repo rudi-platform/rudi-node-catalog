@@ -122,8 +122,9 @@ const fun = 'export'
 const now = utils.nowLocaleFormatted()
 
 utils.consoleLog(mod, fun, `APP_NAME: ${this.APP_NAME}`)
+utils.consoleLog(mod, fun, `LISTENING_ADDR: ${this.LISTENING_ADDR}`)
 utils.consoleLog(mod, fun, `LISTENING_PORT: ${this.LISTENING_PORT}`)
 utils.consoleLog(mod, fun, `OUT_LOG: ${this.OUT_LOG}`)
 utils.consoleLog(mod, fun, `LOG_LVL: ${this.LOG_LVL}`)
 utils.consoleLog(mod, fun, `DB_NAME: ${this.DB_NAME}`)
-utils.consoleLog(mod, fun, `DB_URL: ${this.DB_URL}`)
+utils.consoleLog(mod, fun, `DB_URL: ${this.DB_URL}`) 

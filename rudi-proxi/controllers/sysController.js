@@ -20,6 +20,7 @@ const sys = require('../config/confSystem');
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
 const json = require('../utils/jsonAccess');
+const skos = require('../config/confSKOS')
 
 const {
   URL_LOGS_ACCESS,
@@ -29,17 +30,6 @@ const {
   PARAM_THESAURUS_CODE,
 } = require('../config/confApi');
 
-
-//---------------------------------------------------------------
-// Thesauri
-//---------------------------------------------------------------
-const Encodings = require('../definitions/thesaurus/Encodings');
-const FileTypes = require('../definitions/thesaurus/FileTypes');
-const HashAlgorithms = require('../definitions/thesaurus/HashAlgorithms');
-const Keywords = require('../definitions/thesaurus/Keywords');
-const Languages = require('../definitions/thesaurus/Languages');
-const Projections = require('../definitions/thesaurus/Projections');
-const Themes = require('../definitions/thesaurus/Themes');
 
 //---------------------------------------------------------------
 // App ID
@@ -99,21 +89,12 @@ exports.getLogs = () => {
 //---------------------------------------------------------------
 // Thesaurus
 //---------------------------------------------------------------
-const THESAURI = {
-  "Encodings": Encodings,
-  "FileTypes": FileTypes,
-  "HashAlgorithms": HashAlgorithms,
-  "Keywords": Keywords,
-  "Languages": Languages,
-  "Projections": Projections,
-  "Themes": Themes
-}
 
 exports.getEveryThesaurus = (req, reply) => {
   const fun = 'getEveryThesaurus'
   log.v(mod, fun, `< GET ${URL_THESAURUS_ACCESS}`)
   log.d(mod, fun, ``)
-  return THESAURI
+  return skos.Thesauri
 }
 
 exports.getSingleThesaurus = (req, reply) => {
@@ -123,7 +104,7 @@ exports.getSingleThesaurus = (req, reply) => {
   const thesaurusCode = json.accessReqParam(req, PARAM_THESAURUS_CODE)
   log.d(mod, fun, `thesaurusCode: ${thesaurusCode}`)
 
-  const thesaurus = THESAURI[thesaurusCode]
+  const thesaurus = skos.Thesauri[thesaurusCode]
   if (!thesaurus) throw new Error(`Thesaurus not found for such required code: ${json.beautify(thesaurusCode)}`)
   return thesaurus
 }

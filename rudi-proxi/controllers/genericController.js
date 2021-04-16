@@ -177,13 +177,12 @@ async function treatDbObject(objectType, dbObject) {
   switch (objectType) {
     case URL_OBJECT_METADATA:
       return await metadataController.dbMetadataToRudi(dbObject)
-      break
-    case URL_OBJECT_ORGANIZATIONS:
-    case URL_OBJECT_CONTACTS:
     case URL_OBJECT_SKOS_SCHEME:
       return await skosController.dbSchemeToRudi(dbObject)
-      case URL_OBJECT_SKOS_CONCEPT:
+    case URL_OBJECT_SKOS_CONCEPT:
       return await skosController.dbConceptToRudiMinimal(dbObject)
+    case URL_OBJECT_ORGANIZATIONS:
+    case URL_OBJECT_CONTACTS:
     case URL_ACTION_REPORT:
       return dbObject
       break
@@ -205,10 +204,10 @@ async function treatDbObjectList(objectType, dbObjectList) {
       const conceptList = await skosController.dbConceptListToRudiRecursive(dbObjectList)
       return conceptList
       break;
+    case URL_OBJECT_SKOS_SCHEME:
     case URL_OBJECT_ORGANIZATIONS:
     case URL_OBJECT_CONTACTS:
     case URL_OBJECT_MEDIA:
-    case URL_OBJECT_SKOS_SCHEME:
     case URL_ACTION_REPORT:
       return dbObjectList
       break;
@@ -472,7 +471,7 @@ exports.deleteEveryObject = async (req, reply) => {
 
     const object = await db.deleteAll(Model)
     return object
-  } catch (err) { 
+  } catch (err) {
     log.e(mod, fun, err)
     throw boom.boomify(err)
   }

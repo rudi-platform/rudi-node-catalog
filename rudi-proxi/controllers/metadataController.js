@@ -85,7 +85,7 @@ exports.organizationRudiToDbFormat = async (rudiProducer, shouldCreateIfNotFound
   log.d(mod, fun, ``)
   if (null == rudiProducer) throw new Error(`${msg.parameterExpected(fun, 'rudiProducer')}`)
 
-  const organizationDbId = await db.getOrganizationDbIdWithJson(rudiProducer)
+  let organizationDbId = await db.getOrganizationDbIdWithJson(rudiProducer)
 
   if (!organizationDbId) {
     if (!shouldCreateIfNotFound) throw err

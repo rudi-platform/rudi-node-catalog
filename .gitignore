@@ -4,7 +4,7 @@
 **/.DS_Store
 **/*.log
 **/.*-audit.json
-**/javascript.test.js
+**/jest
 **/*.zip
 **/*.gz
 **/rudi_proxi_custom.ini

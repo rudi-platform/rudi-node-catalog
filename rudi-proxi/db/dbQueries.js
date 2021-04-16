@@ -32,6 +32,7 @@ const {
   URL_OBJECT_SKOS_SCHEME,
   URL_OBJECT_SKOS_CONCEPT,
   URL_ACTION_REPORT,
+  URL_LICENCE_SUFFIX: URL_OBJECT_LICENCES,
 } = require('../config/confApi')
 
 const {
@@ -53,7 +54,9 @@ const {
   API_METAINFO_CONTACTS_PROPERTY,
   API_MEDIA_TYPE_PROPERTY,
   API_SKOS_SCHEME_ID,
-  API_SKOS_CONCEPT_ID
+  API_SKOS_CONCEPT_ID,
+  API_SKOS_SCHEME_CODE,
+  API_SKOS_CONCEPT_ROLE
 } = require('./dbFields')
 
 //---------------------------------------------------------------
@@ -68,6 +71,7 @@ const {
 const Report = require('../definitions/models/Report');
 const SkosScheme = require('../definitions/models/SkosScheme');
 const SkosConcept = require('../definitions/models/SkosConcept');
+const { LicenceSchemeCode } = require('../config/confSKOS');
 
 
 
@@ -83,38 +87,34 @@ exports.getObjectAccesses = (objectType) => {
       return {
         Model: Metadata, idField: API_METADATA_ID
       }
-      break;
     case URL_OBJECT_ORGANIZATIONS:
       return {
         Model: Organization, idField: API_ORGANIZATION_ID
       }
-      break;
     case URL_OBJECT_CONTACTS:
       return {
         Model: Contact, idField: API_CONTACT_ID
       }
-      break;
     case URL_OBJECT_MEDIA:
       return {
         Model: Media, idField: API_MEDIA_ID
       }
-      break;
     case URL_OBJECT_SKOS_SCHEME:
       return {
         Model: SkosScheme, idField: API_SKOS_SCHEME_ID
       }
-      break;
     case URL_OBJECT_SKOS_CONCEPT:
       return {
         Model: SkosConcept, idField: API_SKOS_CONCEPT_ID
       }
-      break;
+   case URL_OBJECT_LICENCES:
+      return {
+        Model: SkosConcept, idField: API_SKOS_CONCEPT_ID
+      }
     case URL_ACTION_REPORT:
       return {
         Model: Report, idField: API_REPORT_ID
       }
-      break;
-
     default:
       throw new Error(msg.objectTypeNotFound(objectType))
   }
@@ -226,6 +226,23 @@ exports.getObjectWithRudiId = async (Model, idField, rudiId) => {
     if (!rudiId) throw new Error(`${msg.parameterExpected(fun, PARAM_ID)}`)
     /* beautify ignore:start */
     const dbObject = await Model.findOne({[idField]: rudiId})
+    /* beautify ignore:end */
+    // log.d(mod, fun, `${rudiId} -> ${json.beautify(dbObject)}\n`)
+
+    return dbObject
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw err
+  }
+}
+
+exports.getObjectWithField = async (Model, fieldName, fieldValue) => {
+  const fun = `getObjectWithField`
+  // log.d(mod, fun, ``)
+  try {
+    if (!fieldName) throw new Error(`${msg.parameterExpected(fun, 'field name')}`)
+    /* beautify ignore:start */
+    const dbObject = await Model.findOne({[fieldName]: fieldValue})
     /* beautify ignore:end */
     // log.d(mod, fun, `${rudiId} -> ${json.beautify(dbObject)}\n`)
 
@@ -867,6 +884,12 @@ exports.getEnsuredSchemeWithDbId = async (schemeDbId) => {
   return this.getEnsuredObjectWithDbId(URL_OBJECT_SKOS_SCHEME, SkosScheme, schemeDbId)
 }
 
+exports.getEnsuredSchemeWithCode = async (schemeCode) => {
+  const fun = `getSchemeJsonIdWithDbId`
+  log.d(mod, fun, ``)
+  return this.getEnsuredObjectWithRudiId(URL_OBJECT_SKOS_SCHEME, SkosScheme, schemeDbId)
+}
+
 //---------------------------------------- 
 // - SKOS: Concept
 //---------------------------------------- 
@@ -901,6 +924,29 @@ exports.getConceptDbIdWithRudiId = async (conceptRudiId) => {
   return this.getDbIdWithRudiId(URL_OBJECT_SKOS_CONCEPT, SkosConcept, API_SKOS_CONCEPT_ID, conceptRudiId)
 }
 
+exports.getAllConcepts = async () => {
+  const fun = `getAllConcepts`
+  log.d(mod, fun, ``)
+
+  const conceptList = await SkosConcept.find({})
+  return conceptList
+}
+
+exports.getAllConceptsFromScheme = async (schemeCode) => {
+  const fun = `getAllConceptsFromScheme`
+  log.d(mod, fun, ``)
+
+  const conceptList = await SkosConcept.find({[API_SKOS_SCHEME_CODE]:schemeCode})
+  return conceptList
+}
+
+exports.getAllConceptsWithRole = async (conceptRole) => {
+  const fun = `getAllConceptsWithRole`
+  log.d(mod, fun, ``)
+
+  const conceptList = await SkosConcept.find({[API_SKOS_CONCEPT_ROLE]:conceptRole})
+  return conceptList
+}
 
 //---------------------------------------- 
 // - Filters

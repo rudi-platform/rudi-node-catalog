@@ -1,0 +1,127 @@
+{
+  "scheme_id": "{{schemeLicence}}",
+  "scheme_code": "software_licences",
+  "scheme_label": [{
+      "lang": "en",
+      "text": "software licences"
+    },
+    {
+      "lang": "fr",
+      "text": "licences logicielles"
+    }
+  ],
+  "top_concepts": [{
+      "concept_id": "{{conceptTopLicence1}}",
+      "concept_code": "free-software-licence",
+      "concept_uri": "https://www.gnu.org/philosophy/free-sw.html",
+      "pref_label": [{
+          "lang": "fr",
+          "text": "Logiciel Libre"
+        },
+        {
+          "lang": "en",
+          "text": "Free-software license"
+        }
+      ],
+      "narrower_concepts": [{
+          "concept_id": "{{conceptLicence0}}",
+          "concept_code": "licence_public-domain-CC0",
+          "concept_role": "licence",
+          "concept_uri": "https://creativecommons.org/share-your-work/public-domain/cc0/",
+          "pref_label": [{
+              "lang": "fr",
+              "text": "Domaine Public"
+            },
+            {
+              "lang": "en",
+              "text": "Public Domain"
+            }
+          ]
+        },
+        {
+          "concept_id": "{{conceptLicence3}}",
+          "concept_code": "licence_GPL-3.0",
+          "concept_role": "licence",
+          "concept_uri": "https://www.gnu.org/licenses/gpl-3.0.en.html",
+          "pref_label": [{
+              "lang": "fr",
+              "text": "GNU General Public License v3"
+            },
+            {
+              "lang": "en",
+              "text": "GNU General Public License v3"
+            }
+          ],
+          "alt_labels": [{
+              "lang": "fr",
+              "text": [
+                "GNU GPL v3",
+                "GPL",
+                "GPL v3",
+                "GPL 3",
+                "GPL3",
+                "GNU General Public License v3"
+              ]
+            },
+            {
+              "lang": "en",
+              "text": [
+                "GPL",
+                "GPL v3",
+                "GPL 3",
+                "GPL3",
+                "GNU GPL v3",
+                "GNU General Public License v3"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "concept_id": "{{conceptTopLicence2}}",
+      "concept_code": "open-source-licence",
+      "concept_uri": "https://opensource.org/licenses",
+      "pref_label": [{
+          "lang": "fr",
+          "text": "Licence Open-Source"
+        },
+        {
+          "lang": "en",
+          "text": "Open-Source Licence"
+        }
+      ],
+      "narrower_concepts": [{
+          "concept_id": "{{conceptLicence1}}",
+          "concept_code": "licence_MIT",
+          "concept_role": "licence",
+          "concept_uri": "https://opensource.org/licenses/MIT",
+          "pref_label": [{
+              "lang": "fr",
+              "text": "Licence MIT"
+            },
+            {
+              "lang": "en",
+              "text": "MIT License"
+            }
+          ]
+        },
+        {
+          "concept_id": "{{conceptLicence2}}",
+          "concept_code": "licence_Apache-2.0",
+          "concept_role": "licence",
+          "concept_uri": "https://opensource.org/licenses/Apache-2.0",
+          "pref_label": [{
+              "lang": "fr",
+              "text": "Licence Apache v2"
+            },
+            {
+              "lang": "en",
+              "text": "Apache License v2"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

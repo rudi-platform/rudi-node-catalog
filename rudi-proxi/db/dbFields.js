@@ -63,6 +63,7 @@ exports.API_SKOS_SCHEME_CODE = 'scheme_code';
 
 exports.API_SKOS_CONCEPT_ID = 'concept_id';
 exports.API_SKOS_CONCEPT_CODE = 'concept_code';
+exports.API_SKOS_CONCEPT_ROLE = 'concept_role';
 
 // Scheme fields referencing Concepts
 exports.API_SCHEME_TOPS_PROPERTY = 'top_concepts'

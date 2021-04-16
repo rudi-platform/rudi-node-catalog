@@ -35,6 +35,7 @@ const {
   URL_THESAURUS_ACCESS,
   URL_APP_ID_ACCESS,
   URL_NODE_VERSION_ACCESS,
+  URL_LICENCE_ACCESS,
 } = require('../config/confApi')
 
 //---------------------------------------------------------------
@@ -48,6 +49,7 @@ const reportController = require('../controllers/reportController')
 
 const dbController = require('../controllers/dbController');
 const sysController = require('../controllers/sysController');
+const licenceController = require('../controllers/licenceController');
 
 //---------------------------------------------------------------
 // Helper functions
@@ -216,13 +218,19 @@ exports.backOfficeRoutes = [
     // preHandler: logRequest,
     handler: sysController.getEveryThesaurus
   },
-{
+  {
     method: 'GET',
     url: `${URL_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}`,
     // preHandler: logRequest,
     handler: sysController.getSingleThesaurus
   },
-
+  {
+    method: 'GET',
+    url: `${URL_LICENCE_ACCESS}`,
+    // preHandler: logRequest,
+    handler: licenceController.getAllLicenses
+  },
+ 
   //---------------------------------------------------------------
   // (distant dev) Route for accessing 
   //---------------------------------------------------------------
