@@ -28,6 +28,16 @@ const {
   API_DATES_CREATED_PROPERTY,
   API_DATES_EDITED_PROPERTY,
   API_DATES_PUBLISHED_PROPERTY,
+  API_METADATA_ID,
+  API_METADATA_ACCESS_CONDITION,
+  API_METADATA_LICENCE,
+  API_METADATA_LICENCE_LABEL,
+  API_METADATA_LICENCE_CUSTOM_LABEL,
+  API_METADATA_LICENCE_CUSTOM_URI,
+  API_METADATA_GEOGRAPHY_PROPERTY,
+  API_METADATA_BBOX_PROPERTY,
+  API_METADATA_PERIOD_PROPERTY,
+  API_METADATA_START_DATE_PROPERTY
 } = require('../../db/dbFields');
 
 const log = require('../../utils/logging')
@@ -58,6 +68,11 @@ const Contact = require('./Contact');
 const { Media, MediaFile, MediaSeries } = require('./Media');
 /* beautify ignore:end */
 const Licence = require('./Licence');
+
+//---------------------------------------------------------------
+// Other controllers
+//---------------------------------------------------------------
+const licenceController = require('../../controllers/licenceController');
 
 //---------------------------------------------------------------
 // Thesaurus definiitons
@@ -337,7 +352,7 @@ const MetadataSchema = new mongoose.Schema({
   },
 
   access_condition: {
-    required: true, 
+    required: true,
     validate: validObjectNotEmpty,
     type: {
       /** Restriction level for the resource */
@@ -460,17 +475,41 @@ function requireSubProperty(metadata, prop, subProp) {
   const fun = 'requireSubProperty'
   if (!json.isNothing(metadata[prop]) && json.isNothing(metadata[prop][subProp])) {
     log.d(mod, fun, `${prop}.${subProp}`)
-    log.d(mod, fun, `metadata[prop]: ${metadata[prop]}`)
-    log.d(mod, fun, `metadata[prop][subProp]: ${metadata[prop][subProp]}`)
+    log.d(mod, fun, `metadata[${prop}]: ${json.beautify(metadata[prop])}`)
+    log.d(mod, fun, `metadata[${prop}][${subProp}]: ${json.beautify(metadata[prop][subProp])}`)
     throw (new Error(`'${prop}.${subProp}' is required when '${prop}' is set`))
+  }
+  return metadata[prop][subProp]
+}
+
+async function checkLicence(metadata) {
+  const fun = 'checkLicence'
+  const licence = requireSubProperty(metadata, API_METADATA_ACCESS_CONDITION, API_METADATA_LICENCE)
+  log.d(mod, fun, `licence: ${json.beautify(licence)}`)
+  const licenceLabel = licence[API_METADATA_LICENCE_LABEL]
+  log.d(mod, fun, `licence label: ${licenceLabel}`)
+  if (!!licenceLabel) {
+    const listLicenceCode = await licenceController.getAllLicenceCodes()
+    log.d(mod, fun, `licence list: ${json.beautify(listLicenceCode)}`)
+    if (listLicenceCode.indexOf(licenceLabel) == -1) {
+      throw (new Error(`Licence label '${licenceLabel}' was not found in licence list '${listLicenceCode}'`))
+    } else {
+      return licenceLabel
+    }
+  } else {
+    requireSubProperty(metadata[API_METADATA_ACCESS_CONDITION], API_METADATA_LICENCE, API_METADATA_LICENCE_CUSTOM_LABEL)
+    requireSubProperty(metadata[API_METADATA_ACCESS_CONDITION], API_METADATA_LICENCE, API_METADATA_LICENCE_CUSTOM_URI)
+    return licence[API_METADATA_LICENCE_CUSTOM_LABEL]
   }
 }
 
-MetadataSchema.pre('save', function (next) {
+MetadataSchema.pre('save', async function (next) {
   const fun = 'pre hook'
   try {
-    requireSubProperty(this, 'geography', 'bounding_box', next)
-    requireSubProperty(this, 'temporal_spread', 'start_date', next)
+    let metadata = this
+    requireSubProperty(metadata, API_METADATA_GEOGRAPHY_PROPERTY, 'bounding_box', next)
+    requireSubProperty(metadata, 'temporal_spread', 'start_date', next)
+    await checkLicence(metadata)
   } catch (err) {
     next(err)
   }

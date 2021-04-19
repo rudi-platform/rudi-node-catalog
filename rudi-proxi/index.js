@@ -14,10 +14,8 @@ const log = require('./utils/logging')
 const api = require('./config/confApi')
 
 //---------------------------------------------------------------
-// External dependancies  
+// External dependancies / init
 //---------------------------------------------------------------
-
-
 // Require external modules
 const mongoose = require('mongoose')
 
@@ -75,7 +73,7 @@ const {
   inspectRequest
 } = require('./routes/routes');
 const {
-  initFFLogger: initLogger
+  initFFLogger
 } = require('./config/confLogs');
 const {
   consoleErr
@@ -121,6 +119,8 @@ backOfficeRoutes.forEach((boRoute, index) => {
   fastify.route(boRoute)
   log.d(mod, fun, `route #${index} = ${boRoute.method} ${boRoute.url}`)
 })
+
+
 
 //---------------------------------------------------------------
 // SERVER 

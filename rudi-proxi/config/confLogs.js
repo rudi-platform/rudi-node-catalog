@@ -34,6 +34,7 @@ const {
 // Constants
 //---------------------------------------------------------------
 const errorLogsFileName = 'error.log'
+const errorDBLogsFileName = 'errorDB.log'
 
 const logsTimestamp = 'YYYY/MM/DD HH:mm:ss'
 const fileTimestamp = 'YYYY-MM-DD-HH'
@@ -151,7 +152,7 @@ function extractErrorFromFastifyMsg(msg) {
     return msg
   }
 }
-let FORMAT_PRINTFF = info => `!${info.timestamp} .${info.level}. ${extractErrorFromFastifyMsg(info.message)}`
+let FORMAT_PRINTFF = info => `${info.timestamp} .${info.level}. [fastify] ${extractErrorFromFastifyMsg(info.message)}`
 
 const formatConsoleFastifyLogs =
   winston.format.combine(
@@ -177,7 +178,15 @@ exports.initFFLogger = (appname) => {
       service: appname + "_" + (process.env.NODE_ENV || "development")
     },
     transports: [
-
+      new winston.transports.File({
+        name: 'errorLogs',
+        filename: `${sys.LOG_DIR}/${errorDBLogsFileName}`,
+        level: 'error',
+        maxSize: '20m',
+        maxFiles: '7d',
+        format: formatFileLogs
+      }),
+  
     ]
   });
 

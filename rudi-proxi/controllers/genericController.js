@@ -74,7 +74,6 @@ const { Media, MediaFile, MediaSeries } = require('../definitions/models/Media')
 //---------------------------------------------------------------
 // Specific controlelrs
 //---------------------------------------------------------------
-
 const metadataController = require('../controllers/metadataController')
 const organizationController = require('../controllers/organizationController')
 const contactController = require('../controllers/contactController');

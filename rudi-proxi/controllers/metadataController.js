@@ -74,6 +74,7 @@ const {
 const {
   MediaTypes
 } = require('../definitions/thesaurus/MediaTypes');
+const licenceController = require('./licenceController');
 
 
 //---------------------------------------------------------------
@@ -503,8 +504,8 @@ exports.newMetadata = async (rudiMetadata) => {
   log.d(mod, fun, `DB ready object: ${json.beautify(dbReadyObject)}`)
 
   const dbMetadata = await new Metadata(dbReadyObject)
-  
-  dbMetadata.save()
+
+  await dbMetadata.save()
 
   return this.dbMetadataToRudi(dbMetadata)
 }

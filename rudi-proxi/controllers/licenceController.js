@@ -24,27 +24,47 @@ const api = require("../config/confApi");
 
 const skos = require("../config/confSKOS");
 const skosController = require("./skosController");
+const {
+  API_SKOS_CONCEPT_CODE
+} = require('../db/dbFields');
+const utils = require('../utils/jsUtils');
 
 //---------------------------------------------------------------
 // Constants
 //---------------------------------------------------------------
-let LICENCE_LIST
 
 const LICENCE_POST_ADDRESS = `http://${sysConf.LISTENING_ADDR}:${sysConf.LISTENING_PORT}${api.URL_PREFIX_PUBLIC}/${api.URL_OBJECT_SKOS_SCHEME}`
 
 //---------------------------------------------------------------
 // Controller
 //---------------------------------------------------------------
-exports.getAllLicenses = async (req, reply) => {
-  const fun = `getAllLicenses`
-  log.v(mod, fun, `< GET ${api.URL_LICENCE_ACCESS}`)
+let LICENCE_LIST
+let LICENCE_CODE_LIST
 
+exports.getLicenceList = async () => {
+  const fun = "getLicenceList"
   if (!this.LICENCE_LIST) {
-    await initLicenses()
-    const licenseList = await db.getAllConceptsWithRole(skos.LicenceConceptRole)
-    this.LICENCE_LIST = await skosController.dbConceptListToRudiRecursive(licenseList)
+    log.d(mod, fun, `Init LICENCE_LIST`)
+    let dbLicenseList = await db.getAllConceptsWithRole(skos.LicenceConceptRole)
+    if (!utils.isNotEmptyArray(dbLicenseList)) {
+      await initLicenses()
+      dbLicenseList = await db.getAllConceptsWithRole(skos.LicenceConceptRole)
+    }
+    this.LICENCE_LIST = await skosController.dbConceptListToRudiRecursive(dbLicenseList)
   }
   return this.LICENCE_LIST
+}
+ 
+exports.getAllLicenceCodes = async () => {
+  const fun = `getAllLicenceCodes`
+  if (!this.LICENCE_CODE_LIST) {
+    const licenceList = await this.getLicenceList()
+    log.d(mod, fun, `licence list: ${json.beautify(licenceList)}`)
+
+    this.LICENCE_CODE_LIST = await licenceList.map(obj => obj[API_SKOS_CONCEPT_CODE])
+  }
+  log.d(mod, fun, `licence codes: ${json.beautify(this.LICENCE_CODE_LIST)}`)
+  return this.LICENCE_CODE_LIST
 }
 
 async function initLicenses() {
@@ -57,9 +77,19 @@ async function initLicenses() {
     })
     // log.d(mod, fun, licenceData)
     const res = await axios.post(LICENCE_POST_ADDRESS, JSON.parse(licenceData))
-    log.d(`Status: ${json.beautify(res.status)}`);
-    log.d('Body: ', json.beautify(res.data));
+    log.d(mod, fun, `Status: ${json.beautify(res.status)}`);
+    log.d(mod, fun, `Body: ${json.beautify(res.data)}`);
   } catch (err) {
     log.e(mod, fun, err)
   }
+}
+//---------------------------------------------------------------
+// Controller
+//---------------------------------------------------------------
+exports.getAllLicenses = async (req, reply) => {
+  const fun = `getAllLicenses`
+  log.v(mod, fun, `< GET ${api.URL_LICENCE_ACCESS}`)
+  // log.d(mod, fun, ``)
+
+  return await this.getLicenceList()
 }
