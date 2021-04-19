@@ -959,6 +959,46 @@
 					"response": []
 				},
 				{
+					"name": "Add meta 2 fails 'licence_label' value",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Metadata 2 creation: testing empty property 'temporal_spread.start_date'\", () => {",
+									"    pm.expect(pm.response.code).to.eql(500);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"global_id\": \"{{metaId2}}\",\n    \"local_id\": \"testingID 3 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-333\",\n    \"resource_title\": \"Test de RUDI en local 33\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 33\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 3\"\n        }\n    ],\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"plu\",\n        \"municipality\"\n    ],\n    \"geography\": {\n        \"spatial_representation\": \"test\",\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\",\n        \"end_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\"\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"available_formats\": [\n        {\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"df4f0fceee7b4ee614295b95531ba1d5\"\n            },\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.2.0\"\n            },\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{mediaId2}}\",\n            \"file_type\": \"application/json\",\n            \"file_size\": 59033\n        }\n    ],\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_label\": \"licence_other\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Add meta 2",
 					"event": [
 						{
@@ -2753,52 +2793,52 @@
 	],
 	"variable": [
 		{
-			"id": "60266904-3b11-404e-b42a-232c5adbb02e",
+			"id": "8b31d8eb-b915-4442-bd95-ceb5fe0293ed",
 			"key": "metaId1",
 			"value": ""
 		},
 		{
-			"id": "08a002ac-c5be-4642-99df-b3b13de7d7cd",
+			"id": "f6bb16b2-6a5f-4de2-95d4-75cc9065e42a",
 			"key": "metaId2",
 			"value": ""
 		},
 		{
-			"id": "7b42029b-9eb6-48e0-846d-d5ac4742a22d",
+			"id": "3caaa5cf-49de-4d19-b469-953bf9a2a955",
 			"key": "orgId1",
 			"value": ""
 		},
 		{
-			"id": "333712fc-c688-409b-89cb-3d6ecc5eb2ef",
+			"id": "3f37c910-68f7-428f-8e1a-1e43f72d26ac",
 			"key": "orgId2",
 			"value": ""
 		},
 		{
-			"id": "51b39e71-9c49-4f04-9a57-6c8331a085da",
+			"id": "ff9a9f04-f5ac-44c7-86b6-c866208fdf60",
 			"key": "contId1",
 			"value": ""
 		},
 		{
-			"id": "484cd773-2d3e-46f3-9177-f68fc8d16321",
+			"id": "bba3305a-5a2f-439d-935c-1512366bf539",
 			"key": "contId2",
 			"value": ""
 		},
 		{
-			"id": "c9ae5a4b-c88a-4905-9aaf-5bcb20c1456d",
+			"id": "37d194c4-165d-4dd5-806b-6f435221da81",
 			"key": "contId3",
 			"value": ""
 		},
 		{
-			"id": "8c8ff7b0-8c75-4723-a1d1-d7bc58ac6259",
+			"id": "bb914178-2826-4fcc-b7bc-c7832fead681",
 			"key": "mediaId1",
 			"value": ""
 		},
 		{
-			"id": "bb70f388-7d85-4d25-b8a5-041c46ca00bf",
+			"id": "cd75485d-ef67-4fdd-bd8c-edff3f2b5720",
 			"key": "mediaId2",
 			"value": ""
 		},
 		{
-			"id": "fb006a81-1a33-40ce-8f30-0efaee380ab3",
+			"id": "b7726dfb-5169-4e6e-8a52-f8d7a7a9937f",
 			"key": "mediaId3",
 			"value": ""
 		}
