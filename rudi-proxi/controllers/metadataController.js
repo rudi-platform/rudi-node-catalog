@@ -245,8 +245,9 @@ function customMerger(a, b) {
 
 // Parameter 'dbMetadata' gets mutated!
 function metadataMerge(dbMetadata, dbReadyModMetadata) {
-  const fun = 'customMerger'
-  log.d(mod, fun, `dbMetadata: ${json.beautify(dbMetadata)}`)
+  const fun = 'metadataMerge'
+  log.d(mod, fun, ``)
+  // log.d(mod, fun, `dbMetadata: ${json.beautify(dbMetadata)}`)
 
   let dataDates = json.deepClone(dbMetadata[API_DATA_DATES_PROPERTY])
   let metaDates = json.deepClone(dbMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY])
@@ -267,6 +268,45 @@ function metadataMerge(dbMetadata, dbReadyModMetadata) {
 
   log.d(mod, fun, `dbMetadata updated: ${json.beautify(dbMetadata)}`)
   return dbMetadata
+}
+
+exports.getObjectListCount = (groupBy) => {
+  const fun = 'getObjectListCount'
+  log.d(mod, fun, ``)
+
+  const fields = groupBy.split('.')
+  log.d(mod, fun, `fields: ${json.beautify(fields)}`)
+
+  let CollectionFrom
+  let populateField
+  switch (fields[0]) {
+    case API_DATA_PRODUCER_PROPERTY:
+      CollectionFrom = Organization;
+      populateField = API_DATA_PRODUCER_PROPERTY;
+      break;
+    case API_DATA_CONTACTS_PROPERTY:
+      CollectionFrom = Contact;
+      populateField = API_DATA_CONTACTS_PROPERTY;
+      break;
+    case API_METAINFO_PROPERTY:
+      switch (fields[1]) {
+        case API_METAINFO_PROVIDER_PROPERTY:
+          CollectionFrom = Organization;
+          populateField = `${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`;
+          break;
+        case API_METAINFO_CONTACTS_PROPERTY:
+          CollectionFrom = Contact;
+          populateField = `${API_METAINFO_PROPERTY}.${API_METAINFO_CONTACTS_PROPERTY}`;
+          break;
+        default:
+          return db.getObjectListCount(Metadata, groupBy)
+      }
+      break;
+    default:
+      return db.getObjectListCount(Metadata, groupBy)
+  }
+
+  return db.getObjectListCountWithLookup(Metadata, CollectionFrom, populateField)
 }
 //---------------------------------------------------------------
 // Atomic treatments of properties: DB -> RUDI

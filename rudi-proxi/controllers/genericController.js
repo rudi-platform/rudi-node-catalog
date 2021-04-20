@@ -40,6 +40,7 @@ const {
   URL_ACTION_REPORT,
   URL_OBJECT,
   URL_ACTION_DELETION,
+  QUERY_GROUP_BY,
 } = require('../config/confApi')
 
 const {
@@ -215,7 +216,24 @@ async function treatDbObjectList(objectType, dbObjectList) {
   }
 }
 
-
+async function getObjectListCount(objectType, Model, groupBy) {
+  switch (objectType) {
+    case URL_OBJECT_METADATA:
+      const rudiMetadataList = await metadataController.getObjectListCount(groupBy)
+      return rudiMetadataList
+      break;
+    case URL_OBJECT_SKOS_CONCEPT:
+    case URL_OBJECT_SKOS_SCHEME:
+    case URL_OBJECT_ORGANIZATIONS:
+    case URL_OBJECT_CONTACTS:
+    case URL_OBJECT_MEDIA:
+    case URL_ACTION_REPORT:
+      return db.getObjectListCount(Model, groupBy)
+      break;
+    default:
+      throw new Error(msg.objectTypeNotFound(objectType))
+  }
+}
 //---------------------------------------------------------------
 // Controllers
 //---------------------------------------------------------------
@@ -320,14 +338,20 @@ exports.getObjectList = async (req, reply) => {
     // retrieve query parameters: 'limit' and 'offset'
     const limit = parseInt(req.query[QUERY_LIMIT]) || 0
     const offset = parseInt(req.query[QUERY_OFFSET]) || 0
+    const groupBy = req.query[QUERY_GROUP_BY]
 
     // accessing the objects
-    const objectList = await db.getObjectList(Model, limit, offset)
+    let objectList
+    if (!groupBy) {
+      const dbObjectList = await db.getObjectList(Model, limit, offset)
+      // special treatments
+      objectList = await treatDbObjectList(objectType, dbObjectList)
+    } else {
+      objectList = await getObjectListCount(objectType, Model, groupBy)
+    }
     log.d(mod, fun, `objectList: ${json.beautify(objectList)}`)
-    // special treatments
-    const refinedObjectList = await treatDbObjectList(objectType, objectList)
 
-    return refinedObjectList
+    return objectList
   } catch (err) {
     log.e(mod, fun, err)
     throw boom.boomify(err)

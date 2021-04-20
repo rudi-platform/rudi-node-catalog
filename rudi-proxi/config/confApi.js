@@ -26,6 +26,7 @@ exports.PARAM_REPORT_ID = 'irid';
 //--- "In query" parameters
 exports.QUERY_LIMIT = 'limit'
 exports.QUERY_OFFSET = 'offset'
+exports.QUERY_GROUP_BY = 'group_by'
 
 //---------------------------------------------------------------
 // REQ URL

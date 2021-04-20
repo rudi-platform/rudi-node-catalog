@@ -32,7 +32,7 @@ const {
   URL_OBJECT_SKOS_SCHEME,
   URL_OBJECT_SKOS_CONCEPT,
   URL_ACTION_REPORT,
-  URL_LICENCE_SUFFIX: URL_OBJECT_LICENCES,
+  URL_LICENCE_SUFFIX,
 } = require('../config/confApi')
 
 const {
@@ -71,7 +71,9 @@ const {
 const Report = require('../definitions/models/Report');
 const SkosScheme = require('../definitions/models/SkosScheme');
 const SkosConcept = require('../definitions/models/SkosConcept');
-const { LicenceSchemeCode } = require('../config/confSKOS');
+const {
+  LicenceSchemeCode
+} = require('../config/confSKOS');
 
 
 
@@ -87,34 +89,42 @@ exports.getObjectAccesses = (objectType) => {
       return {
         Model: Metadata, idField: API_METADATA_ID
       }
+      break;
     case URL_OBJECT_ORGANIZATIONS:
       return {
         Model: Organization, idField: API_ORGANIZATION_ID
       }
+      break;
     case URL_OBJECT_CONTACTS:
       return {
         Model: Contact, idField: API_CONTACT_ID
       }
+      break;
     case URL_OBJECT_MEDIA:
       return {
         Model: Media, idField: API_MEDIA_ID
       }
+      break;
     case URL_OBJECT_SKOS_SCHEME:
       return {
         Model: SkosScheme, idField: API_SKOS_SCHEME_ID
       }
+      break;
     case URL_OBJECT_SKOS_CONCEPT:
       return {
         Model: SkosConcept, idField: API_SKOS_CONCEPT_ID
       }
-   case URL_OBJECT_LICENCES:
+      break;
+    case URL_LICENCE_SUFFIX:
       return {
         Model: SkosConcept, idField: API_SKOS_CONCEPT_ID
       }
+      break;
     case URL_ACTION_REPORT:
       return {
         Model: Report, idField: API_REPORT_ID
       }
+      break;
     default:
       throw new Error(msg.objectTypeNotFound(objectType))
   }
@@ -388,6 +398,65 @@ exports.getObjectListFiltered = async (Model, filter, limit, offset) => {
     const objectList = await Model.find(filter) // .limit(limit).skip(offset)
     log.d(mod, fun, `found: ${json.beautify(objectList)}`)
     return objectList
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw err
+  }
+}
+
+exports.getObjectListCount = async (Model, groupByField) => {
+  const fun = `getObjectListCount`
+  log.d(mod, fun, ``)
+  // log.d(mod, fun, `filter.limit: ${filter.limit}, filter.offset: ${filter.skip}`)
+  try {
+    /* beautify ignore:start */
+    const objectList = await Model.aggregate([
+      {'$unwind': `$${groupByField}`},
+      {'$group': {
+        '_id': `$${groupByField}`,
+        'count': {'$sum': 1}
+      }},
+      {"$sort": {"count": -1}},
+    ]).exec()
+    /* beautify ignore:end */
+    // find({}).limit(limit).skip(offset)
+
+    objectList.map(obj => {
+      obj[groupByField] = obj['_id'];
+      delete obj['_id'];
+    })
+
+    return objectList
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw err
+  }
+}
+
+exports.getObjectListCountWithLookup = async (Model, CollectionFrom, groupByField) => {
+  const fun = `getObjectListCount`
+  log.d(mod, fun, ``)
+  // log.d(mod, fun, `filter.limit: ${filter.limit}, filter.offset: ${filter.skip}`)
+  try {
+    /* beautify ignore:start */
+    const objectList = await Model.aggregate([
+      {'$unwind': `$${groupByField}`},
+      {'$group': {
+        '_id': `$${groupByField}`,
+        'count': {'$sum': 1}
+      }},
+      {"$sort": {"count": -1}},
+    ]).exec();
+    /* beautify ignore:end */
+
+    objectList.map(obj => {
+      obj[groupByField] = obj['_id'];
+      delete obj['_id'];
+    })
+    
+    const finalObjectList = await CollectionFrom.populate(objectList, groupByField)
+    
+    return finalObjectList
   } catch (err) {
     log.e(mod, fun, err)
     throw err
@@ -936,7 +1005,9 @@ exports.getAllConceptsFromScheme = async (schemeCode) => {
   const fun = `getAllConceptsFromScheme`
   log.d(mod, fun, ``)
 
-  const conceptList = await SkosConcept.find({[API_SKOS_SCHEME_CODE]:schemeCode})
+  const conceptList = await SkosConcept.find({
+    [API_SKOS_SCHEME_CODE]: schemeCode
+  })
   return conceptList
 }
 
@@ -944,7 +1015,9 @@ exports.getAllConceptsWithRole = async (conceptRole) => {
   const fun = `getAllConceptsWithRole`
   log.d(mod, fun, ``)
 
-  const conceptList = await SkosConcept.find({[API_SKOS_CONCEPT_ROLE]:conceptRole})
+  const conceptList = await SkosConcept.find({
+    [API_SKOS_CONCEPT_ROLE]: conceptRole
+  })
   return conceptList
 }
 
