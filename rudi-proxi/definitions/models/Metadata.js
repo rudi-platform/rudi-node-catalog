@@ -489,7 +489,7 @@ async function checkLicence(metadata) {
   const licenceLabel = licence[API_METADATA_LICENCE_LABEL]
   log.d(mod, fun, `licence label: ${licenceLabel}`)
   if (!!licenceLabel) {
-    const listLicenceCode = await licenceController.getAllLicenceCodes()
+    const listLicenceCode = await licenceController.getLicenceCodes()
     log.d(mod, fun, `licence list: ${json.beautify(listLicenceCode)}`)
     if (listLicenceCode.indexOf(licenceLabel) == -1) {
       throw (new Error(`Licence label '${licenceLabel}' was not found in licence list '${listLicenceCode}'`))

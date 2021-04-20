@@ -43,6 +43,21 @@
 				},
 				{
 					"name": "Request new UUID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Received a correct UUID\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseStr = pm.response.stream.toString('utf8');",
+									"    pm.expect(responseStr).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -60,7 +75,7 @@
 					"response": []
 				},
 				{
-					"name": "Get Node.js version",
+					"name": "Get node.js version",
 					"event": [
 						{
 							"listen": "test",
@@ -107,7 +122,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Testing thesaurus access\", () => {",
+									"pm.test(\"Every thesaurus received\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    const listEnums = Object.keys(responseJson);",
@@ -179,7 +194,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Clearing database\", () => {",
+									"pm.test(\"Database cleared\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    pm.expect(pm.response.status).to.eq(\"OK\");",
 									"});"
@@ -239,7 +254,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Database cleared\", () => {",
+									"pm.test(\"No collection left in DB\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    const collectionList = _.map(responseJson, 'name');",
@@ -793,7 +808,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Metadata 2 creation: testing empty property 'temporal_spread.start_date'\", () => {",
+									"pm.test(\"Metadata 2 creation: missing property 'geography.bounding_box'\", () => {",
 									"    pm.expect(pm.response.code).to.eql(500);",
 									"    const responseJson = pm.response.json();",
 									"    console.log(responseJson.message);",
@@ -836,7 +851,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Metadata 2 creation: testing empty property 'temporal_spread.start_date'\", () => {",
+									"pm.test(\"Metadata 2 creation: missingy property 'temporal_spread.start_date'\", () => {",
 									"    pm.expect(pm.response.code).to.eql(500);",
 									"    const responseJson = pm.response.json();",
 									"    console.log(responseJson.message);",
@@ -879,7 +894,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Metadata 2 creation: testing empty property 'temporal_spread.start_date'\", () => {",
+									"pm.test(\"Metadata 2 creation: missingy property 'access_condition'\", () => {",
 									"    pm.expect(pm.response.code).to.eql(500);",
 									"    const responseJson = pm.response.json();",
 									"    console.log(responseJson.message);",
@@ -922,7 +937,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Metadata 2 creation: testing empty property 'temporal_spread.start_date'\", () => {",
+									"pm.test(\"Metadata 2 creation: missingy property 'access_condition.licence'\", () => {",
 									"    pm.expect(pm.response.code).to.eql(500);",
 									"    const responseJson = pm.response.json();",
 									"    console.log(responseJson.message);",
@@ -965,8 +980,15 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Metadata 2 creation: testing empty property 'temporal_spread.start_date'\", () => {",
+									"pm.test(\"Metadata 2 creation: 'licence_label' not recognized\", () => {",
 									"    pm.expect(pm.response.code).to.eql(500);",
+									"    const requestBody = JSON.parse(pm.request.body);",
+									"    const licenceLabel = requestBody.access_condition.licence.licence_label;",
+									"    const expectedResponse = `Licence label '${licenceLabel}' was not found in licence list `",
+									"",
+									"    const responseJson = pm.response.json();",
+									"    console.log(responseJson.message);",
+									"    pm.expect(responseJson.message.substring(0,expectedResponse.length)).eql(expectedResponse);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1234,6 +1256,98 @@
 								"{{apiUrl}}",
 								"{{data}}",
 								"{{metaId2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all licenses",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"All licence concept retrieved\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.length).to.gte(0)",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/licences",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"licences"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all licenses codes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"All licence codes retrieved\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.indexOf('licence_mit')).to.gte(0)",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/licence_codes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"licence_codes"
 							]
 						}
 					},
@@ -1803,47 +1917,6 @@
 							"path": [
 								"{{apiUrl}}",
 								"{{data}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete many metadata fail",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Delete many metadata\", () => {",
-									"    pm.expect(pm.response.code).to.eql(400);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"zeomb@iris\"}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{deletion}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{apiUrl}}",
-								"{{data}}",
-								"{{deletion}}"
 							]
 						}
 					},
@@ -2793,52 +2866,52 @@
 	],
 	"variable": [
 		{
-			"id": "828935bf-a80b-4ea4-ac24-f34dcc7c9351",
+			"id": "a049a2b7-f81e-4048-8294-b00696de79ef",
 			"key": "metaId1",
 			"value": ""
 		},
 		{
-			"id": "f515e2f8-1856-4188-a0cc-35c23e8c1c9f",
+			"id": "0cdc4d95-b3c8-4a65-88e7-99eabbf0927f",
 			"key": "metaId2",
 			"value": ""
 		},
 		{
-			"id": "d278e38b-538a-4eb5-9756-bd5df8feb691",
+			"id": "ad7ead2f-843f-43ad-9016-292b6a59aafd",
 			"key": "orgId1",
 			"value": ""
 		},
 		{
-			"id": "5ece9574-1e59-4618-ac0a-68c06f241545",
+			"id": "80855862-28fe-40e4-9887-4a52673fd3db",
 			"key": "orgId2",
 			"value": ""
 		},
 		{
-			"id": "5a1dad85-1a8c-4599-8f37-f40548cc252e",
+			"id": "f99ce845-2899-45f1-9077-2d506a16dc2f",
 			"key": "contId1",
 			"value": ""
 		},
 		{
-			"id": "3bf1f239-bc88-46d0-91fb-c2dc016dd1e9",
+			"id": "28fd57e9-76ac-4038-adec-a18a24db1552",
 			"key": "contId2",
 			"value": ""
 		},
 		{
-			"id": "e227c412-e579-469a-94fd-689e86e837a6",
+			"id": "7fb46164-b67d-44d7-9de5-e1ccc8282ccf",
 			"key": "contId3",
 			"value": ""
 		},
 		{
-			"id": "125ae5e4-2a74-4853-8994-687f72abecf4",
+			"id": "5719823b-4c19-4bb0-9356-ba4a6012b2fc",
 			"key": "mediaId1",
 			"value": ""
 		},
 		{
-			"id": "8b051bf2-f8cb-466c-9746-c3214891de22",
+			"id": "bebf58f2-9397-46a2-9466-fcfa4b63ccbd",
 			"key": "mediaId2",
 			"value": ""
 		},
 		{
-			"id": "34d21d66-7f35-4146-8b9f-c04b316d32f1",
+			"id": "453c49e7-7082-4b48-8fb6-3c41a6c9edd7",
 			"key": "mediaId3",
 			"value": ""
 		}

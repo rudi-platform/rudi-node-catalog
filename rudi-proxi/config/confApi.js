@@ -70,3 +70,6 @@ exports.PARAM_THESAURUS_CODE = `code`
 
 exports.URL_LICENCE_SUFFIX = 'licences'
 exports.URL_LICENCE_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_LICENCE_SUFFIX}`
+
+exports.URL_LICENCE_CODES_SUFFIX = 'licence_codes'
+exports.URL_LICENCE_CODES_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_LICENCE_CODES_SUFFIX}`

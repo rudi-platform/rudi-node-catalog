@@ -41,7 +41,7 @@ const LICENCE_POST_ADDRESS = `http://${sysConf.LISTENING_ADDR}:${sysConf.LISTENI
 let LICENCE_LIST
 let LICENCE_CODE_LIST
 
-exports.getLicenceList = async () => {
+exports.getLicences = async () => {
   const fun = "getLicenceList"
   if (!this.LICENCE_LIST) {
     log.d(mod, fun, `Init LICENCE_LIST`)
@@ -54,11 +54,11 @@ exports.getLicenceList = async () => {
   }
   return this.LICENCE_LIST
 }
- 
-exports.getAllLicenceCodes = async () => {
+
+exports.getLicenceCodes = async () => {
   const fun = `getAllLicenceCodes`
   if (!this.LICENCE_CODE_LIST) {
-    const licenceList = await this.getLicenceList()
+    const licenceList = await this.getLicences()
     log.d(mod, fun, `licence list: ${json.beautify(licenceList)}`)
 
     this.LICENCE_CODE_LIST = await licenceList.map(obj => obj[API_SKOS_CONCEPT_CODE])
@@ -91,5 +91,13 @@ exports.getAllLicenses = async (req, reply) => {
   log.v(mod, fun, `< GET ${api.URL_LICENCE_ACCESS}`)
   // log.d(mod, fun, ``)
 
-  return await this.getLicenceList()
+  return await this.getLicences()
+}
+
+exports.getAllLicenseCodes = async (req, reply) => {
+  const fun = `getAllLicenseCodes`
+  log.v(mod, fun, `< GET ${api.URL_LICENCE_ACCESS}`)
+  // log.d(mod, fun, ``)
+
+  return await this.getLicenceCodes()
 }

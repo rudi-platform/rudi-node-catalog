@@ -36,6 +36,7 @@ const {
   URL_APP_ID_ACCESS,
   URL_NODE_VERSION_ACCESS,
   URL_LICENCE_ACCESS,
+  URL_LICENCE_CODES_ACCESS,
 } = require('../config/confApi')
 
 //---------------------------------------------------------------
@@ -229,6 +230,11 @@ exports.backOfficeRoutes = [
     url: `${URL_LICENCE_ACCESS}`,
     // preHandler: logRequest,
     handler: licenceController.getAllLicenses
+  },{
+    method: 'GET',
+    url: `${URL_LICENCE_CODES_ACCESS}`,
+    // preHandler: logRequest,
+    handler: licenceController.getAllLicenseCodes
   },
  
   //---------------------------------------------------------------
