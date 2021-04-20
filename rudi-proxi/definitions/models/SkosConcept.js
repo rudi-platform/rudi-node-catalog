@@ -21,8 +21,8 @@ const Validation = require('../schemaValidators');
 //---------------------------------------------------------------
 const ids = require('../schemas/Identifiers');
 const Contact = require('./Contact');
-const DictionaryEntry = require('../Schemas/DictionaryEntry');
-const DictionaryList = require('../Schemas/DictionaryList');
+const DictionaryEntry = require('../schemas/DictionaryEntry');
+const DictionaryList = require('../schemas/DictionaryList');
 const {
   populate
 } = require('./Contact');

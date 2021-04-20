@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 // Schema definitions
 //---------------------------------------------------------------
 const Validation = require('../schemaValidators');
-const DictionaryEntry = require('../Schemas/DictionaryEntry');
+const DictionaryEntry = require('../schemas/DictionaryEntry');
 
 //---------------------------------------------------------------
 // Model definitions
