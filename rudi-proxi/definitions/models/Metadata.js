@@ -138,6 +138,7 @@ const MetadataSchema = new mongoose.Schema({
     trim: true,
     index: {
       unique: true,
+      // accept empty values as non-duplicates 
       partialFilterExpression: {
         local_id: {
           $type: "string"
