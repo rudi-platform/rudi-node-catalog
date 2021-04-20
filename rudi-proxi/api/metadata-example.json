@@ -84,5 +84,10 @@
         "created": "2021-04-01T14:24:32.373Z",
         "published": "2021-04-01T14:24:32.373Z"
     },
-    "storage_status": "online"
+    "storage_status": "online",
+    "access_condition": {
+        "licence": {
+            "licence_label": "licence_public-domain-cc0"
+        }
+    }
 }
