@@ -12,6 +12,7 @@ const logConf = require('./config/confLogs')
 const log = require('./utils/logging')
 
 const api = require('./config/confApi')
+const sysController = require('./controllers/sysController');
 
 //---------------------------------------------------------------
 // External dependancies / init
@@ -78,6 +79,7 @@ const {
 const {
   consoleErr
 } = require('./utils/jsUtils');
+const { VERSION } = require('lodash');
 
 // Declare a default route
 fastify.get('/', async (request, reply) => {
@@ -142,6 +144,11 @@ start()
 mongoConnection
   .then(() => {
     log.i(mod, fun, 'MongoDB connected')
+    log.i(mod, fun, `Application version '${sysController.getAppId()}' | API ${api.API_VERSION}`)
+
     utils.separateLogs('Init OK')
   })
   .catch(err => log.e(mod, 'mongoConnection', err))
+
+
+  
