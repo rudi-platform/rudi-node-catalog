@@ -87,8 +87,9 @@
     "storage_status": "online",
     "access_condition": {
         "licence": {
-            "licence_type": "STANDARD",
-            "licence_label": "licence_public-domain-cc0"
+            "licence_type": "CUSTOM",
+            "custom_licence_label": "CC BY-NC-SA 4.0",
+            "custom_licence_uri": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
         }
     }
 }
