@@ -10,5 +10,6 @@
 **/rudi_proxi_custom.ini
 **/logs
 todo
+notes
 *.code-workspace
 **/seed
