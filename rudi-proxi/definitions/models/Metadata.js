@@ -31,13 +31,14 @@ const {
   API_METADATA_ID,
   API_METADATA_ACCESS_CONDITION,
   API_METADATA_LICENCE,
+  API_METADATA_LICENCE_TYPE,
   API_METADATA_LICENCE_LABEL,
   API_METADATA_LICENCE_CUSTOM_LABEL,
   API_METADATA_LICENCE_CUSTOM_URI,
   API_METADATA_GEOGRAPHY_PROPERTY,
   API_METADATA_BBOX_PROPERTY,
   API_METADATA_PERIOD_PROPERTY,
-  API_METADATA_START_DATE_PROPERTY
+  API_METADATA_START_DATE_PROPERTY,
 } = require('../../db/dbFields');
 
 const log = require('../../utils/logging')
@@ -472,44 +473,52 @@ const MetadataSchema = new mongoose.Schema({
 //---------------------------------------------------------------
 // Validation
 //---------------------------------------------------------------
-function requireSubProperty(metadata, prop, subProp) {
-  const fun = 'requireSubProperty'
-  if (!json.isNothing(metadata[prop]) && json.isNothing(metadata[prop][subProp])) {
-    log.d(mod, fun, `${prop}.${subProp}`)
-    log.d(mod, fun, `metadata[${prop}]: ${json.beautify(metadata[prop])}`)
-    log.d(mod, fun, `metadata[${prop}][${subProp}]: ${json.beautify(metadata[prop][subProp])}`)
-    throw (new Error(`'${prop}.${subProp}' is required when '${prop}' is set`))
-  }
-  return metadata[prop][subProp]
-}
-
 async function checkLicence(metadata) {
   const fun = 'checkLicence'
-  const licence = requireSubProperty(metadata, API_METADATA_ACCESS_CONDITION, API_METADATA_LICENCE)
-  log.d(mod, fun, `licence: ${json.beautify(licence)}`)
-  const licenceLabel = licence[API_METADATA_LICENCE_LABEL]
-  log.d(mod, fun, `licence label: ${licenceLabel}`)
-  if (!!licenceLabel) {
-    const listLicenceCode = await licenceController.getLicenceCodes()
-    log.d(mod, fun, `licence list: ${json.beautify(listLicenceCode)}`)
-    if (listLicenceCode.indexOf(licenceLabel) == -1) {
-      throw (new Error(`Licence label '${licenceLabel}' was not found in licence list '${listLicenceCode}'`))
-    } else {
-      return licenceLabel
-    }
-  } else {
-    requireSubProperty(metadata[API_METADATA_ACCESS_CONDITION], API_METADATA_LICENCE, API_METADATA_LICENCE_CUSTOM_LABEL)
-    requireSubProperty(metadata[API_METADATA_ACCESS_CONDITION], API_METADATA_LICENCE, API_METADATA_LICENCE_CUSTOM_URI)
-    return licence[API_METADATA_LICENCE_CUSTOM_LABEL]
+
+  const accessCondition = json.accessProperty(metadata, API_METADATA_ACCESS_CONDITION)
+  // log.d(mod, fun, `accessCondition: ${json.beautify(accessCondition)}`)
+  const licence = json.requireSubProperty(metadata, API_METADATA_ACCESS_CONDITION, API_METADATA_LICENCE)
+  // log.d(mod, fun, `licence: ${json.beautify(licence)}`)
+
+  const licenceType = json.requireSubProperty(accessCondition, API_METADATA_LICENCE, API_METADATA_LICENCE_TYPE)
+
+  switch (licenceType) {
+    case Licence.LicenceTypes.Standard:
+      // log.d(mod, fun, `licenceType: ${json.beautify(licenceType)}`)
+      const licenceLabel = json.requireSubProperty(accessCondition, API_METADATA_LICENCE, API_METADATA_LICENCE_LABEL,
+        API_METADATA_LICENCE_TYPE, Licence.LicenceTypes.Standard)
+      const listLicenceCode = await licenceController.getLicenceCodes()
+      // log.d(mod, fun, `licence list: ${json.beautify(listLicenceCode)}`)
+      if (listLicenceCode.indexOf(licenceLabel) == -1) {
+        throw (new Error(`Licence label '${licenceLabel}' was not found in licence list '${listLicenceCode}'`))
+      } else {
+        return licenceLabel
+      }
+      break;
+    case Licence.LicenceTypes.Custom:
+      // log.d(mod, fun, `licenceType: ${json.beautify(licenceType)}`)
+      json.requireSubProperty(accessCondition, API_METADATA_LICENCE, API_METADATA_LICENCE_CUSTOM_LABEL,
+        API_METADATA_LICENCE_TYPE, Licence.LicenceTypes.Custom)
+      json.requireSubProperty(accessCondition, API_METADATA_LICENCE, API_METADATA_LICENCE_CUSTOM_URI,
+        API_METADATA_LICENCE_TYPE, Licence.LicenceTypes.Custom)
+      return licence[API_METADATA_LICENCE_CUSTOM_LABEL]
+      break;
+    default:
+      throw new Error(
+        msg.incorrectValueForEnum(
+          `${API_METADATA_ACCESS_CONDITION}.${API_METADATA_LICENCE}.${API_METADATA_LICENCE_TYPE}`,
+          licenceType))
   }
+
 }
 
 MetadataSchema.pre('save', async function (next) {
   const fun = 'pre hook'
   try {
     let metadata = this
-    requireSubProperty(metadata, API_METADATA_GEOGRAPHY_PROPERTY, 'bounding_box', next)
-    requireSubProperty(metadata, 'temporal_spread', 'start_date', next)
+    json.requireSubProperty(metadata, API_METADATA_GEOGRAPHY_PROPERTY, API_METADATA_BBOX_PROPERTY, next)
+    json.requireSubProperty(metadata, API_METADATA_PERIOD_PROPERTY, API_METADATA_START_DATE_PROPERTY, next)
     await checkLicence(metadata)
   } catch (err) {
     next(err)

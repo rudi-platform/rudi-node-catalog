@@ -53,6 +53,7 @@ exports.API_METADATA_START_DATE_PROPERTY = 'start_date';
 //---------------------------------------------------------------
 exports.API_METADATA_ACCESS_CONDITION = 'access_condition';
 exports.API_METADATA_LICENCE = 'licence';
+exports.API_METADATA_LICENCE_TYPE = 'licence_type';
 exports.API_METADATA_LICENCE_LABEL = 'licence_label';
 exports.API_METADATA_LICENCE_CUSTOM_LABEL = 'custom_licence_label';
 exports.API_METADATA_LICENCE_CUSTOM_URI = 'custom_licence_uri';

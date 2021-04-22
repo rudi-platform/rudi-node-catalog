@@ -14,7 +14,17 @@ const ids = require('../schemas/Identifiers')
 const api = require('../../config/confApi')
 
 const Validation = require('../schemaValidators');
-const IntegrationStatus = require('../thesaurus/IntegrationStatus')
+// const IntegrationStatus = require('../enums/IntegrationStatus')
+
+
+//---------------------------------------------------------------
+// Constants
+//---------------------------------------------------------------
+const IntegrationStatus = {
+  OK: 'OK',
+  KO: 'KO'
+}
+
 
 //---------------------------------------------------------------
 // Custom schema definition: Report
@@ -99,7 +109,16 @@ ReportSchema.methods.toJSON = function () {
   return obj
 };
 
+
+//---------------------------------------------------------------
+// Models definition
+//---------------------------------------------------------------
+const Report = mongoose.model('Report', ReportSchema)
+
 //---------------------------------------------------------------
 // Exports
 //---------------------------------------------------------------
-module.exports = mongoose.model('Report', ReportSchema)
+module.exports = {
+  Report,
+  IntegrationStatus
+}

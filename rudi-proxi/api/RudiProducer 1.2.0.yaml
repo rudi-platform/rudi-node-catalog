@@ -1013,31 +1013,7 @@ components:
                   type: boolean
             #......................
             'licence':
-              oneOf:
-              - description: Standard license (recognized by RUDI system)
-                type: object
-                required:
-                - licence_label
-                properties: 
-                  'licence_label':
-                    description: Value of the field SkosConcept.concept_code
-                    type: string
-                    format: skosConceptCode
-              - description: Custom license
-                type: object
-                required: 
-                - custom_licence_label
-                - custom_licence_uri
-                properties: 
-                  'custom_licence_label':
-                    description: Title of the custom licence
-                    type: array
-                    items: 
-                      $ref: '#/components/schemas/DictionaryEntry'
-                  'custom_licence_uri':
-                    description: URL towards the custom licence
-                    type: string
-                    format: URI
+              $ref: '#/components/schemas/Licence'
             #......................
             'usage_constraint':
               description: >
@@ -1178,8 +1154,59 @@ components:
           format: email
           #TODO: RGPD compliant!
 
+     
+    #---------------------------------------------------------------------------
+    'Licence':
+      description: Abstract object from which standard and custom licences inherit
+      type: object
+      required:
+      - licence_type
+      properties:
+        #——————————————————————————
+        'licence_type':
+          type: string
+          enum: ['STANDARD', 'CUSTOM']
+ 
+      discriminator:  
+        propertyName: licence_type
+        mapping:
+          'STANDARD': '#/components/schemas/LicenceStandard'
+          'CUSTOM': '#/components/schemas/LicenceCustom'
+                
+    #---------------------------------------------------------------------------
+    'LicenceStandard':
+      allOf:
+      - $ref: "#/components/schemas/Licence"
+      - description: Standard license (recognized by RUDI system)
+        type: object
+        required:
+        - licence_label
+        properties: 
+          'licence_label':
+            description: Value of the field SkosConcept.concept_code
+            type: string
+            format: skosConceptCode
           
-          
+     #---------------------------------------------------------------------------
+    'LicenceCustom':
+      allOf:
+      - $ref: "#/components/schemas/Licence"
+      - description: Custom license
+        type: object
+        required: 
+        - custom_licence_label
+        - custom_licence_uri
+        properties: 
+          'custom_licence_label':
+            description: Title of the custom licence 
+            type: array
+            items: 
+              $ref: '#/components/schemas/DictionaryEntry'
+          'custom_licence_uri':
+            description: URL towards the custom licence
+            type: string
+            format: URI
+         
     #---------------------------------------------------------------------------
     'Media':
       description: Abstract object from which File and Series inherit

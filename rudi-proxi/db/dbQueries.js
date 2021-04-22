@@ -65,15 +65,13 @@ const {
 const Metadata = require('../definitions/models/Metadata')
 const Organization = require('../definitions/models/Organization')
 const Contact = require('../definitions/models/Contact');
-const {
-  Media
-} = require('../definitions/models/Media');
-const Report = require('../definitions/models/Report');
+/* beautify ignore:start */
+const {Media} = require('../definitions/models/Media');
+const {Report} = require('../definitions/models/Report');
+/* beautify ignore:end */
+
 const SkosScheme = require('../definitions/models/SkosScheme');
 const SkosConcept = require('../definitions/models/SkosConcept');
-const {
-  LicenceSchemeCode
-} = require('../config/confSKOS');
 
 
 
@@ -453,9 +451,9 @@ exports.getObjectListCountWithLookup = async (Model, CollectionFrom, groupByFiel
       obj[groupByField] = obj['_id'];
       delete obj['_id'];
     })
-    
+
     const finalObjectList = await CollectionFrom.populate(objectList, groupByField)
-    
+
     return finalObjectList
   } catch (err) {
     log.e(mod, fun, err)

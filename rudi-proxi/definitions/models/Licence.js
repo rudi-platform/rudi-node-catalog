@@ -15,32 +15,64 @@ const DictionaryEntry = require('../schemas/DictionaryEntry');
 const SkosConcept = require('./SkosConcept');
 
 //---------------------------------------------------------------
+// Constants
+//---------------------------------------------------------------
+const LicenceTypes = {
+  Standard: 'STANDARD',
+  Custom: 'CUSTOM'
+}
+
+const { API_METADATA_LICENCE_TYPE } = require('../../db/dbFields');
+const options = {
+  discriminatorKey: API_METADATA_LICENCE_TYPE,
+  timestamps: true,
+  id: false,
+};
+
+//---------------------------------------------------------------
 // Custom schema definition: Licence
 //---------------------------------------------------------------
 const LicenceSchema = new mongoose.Schema({
+  /** Enum to differenciate standard from custom licence */
+  licence_type: {
+    type: String,
+    enum: Object.values(LicenceTypes),
+    required: true
+  },
+}, options);
 
+
+//---------------------------------------------------------------
+// Standard licence schema definition
+//---------------------------------------------------------------
+const LicenceStandardSchema = new mongoose.Schema({
   /** Standard license (recognized by RUDI system) */
   licence_label: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'SkosConcept',
     required: true
   },
+}, options);
+
+
+//---------------------------------------------------------------
+// Custom licence schema definition
+//---------------------------------------------------------------
+const LicenceCustomSchema = new mongoose.Schema({
 
   /** Title of the custom licence */
   custom_licence_label: {
     type: [DictionaryEntry]
   },
 
-  /** Iformative URL towards the custom licence */
+  /** Informative URL towards the custom licence */
   custom_licence_uri: {
     type: String,
-    validate: Validation.isURI
+    validate: Validation.isURI,
+    unique: true,
   },
-}, {
-  // Adds mongoose fields 'updatedAt' and 'createdAt'
-  timestamps: true,
-  id: false,
-});
+}, options);
+
 
 
 //---------------------------------------------------------------
@@ -48,16 +80,18 @@ const LicenceSchema = new mongoose.Schema({
 //---------------------------------------------------------------
 
 //----- toJSON cleanup
-LicenceSchema.methods.toJSON = function () {
-  var obj = this.toObject()
-  delete obj._id
-  delete obj.__v
-  delete obj.createdAt
-  delete obj.updatedAt
-  return obj
-};
+[LicenceSchema, LicenceStandardSchema, LicenceCustomSchema]
+.map(licenceType =>
+  licenceType.methods.toJSON = function () {
+    var obj = this.toObject()
+    delete obj._id
+    delete obj.__v
+    delete obj.createdAt
+    delete obj.updatedAt
+    return obj
+  })
 
-
+/* 
 LicenceSchema.pre('save', function (next) {
   const fun = 'pre hook'
   try {
@@ -80,7 +114,22 @@ LicenceSchema.pre('save', function (next) {
   }
   next()
 });
+ */
+
+//---------------------------------------------------------------
+// Models definition
+//---------------------------------------------------------------
+const Licence = mongoose.model('Licence', LicenceSchema)
+
+const LicenceStandard = Licence.discriminator(LicenceTypes.Standard, LicenceStandardSchema)
+const LicenceCustom = Licence.discriminator(LicenceTypes.Custom, LicenceCustomSchema)
+
 //---------------------------------------------------------------
 // Exports
 //---------------------------------------------------------------
-module.exports = mongoose.model('Licence', LicenceSchema)
+module.exports = {
+  Licence,
+  LicenceStandard,
+  LicenceCustom,
+  LicenceTypes
+}

@@ -87,6 +87,7 @@
     "storage_status": "online",
     "access_condition": {
         "licence": {
+            "licence_type": "STANDARD",
             "licence_label": "licence_public-domain-cc0"
         }
     }

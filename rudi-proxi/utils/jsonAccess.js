@@ -17,9 +17,9 @@ const msg = require('./msg')
 //---------------------------------------------------------------
 exports.isEmpty = (prop) => {
   const fun = 'isEmpty'
-  const str = JSON.stringify(prop)
+  const strProp = JSON.stringify(prop)
   // log.d(mod, fun, `prop: ${str}`)
-  return str == '' || str == '{}' || str == '[]'
+  return prop == '' || prop == '{}' || prop == '[]' || strProp == '{}' || strProp == '[]'
 }
 
 exports.isNothing = (prop) => {
@@ -74,6 +74,57 @@ exports.accessProperty = (jsonObject, jsonProperty) => {
   // log.d(mod, fun, `=> ${jsonProperty} = ${json.beautify(value)}`)
   return value
 }
+
+
+/**
+ * Ensures the sub-property is defined when the parent property is defined
+ * If parameter 'enumVal' is set, checks that subProperty is defined if enum property is set to enumVal
+ * @param {JSON} jsonObject
+ * @param {String} jsonProperty 
+ * @param {String} jsonProperty 
+ * @param {String} jsonProperty supporting the enum value
+ * @param {String} enum value
+ * @returns {String} The property value
+ * @throws object property is missing
+ */
+exports.requireSubProperty = (obj, prop, subProp, enumProp, enumVal) => {
+  const fun = 'requireSubProperty'
+  // log.d(mod, fun, `prop: ${prop} | subProp: ${subProp} | enumVal: ${enumVal}`)
+  if (this.isNothing(obj[prop])) {
+    log.d(mod, fun, `empty obj[${prop}]: ${this.beautify(obj[prop])}`)
+    return
+  }
+  const objProp = obj[prop]
+
+  // log.d(mod, fun, `${prop}: ${this.beautify(propObj)}`)
+  // log.d(mod, fun, `${prop}.${subProp}: ${this.beautify(propObj[subProp])}`)
+  if (!enumVal) { // Regular check: if prop is defined, subProp must be defined !
+    // log.d(mod, fun, `obj.${prop} / ${enumVal}`)
+    if (this.isNothing(objProp[subProp])) {
+      const errMsg = msg.subPropNeededWhenPropSet(prop, subProp)
+      // log.e(mod, fun, errMsg)
+      throw new Error(errMsg)
+    }
+    // log.d(mod, fun, `${objProp[subProp]}`)
+    return objProp[subProp]
+  } else { // Enum conditional check: if prop is defined and enumProp is set to enumVal, subProp must be defined !
+    if (objProp[enumProp] == enumVal) {
+      // log.d(mod, fun, `obj.${prop}.${enumProp} == ${enumVal}`)
+      if (this.isNothing(objProp[subProp])) {
+        const errMsg = msg.subPropNeededWhenPropSetToEnum(prop, subProp, enumProp, enumVal)
+        // log.e(mod, fun, errMsg)
+        throw new Error(errMsg)
+      } else {
+        return objProp[subProp]
+      }
+    } else {
+      log.d(mod, fun, `obj.${prop}.${enumProp} == ${this.beautify(objProp[enumProp])} != ${enumVal}`)
+      return
+    }
+  }
+}
+
+
 
 /**
  * Clone a (JSON) object through JSON.stringify then JSON.parse (beware, it can be slow)

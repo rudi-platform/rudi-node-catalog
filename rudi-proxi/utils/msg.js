@@ -54,16 +54,65 @@ exports.parameterExpected = (fun, param) => {
   }
 }
 
+exports.subPropNeededWhenPropSet = (prop, subProp) => {
+  switch (getLanguage()) {
+    case 'en':
+    case 'en-GB':
+    case 'en-US':
+      return `Subproperty '${prop}.${subProp}' is required when parent property '${prop}' is set`.replace(/\"/g, '\'');
+      break;
+    case 'fr':
+    case 'fr-FR':
+    case 'fr-BE':
+      return `La propriété '${prop}.${subProp}' est requise lorsque la propriété parente '${prop}' est renseignée`.replace(/\"/g, '\'');
+      break;
+    default:
+      return `${DEFAULT_MSG}: ${getLanguage()}`;
+  }
+}
+
+exports.subPropNeededWhenPropSetToEnum = (prop, subProp, enumProp, enumVal) => {
+  switch (getLanguage()) {
+    case 'en':
+    case 'en-GB':
+    case 'en-US':
+      return `Subproperty '${prop}.${subProp}' is required when property '${prop}.${enumProp}' is set to '${enumVal}'`.replace(/\"/g, '\'');
+      break;
+    case 'fr':
+    case 'fr-FR':
+    case 'fr-BE':
+      return `La propriété '${prop}.${subProp}' est requise lorsque la propriété '${prop}.${enumProp}' vaut '${enumVal}'`.replace(/\"/g, '\'');
+      break;
+    default:
+      return `${DEFAULT_MSG}: ${getLanguage()}`;
+  }
+}
+
+exports.incorrectValueForEnum = (property, incorrectValue) => {
+  switch (getLanguage()) {
+    case 'en':
+    case 'en-GB':
+    case 'en-US':
+      return `Incorrect value for property '${property}': '${incorrectValue}' `;
+    case 'fr':
+    case 'fr-FR':
+    case 'fr-BE':
+      return `Valeur incorrecte pour la propriété '${property}' : '${incorrectValue}' `;
+    default:
+      return `${DEFAULT_MSG}: ${getLanguage()}`;
+  }
+}
+
 exports.missingObjectProperty = (jsonObject, property) => {
   switch (getLanguage()) {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `The property '${property}' must be defined for object:\n${json.beautify(jsonObject)} `;
+      return `The property '${property}' must be defined for object: ${json.beautify(jsonObject)} `.replace(/\"/g, '\'');
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `La propriété '${property}' doit être définie pour l'object :\n${json.beautify(jsonObject)} `;
+      return `La propriété '${property}' doit être définie pour l'object : ${json.beautify(jsonObject)} `.replace(/\"/g, '\'');
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
@@ -84,7 +133,7 @@ exports.parametersMismatch = (paramUrl, paramBody) => {
   }
 }
 
-exports.missingField=(fieldName) => {
+exports.missingField = (fieldName) => {
   switch (getLanguage()) {
     case 'en':
     case 'en-GB':

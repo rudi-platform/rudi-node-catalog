@@ -9,8 +9,6 @@ const Int32 = require('mongoose-int32');
 const Ids = require('../schemas/Identifiers');
 const Validation = require('../schemaValidators');
 
-const MediaTypes = require('../thesaurus/MediaTypes');
-
 const Encodings = require('../thesaurus/Encodings');
 const FileTypes = require('../thesaurus/FileTypes');
 const HashAlgorithms = require('../thesaurus/HashAlgorithms');
@@ -18,6 +16,12 @@ const HashAlgorithms = require('../thesaurus/HashAlgorithms');
 //---------------------------------------------------------------
 // Constants
 //---------------------------------------------------------------
+
+const MediaTypes = {
+  File: 'FILE',
+  Series: 'SERIES'
+}
+
 const UpdateStatus = [
   'modified', // the data is in the process of being created but still incomplete
   'updated', // the data is up to date
@@ -188,8 +192,8 @@ const SeriesSchema = new mongoose.Schema({
 //---------------------------------------------------------------
 const Media = mongoose.model('Media', MediaSchema)
 
-const MediaFile = Media.discriminator('FILE', FileSchema)
-const MediaSeries = Media.discriminator('SERIES', SeriesSchema)
+const MediaFile = Media.discriminator(MediaTypes.File, FileSchema)
+const MediaSeries = Media.discriminator(MediaTypes.Series, SeriesSchema)
 
 //---------------------------------------------------------------
 // Exports
@@ -197,5 +201,6 @@ const MediaSeries = Media.discriminator('SERIES', SeriesSchema)
 module.exports = {
   Media,
   MediaFile,
-  MediaSeries
+  MediaSeries,
+  MediaTypes
 }

@@ -23,7 +23,6 @@ const dbRwk = require('../db/dbReworkData')
 const json = require('../utils/jsonAccess')
 const lang = require('../utils/lang')
 
-const status = require('../definitions/thesaurus/IntegrationStatus')
 const genericController = require('../controllers/genericController')
 
 //---------------------------------------------------------------
@@ -56,8 +55,7 @@ const {
 // Data models
 //---------------------------------------------------------------
 const Metadata = require('../definitions/models/Metadata');
-const Report = require('../definitions/models/Report');
-const IntegrationStatus = require('../definitions/thesaurus/IntegrationStatus');
+const {Report, IntegrationStatus} = require('../definitions/models/Report');
 
 //---------------------------------------------------------------
 // Controllers: integration report for any object 

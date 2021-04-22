@@ -69,12 +69,9 @@ const Contact = require('../definitions/models/Contact');
 const {
   Media,
   MediaFile,
-  MediaSeries
-} = require('../definitions/models/Media');
-const {
+  MediaSeries,
   MediaTypes
-} = require('../definitions/thesaurus/MediaTypes');
-const licenceController = require('./licenceController');
+} = require('../definitions/models/Media');
 
 
 //---------------------------------------------------------------

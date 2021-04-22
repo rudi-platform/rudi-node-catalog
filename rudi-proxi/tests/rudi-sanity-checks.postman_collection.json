@@ -116,7 +116,7 @@
 					"response": []
 				},
 				{
-					"name": "Get thesauri",
+					"name": "Get all thesauri",
 					"event": [
 						{
 							"listen": "test",
@@ -144,6 +144,41 @@
 							"path": [
 								"{{adminUrl}}",
 								"enum"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get thesaurus",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Every thesaurus received\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    const listEnums = Object.keys(responseJson);",
+									"    pm.expect(listEnums.length).to.eq(7);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/enum/Encodings",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"enum",
+								"Encodings"
 							]
 						}
 					},
@@ -185,7 +220,7 @@
 			]
 		},
 		{
-			"name": "02. Cleaning / Init",
+			"name": "02. Cleaning / Init Copy",
 			"item": [
 				{
 					"name": "Clear all collections",
@@ -769,7 +804,6 @@
 									"    pm.expect(responseJson.global_id).to.eq(metaId);",
 									"    pm.expect(responseJson.contacts.length).to.eq(2);",
 									"    pm.expect(responseJson.producer.organization_id).to.eq(orgId);",
-									"    pm.expect(responseJson.producer.organization_address).to.eq(\"Campus de Beaulieu, 263 avenue du Général Leclerc, Bâtiment 12 F, allée Jean Perrin, 35042 RENNES Cedex\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -781,7 +815,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"global_id\": \"{{metaId1}}\",\n    \"local_id\": \"testingID 4 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-444\",\n    \"resource_title\": \"Test de RUDI en local 4444\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 4444\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 4\"\n        }\n    ],\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"energy_consommation\",\n        \"electricity\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\",\n        \"organization_address\": \"Campus de Beaulieu, 263 avenue du Général Leclerc, Bâtiment 12 F, allée Jean Perrin, 35042 RENNES Cedex\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"M. Fazo\",\n            \"email\": \"gpizj@pzorjeg.gt\"\n        },\n        {\n            \"contact_id\": \"{{contId2}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_provider\": {\n            \"organization_id\": \"{{orgId1}}\"\n        }\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_label\": \"licence_public-domain-cc0\"\n        }\n    },\n    \"available_formats\": [\n        {\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{mediaId1}}\",\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.1.0\"\n            },\n            \"file_type\": \"application/json\",\n            \"file_size\": 59016,\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"4c9ee0f14e835927a1bbafde0eb89fb3\"\n            }\n        }\n    ]\n}",
+							"raw": "{\n    \"global_id\": \"{{metaId1}}\",\n    \"local_id\": \"testingID 4 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-444\",\n    \"resource_title\": \"Test de RUDI en local 4444\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 4444\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 4\"\n        }\n    ],\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"energy_consommation\",\n        \"electricity\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\",\n        \"organization_address\": \"Campus de Beaulieu, 263 avenue du Général Leclerc, Bâtiment 12 F, allée Jean Perrin, 35042 RENNES Cedex\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"M. Fazo\",\n            \"email\": \"gpizj@pzorjeg.gt\"\n        },\n        {\n            \"contact_id\": \"{{contId2}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_provider\": {\n            \"organization_id\": \"{{orgId1}}\"\n        }\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_type\": \"CUSTOM\",\n            \"custom_licence_label\": \"CC BY-NC-SA 4.0\",\n            \"custom_licence_uri\": \"https://creativecommons.org/licenses/by-nc-sa/4.0/\"\n        }\n    },\n    \"available_formats\": [\n        {\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{mediaId1}}\",\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.1.0\"\n            },\n            \"file_type\": \"application/json\",\n            \"file_size\": 59016,\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"4c9ee0f14e835927a1bbafde0eb89fb3\"\n            }\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -812,7 +846,7 @@
 									"    pm.expect(pm.response.code).to.eql(500);",
 									"    const responseJson = pm.response.json();",
 									"    console.log(responseJson.message);",
-									"    pm.expect(responseJson.message).to.eql(\"'geography.bounding_box' is required when 'geography' is set\");",
+									"    pm.expect(responseJson.message).to.eql(\"La propriété 'geography.bounding_box' est requise lorsque la propriété parente 'geography' est renseignée\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -824,7 +858,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"global_id\": \"{{metaId2}}\",\n    \"local_id\": \"testingID 3 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-333\",\n    \"resource_title\": \"Test de RUDI en local 33\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 33\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 3\"\n        }\n    ],\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"plu\",\n        \"municipality\"\n    ],\n    \"geography\": {\n        \"spatial_representation\": \"test\"\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\"\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"available_formats\": [\n        {\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"df4f0fceee7b4ee614295b95531ba1d5\"\n            },\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.2.0\"\n            },\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{mediaId2}}\",\n            \"file_type\": \"application/json\",\n            \"file_size\": 59033\n        }\n    ],\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_label\": \"licence_public-domain-cc0\"\n        }\n    }\n}",
+							"raw": "{\n    \"global_id\": \"{{metaId2}}\",\n    \"local_id\": \"testingID 3 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-333\",\n    \"resource_title\": \"Test de RUDI en local 33\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 33\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 3\"\n        }\n    ],\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"plu\",\n        \"municipality\"\n    ],\n    \"geography\": {\n        \"spatial_representation\": \"test\"\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\"\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"available_formats\": [\n        {\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"df4f0fceee7b4ee614295b95531ba1d5\"\n            },\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.2.0\"\n            },\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{mediaId2}}\",\n            \"file_type\": \"application/json\",\n            \"file_size\": 59033\n        }\n    ],\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"licence_label\": \"licence_public-domain-cc0\"\n        }\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -855,7 +889,7 @@
 									"    pm.expect(pm.response.code).to.eql(500);",
 									"    const responseJson = pm.response.json();",
 									"    console.log(responseJson.message);",
-									"    pm.expect(responseJson.message).to.eql(\"'temporal_spread.start_date' is required when 'temporal_spread' is set\");",
+									"    pm.expect(responseJson.message).to.eql(\"La propriété 'temporal_spread.start_date' est requise lorsque la propriété parente 'temporal_spread' est renseignée\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -867,7 +901,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"global_id\": \"{{metaId2}}\",\n    \"local_id\": \"testingID 3 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-333\",\n    \"resource_title\": \"Test de RUDI en local 33\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 33\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 3\"\n        }\n    ],\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"plu\",\n        \"municipality\"\n    ],\n    \"geography\": {\n        \"spatial_representation\": \"test\",\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"end_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\"\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"available_formats\": [\n        {\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"df4f0fceee7b4ee614295b95531ba1d5\"\n            },\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.2.0\"\n            },\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{mediaId2}}\",\n            \"file_type\": \"application/json\",\n            \"file_size\": 59033\n        }\n    ],\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_label\": \"licence_public-domain-cc0\"\n        }\n    }\n}",
+							"raw": "{\n    \"global_id\": \"{{metaId2}}\",\n    \"local_id\": \"testingID 3 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-333\",\n    \"resource_title\": \"Test de RUDI en local 33\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 33\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 3\"\n        }\n    ],\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"plu\",\n        \"municipality\"\n    ],\n    \"geography\": {\n        \"spatial_representation\": \"test\",\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"end_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\"\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"available_formats\": [\n        {\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"df4f0fceee7b4ee614295b95531ba1d5\"\n            },\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.2.0\"\n            },\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{mediaId2}}\",\n            \"file_type\": \"application/json\",\n            \"file_size\": 59033\n        }\n    ],\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"licence_label\": \"licence_public-domain-cc0\"\n        }\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -941,7 +975,7 @@
 									"    pm.expect(pm.response.code).to.eql(500);",
 									"    const responseJson = pm.response.json();",
 									"    console.log(responseJson.message);",
-									"    pm.expect(responseJson.message).to.eql(\"'access_condition.licence' is required when 'access_condition' is set\");",
+									"    pm.expect(responseJson.message).to.eql(\"La propriété 'access_condition.licence' est requise lorsque la propriété parente 'access_condition' est renseignée\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1000,7 +1034,195 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"global_id\": \"{{metaId2}}\",\n    \"local_id\": \"testingID 3 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-333\",\n    \"resource_title\": \"Test de RUDI en local 33\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 33\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 3\"\n        }\n    ],\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"plu\",\n        \"municipality\"\n    ],\n    \"geography\": {\n        \"spatial_representation\": \"test\",\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\",\n        \"end_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\"\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"available_formats\": [\n        {\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"df4f0fceee7b4ee614295b95531ba1d5\"\n            },\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.2.0\"\n            },\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{mediaId2}}\",\n            \"file_type\": \"application/json\",\n            \"file_size\": 59033\n        }\n    ],\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_label\": \"licence_other\"\n        }\n    }\n}",
+							"raw": "{\n    \"global_id\": \"{{metaId2}}\",\n    \"local_id\": \"testingID 3 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-333\",\n    \"resource_title\": \"Test de RUDI en local 33\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 33\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 3\"\n        }\n    ],\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"plu\",\n        \"municipality\"\n    ],\n    \"geography\": {\n        \"spatial_representation\": \"test\",\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\",\n        \"end_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\"\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"available_formats\": [\n        {\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"df4f0fceee7b4ee614295b95531ba1d5\"\n            },\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.2.0\"\n            },\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{mediaId2}}\",\n            \"file_type\": \"application/json\",\n            \"file_size\": 59033\n        }\n    ],\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"licence_label\": \"licence_other\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add meta 2 fails 'licence_type' missing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Metadata 2 creation: missing 'licence_type'\", () => {",
+									"    pm.expect(pm.response.code).to.eql(500);",
+									"    const requestBody = JSON.parse(pm.request.body);",
+									"    // const licenceLabel = requestBody.access_condition.licence.licence_label;",
+									"    const expectedResponse = `La propriété 'licence.licence_type' est requise lorsque la propriété parente 'licence' est renseignée`",
+									"",
+									"    const responseJson = pm.response.json();",
+									"    console.log(responseJson.message);",
+									"    pm.expect(responseJson.message.substring(0,expectedResponse.length)).eql(expectedResponse);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"global_id\": \"{{metaId2}}\",\n    \"local_id\": \"testingID 3 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-333\",\n    \"resource_title\": \"Test de RUDI en local 33\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 33\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 3\"\n        }\n    ],\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"plu\",\n        \"municipality\"\n    ],\n    \"geography\": {\n        \"spatial_representation\": \"test\",\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\",\n        \"end_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\"\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"available_formats\": [\n        {\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"df4f0fceee7b4ee614295b95531ba1d5\"\n            },\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.2.0\"\n            },\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{mediaId2}}\",\n            \"file_type\": \"application/json\",\n            \"file_size\": 59033\n        }\n    ],\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_label\": \"CUSTOM\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add meta 2 fails 'custom_licence_uri' missing Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Metadata 2 creation: missing 'licence_label'\", () => {",
+									"    pm.expect(pm.response.code).to.eql(500);",
+									"    const requestBody = JSON.parse(pm.request.body);",
+									"    // const licenceLabel = requestBody.access_condition.licence.licence_label;",
+									"    const expectedResponse = `La propriété 'licence.licence_label' est requise lorsque la propriété 'licence.licence_type' vaut 'STANDARD'`",
+									"",
+									"    const responseJson = pm.response.json();",
+									"    console.log(responseJson.message);",
+									"    pm.expect(responseJson.message.substring(0,expectedResponse.length)).eql(expectedResponse);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"global_id\": \"{{metaId2}}\",\n    \"local_id\": \"testingID 3 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-333\",\n    \"resource_title\": \"Test de RUDI en local 33\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 33\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 3\"\n        }\n    ],\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"plu\",\n        \"municipality\"\n    ],\n    \"geography\": {\n        \"spatial_representation\": \"test\",\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\",\n        \"end_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\"\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"available_formats\": [\n        {\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"df4f0fceee7b4ee614295b95531ba1d5\"\n            },\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.2.0\"\n            },\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{mediaId2}}\",\n            \"file_type\": \"application/json\",\n            \"file_size\": 59033\n        }\n    ],\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"custom_licence_label\": \"CC BY-NC-SA 4.0\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add meta 2 fails 'custom_licence_label' missing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Metadata 2 creation: missing 'custom_licence_label'\", () => {",
+									"    pm.expect(pm.response.code).to.eql(500);",
+									"    const requestBody = JSON.parse(pm.request.body);",
+									"    // const licenceLabel = requestBody.access_condition.licence.licence_label;",
+									"    const expectedResponse = `La propriété 'licence.custom_licence_label' est requise lorsque la propriété 'licence.licence_type' vaut 'CUSTOM'`",
+									"",
+									"    const responseJson = pm.response.json();",
+									"    console.log(responseJson.message);",
+									"    pm.expect(responseJson.message.substring(0,expectedResponse.length)).eql(expectedResponse);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"global_id\": \"{{metaId2}}\",\n    \"local_id\": \"testingID 3 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-333\",\n    \"resource_title\": \"Test de RUDI en local 33\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 33\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 3\"\n        }\n    ],\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"plu\",\n        \"municipality\"\n    ],\n    \"geography\": {\n        \"spatial_representation\": \"test\",\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\",\n        \"end_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\"\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"available_formats\": [\n        {\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"df4f0fceee7b4ee614295b95531ba1d5\"\n            },\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.2.0\"\n            },\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{mediaId2}}\",\n            \"file_type\": \"application/json\",\n            \"file_size\": 59033\n        }\n    ],\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_type\": \"CUSTOM\",\n            \"licence_label\": \"CC BY-NC-SA 4.0\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add meta 2 fails 'custom_licence_uri' missing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Metadata 2 creation: missing 'custom_licence_uri'\", () => {",
+									"    pm.expect(pm.response.code).to.eql(500);",
+									"    const requestBody = JSON.parse(pm.request.body);",
+									"    // const licenceLabel = requestBody.access_condition.licence.licence_label;",
+									"    const expectedResponse = `La propriété 'licence.custom_licence_uri' est requise lorsque la propriété 'licence.licence_type' vaut 'CUSTOM'`",
+									"",
+									"    const responseJson = pm.response.json();",
+									"    console.log(responseJson.message);",
+									"    pm.expect(responseJson.message.substring(0,expectedResponse.length)).eql(expectedResponse);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"global_id\": \"{{metaId2}}\",\n    \"local_id\": \"testingID 3 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-333\",\n    \"resource_title\": \"Test de RUDI en local 33\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 33\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 3\"\n        }\n    ],\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"plu\",\n        \"municipality\"\n    ],\n    \"geography\": {\n        \"spatial_representation\": \"test\",\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\",\n        \"end_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\"\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"available_formats\": [\n        {\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"df4f0fceee7b4ee614295b95531ba1d5\"\n            },\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.2.0\"\n            },\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{mediaId2}}\",\n            \"file_type\": \"application/json\",\n            \"file_size\": 59033\n        }\n    ],\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_type\": \"CUSTOM\",\n            \"custom_licence_label\": \"CC BY-NC-SA 4.0\"\n        }\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1048,7 +1270,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"global_id\": \"{{metaId2}}\",\n    \"local_id\": \"testingID 3 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-333\",\n    \"resource_title\": \"Test de RUDI en local 33\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 33\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 3\"\n        }\n    ],\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"plu\",\n        \"municipality\"\n    ],\n    \"geography\": {\n        \"spatial_representation\": \"test\",\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\",\n        \"end_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\"\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"available_formats\": [\n        {\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"df4f0fceee7b4ee614295b95531ba1d5\"\n            },\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.2.0\"\n            },\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{mediaId2}}\",\n            \"file_type\": \"application/json\",\n            \"file_size\": 59033\n        }\n    ],\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_label\": \"licence_public-domain-cc0\"\n        }\n    }\n}",
+							"raw": "{\n    \"global_id\": \"{{metaId2}}\",\n    \"local_id\": \"testingID 3 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-333\",\n    \"resource_title\": \"Test de RUDI en local 33\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 33\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 3\"\n        }\n    ],\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"plu\",\n        \"municipality\"\n    ],\n    \"geography\": {\n        \"spatial_representation\": \"test\",\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\",\n        \"end_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\"\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"available_formats\": [\n        {\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"df4f0fceee7b4ee614295b95531ba1d5\"\n            },\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.2.0\"\n            },\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{mediaId2}}\",\n            \"file_type\": \"application/json\",\n            \"file_size\": 59033\n        }\n    ],\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_type\": \"CUSTOM\",\n            \"custom_licence_label\": \"CC BY-NC-SA 4.0\",\n            \"custom_licence_uri\": \"https://creativecommons.org/licenses/by-nc-sa/4.0/\"\n        }\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1855,7 +2077,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"global_id\": \"{{metaId1}}\",\n    \"local_id\": \"testingID 4 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-444\",\n    \"resource_title\": \"Test de RUDI en local 4444\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 4444\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 4\"\n        }\n    ],\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"energy_consommation\",\n        \"electricity\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"M. Fazo\",\n            \"email\": \"gpizj@pzorjeg.gt\"\n        },\n        {\n            \"contact_id\": \"{{contId2}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_provider\": {\n            \"organization_id\": \"{{orgId1}}\"\n        }\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_label\": \"licence_public-domain-cc0\"\n        }\n    },\n    \"available_formats\": [\n        {\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{mediaId1}}\",\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.1.0\"\n            },\n            \"file_type\": \"application/json\",\n            \"file_size\": 59016,\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"4c9ee0f14e835927a1bbafde0eb89fb3\"\n            }\n        }\n    ]\n}",
+							"raw": "{\n    \"global_id\": \"{{metaId1}}\",\n    \"local_id\": \"testingID 4 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-444\",\n    \"resource_title\": \"Test de RUDI en local 4444\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 4444\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 4\"\n        }\n    ],\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"energy_consommation\",\n        \"electricity\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"M. Fazo\",\n            \"email\": \"gpizj@pzorjeg.gt\"\n        },\n        {\n            \"contact_id\": \"{{contId2}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_provider\": {\n            \"organization_id\": \"{{orgId1}}\"\n        }\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"licence_label\": \"licence_public-domain-cc0\"\n        }\n    },\n    \"available_formats\": [\n        {\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{mediaId1}}\",\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.1.0\"\n            },\n            \"file_type\": \"application/json\",\n            \"file_size\": 59016,\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"4c9ee0f14e835927a1bbafde0eb89fb3\"\n            }\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1902,7 +2124,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"global_id\": \"{{metaId2}}\",\n    \"local_id\": \"testingID 3 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-333\",\n    \"resource_title\": \"Test de RUDI en local 33\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 33\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 3\"\n        }\n    ],\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"plu\",\n        \"municipality\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\"\n    },\"access_condition\": {\n        \"licence\": {\n            \"licence_label\": \"licence_public-domain-cc0\"\n        }\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"available_formats\": [\n        {\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"df4f0fceee7b4ee614295b95531ba1d5\"\n            },\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.2.0\"\n            },\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{mediaId2}}\",\n            \"file_type\": \"application/json\",\n            \"file_size\": 59033\n        }\n    ],\n    \"storage_status\": \"online\"\n}",
+							"raw": "{\n    \"global_id\": \"{{metaId2}}\",\n    \"local_id\": \"testingID 3 lg\",\n    \"doi\": \"10.1007/s00223-003-0070-333\",\n    \"resource_title\": \"Test de RUDI en local 33\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 33\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 3\"\n        }\n    ],\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"plu\",\n        \"municipality\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{orgId1}}\",\n        \"organization_name\": \"IRISA\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{contId1}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\"\n    },\"access_condition\": {\n        \"licence\": {\n            \"licence_type\": \"CUSTOM\",\n            \"custom_licence_label\": \"CC BY-NC-SA 4.0\",\n            \"custom_licence_uri\": \"https://creativecommons.org/licenses/by-nc-sa/4.0/\"\n        }\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"available_formats\": [\n        {\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"df4f0fceee7b4ee614295b95531ba1d5\"\n            },\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.2.0\"\n            },\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{mediaId2}}\",\n            \"file_type\": \"application/json\",\n            \"file_size\": 59033\n        }\n    ],\n    \"storage_status\": \"online\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1985,7 +2207,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"global_id\": \"53c3a5cf-79b2-4463-9d47-985314f9dfdc\",\n    \"resource_title\": \"volleyball\",\n    \"synopsis\": [\n        {\n            \"lang\": \"no-NO\",\n            \"text\": \"default text\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"no-NO\",\n            \"text\": \"default text\"\n        }\n    ],\n    \"theme\": \"health\",\n    \"keywords\": \"school\",\n    \"producer\": {\n        \"organization_id\": \"199e14ca-3d4c-4907-8107-3df598d78be5\",\n        \"organization_name\": \"MetLife\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"c6a3a1c1-63f1-4f51-b189-57590db4c68c\",\n            \"contact_name\": \"Miriam Dodson\",\n            \"email\": \"miriam.dodson@fake-email.com\"\n        }\n    ],\n    \"available_formats\": [\n        {\n            \"media_type\": \"FILE\",\n            \"media_id\": \"eeb261ad-1a5e-4013-a5bc-e9da943ebd4b\",\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.2.0\"\n            },\n            \"file_type\": \"text/csv\",\n            \"file_size\": 2922,\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"df4f0fceee7b4ee614295b95531ba1d5\"\n            }\n        }\n    ],\n    \"dataset_dates\": {\n        \"created\": \"2012-07-04T21:15:47.120Z\",\n        \"updated\": \"2012-09-28T08:04:28.027Z\"\n    },\n    \"storage_status\": \"archived\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_label\": \"licence_public-domain-cc0\"\n        }\n    },\n    \"metadata_info\": {\n        \"api_version\": \"1.1.0\"\n    }\n}",
+							"raw": "{\n    \"global_id\": \"53c3a5cf-79b2-4463-9d47-985314f9dfdc\",\n    \"resource_title\": \"volleyball\",\n    \"synopsis\": [\n        {\n            \"lang\": \"no-NO\",\n            \"text\": \"default text\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"no-NO\",\n            \"text\": \"default text\"\n        }\n    ],\n    \"theme\": \"health\",\n    \"keywords\": \"school\",\n    \"producer\": {\n        \"organization_id\": \"199e14ca-3d4c-4907-8107-3df598d78be5\",\n        \"organization_name\": \"MetLife\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"c6a3a1c1-63f1-4f51-b189-57590db4c68c\",\n            \"contact_name\": \"Miriam Dodson\",\n            \"email\": \"miriam.dodson@fake-email.com\"\n        }\n    ],\n    \"available_formats\": [\n        {\n            \"media_type\": \"FILE\",\n            \"media_id\": \"eeb261ad-1a5e-4013-a5bc-e9da943ebd4b\",\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.2.0\"\n            },\n            \"file_type\": \"text/csv\",\n            \"file_size\": 2922,\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"df4f0fceee7b4ee614295b95531ba1d5\"\n            }\n        }\n    ],\n    \"dataset_dates\": {\n        \"created\": \"2012-07-04T21:15:47.120Z\",\n        \"updated\": \"2012-09-28T08:04:28.027Z\"\n    },\n    \"storage_status\": \"archived\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"licence_label\": \"licence_public-domain-cc0\"\n        }\n    },\n    \"metadata_info\": {\n        \"api_version\": \"1.1.0\"\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2866,52 +3088,42 @@
 	],
 	"variable": [
 		{
-			"id": "a049a2b7-f81e-4048-8294-b00696de79ef",
 			"key": "metaId1",
 			"value": ""
 		},
 		{
-			"id": "0cdc4d95-b3c8-4a65-88e7-99eabbf0927f",
 			"key": "metaId2",
 			"value": ""
 		},
 		{
-			"id": "ad7ead2f-843f-43ad-9016-292b6a59aafd",
 			"key": "orgId1",
 			"value": ""
 		},
 		{
-			"id": "80855862-28fe-40e4-9887-4a52673fd3db",
 			"key": "orgId2",
 			"value": ""
 		},
 		{
-			"id": "f99ce845-2899-45f1-9077-2d506a16dc2f",
 			"key": "contId1",
 			"value": ""
 		},
 		{
-			"id": "28fd57e9-76ac-4038-adec-a18a24db1552",
 			"key": "contId2",
 			"value": ""
 		},
 		{
-			"id": "7fb46164-b67d-44d7-9de5-e1ccc8282ccf",
 			"key": "contId3",
 			"value": ""
 		},
 		{
-			"id": "5719823b-4c19-4bb0-9356-ba4a6012b2fc",
 			"key": "mediaId1",
 			"value": ""
 		},
 		{
-			"id": "bebf58f2-9397-46a2-9466-fcfa4b63ccbd",
 			"key": "mediaId2",
 			"value": ""
 		},
 		{
-			"id": "453c49e7-7082-4b48-8fb6-3c41a6c9edd7",
 			"key": "mediaId3",
 			"value": ""
 		}
