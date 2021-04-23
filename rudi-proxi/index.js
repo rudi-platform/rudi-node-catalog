@@ -33,6 +33,10 @@ fastify.addHook('onRequest', (req, res, next) => {
   next()
 })
 
+fastify.setErrorHandler(function (error, request, reply) {
+  log.e(mod, fun, error)
+})
+
 // Import Swagger Options
 const swagger = require('./config/swagger')
 
