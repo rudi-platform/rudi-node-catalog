@@ -1,7 +1,6 @@
 'use strict';
 
-const mod = ''
-const fun = 'main'
+const mod = 'main'
 
 //---------------------------------------------------------------
 // Internal dependancies 
@@ -33,9 +32,9 @@ fastify.addHook('onRequest', (req, res, next) => {
   next()
 })
 
-fastify.setErrorHandler(function (error, request, reply) {
-  log.e(mod, fun, error)
-})
+// fastify.setErrorHandler(function (error, request, reply) {
+//   log.e(mod, 'fastifyErrorHandler', error)
+// })
 
 // Import Swagger Options
 const swagger = require('./config/swagger')
@@ -63,7 +62,7 @@ const mongoConnectOptions = {
   useNewUrlParser: true
 }
 
-log.i(mod, fun, `Connecting to [${sys.DB_URL}]`)
+log.i(mod, 'mongo', `Connecting to [${sys.DB_URL}]`)
 const mongoConnection = mongoose.connect(sys.DB_URL, mongoConnectOptions)
 
 
@@ -83,11 +82,13 @@ const {
 const {
   consoleErr
 } = require('./utils/jsUtils');
-const { VERSION } = require('lodash');
+const {
+  VERSION
+} = require('lodash');
 
 // Declare a default route
 fastify.get('/', async (request, reply) => {
-  log.i(mod, fun, "GET /")
+  log.i(mod, 'routes', "GET /")
   return {
     server: "RUDI"
   }
@@ -95,7 +96,7 @@ fastify.get('/', async (request, reply) => {
 // Declare a default route
 fastify.get('/api', async (request, reply) => {
   // request.log.info(`GET /api`)
-  log.i(mod, fun, "GET /api")
+  log.i(mod, 'routes', "GET /api")
   return {
     API: "RUDI API"
   }
@@ -103,13 +104,13 @@ fastify.get('/api', async (request, reply) => {
 // Declare a default route
 // Declare a default route
 fastify.get(api.URL_PREFIX_PUBLIC, async (request, reply) => {
-  log.i(mod, fun, `GET ${api.URL_PREFIX_PUBLIC}`)
+  log.i(mod, 'routes', `GET ${api.URL_PREFIX_PUBLIC}`)
   return {
     'API version': "RUDI API v1"
   }
 })
 fastify.get(`${api.URL_PREFIX_PUBLIC}/`, async (request, reply) => {
-  log.i(mod, fun, `GET ${api.URL_PREFIX_PUBLIC}/`)
+  log.i(mod, 'routes', `GET ${api.URL_PREFIX_PUBLIC}/`)
   return {
     'API version': "RUDI API v1"
   }
@@ -117,13 +118,13 @@ fastify.get(`${api.URL_PREFIX_PUBLIC}/`, async (request, reply) => {
 // Loop over each public route  
 publicRoutes.forEach((pubRoute, index) => {
   fastify.route(pubRoute)
-  log.v(mod, fun, `route #${index} = ${pubRoute.method} ${pubRoute.url}`)
+  log.v(mod, 'routes', `route #${index} = ${pubRoute.method} ${pubRoute.url}`)
 })
 
 // Loop over each backoffice route  
 backOfficeRoutes.forEach((boRoute, index) => {
   fastify.route(boRoute)
-  log.d(mod, fun, `route #${index} = ${boRoute.method} ${boRoute.url}`)
+  log.d(mod, 'routes', `route #${index} = ${boRoute.method} ${boRoute.url}`)
 })
 
 
@@ -134,6 +135,7 @@ backOfficeRoutes.forEach((boRoute, index) => {
 const start = async () => {
   try {
     await fastify.listen(sys.LISTENING_PORT, sys.LISTENING_ADDR)
+      .catch(err => log.e(mod, 'Fastify listen', `${err}`))
     fastify.swagger()
     // fastify.log.info(`Listening on ${fastify.server.address().address}:${fastify.server.address().port}`)
   } catch (err) {
@@ -143,16 +145,21 @@ const start = async () => {
   }
 }
 
-start()
+try {
+  start()
+    .then(() => {
+      log.i(mod, 'server', 'Ready')
+    })
+    .catch(err => log.e(mod, 'server', `Crashed: ${err}`))
+} catch (uncaught) {
+  log.e(mod, 'server', `Uncaught error: ${uncaught}`)
+}
 
 mongoConnection
   .then(() => {
-    log.i(mod, fun, 'MongoDB connected')
-    log.i(mod, fun, `Application version '${sysController.getAppId()}' | API ${api.API_VERSION}`)
+    log.i(mod, 'mongo', 'MongoDB connected')
+    log.i(mod, 'app', `Application version '${sysController.getAppId()}' | API ${api.API_VERSION}`)
 
     utils.separateLogs('Init OK')
   })
   .catch(err => log.e(mod, 'mongoConnection', err))
-
-
-  

@@ -33,6 +33,8 @@ const {
   URL_OBJECT_SKOS_CONCEPT,
   URL_ACTION_REPORT,
   URL_LICENCE_SUFFIX,
+  QUERY_LIMIT_DEFAULT,
+  QUERY_OFFSET_DEFAULT,
 } = require('../config/confApi')
 
 const {
@@ -375,10 +377,11 @@ exports.doesObjectExistWithJson = async (Model, idField, rudiObject) => {
 exports.getObjectList = async (Model, limit, offset) => {
   const fun = `getObjectList`
   log.d(mod, fun, ``)
-  // log.d(mod, fun, `filter.limit: ${filter.limit}, filter.offset: ${filter.skip}`)
   try {
-    limit = limit || 0
-    offset = offset || 0
+    limit = limit || QUERY_LIMIT_DEFAULT
+    offset = offset || QUERY_OFFSET_DEFAULT
+    log.d(mod, fun, `limit: ${limit}, offset: ${offset}`)
+
     const objectList = await Model.find({}).limit(limit).skip(offset)
     return objectList
   } catch (err) {
@@ -390,10 +393,10 @@ exports.getObjectList = async (Model, limit, offset) => {
 exports.getObjectListFiltered = async (Model, filter, limit, offset) => {
   const fun = `getObjectListFiltered`
   try {
-    limit = limit || 0
-    offset = offset || 0
+    limit = limit || QUERY_LIMIT_DEFAULT
+    offset = offset || QUERY_OFFSET_DEFAULT
     log.d(mod, fun, `limit: ${limit}, offset: ${offset}, filter: ${json.beautify(filter)}`)
-    const objectList = await Model.find(filter) // .limit(limit).skip(offset)
+    const objectList = await Model.find(filter).limit(limit).skip(offset)
     log.d(mod, fun, `found: ${json.beautify(objectList)}`)
     return objectList
   } catch (err) {

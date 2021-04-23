@@ -28,6 +28,9 @@ exports.QUERY_LIMIT = 'limit'
 exports.QUERY_OFFSET = 'offset'
 exports.QUERY_GROUP_BY = 'group_by'
 
+exports.QUERY_LIMIT_DEFAULT = 100
+exports.QUERY_OFFSET_DEFAULT = 0
+
 //---------------------------------------------------------------
 // REQ URL
 //---------------------------------------------------------------
