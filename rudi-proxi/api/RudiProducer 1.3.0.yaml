@@ -23,7 +23,7 @@
 #•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
 openapi: 3.0.0
 info:
-  version: 1.2.0
+  version: 1.3.0
   title: rudi-proxi-api
   description: "API pour l'accès aux données au niveau du nœud producteur RUDI"
   termsOfService: "no"
@@ -831,11 +831,23 @@ components:
           # TODO: size ≤ 500
         # !DICO!
 
+        #——————————————————————————
+        'purpose':
+          description: Context, objectives and final use of the data
+          type: array
+          items:
+            $ref: '#/components/schemas/DictionaryEntry'
+
         #—•—•—•—•—•—•—•—•—•—•—•—•—•
         # CLASSIFICATION
         #——————————————————————————
         'theme':
           $ref: '#/components/schemas/Theme'
+        # !SKOS!
+
+        #——————————————————————————
+        'sub_theme':
+          $ref: '#/components/schemas/SubTheme'
         # !SKOS!
 
         #——————————————————————————
@@ -952,6 +964,19 @@ components:
                 # 'RGF93/Lambert-93 (EPSG:2154)'
                 # 'RGF93/CC48 (EPSG:3948)'
               #TODO: 'Projection' thesaurus
+            #......................
+            'scale':
+              description: >
+                Spatial resolution, i.e. geographic or geometric precision
+                used to describe the resource
+              oneOf:
+              - $ref: '#/components/schemas/MapScale'
+              - $ref: '#/components/schemas/Resolution'
+            #......................
+            'spatial_representation':
+              description: Data topology
+              type: string
+              example: 'Points' # 'Lines', 'Polygons'
 
         #——————————————————————————
         'dataset_size':
@@ -1528,6 +1553,23 @@ components:
       type: string
       enum: ['MD5', 'SHA-256', 'SHA-512']
       #TODO: define the thesaurus for the hash algorithms
+
+    #---------------------------------------------------------------------------
+    'MapScale':
+      description: >
+        Denominator of the scale ratio (in the sense of a map common geographic scale)
+      type: integer
+
+    #---------------------------------------------------------------------------
+    'Resolution':
+      description: Smallest distance associated to the data
+      type: object
+      properties:
+        'distance':
+          type: integer
+        'unit':
+          type: string
+          enum: [mm, m, km]
 
     #---------------------------------------------------------------------------
     'Theme':

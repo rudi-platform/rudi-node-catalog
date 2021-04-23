@@ -1129,7 +1129,7 @@ components:
         'unit':
           type: string
           enum: [mm, m, km]
-          #TODO: 'Resolution' thesaurus
+          #TODO: 'Resolution' SKOS
 
 
     #---------------------------------------------------------------------------
