@@ -7,7 +7,6 @@ const mod = 'licenceCtrl'
 //---------------------------------------------------------------
 const axios = require('axios')
 const uuid = require('uuid');
-const json = require('../utils/jsonAccess');
 const {
   replace
 } = require('lodash');
@@ -18,20 +17,22 @@ const {
 //---------------------------------------------------------------
 const sysConf = require('../config/confSystem');
 const log = require("../utils/logging")
+const utils = require('../utils/jsUtils');
+const json = require('../utils/jsonAccess');
 
 const db = require("../db/dbQueries");
 const api = require("../config/confApi");
 
-const skos = require("../config/confSKOS");
-const skosController = require("./skosController");
 const {
   API_SKOS_CONCEPT_CODE
 } = require('../db/dbFields');
-const utils = require('../utils/jsUtils');
 
+const skosController = require("./skosController");
 //---------------------------------------------------------------
 // Constants
 //---------------------------------------------------------------
+exports.LicenceSchemeCode = "software_licences"
+exports.LicenceConceptRole = "licence"
 
 const LICENCE_POST_ADDRESS = `http://${sysConf.LISTENING_ADDR}:${sysConf.LISTENING_PORT}${api.URL_PREFIX_PUBLIC}/${api.URL_OBJECT_SKOS_SCHEME}`
 
@@ -45,10 +46,10 @@ exports.getLicences = async () => {
   const fun = "getLicenceList"
   if (!this.LICENCE_LIST) {
     log.d(mod, fun, `Init LICENCE_LIST`)
-    let dbLicenseList = await db.getAllConceptsWithRole(skos.LicenceConceptRole)
+    let dbLicenseList = await db.getAllConceptsWithRole(this.LicenceConceptRole)
     if (!utils.isNotEmptyArray(dbLicenseList)) {
       await initLicenses()
-      dbLicenseList = await db.getAllConceptsWithRole(skos.LicenceConceptRole)
+      dbLicenseList = await db.getAllConceptsWithRole(this.LicenceConceptRole)
     }
     this.LICENCE_LIST = await skosController.dbConceptListToRudiRecursive(dbLicenseList)
   }

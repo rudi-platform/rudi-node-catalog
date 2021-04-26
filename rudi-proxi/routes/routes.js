@@ -37,6 +37,7 @@ const {
   URL_NODE_VERSION_ACCESS,
   URL_LICENCE_ACCESS,
   URL_LICENCE_CODES_ACCESS,
+  URL_LICENCE_SUFFIX,
 } = require('../config/confApi')
 
 //---------------------------------------------------------------
@@ -50,6 +51,7 @@ const reportController = require('../controllers/reportController')
 
 const dbController = require('../controllers/dbController');
 const sysController = require('../controllers/sysController');
+const skosController = require('../controllers/skosController');
 const licenceController = require('../controllers/licenceController');
 
 //---------------------------------------------------------------
@@ -217,26 +219,26 @@ exports.backOfficeRoutes = [
     method: 'GET',
     url: `${URL_THESAURUS_ACCESS}`,
     // preHandler: logRequest,
-    handler: sysController.getEveryThesaurus
+    handler: skosController.getEveryThesaurus
   },
   {
     method: 'GET',
     url: `${URL_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}`,
     // preHandler: logRequest,
-    handler: sysController.getSingleThesaurus
+    handler: skosController.getSingleThesaurus
   },
   {
     method: 'GET',
     url: `${URL_LICENCE_ACCESS}`,
     // preHandler: logRequest,
     handler: licenceController.getAllLicenses
-  },{
+  }, {
     method: 'GET',
     url: `${URL_LICENCE_CODES_ACCESS}`,
     // preHandler: logRequest,
     handler: licenceController.getAllLicenseCodes
   },
- 
+
   //---------------------------------------------------------------
   // (distant dev) Route for accessing 
   //---------------------------------------------------------------

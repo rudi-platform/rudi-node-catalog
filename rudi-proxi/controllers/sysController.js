@@ -20,7 +20,6 @@ const sys = require('../config/confSystem');
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
 const json = require('../utils/jsonAccess');
-const skos = require('../config/confSKOS')
 
 const {
   URL_LOGS_ACCESS,
@@ -29,6 +28,7 @@ const {
   URL_THESAURUS_ACCESS,
   PARAM_THESAURUS_CODE,
 } = require('../config/confApi');
+
 
 
 //---------------------------------------------------------------
@@ -84,27 +84,4 @@ exports.getLogs = () => {
     log.e(mod, fun, err)
     throw err
   }
-}
-
-//---------------------------------------------------------------
-// Thesaurus
-//---------------------------------------------------------------
-
-exports.getEveryThesaurus = (req, reply) => {
-  const fun = 'getEveryThesaurus'
-  log.v(mod, fun, `< GET ${URL_THESAURUS_ACCESS}`)
-  log.d(mod, fun, ``)
-  return skos.Thesauri
-}
-
-exports.getSingleThesaurus = (req, reply) => {
-  const fun = 'getSingleThesaurus'
-  log.v(mod, fun, `< GET ${URL_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}`)
-
-  const thesaurusCode = json.accessReqParam(req, PARAM_THESAURUS_CODE)
-  log.d(mod, fun, `thesaurusCode: ${thesaurusCode}`)
-
-  const thesaurus = skos.Thesauri[thesaurusCode]
-  if (!thesaurus) throw new Error(`Thesaurus not found for such required code: ${json.beautify(thesaurusCode)}`)
-  return thesaurus
 }

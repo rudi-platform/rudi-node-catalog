@@ -140,7 +140,7 @@ const start = async () => {
     // fastify.log.info(`Listening on ${fastify.server.address().address}:${fastify.server.address().port}`)
   } catch (err) {
     // fastify.log.error(err)
-    log.e(mod, 'startServer', err)
+    log.e(mod, 'exitServer', err)
     process.exit(1)
   }
 }
@@ -163,3 +163,9 @@ mongoConnection
     utils.separateLogs('Init OK')
   })
   .catch(err => log.e(mod, 'mongoConnection', err))
+
+process.on('uncaughtException', err => {
+  log.e(mod, 'process', `Uncaught error: ${err}`)
+  console.error('There was an uncaught error', err)
+  // process.exit(1) //mandatory (as per the Node.js docs)
+})

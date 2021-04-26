@@ -341,6 +341,10 @@ exports.getEnsuredObjectWithDbId = async (objectType, Model, dbId) => {
   log.d(mod, fun, ``)
   try {
     const dbObject = await this.getObjectWithDbId(Model, dbId)
+      .catch(asyncErr => {
+        log.e(mod, `${fun} (async)`, asyncErr)
+        throw new Error(asyncErr)
+      })
     if (!dbObject) throw new Error(`${msg.objectNotFound(objectType, dbId)}`)
     return dbObject
   } catch (err) {
@@ -374,15 +378,16 @@ exports.doesObjectExistWithJson = async (Model, idField, rudiObject) => {
   }
 }
 
-exports.getObjectList = async (Model, limit, offset) => {
+exports.getObjectList = async (Model, limit, offset, filter) => {
   const fun = `getObjectList`
   log.d(mod, fun, ``)
   try {
     limit = limit || QUERY_LIMIT_DEFAULT
     offset = offset || QUERY_OFFSET_DEFAULT
-    log.d(mod, fun, `limit: ${limit}, offset: ${offset}`)
+    filter = filter || {}
+    log.d(mod, fun, `limit: ${limit}, offset: ${offset}, filter: ${filter}`)
 
-    const objectList = await Model.find({}).limit(limit).skip(offset)
+    const objectList = await Model.find(filter).limit(limit).skip(offset)
     return objectList
   } catch (err) {
     log.e(mod, fun, err)

@@ -73,6 +73,11 @@ const {
   MediaTypes
 } = require('../definitions/models/Media');
 
+//---------------------------------------------------------------
+// Controllers
+//---------------------------------------------------------------
+const organisationController = require('./organizationController');
+
 
 //---------------------------------------------------------------
 // Atomic treatments of properties: RUDI -> DB
@@ -87,8 +92,7 @@ exports.organizationRudiToDbFormat = async (rudiProducer, shouldCreateIfNotFound
 
   if (!organizationDbId) {
     if (!shouldCreateIfNotFound) throw err
-    const newOrg = new Organization(rudiProducer)
-    newOrg.save()
+    const newOrg = await organisationController.newOrganization(rudiProducer)
     organizationDbId = newOrg[DB_ID]
   }
   log.d(mod, fun, `${json.beautify(rudiProducer)} -> ${organizationDbId} `)
@@ -541,7 +545,6 @@ exports.newMetadata = async (rudiMetadata) => {
   log.d(mod, fun, `DB ready object: ${json.beautify(dbReadyObject)}`)
 
   const dbMetadata = await new Metadata(dbReadyObject)
-
   await dbMetadata.save()
 
   return this.dbMetadataToRudi(dbMetadata)

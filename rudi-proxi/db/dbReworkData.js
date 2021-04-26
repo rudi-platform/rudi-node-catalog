@@ -156,8 +156,8 @@ exports.updateMetadataListPropertiesFromDb = async (metadataList) => {
   const fun = 'updateMetadataListPropertiesFromDb'
   // log.d(mod, fun, `metadataList: ${metadataList}`)
 
-  let producerCache = new Map()
-  let contactCache = new Map()
+  // let producerCache = new Map()
+  // let contactCache = new Map()
   let updatedMetadataList = []
 
   for (const metadata of metadataList) {
@@ -173,14 +173,14 @@ exports.updateMetadataListPropertiesFromDb = async (metadataList) => {
     //        So 'producer' field is in reality a producer mongo _id!
     const producerId = metadata[API_DATA_PRODUCER_PROPERTY]
 
-    let updatedProducer = producerCache.get(producerId)
+    // let updatedProducer = producerCache.get(producerId)
     if (!updatedProducer) {
       updatedProducer = await db.getOrganizationWithDbId(producerId)
       if ('' == updatedProducer) {
         throw new Error(`${msg.organizationNotFound(producerId)}`)
       }
 
-      producerCache.set(producerId, updatedProducer)
+      // producerCache.set(producerId, updatedProducer)
     }
 
     //————— Updating Contacts info
@@ -192,13 +192,13 @@ exports.updateMetadataListPropertiesFromDb = async (metadataList) => {
     for (const contactId of contacts) {
       // const contactId = contact[API_CONTACT_ID]
 
-      let updatedContact = contactCache.get(contactId)
+      // let updatedContact = contactCache.get(contactId)
       if (!updatedContact) {
         updatedContact = await db.getContactWithDbId(contactId)
         if ('' == updatedContact) {
           throw new Error(`${msg.contactNotFound(producerId)}`)
         }
-        contactCache.set(contactId, updatedContact)
+        // contactCache.set(contactId, updatedContact)
       }
 
       updatedContacts.push(updatedContact)

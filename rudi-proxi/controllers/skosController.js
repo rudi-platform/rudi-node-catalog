@@ -19,6 +19,35 @@ const log = require('../utils/logging')
 const json = require('../utils/jsonAccess');
 const utils = require('../utils/jsUtils');
 
+const licenceController = require('./licenceController')
+
+//---------------------------------------------------------------
+// Data models
+//---------------------------------------------------------------
+const SkosScheme = require('../definitions/models/SkosScheme')
+const SkosConcept = require('../definitions/models/SkosConcept');
+
+//---------------------------------------------------------------
+// Thesauri
+//---------------------------------------------------------------
+const Encodings = require("../definitions/thesaurus/Encodings");
+const FileTypes = require("../definitions/thesaurus/FileTypes");
+const HashAlgorithms = require("../definitions/thesaurus/HashAlgorithms");
+const Keywords = require("../definitions/thesaurus/Keywords");
+const Languages = require("../definitions/thesaurus/Languages");
+const Projections = require("../definitions/thesaurus/Projections");
+const Themes = require("../definitions/thesaurus/Themes");
+
+const THESAURI = {
+  "encodings": Encodings,
+  "filetypes": FileTypes,
+  "hashalgorithms": HashAlgorithms,
+  "keywords": Keywords,
+  "languages": Languages,
+  "projections": Projections,
+  "themes": Themes
+}
+
 //---------------------------------------------------------------
 // Constants
 //---------------------------------------------------------------
@@ -50,11 +79,17 @@ const PROPERTIES_WITH_CONCEPT_REFS = [
   API_CONCEPT_RELATIVE_PROPERTY
 ]
 
-//---------------------------------------------------------------
-// Data models
-//---------------------------------------------------------------
-const SkosScheme = require('../definitions/models/SkosScheme')
-const SkosConcept = require('../definitions/models/SkosConcept');
+
+const {
+  URL_LOGS_ACCESS,
+  URL_APP_ID_ACCESS,
+  URL_NODE_VERSION_ACCESS,
+  URL_THESAURUS_ACCESS,
+  PARAM_THESAURUS_CODE,
+  URL_LICENCE_SUFFIX
+} = require('../config/confApi');
+
+
 
 //---------------------------------------------------------------
 // Controllers: Scheme
@@ -374,4 +409,39 @@ exports.dbConceptListToRudiRecursive = async (dbConceptList) => {
     rudiConceptList.push(rudiConcept)
   }));
   return rudiConceptList
+}
+
+
+//---------------------------------------------------------------
+// Thesaurus
+//---------------------------------------------------------------
+exports.getThesaurus = (thesaurusCode) => {
+  const thesaurusCodeLowerCase = thesaurusCode.toLowerCase()
+  if (thesaurusCodeLowerCase == URL_LICENCE_SUFFIX.toLowerCase())
+    return licenceController.getAllLicenseCodes()
+  else
+    return THESAURI[thesaurusCodeLowerCase]
+}
+
+exports.getEveryThesaurus = async (req, reply) => {
+  const fun = 'getEveryThesaurus'
+  log.v(mod, fun, `< GET ${URL_THESAURUS_ACCESS}`)
+  log.d(mod, fun, ``)
+  let listThesauri = THESAURI 
+  listThesauri["licences"] = await licenceController.getAllLicenseCodes()
+  log.d(mod, fun, `listThesauri: ${listThesauri}`)
+  log.d(mod, fun, `THESAURI: ${THESAURI}`)
+  return listThesauri
+}
+
+exports.getSingleThesaurus = (req, reply) => {
+  const fun = 'getSingleThesaurus'
+  log.v(mod, fun, `< GET ${URL_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}`)
+
+  const thesaurusCode = json.accessReqParam(req, PARAM_THESAURUS_CODE)
+  log.d(mod, fun, `thesaurusCode: ${thesaurusCode}`)
+
+  const thesaurus = this.getThesaurus(thesaurusCode)
+  if (!thesaurus) throw new Error(`Thesaurus not found for such required code: ${json.beautify(thesaurusCode)}`)
+  return thesaurus
 }

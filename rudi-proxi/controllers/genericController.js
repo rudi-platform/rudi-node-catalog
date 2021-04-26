@@ -27,19 +27,22 @@ const utils = require('../utils/jsUtils')
 //---------------------------------------------------------------
 
 const {
+  URL_OBJECT,
   URL_OBJECT_METADATA,
   URL_OBJECT_ORGANIZATIONS,
   URL_OBJECT_CONTACTS,
   URL_OBJECT_MEDIA,
   URL_OBJECT_SKOS_CONCEPT,
   URL_OBJECT_SKOS_SCHEME,
+  URL_ACTION_REPORT,
+  URL_ACTION_DELETION,
   PARAM_ID,
   PARAM_OBJECT,
   QUERY_LIMIT,
+  QUERY_LIMIT_DEFAULT,
   QUERY_OFFSET,
-  URL_ACTION_REPORT,
-  URL_OBJECT,
-  URL_ACTION_DELETION,
+  QUERY_OFFSET_DEFAULT,
+  QUERY_FILTER,
   QUERY_GROUP_BY,
 } = require('../config/confApi')
 
@@ -278,6 +281,9 @@ exports.addSingleObject = async (req, reply) => {
     return createdObject
   } catch (err) {
     log.e(mod, fun, err)
+    // reply.statusCode = 500
+    // reply.message = err
+    // reply.send()
     throw boom.boomify(err)
   }
 }
@@ -336,8 +342,9 @@ exports.getObjectList = async (req, reply) => {
     // log.d(mod, fun, `objectType: '${objectType}', dbModel: ${dbModel}, idFieldLabel: '${idFieldLabel}' `)
 
     // retrieve query parameters: 'limit' and 'offset'
-    const limit = parseInt(req.query[QUERY_LIMIT]) || 0
-    const offset = parseInt(req.query[QUERY_OFFSET]) || 0
+    const limit = parseInt(req.query[QUERY_LIMIT]) || QUERY_LIMIT_DEFAULT
+    const offset = parseInt(req.query[QUERY_OFFSET]) || QUERY_OFFSET_DEFAULT
+    const filter = req.query[QUERY_FILTER]
     const groupBy = req.query[QUERY_GROUP_BY]
 
     // accessing the objects

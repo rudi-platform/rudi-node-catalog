@@ -38,7 +38,8 @@ const {
 //---------------------------------------------------------------
 // Data models
 //---------------------------------------------------------------
-const Organization = require('../definitions/models/Organization')
+const Organization = require('../definitions/models/Organization');
+// const cache = require('../db/dbCache');
 
 exports.newOrganization = async (orgJson) => {
   const fun = 'newOrganization'
@@ -46,6 +47,7 @@ exports.newOrganization = async (orgJson) => {
 
   const dbOrganization = await new Organization(orgJson)
   await dbOrganization.save()
+  // cache.addOrganization(dbOrganization)
 
   return dbOrganization
 }
