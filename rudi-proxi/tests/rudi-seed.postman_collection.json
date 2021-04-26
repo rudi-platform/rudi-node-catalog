@@ -429,8 +429,6 @@
 								"exec": [
 									"pm.test(\"2 metadata created\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const metadataList = pm.response.json();",
-									"    pm.expect(metadataList.length).to.eq(2);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -468,8 +466,6 @@
 								"exec": [
 									"pm.test(\"2 metadata created\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const metadataList = pm.response.json();",
-									"    pm.expect(metadataList.length).to.eq(2);",
 									"});"
 								],
 								"type": "text/javascript"
