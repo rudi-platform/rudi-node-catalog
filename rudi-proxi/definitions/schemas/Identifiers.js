@@ -20,10 +20,7 @@ exports.UUIDv4 = {
   unique: true,
   index: true,
   lowercase: true,
-  validate: {
-    validator: Validation.isUUIDv4,
-    message: '{VALUE} does not appear to be a valid UUID v4'
-  }
+  match: Validation.UUID
 }
 
 exports.UUID = {
@@ -31,10 +28,7 @@ exports.UUID = {
   // default: _ => uuid.v4(),
   trim: true,
   lowercase: true,
-  validate: {
-    validator: Validation.isUUIDv4,
-    message: '{VALUE} does not appear to be a valid UUID v4'
-  }
+  match: Validation.UUID
 }
 
 exports.DOI = {
@@ -43,8 +37,5 @@ exports.DOI = {
   unique: true,
   sparse: true, // accept empty values as non-duplicates 
   lowercase: true,
-  validate: {
-    validator: Validation.isDOI,
-    message: '{VALUE} does not appear to be a valid DOI'
-  }
+  match: Validation.DOI
 }

@@ -99,10 +99,7 @@ const FileSchema = new mongoose.Schema({
   // (language, norm, data structure, JSON schema, OpenAPI, etc.)
   file_structure: {
     type: String,
-    validate: {
-      validator: Validation.isURI,
-      message: '{VALUE} is not a valid URI'
-    }
+    match: Validation.URI
   },
 
   // Source encoding of the data

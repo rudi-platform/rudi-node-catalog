@@ -57,7 +57,8 @@ const {
   PARAM_ID,
   URL_OBJECT_ORGANIZATIONS,
   URL_OBJECT_CONTACTS,
-  URL_OBJECT_MEDIA
+  URL_OBJECT_MEDIA,
+  URL_OBJECT_METADATA
 } = require('../config/confApi')
 
 //---------------------------------------------------------------
@@ -77,6 +78,7 @@ const {
 // Controllers
 //---------------------------------------------------------------
 const organisationController = require('./organizationController');
+const contactController = require('./contactController');
 
 
 //---------------------------------------------------------------
@@ -91,7 +93,11 @@ exports.organizationRudiToDbFormat = async (rudiProducer, shouldCreateIfNotFound
   let organizationDbId = await db.getOrganizationDbIdWithJson(rudiProducer)
 
   if (!organizationDbId) {
-    if (!shouldCreateIfNotFound) throw err
+    if (!shouldCreateIfNotFound) {
+      const errMsg = msg.organizationNotFound(rudiProducer[API_ORGANIZATION_ID])
+      log.e(mod, fun, errMsg)
+      throw new Error(errMsg)
+    }
     const newOrg = await organisationController.newOrganization(rudiProducer)
     organizationDbId = newOrg[DB_ID]
   }
@@ -111,9 +117,9 @@ exports.contactListRudiToDbFormat = async (rudiContactList, shouldCreateIfNotFou
     if (!contactDbId) {
       if (!shouldCreateIfNotFound) throw new Error(`${msg.objectNotFound(URL_OBJECT_CONTACTS, rudiId)}`)
 
-      const newContact = new Contact(rudiContact)
-      newContact.save()
-      contactDbId = newContact[DB_ID]
+      const dbContact = await contactController.newContact(rudiContact)
+
+      contactDbId = dbContact[DB_ID]
     }
     contactDbIds.push(contactDbId)
     log.d(mod, fun, `${json.beautify(rudiContact)} -> ${contactDbId}`)
@@ -455,7 +461,7 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
     // log.d(mod, fun, `dbReadyMetadata: ${json.beautify(dbReadyMetadata, 2)}`)
     return dbReadyMetadata
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
 }
@@ -544,9 +550,19 @@ exports.newMetadata = async (rudiMetadata) => {
 
   log.d(mod, fun, `DB ready object: ${json.beautify(dbReadyObject)}`)
 
-  const dbMetadata = await new Metadata(dbReadyObject)
-  await dbMetadata.save()
-
+  let dbMetadata
+  try {
+    dbMetadata = await new Metadata(dbReadyObject)
+  } catch (err) {
+    log.w(mod, fun, `New object '${URL_OBJECT_METADATA}': ${json.beautify(dbReadyObject)} | Error: ${err}`)
+    throw err
+  }
+  try {
+    await dbMetadata.save()
+  } catch (err) {
+    log.w(mod, fun, `Saving object '${URL_OBJECT_METADATA}': ${json.beautify(dbMetadata)} | Error: ${err}`)
+    throw err
+  }
   return this.dbMetadataToRudi(dbMetadata)
 }
 

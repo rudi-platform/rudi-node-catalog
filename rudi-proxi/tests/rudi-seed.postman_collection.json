@@ -123,11 +123,21 @@
 								"exec": [
 									"pm.test(\"Contact 1 created\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    console.log(responseJson);",
-									"    const contId = pm.variables.get('contId1');",
-									"    pm.expect(responseJson.contact_id).to.eq(contId);",
 									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const contactName = pm.variables.replaceIn('{{$randomFullName}}');",
+									"",
+									"pm.collectionVariables.set('seedContact1Id', pm.variables.replaceIn('{{$randomUUID}}'))",
+									"pm.collectionVariables.set('seedContact1Name', contactName)",
+									"pm.collectionVariables.set('seedContact1Email', utils.getContactEmail(contactName))",
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -138,7 +148,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"contact_id\": \"{{contId1}}\",\n    \"contact_name\": \"M. Fazo Gres\",\n    \"email\": \"fazo@univ-rennes1.fr\"\n}",
+							"raw": "{\n    \"contact_id\": \"{{seedContact1Id}}\",\n    \"contact_name\": \"{{seedContact1Name}}\",\n    \"email\": \"{{seedContact1Email}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -167,11 +177,21 @@
 								"exec": [
 									"pm.test(\"Contact 2 created\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    console.log(responseJson);",
-									"    const contId = pm.variables.get('contId2');",
-									"    pm.expect(responseJson.contact_id).to.eq(contId);",
 									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const contactName = pm.variables.replaceIn('{{$randomFullName}}');",
+									"",
+									"pm.collectionVariables.set('seedContact2Id', pm.variables.replaceIn('{{$randomUUID}}'))",
+									"pm.collectionVariables.set('seedContact2Name', contactName)",
+									"pm.collectionVariables.set('seedContact2Email', utils.getContactEmail(contactName))",
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -182,7 +202,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n   \"contact_id\": \"{{contId2}}\",\n   \"contact_name\": \"Mme. Feya\",\n    \"email\": \"feya@irisa.fr\"\n}",
+							"raw": "{\n    \"contact_id\": \"{{seedContact2Id}}\",\n    \"contact_name\": \"{{seedContact2Name}}\",\n    \"email\": \"{{seedContact2Email}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -211,11 +231,21 @@
 								"exec": [
 									"pm.test(\"Contact 3 created\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    console.log(responseJson);",
-									"    const contId = pm.variables.get('contId3');",
-									"    pm.expect(responseJson.contact_id).to.eq(contId);",
 									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const contactName = pm.variables.replaceIn('{{$randomFullName}}');",
+									"",
+									"pm.collectionVariables.set('seedContact3Id', pm.variables.replaceIn('{{$randomUUID}}'))",
+									"pm.collectionVariables.set('seedContact3Name', contactName)",
+									"pm.collectionVariables.set('seedContact3Email', utils.getContactEmail(contactName))",
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -226,7 +256,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n   \"contact_id\": \"{{contId3}}\",\n   \"contact_name\": \"Mme. Areio\",\n    \"email\": \"areio@irisa.fr\"\n}",
+							"raw": "{\n    \"contact_id\": \"{{seedContact3Id}}\",\n    \"contact_name\": \"{{seedContact3Name}}\",\n    \"email\": \"{{seedContact3Email}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -255,11 +285,20 @@
 								"exec": [
 									"pm.test(\"Producer 1 created\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    console.log(responseJson);",
-									"    const orgId = pm.variables.get('orgId1');",
-									"    pm.expect(responseJson.organization_id).to.eq(orgId);",
 									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set('seedOrg1Id', pm.variables.replaceIn('{{$randomUUID}}'))",
+									"pm.collectionVariables.set('seedOrg1Name', pm.variables.replaceIn('{{$randomCompanyName}}'))",
+									"const orgAddress = `${pm.variables.replaceIn('{{$randomStreetAddress}}')}, ${pm.variables.replaceIn('{{$randomCity}}')}`",
+									"pm.collectionVariables.set('seedOrg1Address', orgAddress)",
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -270,7 +309,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"organization_id\": \"{{orgId1}}\",\n    \"organization_name\": \"IRISA\",\n    \"organization_address\": \"Campus de Beaulieu, 263 avenue du Général Leclerc, Bâtiment 12 F, allée Jean Perrin, 35042 RENNES Cedex\"\n}",
+							"raw": "{\n    \"organization_id\": \"{{seedOrg1Id}}\",\n    \"organization_name\": \"{{seedOrg1Name}}\",\n    \"organization_address\": \"{{seedOrg1Address}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -299,11 +338,20 @@
 								"exec": [
 									"pm.test(\"Producer 2 created\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    console.log(responseJson);",
-									"    const orgId = pm.variables.get('orgId2');",
-									"    pm.expect(responseJson.organization_id).to.eq(orgId);",
 									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set('seedOrg2Id', pm.variables.replaceIn('{{$randomUUID}}'))",
+									"pm.collectionVariables.set('seedOrg2Name', pm.variables.replaceIn('{{$randomCompanyName}}'))",
+									"const orgAddress = `${pm.variables.replaceIn('{{$randomStreetAddress}}')}, ${pm.variables.replaceIn('{{$randomCity}}')}`",
+									"pm.collectionVariables.set('seedOrg2Address', orgAddress)",
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -314,7 +362,59 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"organization_id\": \"{{orgId2}}\",\n    \"organization_name\": \"UR1\",\n    \"organization_address\": \"2 rue du Thabor - CS 46510, 35065 Rennes CEDEX\"\n}",
+							"raw": "{\n    \"organization_id\": \"{{seedOrg2Id}}\",\n    \"organization_name\": \"{{seedOrg2Name}}\",\n    \"organization_address\": \"{{seedOrg2Address}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{org}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{org}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get orgs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get orgs\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"organization_id\": \"{{seedOrg2Id}}\",\n    \"organization_name\": \"{{seedOrg2Name}}\",\n    \"organization_address\": \"{{seedOrg2Address}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -348,9 +448,11 @@
 								"exec": [
 									"pm.test(\"New metadata created\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
+									"    /*",
 									"    const responseJson = pm.response.json();",
 									"    console.log(responseJson);",
 									"    pm.expect(responseJson.contacts.length).to.eq(2);",
+									"    */",
 									"});"
 								],
 								"type": "text/javascript"
@@ -360,26 +462,43 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"function randomPickInList(list) {",
-									"    const randomNumber = _.random(0, list.length-1);",
-									"    return list[randomNumber];",
-									"}",
-									"function randomPick(listName) {",
-									"    return randomPickInList(pm.collectionVariables.get(listName));",
-									"}",
+									"//————— Thesauri",
+									"pm.collectionVariables.set('randomTheme', utils.randomPick('themes'));",
+									"pm.collectionVariables.set('randomKeyword1', utils.randomPick('keywords'));",
+									"pm.collectionVariables.set('randomKeyword2', utils.randomPick('keywords'));",
+									"pm.collectionVariables.set('randomLicence', utils.randomPick('licences'));",
 									"",
-									"pm.collectionVariables.set('randomTheme', randomPick('themes'));",
-									"pm.collectionVariables.set('randomKeyword1', randomPick('keywords'));",
-									"pm.collectionVariables.set('randomKeyword2', randomPick('keywords'));",
-									"pm.collectionVariables.set('randomLicence', randomPick('licences'));",
+									"//————— Producer",
+									"const orgs = [",
+									"    pm.collectionVariables.get('seedOrg1Id'), ",
+									"    pm.collectionVariables.get('seedOrg2Id')]",
+									"const randomOrgId = utils.randomPickInList(orgs)",
+									"//console.log(`randomOrgId: ${randomOrgId}`)",
+									"pm.collectionVariables.set('randomOrg', randomOrgId);",
 									"",
-									"const orgs = [pm.variables.get('orgId1'), pm.variables.get('orgId2')]",
-									"pm.collectionVariables.set('randomOrg', randomPickInList(orgs));",
+									"//————— Contact 1",
+									"const contacts = [ ",
+									"    pm.collectionVariables.get('seedContact1Id'), ",
+									"    pm.collectionVariables.get('seedContact2Id'), ",
+									"    pm.collectionVariables.get('seedContact3Id')];",
+									"//console.log(`contacts: ${contacts}`)",
 									"",
-									"const contacts = [ pm.variables.get('contId1'), pm.variables.get('contId2'), pm.variables.get('contId3')]",
-									"pm.collectionVariables.set('randomContact1', randomPickInList(contacts));",
-									"pm.collectionVariables.set('randomContact2', randomPickInList(contacts));",
 									"",
+									"const randomContId1 = utils.randomPickInList(contacts)",
+									"//console.log(`randomContId1: ${randomContId1}`)",
+									"",
+									"pm.collectionVariables.set('randomContact1', randomContId1);",
+									"",
+									"//————— Contact 2",
+									"const contactsLeft = contacts",
+									"    .filter(function(value, index, arr){ return value != randomContId1 });",
+									"",
+									"const randomContId2 = utils.randomPickInList(contactsLeft)",
+									"//console.log(`randomContId2: ${randomContId2}`)",
+									"",
+									"pm.collectionVariables.set('randomContact2', randomContId2);",
+									"",
+									"//————— Description",
 									"pm.collectionVariables.set('randomTitle', pm.variables.replaceIn('{{$randomCatchPhrase}}'));",
 									"pm.collectionVariables.set('randomSynopsis', `${pm.variables.replaceIn('{{$randomProductAdjective}}')} ${pm.variables.replaceIn('{{$randomBs}}')}`);",
 									"pm.collectionVariables.set('randomSummary', `${pm.variables.replaceIn('{{$randomPhrase}}')} ${pm.variables.replaceIn('{{$randomPhrase}}')} ${pm.variables.replaceIn('{{$randomLoremParagraph}}')}`);",
@@ -395,7 +514,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"global_id\": \"{{$randomUUID}}\",\n    \"resource_title\": \"{{randomTitle}}\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{randomSynopsis}}\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{randomSummary}}\"\n        }\n    ],\n    \"theme\": \"{{randomTheme}}\",\n    \"keywords\": [\"{{randomKeyword1}}\", \"{{randomKeyword2}}\"],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"{{$randomDatePast}}\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{randomOrg}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{randomContact1}}\"\n        },\n        {\n            \"contact_id\": \"{{randomContact2}}\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_provider\": {\n            \"organization_id\": \"{{orgId1}}\"\n        }\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{$randomDateRecent}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\":{\n        \"licence\":{\n            \"licence_type\":\"STANDARD\",\n            \"licence_label\":\"licence_mit\"\n            \n        }\n    },\n    \"available_formats\": [\n        {\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{mediaId1}}\",\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.1.0\"\n            },\n            \"file_type\": \"application/json\",\n            \"file_size\": 59016,\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"4c9ee0f14e835927a1bbafde0eb89fb3\"\n            }\n        }\n    ]\n}",
+							"raw": "{\n    \"global_id\": \"{{$randomUUID}}\",\n    \"resource_title\": \"{{randomTitle}}\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{randomSynopsis}}\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{randomSummary}}\"\n        }\n    ],\n    \"theme\": \"{{randomTheme}}\",\n    \"keywords\": [\"{{randomKeyword1}}\", \"{{randomKeyword2}}\"],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"{{$randomDatePast}}\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{randomOrg}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{randomContact1}}\"\n        },\n        {\n            \"contact_id\": \"{{randomContact2}}\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_provider\": {\n            \"organization_id\": \"{{randomOrg}}\"\n        }\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{$randomDateRecent}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\":{\n        \"licence\":{\n            \"licence_type\":\"STANDARD\",\n            \"licence_label\":\"licence_mit\"\n            \n        }\n    },\n    \"available_formats\": [\n        {\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{mediaId1}}\",\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.1.0\"\n            },\n            \"file_type\": \"application/json\",\n            \"file_size\": 59016,\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"4c9ee0f14e835927a1bbafde0eb89fb3\"\n            }\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -504,7 +623,28 @@
 				"type": "text/javascript",
 				"exec": [
 					"pm.globals.set(\"now\", new Date().toISOString());",
-					"pm.globals.set(\"timezone\", new Date().getTimezoneOffset());"
+					"pm.globals.set(\"timezone\", new Date().getTimezoneOffset());",
+					"",
+					"",
+					"utils = {",
+					"    getContactEmail: function (contactName) {",
+					"        return `${contactName",
+					"            .replace(/(Miss|(Ms|Mrs|Mr|Dr)\\.)\\s|'Jr\\.'/gi, '')",
+					"            .toLowerCase()",
+					"            .replace(/\\s+|\\.\\./g, '.')",
+					"            .replace(/^\\.+|\\.+$|\\'+/g, '')",
+					"            }@irisa.fr`;",
+					"    },",
+					"",
+					"    randomPickInList: function (list) {",
+					"        const randomNumber = _.random(0, list.length-1);",
+					"        return list[randomNumber];",
+					"    },",
+					"    ",
+					"    randomPick: function (listName) {",
+					"        return this.randomPickInList(pm.collectionVariables.get(listName));",
+					"    }",
+					"};"
 				]
 			}
 		},
@@ -569,6 +709,70 @@
 		},
 		{
 			"key": "randomTitle",
+			"value": ""
+		},
+		{
+			"key": "seedOrg1Id",
+			"value": ""
+		},
+		{
+			"key": "seedOrg1Name",
+			"value": ""
+		},
+		{
+			"key": "seedOrg1Address",
+			"value": ""
+		},
+		{
+			"key": "seedOrg2Id",
+			"value": ""
+		},
+		{
+			"key": "seedOrg2Name",
+			"value": ""
+		},
+		{
+			"key": "seedOrg2Address",
+			"value": ""
+		},
+		{
+			"key": "seedContact1Id",
+			"value": ""
+		},
+		{
+			"key": "seedContact1Name",
+			"value": ""
+		},
+		{
+			"key": "seedContact1Email",
+			"value": ""
+		},
+		{
+			"key": "seedContact2Id",
+			"value": ""
+		},
+		{
+			"key": "seedContact2Name",
+			"value": ""
+		},
+		{
+			"key": "seedContact2Email",
+			"value": ""
+		},
+		{
+			"key": "seedContact3Id",
+			"value": ""
+		},
+		{
+			"key": "seedContact3Name",
+			"value": ""
+		},
+		{
+			"key": "seedContact3Email",
+			"value": ""
+		},
+		{
+			"key": "randomOrgId",
 			"value": ""
 		}
 	]

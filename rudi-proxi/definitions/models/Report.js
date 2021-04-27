@@ -57,10 +57,7 @@ const ReportSchema = new mongoose.Schema({
   version: {
     type: String,
     required: true,
-    validate: {
-      validator: Validation.isVersion,
-      message: '{VALUE} does not appear to be a valid version number (0.0.0abc)'
-    }
+    match: Validation.API_VERSION
   },
 
   // State of the integration of the resource in the Portal

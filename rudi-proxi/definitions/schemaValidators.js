@@ -16,15 +16,12 @@ exports.validateSchema = (schemaStr, regExPattern) => {
 // UUID
 //---------------------------------------------------------------
 
-const regexUUIDv4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+exports.REGEX_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+exports.UUID = [
+  this.REGEX_UUID,
+  `'{VALUE}' is not a valid UUID v4`
+]
 
-exports.isUUIDv4 = (str) => {
-  return this.validateSchema(str, regexUUIDv4)
-}
-
-exports.isRudiID = (str) => {
-  return this.isUUIDv4(str) // || isDOI(idStr)
-}
 
 //---------------------------------------------------------------
 // DOI
@@ -32,33 +29,38 @@ exports.isRudiID = (str) => {
 
 // source: https://www.crossref.org/blog/dois-and-matching-regular-expressions/
 // alternative: https://github.com/regexhq/doi-regex/blob/master/index.js
-const regexDOI = /^10.\d{4,9}\/[-.;()\/:\w]+$/i;
-exports.isDOI = (str) => {
-  return this.validateSchema(str, regexDOI)
-}
+exports.REGEX_DOI = /^10.\d{4,9}\/[-.;()\/:\w]+$/i;
+exports.DOI = [
+  this.REGEX_DOI,
+  `'{VALUE}' is not a valid DOI`
+]
 
 //---------------------------------------------------------------
 // URI
 //---------------------------------------------------------------
 
-const regexURI = /^(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?$/;
-exports.isURI = (str) => {
-  return this.validateSchema(str, regexURI)
-}
+exports.REGEX_URI = /^(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?$/;
+exports.URI = [
+  this.REGEX_URI,
+  `'{VALUE}' is not a valid URI`
+]
 
 //---------------------------------------------------------------
 // E-mail
 //---------------------------------------------------------------
 
-const regexEmail = /^([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-exports.isEmail = (str) => {
-  return this.validateSchema(str, regexEmail)
-}
+exports.REGEX_EMAIL = /^([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+exports.EMAIL = [
+  this.REGEX_EMAIL,
+  `'{VALUE}' is not a valid e-mail`
+]
+
 
 //---------------------------------------------------------------
 // API version
 //---------------------------------------------------------------
-const regexVersionRudi = /^[0-9]{1,2}\.[0-9]{1,2}(\.[0-9]{1,2})?[a-z]*$/
-exports.isVersion = (str) => {
-  return this.validateSchema(str, regexVersionRudi)
-}
+exports.REGEX_API_VERSION = /^[0-9]+\.[0-9]+(\.[0-9]+)?[a-z]*$/
+exports.API_VERSION = [
+  this.REGEX_API_VERSION,
+  `'{VALUE}' does not appear to be a valid RUDI API version number! Expected format: '0.0.0abc' `
+]

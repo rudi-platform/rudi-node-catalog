@@ -38,12 +38,13 @@ const ContactSchema = new mongoose.Schema({
   // Updated offical postal address of the organization
   email: {
     type: String,
-    required: true,
+    trim: true,
+    required: true, //[true, 'Please enter Email Address'],
+    unique: true,
+    index: true,
     lowercase: true,
-    validate: {
-      validator: Validation.isEmail,
-      message: '{VALUE} is not a valid e-mail'
-    }
+    dropDups: true,
+    match: Validation.EMAIL
   },
 
   // Time when this contact was successfully published on RUDI portal

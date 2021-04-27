@@ -38,6 +38,7 @@ const {
   URL_LICENCE_ACCESS,
   URL_LICENCE_CODES_ACCESS,
   URL_LICENCE_SUFFIX,
+  PARAM_LOGS_LINES,
 } = require('../config/confApi')
 
 //---------------------------------------------------------------
@@ -210,6 +211,12 @@ exports.backOfficeRoutes = [
     url: `${URL_LOGS_ACCESS}`,
     // preHandler: logRequest,
     handler: sysController.getLogs
+  },
+  {
+    method: 'GET',
+    url: `${URL_LOGS_ACCESS}/:${PARAM_LOGS_LINES}`,
+    // preHandler: logRequest,
+    handler: sysController.getLastLogLines
   },
 
   //---------------------------------------------------------------

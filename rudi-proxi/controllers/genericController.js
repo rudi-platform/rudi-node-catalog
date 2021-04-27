@@ -113,8 +113,8 @@ async function newObject(objectType, objectData) {
         throw new Error(msg.objectTypeNotFound(objectType))
     }
   } catch (err) {
-    log.e(mod, fun, err)
-    throw boom.boomify(err)
+    log.w(mod, fun, err)
+    throw err
   }
 }
 
@@ -256,7 +256,7 @@ exports.addSingleObject = async (req, reply) => {
     // identify object model
     const {Model, idField} = db.getObjectAccesses(objectType)
     // accessing the request body
-    let rudiObject = {...req.body}
+    let rudiObject = req.body
     /* beautify ignore:end */
 
     // retrieving the id
@@ -269,16 +269,10 @@ exports.addSingleObject = async (req, reply) => {
 
     // Creating new object + specific treatments
     const createdObject = await newObject(objectType, rudiObject)
-    // const dbReadyObject = await new Model(rudiObject)
-    // log.d(mod, fun, `created dbReadyObject: ${json.beautify(dbReadyObject)}`)
-
-    // const dbActionResult = await dbReadyObject.save()
-    // log.d(mod, fun, `saved, dbActionResult: ${json.beautify(dbActionResult)}`)
-
+    
     log.i(mod, fun, `${msg.objectAdded(objectType, rudiId)}`)
-    // const refinedObject = await treatDbObject(objectType, dbReadyObject)
-    // return refinedObject
     return createdObject
+    
   } catch (err) {
     log.e(mod, fun, err)
     // reply.statusCode = 500

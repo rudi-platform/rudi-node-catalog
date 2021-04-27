@@ -169,3 +169,9 @@ process.on('uncaughtException', err => {
   console.error('There was an uncaught error', err)
   // process.exit(1) //mandatory (as per the Node.js docs)
 })
+
+process.on('unhandledRejection', (error, promise) => {
+  const fun = 'catching promise rejection'
+  log.e(mod, fun, 'DAMN!!! Promise rejection not handled here: ', promise);
+  log.e(mod, fun, 'The error was: ', error);
+});

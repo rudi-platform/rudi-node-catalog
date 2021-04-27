@@ -59,6 +59,7 @@ exports.URL_PREFIX_PRIVATE = '/api/admin';
 
 exports.URL_LOGS_SUFFIX = 'logs'
 exports.URL_LOGS_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_LOGS_SUFFIX}`
+exports.PARAM_LOGS_LINES = `lines`
 
 exports.URL_APP_ID_SUFFIX = 'hash'
 exports.URL_APP_ID_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_APP_ID_SUFFIX}`

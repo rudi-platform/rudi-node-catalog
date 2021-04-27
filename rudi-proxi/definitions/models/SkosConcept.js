@@ -83,10 +83,7 @@ const SkosConceptSchema = new mongoose.Schema({
    */
   concept_uri: {
     type: String,
-    validate: {
-      validator: Validation.isURI,
-      message: '{VALUE} is not a valid URI'
-    }
+    match: Validation.URI
   },
 
   //---------------------------

@@ -6,7 +6,7 @@ const mod = 'orgCtrl'
  * action on the organizations (producer or publisher)
  */
 
- //---------------------------------------------------------------
+//---------------------------------------------------------------
 // External dependancies 
 //---------------------------------------------------------------
 const boom = require('@hapi/boom')
@@ -32,7 +32,8 @@ const {
 
 const {
   PARAM_LANG: REQ_LANG,
-  PARAM_ID: REQ_ID
+  PARAM_ID: REQ_ID,
+  URL_OBJECT_ORGANIZATIONS
 } = require('../config/confApi')
 
 //---------------------------------------------------------------
@@ -45,9 +46,22 @@ exports.newOrganization = async (orgJson) => {
   const fun = 'newOrganization'
   log.d(mod, fun, ``)
 
-  const dbOrganization = await new Organization(orgJson)
-  await dbOrganization.save()
-  // cache.addOrganization(dbOrganization)
+  let dbOrganization
 
+  try {
+    dbOrganization = await new Organization(orgJson)
+  } catch (err) {
+    log.w(mod, fun, `New object '${URL_OBJECT_ORGANIZATIONS}': ${json.beautify(orgJson)} | Error: ${err}`)
+    log.e(mod, fun, err)
+    throw err
+  }
+  try {
+    await dbOrganization.save()
+    // cache.addOrganization(dbOrganization)
+  } catch (err) {
+    log.w(mod, fun, `Saving object '${URL_OBJECT_ORGANIZATIONS}': ${json.beautify(dbOrganization)} | Error: ${err}`)
+    log.e(mod, fun, err)
+    throw err
+  }
   return dbOrganization
 }

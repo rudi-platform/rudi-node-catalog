@@ -419,10 +419,7 @@ const MetadataSchema = new mongoose.Schema({
     api_version: {
       type: String,
       required: true,
-      validate: {
-        validator: Validation.isVersion,
-        message: '{VALUE} does not appear to be a valid version number (0.0.0abc)'
-      }
+      match: Validation.API_VERSION
     },
 
     // Dates of the actions performed on the metadata (creation, publishing, update...)

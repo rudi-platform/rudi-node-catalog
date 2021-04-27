@@ -220,7 +220,7 @@
 			]
 		},
 		{
-			"name": "02. Cleaning / Init Copy",
+			"name": "02. Init DB",
 			"item": [
 				{
 					"name": "Clear all collections",
@@ -242,7 +242,6 @@
 							"script": {
 								"exec": [
 									"var uuid = require('uuid');",
-									"",
 									"[",
 									"    \"metaId1\", ",
 									"    \"metaId2\", ",
@@ -257,7 +256,7 @@
 									"    \"mediaId2\"",
 									"].map(idLabel => {",
 									"    const newUUID = uuid.v4()",
-									"    console.log(`${idLabel}: ${newUUID}`)",
+									"    //console.log(`${idLabel}: ${newUUID}`)",
 									"    pm.environment.set(idLabel, newUUID)",
 									"});",
 									""
@@ -423,6 +422,16 @@
 									"    const contId = pm.variables.get('contId3');",
 									"    pm.expect(responseJson.contact_id).to.eq(contId);",
 									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const contactId = pm.variables.replaceIn('{{$randomUUID}}')",
+									"pm.collectionVariables.set('contact3', contactId)"
 								],
 								"type": "text/javascript"
 							}
@@ -1311,13 +1320,19 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?limit=100",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{apiUrl}}",
 								"{{data}}"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "100"
+								}
 							]
 						}
 					},
@@ -3027,13 +3042,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{logs}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{logs}}/100",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{adminUrl}}",
-								"{{logs}}"
+								"{{logs}}",
+								"100"
 							]
 						}
 					},
@@ -3048,31 +3064,29 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
-					"",
 					"pm.globals.set(\"now\", new Date().toISOString());",
 					"pm.globals.set(\"timezone\", new Date().getTimezoneOffset());",
 					"",
 					"",
-					"/*",
-					"var uuid = require('uuid');",
-					"[",
-					"    \"metaId1\", ",
-					"    \"metaId2\", ",
-					"    \"orgId1\", ",
-					"    \"orgId2\", ",
-					"    \"contId1\", ",
-					"    \"contId2\", ",
-					"    \"contId3\", ",
-					"    \"reportId1\", ",
-					"    \"reportId2\", ",
-					"    \"mediaId1\", ",
-					"    \"mediaId2\"",
-					"].map(idLabel => {",
-					"    const newUUID = uuid.v4()",
-					"    console.log(`newUUID: ${newUUID}`)",
-					"    pm.environment.set(idLabel, newUUID)",
-					"});",
-					"*/"
+					"utils = {",
+					"    getContactEmail: function (contactName) {",
+					"        return `${contactName",
+					"            .replace(/(Miss|(Ms|Mrs|Mr|Dr)\\.)\\s|'Jr\\.'/gi, '')",
+					"            .toLowerCase()",
+					"            .replace(/\\s+|\\.\\./g, '.')",
+					"            .replace(/^\\.+|\\.+$|\\'+/g, '')",
+					"            }@irisa.fr`;",
+					"    },",
+					"",
+					"    randomPickInList: function (list) {",
+					"        const randomNumber = _.random(0, list.length-1);",
+					"        return list[randomNumber];",
+					"    },",
+					"    ",
+					"    randomPick: function (listName) {",
+					"        return this.randomPickInList(pm.collectionVariables.get(listName));",
+					"    }",
+					"};"
 				]
 			}
 		},
@@ -3125,6 +3139,10 @@
 		},
 		{
 			"key": "mediaId3",
+			"value": ""
+		},
+		{
+			"key": "contact3",
 			"value": ""
 		}
 	]

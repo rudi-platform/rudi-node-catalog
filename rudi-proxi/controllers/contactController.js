@@ -30,7 +30,8 @@ const {
 
 const {
   PARAM_LANG: REQ_LANG,
-  PARAM_ID: REQ_ID
+  PARAM_ID: REQ_ID,
+  URL_OBJECT_CONTACTS
 } = require('../config/confApi')
 
 //---------------------------------------------------------------
@@ -42,9 +43,18 @@ const Contact = require('../definitions/models/Contact')
 exports.newContact = async (contactJson) => {
   const fun = 'newContact'
   log.d(mod, fun, ``)
-
-  const dbContact = await new Contact(contactJson)
-  await dbContact.save()
-
+  let dbContact
+  try {
+    dbContact = await new Contact(contactJson)
+  } catch (err) {
+    log.w(mod, fun, `New object '${URL_OBJECT_CONTACTS}': ${json.beautify(contactJson)} | Error: ${err}`)
+    throw err
+  }
+  try {
+    await dbContact.save()
+  } catch (err) {
+    log.w(mod, fun, `Saving object '${URL_OBJECT_CONTACTS}': ${json.beautify(dbContact)} | Error: ${err}`)
+    throw err
+  }
   return dbContact
 }

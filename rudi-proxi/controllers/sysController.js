@@ -12,6 +12,7 @@ const mod = 'sysCtrl'
 const boom = require('@hapi/boom')
 const fs = require('fs');
 const prcs = require('child_process')
+const readLastLines = require('read-last-lines');
 
 //---------------------------------------------------------------
 // Internal dependancies 
@@ -27,6 +28,7 @@ const {
   URL_NODE_VERSION_ACCESS,
   URL_THESAURUS_ACCESS,
   PARAM_THESAURUS_CODE,
+  PARAM_LOGS_LINES,
 } = require('../config/confApi');
 
 
@@ -71,14 +73,27 @@ exports.getNodeVersion = () => {
 // Logs
 //---------------------------------------------------------------
 
-exports.getLogs = () => {
+exports.getLogs = async (req, reply) => {
   const fun = 'getLogs'
   try {
     log.d(mod, fun, `GET ${URL_LOGS_ACCESS}`)
 
     /* beautify ignore:start */
-    const logs = fs.readFileSync(sys.OUT_LOG, {encoding: 'utf8', flag: 'r'});
+    const readOptions = {encoding: 'utf8', flag: 'r'}
     /* beautify ignore:end */
+    const logs = fs.readFileSync(sys.OUT_LOG, readOptions)   
+    return logs
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw err
+  }
+}
+exports.getLastLogLines = async (req, reply) => {
+  const fun = 'getLogs'
+  try {
+    log.d(mod, fun, `GET ${URL_LOGS_ACCESS}/:${PARAM_LOGS_LINES}`)
+    const nbLines = json.accessReqParam(req, PARAM_LOGS_LINES)    
+    const logs = readLastLines.read(sys.OUT_LOG, nbLines)
     return logs
   } catch (err) {
     log.e(mod, fun, err)

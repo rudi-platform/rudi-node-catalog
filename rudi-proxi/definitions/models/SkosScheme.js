@@ -69,10 +69,7 @@ const SkosSchemeSchema = new mongoose.Schema({
   /** Web page that document the SKOS concept scheme */
   scheme_uri: {
     type: String,
-    validate: {
-      validator: Validation.isURI,
-      message: '{VALUE} is not a valid URI'
-    }
+    match: Validation.URI
   },
 
   /** List of the highest level concepts in the concept scheme */
