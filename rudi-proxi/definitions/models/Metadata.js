@@ -308,7 +308,7 @@ const MetadataSchema = new mongoose.Schema({
      */
     projection: {
       type: String,
-      enum: Object.values(Projection)
+      enum: Object.values(Projection) 
     },
 
     /** 
@@ -426,7 +426,7 @@ const MetadataSchema = new mongoose.Schema({
     metadata_dates: {
       validated: {
         type: Date
-      },
+      }, 
       deleted: {
         type: Date
       }
