@@ -3102,46 +3102,6 @@
 	],
 	"variable": [
 		{
-			"key": "metaId1",
-			"value": ""
-		},
-		{
-			"key": "metaId2",
-			"value": ""
-		},
-		{
-			"key": "orgId1",
-			"value": ""
-		},
-		{
-			"key": "orgId2",
-			"value": ""
-		},
-		{
-			"key": "contId1",
-			"value": ""
-		},
-		{
-			"key": "contId2",
-			"value": ""
-		},
-		{
-			"key": "contId3",
-			"value": ""
-		},
-		{
-			"key": "mediaId1",
-			"value": ""
-		},
-		{
-			"key": "mediaId2",
-			"value": ""
-		},
-		{
-			"key": "mediaId3",
-			"value": ""
-		},
-		{
 			"key": "contact3",
 			"value": ""
 		}

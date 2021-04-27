@@ -132,9 +132,9 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"const contactName = pm.variables.replaceIn('{{$randomFullName}}');",
+									"const contactName = rand.get('{{$randomFullName}}');",
 									"",
-									"pm.collectionVariables.set('seedContact1Id', pm.variables.replaceIn('{{$randomUUID}}'))",
+									"pm.collectionVariables.set('seedContact1Id', rand.get('{{$randomUUID}}'))",
 									"pm.collectionVariables.set('seedContact1Name', contactName)",
 									"pm.collectionVariables.set('seedContact1Email', utils.getContactEmail(contactName))",
 									""
@@ -186,9 +186,9 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"const contactName = pm.variables.replaceIn('{{$randomFullName}}');",
+									"const contactName = rand.get('{{$randomFullName}}');",
 									"",
-									"pm.collectionVariables.set('seedContact2Id', pm.variables.replaceIn('{{$randomUUID}}'))",
+									"pm.collectionVariables.set('seedContact2Id', rand.get('{{$randomUUID}}'))",
 									"pm.collectionVariables.set('seedContact2Name', contactName)",
 									"pm.collectionVariables.set('seedContact2Email', utils.getContactEmail(contactName))",
 									""
@@ -240,9 +240,9 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"const contactName = pm.variables.replaceIn('{{$randomFullName}}');",
+									"const contactName = rand.get('{{$randomFullName}}');",
 									"",
-									"pm.collectionVariables.set('seedContact3Id', pm.variables.replaceIn('{{$randomUUID}}'))",
+									"pm.collectionVariables.set('seedContact3Id', rand.get('{{$randomUUID}}'))",
 									"pm.collectionVariables.set('seedContact3Name', contactName)",
 									"pm.collectionVariables.set('seedContact3Email', utils.getContactEmail(contactName))",
 									""
@@ -294,9 +294,9 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.collectionVariables.set('seedOrg1Id', pm.variables.replaceIn('{{$randomUUID}}'))",
-									"pm.collectionVariables.set('seedOrg1Name', pm.variables.replaceIn('{{$randomCompanyName}}'))",
-									"const orgAddress = `${pm.variables.replaceIn('{{$randomStreetAddress}}')}, ${pm.variables.replaceIn('{{$randomCity}}')}`",
+									"pm.collectionVariables.set('seedOrg1Id', rand.get('{{$randomUUID}}'))",
+									"pm.collectionVariables.set('seedOrg1Name', rand.get('{{$randomCompanyName}}'))",
+									"const orgAddress = `${rand.get('{{$randomStreetAddress}}')}, ${rand.get('{{$randomCity}}')}`",
 									"pm.collectionVariables.set('seedOrg1Address', orgAddress)",
 									""
 								],
@@ -347,9 +347,9 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.collectionVariables.set('seedOrg2Id', pm.variables.replaceIn('{{$randomUUID}}'))",
-									"pm.collectionVariables.set('seedOrg2Name', pm.variables.replaceIn('{{$randomCompanyName}}'))",
-									"const orgAddress = `${pm.variables.replaceIn('{{$randomStreetAddress}}')}, ${pm.variables.replaceIn('{{$randomCity}}')}`",
+									"pm.collectionVariables.set('seedOrg2Id', rand.get('{{$randomUUID}}'))",
+									"pm.collectionVariables.set('seedOrg2Name', rand.get('{{$randomCompanyName}}'))",
+									"const orgAddress = `${rand.get('{{$randomStreetAddress}}')}, ${rand.get('{{$randomCity}}')}`",
 									"pm.collectionVariables.set('seedOrg2Address', orgAddress)",
 									""
 								],
@@ -499,9 +499,9 @@
 									"pm.collectionVariables.set('randomContact2', randomContId2);",
 									"",
 									"//————— Description",
-									"pm.collectionVariables.set('randomTitle', pm.variables.replaceIn('{{$randomCatchPhrase}}'));",
-									"pm.collectionVariables.set('randomSynopsis', `${pm.variables.replaceIn('{{$randomProductAdjective}}')} ${pm.variables.replaceIn('{{$randomBs}}')}`);",
-									"pm.collectionVariables.set('randomSummary', `${pm.variables.replaceIn('{{$randomPhrase}}')} ${pm.variables.replaceIn('{{$randomPhrase}}')} ${pm.variables.replaceIn('{{$randomLoremParagraph}}')}`);",
+									"pm.collectionVariables.set('randomTitle', rand.get('{{$randomCatchPhrase}}'));",
+									"pm.collectionVariables.set('randomSynopsis', `${rand.get('{{$randomProductAdjective}}')} ${rand.get('{{$randomBs}}')}`);",
+									"pm.collectionVariables.set('randomSummary', `${rand.get('{{$randomPhrase}}')} ${rand.get('{{$randomPhrase}}')} ${rand.get('{{$randomLoremParagraph}}')}`);",
 									"",
 									""
 								],
@@ -643,6 +643,12 @@
 					"    ",
 					"    randomPick: function (listName) {",
 					"        return this.randomPickInList(pm.collectionVariables.get(listName));",
+					"    },",
+					"};",
+					"",
+					"rand = {",
+					"    get: function (randName) {",
+					"        return pm.variables.replaceIn(randName);",
 					"    }",
 					"};"
 				]
