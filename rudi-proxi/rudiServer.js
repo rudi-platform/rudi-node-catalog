@@ -101,7 +101,7 @@ fastify.get('/api', async (request, reply) => {
     API: "RUDI API"
   }
 })
-// Declare a default route
+
 // Declare a default route
 fastify.get(api.URL_PREFIX_PUBLIC, async (request, reply) => {
   log.i(mod, 'routes', `GET ${api.URL_PREFIX_PUBLIC}`)
@@ -115,6 +115,7 @@ fastify.get(`${api.URL_PREFIX_PUBLIC}/`, async (request, reply) => {
     'API version': "RUDI API v1"
   }
 })
+
 // Loop over each public route  
 publicRoutes.forEach((pubRoute, index) => {
   fastify.route(pubRoute)
@@ -126,8 +127,6 @@ backOfficeRoutes.forEach((boRoute, index) => {
   fastify.route(boRoute)
   log.d(mod, 'routes', `route #${index} = ${boRoute.method} ${boRoute.url}`)
 })
-
-
 
 //---------------------------------------------------------------
 // SERVER 

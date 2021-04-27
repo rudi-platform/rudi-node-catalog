@@ -298,7 +298,7 @@ const MetadataSchema = new mongoose.Schema({
 
     /**
      * Precise geographic distribution of the data   
-     */
+     */ 
     geographic_distribution: {
       type: mongoose.SchemaTypes.GeoJSON
     },

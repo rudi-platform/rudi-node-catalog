@@ -10,6 +10,7 @@ const mod = 'genCtrl'
 //---------------------------------------------------------------
 const boom = require('@hapi/boom')
 const uuid = require('uuid')
+var url = require('url');
 
 //---------------------------------------------------------------
 // Internal dependancies 
@@ -44,6 +45,7 @@ const {
   QUERY_OFFSET_DEFAULT,
   QUERY_FILTER,
   QUERY_GROUP_BY,
+  URL_ACTION_FILTER,
 } = require('../config/confApi')
 
 const {
@@ -82,10 +84,65 @@ const metadataController = require('../controllers/metadataController')
 const organizationController = require('../controllers/organizationController')
 const contactController = require('../controllers/contactController');
 const skosController = require('./skosController');
+const _ = require('lodash');
 
 //---------------------------------------------------------------
 // Specific object type helper functions
 //---------------------------------------------------------------
+const QUERY_RESERVED_WORDS = [
+  QUERY_LIMIT,
+  QUERY_OFFSET
+]
+
+function parseQueryParameters(objectType, queryParameters) {
+  const fun = 'checkQueryParameters'
+  log.d(mod, fun, `queryParameters: ${json.beautify(queryParameters)}`)
+  // identify object model
+  /* beautify ignore:start */
+  const {Model, idField} = db.getObjectAccesses(objectType)
+  /* beautify ignore:end */
+  const modelProperties = db.modelProperties(Model)
+
+  const queryKeys = Object.keys(queryParameters)
+  let filterReturn = {}
+  filterReturn[QUERY_LIMIT] = QUERY_LIMIT_DEFAULT;
+  filterReturn[QUERY_OFFSET] = QUERY_OFFSET_DEFAULT;
+  filterReturn[QUERY_FILTER] = {}
+
+  queryKeys.map(key => {
+    if (QUERY_RESERVED_WORDS.includes(key)) {
+      log.d(mod, fun, `Key is a reserved word: ${json.beautify(key)}`)
+      switch (key) {
+        case QUERY_LIMIT:
+          filterReturn[QUERY_LIMIT] = queryKeys[QUERY_LIMIT];
+          log.d(mod, fun, `Limit: ${json.beautify(filterReturn[QUERY_LIMIT])}`)
+          break
+        case QUERY_OFFSET:
+          filterReturn[QUERY_OFFSET] = queryKeys[key];
+          log.d(mod, fun, `Offset: ${json.beautify(filterReturn[QUERY_OFFSET])}`)
+          break
+      }
+    } else if (modelProperties.includes(key)) {
+      log.d(mod, fun, `Key is a ${objectType} property: ${json.beautify(key)}`)
+      const val = queryParameters[key]
+      log.d(mod, fun, `Associated value: ${val}`)
+      log.d(mod, fun, `isObject: ${_.isObject(val)}`)
+      log.d(mod, fun, `_isString: ${_.isString(val)}`)
+      try {
+        const obj = JSON.parse(val)
+        log.d(mod, fun, `parsed String: ${json.beautify(obj)}`)
+        filterReturn[QUERY_FILTER][key] = obj
+      } catch (err) {
+        log.d(mod, fun, `can't parse: '${val}': ${err}}`)
+      }
+    } else {
+      log.d(mod, fun, `Key is unkown and ignored: ${json.beautify(key)}`)
+    }
+  })
+  log.d(mod, fun, `filterReturn: ${json.beautify(filterReturn)}`)
+
+  return filterReturn
+}
 
 async function newObject(objectType, objectData) {
   const fun = 'newObject'
@@ -269,10 +326,10 @@ exports.addSingleObject = async (req, reply) => {
 
     // Creating new object + specific treatments
     const createdObject = await newObject(objectType, rudiObject)
-    
+
     log.i(mod, fun, `${msg.objectAdded(objectType, rudiId)}`)
     return createdObject
-    
+
   } catch (err) {
     log.e(mod, fun, err)
     // reply.statusCode = 500
@@ -344,13 +401,50 @@ exports.getObjectList = async (req, reply) => {
     // accessing the objects
     let objectList
     if (!groupBy) {
-      const dbObjectList = await db.getObjectList(Model, limit, offset)
+      const dbObjectList = await db.getObjectList(Model, limit, offset, filter)
       // special treatments
       objectList = await treatDbObjectList(objectType, dbObjectList)
     } else {
       objectList = await getObjectListCount(objectType, Model, groupBy)
     }
     log.d(mod, fun, `objectList: ${json.beautify(objectList)}`)
+
+    return objectList
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw boom.boomify(err)
+  }
+}
+
+/** 
+ * Get several objects from a filter query
+ * => GET /{object}
+ */
+exports.getObjectListFiltered = async (req, reply) => {
+  const fun = 'getObjectListFiltered'
+  log.v(mod, fun, `< GET ${URL_OBJECT}/${URL_ACTION_FILTER}`)
+  try {
+    // retrieve url parameter: object type
+    const objectType = json.accessReqParam(req, PARAM_OBJECT)
+
+    /* beautify ignore:start */
+    // identify object model
+    const {Model, idField} = db.getObjectAccesses(objectType)
+    /* beautify ignore:end */
+
+    const queryParameters = url.parse(req.url, true).query
+    const parsedParameters = parseQueryParameters(objectType, queryParameters)
+    log.d(mod, fun, json.beautify(`req.query: ${json.beautify(req.query)}`))
+
+    // accessing the objects
+
+    const limit = parsedParameters[QUERY_LIMIT]
+    const offset = parsedParameters[QUERY_OFFSET]
+    const filter = parsedParameters[QUERY_FILTER]
+    const dbObjectList = await db.getObjectList(Model, limit, offset, filter)
+    
+    // special treatments
+    const objectList = await treatDbObjectList(objectType, dbObjectList)
 
     return objectList
   } catch (err) {

@@ -5,8 +5,9 @@
   "description": "RUDI proxi for producer nodes",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --ignore logs/ --ignore package-lock.json -e js,ini --exec \"npm run rudiapp\"",
+    "start": "nodemon -e js,ini --exec \"npm run rudiapp\"",
     "rudiapp": "npm install && node rudiServer.js",
+    "devstart": "./node_modules/nodemon/bin/nodemon.js ./rudiserver.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

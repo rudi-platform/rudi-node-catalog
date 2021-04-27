@@ -39,6 +39,7 @@ const {
   URL_LICENCE_CODES_ACCESS,
   URL_LICENCE_SUFFIX,
   PARAM_LOGS_LINES,
+  URL_ACTION_FILTER,
 } = require('../config/confApi')
 
 //---------------------------------------------------------------
@@ -111,7 +112,13 @@ exports.publicRoutes = [
     // preHandler: logRequest,
     handler: genericController.getObjectList,
   },
-  // Get 1
+  // Filter
+  {
+    method: 'GET',
+    url: `${URL_OBJECT}/${URL_ACTION_FILTER}`,
+    // preHandler: logRequest,
+    handler: genericController.getObjectListFiltered
+  }, // Get 1
   {
     method: 'GET',
     url: `${URL_OBJECT}/:${PARAM_ID}`,

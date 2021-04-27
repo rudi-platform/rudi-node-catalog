@@ -49,6 +49,7 @@ exports.URL_OBJECT_SKOS_CONCEPT = 'skos_concepts'
 
 exports.URL_ACTION_UUID_GEN = 'id_generation'
 exports.URL_ACTION_DELETION = 'deletion'
+exports.URL_ACTION_FILTER = 'filter'
 exports.URL_ACTION_REPORT = 'report'
 
 

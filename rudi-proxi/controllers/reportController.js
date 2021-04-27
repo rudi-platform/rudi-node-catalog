@@ -55,7 +55,10 @@ const {
 // Data models
 //---------------------------------------------------------------
 const Metadata = require('../definitions/models/Metadata');
-const {Report, IntegrationStatus} = require('../definitions/models/Report');
+const {
+  Report,
+  IntegrationStatus
+} = require('../definitions/models/Report');
 
 //---------------------------------------------------------------
 // Controllers: integration report for any object 
@@ -193,7 +196,7 @@ exports.getReportListForObject = async (req, reply) => {
 
     // get all reports for this object
     /* beautify ignore:start */
-    const dbReportList = await db.getObjectListFiltered(Report, {[API_REPORT_RESOURCE_ID]: urlObjectId}, limit, offset)
+    const dbReportList = await db.getObjectList(Report, limit, offset, {[API_REPORT_RESOURCE_ID]: urlObjectId})
     /* beautify ignore:end */
     return dbReportList
   } catch (err) {

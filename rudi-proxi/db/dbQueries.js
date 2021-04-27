@@ -130,6 +130,18 @@ exports.getObjectAccesses = (objectType) => {
   }
 }
 
+
+//---------------------------------------------------------------
+// Helper functions
+//---------------------------------------------------------------
+exports.modelProperties = (Model) => {
+  return Object.keys(Model.schema.paths)
+}
+
+exports.isProperty = (Model, prop) => {
+  return this.modelProperties(Model).includes(prop)
+}
+
 //---------------------------------------------------------------
 // Actions on DB tables
 //---------------------------------------------------------------
@@ -388,21 +400,6 @@ exports.getObjectList = async (Model, limit, offset, filter) => {
     log.d(mod, fun, `limit: ${limit}, offset: ${offset}, filter: ${filter}`)
 
     const objectList = await Model.find(filter).limit(limit).skip(offset)
-    return objectList
-  } catch (err) {
-    log.e(mod, fun, err)
-    throw err
-  }
-}
-
-exports.getObjectListFiltered = async (Model, filter, limit, offset) => {
-  const fun = `getObjectListFiltered`
-  try {
-    limit = limit || QUERY_LIMIT_DEFAULT
-    offset = offset || QUERY_OFFSET_DEFAULT
-    log.d(mod, fun, `limit: ${limit}, offset: ${offset}, filter: ${json.beautify(filter)}`)
-    const objectList = await Model.find(filter).limit(limit).skip(offset)
-    log.d(mod, fun, `found: ${json.beautify(objectList)}`)
     return objectList
   } catch (err) {
     log.e(mod, fun, err)
