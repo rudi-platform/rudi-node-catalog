@@ -54,7 +54,9 @@ const {
 //---------------------------------------------------------------
 // Data models
 //---------------------------------------------------------------
-const Metadata = require('../definitions/models/Metadata');
+const {
+  Metadata
+} = require('../definitions/models/Metadata');
 const {
   Report,
   IntegrationStatus

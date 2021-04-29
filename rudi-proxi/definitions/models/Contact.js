@@ -3,10 +3,16 @@
 //---------------------------------------------------------------
 // External dependancies
 //---------------------------------------------------------------
+const _ = require('lodash')
+const mongoose = require('mongoose');
+
+
+//---------------------------------------------------------------
+// Internal dependancies
+//---------------------------------------------------------------
 const {
-  toLower
-} = require('lodash')
-const mongoose = require('mongoose')
+  FIELDS_TO_SKIP
+} = require('../../db/dbFields');
 
 const ids = require('../schemas/Identifiers')
 const Validation = require('../schemaValidators')
@@ -65,13 +71,7 @@ const ContactSchema = new mongoose.Schema({
 
 //----- toJSON cleanup
 ContactSchema.methods.toJSON = function () {
-  var obj = this.toObject()
-  delete obj._id
-  delete obj.__v
-  delete obj.createdAt
-  delete obj.updatedAt
-  delete obj.publishedAt
-  return obj
+  return _.omit(this.toObject(), FIELDS_TO_SKIP)
 };
 
 //---------------------------------------------------------------

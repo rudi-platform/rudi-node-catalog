@@ -4,12 +4,18 @@
 // External dependancies
 //---------------------------------------------------------------
 const mongoose = require('mongoose');
+const _ = require('lodash');
+
 
 //---------------------------------------------------------------
 // Internal dependancies
 //---------------------------------------------------------------
 const ids = require('../schemas/Identifiers');
 const Validation = require('../schemaValidators');
+
+const {
+  FIELDS_TO_SKIP
+} = require('../../db/dbFields');
 
 //---------------------------------------------------------------
 // Custom schema definition
@@ -56,14 +62,9 @@ const OrganizationSchema = new mongoose.Schema({
 
 //----- toJSON cleanup
 OrganizationSchema.methods.toJSON = function () {
-  var obj = this.toObject()
-  delete obj._id
-  delete obj.__v
-  delete obj.createdAt
-  delete obj.updatedAt
-  delete obj.publishedAt
-  return obj
+  return _.omit(this.toObject(), FIELDS_TO_SKIP)
 };
+
 
 //---------------------------------------------------------------
 // Exports

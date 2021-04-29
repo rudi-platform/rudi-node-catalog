@@ -45,6 +45,7 @@ const {
   QUERY_OFFSET_DEFAULT,
   QUERY_FILTER,
   QUERY_GROUP_BY,
+  QUERY_COUNT_BY,
   URL_ACTION_FILTER,
 } = require('../config/confApi')
 
@@ -63,17 +64,26 @@ const {
 } = require('../db/dbFields')
 
 
+const URL_OBJECTS = [
+  URL_OBJECT_METADATA,
+  URL_OBJECT_ORGANIZATIONS,
+  URL_OBJECT_CONTACTS,
+  URL_OBJECT_MEDIA,
+  URL_OBJECT_SKOS_CONCEPT,
+  URL_OBJECT_SKOS_SCHEME,
+  URL_ACTION_REPORT
+]
 //---------------------------------------------------------------
 // Models
 //---------------------------------------------------------------
 
-const Metadata = require('../definitions/models/Metadata');
 const Organization = require('../definitions/models/Organization');
 const Contact = require('../definitions/models/Contact');
 const Report = require('../definitions/models/Report');
 const SkosConcept = require('../definitions/models/SkosConcept');
 const SkosScheme = require('../definitions/models/SkosScheme');
 /* beautify ignore:start */
+const { Metadata } = require('../definitions/models/Metadata');
 const { Media, MediaFile, MediaSeries } = require('../definitions/models/Media');
 /* beautify ignore:end */
 
@@ -95,15 +105,17 @@ const QUERY_RESERVED_WORDS = [
 ]
 
 function parseQueryParameters(objectType, queryParameters) {
-  const fun = 'checkQueryParameters'
+  const fun = 'parseQueryParameters'
   log.d(mod, fun, `queryParameters: ${json.beautify(queryParameters)}`)
   // identify object model
   /* beautify ignore:start */
   const {Model, idField} = db.getObjectAccesses(objectType)
   /* beautify ignore:end */
-  const modelProperties = db.modelProperties(Model)
+  const modelProperties = db.modelPropertyList(Model)
 
   const queryKeys = Object.keys(queryParameters)
+  log.d(mod, fun, `queryKeys: ${json.beautify(queryKeys)}`)
+
   let filterReturn = {}
   filterReturn[QUERY_LIMIT] = QUERY_LIMIT_DEFAULT;
   filterReturn[QUERY_OFFSET] = QUERY_OFFSET_DEFAULT;
@@ -111,14 +123,14 @@ function parseQueryParameters(objectType, queryParameters) {
 
   queryKeys.map(key => {
     if (QUERY_RESERVED_WORDS.includes(key)) {
-      log.d(mod, fun, `Key is a reserved word: ${json.beautify(key)}`)
+      log.d(mod, fun, `Key is a reserved word: ${json.beautify(key)} => ${json.beautify(queryParameters[key])}`)
       switch (key) {
         case QUERY_LIMIT:
-          filterReturn[QUERY_LIMIT] = queryKeys[QUERY_LIMIT];
+          filterReturn[QUERY_LIMIT] = parseInt(queryParameters[key]);
           log.d(mod, fun, `Limit: ${json.beautify(filterReturn[QUERY_LIMIT])}`)
           break
         case QUERY_OFFSET:
-          filterReturn[QUERY_OFFSET] = queryKeys[key];
+          filterReturn[QUERY_OFFSET] = parseInt(queryParameters[key]);
           log.d(mod, fun, `Offset: ${json.beautify(filterReturn[QUERY_OFFSET])}`)
           break
       }
@@ -144,11 +156,15 @@ function parseQueryParameters(objectType, queryParameters) {
   return filterReturn
 }
 
+function checkIsUrlObject(objectType) {
+  if (URL_OBJECTS.indexOf(objectType) == -1) throw new Error(msg.objectTypeNotFound(objectType))
+}
 async function newObject(objectType, objectData) {
   const fun = 'newObject'
-  log.d(mod, fun, `objectType: ${objectType}`)
-  log.d(mod, fun, `incoming objectData: ${json.beautify(objectData)}`)
+
   try {
+    checkIsUrlObject(objectType)
+
     switch (objectType) {
       case URL_OBJECT_METADATA:
         return await metadataController.newMetadata(objectData)
@@ -175,41 +191,77 @@ async function newObject(objectType, objectData) {
   }
 }
 
+async function getObjectListCount(objectType, countBy, limit, offset) {
+  const fun = 'getObjectListCount'
+  log.d(mod, fun, `objectType: ${objectType}`)
+  try {
+    checkIsUrlObject(objectType)
+
+    /* beautify ignore:start */
+    const {Model, idField} = db.getObjectAccesses(objectType)
+    /* beautify ignore:end */
+
+    if (!db.isProperty(Model, countBy)) {
+      const errMsg = `Field ${countBy} is not a property for type '${(objectType)}'`
+      log.e(mod, fun, errMsg)
+      throw newError(errMsg)
+    }
+
+    if (objectType == URL_OBJECT_METADATA)
+      return await metadataController.getObjectListCount(countBy, limit, offset)
+
+    return await db.getObjectListCount(Model, countBy, limit, offset)
+
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
+}
+
+async function getObjectListGroup(objectType, groupBy, limit, offset) {
+  const fun = 'getObjectListGroup'
+  log.d(mod, fun, `objectType: ${objectType}`)
+  try {
+    checkIsUrlObject(objectType)
+
+    /* beautify ignore:start */
+    const {Model, idField} = db.getObjectAccesses(objectType)
+    /* beautify ignore:end */
+
+    if (!db.isProperty(Model, groupBy))
+      throw new Error(`Field '${groupBy}' is not a property for objects of type '${(objectType)}'`)
+
+    if (objectType == URL_OBJECT_METADATA)
+      return await metadataController.getObjectListGroup(groupBy, limit, offset)
+
+    return await db.getObjectListGroup(objectType, groupBy, limit, offset)
+
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
+}
+
 async function editObject(objectType, editedObjectData) {
   const fun = 'editObject'
-  log.d(mod, fun, `objectType: ${objectType}`)
-  log.d(mod, fun, `incoming objectData: ${json.beautify(editedObjectData)}`)
+  log.d(mod, fun, ``)
+  checkIsUrlObject(objectType)
+
   let dbReadyObject
-  switch (objectType) {
-    case URL_OBJECT_METADATA:
-      dbReadyObject = await metadataController.updateMetadata(editedObjectData)
-      break
-    case URL_OBJECT_ORGANIZATIONS:
-    case URL_OBJECT_CONTACTS:
-    case URL_OBJECT_SKOS_CONCEPT:
-    case URL_OBJECT_SKOS_SCHEME:
-      /* beautify ignore:start */
-      const {Model, idField} = db.getObjectAccesses(objectType)
-      /* beautify ignore:end */
-      dbReadyObject = await db.updateObject(Model, idField, editedObjectData)
-      break
-    default:
-      throw new Error(msg.objectTypeNotFound(objectType))
-  }
-  return dbReadyObject
+  if (objectType == URL_OBJECT_METADATA) return await metadataController.updateMetadata(editedObjectData)
+
+  /* beautify ignore:start */
+  const {Model, idField} = db.getObjectAccesses(objectType)
+  /* beautify ignore:end */
+  return await db.updateObject(Model, idField, editedObjectData)
 }
 
 async function isDeletionPermitted(objectType, Model, objectToDelete) {
   const fun = 'isDeletionPermitted'
   log.d(mod, fun, `objectType: ${objectType}`)
+  checkIsUrlObject(objectType)
 
   switch (objectType) {
-    case URL_OBJECT_METADATA:
-    case URL_OBJECT_SKOS_CONCEPT:
-    case URL_ACTION_REPORT:
-    case URL_OBJECT_SKOS_SCHEME:
-      return true
-      break
     case URL_OBJECT_ORGANIZATIONS:
       return !(await db.isOrgUsedInMetadata(objectToDelete))
       break
@@ -217,9 +269,8 @@ async function isDeletionPermitted(objectType, Model, objectToDelete) {
       return !(await db.isContactUsedInMetadata(objectToDelete))
       break
     default:
-      throw new Error(msg.objectTypeNotFound(objectType))
+      return true
   }
-  return actionResult
 }
 
 exports.setPublishedFlag = async (dbObject) => {
@@ -253,6 +304,7 @@ async function treatDbObject(objectType, dbObject) {
 
 async function treatDbObjectList(objectType, dbObjectList) {
   const fun = 'treatDbObjectList'
+  log.d(mod, fun, ``)
   // log.d(mod, fun, `objectType: ${objectType}\nobjectData: ${json.beautify(rudiObjectList)}`)
 
   switch (objectType) {
@@ -276,24 +328,6 @@ async function treatDbObjectList(objectType, dbObjectList) {
   }
 }
 
-async function getObjectListCount(objectType, Model, groupBy) {
-  switch (objectType) {
-    case URL_OBJECT_METADATA:
-      const rudiMetadataList = await metadataController.getObjectListCount(groupBy)
-      return rudiMetadataList
-      break;
-    case URL_OBJECT_SKOS_CONCEPT:
-    case URL_OBJECT_SKOS_SCHEME:
-    case URL_OBJECT_ORGANIZATIONS:
-    case URL_OBJECT_CONTACTS:
-    case URL_OBJECT_MEDIA:
-    case URL_ACTION_REPORT:
-      return db.getObjectListCount(Model, groupBy)
-      break;
-    default:
-      throw new Error(msg.objectTypeNotFound(objectType))
-  }
-}
 //---------------------------------------------------------------
 // Controllers
 //---------------------------------------------------------------
@@ -317,7 +351,7 @@ exports.addSingleObject = async (req, reply) => {
     /* beautify ignore:end */
 
     // retrieving the id
-    log.d(mod, fun, `objectType: '${objectType}', incomingData: '${json.beautify(rudiObject)}' `)
+    // log.d(mod, fun, `objectType: '${objectType}', incomingData: '${json.beautify(rudiObject)}' `)
     const rudiId = json.accessProperty(rudiObject, idField)
 
     // First: we make sure object doesn't exist already
@@ -360,14 +394,19 @@ exports.getSingleObject = async (req, reply) => {
     // log.d(mod, fun, `objectType: '${objectType}', idFieldLabel: '${idFieldLabel}' `)
 
     // ensure the object exists
-    const dbObject = await db.getEnsuredObjectWithRudiId(objectType, Model, idField, objectId)
-    log.d(mod, fun, `dbObject: ${json.beautify(dbObject)}`)
+    let dbObject
+    if (objectType == URL_OBJECT_METADATA) {
+      dbObject = await db.getEnsuredMetadataWithRudiId(objectId)
+    } else {
+      dbObject = await db.getEnsuredObjectWithRudiId(objectType, Model, idField, objectId)
+    }
+    // log.d(mod, fun, `dbObject: ${json.beautify(dbObject)}`)
 
     // special treatments
-    const refinedObject = await treatDbObject(objectType, dbObject)
+    // const refinedObject = await treatDbObject(objectType, dbObject)
 
     // return the object
-    return refinedObject
+    return dbObject
   } catch (err) {
     log.e(mod, fun, err)
     throw boom.boomify(err)
@@ -397,17 +436,24 @@ exports.getObjectList = async (req, reply) => {
     const offset = parseInt(req.query[QUERY_OFFSET]) || QUERY_OFFSET_DEFAULT
     const filter = req.query[QUERY_FILTER]
     const groupBy = req.query[QUERY_GROUP_BY]
+    const countBy = req.query[QUERY_COUNT_BY]
 
     // accessing the objects
     let objectList
-    if (!groupBy) {
-      const dbObjectList = await db.getObjectList(Model, limit, offset, filter)
+    if (!countBy && !groupBy) {
+      if (objectType == URL_OBJECT_METADATA) {
+        objectList = await db.getMetadataList(limit, offset, filter)
+      } else {
+        objectList = await db.getObjectList(Model, limit, offset, filter)
+      }
       // special treatments
-      objectList = await treatDbObjectList(objectType, dbObjectList)
-    } else {
-      objectList = await getObjectListCount(objectType, Model, groupBy)
+      // objectList = await treatDbObjectList(objectType, dbObjectList)
+    } else if (!!groupBy) {
+      objectList = await getObjectListGroup(objectType, groupBy, limit, offset)
+    } else { // if( !!countBy) {
+      objectList = await getObjectListCount(objectType, countBy, limit, offset)
     }
-    log.d(mod, fun, `objectList: ${json.beautify(objectList)}`)
+    // log.d(mod, fun, `objectList: ${json.beautify(objectList)}`)
 
     return objectList
   } catch (err) {
@@ -441,12 +487,13 @@ exports.getObjectListFiltered = async (req, reply) => {
     const limit = parsedParameters[QUERY_LIMIT]
     const offset = parsedParameters[QUERY_OFFSET]
     const filter = parsedParameters[QUERY_FILTER]
-    const dbObjectList = await db.getObjectList(Model, limit, offset, filter)
-    
-    // special treatments
-    const objectList = await treatDbObjectList(objectType, dbObjectList)
 
-    return objectList
+    if (objectType == URL_OBJECT_METADATA) {
+      return await db.getMetadataList(limit, offset, filter)
+    } else {
+      return await db.getObjectList(Model, limit, offset, filter)
+    }
+
   } catch (err) {
     log.e(mod, fun, err)
     throw boom.boomify(err)
@@ -470,7 +517,7 @@ exports.updateSingleObject = async (req, reply) => {
     // retrieve incoming data
     const {...incomingPartialRudiObject} = req.body
     /* beautify ignore:end */
-    log.d(mod, fun, `incomingPartialRudiObject: ${json.beautify(incomingPartialRudiObject)}`)
+    // log.d(mod, fun, `incomingPartialRudiObject: ${json.beautify(incomingPartialRudiObject)}`)
 
     // retrieve url parameters: object type, object id
     const rudiId = json.accessProperty(req.body, idField)
@@ -518,19 +565,11 @@ exports.deleteSingleObject = async (req, reply) => {
 
     // TODO: if SkosScheme: delete all SkosConcepts that reference it
     // TODO: if SkosConcept: update all other SkosConcepts that reference it (parents/children/siblings/relatives)
-    const deletedObject = await db.deleteObject(Model, idField, objectRudiId)
-    // return: dbToRudi?
-    let returnedObject = deletedObject
     if (objectType == URL_OBJECT_METADATA) {
-      try {
-        returnedObject = metadataController.dbMetadataToRudi(deletedObject)
-      } catch (err) {
-        log.w(err)
-      }
-
+      return await db.deleteMetadata(objectRudiId)
+    } else {
+      return await db.deleteObject(Model, idField, objectRudiId)
     }
-
-    return returnedObject
   } catch (err) {
     log.e(mod, fun, err)
     throw boom.boomify(err)

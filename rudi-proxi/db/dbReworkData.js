@@ -41,7 +41,9 @@ const {
 //---------------------------------------------------------------
 // Data models
 //---------------------------------------------------------------
-const Metadata = require('../definitions/models/Metadata')
+/* beautify ignore:start */
+const { Metadata } = require('../definitions/models/Metadata');
+/* beautify ignore:end */
 const Organization = require('../definitions/models/Organization')
 const Contact = require('../definitions/models/Contact')
 

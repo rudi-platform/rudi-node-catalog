@@ -5,13 +5,22 @@
 //---------------------------------------------------------------
 const mongoose = require('mongoose');
 const Int32 = require('mongoose-int32');
+const _ = require('lodash');
 
+
+//---------------------------------------------------------------
+// Internal dependancies
+//---------------------------------------------------------------
 const Ids = require('../schemas/Identifiers');
 const Validation = require('../schemaValidators');
 
 const Encodings = require('../thesaurus/Encodings');
 const FileTypes = require('../thesaurus/FileTypes');
 const HashAlgorithms = require('../thesaurus/HashAlgorithms');
+
+const {
+  FIELDS_TO_SKIP
+} = require('../../db/dbFields')
 
 //---------------------------------------------------------------
 // Constants
@@ -29,7 +38,7 @@ const UpdateStatus = [
   'obsolete', // dataset that is too old but cannot be updated or replaced with another
 ];
 
-const options = {
+const commonSchemaOptions = {
   discriminatorKey: 'media_type',
   timestamps: true,
   id: false,
@@ -62,7 +71,7 @@ const MediaSchema = new mongoose.Schema({
     // a known manner
     interface_contract: String
   },
-}, options);
+}, commonSchemaOptions);
 
 //---------------------------------------------------------------
 // File schema definition
@@ -121,7 +130,7 @@ const FileSchema = new mongoose.Schema({
     enum: Object.values(UpdateStatus)
   },
 
-}, options);
+}, commonSchemaOptions);
 
 //---------------------------------------------------------------
 // Series schema definition
@@ -165,7 +174,7 @@ const SeriesSchema = new mongoose.Schema({
     minimum: 0
   },
 
-}, options);
+}, commonSchemaOptions);
 
 //---------------------------------------------------------------
 // Schema refinements
@@ -175,12 +184,7 @@ const SeriesSchema = new mongoose.Schema({
 [MediaSchema, FileSchema, SeriesSchema]
 .map(mediaType =>
   mediaType.methods.toJSON = function () {
-    var obj = this.toObject()
-    delete obj._id
-    delete obj.__v
-    delete obj.createdAt
-    delete obj.updatedAt
-    return obj
+    return _.omit(this.toObject(), FIELDS_TO_SKIP)
   })
 
 
@@ -188,7 +192,6 @@ const SeriesSchema = new mongoose.Schema({
 // Models definition
 //---------------------------------------------------------------
 const Media = mongoose.model('Media', MediaSchema)
-
 const MediaFile = Media.discriminator(MediaTypes.File, FileSchema)
 const MediaSeries = Media.discriminator(MediaTypes.Series, SeriesSchema)
 

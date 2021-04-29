@@ -49,7 +49,7 @@ const {
   API_METAINFO_PROVIDER_PROPERTY,
   API_METAINFO_CONTACTS_PROPERTY,
   API_METAINFO_DATES_PROPERTY,
-
+  FIELDS_TO_POPULATE
 } = require('../db/dbFields')
 
 const {
@@ -58,21 +58,23 @@ const {
   URL_OBJECT_ORGANIZATIONS,
   URL_OBJECT_CONTACTS,
   URL_OBJECT_MEDIA,
-  URL_OBJECT_METADATA
+  URL_OBJECT_METADATA,
+  QUERY_OFFSET_DEFAULT,
+  QUERY_LIMIT_DEFAULT
 } = require('../config/confApi')
+
+
 
 //---------------------------------------------------------------
 // Data models
 //---------------------------------------------------------------
-const Metadata = require('../definitions/models/Metadata')
 const Organization = require('../definitions/models/Organization')
 const Contact = require('../definitions/models/Contact');
-const {
-  Media,
-  MediaFile,
-  MediaSeries,
-  MediaTypes
-} = require('../definitions/models/Media');
+/* beautify ignore:start */
+const { Metadata } = require('../definitions/models/Metadata');
+const { Media, MediaFile, MediaSeries, MediaTypes } = require('../definitions/models/Media');
+/* beautify ignore:end */
+
 
 //---------------------------------------------------------------
 // Controllers
@@ -145,22 +147,8 @@ exports.mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFound) 
       if (!shouldCreateIfNotFound) throw new Error(`${msg.objectNotFound(URL_OBJECT_MEDIA, rudiId)}`)
 
       // log.d(mod, fun, `rudiMedia[API_MEDIA_TYPE_PROPERTY]: ${json.beautify(rudiMedia[API_MEDIA_TYPE_PROPERTY])}`)
-      let media
-      switch (rudiMedia[API_MEDIA_TYPE_PROPERTY]) {
-        case MediaTypes.File:
-          log.d(mod, fun, `new MediaFile`)
-          media = await new MediaFile(rudiMedia)
-          break;
-        case MediaTypes.Series:
-          log.d(mod, fun, `new MediaSeries`)
-          media = await new MediaSeries(rudiMedia)
-          break;
-        default:
-          const errMsg = `'${rudiMedia[API_MEDIA_PROPERTY]}' is not a recognized Media type`
-          log.e(mod, fun, errMsg)
-          throw new Error(errMsg)
-      }
-      log.d(mod, fun, `new media: ${json.beautify(media)}`)
+      let media = new Media(rudiMedia)
+      log.d(mod, fun, `new Media: ${json.beautify(media)}`)
 
       // log.d(mod, fun, media)
       const dbActionResult = await media.save();
@@ -176,83 +164,13 @@ exports.mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFound) 
   return mediaDbIds
 }
 
-exports.setCreateDateInRudiObject = async (rudiMetadata, createDate) => {
-  const fun = 'setCreateDateInRudiObject'
-  log.d(mod, fun, ``)
-  if (null == rudiMetadata) throw new Error(`${msg.parameterExpected(fun, 'rudiMetadata')}`)
-  if (null == createDate) createDate == utils.nowISO()
-  /* 
-    let metaInfo = json.accessProperty(rudiMetadata, API_METAINFO_PROPERTY)
-    let metaInfoDates = json.accessProperty(rudiMetadata, API_METAINFO_DATES_PROPERTY)
-    let metaInfoDateCreated = json.accessProperty(rudiMetadata, API_METAINFO_DATES_CREATED_PROPERTY)
-   */
-
-  // TODO: check if create date already set?
-  rudiMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_CREATED_PROPERTY] = createDate
-  return rudiMetadata
-}
-
-exports.getCreateDateInRudiObject = async (rudiMetadata) => {
-  const fun = 'getCreateDateInRudiObject'
-  log.d(mod, fun, ``)
-  if (null == rudiMetadata) throw new Error(`${msg.parameterExpected(fun, 'rudiMetadata')}`)
-  /* 
-    let metaInfo = json.accessProperty(rudiMetadata, API_METAINFO_PROPERTY)
-    let metaInfoDates = json.accessProperty(rudiMetadata, API_METAINFO_DATES_PROPERTY)
-    let metaInfoDateCreated = json.accessProperty(rudiMetadata, API_METAINFO_DATES_CREATED_PROPERTY)
-   */
-  let metaInfo = json.accessProperty(rudiMetadata, API_METAINFO_PROPERTY)
-  return (!metaInfo[API_METAINFO_DATES_PROPERTY]) ? undefined :
-    rudiMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_CREATED_PROPERTY]
-
-}
-
-exports.setEditDateInRudiObject = async (rudiMetadata, editDate) => {
-  const fun = 'setEditDateInRudiObject'
-  log.d(mod, fun, ``)
-  try {
-    if (null == rudiMetadata) throw new Error(`${msg.parameterExpected(fun, 'rudiMetadata')}`)
-    if (null == editDate) editDate == utils.nowISO()
-
-    /* 
-      let metaInfo = json.accessProperty(rudiMetadata, API_METAINFO_PROPERTY)
-      let metaInfoDates = json.accessProperty(rudiMetadata, API_METAINFO_DATES_PROPERTY)
-      let metaInfoDateCreated = json.accessProperty(rudiMetadata, API_METAINFO_DATES_CREATED_PROPERTY)
-     */
-
-    rudiMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_EDITED_PROPERTY] = editDate
-    return rudiMetadata
-  } catch (err) {
-    log.e(mod, fun, err)
-    throw err
-  }
-}
-
-exports.getDbCreateDateWithRudiId = async (rudiId) => {
-  const fun = 'getDbCreateDateFromRudiId'
-  log.d(mod, fun, ``)
-  try {
-    if (null == rudiId) throw new Error(`${msg.parameterExpected(fun, 'rudiId')}`)
-    /* 
-      let metaInfo = json.accessProperty(rudiMetadata, API_METAINFO_PROPERTY)
-      let metaInfoDates = json.accessProperty(rudiMetadata, API_METAINFO_DATES_PROPERTY)
-      let metaInfoDateCreated = json.accessProperty(rudiMetadata, API_METAINFO_DATES_CREATED_PROPERTY)
-     */
-    const rudiMetadata = db.getEnsuredMetadataWithRudiId(rudiId)
-    return rudiMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_CREATED_PROPERTY]
-  } catch (err) {
-    log.e(mod, fun, err)
-    throw err
-  }
-}
-
 function customMerger(a, b) {
   return _.isArray(b) ? b : undefined
 }
 
 // Parameter 'dbMetadata' gets mutated!
-function metadataMerge(dbMetadata, dbReadyModMetadata) {
-  const fun = 'metadataMerge'
+function metadataCustomMerge(dbMetadata, dbReadyModMetadata) {
+  const fun = 'metadataCustomMerge'
   log.d(mod, fun, ``)
   // log.d(mod, fun, `dbMetadata: ${json.beautify(dbMetadata)}`)
 
@@ -273,48 +191,53 @@ function metadataMerge(dbMetadata, dbReadyModMetadata) {
   dbMetadata[API_DATA_DATES_PROPERTY] = dataDates
   dbMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY] = metaDates
 
-  log.d(mod, fun, `dbMetadata updated: ${json.beautify(dbMetadata)}`)
+  // log.d(mod, fun, `dbMetadata updated: ${json.beautify(dbMetadata)}`)
   return dbMetadata
 }
 
-exports.getObjectListCount = (groupBy) => {
-  const fun = 'getObjectListCount'
-  log.d(mod, fun, ``)
+function fieldModel(field) {
+  const fun = 'fieldModel'
+  log.d(mod, fun, `field: ${field}`)
 
-  const fields = groupBy.split('.')
-  log.d(mod, fun, `fields: ${json.beautify(fields)}`)
-
-  let CollectionFrom
-  let populateField
-  switch (fields[0]) {
+  switch (field) {
     case API_DATA_PRODUCER_PROPERTY:
-      CollectionFrom = Organization;
-      populateField = API_DATA_PRODUCER_PROPERTY;
+    case `${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`:
+      return Organization
       break;
     case API_DATA_CONTACTS_PROPERTY:
-      CollectionFrom = Contact;
-      populateField = API_DATA_CONTACTS_PROPERTY;
+    case `${API_METAINFO_PROPERTY}.${API_METAINFO_CONTACTS_PROPERTY}`:
+      return Contact
       break;
-    case API_METAINFO_PROPERTY:
-      switch (fields[1]) {
-        case API_METAINFO_PROVIDER_PROPERTY:
-          CollectionFrom = Organization;
-          populateField = `${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`;
-          break;
-        case API_METAINFO_CONTACTS_PROPERTY:
-          CollectionFrom = Contact;
-          populateField = `${API_METAINFO_PROPERTY}.${API_METAINFO_CONTACTS_PROPERTY}`;
-          break;
-        default:
-          return db.getObjectListCount(Metadata, groupBy)
-      }
+    case `${API_MEDIA_PROPERTY}`:
+      return Media
       break;
     default:
-      return db.getObjectListCount(Metadata, groupBy)
+      return null
   }
-
-  return db.getObjectListCountWithLookup(Metadata, CollectionFrom, populateField)
 }
+
+exports.getObjectListGroup = async (groupBy, limit, offset) => {
+  const fun = 'getObjectListGroup'
+  log.d(mod, fun, `groupByField: ${groupBy}`)
+  try {
+    return await db.getObjectListGroup(URL_OBJECT_METADATA, groupBy, fieldModel(groupBy), limit, offset)
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
+}
+
+exports.getObjectListCount = async (countBy, limit, offset) => {
+  const fun = 'getObjectListCount'
+  log.d(mod, fun, `countByField: ${countBy}`)
+  try {
+    return await db.getObjectListCount(Metadata, countBy, fieldModel(countBy), limit, offset)
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
+}
+
 //---------------------------------------------------------------
 // Atomic treatments of properties: DB -> RUDI
 //---------------------------------------------------------------
@@ -471,7 +394,7 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
 //---------------------------------------------------------------
 
 exports.dbMetadataToRudi = async (dbMetadata) => {
-  const fun = 'dbToRudiMetadata'
+  const fun = 'dbMetadataToRudi'
   log.d(mod, fun, ``)
 
   // log.d(mod, fun, `dbMetadata: ${json.beautify(dbMetadata)}`)
@@ -548,7 +471,7 @@ exports.newMetadata = async (rudiMetadata) => {
   // Special update for metadataInfo.referenceDates: update 'createdDate' 
   // this.setCreateDateInRudiObject(dbReadyObject)
 
-  log.d(mod, fun, `DB ready object: ${json.beautify(dbReadyObject)}`)
+  // log.d(mod, fun, `DB ready object: ${json.beautify(dbReadyObject)}`)
 
   let dbMetadata
   try {
@@ -558,12 +481,13 @@ exports.newMetadata = async (rudiMetadata) => {
     throw err
   }
   try {
-    await dbMetadata.save()
+    await (await dbMetadata.save())
   } catch (err) {
     log.w(mod, fun, `Saving object '${URL_OBJECT_METADATA}': ${json.beautify(dbMetadata)} | Error: ${err}`)
     throw err
   }
-  return this.dbMetadataToRudi(dbMetadata)
+  return dbMetadata
+  // return this.dbMetadataToRudi(dbMetadata)
 }
 
 // parameter incomingRudiMetadata can be partial metadata
@@ -576,21 +500,20 @@ exports.updateMetadata = async (incomingRudiMetadata) => {
 
   // ensure the metadata already exist
   const rudiId = json.accessProperty(incomingRudiMetadata, API_METADATA_ID)
-  let dbMetadata = await db.getEnsuredMetadataWithRudiId(rudiId)
+  // // let dbMetadata = await db.getEnsuredMetadataWithRudiId(rudiId) // No => no populate please !
+  let dbMetadata = await db.getEnsuredObjectWithRudiId(URL_OBJECT_METADATA, Metadata, API_METADATA_ID, rudiId)
   log.v(mod, fun, `corresponding db object: ${json.beautify(dbMetadata)}\n`)
 
   let dbReadyEditedMetadata = await this.rudiToDbFormat(incomingRudiMetadata)
-  log.v(mod, fun, `dbReadyEditedMetadata: ${json.beautify(dbReadyEditedMetadata)}\n`)
+  // log.v(mod, fun, `dbReadyEditedMetadata: ${json.beautify(dbReadyEditedMetadata)}\n`)
 
   // Backing up existing dates ('dataset_dates' and 'metadata_info.meadatada_dates' properties)
 
-  metadataMerge(dbMetadata, dbReadyEditedMetadata)
+  metadataCustomMerge(dbMetadata, dbReadyEditedMetadata)
 
   log.d(mod, fun, `modified metadata: ${json.beautify(dbMetadata)}`)
 
-  dbMetadata.save()
-
-  return this.dbMetadataToRudi(dbMetadata)
+  return await dbMetadata.save()
   /* 
 
   // Updating 'dataset_dates' field with changed ones while keeping other dates

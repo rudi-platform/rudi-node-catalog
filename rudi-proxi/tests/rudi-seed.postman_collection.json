@@ -462,6 +462,8 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
+									"pm.collectionVariables.set('seedLastMetaId', rand.get('{{$randomUUID}}'))",
+									"",
 									"//————— Thesauri",
 									"pm.collectionVariables.set('randomTheme', utils.randomPick('themes'));",
 									"pm.collectionVariables.set('randomKeyword1', utils.randomPick('keywords'));",
@@ -514,7 +516,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"global_id\": \"{{$randomUUID}}\",\n    \"resource_title\": \"{{randomTitle}}\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{randomSynopsis}}\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{randomSummary}}\"\n        }\n    ],\n    \"theme\": \"{{randomTheme}}\",\n    \"keywords\": [\"{{randomKeyword1}}\", \"{{randomKeyword2}}\"],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"{{$randomDatePast}}\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{randomOrg}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{randomContact1}}\"\n        },\n        {\n            \"contact_id\": \"{{randomContact2}}\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_provider\": {\n            \"organization_id\": \"{{randomOrg}}\"\n        }\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{$randomDateRecent}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\":{\n        \"licence\":{\n            \"licence_type\":\"STANDARD\",\n            \"licence_label\":\"licence_mit\"\n            \n        }\n    },\n    \"available_formats\": [\n        {\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{mediaId1}}\",\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.1.0\"\n            },\n            \"file_type\": \"application/json\",\n            \"file_size\": 59016,\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"4c9ee0f14e835927a1bbafde0eb89fb3\"\n            }\n        }\n    ]\n}",
+							"raw": "{\n    \"global_id\": \"{{seedLastMetaId}}\",\n    \"resource_title\": \"{{randomTitle}}\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{randomSynopsis}}\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{randomSummary}}\"\n        }\n    ],\n    \"theme\": \"{{randomTheme}}\",\n    \"keywords\": [\"{{randomKeyword1}}\", \"{{randomKeyword2}}\"],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"{{$randomDatePast}}\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{randomOrg}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{randomContact1}}\"\n        },\n        {\n            \"contact_id\": \"{{randomContact2}}\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_provider\": {\n            \"organization_id\": \"{{randomOrg}}\"\n        },\n        \"contacts\":[{\"contact_id\":\"{{randomContact2}}\"}]\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{$randomDateRecent}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\":{\n        \"licence\":{\n            \"licence_type\":\"STANDARD\",\n            \"licence_label\":\"licence_mit\"\n            \n        }\n    },\n    \"available_formats\": [\n        {\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{$randomUUID}}\",\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.1.0\"\n            },\n            \"file_type\": \"application/json\",\n            \"file_size\": 59016,\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"4c9ee0f14e835927a1bbafde0eb89fb3\"\n            }\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -540,7 +542,7 @@
 			"name": "Checks",
 			"item": [
 				{
-					"name": "Count metadata",
+					"name": "Count metadata (producer)",
 					"event": [
 						{
 							"listen": "test",
@@ -558,7 +560,81 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?group_by=metadata_info.api_version",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?count_by=producer",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}"
+							],
+							"query": [
+								{
+									"key": "count_by",
+									"value": "producer"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Count metadata (api version)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"2 metadata created\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?count_by=metadata_info.api_version",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}"
+							],
+							"query": [
+								{
+									"key": "count_by",
+									"value": "metadata_info.api_version"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Group metadata",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Group by api_version\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?group_by=metadata_info.api_version&limit=10",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -570,6 +646,10 @@
 								{
 									"key": "group_by",
 									"value": "metadata_info.api_version"
+								},
+								{
+									"key": "limit",
+									"value": "10"
 								}
 							]
 						}
@@ -577,7 +657,7 @@
 					"response": []
 				},
 				{
-					"name": "Count metadata",
+					"name": "Get all metadata filtered Copy",
 					"event": [
 						{
 							"listen": "test",
@@ -585,6 +665,8 @@
 								"exec": [
 									"pm.test(\"2 metadata created\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const metadataList = pm.response.json();",
+									"    console.log(metadataList.length);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -595,7 +677,63 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?group_by=producer",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/filter?limit=10&keywords={\"$in\":[\"population\",\"plu\"]}&temporal_spread.start_date={\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2021-05-28T23:24:51.000Z\"}&perlin=2346&resource_languages=\"fr\"",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}",
+								"filter"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "keywords",
+									"value": "{\"$in\":[\"population\",\"plu\"]}"
+								},
+								{
+									"key": "temporal_spread.start_date",
+									"value": "{\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2021-05-28T23:24:51.000Z\"}"
+								},
+								{
+									"key": "perlin",
+									"value": "2346"
+								},
+								{
+									"key": "resource_languages",
+									"value": "\"fr\""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get 10 metadata",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"2 metadata created\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const metadataList = pm.response.json();",
+									"    console.log(metadataList.length);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?limit=10",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -605,8 +743,81 @@
 							],
 							"query": [
 								{
-									"key": "group_by",
-									"value": "producer"
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get 1 metadata",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"2 metadata created\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const metadataList = pm.response.json();",
+									"    console.log(metadataList.length);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{seedLastMetaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}",
+								"{{seedLastMetaId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get 10 media",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"2 metadata created\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const metadataList = pm.response.json();",
+									"    console.log(metadataList.length);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{media}}?limit=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{media}}"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
 								}
 							]
 						}
@@ -779,6 +990,14 @@
 		},
 		{
 			"key": "randomOrgId",
+			"value": ""
+		},
+		{
+			"key": "randomMetaId",
+			"value": ""
+		},
+		{
+			"key": "seedLastMetaId",
 			"value": ""
 		}
 	]

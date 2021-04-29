@@ -5,6 +5,7 @@
 //---------------------------------------------------------------
 const mongoose = require('mongoose');
 const Int32 = require('mongoose-int32');
+const _ = require('lodash')
 
 //---------------------------------------------------------------
 // Internal dependancies
@@ -14,17 +15,19 @@ const ids = require('../schemas/Identifiers')
 const api = require('../../config/confApi')
 
 const Validation = require('../schemaValidators');
+const {
+  FIELDS_TO_SKIP
+} = require('../../db/dbFields');
 // const IntegrationStatus = require('../enums/IntegrationStatus')
 
 
 //---------------------------------------------------------------
 // Constants
 //---------------------------------------------------------------
-const IntegrationStatus = {
+exports.IntegrationStatus = {
   OK: 'OK',
   KO: 'KO'
 }
-
 
 //---------------------------------------------------------------
 // Custom schema definition: Report
@@ -63,7 +66,7 @@ const ReportSchema = new mongoose.Schema({
   // State of the integration of the resource in the Portal
   integration_status: {
     type: String,
-    enum: Object.values(IntegrationStatus),
+    enum: Object.values(this.IntegrationStatus),
   },
 
   // Comment on the state of the integration of the resource in the
@@ -98,24 +101,11 @@ const ReportSchema = new mongoose.Schema({
 
 //----- toJSON cleanup
 ReportSchema.methods.toJSON = function () {
-  var obj = this.toObject()
-  delete obj._id
-  delete obj.__v
-  delete obj.createdAt
-  delete obj.updatedAt
-  return obj
+  return _.omit(this.toObject(), FIELDS_TO_SKIP)
 };
 
 
 //---------------------------------------------------------------
 // Models definition
 //---------------------------------------------------------------
-const Report = mongoose.model('Report', ReportSchema)
-
-//---------------------------------------------------------------
-// Exports
-//---------------------------------------------------------------
-module.exports = {
-  Report,
-  IntegrationStatus
-}
+exports.Report = mongoose.model('Report', ReportSchema)

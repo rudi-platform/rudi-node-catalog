@@ -307,7 +307,7 @@ exports.setDbConceptRefs = async (rudiConcept, prop) => {
 
   const listConceptsReferences = rudiConcept[prop]
 
-  log.d(mod, fun, `listConceptsReferences: ${json.beautify(listConceptsReferences)}`)
+  // log.d(mod, fun, `listConceptsReferences: ${json.beautify(listConceptsReferences)}`)
   if (!listConceptsReferences) return
 
   let listRefs = []
@@ -368,7 +368,7 @@ exports.dbConceptToRudiRecursive = async (dbConcept) => {
   const fun = 'dbConceptToRudiRecursive'
   log.d(mod, fun, ``)
 
-  log.d(mod, fun, `dbConcept: ${json.beautify(dbConcept)}`)
+  // log.d(mod, fun, `dbConcept: ${json.beautify(dbConcept)}`)
   if (!dbConcept) return
 
   const rudiConcept = await dbConcept.populate({
@@ -390,7 +390,7 @@ exports.dbConceptToRudiRecursive = async (dbConcept) => {
 
   rudiConcept[API_CONCEPT_CHILDREN_PROPERTY] =
     await this.dbConceptListToRudiRecursive(rudiConcept[API_CONCEPT_CHILDREN_PROPERTY])
-  log.d(mod, fun, `rudiConcept: ${json.beautify(rudiConcept)}`)
+  // log.d(mod, fun, `rudiConcept: ${json.beautify(rudiConcept)}`)
 
   return rudiConcept
   // TODO: populate ref fileds ?
@@ -400,7 +400,7 @@ exports.dbConceptListToRudiRecursive = async (dbConceptList) => {
   const fun = 'dbConceptListToRudiRecursive'
   log.d(mod, fun, ``)
 
-  log.d(mod, fun, `dbConceptList: ${json.beautify(dbConceptList)}`)
+  // log.d(mod, fun, `dbConceptList: ${json.beautify(dbConceptList)}`)
   if (!dbConceptList) return
 
   let rudiConceptList = []

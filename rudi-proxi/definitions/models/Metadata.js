@@ -12,6 +12,7 @@ const {
 //---------------------------------------------------------------
 const boom = require('@hapi/boom')
 const mongoose = require('mongoose');
+const _ = require('lodash');
 
 const Int32 = require('mongoose-int32');
 
@@ -20,25 +21,36 @@ const Int32 = require('mongoose-int32');
 //---------------------------------------------------------------
 const db = require('../../db/dbQueries')
 const {
+  API_METADATA_ID,
   API_ORGANIZATION_ID,
   API_CONTACT_ID,
-  DB_ID,
-  API_METAINFO_PROPERTY,
-  API_METAINFO_DATES_PROPERTY,
-  API_DATES_CREATED_PROPERTY,
-  API_DATES_EDITED_PROPERTY,
-  API_DATES_PUBLISHED_PROPERTY,
-  API_METADATA_ID,
+  API_DATA_PRODUCER_PROPERTY,
+  API_DATA_CONTACTS_PROPERTY,
+
   API_METADATA_ACCESS_CONDITION,
   API_METADATA_LICENCE,
   API_METADATA_LICENCE_TYPE,
   API_METADATA_LICENCE_LABEL,
   API_METADATA_LICENCE_CUSTOM_LABEL,
   API_METADATA_LICENCE_CUSTOM_URI,
+
   API_METADATA_GEOGRAPHY_PROPERTY,
   API_METADATA_BBOX_PROPERTY,
   API_METADATA_PERIOD_PROPERTY,
   API_METADATA_START_DATE_PROPERTY,
+
+  API_METAINFO_PROPERTY,
+  API_METAINFO_CONTACTS_PROPERTY,
+  API_METAINFO_PROVIDER_PROPERTY,
+  API_METAINFO_DATES_PROPERTY,
+
+  API_DATES_CREATED_PROPERTY,
+  API_DATES_EDITED_PROPERTY,
+  API_DATES_PUBLISHED_PROPERTY,
+
+  API_MEDIA_PROPERTY,
+
+  FIELDS_TO_SKIP,
 } = require('../../db/dbFields');
 
 const log = require('../../utils/logging')
@@ -113,6 +125,9 @@ const TransmissionModes = {
   series: 'SERIES'
 };
 
+//---------------------------------------------------------------
+// Validators
+//---------------------------------------------------------------
 const validArrayNotNull = {
   validator: utils.isNotEmptyArray,
   message: `'{PATH}' property should not be empty`
@@ -121,6 +136,27 @@ const validObjectNotEmpty = {
   validator: utils.isNotEmptyObject,
   message: `'{PATH}' property should not be empty`
 }
+
+//---------------------------------------------------------------
+// Fields with specific treatments
+//---------------------------------------------------------------
+const FIELDS_TO_POPULATE = [
+  API_DATA_PRODUCER_PROPERTY,
+  API_DATA_CONTACTS_PROPERTY,
+  `${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`,
+  `${API_METAINFO_PROPERTY}.${API_METAINFO_CONTACTS_PROPERTY}`,
+  API_MEDIA_PROPERTY
+].join(' ');
+
+const SKIP_FIELDS = `-${FIELDS_TO_SKIP.join(' -')}`
+
+
+const POPULATE_OPTS = {
+  path: FIELDS_TO_POPULATE,
+  select: SKIP_FIELDS
+}
+
+
 //---------------------------------------------------------------
 // Custom schema definitions
 //---------------------------------------------------------------
@@ -298,7 +334,7 @@ const MetadataSchema = new mongoose.Schema({
 
     /**
      * Precise geographic distribution of the data   
-     */ 
+     */
     geographic_distribution: {
       type: mongoose.SchemaTypes.GeoJSON
     },
@@ -308,7 +344,7 @@ const MetadataSchema = new mongoose.Schema({
      */
     projection: {
       type: String,
-      enum: Object.values(Projection) 
+      enum: Object.values(Projection)
     },
 
     /** 
@@ -426,7 +462,7 @@ const MetadataSchema = new mongoose.Schema({
     metadata_dates: {
       validated: {
         type: Date
-      }, 
+      },
       deleted: {
         type: Date
       }
@@ -510,35 +546,13 @@ async function checkLicence(metadata) {
 
 }
 
-MetadataSchema.pre('save', async function (next) {
-  const fun = 'pre hook'
-  try {
-    let metadata = this
-    json.requireSubProperty(metadata, API_METADATA_GEOGRAPHY_PROPERTY, API_METADATA_BBOX_PROPERTY, next)
-    json.requireSubProperty(metadata, API_METADATA_PERIOD_PROPERTY, API_METADATA_START_DATE_PROPERTY, next)
-    await checkLicence(metadata)
-  } catch (err) {
-    next(err)
-  }
-  next()
-});
-
 //---------------------------------------------------------------
 // Schema refinements
 //---------------------------------------------------------------
 
 //----- toJSON cleanup
 MetadataSchema.methods.toJSON = function () {
-  var obj = this.toObject()
-  // metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_CREATED_PROPERTY] = metadata.createdAt
-  // metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY][API_DATES_EDITED_PROPERTY] = metadata.updatedAt
-  delete obj.id
-  delete obj._id
-  delete obj.__v
-  delete obj.createdAt
-  delete obj.updatedAt
-  delete obj.publishedAt
-  return obj
+  return _.omit(this.toObject(), FIELDS_TO_SKIP)
 };
 
 //----- Virtuals
@@ -553,7 +567,51 @@ MetadataSchema.virtual(`${API_METAINFO_PROPERTY}.${API_METAINFO_DATES_PROPERTY}.
 });
 
 
+MetadataSchema.pre('save', async function (next) {
+  const fun = 'pre save hook'
+  log.d(mod, fun, ``)
+  try {
+    let metadata = this
+    json.requireSubProperty(metadata, API_METADATA_GEOGRAPHY_PROPERTY, API_METADATA_BBOX_PROPERTY)
+    json.requireSubProperty(metadata, API_METADATA_PERIOD_PROPERTY, API_METADATA_START_DATE_PROPERTY)
+    await checkLicence(metadata)
+  } catch (err) {
+    next(err)
+  }
+  next()
+});
+
+MetadataSchema.post('save', async function (doc, next) {
+  const fun = 'post save hook'
+  log.d(mod, fun, ``)
+
+  try {
+    await this.populate(POPULATE_OPTS).execPopulate();
+  } catch (err) {
+    next(err)
+  }
+  next()
+});
+
+/* 
+MetadataSchema.post('find', async function (docs, next) {
+  const fun = 'post find hook'
+  log.d(mod, fun, ``)
+
+  try {
+    for (let doc of docs) {
+      // if (doc.isPublic) 
+      await doc.populate(POPULATE_OPTS).execPopulate();
+    }
+  } catch (err) {
+    next(err)
+  }
+  next()
+});
+ */
+
 //---------------------------------------------------------------
 // Exports
 //---------------------------------------------------------------
-module.exports = mongoose.model('Metadata', MetadataSchema);
+exports.Metadata = mongoose.model('Metadata', MetadataSchema);
+exports.METADATA_FIELDS_TO_POPULATE = FIELDS_TO_POPULATE

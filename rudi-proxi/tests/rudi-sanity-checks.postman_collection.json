@@ -6,7 +6,7 @@
 	},
 	"item": [
 		{
-			"name": "01. Check app online",
+			"name": "00. Check app online",
 			"item": [
 				{
 					"name": "Get app id",
@@ -116,75 +116,6 @@
 					"response": []
 				},
 				{
-					"name": "Get all thesauri",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Every thesaurus received\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    const listEnums = Object.keys(responseJson);",
-									"    pm.expect(listEnums.length).to.eq(8);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/enum",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{adminUrl}}",
-								"enum"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get thesaurus",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Every thesaurus received\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    const listEnums = Object.keys(responseJson);",
-									"    pm.expect(listEnums.length).to.eq(7);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/enum/Encodings",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{adminUrl}}",
-								"enum",
-								"Encodings"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Get all collections",
 					"event": [
 						{
@@ -220,7 +151,7 @@
 			]
 		},
 		{
-			"name": "02. Init DB",
+			"name": "01. Init DB",
 			"item": [
 				{
 					"name": "Clear all collections",
@@ -310,6 +241,308 @@
 							"path": [
 								"{{adminUrl}}",
 								"{{db}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "02. Init lists",
+			"item": [
+				{
+					"name": "Get keywords",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Keywords received\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    pm.collectionVariables.set('keywords', responseJson);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/enum/Keywords",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"enum",
+								"Keywords"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get themes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Themes received\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    pm.collectionVariables.set('themes', responseJson);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/enum/Themes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"enum",
+								"Themes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get licences",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Licences received\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    pm.collectionVariables.set('licences', responseJson);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/licence_codes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"licence_codes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all licenses",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"All licence concept retrieved\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.length).to.gte(0)",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/licences",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"licences"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all licenses codes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"All licence codes retrieved\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.indexOf('licence_mit')).to.gte(0)",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/licence_codes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"licence_codes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get every thesaurus",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Testing thesaurus access\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    const listEnums = Object.keys(responseJson);",
+									"    pm.expect(listEnums.length).to.eq(8);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/enum",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"enum"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get thesaurus",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Every thesaurus received\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    const listEnums = Object.keys(responseJson);",
+									"    pm.expect(listEnums.length).to.eq(7);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/enum/Encodings",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"enum",
+								"Encodings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all thesauri",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Every thesaurus received\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    const listEnums = Object.keys(responseJson);",
+									"    pm.expect(listEnums.length).to.eq(8);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/enum",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"enum"
 							]
 						}
 					},
@@ -1320,7 +1553,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?limit=100",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?limit=10",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -1331,7 +1564,223 @@
 							"query": [
 								{
 									"key": "limit",
-									"value": "100"
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all metadata filtered",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"2 metadata created\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const metadataList = pm.response.json();",
+									"    console.log(metadataList.length);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/filter?limit=10&keywords={\"$in\":[\"population\",\"plu\"]}&temporal_spread.start_date={\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2021-05-28T23:24:51.000Z\"}&perlin=2346&resource_languages=\"fr\"",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}",
+								"filter"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "keywords",
+									"value": "{\"$in\":[\"population\",\"plu\"]}"
+								},
+								{
+									"key": "temporal_spread.start_date",
+									"value": "{\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2021-05-28T23:24:51.000Z\"}"
+								},
+								{
+									"key": "perlin",
+									"value": "2346"
+								},
+								{
+									"key": "resource_languages",
+									"value": "\"fr\""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Count metadata (api_version)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"2 metadata created\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const metadataList = pm.response.json();",
+									"    pm.expect(metadataList.length).to.eq(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?count_by=metadata_info.api_version",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}"
+							],
+							"query": [
+								{
+									"key": "count_by",
+									"value": "metadata_info.api_version"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Count all metadata (producer)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"2 metadata created\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const metadataList = pm.response.json();",
+									"    pm.expect(metadataList.length).to.eq(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?count_by=producer",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}"
+							],
+							"query": [
+								{
+									"key": "count_by",
+									"value": "producer"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Group metadata (api_version)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"2 metadata created\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?group_by=metadata_info.api_version&limit=3",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}"
+							],
+							"query": [
+								{
+									"key": "group_by",
+									"value": "metadata_info.api_version"
+								},
+								{
+									"key": "limit",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Group metadata (producer)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"2 metadata created\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?group_by=producer&limit=4",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}"
+							],
+							"query": [
+								{
+									"key": "group_by",
+									"value": "producer"
+								},
+								{
+									"key": "limit",
+									"value": "4"
 								}
 							]
 						}
@@ -1493,98 +1942,6 @@
 								"{{apiUrl}}",
 								"{{data}}",
 								"{{metaId2}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get all licenses",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"All licence concept retrieved\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    pm.expect(responseJson.length).to.gte(0)",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/licences",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{adminUrl}}",
-								"licences"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get all licenses codes",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"All licence codes retrieved\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    pm.expect(responseJson.indexOf('licence_mit')).to.gte(0)",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/licence_codes",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{adminUrl}}",
-								"licence_codes"
 							]
 						}
 					},
@@ -3103,6 +3460,18 @@
 	"variable": [
 		{
 			"key": "contact3",
+			"value": ""
+		},
+		{
+			"key": "keywords",
+			"value": ""
+		},
+		{
+			"key": "themes",
+			"value": ""
+		},
+		{
+			"key": "licences",
 			"value": ""
 		}
 	]

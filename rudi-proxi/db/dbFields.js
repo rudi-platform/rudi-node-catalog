@@ -10,6 +10,16 @@
 //---------------------------------------------------------------
 exports.DB_ID = '_id';
 exports.DB_V = '__v';
+exports.DB_CREATE_AT = 'createdAt'
+exports.DB_UPDATED_AT = 'updatedAt'
+
+exports.FIELDS_TO_SKIP = [
+  this.DB_ID,
+  this.DB_V,
+  this.DB_CREATE_AT,
+  this.DB_UPDATED_AT,
+  'publishedAt'
+]
 
 //---------------------------------------------------------------
 // ID properties

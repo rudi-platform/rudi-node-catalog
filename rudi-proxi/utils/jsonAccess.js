@@ -157,7 +157,7 @@ exports.deepClone = (jsonObject) => {
  */
 exports.beautify = (jsonObject, option) => {
   try {
-    return `${JSON.stringify(jsonObject, null, option)}${option!=null?'\n':''}`
+    return `${JSON.stringify(jsonObject, null, option).replace(/\\"/g,'"')}${option!=null?'\n':''}`
   } catch (err) {
     return `${util.inspect(jsonObject)}`
 
