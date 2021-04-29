@@ -1572,222 +1572,6 @@
 					"response": []
 				},
 				{
-					"name": "Get all metadata filtered",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"2 metadata created\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const metadataList = pm.response.json();",
-									"    console.log(metadataList.length);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/filter?limit=10&keywords={\"$in\":[\"population\",\"plu\"]}&temporal_spread.start_date={\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2021-05-28T23:24:51.000Z\"}&perlin=2346&resource_languages=\"fr\"",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{apiUrl}}",
-								"{{data}}",
-								"filter"
-							],
-							"query": [
-								{
-									"key": "limit",
-									"value": "10"
-								},
-								{
-									"key": "keywords",
-									"value": "{\"$in\":[\"population\",\"plu\"]}"
-								},
-								{
-									"key": "temporal_spread.start_date",
-									"value": "{\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2021-05-28T23:24:51.000Z\"}"
-								},
-								{
-									"key": "perlin",
-									"value": "2346"
-								},
-								{
-									"key": "resource_languages",
-									"value": "\"fr\""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Count metadata (api_version)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"2 metadata created\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const metadataList = pm.response.json();",
-									"    pm.expect(metadataList.length).to.eq(1);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?count_by=metadata_info.api_version",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{apiUrl}}",
-								"{{data}}"
-							],
-							"query": [
-								{
-									"key": "count_by",
-									"value": "metadata_info.api_version"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Count all metadata (producer)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"2 metadata created\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const metadataList = pm.response.json();",
-									"    pm.expect(metadataList.length).to.eq(1);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?count_by=producer",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{apiUrl}}",
-								"{{data}}"
-							],
-							"query": [
-								{
-									"key": "count_by",
-									"value": "producer"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Group metadata (api_version)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"2 metadata created\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?group_by=metadata_info.api_version&limit=3",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{apiUrl}}",
-								"{{data}}"
-							],
-							"query": [
-								{
-									"key": "group_by",
-									"value": "metadata_info.api_version"
-								},
-								{
-									"key": "limit",
-									"value": "3"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Group metadata (producer)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"2 metadata created\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?group_by=producer&limit=4",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{apiUrl}}",
-								"{{data}}"
-							],
-							"query": [
-								{
-									"key": "group_by",
-									"value": "producer"
-								},
-								{
-									"key": "limit",
-									"value": "4"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Edit meta 1",
 					"event": [
 						{
@@ -1942,6 +1726,223 @@
 								"{{apiUrl}}",
 								"{{data}}",
 								"{{metaId2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all metadata filtered",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"2 metadata created\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const metadataList = pm.response.json();",
+									"    console.log(metadataList.length);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/filter?limit=10&keywords={\"$in\":[\"population\",\"plu\"]}&temporal_spread.start_date={\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2021-05-28T23:24:51.000Z\"}&perlin=2346&resource_languages=\"fr\"",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}",
+								"filter"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "keywords",
+									"value": "{\"$in\":[\"population\",\"plu\"]}"
+								},
+								{
+									"key": "temporal_spread.start_date",
+									"value": "{\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2021-05-28T23:24:51.000Z\"}"
+								},
+								{
+									"key": "perlin",
+									"value": "2346"
+								},
+								{
+									"key": "resource_languages",
+									"value": "\"fr\""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Count metadata (api_version)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Count by API version\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const metadataList = pm.response.json();",
+									"    pm.expect(metadataList.length).to.eq(1);",
+									"    pm.expect(metadataList[0].count).to.eq(2);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?count_by=metadata_info.api_version",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}"
+							],
+							"query": [
+								{
+									"key": "count_by",
+									"value": "metadata_info.api_version"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Count all metadata (producer)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Count by producer\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const metadataList = pm.response.json();",
+									"    pm.expect(metadataList.length).to.eq(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?count_by=producer",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}"
+							],
+							"query": [
+								{
+									"key": "count_by",
+									"value": "producer"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Group metadata (api_version)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Group by API version\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?group_by=metadata_info.api_version&limit=3",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}"
+							],
+							"query": [
+								{
+									"key": "group_by",
+									"value": "metadata_info.api_version"
+								},
+								{
+									"key": "limit",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Group metadata (producer)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"2 metadata created\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?group_by=producer&limit=4",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}"
+							],
+							"query": [
+								{
+									"key": "group_by",
+									"value": "producer"
+								},
+								{
+									"key": "limit",
+									"value": "4"
+								}
 							]
 						}
 					},

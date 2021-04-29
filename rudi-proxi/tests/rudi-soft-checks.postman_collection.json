@@ -1730,7 +1730,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"2 metadata created\", () => {",
+									"pm.test(\"Count by API version\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const metadataList = pm.response.json();",
 									"    pm.expect(metadataList.length).to.eq(1);",
@@ -1769,7 +1769,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"2 metadata created\", () => {",
+									"pm.test(\"Count by producer\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"});"
 								],
@@ -1806,7 +1806,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"2 metadata created\", () => {",
+									"pm.test(\"Group by API version\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const metadataList = pm.response.json();",
 									"    pm.expect(metadataList.length).to.eq(1);",
@@ -1849,7 +1849,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"2 metadata created\", () => {",
+									"pm.test(\"Group by producer\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"});"
 								],
