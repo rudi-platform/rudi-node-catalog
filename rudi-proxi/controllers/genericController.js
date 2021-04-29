@@ -1,4 +1,5 @@
 'use strict';
+
 const mod = 'genCtrl'
 /*
  * In this file are made the different steps followed for each 
