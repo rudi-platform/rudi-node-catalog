@@ -9,13 +9,13 @@
 			"name": "00. Check app online",
 			"item": [
 				{
-					"name": "Get app id",
+					"name": "Get git hash",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"App ID : 7 alphanumerical characters\", () => {",
+									"pm.test(\"Git hash : 7 alphanumerical characters\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseStr = pm.response.stream.toString('utf8');",
 									"    pm.expect(responseStr).to.match(/^[0-9a-z]{7}$/)",
@@ -29,13 +29,49 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{appId}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/hash",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{adminUrl}}",
-								"{{appId}}"
+								"hash"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get app hash",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const gitHash = pm.collectionVariables.get('gitHash');",
+									"",
+									"pm.test(\"Current app hash = git hash\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseStr = pm.response.stream.toString('utf8');",
+									"    pm.expect(responseStr).to.match(/^[0-9a-z]{7}$/)",
+									"    pm.expect(responseStr).to.eq(gitHash)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/apphash",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"apphash"
 							]
 						}
 					},
@@ -1914,7 +1950,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"2 metadata created\", () => {",
+									"pm.test(\"Group by producer\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"});"
 								],
@@ -3400,14 +3436,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{logs}}/100",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{logs}}/1000",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{adminUrl}}",
 								"{{logs}}",
-								"100"
+								"1000"
 							]
 						}
 					},
@@ -3473,6 +3509,10 @@
 		},
 		{
 			"key": "licences",
+			"value": ""
+		},
+		{
+			"key": "gitHash",
 			"value": ""
 		}
 	]
