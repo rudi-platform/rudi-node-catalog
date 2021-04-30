@@ -21,6 +21,9 @@ exports.nowLocaleFormatted = () => {
 exports.isNotEmptyArray = (anArray) => {
   return Array.isArray(anArray) && anArray.length > 0
 }
+exports.isEmptyArray = (anArray) => {
+  return Array.isArray(anArray) && anArray.length == 0
+}
 
 //---------------------------------------------------------------
 // Objects

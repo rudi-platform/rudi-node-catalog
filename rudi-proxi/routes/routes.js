@@ -42,6 +42,7 @@ const {
   URL_ACTION_FILTER,
   URL_GIT_HASH_ACCESS,
   URL_APP_HASH_ACCESS,
+  URL_PREFIX_PRIVATE,
 } = require('../config/confApi')
 
 //---------------------------------------------------------------
@@ -57,6 +58,8 @@ const dbController = require('../controllers/dbController');
 const sysController = require('../controllers/sysController');
 const skosController = require('../controllers/skosController');
 const licenceController = require('../controllers/licenceController');
+
+const devController = require('../controllers/testController');
 
 //---------------------------------------------------------------
 // Helper functions
@@ -294,4 +297,13 @@ exports.backOfficeRoutes = [
     handler: dbController.dropDB
   },
 
+]
+
+exports.devRoutes = [
+  {
+    method: 'GET',
+    url: `${URL_PREFIX_PRIVATE}/test`,
+    // preHandler: logRequest,
+    handler: devController.test
+  },
 ]

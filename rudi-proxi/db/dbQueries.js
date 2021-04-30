@@ -60,6 +60,7 @@ const {
   API_SKOS_SCHEME_CODE,
   API_SKOS_CONCEPT_ROLE,
   FIELDS_TO_SKIP,
+  API_MEDIA_PROPERTY,
 } = require('./dbFields');
 
 
@@ -164,7 +165,7 @@ exports.getCollections = async () => {
     })
     return collections
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
 }
@@ -177,7 +178,7 @@ exports.dropDB = async () => {
     log.d(mod, fun, 'DB dropped')
     return dbActionResult
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
 }
@@ -200,7 +201,7 @@ exports.getDbIdWithRudiId = async (objectType, Model, idField, rudiId) => {
 
     return dbObject[DB_ID]
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
 }
@@ -219,7 +220,7 @@ exports.getEnsuredDbIdWithRudiId = async (objectType, Model, idField, rudiId) =>
     const dbId = json.accessProperty(dbObject, DB_ID)
     return dbId
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
 }
@@ -234,7 +235,7 @@ exports.getDbIdWithJson = async (objectType, Model, idField, rudiObject) => {
     const rudiId = json.accessProperty(rudiObject, idField)
     return await this.getDbIdWithRudiId(objectType, Model, idField, rudiId)
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
 }
@@ -249,7 +250,7 @@ exports.getEnsuredDbIdWithJson = async (objectType, Model, idField, rudiObject) 
     const rudiId = json.accessProperty(rudiObject, idField)
     return await this.getEnsuredDbIdWithRudiId(objectType, Model, idField, rudiId)
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
 }
@@ -267,7 +268,7 @@ exports.getObject = async (Model, filter, populateFields) => {
     return await Model.findOne(filter).populate(populateOpts)
 
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
 }
@@ -283,7 +284,7 @@ exports.getObjectWithField = async (Model, fieldName, fieldValue, populateFields
     }
     return await this.getObject(Model, filter, populateFields)
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
 }
@@ -297,7 +298,7 @@ exports.getObjectWithDbId = async (Model, dbId, populateFields) => {
     }
     return await this.getObject(Model, filter, populateFields)
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
 }
@@ -312,7 +313,7 @@ exports.getObjectWithRudiId = async (Model, idField, rudiId, populateFields) => 
     }
     return await this.getObject(Model, filter, populateFields)
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
 }
@@ -325,19 +326,20 @@ exports.getObjectWithJson = async (Model, idField, rudiObject, populateFields) =
     const dbObject = await this.getObjectWithRudiId(Model, idField, rudiId, populateFields)
     return dbObject
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
 }
 
 exports.getObjectPropertiesWithDbId = async (Model, dbId, propertyList, populateFields) => {
-  const fun = `getObjectWithDbId`
+  const fun = `getObjectPropertiesWithDbId`
   log.d(mod, fun, ``)
   try {
     const filter = {
       [DB_ID]: dbId
     }
     const fields = propertyList.join(' ')
+
     if (!populateFields) return await Model.findOne(filter, fields)
 
     const populateOpts = {
@@ -346,7 +348,58 @@ exports.getObjectPropertiesWithDbId = async (Model, dbId, propertyList, populate
     }
     return await Model.findOne(filter, fields).populate(populateOpts)
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
+    throw err
+  }
+}
+
+exports.getObjectPropertiesWithRudiId = async (objectType, rudiId, propertyList, populateFields) => {
+  const fun = `getObjectPropertiesWithRudiId`
+  log.d(mod, fun, `${objectType}: ${rudiId}`)
+  try {
+    const {
+      Model,
+      idField
+    } = this.getObjectAccesses(objectType)
+
+    const filter = {
+      [idField]: rudiId
+    }
+    const fields = propertyList.join(' ')
+
+    if (!populateFields) return await Model.findOne(filter, fields)
+
+    const populateOpts = {
+      path: populateFields,
+      select: SKIP_FIELDS
+    }
+    return await Model.findOne(filter, fields).populate(populateOpts)
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
+}
+
+exports.getObjectListWithProperties = async (objectType, filter, fields, populateFields) => {
+  const fun = `getObjectListWithProperties`
+  log.d(mod, fun, ``)
+  try {
+    const {
+      Model,
+      idField
+    } = this.getObjectAccesses(objectType)
+
+    log.d(mod, fun, `fields: ${json.beautify(fields)}`)
+
+    if (!populateFields) return await Model.findOne(filter, fields)
+
+    const populateOpts = {
+      path: populateFields,
+      select: SKIP_FIELDS
+    }
+    return await Model.findOne(filter, fields).populate(populateOpts)
+  } catch (err) {
+    log.w(mod, fun, err)
     throw err
   }
 }
@@ -359,7 +412,7 @@ exports.getEnsuredObjectWithDbId = async (objectType, Model, dbId, populateField
     if (!dbObject) throw new Error(`${msg.objectNotFound(objectType, dbId)}`)
     return dbObject
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
 }
@@ -390,7 +443,7 @@ exports.getEnsuredObjectWithJson = async (objectType, Model, idField, rudiObject
     if (!dbObject) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
     return dbObject
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
 }
@@ -403,7 +456,7 @@ exports.doesObjectExistWithRudiId = async (Model, idField, rudiId) => {
     // log.d(mod, fun, `existingObject: ${json.beautify(dbObject)}`)
     return (!!dbObject)
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
 }
@@ -415,7 +468,7 @@ exports.doesObjectExistWithJson = async (Model, idField, rudiObject) => {
     const dbObject = await this.getObjectWithJson(Model, idField, rudiObject)
     return (!!dbObject)
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
 }
@@ -439,7 +492,7 @@ exports.getObjectList = async (Model, limit, offset, filter, populateFields) => 
     return await Model.find(filter).limit(limit).skip(offset).populate(populateOpts)
 
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
 }
@@ -448,6 +501,7 @@ exports.getObjectList = async (Model, limit, offset, filter, populateFields) => 
 exports.getObjectListCount = async (Model, countByField, FieldModel, limit, offset) => {
   const fun = `getObjectListCount`
   log.d(mod, fun, ``)
+  log.d(mod, fun, `Model: ${Model.collection.collectionName}, countByField: ${countByField}, FieldModel: ${!FieldModel?'%':FieldModel.collection.collectionName}, limit: ${limit} / offset: ${offset} `)
 
   try {
     /* beautify ignore:start */
@@ -461,20 +515,22 @@ exports.getObjectListCount = async (Model, countByField, FieldModel, limit, offs
     ]).exec();
     /* beautify ignore:end */
 
-    objectList.map(obj => {
-      obj[countByField] = obj['_id'];
-      delete obj['_id'];
-    })
     if (!FieldModel) {
+      objectList.map(obj => {
+        obj[countByField] = obj['_id'];
+        delete obj['_id'];
+      })
       return objectList
     } else {
-      log.d(mod, fun, `CollectionFrom: ${json.beautify(FieldModel)}`)
+      await Promise.all(objectList.map(async (obj) => {
+        obj[countByField] = await FieldModel.findById(obj['_id'])
+        delete obj['_id'];
+      }))
 
-      const finalObjectList = await FieldModel.populate(objectList, countByField)
-      return finalObjectList
+      return objectList
     }
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
 }
@@ -492,7 +548,7 @@ function populateOptions(objectType) {
 exports.getObjectListGroup = async (objectType, groupByField, FieldModel, limit, offset) => {
   const fun = `getObjectListGroup`
   log.d(mod, fun, ``)
-  // log.d(mod, fun, `idField: ${idField}, groupByField: ${groupByField}, FieldModel: ${FieldModel} `)
+  log.d(mod, fun, `objectType: ${objectType}, groupByField: ${groupByField}, FieldModel: ${FieldModel}, ${limit}/${offset} `)
 
   try {
     /* beautify ignore:start */
@@ -542,7 +598,7 @@ exports.getObjectListGroup = async (objectType, groupByField, FieldModel, limit,
       return finalObjectList
     }
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
 }
@@ -569,7 +625,7 @@ exports.updateObject = async (Model, idField, jsonUpdateData, populateFields) =>
     return await Model.findOneAndUpdate(filter, jsonUpdateData, updateOpts).populate(populateOpts)
 
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
   log.d(mod, fun, `updatedObject: ${json.beautify(updatedObject)}`)
@@ -595,7 +651,7 @@ exports.deleteObject = async (Model, idField, id, populateFields) => {
     }
     return await Model.findOneAndRemove(filter).populate(populateOpts)
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
   return fullInfo
@@ -609,7 +665,7 @@ exports.deleteAll = async (Model) => {
     let deletionInfo = await Model.deleteMany()
     return deletionInfo
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
 }
@@ -639,7 +695,7 @@ exports.deleteManyWithRudiIds = async (Model, idField, rudiIdList) => {
     let deletionInfo = await Model.deleteMany(filter)
     return deletionInfo
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
 }
@@ -656,7 +712,7 @@ exports.deleteManyWithFilter = async (Model, conditions) => {
     let deletionInfo = await Model.deleteMany(conditions)
     return deletionInfo
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
 }
@@ -1102,18 +1158,67 @@ exports.getAllConceptsWithRole = async (conceptRole) => {
 //---------------------------------------- 
 // - Filters
 //---------------------------------------- 
+exports.findNotReferencedInMetadata=(objectType)=>{
+  const fun = `isReferencedInMetadata`
+  log.d(mod, fun, ``)
+
+  
+}
+
 exports.isReferencedInMetadata = async (objectType, rudiId) => {
   const fun = `isReferencedInMetadata`
-  log.d(mod, fun, `objectType: ${objectType} / rudiId: ${rudiId}`)
+  log.d(mod, fun, `${objectType}: ${rudiId}`)
 
+  // const truc1 = await (await Contact.findOne({[API_CONTACT_ID]: rudiId}, '_id')).toObject()
+  // const truc = await Contact.findOne({[API_CONTACT_ID]: rudiId}, '_id')
+  // const truc2 = await truc.toObject()
+  // log.d(mod, fun, `truc: ${json.beautify(truc2)}`)
+  let dbId
+  try {
+    dbId = await (await this.getObjectPropertiesWithRudiId(objectType, rudiId, [DB_ID])).toObject()[DB_ID]
+  } catch (err) {
+    const errMsg = msg.objectNotFound(objectType, rudiId)
+    log.w(mod, fun, errMsg)
+    throw new Error(errMsg)
+  }
+
+  log.d(mod, fun, `dbId: ${json.beautify(dbId)}`)
+
+  let metadataFilter, res
   switch (objectType) {
     case URL_OBJECT_ORGANIZATIONS:
+      metadataFilter = {
+        $or: [
+          /* beautify ignore:start */
+          {[API_DATA_PRODUCER_PROPERTY]: dbId},
+          {[`${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`]: dbId}
+          /* beautify ignore:end */
+        ]
+      }
       break;
     case URL_OBJECT_CONTACTS:
+      metadataFilter = {
+        $or: [
+          /* beautify ignore:start */
+          {[API_DATA_CONTACTS_PROPERTY]: dbId},
+          {[`${API_METAINFO_PROPERTY}.${API_METAINFO_CONTACTS_PROPERTY}`]: dbId}
+          /* beautify ignore:end */
+        ]
+      }
       break;
+    case URL_OBJECT_MEDIA:
+      metadataFilter = {
+        [`${API_MEDIA_PROPERTY}`]: dbId
+      }
+      break
     default:
       throw new Error(msg.objectTypeNotFound(objectType))
   }
+  res = await Metadata.findOne(metadataFilter, API_METADATA_ID)
+  log.d(mod, fun, `res: ${json.beautify(res)}`)
+  return !!res
+  // res = await Metadata.find(metadataFilter, API_METADATA_ID)
+  // return !!utils.isEmptyArray(res)
 }
 // ensure the organization is not in metadata.producer
 // ensure the organization is not in metadata.metainfo.provider

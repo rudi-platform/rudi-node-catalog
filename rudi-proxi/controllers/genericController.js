@@ -11,7 +11,7 @@ const mod = 'genCtrl'
 //---------------------------------------------------------------
 const boom = require('@hapi/boom')
 const uuid = require('uuid')
-var url = require('url');
+const url = require('url');
 
 //---------------------------------------------------------------
 // Internal dependancies 
@@ -99,7 +99,7 @@ const QUERY_RESERVED_WORDS = [
 
 function parseQueryParameters(objectType, queryParameters) {
   const fun = 'parseQueryParameters'
-  log.d(mod, fun, `queryParameters: ${json.beautify(queryParameters)}`)
+  // log.d(mod, fun, `queryParameters: ${json.beautify(queryParameters)}`)
   // identify object model
   /* beautify ignore:start */
   const {Model, idField} = db.getObjectAccesses(objectType)
@@ -107,7 +107,7 @@ function parseQueryParameters(objectType, queryParameters) {
   const modelProperties = db.modelPropertyList(Model)
 
   const queryKeys = Object.keys(queryParameters)
-  log.d(mod, fun, `queryKeys: ${json.beautify(queryKeys)}`)
+  // log.d(mod, fun, `queryKeys: ${json.beautify(queryKeys)}`)
 
   let filterReturn = {}
   filterReturn[QUERY_LIMIT] = QUERY_LIMIT_DEFAULT;
@@ -116,35 +116,37 @@ function parseQueryParameters(objectType, queryParameters) {
 
   queryKeys.map(key => {
     if (QUERY_RESERVED_WORDS.includes(key)) {
-      log.d(mod, fun, `Key is a reserved word: ${json.beautify(key)} => ${json.beautify(queryParameters[key])}`)
+      // log.d(mod, fun, `Key is a reserved word: ${json.beautify(key)} => ${json.beautify(queryParameters[key])}`)
       switch (key) {
         case QUERY_LIMIT:
           filterReturn[QUERY_LIMIT] = parseInt(queryParameters[key]);
-          log.d(mod, fun, `Limit: ${json.beautify(filterReturn[QUERY_LIMIT])}`)
+          // log.d(mod, fun, `Limit: ${json.beautify(filterReturn[QUERY_LIMIT])}`)
           break
         case QUERY_OFFSET:
           filterReturn[QUERY_OFFSET] = parseInt(queryParameters[key]);
-          log.d(mod, fun, `Offset: ${json.beautify(filterReturn[QUERY_OFFSET])}`)
+          // log.d(mod, fun, `Offset: ${json.beautify(filterReturn[QUERY_OFFSET])}`)
           break
       }
     } else if (modelProperties.includes(key)) {
-      log.d(mod, fun, `Key is a ${objectType} property: ${json.beautify(key)}`)
+      // log.d(mod, fun, `Key is a ${objectType} property: ${json.beautify(key)}`)
       const val = queryParameters[key]
-      log.d(mod, fun, `Associated value: ${val}`)
-      log.d(mod, fun, `isObject: ${_.isObject(val)}`)
-      log.d(mod, fun, `_isString: ${_.isString(val)}`)
+      // log.d(mod, fun, `Associated value: ${val}`)
+      // log.d(mod, fun, `isObject: ${_.isObject(val)}`)
+      // log.d(mod, fun, `_isString: ${_.isString(val)}`)
       try {
         const obj = JSON.parse(val)
-        log.d(mod, fun, `parsed String: ${json.beautify(obj)}`)
+        // log.d(mod, fun, `parsed String: ${json.beautify(obj)}`)
         filterReturn[QUERY_FILTER][key] = obj
       } catch (err) {
-        log.d(mod, fun, `can't parse: '${val}': ${err}}`)
+        const errMsg = `Error while parsing: '${json.beautify(val)}': ${err}}`
+        log.w(mod, fun, errMsg)
+        throw new Error(errMsg)
       }
     } else {
-      log.d(mod, fun, `Key is unkown and ignored: ${json.beautify(key)}`)
+      log.w(mod, fun, `Key is unkown and ignored: ${json.beautify(key)}`)
     }
   })
-  log.d(mod, fun, `filterReturn: ${json.beautify(filterReturn)}`)
+  // log.d(mod, fun, `filterReturn: ${json.beautify(filterReturn)}`)
 
   return filterReturn
 }
@@ -197,7 +199,7 @@ async function getObjectListCount(objectType, countBy, limit, offset) {
     if (!db.isProperty(Model, countBy)) {
       const errMsg = `Field ${countBy} is not a property for type '${(objectType)}'`
       log.e(mod, fun, errMsg)
-      throw newError(errMsg)
+      throw new Error(errMsg)
     }
 
     if (objectType == URL_OBJECT_METADATA)
@@ -249,20 +251,19 @@ async function editObject(objectType, editedObjectData) {
   return await db.updateObject(Model, idField, editedObjectData)
 }
 
-async function isDeletionPermitted(objectType, Model, objectToDelete) {
-  const fun = 'isDeletionPermitted'
+async function isObjectReferenced(objectType, rudiId) {
+  const fun = 'isObjectReferenced'
   log.d(mod, fun, `objectType: ${objectType}`)
   checkIsUrlObject(objectType)
 
   switch (objectType) {
     case URL_OBJECT_ORGANIZATIONS:
-      return !(await db.isOrgUsedInMetadata(objectToDelete))
-      break
     case URL_OBJECT_CONTACTS:
-      return !(await db.isContactUsedInMetadata(objectToDelete))
+    case URL_OBJECT_MEDIA:
+      return !(await db.isReferencedInMetadata(objectType, rudiId))
       break
     default:
-      return true
+      return false
   }
 }
 
@@ -473,7 +474,7 @@ exports.getObjectListFiltered = async (req, reply) => {
 
     const queryParameters = url.parse(req.url, true).query
     const parsedParameters = parseQueryParameters(objectType, queryParameters)
-    log.d(mod, fun, json.beautify(`req.query: ${json.beautify(req.query)}`))
+    // log.d(mod, fun, json.beautify(`req.query: ${json.beautify(req.query)}`))
 
     // accessing the objects
 
@@ -553,8 +554,8 @@ exports.deleteSingleObject = async (req, reply) => {
         log.d(mod, fun, `isOrgUsed: ${isOrgUsed}`)
         return
      */
-    const deletionOK = await isDeletionPermitted(objectType, Model, objectToDelete)
-    if (!deletionOK) throw new Error(msg.objectNotDeletedBecauseUsed(objectType, objectRudiId))
+    if (await isObjectReferenced(objectType, objectRudiId))
+      throw new Error(msg.objectNotDeletedBecauseUsed(objectType, objectRudiId))
 
     // TODO: if SkosScheme: delete all SkosConcepts that reference it
     // TODO: if SkosConcept: update all other SkosConcepts that reference it (parents/children/siblings/relatives)

@@ -117,7 +117,7 @@ exports.contactListRudiToDbFormat = async (rudiContactList, shouldCreateIfNotFou
     let contactDbId
     contactDbId = await db.getContactDbIdWithJson(rudiContact)
     if (!contactDbId) {
-      if (!shouldCreateIfNotFound) throw new Error(`${msg.objectNotFound(URL_OBJECT_CONTACTS, rudiId)}`)
+      if (!shouldCreateIfNotFound) throw new Error(`${msg.objectNotFound(URL_OBJECT_CONTACTS, rudiContact[API_CONTACT_ID])}`)
 
       const dbContact = await contactController.newContact(rudiContact)
 

@@ -74,7 +74,8 @@ const mongoConnection = mongoose.connect(sys.DB_URL, mongoConnectOptions)
 const {
   publicRoutes,
   backOfficeRoutes,
-  inspectRequest
+  inspectRequest,
+  devRoutes
 } = require('./routes/routes');
 const {
   initFFLogger
@@ -128,6 +129,10 @@ backOfficeRoutes.forEach((boRoute, index) => {
   log.d(mod, 'routes', `route #${index} = ${boRoute.method} ${boRoute.url}`)
 })
 
+devRoutes.forEach((rouge, index) => {
+  fastify.route(rouge)
+})
+
 //---------------------------------------------------------------
 // SERVER 
 //---------------------------------------------------------------
@@ -157,7 +162,7 @@ try {
 mongoConnection
   .then(() => {
     log.i(mod, 'mongo', 'MongoDB connected')
-    log.i(mod, 'app', `Application version '${sysController.getCurrentAppId()}' | API ${api.API_VERSION}`)
+    log.i(mod, 'app', `Application version '${sysController.getAppHash()}' | API ${api.API_VERSION}`)
 
     utils.separateLogs('Init OK')
   })

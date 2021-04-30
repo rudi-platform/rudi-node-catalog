@@ -216,11 +216,11 @@ exports.objectNotDeletedBecauseUsed = (objectType, id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `The object of type '${objectType}' couldn't be deleted. The following id was found in other documents: ${id} `;
+      return `The object of type '${objectType}' couldn't be deleted. Its identifier is referenced in a metadata: ${id} `;
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `L'objet de type '${objectType}' n'a pas pu être supprimé. L'identifiant suivant a été trouvé dans d'autres documents : ${id} `;
+      return `L'objet de type '${objectType}' n'a pas pu être supprimé. Son identifiant est référencé dans une métadonnée : ${id} `;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }
