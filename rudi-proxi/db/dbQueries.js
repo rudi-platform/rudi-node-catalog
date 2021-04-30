@@ -1102,7 +1102,19 @@ exports.getAllConceptsWithRole = async (conceptRole) => {
 //---------------------------------------- 
 // - Filters
 //---------------------------------------- 
+exports.isReferencedInMetadata = async (objectType, rudiId) => {
+  const fun = `isReferencedInMetadata`
+  log.d(mod, fun, `objectType: ${objectType} / rudiId: ${rudiId}`)
 
+  switch (objectType) {
+    case URL_OBJECT_ORGANIZATIONS:
+      break;
+    case URL_OBJECT_CONTACTS:
+      break;
+    default:
+      throw new Error(msg.objectTypeNotFound(objectType))
+  }
+}
 // ensure the organization is not in metadata.producer
 // ensure the organization is not in metadata.metainfo.provider
 exports.isOrgUsedInMetadata = async (dbOrg) => {

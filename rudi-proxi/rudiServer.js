@@ -157,7 +157,7 @@ try {
 mongoConnection
   .then(() => {
     log.i(mod, 'mongo', 'MongoDB connected')
-    log.i(mod, 'app', `Application version '${sysController.getAppId()}' | API ${api.API_VERSION}`)
+    log.i(mod, 'app', `Application version '${sysController.getCurrentAppId()}' | API ${api.API_VERSION}`)
 
     utils.separateLogs('Init OK')
   })

@@ -5,14 +5,16 @@
   "description": "RUDI proxi for producer nodes",
   "main": "index.js",
   "scripts": {
-    "start": "./node_modules/nodemon/bin/nodemon.js ./rudiserver.js",
+    "start": "nodemon ./rudiServer.js",
     "extstart": "nodemon -e js,ini --exec \"npm run rudiapp\"",
     "rudiapp": "npm install && node rudiServer.js",
-    "devstart": "./node_modules/nodemon/bin/nodemon.js ./rudiserver.js",
+    "devstart": "./node_modules/nodemon/bin/nodemon.js ./rudiServer.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "rudi"
+    "rudi",
+    "metadata",
+    "open-data"
   ],
   "author": "Olivier Martineau <olivier.martineau@gmail.com>",
   "homepage": "https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER",

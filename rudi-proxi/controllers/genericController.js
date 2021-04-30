@@ -29,7 +29,7 @@ const utils = require('../utils/jsUtils')
 //---------------------------------------------------------------
 
 const {
-  URL_OBJECT,
+  URL_OBJECT_GENERIC,
   URL_OBJECT_METADATA,
   URL_OBJECT_ORGANIZATIONS,
   URL_OBJECT_CONTACTS,
@@ -48,6 +48,7 @@ const {
   QUERY_GROUP_BY,
   QUERY_COUNT_BY,
   URL_ACTION_FILTER,
+  URL_OBJECTS,
 } = require('../config/confApi')
 
 const {
@@ -65,15 +66,6 @@ const {
 } = require('../db/dbFields')
 
 
-const URL_OBJECTS = [
-  URL_OBJECT_METADATA,
-  URL_OBJECT_ORGANIZATIONS,
-  URL_OBJECT_CONTACTS,
-  URL_OBJECT_MEDIA,
-  URL_OBJECT_SKOS_CONCEPT,
-  URL_OBJECT_SKOS_SCHEME,
-  URL_ACTION_REPORT
-]
 //---------------------------------------------------------------
 // Models
 //---------------------------------------------------------------
@@ -339,7 +331,7 @@ async function treatDbObjectList(objectType, dbObjectList) {
  */
 exports.addSingleObject = async (req, reply) => {
   const fun = 'addSingleObject'
-  log.v(mod, fun, `< POST ${URL_OBJECT}`)
+  log.v(mod, fun, `< POST ${URL_OBJECT_GENERIC}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -380,7 +372,7 @@ exports.addSingleObject = async (req, reply) => {
  */
 exports.getSingleObject = async (req, reply) => {
   const fun = 'getSingleObject'
-  log.v(mod, fun, `< GET ${URL_OBJECT}/:${PARAM_ID}`)
+  log.v(mod, fun, `< GET ${URL_OBJECT_GENERIC}/:${PARAM_ID}`)
   try {
 
     // retrieve url parameters: object type, object id
@@ -420,7 +412,7 @@ exports.getSingleObject = async (req, reply) => {
  */
 exports.getObjectList = async (req, reply) => {
   const fun = 'getObjectList'
-  log.v(mod, fun, `< GET ${URL_OBJECT}`)
+  log.v(mod, fun, `< GET ${URL_OBJECT_GENERIC}`)
   try {
     // retrieve url parameter: object type
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -469,7 +461,7 @@ exports.getObjectList = async (req, reply) => {
  */
 exports.getObjectListFiltered = async (req, reply) => {
   const fun = 'getObjectListFiltered'
-  log.v(mod, fun, `< GET ${URL_OBJECT}/${URL_ACTION_FILTER}`)
+  log.v(mod, fun, `< GET ${URL_OBJECT_GENERIC}/${URL_ACTION_FILTER}`)
   try {
     // retrieve url parameter: object type
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -507,7 +499,7 @@ exports.getObjectListFiltered = async (req, reply) => {
  */
 exports.updateSingleObject = async (req, reply) => {
   const fun = 'updateSingleObject'
-  log.v(mod, fun, `< PUT ${URL_OBJECT}`)
+  log.v(mod, fun, `< PUT ${URL_OBJECT_GENERIC}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -541,7 +533,7 @@ exports.updateSingleObject = async (req, reply) => {
  */
 exports.deleteSingleObject = async (req, reply) => {
   const fun = 'deleteSingleObject'
-  log.v(mod, fun, `< DELETE ${URL_OBJECT}/:${PARAM_ID}`)
+  log.v(mod, fun, `< DELETE ${URL_OBJECT_GENERIC}/:${PARAM_ID}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -584,7 +576,7 @@ exports.deleteSingleObject = async (req, reply) => {
  */
 exports.deleteObjectList = async (req, reply) => {
   const fun = 'deleteObjectList'
-  log.v(mod, fun, `< POST ${URL_OBJECT}/${URL_ACTION_DELETION}`)
+  log.v(mod, fun, `< POST ${URL_OBJECT_GENERIC}/${URL_ACTION_DELETION}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -617,7 +609,7 @@ exports.deleteObjectList = async (req, reply) => {
  */
 exports.deleteEveryObject = async (req, reply) => {
   const fun = 'deleteEveryObject'
-  log.v(mod, fun, `< DELETE ${URL_OBJECT}`)
+  log.v(mod, fun, `< DELETE ${URL_OBJECT_GENERIC}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
