@@ -260,7 +260,7 @@ async function isObjectReferenced(objectType, rudiId) {
     case URL_OBJECT_ORGANIZATIONS:
     case URL_OBJECT_CONTACTS:
     case URL_OBJECT_MEDIA:
-      return !(await db.isReferencedInMetadata(objectType, rudiId))
+      return await db.isReferencedInMetadata(objectType, rudiId)
       break
     default:
       return false
@@ -554,9 +554,11 @@ exports.deleteSingleObject = async (req, reply) => {
         log.d(mod, fun, `isOrgUsed: ${isOrgUsed}`)
         return
      */
-    if (await isObjectReferenced(objectType, objectRudiId))
-      throw new Error(msg.objectNotDeletedBecauseUsed(objectType, objectRudiId))
-
+    if (await isObjectReferenced(objectType, objectRudiId)) {
+      const err = new Error(msg.objectNotDeletedBecauseUsed(objectType, objectRudiId))
+      err.statusCode = 403
+      throw err
+    }
     // TODO: if SkosScheme: delete all SkosConcepts that reference it
     // TODO: if SkosConcept: update all other SkosConcepts that reference it (parents/children/siblings/relatives)
     if (objectType == URL_OBJECT_METADATA) {

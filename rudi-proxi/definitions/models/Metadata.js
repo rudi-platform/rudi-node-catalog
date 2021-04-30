@@ -166,10 +166,10 @@ const MetadataSchema = new mongoose.Schema({
   // Resource identifiers
   //---------------------------
 
-  // Unique and permanent identifier for the ressource in RUDI system (required)
+  /** Unique and permanent identifier for the ressource in RUDI system (required) */
   global_id: UUIDv4,
 
-  // Identifier for the ressource in the producer system (optional)
+  /** Identifier for the ressource in the producer system (optional) */
   local_id: {
     type: String,
     trim: true,
@@ -191,39 +191,44 @@ const MetadataSchema = new mongoose.Schema({
   // Dataset description
   //---------------------------
 
-  // Simple name for the resource
+  /** Simple name for the resource */
   resource_title: {
     type: String,
     maxlength: 150,
     required: true
   },
 
-  // Short description for the whole dataset
+  /** Short description for the whole dataset */
   synopsis: {
     type: [DictionaryEntry],
     required: true,
     validate: validArrayNotNull
   },
 
-  // More precise description for the whole dataset
+  /** More precise description for the whole dataset */
   summary: {
     type: [DictionaryEntry],
     required: true,
     validate: validArrayNotNull
   },
 
+   /** Context, objectives and final use of the data */
+   purpose: {
+    type: [DictionaryEntry],
+  },
+
   //---------------------------
   // Dataset classification
   //---------------------------
 
-  // Category for thematic classification of the data
+  /** Category for thematic classification of the data */
   theme: {
     type: String,
     enum: Object.values(Themes),
     required: true
   },
 
-  // List of tags that can be used to retrieve the data
+  /** List of tags that can be used to retrieve the data */
   keywords: {
     type: [{
       type: String,
@@ -448,17 +453,17 @@ const MetadataSchema = new mongoose.Schema({
     },
   },
 
-  // Metadata on the metadata
+  /** Metadata on the metadata */
   metadata_info: {
 
-    // API version number (used for retro-compatibility)
+    /** API version number (used for retro-compatibility) */
     api_version: {
       type: String,
       required: true,
       match: Validation.API_VERSION
     },
 
-    // Dates of the actions performed on the metadata (creation, publishing, update...)
+    /** Dates of the actions performed on the metadata (creation, publishing, update...) */
     metadata_dates: {
       validated: {
         type: Date
@@ -468,20 +473,20 @@ const MetadataSchema = new mongoose.Schema({
       }
     },
 
-    // Description of the organization that produced the metadata
+    /** Description of the organization that produced the metadata */
     metadata_provider: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Organization',
     },
 
-    // Addresses to get further information on the metadata
+    /** Addresses to get further information on the metadata */
     metadata_contacts: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Contact',
     }]
   },
 
-  // Date when the resource has been successfully integrated on Rudi Portal for the first time
+  /** Date when the resource has been successfully integrated on Rudi Portal for the first time */
   publishedAt: {
     type: Date
   }
