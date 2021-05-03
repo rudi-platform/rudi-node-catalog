@@ -238,6 +238,11 @@ const MetadataSchema = new mongoose.Schema({
     validate: validArrayNotNull
   },
 
+  /** Tag for identifying a collection of resources */
+  collection_tag: {
+    type: String
+  },
+  
   //---------------------------
   // Involved parties
   //---------------------------

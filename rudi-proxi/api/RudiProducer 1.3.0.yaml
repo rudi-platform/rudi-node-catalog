@@ -20,6 +20,8 @@
 #   - 'UUIDv4' schema deleted
 #   - 
 #
+# [1.3.0]
+#   - Added 'collection_tag'
 #•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
 openapi: 3.0.0
 info:
@@ -857,6 +859,11 @@ components:
           items:
             $ref: '#/components/schemas/Keyword'
         # !SKOS!
+
+        #——————————————————————————
+        'collection_tag':
+          description: Tag for identifying a collection of resources
+          type: string
 
         #—•—•—•—•—•—•—•—•—•—•—•—•—•
         # INVOLVED PARTIES

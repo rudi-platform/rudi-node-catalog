@@ -590,10 +590,14 @@ exports.deleteObjectList = async (req, reply) => {
     /* beautify ignore:end */
 
     // retrieve incoming data
-    const rudiIdList = req.body
-    log.d(mod, fun, json.beautify(rudiIdList))
-
-    const deletionResult = await db.deleteManyWithRudiIds(Model, idField, rudiIdList)
+    const filter = req.body
+    log.d(mod, fun, json.beautify(filter))
+    let deletionResult
+    if (Array.isArray(filter)) {
+      deletionResult = await db.deleteManyWithRudiIds(Model, idField, filter)
+    } else {
+      deletionResult = await db.deleteManyWithFilter(Model, filter)
+    }
     return deletionResult
   } catch (err) {
     log.e(mod, fun, err)

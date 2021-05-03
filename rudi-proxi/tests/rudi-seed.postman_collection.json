@@ -518,7 +518,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"global_id\": \"{{seedLastMetaId}}\",\n    \"resource_title\": \"{{randomTitle}}\",\n    \"purpose\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{stamp}}}}\"\n        }\n    ],\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{randomSynopsis}}\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{randomSummary}}\"\n        }\n    ],\n    \"theme\": \"{{randomTheme}}\",\n    \"keywords\": [\n        \"{{randomKeyword1}}\",\n        \"{{randomKeyword2}}\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"{{$randomDatePast}}\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{randomOrg}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{randomContact1}}\"\n        },\n        {\n            \"contact_id\": \"{{randomContact2}}\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_provider\": {\n            \"organization_id\": \"{{randomMetaInfoOrg}}\"\n        },\n        \"metadata_contacts\": [\n            {\n                \"contact_id\": \"{{randomContact3}}\"\n            }\n        ]\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{$randomDateRecent}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"licence_label\": \"licence_mit\"\n        }\n    },\n    \"available_formats\": [\n        {\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{$randomUUID}}\",\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.1.0\"\n            },\n            \"file_type\": \"application/json\",\n            \"file_size\": 59016,\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"4c9ee0f14e835927a1bbafde0eb89fb3\"\n            }\n        }\n    ]\n}",
+							"raw": "{\n    \"global_id\": \"{{seedLastMetaId}}\",\n    \"resource_title\": \"{{randomTitle}}\",\n    \"collection_tag\": \"{{stamp}}\",\n    \"purpose\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{stamp}}\"\n        }\n    ],\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{randomSynopsis}}\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{randomSummary}}\"\n        }\n    ],\n    \"theme\": \"{{randomTheme}}\",\n    \"keywords\": [\n        \"{{randomKeyword1}}\",\n        \"{{randomKeyword2}}\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"{{$randomDatePast}}\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{randomOrg}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{randomContact1}}\"\n        },\n        {\n            \"contact_id\": \"{{randomContact2}}\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_provider\": {\n            \"organization_id\": \"{{randomMetaInfoOrg}}\"\n        },\n        \"metadata_contacts\": [\n            {\n                \"contact_id\": \"{{randomContact3}}\"\n            }\n        ]\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{$randomDateRecent}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"licence_label\": \"licence_mit\"\n        }\n    },\n    \"available_formats\": [\n        {\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{$randomUUID}}\",\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.1.0\"\n            },\n            \"file_type\": \"application/json\",\n            \"file_size\": 59016,\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"4c9ee0f14e835927a1bbafde0eb89fb3\"\n            }\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -825,6 +825,47 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get 'rudi-seed' metadata",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const stamp = pm.collectionVariables.get('stamp')",
+									"pm.test(`Metadata with '${stamp}' stamp'`, () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const metadataList = pm.response.json();",
+									"    console.log(metadataList.length);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/filter?collection_tag=\"{{stamp}}\"",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}",
+								"filter"
+							],
+							"query": [
+								{
+									"key": "collection_tag",
+									"value": "\"{{stamp}}\""
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
@@ -1011,7 +1052,7 @@
 			"value": ""
 		},
 		{
-			"key": "mp",
+			"key": "stamp",
 			"value": ""
 		}
 	]
