@@ -827,7 +827,7 @@
 					"response": []
 				},
 				{
-					"name": "Get 'rudi-seed' metadata",
+					"name": "Count 'rudi-seed' metadata",
 					"event": [
 						{
 							"listen": "test",
@@ -848,19 +848,18 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/filter?collection_tag=\"{{stamp}}\"",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?count_by=collection_tag",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{apiUrl}}",
-								"{{data}}",
-								"filter"
+								"{{data}}"
 							],
 							"query": [
 								{
-									"key": "collection_tag",
-									"value": "\"{{stamp}}\""
+									"key": "count_by",
+									"value": "collection_tag"
 								}
 							]
 						}
@@ -919,6 +918,10 @@
 		}
 	],
 	"variable": [
+		{
+			"key": "stamp",
+			"value": "rudi-seed"
+		},
 		{
 			"key": "keywords",
 			"value": ""
@@ -1049,10 +1052,6 @@
 		},
 		{
 			"key": "randomContact3",
-			"value": ""
-		},
-		{
-			"key": "stamp",
 			"value": ""
 		}
 	]

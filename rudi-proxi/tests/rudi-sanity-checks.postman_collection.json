@@ -3603,7 +3603,11 @@
 	],
 	"variable": [
 		{
-			"key": "contact3",
+			"key": "stamp",
+			"value": "sanity-checks"
+		},
+		{
+			"key": "gitHash",
 			"value": ""
 		},
 		{
@@ -3619,11 +3623,7 @@
 			"value": ""
 		},
 		{
-			"key": "gitHash",
-			"value": ""
-		},
-		{
-			"key": "stamp",
+			"key": "contact3",
 			"value": ""
 		}
 	]

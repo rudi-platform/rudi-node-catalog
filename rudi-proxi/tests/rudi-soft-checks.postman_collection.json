@@ -2943,6 +2943,26 @@
 	],
 	"variable": [
 		{
+			"key": "stamp",
+			"value": "rudi-soft-checks"
+		},
+		{
+			"key": "gitHash",
+			"value": ""
+		},
+		{
+			"key": "keywords",
+			"value": ""
+		},
+		{
+			"key": "themes",
+			"value": ""
+		},
+		{
+			"key": "licences",
+			"value": ""
+		},
+		{
 			"key": "softContact1Id",
 			"value": ""
 		},
@@ -3007,15 +3027,7 @@
 			"value": ""
 		},
 		{
-			"key": "keywords",
-			"value": ""
-		},
-		{
-			"key": "themes",
-			"value": ""
-		},
-		{
-			"key": "licences",
+			"key": "softMedia1Id",
 			"value": ""
 		},
 		{
@@ -3063,15 +3075,7 @@
 			"value": ""
 		},
 		{
-			"key": "softMedia1Id",
-			"value": ""
-		},
-		{
 			"key": "softMedia2Id",
-			"value": ""
-		},
-		{
-			"key": "softReport2Id",
 			"value": ""
 		},
 		{
@@ -3079,11 +3083,7 @@
 			"value": ""
 		},
 		{
-			"key": "stamp",
-			"value": ""
-		},
-		{
-			"key": "gitHash",
+			"key": "softReport2Id",
 			"value": ""
 		}
 	]

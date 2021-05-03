@@ -548,7 +548,7 @@ function populateOptions(objectType) {
 exports.getObjectListGroup = async (objectType, groupByField, FieldModel, limit, offset) => {
   const fun = `getObjectListGroup`
   log.d(mod, fun, ``)
-  log.d(mod, fun, `objectType: ${objectType}, groupByField: ${groupByField}, FieldModel: ${FieldModel}, ${limit}/${offset} `)
+  log.d(mod, fun, `objectType: ${objectType}, groupByField: ${groupByField}, FieldModel: ${!FieldModel?'%':FieldModel.collection.collectionName}, limit: ${limit} / offset${offset} `)
 
   try {
     /* beautify ignore:start */

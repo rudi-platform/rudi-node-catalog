@@ -224,7 +224,7 @@ async function getObjectListGroup(objectType, groupBy, limit, offset) {
     /* beautify ignore:end */
 
     if (!db.isProperty(Model, groupBy))
-      throw new Error(`Field '${groupBy}' is not a property for objects of type '${(objectType)}'`)
+      throw new Error(`Field '${groupBy}' is not a property for objects of type '${objectType}'`)
 
     if (objectType == URL_OBJECT_METADATA)
       return await metadataController.getObjectListGroup(groupBy, limit, offset)
