@@ -163,7 +163,7 @@
 									"pm.test(\"Database accessible\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json()",
-									"    console.log(_.map(responseJson, 'name'))",
+									"    responseJson.map(coll => console.log(coll))",
 									"});"
 								],
 								"type": "text/javascript"
