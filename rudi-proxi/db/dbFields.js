@@ -54,7 +54,14 @@ exports.API_METAINFO_DATES_PROPERTY = 'metadata_dates';
 // Metadata properties: geospatial
 //---------------------------------------------------------------
 exports.API_METADATA_GEOGRAPHY_PROPERTY = 'geography';
+exports.API_METADATA_GEOJSON_PROPERTY = 'geographic_distribution';
+exports.API_METADATA_GEO_PROJECTION_PROPERTY = 'projection';
 exports.API_METADATA_BBOX_PROPERTY = 'bounding_box';
+exports.API_METADATA_BBOX_WEST = 'west_longitude';
+exports.API_METADATA_BBOX_EAST = 'east_longitude';
+exports.API_METADATA_BBOX_SOUTH = 'south_latitude';
+exports.API_METADATA_BBOX_NORTH = 'north_latitude';
+
 exports.API_METADATA_PERIOD_PROPERTY = 'temporal_spread';
 exports.API_METADATA_START_DATE_PROPERTY = 'start_date';
 

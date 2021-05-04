@@ -268,7 +268,15 @@ async function isObjectReferenced(objectType, rudiId) {
 }
 
 exports.setPublishedFlag = async (dbObject) => {
-  if (!dbObject.publishedAt) dbObject.publishedAt = utils.nowISO()
+  const fun = 'setPublishedFlag'
+  log.d(mod, fun, ``)
+  if (!dbObject.publishedAt) {
+    dbObject.publishedAt = utils.nowISO()
+    dbObject.save()
+    log.d(mod, fun, `dbObject published: ${json.beautify(dbObject)}`)
+  } else {
+    log.w(mod, fun, `Data was already published on : ${(dbObject.publishedAt)}`)
+  }
 }
 
 //---------------------------------------------------------------

@@ -36,6 +36,7 @@ const {
 
   API_METADATA_GEOGRAPHY_PROPERTY,
   API_METADATA_BBOX_PROPERTY,
+  API_METADATA_GEO_PROJECTION_PROPERTY,
   API_METADATA_PERIOD_PROPERTY,
   API_METADATA_START_DATE_PROPERTY,
 
@@ -96,6 +97,7 @@ const Themes = require('../thesaurus/Themes');
 const Projection = require('../thesaurus/Projections');
 const Encoding = require('../thesaurus/Encodings');
 const HashAlgo = require('../thesaurus/HashAlgorithms');
+const Projections = require('../thesaurus/Projections');
 
 
 //---------------------------------------------------------------
@@ -212,8 +214,8 @@ const MetadataSchema = new mongoose.Schema({
     validate: validArrayNotNull
   },
 
-   /** Context, objectives and final use of the data */
-   purpose: {
+  /** Context, objectives and final use of the data */
+  purpose: {
     type: [DictionaryEntry],
   },
 
@@ -242,7 +244,7 @@ const MetadataSchema = new mongoose.Schema({
   collection_tag: {
     type: String
   },
-  
+
   //---------------------------
   // Involved parties
   //---------------------------
@@ -316,18 +318,6 @@ const MetadataSchema = new mongoose.Schema({
       type: Object,
       // Custom validation in pre-save hook: required if 'geography' is defined !
 
-      /** Northernmost latitude given as a decimal number */
-      north_latitude: {
-        type: Number,
-        min: -90,
-        max: 90,
-      },
-      /** Southernmost latitude given as a decimal number */
-      south_latitude: {
-        type: Number,
-        min: -90,
-        max: 90,
-      },
       /** Westernmost latitude given as a decimal number */
       west_longitude: {
         type: Number,
@@ -340,10 +330,30 @@ const MetadataSchema = new mongoose.Schema({
         min: -180,
         max: 180,
       },
+      /** Southernmost latitude given as a decimal number */
+      south_latitude: {
+        type: Number,
+        min: -90,
+        max: 90,
+      },
+      /** Northernmost latitude given as a decimal number */
+      north_latitude: {
+        type: Number,
+        min: -90,
+        max: 90,
+      },
     },
 
     /**
-     * Precise geographic distribution of the data   
+     * Precise geographic distribution of the data
+     * 
+     * Précisions: GeoJSON uses a geographic coordinate reference system, 
+     * World Geodetic System 1984, and units of decimal degrees.
+     * The first two elements are longitude and latitude, or easting and 
+     * northing, precisely in that order and using decimal numbers.  
+     * Altitude or elevation MAY be included as an optional third element.
+     * 
+     * Source: https://tools.ietf.org/html/rfc7946#section-3.1.1
      */
     geographic_distribution: {
       type: mongoose.SchemaTypes.GeoJSON
@@ -354,7 +364,8 @@ const MetadataSchema = new mongoose.Schema({
      */
     projection: {
       type: String,
-      enum: Object.values(Projection)
+      enum: Object.values(Projection),
+      // default: 'WGS 84'
     },
 
     /** 
@@ -582,7 +593,11 @@ MetadataSchema.pre('save', async function (next) {
   log.d(mod, fun, ``)
   try {
     let metadata = this
-    json.requireSubProperty(metadata, API_METADATA_GEOGRAPHY_PROPERTY, API_METADATA_BBOX_PROPERTY)
+    if (json.requireSubProperty(metadata, API_METADATA_GEOGRAPHY_PROPERTY, API_METADATA_BBOX_PROPERTY)) {
+      if (json.isNothing(metadata[API_METADATA_GEOGRAPHY_PROPERTY][API_METADATA_GEO_PROJECTION_PROPERTY]))
+        metadata[API_METADATA_GEOGRAPHY_PROPERTY][API_METADATA_GEO_PROJECTION_PROPERTY] = 'WGS 84'
+    }
+
     json.requireSubProperty(metadata, API_METADATA_PERIOD_PROPERTY, API_METADATA_START_DATE_PROPERTY)
     await checkLicence(metadata)
   } catch (err) {

@@ -84,7 +84,7 @@ exports.accessProperty = (jsonObject, jsonProperty) => {
  * @param {String} jsonProperty 
  * @param {String} jsonProperty supporting the enum value
  * @param {String} enum value
- * @returns {String} The property value
+ * @returns {String} The property value, or false if the parent property is not defined
  * @throws object property is missing
  */
 exports.requireSubProperty = (obj, prop, subProp, enumProp, enumVal) => {
@@ -92,7 +92,7 @@ exports.requireSubProperty = (obj, prop, subProp, enumProp, enumVal) => {
   // log.d(mod, fun, `prop: ${prop} | subProp: ${subProp} | enumVal: ${enumVal}`)
   if (this.isNothing(obj[prop])) {
     log.d(mod, fun, `empty obj[${prop}]: ${this.beautify(obj[prop])}`)
-    return
+    return false
   }
   const objProp = obj[prop]
 

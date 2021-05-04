@@ -23,6 +23,7 @@ const utils = require('../utils/jsUtils')
 const db = require('../db/dbQueries')
 const dbRwk = require('../db/dbReworkData')
 const json = require('../utils/jsonAccess')
+const geo = require('../utils/geo');
 
 //---------------------------------------------------------------
 // Constants
@@ -49,7 +50,16 @@ const {
   API_METAINFO_PROVIDER_PROPERTY,
   API_METAINFO_CONTACTS_PROPERTY,
   API_METAINFO_DATES_PROPERTY,
-  FIELDS_TO_POPULATE
+
+  API_METADATA_GEOGRAPHY_PROPERTY,
+  API_METADATA_GEOJSON_PROPERTY,
+  API_METADATA_BBOX_PROPERTY,
+  API_METADATA_BBOX_WEST,
+  API_METADATA_BBOX_EAST,
+  API_METADATA_BBOX_NORTH,
+  API_METADATA_BBOX_SOUTH,
+
+  FIELDS_TO_POPULATE,
 } = require('../db/dbFields')
 
 const {
@@ -381,6 +391,9 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
         dbReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_CONTACTS_PROPERTY] = await this.contactListRudiToDbFormat(metaInfoContacts)
       }
     }
+
+    this.setGeography(dbReadyMetadata)
+
     // log.d(mod, fun, `dbReadyMetadata: ${json.beautify(dbReadyMetadata, 2)}`)
     return dbReadyMetadata
   } catch (err) {
@@ -388,6 +401,71 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
     throw err
   }
 }
+
+/** 
+ * If both 'geography.geographic_distribution' and 'geography.bounding_box' are defined,
+ * do nothing (TODO: check that they are coherent)
+ * 
+ * If 'geography.geographic_distribution' is not set and 'geography.bounding_box' is defined,
+ * sets the GeoJSON object for 'geographic_distribution' property
+ * according to 'bounding_box' properties
+ * 
+ * (TODO)
+ * If 'geography.bounding_box' is not set and 'geography.geographic_distribution' is defined, 
+ * extracts the bounding box from the GeoJSON object and set 'geography.bounding_box' accordingly
+ */
+exports.setGeography = (metadata) => {
+  const fun = 'setGeography'
+  log.d(mod, fun, ``)
+  const geography = metadata[API_METADATA_GEOGRAPHY_PROPERTY]
+  if (json.isNothing(geography)) {
+    log.d(mod, fun, `No '${API_METADATA_GEOGRAPHY_PROPERTY}' property was set`)
+    return
+  }
+
+  const bbox = geography[API_METADATA_BBOX_PROPERTY]
+  const geojson = geography[API_METADATA_GEOJSON_PROPERTY]
+  if (json.isNothing(bbox)) {
+    log.d(mod, fun, `No '${API_METADATA_BBOX_PROPERTY}' property was set`)
+    if (json.isNothing(geojson)) {
+      log.d(mod, fun, `No '${API_METADATA_GEOJSON_PROPERTY}' property was set`)
+      // No geographic information
+      // TODO: (If shouldBeStrict: error => bbox is mandatory if 'geography' is set!)
+      return
+    } else {
+      // GeoJsonToBbox GeoJSON =
+      //    1. extract 'geography.geographic_distribution.bbox'
+      //    2. set 'geography.bounding_box' properties
+      return
+    }
+  }
+
+  // else 'bbox' is set
+  if (!json.isNothing(geojson)) {
+    log.d(mod, fun, `Both '${API_METADATA_BBOX_PROPERTY}' and '${API_METADATA_GEOJSON_PROPERTY}' properties are already set`)
+    log.d(mod, fun, `'${API_METADATA_BBOX_PROPERTY}' = ${json.beautify(bbox)}`)
+    log.d(mod, fun, `'${API_METADATA_GEOJSON_PROPERTY}' = ${json.beautify(geojson)}`)
+    // TODO: check that 'geographic_distribution' property is a valid GeoJSON
+    // TODO: set bbox property if not set
+    // TODO: check that bbox subproperty is coherent with 'geography.bounding_box' coordinates
+    return
+  }
+
+  // BboxToJson = 
+  //      1. extract 'geography.bounding_box' properties
+  //      2. Create a GeoJSON Polygon with 'bbox' property
+  //      3. set 'geography.geographic_distribution' property
+
+  const west = bbox[API_METADATA_BBOX_WEST]
+  const south = bbox[API_METADATA_BBOX_SOUTH]
+  const east = bbox[API_METADATA_BBOX_EAST]
+  const north = bbox[API_METADATA_BBOX_NORTH]
+
+  metadata[API_METADATA_GEOGRAPHY_PROPERTY][API_METADATA_GEOJSON_PROPERTY] =
+    geo.bboxToGeoJsonPolygon(west, south, east, north)
+}
+
+
 
 //---------------------------------------------------------------
 // Global treatments of properties: DB -> RUDI

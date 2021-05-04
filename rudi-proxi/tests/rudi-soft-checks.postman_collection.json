@@ -2041,7 +2041,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"global_id\": \"{{softMeta1Id}}\",\n    \"resource_title\": \"Test de RUDI en local 44\",\n    \"summary\": [{\n        \"lang\": \"fr-FR\",\n        \"text\": \"Mon résumé chg 444\"\n    }],\n    \"producer\": {\n        \"organization_id\": \"{{softOrg1Id}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{softContact1Id}}\"\n        }\n    ],\n    \"metadata_info\": {\n        \"metadata_provider\": {\n            \"organization_id\": \"{{softOrg2Id}}\"\n        },\n        \"metadata_contacts\": [\n            {\n                \"contact_id\": \"{{softContact2Id}}\"\n            }\n        ]\n    }\n}",
+							"raw": "{\n    \"global_id\": \"{{softMeta1Id}}\",\n    \"resource_title\": \"Test de RUDI en local 44\",\n    \"summary\": [{\n        \"lang\": \"fr-FR\",\n        \"text\": \"Mon résumé chg 444\"\n    }],\n    \"producer\": {\n        \"organization_id\": \"{{softOrg1Id}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{softContact1Id}}\"\n        }\n    ],\n    \"metadata_info\": {\n        \"metadata_provider\": {\n            \"organization_id\": \"{{softOrg2Id}}\"\n        },\n        \"metadata_contacts\": [\n            {\n                \"contact_id\": \"{{softContact2Id}}\"\n            }\n        ],\n        \"metadata_dates\": {\n            \"created\": \"{{now}}\"\n        }\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
