@@ -13,4 +13,4 @@ todo
 notes
 *.code-workspace
 **/seed
-eslintrc.json
+**/.eslintrc.json
