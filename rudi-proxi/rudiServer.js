@@ -1,21 +1,21 @@
-'use strict';
+'use strict'
 
 const mod = 'main'
 
-//---------------------------------------------------------------
-// Internal dependancies 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
+// Internal dependancies
+// ---------------------------------------------------------------
 const utils = require('./utils/jsUtils')
 const sys = require('./config/confSystem')
 const logConf = require('./config/confLogs')
 const log = require('./utils/logging')
 
 const api = require('./config/confApi')
-const sysController = require('./controllers/sysController');
+const sysController = require('./controllers/sysController')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // External dependancies / init
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Require external modules
 const mongoose = require('mongoose')
 
@@ -42,12 +42,12 @@ const swagger = require('./config/swagger')
 // Register Swagger
 fastify.register(require('fastify-swagger'), swagger.options)
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // DB connection
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
 // Setting flags to avoid deprecation warnings
-mongoose.set('useFindAndModify', false);
+mongoose.set('useFindAndModify', false)
 
 // Connect to DB
 /*
@@ -65,10 +65,9 @@ const mongoConnectOptions = {
 log.i(mod, 'mongo', `Connecting to [${sys.DB_URL}]`)
 const mongoConnection = mongoose.connect(sys.DB_URL, mongoConnectOptions)
 
-
-//---------------------------------------------------------------
-// ROUTES 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
+// ROUTES
+// ---------------------------------------------------------------
 
 // Import Routes
 const {
@@ -76,16 +75,16 @@ const {
   backOfficeRoutes,
   inspectRequest,
   devRoutes
-} = require('./routes/routes');
+} = require('./routes/routes')
 const {
   initFFLogger
-} = require('./config/confLogs');
+} = require('./config/confLogs')
 const {
   consoleErr
-} = require('./utils/jsUtils');
+} = require('./utils/jsUtils')
 const {
   VERSION
-} = require('lodash');
+} = require('lodash')
 
 // Declare a default route
 fastify.get('/', async (request, reply) => {
@@ -117,13 +116,13 @@ fastify.get(`${api.URL_PREFIX_PUBLIC}/`, async (request, reply) => {
   }
 })
 
-// Loop over each public route  
+// Loop over each public route
 publicRoutes.forEach((pubRoute, index) => {
   fastify.route(pubRoute)
   log.v(mod, 'routes', `route #${index} = ${pubRoute.method} ${pubRoute.url}`)
 })
 
-// Loop over each backoffice route  
+// Loop over each backoffice route
 backOfficeRoutes.forEach((boRoute, index) => {
   fastify.route(boRoute)
   log.d(mod, 'routes', `route #${index} = ${boRoute.method} ${boRoute.url}`)
@@ -133,9 +132,9 @@ devRoutes.forEach((rouge, index) => {
   fastify.route(rouge)
 })
 
-//---------------------------------------------------------------
-// SERVER 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
+// SERVER
+// ---------------------------------------------------------------
 const start = async () => {
   try {
     await fastify.listen(sys.LISTENING_PORT, sys.LISTENING_ADDR)
@@ -176,6 +175,6 @@ process.on('uncaughtException', err => {
 
 process.on('unhandledRejection', (error, promise) => {
   const fun = 'catching promise rejection'
-  log.e(mod, fun, 'DAMN!!! Promise rejection not handled here: ', promise);
-  log.e(mod, fun, 'The error was: ', error);
-});
+  log.e(mod, fun, 'DAMN!!! Promise rejection not handled here: ', promise)
+  log.e(mod, fun, 'The error was: ', error)
+})

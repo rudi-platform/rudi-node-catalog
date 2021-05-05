@@ -1,28 +1,28 @@
-'use strict';
+'use strict'
 
 const mod = 'db'
 /*
  * In this file are made the different calls to the database
  */
 
-//---------------------------------------------------------------
-// External dependancies 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
+// External dependancies
+// ---------------------------------------------------------------
 const boom = require('@hapi/boom')
 const mongoose = require('mongoose')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Internal dependencies
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
 
 const json = require('../utils/jsonAccess')
 const utils = require('../utils/jsUtils')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Constants
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const {
   PARAM_ID,
   URL_OBJECT_METADATA,
@@ -61,32 +61,31 @@ const {
   API_SKOS_CONCEPT_ROLE,
   FIELDS_TO_SKIP,
   API_MEDIA_PROPERTY,
-} = require('./dbFields');
+} = require('./dbFields')
 
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Data models
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const Organization = require('../definitions/models/Organization')
-const Contact = require('../definitions/models/Contact');
+const Contact = require('../definitions/models/Contact')
 /* beautify ignore:start */
 const { Metadata, METADATA_FIELDS_TO_POPULATE } = require('../definitions/models/Metadata')
-const { Media } = require('../definitions/models/Media');
-const { Report } = require('../definitions/models/Report');
+const { Media } = require('../definitions/models/Media')
+const { Report } = require('../definitions/models/Report')
 /* beautify ignore:end */
 
-const SkosScheme = require('../definitions/models/SkosScheme');
-const SkosConcept = require('../definitions/models/SkosConcept');
+const SkosScheme = require('../definitions/models/SkosScheme')
+const SkosConcept = require('../definitions/models/SkosConcept')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Properties with special treatments
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 /** Fields to skip while populating */
 const SKIP_FIELDS = `-${FIELDS_TO_SKIP.join(' -')}`
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Specific object accesses
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const OBJ_MODEL = {
   [URL_OBJECT_METADATA]: Metadata,
   [URL_OBJECT_ORGANIZATIONS]: Organization,
@@ -155,14 +154,14 @@ exports.getFieldModel = (objectType, field) => {
     case API_DATA_PRODUCER_PROPERTY:
     case `${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`:
       return Organization
-      break;
+      break
     case API_DATA_CONTACTS_PROPERTY:
     case `${API_METAINFO_PROPERTY}.${API_METAINFO_CONTACTS_PROPERTY}`:
       return Contact
-      break;
+      break
     case `${API_MEDIA_PROPERTY}`:
       return Media
-      break;
+      break
     default:
       return null
   }
@@ -183,9 +182,9 @@ function getPopulateFields(objectType) {
   return METADATA_FIELDS_TO_POPULATE
 }
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Helper functions
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 exports.getModelPropertyNames = (Model) => {
   return Object.keys(Model.schema.paths)
 }
@@ -194,9 +193,9 @@ exports.isProperty = (Model, prop) => {
   return this.getModelPropertyNames(Model).includes(prop)
 }
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Actions on DB tables
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 exports.getCollections = async () => {
   const fun = `getCollections`
   try {
@@ -224,9 +223,9 @@ exports.dropDB = async () => {
     throw err
   }
 }
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Generic functions: get single object
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 exports.getObject = async (objectType, filter) => {
   const fun = `getObject`
   log.d(mod, fun, ``)
@@ -294,6 +293,7 @@ exports.getEnsuredObjectWithJson = async (objectType, rudiObject) => {
     throw err
   }
 }
+
 exports.getEnsuredObjectWithDbId = async (objectType, dbId) => {
   const fun = `getEnsuredObjectWithDbId`
   log.d(mod, fun, ``)
@@ -331,9 +331,9 @@ exports.doesObjectExistWithJson = async (objectType, rudiObject) => {
   }
 }
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Generic functions: get single object / partial access
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 exports.getObjectPropertiesWithDbId = async (objectType, dbId, propertyList) => {
   const fun = `getObjectPropertiesWithDbId`
   log.d(mod, fun, ``)
@@ -431,7 +431,7 @@ exports.getEnsuredDbIdWithJson = async (objectType, rudiObject) => {
   }
 }
 
-/* 
+/*
 exports.getObjectWithField = async (Model, fieldName, fieldValue, populateFields) => {
   const fun = `getObjectWithField`
   // log.d(mod, fun, ``)
@@ -449,12 +449,9 @@ exports.getObjectWithField = async (Model, fieldName, fieldValue, populateFields
 }
  */
 
-
-
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Generic functions: get object list
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 exports.getObjectList = async (objectType, limit, offset, filter, extRefs) => {
   const fun = `getObjectList`
   log.d(mod, fun, ``)
@@ -518,20 +515,19 @@ exports.getObjectListCount = async (objectType, unionField, limit, offset) => {
         'count': {'$sum': 1}
       }},
       {"$sort": {"count": -1}},
-    ]).exec();
+    ]).exec()
     /* beautify ignore:end */
-
 
     if (!FieldModel) {
       objectList.map(obj => {
-        obj[unionField] = obj['_id'];
-        delete obj['_id'];
+        obj[unionField] = obj['_id']
+        delete obj['_id']
       })
       return objectList
     } else {
       await Promise.all(objectList.map(async (obj) => {
         obj[unionField] = await FieldModel.findById(obj['_id'])
-        delete obj['_id'];
+        delete obj['_id']
       }))
 
       return objectList
@@ -560,12 +556,12 @@ exports.getObjectListGroup = async (objectType, unionField, limit, offset) => {
         'list':{$push: {id:"$_id"}}
       }},
       {"$sort": {"count": -1}},
-    ]).exec();
+    ]).exec()
     /* beautify ignore:end */
 
     objectList.map(obj => {
-      obj[unionField] = obj['_id'];
-      delete obj['_id'];
+      obj[unionField] = obj['_id']
+      delete obj['_id']
     })
 
     if (!FieldModel) {
@@ -679,7 +675,7 @@ exports.deleteManyWithRudiIds = async (objectType, rudiIdList) => {
   }
 
   /* beautify ignore:start */
-  const {Model, idField} = this.getObjectAccesses(objectType)  
+  const {Model, idField} = this.getObjectAccesses(objectType)
   const filter = { [idField]: {$in: rudiIdList} }
   /* beautify ignore:end */
 
@@ -725,13 +721,13 @@ function changeConditionsIntoRegex(conditions) {
   return regexConditions
 }
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Specific functions
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
-//---------------------------------------- 
+// ----------------------------------------
 // - Metadata
-//---------------------------------------- 
+// ----------------------------------------
 exports.getMetadataWithJson = async (metadataJson) => {
   const fun = `getMetadataFromJson`
   log.d(mod, fun, ``)
@@ -806,9 +802,9 @@ exports.deleteMetadata = async (metadataRudiId) => {
   return deletedMetadata
 }
 
-//---------------------------------------- 
+// ----------------------------------------
 // - Organization
-//---------------------------------------- 
+// ----------------------------------------
 exports.getOrganizationWithJson = async (organizationJson) => {
   const fun = `getOrganizationWithJson`
   log.d(mod, fun, ``)
@@ -910,9 +906,9 @@ exports.deleteOrganization = async (organizationRudiId) => {
   return deletedOrganization
 }
 
-//---------------------------------------- 
+// ----------------------------------------
 // - Contacts
-//---------------------------------------- 
+// ----------------------------------------
 
 exports.getContactWithRudiId = async (contactRudiId) => {
   const fun = `getContactWithRudiId`
@@ -1004,9 +1000,9 @@ exports.deleteContact = async (contactRudiId) => {
   return deletedContact
 }
 
-//---------------------------------------- 
+// ----------------------------------------
 // - Media
-//---------------------------------------- 
+// ----------------------------------------
 exports.getMediaDbIdWithJson = async (mediaJson) => {
   const fun = `getMediaDbIdWithJson`
   log.d(mod, fun, ``)
@@ -1039,9 +1035,9 @@ exports.getEnsuredMediaWithDbId = async (mediaDbId) => {
   return await this.getEnsuredObjectWithDbId(URL_OBJECT_MEDIA, mediaDbId)
 }
 
-//---------------------------------------- 
+// ----------------------------------------
 // - SKOS: Scheme
-//---------------------------------------- 
+// ----------------------------------------
 exports.getSchemeDbIdWithJson = async (schemeJson) => {
   const fun = `getSchemeDbIdWithJson`
   log.d(mod, fun, ``)
@@ -1077,16 +1073,16 @@ exports.getEnsuredSchemeWithDbId = async (schemeDbId) => {
   log.d(mod, fun, ``)
   return await this.getEnsuredObjectWithDbId(URL_OBJECT_SKOS_SCHEME, schemeDbId)
 }
-/* 
+/*
 exports.getEnsuredSchemeWithCode = async (schemeCode) => {
   const fun = `getSchemeJsonIdWithDbId`
   log.d(mod, fun, ``)
   return this.getEnsuredObjectWithRudiId(URL_OBJECT_SKOS_SCHEME, SkosScheme, schemeDbId)
 }
  */
-//---------------------------------------- 
+// ----------------------------------------
 // - SKOS: Concept
-//---------------------------------------- 
+// ----------------------------------------
 
 exports.getConceptWithDbId = async (conceptDbId) => {
   const fun = `getConceptWithDbId`
@@ -1146,13 +1142,12 @@ exports.getAllConceptsWithRole = async (conceptRole) => {
   return conceptList
 }
 
-//---------------------------------------- 
+// ----------------------------------------
 // - Filters
-//---------------------------------------- 
+// ----------------------------------------
 exports.findNotReferencedInMetadata = (objectType) => {
   const fun = `isReferencedInMetadata`
   log.d(mod, fun, ``)
-
 
 }
 
@@ -1186,7 +1181,7 @@ exports.isReferencedInMetadata = async (objectType, rudiId) => {
           /* beautify ignore:end */
         ]
       }
-      break;
+      break
     case URL_OBJECT_CONTACTS:
       metadataFilter = {
         $or: [
@@ -1196,7 +1191,7 @@ exports.isReferencedInMetadata = async (objectType, rudiId) => {
           /* beautify ignore:end */
         ]
       }
-      break;
+      break
     case URL_OBJECT_MEDIA:
       metadataFilter = {
         [`${API_MEDIA_PROPERTY}`]: dbId
@@ -1240,7 +1235,6 @@ exports.isOrgUsedInMetadata = async (dbOrg) => {
   // return (null != metadataWithMetaInfoProvider)
   return (null != metadataWithMetaInfoProvider)
 }
-
 
 // what? filtering nested array
 // how-> https://www.devsbedevin.net/mongodb-find-findone-with-nested-array-filtering-finally/

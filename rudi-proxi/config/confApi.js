@@ -1,29 +1,29 @@
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // API version
-//---------------------------------------------------------------
-exports.API_VERSION = '1.2.0';
+// ---------------------------------------------------------------
+exports.API_VERSION = '1.2.0'
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // REQ methods
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 exports.HttpMethods = {
   POST: 'POST',
   PUT: 'PUT',
   DELETE: 'DELETE'
 }
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // REQ parameters
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 exports.DEFAULT_LANG = 'fr'
 
-//--- "In path" parameters
-exports.PARAM_LANG = 'lang';
-exports.PARAM_OBJECT = 'object';
-exports.PARAM_ID = 'id';
-exports.PARAM_REPORT_ID = 'irid';
+// --- "In path" parameters
+exports.PARAM_LANG = 'lang'
+exports.PARAM_OBJECT = 'object'
+exports.PARAM_ID = 'id'
+exports.PARAM_REPORT_ID = 'irid'
 
-//--- "In query" parameters
+// --- "In query" parameters
 exports.QUERY_LIMIT = 'limit'
 exports.QUERY_OFFSET = 'offset'
 exports.QUERY_FILTER = 'filter'
@@ -33,10 +33,10 @@ exports.QUERY_COUNT_BY = 'count_by'
 exports.QUERY_LIMIT_DEFAULT = 100
 exports.QUERY_OFFSET_DEFAULT = 0
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // REQ URL
-//---------------------------------------------------------------
-exports.URL_PREFIX_PUBLIC = '/api/v1';
+// ---------------------------------------------------------------
+exports.URL_PREFIX_PUBLIC = '/api/v1'
 
 // This generic URL will be used to factorize the treatments on resources, organizations, contacts, etc.
 exports.URL_OBJECT_GENERIC = `${this.URL_PREFIX_PUBLIC}/:${this.PARAM_OBJECT}`
@@ -63,10 +63,10 @@ exports.URL_OBJECTS = [
   this.URL_ACTION_REPORT
 ]
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // DB actions
-//---------------------------------------------------------------
-exports.URL_PREFIX_PRIVATE = '/api/admin';
+// ---------------------------------------------------------------
+exports.URL_PREFIX_PRIVATE = '/api/admin'
 
 exports.URL_LOGS_SUFFIX = 'logs'
 exports.URL_LOGS_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_LOGS_SUFFIX}`

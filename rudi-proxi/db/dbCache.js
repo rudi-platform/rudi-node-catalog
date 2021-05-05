@@ -1,9 +1,9 @@
 const {
   DB_ID
-} = require("./dbFields");
+} = require("./dbFields")
 
-const ORG_MAP = new Map();
-const CONT_MAP = new Map();
+const ORG_MAP = new Map()
+const CONT_MAP = new Map()
 
 /** Replaces an access to the DB by acceding a simple map */
 exports.getOrganization = (orgDbId) => {
@@ -29,4 +29,3 @@ exports.removeOrganization = (orgDbId) => {
 
 exports.deleteAllOrganization = () => {
 
-}

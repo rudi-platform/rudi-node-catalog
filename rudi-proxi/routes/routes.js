@@ -1,29 +1,27 @@
-'use strict';
+'use strict'
 
-const mod = 'routes'
+// const mod = 'routes'
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // External dependencies
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Internal dependencies
-//---------------------------------------------------------------
-const utils = require('../utils/jsUtils');
-const log = require('../utils/logging')
+// ---------------------------------------------------------------
+const utils = require('../utils/jsUtils')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Swagger documentation
-//---------------------------------------------------------------
-const documentation = require('./documentation/metadataApi')
+// ---------------------------------------------------------------
+// const documentation = require('./documentation/metadataApi')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // API request constants
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const {
   URL_PREFIX_PUBLIC,
   URL_OBJECT_GENERIC,
-  PARAM_OBJECT,
   PARAM_ID,
   PARAM_REPORT_ID,
   PARAM_THESAURUS_CODE,
@@ -33,11 +31,9 @@ const {
   URL_DB_ACCESS,
   URL_LOGS_ACCESS,
   URL_THESAURUS_ACCESS,
-  URL_GIT_HASH_ACCESS: URL_APP_ID_ACCESS,
   URL_NODE_VERSION_ACCESS,
   URL_LICENCE_ACCESS,
   URL_LICENCE_CODES_ACCESS,
-  URL_LICENCE_SUFFIX,
   PARAM_LOGS_LINES,
   URL_ACTION_FILTER,
   URL_GIT_HASH_ACCESS,
@@ -45,33 +41,30 @@ const {
   URL_PREFIX_PRIVATE,
 } = require('../config/confApi')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Controllers
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const genericController = require('../controllers/genericController')
-const metadataController = require('../controllers/metadataController')
-const organizationController = require('../controllers/organizationController')
-const contactController = require('../controllers/contactController')
 const reportController = require('../controllers/reportController')
 
-const dbController = require('../controllers/dbController');
-const sysController = require('../controllers/sysController');
-const skosController = require('../controllers/skosController');
-const licenceController = require('../controllers/licenceController');
+const dbController = require('../controllers/dbController')
+const sysController = require('../controllers/sysController')
+const skosController = require('../controllers/skosController')
+const licenceController = require('../controllers/licenceController')
 
-const devController = require('../controllers/testController');
+const devController = require('../controllers/testController')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Helper functions
-//---------------------------------------------------------------
-function logRequest(req, res) {
+// ---------------------------------------------------------------
+/* function logRequest(req, res) {
   const fun = 'logRequest'
   utils.consoleLog('', fun, `${req.ip}: ${req.method} ${req.url} `)
 }
-
-//---------------------------------------------------------------
+ */
+// ---------------------------------------------------------------
 // Public routes
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 exports.publicRoutes = [
 
   // Routes accessed by RUDI Portal:
@@ -84,10 +77,10 @@ exports.publicRoutes = [
     // preHandler: logRequest,
     handler: genericController.generateUUID
   },
-  //---------------------------------------------------------------
+  // ---------------------------------------------------------------
   // Generic routes for accessing any object
   // ('Metadata', 'Organizations' and 'Contacts')
-  //---------------------------------------------------------------
+  // ---------------------------------------------------------------
   // Delete many
   {
     method: 'POST',
@@ -146,9 +139,9 @@ exports.publicRoutes = [
     handler: genericController.deleteEveryObject
   },
 
-  //---------------------------------------------------------------
+  // ---------------------------------------------------------------
   // Integration reports for one particular object
-  //---------------------------------------------------------------
+  // ---------------------------------------------------------------
   // Delete many reports for one object integration
   {
     method: 'POST',
@@ -199,9 +192,9 @@ exports.publicRoutes = [
     handler: reportController.deleteEveryReportForObject
   },
 
-  //---------------------------------------------------------------
+  // ---------------------------------------------------------------
   // Integration reports for one object type
-  //---------------------------------------------------------------
+  // ---------------------------------------------------------------
   // Get all reports for one object integration
   {
     method: 'GET',
@@ -211,13 +204,13 @@ exports.publicRoutes = [
   },
 ]
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Private routes
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 exports.backOfficeRoutes = [
-  //---------------------------------------------------------------
+  // ---------------------------------------------------------------
   // (distant dev) Route for accessing logs
-  //---------------------------------------------------------------
+  // ---------------------------------------------------------------
   {
     method: 'GET',
     url: `${URL_LOGS_ACCESS}`,
@@ -231,9 +224,9 @@ exports.backOfficeRoutes = [
     handler: sysController.getLastLogLines
   },
 
-  //---------------------------------------------------------------
+  // ---------------------------------------------------------------
   // (distant dev) Route for accessing thesaurus
-  //---------------------------------------------------------------
+  // ---------------------------------------------------------------
   {
     method: 'GET',
     url: `${URL_THESAURUS_ACCESS}`,
@@ -258,9 +251,9 @@ exports.backOfficeRoutes = [
     handler: licenceController.getAllLicenseCodes
   },
 
-  //---------------------------------------------------------------
-  // (distant dev) Route for accessing 
-  //---------------------------------------------------------------
+  // ---------------------------------------------------------------
+  // (distant dev) Route for accessing
+  // ---------------------------------------------------------------
   {
     method: 'GET',
     url: `${URL_GIT_HASH_ACCESS}`,
@@ -279,9 +272,9 @@ exports.backOfficeRoutes = [
     // preHandler: logRequest,
     handler: sysController.getNodeVersion
   },
-  //---------------------------------------------------------------
+  // ---------------------------------------------------------------
   // (distant dev) Routes for actions on DB
-  //---------------------------------------------------------------
+  // ---------------------------------------------------------------
   // Get all collections
   {
     method: 'GET',
@@ -295,8 +288,7 @@ exports.backOfficeRoutes = [
     url: `${URL_DB_ACCESS}`,
     // preHandler: logRequest,
     handler: dbController.dropDB
-  },
-
+  }
 ]
 
 exports.devRoutes = [
@@ -305,5 +297,5 @@ exports.devRoutes = [
     url: `${URL_PREFIX_PRIVATE}/test`,
     // preHandler: logRequest,
     handler: devController.test
-  },
+  }
 ]

@@ -1,8 +1,8 @@
-'use strict';
+'use strict'
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Custom schema definition
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
 // Method for computing the integrity hash of the data
 const Keywords = [
@@ -52,13 +52,11 @@ const Keywords = [
   society: "Société",
   structure: "Structure",
   transportation: "Transport",
-  utilitiesCommunication: "Services d’utilité publique/Communication", 
+  utilitiesCommunication: "Services d’utilité publique/Communication",
 }
   */
 
-
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Exports
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 module.exports = Keywords

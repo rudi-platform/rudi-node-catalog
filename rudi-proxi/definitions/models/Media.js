@@ -1,30 +1,29 @@
-'use strict';
+'use strict'
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // External dependancies
-//---------------------------------------------------------------
-const mongoose = require('mongoose');
-const Int32 = require('mongoose-int32');
-const _ = require('lodash');
+// ---------------------------------------------------------------
+const mongoose = require('mongoose')
+const Int32 = require('mongoose-int32')
+const _ = require('lodash')
 
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Internal dependancies
-//---------------------------------------------------------------
-const Ids = require('../schemas/Identifiers');
-const Validation = require('../schemaValidators');
+// ---------------------------------------------------------------
+const Ids = require('../schemas/Identifiers')
+const Validation = require('../schemaValidators')
 
-const Encodings = require('../thesaurus/Encodings');
-const FileTypes = require('../thesaurus/FileTypes');
-const HashAlgorithms = require('../thesaurus/HashAlgorithms');
+const Encodings = require('../thesaurus/Encodings')
+const FileTypes = require('../thesaurus/FileTypes')
+const HashAlgorithms = require('../thesaurus/HashAlgorithms')
 
 const {
   FIELDS_TO_SKIP
 } = require('../../db/dbFields')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Constants
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
 const MediaTypes = {
   File: 'FILE',
@@ -36,20 +35,20 @@ const UpdateStatus = [
   'updated', // the data is up to date
   'historical', // ancient data that has been updated
   'obsolete', // dataset that is too old but cannot be updated or replaced with another
-];
+]
 
 const commonSchemaOptions = {
   discriminatorKey: 'media_type',
   timestamps: true,
   id: false,
-};
+}
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Media schema definition
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
 const MediaSchema = new mongoose.Schema({
-  // Unique and permanent identifier for the organization in RUDI 
+  // Unique and permanent identifier for the organization in RUDI
   // system (required)
   media_id: Ids.UUIDv4,
 
@@ -66,16 +65,16 @@ const MediaSchema = new mongoose.Schema({
       type: String,
       required: true
     },
-    // TODO: define this properly. 
-    // Most likely an enum defined in Rudi that can be handled in 
+    // TODO: define this properly.
+    // Most likely an enum defined in Rudi that can be handled in
     // a known manner
     interface_contract: String
   },
-}, commonSchemaOptions);
+}, commonSchemaOptions)
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // File schema definition
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const FileSchema = new mongoose.Schema({
 
   // Native format of the resource
@@ -85,7 +84,7 @@ const FileSchema = new mongoose.Schema({
     required: true
   },
 
-  // Size of the file, in bytes 
+  // Size of the file, in bytes
   file_size: {
     type: Int32,
     required: true
@@ -123,18 +122,18 @@ const FileSchema = new mongoose.Schema({
   //                    but still incomplete
   //   - 'updated'    = the data is up to date
   //   - 'historical' = ancient data that has been updated
-  //   - 'obsolete'   = dataset that is too old but cannot be updated 
+  //   - 'obsolete'   = dataset that is too old but cannot be updated
   //                    or replaced with another
   update_status: {
     type: String,
     enum: Object.values(UpdateStatus)
-  },
+  }
 
-}, commonSchemaOptions);
+}, commonSchemaOptions)
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Series schema definition
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const SeriesSchema = new mongoose.Schema({
 
   // Theorical delay between the production of the record and its availability,
@@ -168,36 +167,39 @@ const SeriesSchema = new mongoose.Schema({
     minimum: 0
   },
 
-  // Estimated total size of the data, in bytes 
+  // Estimated total size of the data, in bytes
   total_size: {
     type: Int32,
     minimum: 0
-  },
+  }
 
-}, commonSchemaOptions);
+}, commonSchemaOptions)
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Schema refinements
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
-//----- toJSON cleanup
-[MediaSchema, FileSchema, SeriesSchema]
-.map(mediaType =>
-  mediaType.methods.toJSON = function () {
-    return _.omit(this.toObject(), FIELDS_TO_SKIP)
-  })
+// ----- toJSON cleanup
+MediaSchema.methods.toJSON = function () {
+  return _.omit(this.toObject(), FIELDS_TO_SKIP)
+}
+FileSchema.methods.toJSON = function () {
+  return _.omit(this.toObject(), FIELDS_TO_SKIP)
+}
+SeriesSchema.methods.toJSON = function () {
+  return _.omit(this.toObject(), FIELDS_TO_SKIP)
+}
 
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Models definition
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const Media = mongoose.model('Media', MediaSchema)
 const MediaFile = Media.discriminator(MediaTypes.File, FileSchema)
 const MediaSeries = Media.discriminator(MediaTypes.Series, SeriesSchema)
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Exports
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 module.exports = {
   Media,
   MediaFile,

@@ -1,20 +1,20 @@
-'use strict';
+'use strict'
 
 const mod = 'repCtrl'
 /*
- * This file describes the different steps followed for each 
+ * This file describes the different steps followed for each
  * action on the intergration reports submitted by the Portal
  * (for metadata as well as organizations and contacts integration)
  */
 
-//---------------------------------------------------------------
-// External dependancies 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
+// External dependancies
+// ---------------------------------------------------------------
 const boom = require('@hapi/boom')
 
-//---------------------------------------------------------------
-// Internal dependancies 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
+// Internal dependancies
+// ---------------------------------------------------------------
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
 
@@ -25,9 +25,9 @@ const lang = require('../utils/lang')
 
 const genericController = require('../controllers/genericController')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Constants
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const {
   DB_ID,
   API_METADATA_ID,
@@ -52,20 +52,20 @@ const {
   URL_ACTION_FILTER
 } = require('../config/confApi')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Data models
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const {
   Metadata
-} = require('../definitions/models/Metadata');
+} = require('../definitions/models/Metadata')
 const {
   Report,
   IntegrationStatus
-} = require('../definitions/models/Report');
+} = require('../definitions/models/Report')
 
-//---------------------------------------------------------------
-// Controllers: integration report for any object 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
+// Controllers: integration report for any object
+// ---------------------------------------------------------------
 
 // Add a new report for one object integration
 exports.addSingleReportForObject = async (req, reply) => {
@@ -132,7 +132,7 @@ exports.addOrEditSingleReportForObject = async (req, reply) => {
     const existsObject = await db.doesObjectExistWithRudiId(objectType, urlObjectId)
     if (!existsObject) throw new Error(`${msg.objectNotFound(objectType, urlObjectId)}`)
 
-    // check if the report exists 
+    // check if the report exists
     const dbReport = await db.getObjectWithRudiId(URL_ACTION_REPORT, reportId)
 
     let dbReadyReport

@@ -1,14 +1,14 @@
-'use strict';
+'use strict'
 
 const mod = 'orgCtrl'
 /*
- * This file describes the steps followed for each 
+ * This file describes the steps followed for each
  * action on the organizations (producer or publisher)
  */
 
-//---------------------------------------------------------------
-// External dependancies 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
+// External dependancies
+// ---------------------------------------------------------------
 const boom = require('@hapi/boom')
 
 const log = require('../utils/logging')
@@ -18,9 +18,9 @@ const db = require('../db/dbQueries')
 const dbRwk = require('../db/dbReworkData')
 const json = require('../utils/jsonAccess')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Constants
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const {
   DB_ID,
   API_METADATA_ID,
@@ -36,11 +36,11 @@ const {
   URL_OBJECT_ORGANIZATIONS
 } = require('../config/confApi')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Data models
-//---------------------------------------------------------------
-const Organization = require('../definitions/models/Organization');
-// const cache = require('../db/dbCache');
+// ---------------------------------------------------------------
+const Organization = require('../definitions/models/Organization')
+// const cache = require('../db/dbCache')
 
 exports.newOrganization = async (orgJson) => {
   const fun = 'newOrganization'

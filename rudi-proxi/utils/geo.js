@@ -1,27 +1,25 @@
-'use strict';
+'use strict'
 
 const mod = 'geo'
-/** 
+/**
  * Library for treating geography related properties
  */
 
-//---------------------------------------------------------------
-// External dependancies 
-//---------------------------------------------------------------
-// const geojson = require('geojson');
+// ---------------------------------------------------------------
+// External dependancies
+// ---------------------------------------------------------------
+// const geojson = require('geojson')
 
+// ---------------------------------------------------------------
+// Internal dependancies
+// ---------------------------------------------------------------
+const log = require("./logging")
 
-//---------------------------------------------------------------
-// Internal dependancies 
-//---------------------------------------------------------------
-const log = require("./logging");
-
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Functions
-//---------------------------------------------------------------
-/** 
- * Creates a GeoJSON Polygon object from a set of 4 coordinates 
+// ---------------------------------------------------------------
+/**
+ * Creates a GeoJSON Polygon object from a set of 4 coordinates
  * describing a bounding box
  */
 exports.bboxToGeoJsonPolygon = (western, southern, eastern, northern) => {
@@ -48,9 +46,9 @@ exports.bboxToGeoJsonPolygon = (western, southern, eastern, northern) => {
     [western, southern]
   ]
 
-  // Coordinates of a Polygon are an array of linear ring 
-  // coordinate arrays.  
-  // The first element in the array represents the exterior ring.  
+  // Coordinates of a Polygon are an array of linear ring
+  // coordinate arrays.
+  // The first element in the array represents the exterior ring.
   // Any subsequent elements represent interior rings (or holes).
   // source: https://tools.ietf.org/html/rfc7946#appendix-A.3
   const geoJsonPolygon = {
@@ -62,11 +60,11 @@ exports.bboxToGeoJsonPolygon = (western, southern, eastern, northern) => {
   return geoJsonPolygon
 }
 
-/** 
- * Creates a GeoJSON Polygon object from a set of 4 coordinates 
+/**
+ * Creates a GeoJSON Polygon object from a set of 4 coordinates
  * describing a bounding box
  */
-/* 
+/*
 exports.bboxFromGeoJsonObject = (geoJsonObject) => {
   const fun = 'bboxFromGeoJsonObject'
   log.d(mod, fun, ``)
@@ -75,4 +73,4 @@ exports.bboxFromGeoJsonObject = (geoJsonObject) => {
   log.d(mod, fun, `bbox: ${bbox}`)
 
   return bbox
-} */
+ */

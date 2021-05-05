@@ -1,42 +1,42 @@
-'use strict';
+'use strict'
 
 const mod = 'skosCtrl'
 /*
- * In this file are made the different steps followed for each 
+ * In this file are made the different steps followed for each
  * action on the thesaurus
  */
 
-//---------------------------------------------------------------
-// External dependancies 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
+// External dependancies
+// ---------------------------------------------------------------
 const boom = require('@hapi/boom')
 
-//---------------------------------------------------------------
-// Internal dependancies 
-//---------------------------------------------------------------
-const db = require('../db/dbQueries');
+// ---------------------------------------------------------------
+// Internal dependancies
+// ---------------------------------------------------------------
+const db = require('../db/dbQueries')
 const log = require('../utils/logging')
-const json = require('../utils/jsonAccess');
-const utils = require('../utils/jsUtils');
+const json = require('../utils/jsonAccess')
+const utils = require('../utils/jsUtils')
 
 const licenceController = require('./licenceController')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Data models
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const SkosScheme = require('../definitions/models/SkosScheme')
-const SkosConcept = require('../definitions/models/SkosConcept');
+const SkosConcept = require('../definitions/models/SkosConcept')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Thesauri
-//---------------------------------------------------------------
-const Encodings = require("../definitions/thesaurus/Encodings");
-const FileTypes = require("../definitions/thesaurus/FileTypes");
-const HashAlgorithms = require("../definitions/thesaurus/HashAlgorithms");
-const Keywords = require("../definitions/thesaurus/Keywords");
-const Languages = require("../definitions/thesaurus/Languages");
-const Projections = require("../definitions/thesaurus/Projections");
-const Themes = require("../definitions/thesaurus/Themes");
+// ---------------------------------------------------------------
+const Encodings = require("../definitions/thesaurus/Encodings")
+const FileTypes = require("../definitions/thesaurus/FileTypes")
+const HashAlgorithms = require("../definitions/thesaurus/HashAlgorithms")
+const Keywords = require("../definitions/thesaurus/Keywords")
+const Languages = require("../definitions/thesaurus/Languages")
+const Projections = require("../definitions/thesaurus/Projections")
+const Themes = require("../definitions/thesaurus/Themes")
 
 const THESAURI = {
   "encodings": Encodings,
@@ -48,9 +48,9 @@ const THESAURI = {
   "themes": Themes
 }
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Constants
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const {
   DB_ID,
   DB_V,
@@ -69,8 +69,7 @@ const {
   API_CONCEPT_SIBLINGS_PROPERTY,
   API_CONCEPT_RELATIVE_PROPERTY,
   API_CONTACT_ID
-} = require('../db/dbFields');
-
+} = require('../db/dbFields')
 
 const PROPERTIES_WITH_CONCEPT_REFS = [
   API_CONCEPT_PARENTS_PROPERTY,
@@ -79,7 +78,6 @@ const PROPERTIES_WITH_CONCEPT_REFS = [
   API_CONCEPT_RELATIVE_PROPERTY
 ]
 
-
 const {
   URL_LOGS_ACCESS,
   URL_GIT_HASH_ACCESS: URL_APP_ID_ACCESS,
@@ -87,21 +85,19 @@ const {
   URL_THESAURUS_ACCESS,
   PARAM_THESAURUS_CODE,
   URL_LICENCE_SUFFIX
-} = require('../config/confApi');
+} = require('../config/confApi')
 
-
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Controllers: Scheme
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
 /**
  * Creation of a new Scheme.
- * This is made in two times: first we create the Scheme without the 
+ * This is made in two times: first we create the Scheme without the
  * "top concepts" references.
  * Then we can create the referenced concepts, and update the Scheme.
- * @param {JSON description of a new SKOS Scheme in RUDI system} rudiScheme 
- * @returns 
+ * @param {JSON description of a new SKOS Scheme in RUDI system} rudiScheme
+ * @returns
  */
 exports.newSkosScheme = async (rudiScheme) => {
   const fun = 'newScheme'
@@ -160,9 +156,9 @@ exports.dbSchemeToRudi = async (dbScheme) => {
  * - Follows the "children" (narrower) links and make sure "parents" (broader)
  * are updated accordingly.
  * Siblings and Relatives are not created through this operation.
- * @param {The list of top concepts} topConcepts 
- * @param {The current Scheme class object ID} schemeDbId 
- * @returns 
+ * @param {The list of top concepts} topConcepts
+ * @param {The current Scheme class object ID} schemeDbId
+ * @returns
  */
 exports.createConceptHierarchy = async (listConcepts, schemeDbId, parentConcept) => {
   const fun = 'createConceptHierarchy'
@@ -238,14 +234,14 @@ exports.createConceptHierarchy = async (listConcepts, schemeDbId, parentConcept)
     } catch (err) {
       log.e(mod, fun, err)
     }
-  }));
+  }))
 
   return conceptDbIds
 }
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Controllers: Concept
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
 /**
  * Creates a concept in DB from a Concept in RUDI format,
@@ -260,12 +256,12 @@ exports.newSkosConcept = async (rudiConcept, inSchemeDbId) => {
   // Scanning every property with concept references
   await Promise.all(PROPERTIES_WITH_CONCEPT_REFS.map(
     async prop => {
-      await this.setDbConceptRefs(rudiConcept, prop);
-    }));
+      await this.setDbConceptRefs(rudiConcept, prop)
+    }))
 
   let dbConcept = await new SkosConcept(rudiConcept)
-  log.d(mod, fun, `dbConcept: ${json.beautify (dbConcept)}`);
-  await dbConcept.save();
+  log.d(mod, fun, `dbConcept: ${json.beautify (dbConcept)}`)
+  await dbConcept.save()
   log.d(mod, fun, `=> saved`)
 
   const rudiReadyConcept = await this.dbConceptToRudiMinimal(dbConcept)
@@ -274,10 +270,10 @@ exports.newSkosConcept = async (rudiConcept, inSchemeDbId) => {
 }
 
 /**
- * 
- * @param {SKOS concept in RUDI format} rudiConcept 
- * @param {*} inSchemeDbId 
- * @returns 
+ *
+ * @param {SKOS concept in RUDI format} rudiConcept
+ * @param {*} inSchemeDbId
+ * @returns
  */
 exports.setDbScheme = async (rudiConcept, inSchemeDbId) => {
   const fun = 'setDbScheme'
@@ -330,7 +326,7 @@ exports.setDbConceptRefs = async (rudiConcept, prop) => {
       log.d(mod, fun, `refConceptDbId: ${refConceptDbId}`)
       listRefs.push(refConceptDbId)
     }
-  }));
+  }))
   rudiConcept[prop] = listRefs
   return listRefs
 }
@@ -407,14 +403,13 @@ exports.dbConceptListToRudiRecursive = async (dbConceptList) => {
   await Promise.all(dbConceptList.map(async (dbConcept) => {
     const rudiConcept = await this.dbConceptToRudiRecursive(dbConcept)
     rudiConceptList.push(rudiConcept)
-  }));
+  }))
   return rudiConceptList
 }
 
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Thesaurus
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 exports.getThesaurus = (thesaurusCode) => {
   const thesaurusCodeLowerCase = thesaurusCode.toLowerCase()
   if (thesaurusCodeLowerCase == URL_LICENCE_SUFFIX.toLowerCase())
@@ -427,7 +422,7 @@ exports.getEveryThesaurus = async (req, reply) => {
   const fun = 'getEveryThesaurus'
   log.v(mod, fun, `< GET ${URL_THESAURUS_ACCESS}`)
   log.d(mod, fun, ``)
-  let listThesauri = THESAURI 
+  let listThesauri = THESAURI
   listThesauri["licences"] = await licenceController.getAllLicenseCodes()
   // log.d(mod, fun, `listThesauri: ${json.beautify(listThesauri)}`)
   // log.d(mod, fun, `THESAURI: ${json.beautify(THESAURI)}`)

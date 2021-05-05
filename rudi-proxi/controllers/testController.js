@@ -1,30 +1,29 @@
-'use strict';
+'use strict'
 
 const mod = 'devCtrl'
 
-//---------------------------------------------------------------
-// External dependancies 
-//---------------------------------------------------------------
-const db = require("../db/dbQueries");
-const url = require('url');
+// ---------------------------------------------------------------
+// External dependancies
+// ---------------------------------------------------------------
+const db = require("../db/dbQueries")
+const url = require('url')
 
-
-//---------------------------------------------------------------
-// Internal dependancies 
-//---------------------------------------------------------------
-const Organization = require("../definitions/models/Organization");
-const json = require("../utils/jsonAccess");
-const log = require("../utils/logging");
+// ---------------------------------------------------------------
+// Internal dependancies
+// ---------------------------------------------------------------
+const Organization = require("../definitions/models/Organization")
+const json = require("../utils/jsonAccess")
+const log = require("../utils/logging")
 const {
   URL_OBJECT_ORGANIZATIONS,
   URL_OBJECT_CONTACTS,
   URL_OBJECT_MEDIA
-} = require("../config/confApi");
-const boom = require("@hapi/boom");
+} = require("../config/confApi")
+const boom = require("@hapi/boom")
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // tests
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 exports.test = async (req, reply) => {
   const fun = 'test'
   try {

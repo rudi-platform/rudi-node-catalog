@@ -1,44 +1,43 @@
-'use strict';
+'use strict'
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // External dependancies
-//---------------------------------------------------------------
-const mongoose = require('mongoose');
-const Int32 = require('mongoose-int32');
+// ---------------------------------------------------------------
+const mongoose = require('mongoose')
+const Int32 = require('mongoose-int32')
 const _ = require('lodash')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Internal dependancies
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
 const ids = require('../schemas/Identifiers')
 const api = require('../../config/confApi')
 
-const Validation = require('../schemaValidators');
+const Validation = require('../schemaValidators')
 const {
   FIELDS_TO_SKIP
-} = require('../../db/dbFields');
+} = require('../../db/dbFields')
 // const IntegrationStatus = require('../enums/IntegrationStatus')
 
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Constants
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 exports.IntegrationStatus = {
   OK: 'OK',
   KO: 'KO'
 }
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Custom schema definition: Report
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
 const ReportSchema = new mongoose.Schema({
 
   // Unique identifier of the integration report (required)
   report_id: ids.UUIDv4,
 
-  // Unique and permanent identifier for the resource in RUDI 
+  // Unique and permanent identifier for the resource in RUDI
   // system (required)
   resource_id: ids.UUID,
 
@@ -96,16 +95,14 @@ const ReportSchema = new mongoose.Schema({
 }, {
   timestamps: true,
   id: false,
-});
+})
 
-
-//----- toJSON cleanup
+// ----- toJSON cleanup
 ReportSchema.methods.toJSON = function () {
   return _.omit(this.toObject(), FIELDS_TO_SKIP)
-};
+}
 
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Models definition
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 exports.Report = mongoose.model('Report', ReportSchema)

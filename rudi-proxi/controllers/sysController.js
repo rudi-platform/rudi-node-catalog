@@ -1,26 +1,26 @@
-'use strict';
+'use strict'
 
 const mod = 'sysCtrl'
 /*
- * In this file are made the different steps followed for each 
+ * In this file are made the different steps followed for each
  * action on the contacts (producer or publisher)
  */
 
-//---------------------------------------------------------------
-// External dependancies 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
+// External dependancies
+// ---------------------------------------------------------------
 const boom = require('@hapi/boom')
-const fs = require('fs');
+const fs = require('fs')
 const prcs = require('child_process')
-const readLastLines = require('read-last-lines');
+const readLastLines = require('read-last-lines')
 
-//---------------------------------------------------------------
-// Internal dependancies 
-//---------------------------------------------------------------
-const sys = require('../config/confSystem');
+// ---------------------------------------------------------------
+// Internal dependancies
+// ---------------------------------------------------------------
+const sys = require('../config/confSystem')
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
-const json = require('../utils/jsonAccess');
+const json = require('../utils/jsonAccess')
 
 const {
   URL_LOGS_ACCESS,
@@ -29,17 +29,16 @@ const {
   URL_THESAURUS_ACCESS,
   PARAM_THESAURUS_CODE,
   PARAM_LOGS_LINES,
-} = require('../config/confApi');
+} = require('../config/confApi')
 
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Cosntants
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const NB_LOG_LINES_DEFAULT = 100
 let CURRENT_APP_HASH
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // App ID
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
 /** Returns the actual git hash */
 exports.getGitHash = () => {
@@ -88,15 +87,15 @@ exports.getNodeVersion = () => {
   }
 }
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Logs
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
 exports.getLogs = async (req, reply) => {
   const fun = 'getLogs'
   try {
     log.d(mod, fun, `GET ${URL_LOGS_ACCESS}`)
-    /* 
+    /*
     const readOptions = {
       encoding: 'utf8',
       flag: 'r'

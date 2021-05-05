@@ -1,15 +1,14 @@
-'use strict';
+'use strict'
 
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Internal dependencies
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const logger = require('../config/confLogs').logger
 const json = require('../utils/jsonAccess')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Colors
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const Colors = {
   Reset: "\x1b[0m",
   Bright: "\x1b[1m",
@@ -42,9 +41,9 @@ const FgErrorDebug = Colors.FgCyan
 const FgErrorColor = Colors.FgRed
 const BgErrorDebug = ''
 const BgErrorColor = Colors.BgWhite
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Constants
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const levels = {
   error: 0,
   warning: 1,
@@ -56,11 +55,11 @@ const levels = {
 }
 const LOG_LVL = levels.debug
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Display functions
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 function displayColor(fgColor, bgColor, msg) {
-  console.log(fgColor, bgColor, msg, Colors.Reset);
+  console.log(fgColor, bgColor, msg, Colors.Reset)
 }
 
 function display(logLvl, msg) {
@@ -76,23 +75,19 @@ function displayLine(logLvl, mod, fun, msg) {
 
 function displayStr(mod, fun, msg) {
   if ('' == mod)
-  return `[ ${fun} ] ${msg != ''? msg : '<-'}`
+    return `[ ${fun} ] ${msg != ''? msg : '<-'}`
   else
     return `[ ${mod} • ${fun} ] ${msg!=''?msg:'<-'}`
 }
 
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Logging functions
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const ERROR = 'ERROR'
 const WARNING = 'WARNING'
 const INFO = 'INFO'
 const VERBOSE = 'VERBOSE'
 const DEBUG = 'DEBUG'
-
-
-
 
 exports.e = (mod, fun, msg) => {
   logger.error(displayStr(mod, fun, msg))
@@ -124,15 +119,13 @@ exports.d = (mod, fun, msg) => {
   // displayFunc(DEBUG, fun, msg)
 }
 
-
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Request inspector
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 exports.logRequest = (req, res) => {
   const fun = 'request'
-  this.i('', fun,`${req.method} ${req.url} <- ${req.ip} `)
-  return
+  this.i('', fun, `${req.method} ${req.url} <- ${req.ip} `)
+  // return
   // this.d(mod, fun, `method: ${json.beautify(req.method)}`)
   // this.d(mod, fun, `url: ${json.beautify(req.url)}`)
   // this.d(mod, fun, `routerMethod: ${json.beautify(req.routerMethod)}`)

@@ -1,22 +1,22 @@
-'use strict';
+'use strict'
 const mod = 'msg'
-//---------------------------------------------------------------
-// Internal dependancies 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
+// Internal dependancies
+// ---------------------------------------------------------------
 const {
   getLanguage
 } = require('../utils/lang')
 
 const json = require('../utils/jsonAccess')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Constants
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const DEFAULT_MSG = 'Language not found'
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Generic
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 //TODO: store all this in a db
 
 exports.missingRequestParameter = (req, param) => {
@@ -25,13 +25,13 @@ exports.missingRequestParameter = (req, param) => {
       case 'en':
       case 'en-GB':
       case 'en-US':
-        return `The parameter '${param}' should define in url '${req.url}' `;
+        return `The parameter '${param}' should define in url '${req.url}' `
       case 'fr':
       case 'fr-FR':
       case 'fr-BE':
-        return `Le paramètre '${param}' devrait être défini dans l'url '${req.url}' `;
+        return `Le paramètre '${param}' devrait être défini dans l'url '${req.url}' `
       default:
-        return `${DEFAULT_MSG}: ${getLanguage()}`;
+        return `${DEFAULT_MSG}: ${getLanguage()}`
     }
   } catch (err) {
     log.e(mod, fun, err)
@@ -44,13 +44,13 @@ exports.parameterExpected = (fun, param) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `The function '${fun}' should be called with a parameter of'${param}' `;
+      return `The function '${fun}' should be called with a parameter of'${param}' `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `La fonction '${fun}' devrait être appelée avec le paramètre '${param}' `;
+      return `La fonction '${fun}' devrait être appelée avec le paramètre '${param}' `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
@@ -59,13 +59,13 @@ exports.parameterTypeExpected = (fun, expected, obj) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `The function '${fun}' should be called with a parameter of type '${expected}' (got typeof '${typeof obj}')`;
+      return `The function '${fun}' should be called with a parameter of type '${expected}' (got typeof '${typeof obj}')`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `La fonction '${fun}' devrait être appelée avec un paramètre de type '${expected}' (reçu: '${typeof obj}')`;
+      return `La fonction '${fun}' devrait être appelée avec un paramètre de type '${expected}' (reçu: '${typeof obj}')`
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
@@ -74,15 +74,15 @@ exports.subPropNeededWhenPropSet = (prop, subProp) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Subproperty '${prop}.${subProp}' is required when parent property '${prop}' is set`.replace(/\"/g, '\'');
-      break;
+      return `Subproperty '${prop}.${subProp}' is required when parent property '${prop}' is set`.replace(/\"/g, '\'')
+      break
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `La propriété '${prop}.${subProp}' est requise lorsque la propriété parente '${prop}' est renseignée`.replace(/\"/g, '\'');
-      break;
+      return `La propriété '${prop}.${subProp}' est requise lorsque la propriété parente '${prop}' est renseignée`.replace(/\"/g, '\'')
+      break
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
@@ -91,15 +91,15 @@ exports.subPropNeededWhenPropSetToEnum = (prop, subProp, enumProp, enumVal) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Subproperty '${prop}.${subProp}' is required when property '${prop}.${enumProp}' is set to '${enumVal}'`.replace(/\"/g, '\'');
-      break;
+      return `Subproperty '${prop}.${subProp}' is required when property '${prop}.${enumProp}' is set to '${enumVal}'`.replace(/\"/g, '\'')
+      break
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `La propriété '${prop}.${subProp}' est requise lorsque la propriété '${prop}.${enumProp}' vaut '${enumVal}'`.replace(/\"/g, '\'');
-      break;
+      return `La propriété '${prop}.${subProp}' est requise lorsque la propriété '${prop}.${enumProp}' vaut '${enumVal}'`.replace(/\"/g, '\'')
+      break
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
@@ -108,13 +108,13 @@ exports.incorrectValueForEnum = (property, incorrectValue) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Incorrect value for property '${property}': '${incorrectValue}' `;
+      return `Incorrect value for property '${property}': '${incorrectValue}' `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Valeur incorrecte pour la propriété '${property}' : '${incorrectValue}' `;
+      return `Valeur incorrecte pour la propriété '${property}' : '${incorrectValue}' `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
@@ -123,13 +123,13 @@ exports.missingObjectProperty = (jsonObject, property) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `The property '${property}' must be defined for object: ${json.beautify(jsonObject)} `.replace(/\"/g, '\'');
+      return `The property '${property}' must be defined for object: ${json.beautify(jsonObject)} `.replace(/\"/g, '\'')
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `La propriété '${property}' doit être définie pour l'object : ${json.beautify(jsonObject)} `.replace(/\"/g, '\'');
+      return `La propriété '${property}' doit être définie pour l'object : ${json.beautify(jsonObject)} `.replace(/\"/g, '\'')
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
@@ -138,13 +138,13 @@ exports.parametersMismatch = (paramUrl, paramBody) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Parameters should be the same between body and URL call!\n- URL parameter: '${paramUrl}'\n- body parameter: '${paramBody}' `;
+      return `Parameters should be the same between body and URL call!\n- URL parameter: '${paramUrl}'\n- body parameter: '${paramBody}' `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Les paramètres doivent être identiques entre le corps de la requête et l'URL\n- URL : '${paramUrl}'\n- requête : '${paramBody}' `;
+      return `Les paramètres doivent être identiques entre le corps de la requête et l'URL\n- URL : '${paramUrl}'\n- requête : '${paramBody}' `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
@@ -153,31 +153,31 @@ exports.missingField = (fieldName) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `The field '${fieldName}' must be defined `;
+      return `The field '${fieldName}' must be defined `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `La propriété '${fieldName}' est requise `;
+      return `La propriété '${fieldName}' est requise `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Generic
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
 exports.objectTypeNotFound = (objectType) => {
   switch (getLanguage()) {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `This object type is not recognized: '${objectType}' `;
+      return `This object type is not recognized: '${objectType}' `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Ce type d'objet n'est pas reconnu : '${objectType}' `;
+      return `Ce type d'objet n'est pas reconnu : '${objectType}' `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
@@ -186,13 +186,13 @@ exports.objectNotFound = (objectType, objectId) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `No object of type '${objectType}' was found with id'${objectId}' `;
+      return `No object of type '${objectType}' was found with id'${objectId}' `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Aucun objet de type '${objectType}' n'a été trouvé pour l'identifiant : ${objectId} `;
+      return `Aucun objet de type '${objectType}' n'a été trouvé pour l'identifiant : ${objectId} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
@@ -201,13 +201,13 @@ exports.objectAlreadyExists = (objectType, id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `An object of type '${objectType}' already exists for id: ${id} `;
+      return `An object of type '${objectType}' already exists for id: ${id} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Un objet de type '${objectType}' existe déjà pour l'identifiant : ${id} `;
+      return `Un objet de type '${objectType}' existe déjà pour l'identifiant : ${id} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
@@ -216,13 +216,13 @@ exports.objectAdded = (objectType, id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `New object of type '${objectType}' added with id: ${id} `;
+      return `New object of type '${objectType}' added with id: ${id} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Objet de type '${objectType}' créé avec l'identifiant : ${id} `;
+      return `Objet de type '${objectType}' créé avec l'identifiant : ${id} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
@@ -231,31 +231,31 @@ exports.objectNotDeletedBecauseUsed = (objectType, id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `The object of type '${objectType}' couldn't be deleted. Its identifier is referenced in a metadata: ${id} `;
+      return `The object of type '${objectType}' couldn't be deleted. Its identifier is referenced in a metadata: ${id} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `L'objet de type '${objectType}' n'a pas pu être supprimé. Son identifiant est référencé dans une métadonnée : ${id} `;
+      return `L'objet de type '${objectType}' n'a pas pu être supprimé. Son identifiant est référencé dans une métadonnée : ${id} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Metadata
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 exports.metadataAlreadyExists = (id) => {
   switch (getLanguage()) {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `A metadata already exists for id: ${id} `;
+      return `A metadata already exists for id: ${id} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Une metadonnée existe déjà pour l'identifiant : ${id} `;
+      return `Une metadonnée existe déjà pour l'identifiant : ${id} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
@@ -264,13 +264,13 @@ exports.metadataAdded = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `New metadata added with id: ${id} `;
+      return `New metadata added with id: ${id} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Metadonnée ajoutée avec l'identifiant : ${id} `;
+      return `Metadonnée ajoutée avec l'identifiant : ${id} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
@@ -279,13 +279,13 @@ exports.metadataUpdated = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Metadata updated for id: ${id} `;
+      return `Metadata updated for id: ${id} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Metadonée mise à jour pour l'identifiant : ${id} `;
+      return `Metadonée mise à jour pour l'identifiant : ${id} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
@@ -294,13 +294,13 @@ exports.metadataFound = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `A metadata was found with id: ${id} `;
+      return `A metadata was found with id: ${id} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Une metadonnée a été trouvée avec l'identifiant : ${id} `;
+      return `Une metadonnée a été trouvée avec l'identifiant : ${id} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
@@ -309,29 +309,28 @@ exports.metadataNotFound = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `No metadata was found with id: ${id} `;
+      return `No metadata was found with id: ${id} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Aucune metadonnée trouvée avec l'identifiant : ${id} `;
+      return `Aucune metadonnée trouvée avec l'identifiant : ${id} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
-
 
 exports.metadataDeleted = (id) => {
   switch (getLanguage()) {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Metadata deleted for id: ${id} `;
+      return `Metadata deleted for id: ${id} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Métadonnée supprimée pour l'identifiant : ${id} `;
+      return `Métadonnée supprimée pour l'identifiant : ${id} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
@@ -340,32 +339,31 @@ exports.metadataDeletedWithCondition = (condition) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Metadata deleted for condition: '${condition}'`;
+      return `Metadata deleted for condition: '${condition}'`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Métadonnées supprimées pour la condition : '${condition}'`;
+      return `Métadonnées supprimées pour la condition : '${condition}'`
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Organization
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 exports.organizationAdded = (id) => {
   switch (getLanguage()) {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `New organization added with id: ${id} `;
+      return `New organization added with id: ${id} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Organisation créée avec l'identifiant : ${id} `;
+      return `Organisation créée avec l'identifiant : ${id} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 exports.organizationAlreadyExists = (id) => {
@@ -373,13 +371,13 @@ exports.organizationAlreadyExists = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `An organization already exists for id: ${id} `;
+      return `An organization already exists for id: ${id} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Une organisation existe déjà pour l'identifiant : ${id} `;
+      return `Une organisation existe déjà pour l'identifiant : ${id} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
@@ -388,13 +386,13 @@ exports.organizationUpdated = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Organization updated for id: ${id} `;
+      return `Organization updated for id: ${id} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Organisation mise à jour pour l'identifiant : ${id} `;
+      return `Organisation mise à jour pour l'identifiant : ${id} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
@@ -403,13 +401,13 @@ exports.organizationDeleted = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Organization deleted for id: ${id} `;
+      return `Organization deleted for id: ${id} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Organisation supprimée pour l'identifiant : ${id} `;
+      return `Organisation supprimée pour l'identifiant : ${id} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
@@ -418,32 +416,31 @@ exports.organizationNotFound = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `No organization was found with id: ${id} `;
+      return `No organization was found with id: ${id} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Aucune organisation trouvée avec l'identifiant : ${id} `;
+      return `Aucune organisation trouvée avec l'identifiant : ${id} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Contact
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 exports.contactAdded = (id) => {
   switch (getLanguage()) {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `New contact added with id: ${id} `;
+      return `New contact added with id: ${id} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Contact créé avec l'identifiant : ${id} `;
+      return `Contact créé avec l'identifiant : ${id} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
@@ -452,13 +449,13 @@ exports.contactAlreadyExists = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `A contact already exists for id: ${id} `;
+      return `A contact already exists for id: ${id} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Un contact existe déjà pour l'identifiant : ${id} `;
+      return `Un contact existe déjà pour l'identifiant : ${id} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
@@ -467,29 +464,28 @@ exports.contactUpdated = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Contact updated for id: ${id} `;
+      return `Contact updated for id: ${id} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Contact mis à jour pour l'identifiant : ${id} `;
+      return `Contact mis à jour pour l'identifiant : ${id} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
-
 
 exports.contactDeleted = (id) => {
   switch (getLanguage()) {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Contact deleted for id: ${id} `;
+      return `Contact deleted for id: ${id} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Contact supprimé pour l'identifiant : ${id} `;
+      return `Contact supprimé pour l'identifiant : ${id} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 exports.contactNotFound = (id) => {
@@ -497,32 +493,31 @@ exports.contactNotFound = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `No contact was found with id: ${id} `;
+      return `No contact was found with id: ${id} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Aucun contact trouvé avec l'identifiant : ${id} `;
+      return `Aucun contact trouvé avec l'identifiant : ${id} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Report
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 exports.reportAdded = (id) => {
   switch (getLanguage()) {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `New report added with id: ${id} `;
+      return `New report added with id: ${id} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Rapport créé avec l'identifiant : ${id} `;
+      return `Rapport créé avec l'identifiant : ${id} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
@@ -531,13 +526,13 @@ exports.reportAlreadyExists = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `A report already exists for id: ${id} `;
+      return `A report already exists for id: ${id} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Un rapport existe déjà pour l'identifiant : ${id} `;
+      return `Un rapport existe déjà pour l'identifiant : ${id} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 
@@ -546,29 +541,28 @@ exports.reportUpdated = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Report updated for id: ${id} `;
+      return `Report updated for id: ${id} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Rapport mis à jour pour l'identifiant : ${id} `;
+      return `Rapport mis à jour pour l'identifiant : ${id} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
-
 
 exports.reportDeleted = (id) => {
   switch (getLanguage()) {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Report deleted for id: ${id} `;
+      return `Report deleted for id: ${id} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Rapport supprimé pour l'identifiant : ${id} `;
+      return `Rapport supprimé pour l'identifiant : ${id} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 exports.reportNotFound = (id) => {
@@ -576,13 +570,13 @@ exports.reportNotFound = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `No report was found with id: ${id} `;
+      return `No report was found with id: ${id} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Aucun rapport trouvé avec l'identifiant : ${id} `;
+      return `Aucun rapport trouvé avec l'identifiant : ${id} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }
 exports.reportMismatch = (reportId, urlObjectId, reportObjectId) => {
@@ -590,12 +584,12 @@ exports.reportMismatch = (reportId, urlObjectId, reportObjectId) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Resource identifier doesn't match the URL call for report ${reportId} \nURL resource id: ${urlObjectId} != report.resource_id: ${reportObjectId} `;
+      return `Resource identifier doesn't match the URL call for report ${reportId} \nURL resource id: ${urlObjectId} != report.resource_id: ${reportObjectId} `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `L'identifiant de la resource associée est incohérente avec celle utilisée dans l'URL pour le rapport ${reportId}\nURL id: ${urlObjectId} != report.resource_id: ${reportObjectId} `;
+      return `L'identifiant de la resource associée est incohérente avec celle utilisée dans l'URL pour le rapport ${reportId}\nURL id: ${urlObjectId} != report.resource_id: ${reportObjectId} `
     default:
-      return `${DEFAULT_MSG}: ${getLanguage()}`;
+      return `${DEFAULT_MSG}: ${getLanguage()}`
   }
 }

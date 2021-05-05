@@ -1,16 +1,16 @@
-'use strict';
+'use strict'
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // External dependancies
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const mongoose = require('mongoose')
-// const uuid = require('uuid');
+// const uuid = require('uuid')
 
 const Validation = require('../schemaValidators')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Constants
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
 exports.UUIDv4 = {
   type: String,
@@ -35,7 +35,7 @@ exports.DOI = {
   type: String,
   trim: true,
   unique: true,
-  sparse: true, // accept empty values as non-duplicates 
+  sparse: true, // accept empty values as non-duplicates
   lowercase: true,
   match: Validation.DOI
 }

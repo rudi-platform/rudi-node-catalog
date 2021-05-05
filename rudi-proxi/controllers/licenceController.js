@@ -1,44 +1,43 @@
-'use strict';
+'use strict'
 
 const mod = 'licenceCtrl'
 
-//---------------------------------------------------------------
-// External dependancies 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
+// External dependancies
+// ---------------------------------------------------------------
 const axios = require('axios')
-const uuid = require('uuid');
+const uuid = require('uuid')
 const {
   replace
-} = require('lodash');
+} = require('lodash')
 
-
-//---------------------------------------------------------------
-// Internal dependancies 
-//---------------------------------------------------------------
-const sysConf = require('../config/confSystem');
+// ---------------------------------------------------------------
+// Internal dependancies
+// ---------------------------------------------------------------
+const sysConf = require('../config/confSystem')
 const log = require("../utils/logging")
-const utils = require('../utils/jsUtils');
-const json = require('../utils/jsonAccess');
+const utils = require('../utils/jsUtils')
+const json = require('../utils/jsonAccess')
 
-const db = require("../db/dbQueries");
-const api = require("../config/confApi");
+const db = require("../db/dbQueries")
+const api = require("../config/confApi")
 
 const {
   API_SKOS_CONCEPT_CODE
-} = require('../db/dbFields');
+} = require('../db/dbFields')
 
-const skosController = require("./skosController");
-//---------------------------------------------------------------
+const skosController = require("./skosController")
+// ---------------------------------------------------------------
 // Constants
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 exports.LicenceSchemeCode = "software_licences"
 exports.LicenceConceptRole = "licence"
 
 const LICENCE_POST_ADDRESS = `http://${sysConf.LISTENING_ADDR}:${sysConf.LISTENING_PORT}${api.URL_PREFIX_PUBLIC}/${api.URL_OBJECT_SKOS_SCHEME}`
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Controller
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 let LICENCE_LIST
 let LICENCE_CODE_LIST
 
@@ -78,15 +77,15 @@ async function initLicenses() {
     })
     // log.d(mod, fun, licenceData)
     const res = await axios.post(LICENCE_POST_ADDRESS, JSON.parse(licenceData))
-    log.d(mod, fun, `Status: ${json.beautify(res.status)}`);
-    log.d(mod, fun, `Body: ${json.beautify(res.data)}`);
+    log.d(mod, fun, `Status: ${json.beautify(res.status)}`)
+    log.d(mod, fun, `Body: ${json.beautify(res.data)}`)
   } catch (err) {
     log.e(mod, fun, err)
   }
 }
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Controller
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 exports.getAllLicenses = async (req, reply) => {
   const fun = `getAllLicenses`
   log.v(mod, fun, `< GET ${api.URL_LICENCE_ACCESS}`)

@@ -1,27 +1,26 @@
-'use strict';
+'use strict'
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // External dependancies
-//---------------------------------------------------------------
-const mongoose = require('mongoose');
-const _ = require('lodash');
+// ---------------------------------------------------------------
+const mongoose = require('mongoose')
+const _ = require('lodash')
 
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Internal dependancies
-//---------------------------------------------------------------
-const ids = require('../schemas/Identifiers');
-const Validation = require('../schemaValidators');
+// ---------------------------------------------------------------
+const ids = require('../schemas/Identifiers')
+const Validation = require('../schemaValidators')
 
 const {
   FIELDS_TO_SKIP
-} = require('../../db/dbFields');
+} = require('../../db/dbFields')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Custom schema definition
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const OrganizationSchema = new mongoose.Schema({
-  // Unique and permanent identifier for the organization in RUDI 
+  // Unique and permanent identifier for the organization in RUDI
   // system (required)
   organization_id: ids.UUIDv4,
 
@@ -53,20 +52,18 @@ const OrganizationSchema = new mongoose.Schema({
   //   setters: true,
   //   virtuals: false
   // },
-});
+})
 
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Schema refinements
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
-//----- toJSON cleanup
+// ----- toJSON cleanup
 OrganizationSchema.methods.toJSON = function () {
   return _.omit(this.toObject(), FIELDS_TO_SKIP)
-};
+}
 
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Exports
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 module.exports = mongoose.model('Organization', OrganizationSchema)

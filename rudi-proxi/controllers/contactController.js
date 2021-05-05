@@ -1,14 +1,14 @@
-'use strict';
+'use strict'
 
 const mod = 'contCtrl'
 /*
- * In this file are made the different steps followed for each 
+ * In this file are made the different steps followed for each
  * action on the contacts (producer or publisher)
  */
 
-//---------------------------------------------------------------
-// External dependancies 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
+// External dependancies
+// ---------------------------------------------------------------
 const boom = require('@hapi/boom')
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
@@ -16,9 +16,9 @@ const msg = require('../utils/msg')
 const db = require('../db/dbQueries')
 const dbRwk = require('../db/dbReworkData')
 const json = require('../utils/jsonAccess')
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Constants
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const {
   DB_ID,
   API_METADATA_ID,
@@ -34,11 +34,10 @@ const {
   URL_OBJECT_CONTACTS
 } = require('../config/confApi')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Data models
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const Contact = require('../definitions/models/Contact')
-
 
 exports.newContact = async (contactJson) => {
   const fun = 'newContact'

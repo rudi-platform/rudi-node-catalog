@@ -1,32 +1,32 @@
-'use strict';
+/* eslint-disable no-unused-vars */
+'use strict'
 
 const mod = 'genCtrl'
 /*
- * In this file are made the different steps followed for each 
+ * In this file are made the different steps followed for each
  * action on the objects (producer or publisher)
  */
 
-//---------------------------------------------------------------
-// External dependancies 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
+// External dependancies
+// ---------------------------------------------------------------
 const boom = require('@hapi/boom')
 const uuid = require('uuid')
-const url = require('url');
+const url = require('url')
 
-//---------------------------------------------------------------
-// Internal dependancies 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
+// Internal dependancies
+// ---------------------------------------------------------------
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
 
 const db = require('../db/dbQueries')
-const dbRwk = require('../db/dbReworkData')
 const json = require('../utils/jsonAccess')
 const utils = require('../utils/jsUtils')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Constants
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
 const {
   URL_OBJECT_GENERIC,
@@ -48,51 +48,39 @@ const {
   QUERY_GROUP_BY,
   QUERY_COUNT_BY,
   URL_ACTION_FILTER,
-  URL_OBJECTS,
+  URL_OBJECTS
 } = require('../config/confApi')
 
 const {
-  DB_ID,
-  API_METADATA_ID,
-  API_ORGANIZATION_ID,
-  API_CONTACT_ID,
-  API_DATA_PRODUCER_PROPERTY,
-  API_DATA_CONTACTS_PROPERTY,
-  API_METAINFO_PROPERTY,
-  API_REPORT_ID,
-  API_DATES_PUBLISHED_PROPERTY,
-  API_MEDIA_ID,
-  API_CONCEPT_PARENTS_PROPERTY,
   DB_PUBLISHED_AT
 } = require('../db/dbFields')
 
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Models
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
-const Organization = require('../definitions/models/Organization');
-const Contact = require('../definitions/models/Contact');
-const Report = require('../definitions/models/Report');
-const SkosConcept = require('../definitions/models/SkosConcept');
-const SkosScheme = require('../definitions/models/SkosScheme');
+const Organization = require('../definitions/models/Organization')
+const Contact = require('../definitions/models/Contact')
+const Report = require('../definitions/models/Report')
+const SkosConcept = require('../definitions/models/SkosConcept')
+const SkosScheme = require('../definitions/models/SkosScheme')
 /* beautify ignore:start */
-const { Metadata } = require('../definitions/models/Metadata');
-const { Media, MediaFile, MediaSeries } = require('../definitions/models/Media');
+const { Metadata } = require('../definitions/models/Metadata')
+const { Media, MediaFile, MediaSeries } = require('../definitions/models/Media')
 /* beautify ignore:end */
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Specific controlelrs
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const metadataController = require('../controllers/metadataController')
 const organizationController = require('../controllers/organizationController')
-const contactController = require('../controllers/contactController');
-const skosController = require('./skosController');
-const _ = require('lodash');
+const contactController = require('../controllers/contactController')
+const skosController = require('./skosController')
+const _ = require('lodash')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Specific object type helper functions
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const QUERY_RESERVED_WORDS = [
   QUERY_LIMIT,
   QUERY_OFFSET
@@ -105,30 +93,29 @@ function parseQueryParameters(objectType, queryParameters) {
   // log.d(mod, fun, `queryParameters: ${json.beautify(queryParameters)}`)
   // identify object model
   /* beautify ignore:start */
-  const {Model, idField} = db.getObjectAccesses(objectType)
+  const { Model, idField } = db.getObjectAccesses(objectType)
   /* beautify ignore:end */
   const modelProperties = db.getModelPropertyNames(Model)
 
   const queryKeys = Object.keys(queryParameters)
   // log.d(mod, fun, `queryKeys: ${json.beautify(queryKeys)}`)
 
-  let filterReturn = {}
-  filterReturn[QUERY_LIMIT] = QUERY_LIMIT_DEFAULT;
-  filterReturn[QUERY_OFFSET] = QUERY_OFFSET_DEFAULT;
+  const filterReturn = {}
+  filterReturn[QUERY_LIMIT] = QUERY_LIMIT_DEFAULT
+  filterReturn[QUERY_OFFSET] = QUERY_OFFSET_DEFAULT
   filterReturn[QUERY_FILTER] = {}
   filterReturn[EXT_REFS] = []
 
   queryKeys.map(key => {
-
     if (QUERY_RESERVED_WORDS.includes(key)) {
       // log.d(mod, fun, `Key is a reserved word: ${json.beautify(key)} => ${json.beautify(queryParameters[key])}`)
       switch (key) {
         case QUERY_LIMIT:
-          filterReturn[QUERY_LIMIT] = parseInt(queryParameters[key]);
+          filterReturn[QUERY_LIMIT] = parseInt(queryParameters[key])
           // log.d(mod, fun, `Limit: ${json.beautify(filterReturn[QUERY_LIMIT])}`)
           break
         case QUERY_OFFSET:
-          filterReturn[QUERY_OFFSET] = parseInt(queryParameters[key]);
+          filterReturn[QUERY_OFFSET] = parseInt(queryParameters[key])
           // log.d(mod, fun, `Offset: ${json.beautify(filterReturn[QUERY_OFFSET])}`)
           break
         default:
@@ -171,6 +158,7 @@ function parseQueryParameters(objectType, queryParameters) {
         log.w(mod, fun, `Model properties: ${json.beautify(modelProperties)}`)
       }
     }
+    return filterReturn
   })
   // log.d(mod, fun, `filterReturn: ${json.beautify(filterReturn)}`)
 
@@ -178,8 +166,9 @@ function parseQueryParameters(objectType, queryParameters) {
 }
 
 function checkIsUrlObject(objectType) {
-  if (URL_OBJECTS.indexOf(objectType) == -1) throw new Error(msg.objectTypeNotFound(objectType))
+  if (URL_OBJECTS.indexOf(objectType) === -1) throw new Error(msg.objectTypeNotFound(objectType))
 }
+
 async function newObject(objectType, objectData) {
   const fun = 'newObject'
 
@@ -189,20 +178,15 @@ async function newObject(objectType, objectData) {
     switch (objectType) {
       case URL_OBJECT_METADATA:
         return await metadataController.newMetadata(objectData)
-        break
       case URL_OBJECT_ORGANIZATIONS:
         return await organizationController.newOrganization(objectData)
-        break
       case URL_OBJECT_CONTACTS:
         return await contactController.newContact(objectData)
-        break
       case URL_OBJECT_SKOS_CONCEPT:
         return await skosController.newSkosConcept(objectData)
-        break
       case URL_OBJECT_SKOS_SCHEME:
         // Custom creation to create the children scheme concepts
         return await skosController.newSkosScheme(objectData)
-        break
       default:
         throw new Error(msg.objectTypeNotFound(objectType))
     }
@@ -222,7 +206,6 @@ async function isObjectReferenced(objectType, rudiId) {
     case URL_OBJECT_CONTACTS:
     case URL_OBJECT_MEDIA:
       return await db.isReferencedInMetadata(objectType, rudiId)
-      break
     default:
       return false
   }
@@ -230,7 +213,7 @@ async function isObjectReferenced(objectType, rudiId) {
 
 exports.setPublishedFlag = async (dbObject) => {
   const fun = 'setPublishedFlag'
-  log.d(mod, fun, ``)
+  log.d(mod, fun, '')
   if (!dbObject[DB_PUBLISHED_AT]) {
     dbObject[DB_PUBLISHED_AT] = utils.nowISO()
     dbObject.save()
@@ -240,9 +223,9 @@ exports.setPublishedFlag = async (dbObject) => {
   }
 }
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Treatments of properties: DB -> RUDI
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
 async function treatDbObject(objectType, dbObject) {
   const fun = 'treatDbObject'
@@ -259,7 +242,6 @@ async function treatDbObject(objectType, dbObject) {
     case URL_OBJECT_CONTACTS:
     case URL_ACTION_REPORT:
       return dbObject
-      break
     default:
       throw new Error(msg.objectTypeNotFound(objectType))
   }
@@ -267,33 +249,28 @@ async function treatDbObject(objectType, dbObject) {
 
 async function treatDbObjectList(objectType, dbObjectList) {
   const fun = 'treatDbObjectList'
-  log.d(mod, fun, ``)
+  log.d(mod, fun, '')
   // log.d(mod, fun, `objectType: ${objectType}\nobjectData: ${json.beautify(rudiObjectList)}`)
 
   switch (objectType) {
     case URL_OBJECT_METADATA:
-      const rudiMetadataList = await metadataController.dbMetadataListToRudi(dbObjectList)
-      return rudiMetadataList
-      break;
+      return await metadataController.dbMetadataListToRudi(dbObjectList)
     case URL_OBJECT_SKOS_CONCEPT:
-      const conceptList = await skosController.dbConceptListToRudiRecursive(dbObjectList)
-      return conceptList
-      break;
+      return await skosController.dbConceptListToRudiRecursive(dbObjectList)
     case URL_OBJECT_SKOS_SCHEME:
     case URL_OBJECT_ORGANIZATIONS:
     case URL_OBJECT_CONTACTS:
     case URL_OBJECT_MEDIA:
     case URL_ACTION_REPORT:
       return dbObjectList
-      break;
     default:
       throw new Error(msg.objectTypeNotFound(objectType))
   }
 }
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Controllers
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
 /**
  * Add a new object
@@ -306,19 +283,17 @@ exports.addSingleObject = async (req, reply) => {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
 
-    /* beautify ignore:start */
-    // identify object model
-    const {Model, idField} = db.getObjectAccesses(objectType)
+    // get the rudiId field for this object type
+    const idField = db.getObjectIdField(objectType)
     // accessing the request body
-    let rudiObject = req.body
-    /* beautify ignore:end */
+    const rudiObject = req.body
 
     // retrieving the id
     // log.d(mod, fun, `objectType: '${objectType}', incomingData: '${json.beautify(rudiObject)}' `)
     const rudiId = json.accessProperty(rudiObject, idField)
 
     // First: we make sure object doesn't exist already
-    const existsObject = await db.doesObjectExistWithRudiId(objectType, rudiId)
+    const existsObject = await db.doesObjectExistWithJson(objectType, rudiObject)
     if (existsObject) throw new Error(`${msg.objectAlreadyExists(objectType, rudiId)}`)
 
     // Creating new object + specific treatments
@@ -326,7 +301,6 @@ exports.addSingleObject = async (req, reply) => {
 
     log.i(mod, fun, `${msg.objectAdded(objectType, rudiId)}`)
     return createdObject
-
   } catch (err) {
     log.e(mod, fun, err)
     // reply.statusCode = 500
@@ -336,15 +310,14 @@ exports.addSingleObject = async (req, reply) => {
   }
 }
 
-/** 
- * Get single object by ID 
+/**
+ * Get single object by ID
  * => GET /{object}/{id}
  */
 exports.getSingleObject = async (req, reply) => {
   const fun = 'getSingleObject'
   log.v(mod, fun, `< GET ${URL_OBJECT_GENERIC}/:${PARAM_ID}`)
   try {
-
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
     const objectId = json.accessReqParam(req, PARAM_ID)
@@ -359,7 +332,7 @@ exports.getSingleObject = async (req, reply) => {
   }
 }
 
-/** 
+/**
  * Get several objects
  * => GET /{object}
  */
@@ -381,7 +354,7 @@ exports.getObjectList = async (req, reply) => {
     let objectList
     if (!countBy && !groupBy) {
       objectList = await db.getObjectList(objectType, limit, offset, filter)
-    } else if (!!groupBy) {
+    } else if (groupBy) {
       objectList = await db.getObjectListGroup(objectType, groupBy, limit, offset)
     } else { // if( !!countBy) {
       objectList = await db.getObjectListCount(objectType, countBy, limit, offset)
@@ -395,7 +368,7 @@ exports.getObjectList = async (req, reply) => {
   }
 }
 
-/** 
+/**
  * Get several objects from a filter query
  * => GET /{object}
  */
@@ -418,7 +391,6 @@ exports.getObjectListFiltered = async (req, reply) => {
     } else {
       return await db.getObjectList(objectType, limit, offset, filter)
     }
-
   } catch (err) {
     log.e(mod, fun, err)
     throw boom.boomify(err)
@@ -445,19 +417,19 @@ exports.updateSingleObject = async (req, reply) => {
     const existsObject = await db.doesObjectExistWithRudiId(objectType, rudiId)
     if (!existsObject) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
 
-    if (objectType == URL_OBJECT_METADATA)
+    if (objectType == URL_OBJECT_METADATA) {
       return await metadataController.updateMetadata(updateData)
-    else
+    } else {
       return await db.updateObject(objectType, updateData)
-
+    }
   } catch (err) {
     log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 }
 
-/** 
- * Delete a single object 
+/**
+ * Delete a single object
  * => DELETE /{object}/{id}
  */
 exports.deleteSingleObject = async (req, reply) => {
@@ -479,16 +451,14 @@ exports.deleteSingleObject = async (req, reply) => {
     // TODO: if SkosScheme: delete all SkosConcepts that reference it
     // TODO: if SkosConcept: update all other SkosConcepts that reference it (parents/children/siblings/relatives)
     return await db.deleteObject(objectType, objectRudiId)
-
   } catch (err) {
     log.e(mod, fun, err)
     throw boom.boomify(err)
   }
 }
 
-
-/** 
- * Delete several objects 
+/**
+ * Delete several objects
  * => POST /{object}/deletion
  */
 exports.deleteObjectList = async (req, reply) => {
@@ -500,7 +470,7 @@ exports.deleteObjectList = async (req, reply) => {
 
     /* beautify ignore:start */
     // identify object model
-    const {Model, idField} = db.getObjectAccesses(objectType)
+    const { Model, idField } = db.getObjectAccesses(objectType)
     /* beautify ignore:end */
 
     // retrieve incoming data
@@ -523,9 +493,8 @@ exports.deleteObjectList = async (req, reply) => {
   }
 }
 
-
-/** 
- * Delete every object 
+/**
+ * Delete every object
  * => DELETE /{object}
  */
 exports.deleteEveryObject = async (req, reply) => {
@@ -540,12 +509,12 @@ exports.deleteEveryObject = async (req, reply) => {
   }
 }
 
-/** 
- * Generate an UUID v4 
+/**
+ * Generate an UUID v4
  */
 exports.generateUUID = async (req, reply) => {
   const fun = 'generateUUID'
-  log.d(mod, fun, ``)
+  log.d(mod, fun, '')
   try {
     return uuid.v4()
   } catch (err) {

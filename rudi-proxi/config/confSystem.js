@@ -1,17 +1,20 @@
-'use strict';
+'use strict'
 
 const mod = 'sysConf'
 
-//---------------------------------------------------------------
+const {
+  log
+} = require('winston')
+// ---------------------------------------------------------------
 // Internal dependecies
-//---------------------------------------------------------------
-const fa = require('../utils/fileActions');
-const utils = require('../utils/jsUtils');
+// ---------------------------------------------------------------
+const fa = require('../utils/fileActions')
+const utils = require('../utils/jsUtils')
 
 utils.separateLogs()
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Constants: local ini file configuration settings
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
 // Conf files name
 // - user conf
@@ -31,7 +34,7 @@ const _dbUrl = 'db_url'
 const _dbName = 'db_name'
 const _dbPort = 'db_port'
 
-// Logs section 
+// Logs section
 const LOG_SECTION = 'logging'
 
 const _appName = 'app_name'
@@ -39,40 +42,42 @@ const _logDir = 'log_dir'
 const _logFileName = 'log_file'
 const _logLevel = 'log_level'
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Constants: default configuration
-//---------------------------------------------------------------
-var DEFAULT_CONF = {}
-// Node.js server
-DEFAULT_CONF[SERVER_SECTION] = {}
-DEFAULT_CONF[SERVER_SECTION][_serverAddress] = '0.0.0.0'
-DEFAULT_CONF[SERVER_SECTION][_serverPort] = 3000
-// DB
-DEFAULT_CONF[DB_SECTION] = {}
-DEFAULT_CONF[DB_SECTION][_dbUrl] = 'mongodb://127.0.0.1/'
-DEFAULT_CONF[DB_SECTION][_dbName] = 'rudi_prod'
-DEFAULT_CONF[DB_SECTION][_dbPort] = 27017
-// Logs
-DEFAULT_CONF[LOG_SECTION] = {}
-DEFAULT_CONF[LOG_SECTION][_appName] = 'rudiProxi'
-DEFAULT_CONF[LOG_SECTION][_logDir] = './logs'
-DEFAULT_CONF[LOG_SECTION][_logFileName] = 'rudiProxi.log'
-DEFAULT_CONF[LOG_SECTION][_logLevel] = 'debug'
-
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
+const DEFAULT_CONF = {
+  // Node.js server
+  [SERVER_SECTION]: {
+    [_serverAddress]: '0.0.0.0',
+    [_serverPort]: 3000
+  },
+  // DB
+  [DB_SECTION]: {
+    [_dbUrl]: 'mongodb://127.0.0.1/',
+    [_dbName]: 'rudi_prod',
+    [_dbPort]: 27017
+  },
+  // Logs
+  [LOG_SECTION]: {
+    [_appName]: 'rudiProxi',
+    [_logDir]: './logs',
+    [_logFileName]: 'rudiProxi.log',
+    [_logLevel]: 'debug'
+  }
+}
+console.log(`DEFAULT_CONF: ${JSON.stringify(DEFAULT_CONF)}`)
+// ---------------------------------------------------------------
 // Constants: user and local configuration
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Getting user conf file value
 // if null, local conf file value
 // if null , default value
 const USER_CONF = fa.readIniFile(userConfFile)
 const LOCAL_CONF = fa.readIniFile(defConfFile)
 
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Helper functions
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Accessing properties without raising errors
 function quietAccess(obj, prop, alt) {
   try {
@@ -87,7 +92,7 @@ function quietAccess(obj, prop, alt) {
 //    if null get local conf file value
 //    if null get default value
 function getValue(section, field) {
-  const fun = '[getVal]'
+  // const fun = 'getVal'
   const userSection = quietAccess(USER_CONF, section)
   const userValue = quietAccess(userSection, field)
 
@@ -98,18 +103,18 @@ function getValue(section, field) {
   return userValue || localValue || DEFAULT_CONF[section][field]
 }
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Extracting and exporting sys configuration
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
 // Server
 exports.LISTENING_ADDR = getValue(SERVER_SECTION, _serverAddress)
 exports.LISTENING_PORT = getValue(SERVER_SECTION, _serverPort)
 
-// DB 
+// DB
 exports.DB_NAME = getValue(DB_SECTION, _dbName)
 const DB_URL_PREFIX = getValue(DB_SECTION, _dbUrl)
-exports.DB_URL = `${ DB_URL_PREFIX }${ this.DB_NAME }`
+exports.DB_URL = `${DB_URL_PREFIX}${this.DB_NAME}`
 
 // Logs
 exports.APP_NAME = getValue(LOG_SECTION, _appName)
@@ -119,7 +124,7 @@ exports.OUT_LOG = `${this.LOG_DIR}/${this.LOG_FILE}`
 exports.LOG_LVL = getValue(LOG_SECTION, _logLevel)
 
 const fun = 'export'
-const now = utils.nowLocaleFormatted()
+// const now = utils.nowLocaleFormatted()
 
 utils.consoleLog(mod, fun, `APP_NAME: ${this.APP_NAME}`)
 utils.consoleLog(mod, fun, `LISTENING_ADDR: ${this.LISTENING_ADDR}`)
@@ -127,4 +132,4 @@ utils.consoleLog(mod, fun, `LISTENING_PORT: ${this.LISTENING_PORT}`)
 utils.consoleLog(mod, fun, `OUT_LOG: ${this.OUT_LOG}`)
 utils.consoleLog(mod, fun, `LOG_LVL: ${this.LOG_LVL}`)
 utils.consoleLog(mod, fun, `DB_NAME: ${this.DB_NAME}`)
-utils.consoleLog(mod, fun, `DB_URL: ${this.DB_URL}`) 
+utils.consoleLog(mod, fun, `DB_URL: ${this.DB_URL}`)

@@ -1,20 +1,20 @@
-'use strict';
+'use strict'
 const mod = 'json'
-//---------------------------------------------------------------
-// External dependancies 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
+// External dependancies
+// ---------------------------------------------------------------
 const boom = require('@hapi/boom')
 const util = require('util')
 const _ = require('lodash')
-//---------------------------------------------------------------
-// Internal dependancies 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
+// Internal dependancies
+// ---------------------------------------------------------------
 const log = require('./logging')
 const msg = require('./msg')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Functions
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 exports.isEmpty = (prop) => {
   const fun = 'isEmpty'
   const strProp = JSON.stringify(prop)
@@ -25,7 +25,7 @@ exports.isEmpty = (prop) => {
 exports.isNothing = (prop) => {
   const fun = 'isNothing'
   const result = (!prop || this.isEmpty(prop))
-  /* 
+  /*
     log.d(mod, fun, `===`)
     log.d(mod, fun, `prop: ${prop}`)
     log.d(mod, fun, `!prop: ${!prop}`)
@@ -60,8 +60,8 @@ exports.accessReqParam = (req, param) => {
 
 /**
  * Safe access to a property of a JSON object: ensures the property is defined
- * @param {JSON} jsonObject 
- * @param {String} jsonProperty 
+ * @param {JSON} jsonObject
+ * @param {String} jsonProperty
  * @returns {String} The property value
  * @throws object property is missing
  */
@@ -75,13 +75,12 @@ exports.accessProperty = (jsonObject, jsonProperty) => {
   return value
 }
 
-
 /**
  * Ensures the sub-property is defined when the parent property is defined
  * If parameter 'enumVal' is set, checks that subProperty is defined if enum property is set to enumVal
  * @param {JSON} jsonObject
- * @param {String} jsonProperty 
- * @param {String} jsonProperty 
+ * @param {String} jsonProperty
+ * @param {String} jsonProperty
  * @param {String} jsonProperty supporting the enum value
  * @param {String} enum value
  * @returns {String} The property value, or false if the parent property is not defined
@@ -124,11 +123,9 @@ exports.requireSubProperty = (obj, prop, subProp, enumProp, enumVal) => {
   }
 }
 
-
-
 /**
  * Clone a (JSON) object through JSON.stringify then JSON.parse (beware, it can be slow)
- * @param {JSON} jsonObject 
+ * @param {JSON} jsonObject
  * @returns {JSON} The deep (dissociated) clone of the input object
  * @throws parameter 'jsonObject' is undefined, null or empty
  */
@@ -140,13 +137,12 @@ exports.deepClone = (jsonObject) => {
       log.e(mod, fun, `Input parameter should not be null nor undefined: ${this.beautify(jsonObject)}`)
       throw new Error(`${msg.parameterExpected(fun, 'jsonObject')}`)
     }
-    return JSON.parse(JSON.stringify(jsonObject));
+    return JSON.parse(JSON.stringify(jsonObject))
   } catch (err) {
     log.e(mod, fun, err)
     throw err
   }
 }
-
 
 /**
  * Custom JSON beautifying function
@@ -157,9 +153,8 @@ exports.deepClone = (jsonObject) => {
  */
 exports.beautify = (jsonObject, option) => {
   try {
-    return `${JSON.stringify(jsonObject, null, option).replace(/\\"/g,'"')}${option!=null?'\n':''}`
+    return `${JSON.stringify(jsonObject, null, option).replace(/\\"/g, '"')}${option != null ? '\n' : ''}`
   } catch (err) {
     return `${util.inspect(jsonObject)}`
-
   }
 }

@@ -1,27 +1,26 @@
-'use strict';
+'use strict'
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // External dependancies
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const _ = require('lodash')
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Internal dependancies
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const {
   FIELDS_TO_SKIP
-} = require('../../db/dbFields');
+} = require('../../db/dbFields')
 
 const ids = require('../schemas/Identifiers')
 const Validation = require('../schemaValidators')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Custom schema definition
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const ContactSchema = new mongoose.Schema({
-  // Unique and permanent identifier for the contact in RUDI 
+  // Unique and permanent identifier for the contact in RUDI
   // system (required)
   contact_id: ids.UUIDv4,
 
@@ -62,19 +61,18 @@ const ContactSchema = new mongoose.Schema({
   id: false,
   // optimisticConcurrency: true,
   // strict: true,
-});
+})
 
-
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Schema refinements
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
-//----- toJSON cleanup
+// ----- toJSON cleanup
 ContactSchema.methods.toJSON = function () {
   return _.omit(this.toObject(), FIELDS_TO_SKIP)
-};
+}
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Exports
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 module.exports = mongoose.model('Contact', ContactSchema)

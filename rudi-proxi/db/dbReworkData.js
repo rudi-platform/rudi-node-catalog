@@ -1,23 +1,23 @@
-'use strict';
+'use strict'
 
 const mod = 'dbRwk'
 /*
- * In this file are a set of functions that rework the data 
+ * In this file are a set of functions that rework the data
  * - hide mongoose fields '_id' and '__v': they are not permanent
  *   so irrelevant
  * - replace attributes that link a mongoose document id by its
- *   attributes values, ie 'producer', 'contacts', and the ones 
+ *   attributes values, ie 'producer', 'contacts', and the ones
  *   that can be found in 'metadata_info'.
  */
 
-//---------------------------------------------------------------
-// External dependancies 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
+// External dependancies
+// ---------------------------------------------------------------
 const boom = require('@hapi/boom')
 
-//---------------------------------------------------------------
-// Internal dependancies 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
+// Internal dependancies
+// ---------------------------------------------------------------
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
 const lang = require('../utils/lang')
@@ -25,9 +25,9 @@ const lang = require('../utils/lang')
 const db = require('./dbQueries')
 const json = require('../utils/jsonAccess')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Constants
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 const {
   DB_ID,
   DB_V,
@@ -38,18 +38,18 @@ const {
   API_DATA_CONTACTS_PROPERTY
 } = require('./dbFields')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Data models
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 /* beautify ignore:start */
-const { Metadata } = require('../definitions/models/Metadata');
+const { Metadata } = require('../definitions/models/Metadata')
 /* beautify ignore:end */
 const Organization = require('../definitions/models/Organization')
 const Contact = require('../definitions/models/Contact')
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Unmongoozify functions
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
 exports.unmongoosify = (dbObject) => {
   const fun = 'unmongoosify'
@@ -67,9 +67,9 @@ exports.unmongoosify = (dbObject) => {
   }
 }
 
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Producer/contacts functions
-//---------------------------------------------------------------
+// ---------------------------------------------------------------
 
 exports.updateJsonOrganization = async (organizationJson) => {
   const fun = 'updateJsonOrganization'
@@ -120,7 +120,7 @@ exports.updateMetadataPropertiesFromDb = async (metadata) => {
 
   /* beautify ignore:start */
   // TODO: clone the metadata (to avoid mutating an external object)
-  let updatedMetadata = metadata;
+  let updatedMetadata = metadata
   /* beautify ignore:end */
 
   //————— Updating Producer info
@@ -166,7 +166,7 @@ exports.updateMetadataListPropertiesFromDb = async (metadataList) => {
     // log.d(mod, fun, `metadata: ${metadata}`)
 
     /* beautify ignore:start */
-    let updatedMetadata = metadata;
+    let updatedMetadata = metadata
     /* beautify ignore:end */
     // log.d(mod, fun, `metadata clone: ${updatedMetadata}`)
 
