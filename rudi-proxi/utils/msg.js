@@ -44,11 +44,26 @@ exports.parameterExpected = (fun, param) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `The function '${fun}' should be called with a parameter '${param}' `;
+      return `The function '${fun}' should be called with a parameter of'${param}' `;
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
       return `La fonction '${fun}' devrait être appelée avec le paramètre '${param}' `;
+    default:
+      return `${DEFAULT_MSG}: ${getLanguage()}`;
+  }
+}
+
+exports.parameterTypeExpected = (fun, expected, obj) => {
+  switch (getLanguage()) {
+    case 'en':
+    case 'en-GB':
+    case 'en-US':
+      return `The function '${fun}' should be called with a parameter of type '${expected}' (got typeof '${typeof obj}')`;
+    case 'fr':
+    case 'fr-FR':
+    case 'fr-BE':
+      return `La fonction '${fun}' devrait être appelée avec un paramètre de type '${expected}' (reçu: '${typeof obj}')`;
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`;
   }

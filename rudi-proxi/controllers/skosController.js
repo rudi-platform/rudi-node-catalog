@@ -429,8 +429,8 @@ exports.getEveryThesaurus = async (req, reply) => {
   log.d(mod, fun, ``)
   let listThesauri = THESAURI 
   listThesauri["licences"] = await licenceController.getAllLicenseCodes()
-  log.d(mod, fun, `listThesauri: ${listThesauri}`)
-  log.d(mod, fun, `THESAURI: ${THESAURI}`)
+  // log.d(mod, fun, `listThesauri: ${json.beautify(listThesauri)}`)
+  // log.d(mod, fun, `THESAURI: ${json.beautify(THESAURI)}`)
   return listThesauri
 }
 

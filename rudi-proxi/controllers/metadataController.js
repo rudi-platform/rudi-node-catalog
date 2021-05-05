@@ -205,49 +205,6 @@ function metadataCustomMerge(dbMetadata, dbReadyModMetadata) {
   return dbMetadata
 }
 
-function fieldModel(field) {
-  const fun = 'fieldModel'
-  log.d(mod, fun, `field: ${field}`)
-
-  switch (field) {
-    case API_DATA_PRODUCER_PROPERTY:
-    case `${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`:
-      return Organization
-      break;
-    case API_DATA_CONTACTS_PROPERTY:
-    case `${API_METAINFO_PROPERTY}.${API_METAINFO_CONTACTS_PROPERTY}`:
-      return Contact
-      break;
-    case `${API_MEDIA_PROPERTY}`:
-      return Media
-      break;
-    default:
-      return null
-  }
-}
-
-exports.getObjectListGroup = async (groupBy, limit, offset) => {
-  const fun = 'getObjectListGroup'
-  log.d(mod, fun, `groupByField: ${groupBy}`)
-  try {
-    return await db.getObjectListGroup(URL_OBJECT_METADATA, groupBy, fieldModel(groupBy), limit, offset)
-  } catch (err) {
-    log.w(mod, fun, err)
-    throw err
-  }
-}
-
-exports.getObjectListCount = async (countBy, limit, offset) => {
-  const fun = 'getObjectListCount'
-  log.d(mod, fun, `countByField: ${countBy}`)
-  try {
-    return await db.getObjectListCount(Metadata, countBy, fieldModel(countBy), limit, offset)
-  } catch (err) {
-    log.w(mod, fun, err)
-    throw err
-  }
-}
-
 //---------------------------------------------------------------
 // Atomic treatments of properties: DB -> RUDI
 //---------------------------------------------------------------
@@ -579,7 +536,7 @@ exports.updateMetadata = async (incomingRudiMetadata) => {
   // ensure the metadata already exist
   const rudiId = json.accessProperty(incomingRudiMetadata, API_METADATA_ID)
   // // let dbMetadata = await db.getEnsuredMetadataWithRudiId(rudiId) // No => no populate please !
-  let dbMetadata = await db.getEnsuredObjectWithRudiId(URL_OBJECT_METADATA, Metadata, API_METADATA_ID, rudiId)
+  let dbMetadata = await db.getEnsuredObjectWithRudiId(URL_OBJECT_METADATA, rudiId)
   log.v(mod, fun, `corresponding db object: ${json.beautify(dbMetadata)}\n`)
 
   let dbReadyEditedMetadata = await this.rudiToDbFormat(incomingRudiMetadata)
