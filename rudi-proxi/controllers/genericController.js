@@ -12,7 +12,11 @@ const mod = 'genCtrl'
 // ---------------------------------------------------------------
 const boom = require('@hapi/boom')
 const uuid = require('uuid')
-const url = require('url')
+// const url = require('url')
+const _ = require('lodash')
+const {
+  indexOf
+} = require('lodash')
 
 // ---------------------------------------------------------------
 // Internal dependancies
@@ -20,7 +24,10 @@ const url = require('url')
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
 
+const sys = require('../config/confSystem')
+
 const db = require('../db/dbQueries')
+
 const json = require('../utils/jsonAccess')
 const utils = require('../utils/jsUtils')
 
@@ -52,7 +59,7 @@ const {
 } = require('../config/confApi')
 
 const {
-  DB_PUBLISHED_AT
+  DB_PUBLISHED_AT, DB_ID
 } = require('../db/dbFields')
 
 // ---------------------------------------------------------------
@@ -76,7 +83,6 @@ const metadataController = require('../controllers/metadataController')
 const organizationController = require('../controllers/organizationController')
 const contactController = require('../controllers/contactController')
 const skosController = require('./skosController')
-const _ = require('lodash')
 
 // ---------------------------------------------------------------
 // Specific object type helper functions
@@ -88,17 +94,11 @@ const QUERY_RESERVED_WORDS = [
 
 const EXT_REFS = 'external_references' // External references needing aggregation
 
-function parseQueryParameters(objectType, queryParameters) {
+async function parseQueryParameters(objectType, urlSearchParams) {
   const fun = 'parseQueryParameters'
-  // log.d(mod, fun, `queryParameters: ${json.beautify(queryParameters)}`)
   // identify object model
-  /* beautify ignore:start */
-  const { Model, idField } = db.getObjectAccesses(objectType)
-  /* beautify ignore:end */
+  const Model = db.getObjectModel(objectType)
   const modelProperties = db.getModelPropertyNames(Model)
-
-  const queryKeys = Object.keys(queryParameters)
-  // log.d(mod, fun, `queryKeys: ${json.beautify(queryKeys)}`)
 
   const filterReturn = {}
   filterReturn[QUERY_LIMIT] = QUERY_LIMIT_DEFAULT
@@ -106,16 +106,16 @@ function parseQueryParameters(objectType, queryParameters) {
   filterReturn[QUERY_FILTER] = {}
   filterReturn[EXT_REFS] = []
 
-  queryKeys.map(key => {
+  for (const [key, value] of urlSearchParams) {
     if (QUERY_RESERVED_WORDS.includes(key)) {
       // log.d(mod, fun, `Key is a reserved word: ${json.beautify(key)} => ${json.beautify(queryParameters[key])}`)
       switch (key) {
         case QUERY_LIMIT:
-          filterReturn[QUERY_LIMIT] = parseInt(queryParameters[key])
+          filterReturn[QUERY_LIMIT] = parseInt(value)
           // log.d(mod, fun, `Limit: ${json.beautify(filterReturn[QUERY_LIMIT])}`)
           break
         case QUERY_OFFSET:
-          filterReturn[QUERY_OFFSET] = parseInt(queryParameters[key])
+          filterReturn[QUERY_OFFSET] = parseInt(value)
           // log.d(mod, fun, `Offset: ${json.beautify(filterReturn[QUERY_OFFSET])}`)
           break
         default:
@@ -123,10 +123,7 @@ function parseQueryParameters(objectType, queryParameters) {
       }
     } else if (modelProperties.includes(key)) {
       // log.d(mod, fun, `Key is a ${objectType} property: ${json.beautify(key)}`)
-      const val = queryParameters[key]
-      // log.d(mod, fun, `Associated value: ${val}`)
-      // log.d(mod, fun, `isObject: ${_.isObject(val)}`)
-      // log.d(mod, fun, `_isString: ${_.isString(val)}`)
+      const val = value
       try {
         const obj = JSON.parse(val)
         // log.d(mod, fun, `parsed String: ${json.beautify(obj)}`)
@@ -137,29 +134,35 @@ function parseQueryParameters(objectType, queryParameters) {
         throw new Error(errMsg)
       }
     } else {
-      const parentKey = key.substring(0, key.lastIndexOf('.'))
+      const indexSeparator = key.lastIndexOf('.')
+      const nestedField = key.substring(0, indexSeparator)
+      const nestedFieldProp = key.substring(indexSeparator + 1)
 
-      if (modelProperties.includes(parentKey)) {
-        const val = queryParameters[key]
-
+      if (modelProperties.includes(nestedField)) {
         try {
-          const obj = JSON.parse(val)
-          filterReturn[QUERY_FILTER][key] = obj
-          filterReturn[EXT_REFS].push(parentKey)
+          const obj = JSON.parse(value)
+          log.d(mod, fun, `nestedField: ${nestedField} / nestedFieldProp: ${nestedFieldProp} / value: ${obj}`)
+          // get the Model for the parent field
+          // retrieve the DB ID of the object corresponding to the parent key
+          const filter = {
+            [nestedFieldProp]: obj
+          }
+          const nestedFieldIds = await db.getNestedObject(objectType, nestedField, filter, DB_ID)
+          log.d(mod, fun, `nestedFieldIds: ${json.beautify(nestedFieldIds)}`)
+          filterReturn[QUERY_FILTER][nestedField] = nestedFieldIds
         } catch (err) {
-          const errMsg = `Error while parsing: '${json.beautify(val)}': ${err}}`
+          const errMsg = `Couldn't parse: '${json.beautify(value)}': ${err}}`
           log.w(mod, fun, errMsg)
           throw new Error(errMsg)
         }
 
-        log.d(mod, fun, `parentKey: ${parentKey}`)
+        log.d(mod, fun, `parentKey: ${nestedField}`)
       } else {
         log.w(mod, fun, `Key is unkown and ignored: ${json.beautify(key)}`)
         log.w(mod, fun, `Model properties: ${json.beautify(modelProperties)}`)
       }
     }
-    return filterReturn
-  })
+  }
   // log.d(mod, fun, `filterReturn: ${json.beautify(filterReturn)}`)
 
   return filterReturn
@@ -220,51 +223,6 @@ exports.setPublishedFlag = async (dbObject) => {
     log.d(mod, fun, `dbObject published: ${json.beautify(dbObject)}`)
   } else {
     log.w(mod, fun, `Data was already published on : ${(dbObject[DB_PUBLISHED_AT])}`)
-  }
-}
-
-// ---------------------------------------------------------------
-// Treatments of properties: DB -> RUDI
-// ---------------------------------------------------------------
-
-async function treatDbObject(objectType, dbObject) {
-  const fun = 'treatDbObject'
-  // log.d(mod, fun, `objectType: ${objectType}\nobjectData: ${json.beautify(dbObject)}`)
-
-  switch (objectType) {
-    case URL_OBJECT_METADATA:
-      return await metadataController.dbMetadataToRudi(dbObject)
-    case URL_OBJECT_SKOS_SCHEME:
-      return await skosController.dbSchemeToRudi(dbObject)
-    case URL_OBJECT_SKOS_CONCEPT:
-      return await skosController.dbConceptToRudiMinimal(dbObject)
-    case URL_OBJECT_ORGANIZATIONS:
-    case URL_OBJECT_CONTACTS:
-    case URL_ACTION_REPORT:
-      return dbObject
-    default:
-      throw new Error(msg.objectTypeNotFound(objectType))
-  }
-}
-
-async function treatDbObjectList(objectType, dbObjectList) {
-  const fun = 'treatDbObjectList'
-  log.d(mod, fun, '')
-  // log.d(mod, fun, `objectType: ${objectType}\nobjectData: ${json.beautify(rudiObjectList)}`)
-
-  switch (objectType) {
-    case URL_OBJECT_METADATA:
-      return await metadataController.dbMetadataListToRudi(dbObjectList)
-    case URL_OBJECT_SKOS_CONCEPT:
-      return await skosController.dbConceptListToRudiRecursive(dbObjectList)
-    case URL_OBJECT_SKOS_SCHEME:
-    case URL_OBJECT_ORGANIZATIONS:
-    case URL_OBJECT_CONTACTS:
-    case URL_OBJECT_MEDIA:
-    case URL_ACTION_REPORT:
-      return dbObjectList
-    default:
-      throw new Error(msg.objectTypeNotFound(objectType))
   }
 }
 
@@ -378,19 +336,16 @@ exports.getObjectListFiltered = async (req, reply) => {
   try {
     // retrieve url parameter: object type
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
-    const queryParameters = url.parse(req.url, true).query
 
-    const parsedParameters = parseQueryParameters(objectType, queryParameters)
+    // retrieve url query parameters
+    const reqSearch = req.url.substring(req.url.indexOf('?'))
+    const parsedParameters = await parseQueryParameters(objectType, new URLSearchParams(reqSearch))
+
     const limit = parsedParameters[QUERY_LIMIT]
     const offset = parsedParameters[QUERY_OFFSET]
     const filter = parsedParameters[QUERY_FILTER]
-    const extRefs = parsedParameters[EXT_REFS]
 
-    if (objectType == URL_OBJECT_METADATA) {
-      return await db.getMetadataList(limit, offset, filter, extRefs)
-    } else {
-      return await db.getObjectList(objectType, limit, offset, filter)
-    }
+    return await db.getObjectList(objectType, limit, offset, filter)
   } catch (err) {
     log.e(mod, fun, err)
     throw boom.boomify(err)
@@ -417,7 +372,7 @@ exports.updateSingleObject = async (req, reply) => {
     const existsObject = await db.doesObjectExistWithRudiId(objectType, rudiId)
     if (!existsObject) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
 
-    if (objectType == URL_OBJECT_METADATA) {
+    if (objectType === URL_OBJECT_METADATA) {
       return await metadataController.updateMetadata(updateData)
     } else {
       return await db.updateObject(objectType, updateData)

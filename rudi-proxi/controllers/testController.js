@@ -5,21 +5,13 @@ const mod = 'devCtrl'
 // ---------------------------------------------------------------
 // External dependancies
 // ---------------------------------------------------------------
-const db = require("../db/dbQueries")
-const url = require('url')
+const db = require('../db/dbQueries')
 
 // ---------------------------------------------------------------
 // Internal dependancies
 // ---------------------------------------------------------------
-const Organization = require("../definitions/models/Organization")
-const json = require("../utils/jsonAccess")
-const log = require("../utils/logging")
-const {
-  URL_OBJECT_ORGANIZATIONS,
-  URL_OBJECT_CONTACTS,
-  URL_OBJECT_MEDIA
-} = require("../config/confApi")
-const boom = require("@hapi/boom")
+const log = require('../utils/logging')
+const boom = require('@hapi/boom')
 
 // ---------------------------------------------------------------
 // tests
@@ -27,9 +19,10 @@ const boom = require("@hapi/boom")
 exports.test = async (req, reply) => {
   const fun = 'test'
   try {
-    const queryParameters = url.parse(req.url, true).query
-    const rudiId = queryParameters['id']
-    const objectType = queryParameters['type']
+    const reqSearch = req.url.substring(req.url.indexOf('?'))
+    const searchParams = new URLSearchParams(reqSearch)
+    const rudiId = searchParams.get('id')
+    const objectType = searchParams.get('type')
     log.d(mod, fun, rudiId)
 
     return await db.isReferencedInMetadata(objectType, rudiId)

@@ -2,9 +2,7 @@
 
 const mod = 'sysConf'
 
-const {
-  log
-} = require('winston')
+require('winston')
 // ---------------------------------------------------------------
 // Internal dependecies
 // ---------------------------------------------------------------
@@ -65,7 +63,7 @@ const DEFAULT_CONF = {
     [_logLevel]: 'debug'
   }
 }
-console.log(`DEFAULT_CONF: ${JSON.stringify(DEFAULT_CONF)}`)
+
 // ---------------------------------------------------------------
 // Constants: user and local configuration
 // ---------------------------------------------------------------
@@ -133,3 +131,7 @@ utils.consoleLog(mod, fun, `OUT_LOG: ${this.OUT_LOG}`)
 utils.consoleLog(mod, fun, `LOG_LVL: ${this.LOG_LVL}`)
 utils.consoleLog(mod, fun, `DB_NAME: ${this.DB_NAME}`)
 utils.consoleLog(mod, fun, `DB_URL: ${this.DB_URL}`)
+
+exports.getHost = () => {
+  return `https://${this.LISTENING_ADDR}:${this.LISTENING_PORT}`
+}

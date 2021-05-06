@@ -23,7 +23,7 @@ const mongoose = require('mongoose')
 const fastify = require('fastify')({
   logger: {
     level: 'warn',
-    logger: logConf.initFFLogger("rudiProxi")
+    logger: logConf.initFFLogger('rudiProxi')
     // file: sys.OUT_LOG
   }
 })
@@ -73,32 +73,23 @@ const mongoConnection = mongoose.connect(sys.DB_URL, mongoConnectOptions)
 const {
   publicRoutes,
   backOfficeRoutes,
-  inspectRequest,
   devRoutes
 } = require('./routes/routes')
-const {
-  initFFLogger
-} = require('./config/confLogs')
-const {
-  consoleErr
-} = require('./utils/jsUtils')
-const {
-  VERSION
-} = require('lodash')
 
 // Declare a default route
 fastify.get('/', async (request, reply) => {
-  log.i(mod, 'routes', "GET /")
+  log.i(mod, 'routes', 'GET /')
   return {
-    server: "RUDI"
+    server: 'RUDI'
   }
 })
+
 // Declare a default route
 fastify.get('/api', async (request, reply) => {
   // request.log.info(`GET /api`)
-  log.i(mod, 'routes', "GET /api")
+  log.i(mod, 'routes', 'GET /api')
   return {
-    API: "RUDI API"
+    API: 'RUDI API'
   }
 })
 
@@ -106,13 +97,13 @@ fastify.get('/api', async (request, reply) => {
 fastify.get(api.URL_PREFIX_PUBLIC, async (request, reply) => {
   log.i(mod, 'routes', `GET ${api.URL_PREFIX_PUBLIC}`)
   return {
-    'API version': "RUDI API v1"
+    'API version': 'RUDI API v1'
   }
 })
 fastify.get(`${api.URL_PREFIX_PUBLIC}/`, async (request, reply) => {
   log.i(mod, 'routes', `GET ${api.URL_PREFIX_PUBLIC}/`)
   return {
-    'API version': "RUDI API v1"
+    'API version': 'RUDI API v1'
   }
 })
 
@@ -169,7 +160,7 @@ mongoConnection
 
 process.on('uncaughtException', err => {
   log.e(mod, 'process', `Uncaught error: ${err}`)
-  console.error('There was an uncaught error', err)
+  // console.error('There was an uncaught error', err)
   // process.exit(1) //mandatory (as per the Node.js docs)
 })
 

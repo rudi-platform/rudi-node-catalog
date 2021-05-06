@@ -14,3 +14,4 @@ notes
 *.code-workspace
 **/seed
 **/.eslintrc.json
+**/.jsbeautifyrc

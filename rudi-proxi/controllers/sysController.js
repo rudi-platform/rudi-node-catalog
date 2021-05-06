@@ -10,7 +10,6 @@ const mod = 'sysCtrl'
 // External dependancies
 // ---------------------------------------------------------------
 const boom = require('@hapi/boom')
-const fs = require('fs')
 const prcs = require('child_process')
 const readLastLines = require('read-last-lines')
 
@@ -19,16 +18,13 @@ const readLastLines = require('read-last-lines')
 // ---------------------------------------------------------------
 const sys = require('../config/confSystem')
 const log = require('../utils/logging')
-const msg = require('../utils/msg')
 const json = require('../utils/jsonAccess')
 
 const {
   URL_LOGS_ACCESS,
-  URL_GIT_HASH_ACCESS: URL_APP_ID_ACCESS,
+  URL_GIT_HASH_ACCESS,
   URL_NODE_VERSION_ACCESS,
-  URL_THESAURUS_ACCESS,
-  PARAM_THESAURUS_CODE,
-  PARAM_LOGS_LINES,
+  PARAM_LOGS_LINES
 } = require('../config/confApi')
 
 // ---------------------------------------------------------------
@@ -42,16 +38,17 @@ let CURRENT_APP_HASH
 
 /** Returns the actual git hash */
 exports.getGitHash = () => {
-  const fun = 'getAppId'
+  const fun = 'getGitHash'
+  // log.d(mod, fun, ``)
   try {
-    // log.d(mod, fun, ` GET ${URL_APP_ID_ACCESS}`)
+    log.d(mod, fun, ` GET ${URL_GIT_HASH_ACCESS}`)
     const hashId = require('child_process').execSync('git rev-parse --short HEAD')
     // log.d(mod, fun, `${hashId}`.trim())
 
     return `${hashId}`.trim()
   } catch (err) {
     log.e(mod, fun, err)
-    throw err
+    throw boom.boomify(err)
   }
 }
 
@@ -63,7 +60,7 @@ exports.getAppHash = () => {
     return CURRENT_APP_HASH
   } catch (err) {
     log.e(mod, fun, err)
-    throw err
+    throw boom.boomify(err)
   }
 }
 
@@ -83,7 +80,7 @@ exports.getNodeVersion = () => {
     return nVersions
   } catch (err) {
     log.e(mod, fun, err)
-    throw err
+    throw boom.boomify(err)
   }
 }
 
@@ -106,7 +103,7 @@ exports.getLogs = async (req, reply) => {
     return logs
   } catch (err) {
     log.e(mod, fun, err)
-    throw err
+    throw boom.boomify(err)
   }
 }
 
@@ -119,6 +116,6 @@ exports.getLastLogLines = async (req, reply) => {
     return logs
   } catch (err) {
     log.e(mod, fun, err)
-    throw err
+    throw boom.boomify(err)
   }
 }
