@@ -400,7 +400,7 @@
 									"pm.test(\"All licence concept retrieved\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
-									"    pm.expect(responseJson.length).to.gte(0)",
+									"    pm.expect(responseJson.length).to.gt(0)",
 									"});",
 									""
 								],
@@ -1905,7 +1905,7 @@
 					"response": []
 				},
 				{
-					"name": "Group metadata (api_version)",
+					"name": "Group by api_version",
 					"event": [
 						{
 							"listen": "test",
@@ -1946,7 +1946,62 @@
 					"response": []
 				},
 				{
-					"name": "Group metadata (producer)",
+					"name": "Count by producer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Count by producer\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json()",
+									"",
+									"    const orgId = pm.variables.get('orgId1')",
+									"    console.log(`orgId: ${orgId}`)",
+									"    let varWasInitialized = false",
+									"    responseJson.map((res) => {",
+									"        console.log(`res.producer.organization_id: ${res.producer.organization_id}`)",
+									"        if(res.producer.organization_id == orgId) {",
+									"            console.log(res.count)",
+									"            pm.collectionVariables.set('countWithOrg1', res.count)",
+									"            varWasInitialized = true",
+									"        }",
+									"    })",
+									"    pm.expect(varWasInitialized).to.be.true",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?count_by=producer&limit=4",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}"
+							],
+							"query": [
+								{
+									"key": "count_by",
+									"value": "producer"
+								},
+								{
+									"key": "limit",
+									"value": "4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Group by producer",
 					"event": [
 						{
 							"listen": "test",
@@ -1954,6 +2009,20 @@
 								"exec": [
 									"pm.test(\"Group by producer\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
+									"",
+									"    const responseJson = pm.response.json()",
+									"",
+									"    const orgId = pm.variables.get('org1Id')",
+									"    const countWithOrg1 = pm.collectionVariables.get('countWithOrg1')",
+									"    //console.log(`orgId: ${orgId}`)",
+									"",
+									"    responseJson.map((res) => {",
+									"        //console.log(`res.producer.organization_id: ${res.producer.organization_id}`)",
+									"        if(res.producer.organization_id == orgId) {",
+									"            //console.log(res.count)",
+									"            pm.expect(res.count).to.eq(countWithOrg1)",
+									"        }",
+									"    })",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1980,6 +2049,49 @@
 								{
 									"key": "limit",
 									"value": "4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filter by producer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Filter by producer\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json()",
+									"",
+									"    const countWithOrg1 = pm.collectionVariables.get('countWithOrg1')",
+									"    // console.log(`should have: ${countWithOrg1} / found: ${responseJson.length}`)",
+									"    pm.expect(countWithOrg1).to.eq(responseJson.length)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/filter?producer.organization_id=\"{{orgId1}}\"",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}",
+								"filter"
+							],
+							"query": [
+								{
+									"key": "producer.organization_id",
+									"value": "\"{{orgId1}}\""
 								}
 							]
 						}
@@ -3624,6 +3736,10 @@
 		},
 		{
 			"key": "contact3",
+			"value": ""
+		},
+		{
+			"key": "countWithOrg1",
 			"value": ""
 		}
 	]

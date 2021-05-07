@@ -1621,7 +1621,7 @@
 									"pm.test(\"Metadata 2 created\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
-									"    console.log(responseJson);",
+									"    // console.log(responseJson);",
 									"    const metaId = pm.variables.get('softMeta2Id');",
 									"    const orgId = pm.variables.get('softOrg1Id');",
 									"    pm.expect(responseJson.global_id).to.eq(metaId);",
@@ -1805,43 +1805,6 @@
 					"response": []
 				},
 				{
-					"name": "Count metadata (producer) Copy",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Count by producer\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?count_by=producer",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{apiUrl}}",
-								"{{data}}"
-							],
-							"query": [
-								{
-									"key": "count_by",
-									"value": "producer"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Count metadata (metadata_provider)",
 					"event": [
 						{
@@ -1959,6 +1922,96 @@
 					"response": []
 				},
 				{
+					"name": "Count metadata (producer)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Count by producer\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json()",
+									"",
+									"    const orgId = pm.collectionVariables.get('softOrg1Id')",
+									"    console.log(`orgId: ${orgId}`)",
+									"    responseJson.map((res) => {",
+									"        console.log(`res.producer.organization_id: ${res.producer.organization_id}`)",
+									"        if(res.producer.organization_id == orgId) {",
+									"            console.log(res.count)",
+									"            pm.collectionVariables.set('countWithOrg1', res.count)",
+									"        }",
+									"    })",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?count_by=producer",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}"
+							],
+							"query": [
+								{
+									"key": "count_by",
+									"value": "producer"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filter metadata (producer)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Filter by producer\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json()",
+									"",
+									"    const countWithOrg1 = pm.collectionVariables.get('countWithOrg1')",
+									"    pm.expect(countWithOrg1).to.eq(responseJson.length)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/filter?producer.organization_id=\"{{softOrg1Id}}\"",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}",
+								"filter"
+							],
+							"query": [
+								{
+									"key": "producer.organization_id",
+									"value": "\"{{softOrg1Id}}\""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Group metadata (producer)",
 					"event": [
 						{
@@ -1967,6 +2020,20 @@
 								"exec": [
 									"pm.test(\"Group by producer\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
+									"",
+									"    const responseJson = pm.response.json()",
+									"",
+									"    const orgId = pm.collectionVariables.get('softOrg1Id')",
+									"    const countWithOrg1 = pm.collectionVariables.get('countWithOrg1')",
+									"    console.log(`orgId: ${orgId}`)",
+									"",
+									"    responseJson.map((res) => {",
+									"        console.log(`res.producer.organization_id: ${res.producer.organization_id}`)",
+									"        if(res.producer.organization_id == orgId) {",
+									"            console.log(res.count)",
+									"            pm.expect(res.count).to.eq(countWithOrg1)",
+									"        }",
+									"    })",
 									"});"
 								],
 								"type": "text/javascript"
@@ -3084,6 +3151,10 @@
 		},
 		{
 			"key": "softReport2Id",
+			"value": ""
+		},
+		{
+			"key": "countWithOrg1",
 			"value": ""
 		}
 	]

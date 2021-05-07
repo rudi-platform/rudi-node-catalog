@@ -1613,7 +1613,7 @@ components:
           $ref: '#/components/schemas/Date'
         'published':
           $ref: '#/components/schemas/Date'
-        'updated':
+        'updated' :
           $ref: '#/components/schemas/Date'
         'deleted':
           $ref: '#/components/schemas/Date'

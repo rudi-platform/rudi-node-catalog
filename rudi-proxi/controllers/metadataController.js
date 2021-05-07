@@ -226,14 +226,13 @@ exports.mediaListDbToRudiFormat = async (mediaDbIds) => {
   if (!mediaDbIds) throw new Error(`${msg.parameterExpected(fun, 'mediaDbIds')}`)
 
   const mediaList = []
-  await Promise.all(mediaDbIds.map(
-    async (mediaDbId) => {
-      // log.d(mod, fun, `contactDbId: ${contactDbId}`)
-      const dbMedia = await db.getEnsuredMediaWithDbId(mediaDbId)
-      // contacts.push(dbRwk.unmongoosify(contact))
-      mediaList.push(dbMedia)
-      log.d(mod, fun, `${mediaDbId} -> ${json.beautify(dbMedia)}`)
-    }))
+  await Promise.all(mediaDbIds.map(async (mediaDbId) => {
+    // log.d(mod, fun, `contactDbId: ${contactDbId}`)
+    const dbMedia = await db.getEnsuredMediaWithDbId(mediaDbId)
+    // contacts.push(dbRwk.unmongoosify(contact))
+    mediaList.push(dbMedia)
+    log.d(mod, fun, `${mediaDbId} -> ${json.beautify(dbMedia)}`)
+  }))
   return mediaList
 }
 

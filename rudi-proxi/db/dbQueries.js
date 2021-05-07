@@ -332,7 +332,7 @@ exports.doesObjectExistWithJson = async (objectType, rudiObject) => {
 
 exports.getNestedObject = async (objectType, nestedObjectProperty, filter, fieldSelection) => {
   const fun = `getNestedObject`
-  log.d(mod, fun, `filter : ${json.beautify(filter)}`)
+  log.d(mod, fun, `objectType: ${objectType}, nestedObjectProperty: ${json.beautify(nestedObjectProperty)}, filter : ${json.beautify(filter)}, fieldSelection: ${fieldSelection} `)
   try {
     if (isArray(fieldSelection)) fieldSelection = fieldSelection.join(' ')
 
@@ -340,9 +340,8 @@ exports.getNestedObject = async (objectType, nestedObjectProperty, filter, field
     if (!fieldSelection) {
       return await FieldModel.find(filter)
     } else {
-      log.d(mod, fun, `fieldSelection: ${json.beautify(fieldSelection)}`)
       const dbObjects = await FieldModel.find(filter, fieldSelection)
-      log.d(mod, fun, `dbObjects: ${dbObjects}`)
+      log.d(mod, fun, `dbObjects: ${json.beautify(dbObjects)}`)
       return dbObjects
     }
   } catch (err) {
@@ -483,7 +482,7 @@ exports.getObjectList = async (objectType, limit, offset, filter) => {
     filter = filter || {}
     const populateFields = getPopulateFields(objectType)
 
-    log.d(mod, fun, `limit: ${limit}, offset: ${offset}, filter: ${json.beautify(filter)}`)
+    log.d(mod, fun, `objectType: ${objectType}, limit: ${limit}, offset: ${offset}, filter: ${json.beautify(filter)}`)
     if (utils.isEmptyArray(populateFields)) {
       return await Model.find(filter).limit(limit).skip(offset)
     } else {

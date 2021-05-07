@@ -15,7 +15,8 @@ const uuid = require('uuid')
 // const url = require('url')
 const _ = require('lodash')
 const {
-  indexOf
+  indexOf,
+  isArray
 } = require('lodash')
 
 // ---------------------------------------------------------------
@@ -59,7 +60,8 @@ const {
 } = require('../config/confApi')
 
 const {
-  DB_PUBLISHED_AT, DB_ID
+  DB_PUBLISHED_AT,
+  DB_ID
 } = require('../db/dbFields')
 
 // ---------------------------------------------------------------
@@ -93,6 +95,9 @@ const QUERY_RESERVED_WORDS = [
 ]
 
 const EXT_REFS = 'external_references' // External references needing aggregation
+const EXT_OBJ = 'refObj'
+const EXT_OBJ_PROP = 'refObjProp'
+const EXT_OBJ_VAL = 'refObjVal'
 
 async function parseQueryParameters(objectType, urlSearchParams) {
   const fun = 'parseQueryParameters'
@@ -100,22 +105,22 @@ async function parseQueryParameters(objectType, urlSearchParams) {
   const Model = db.getObjectModel(objectType)
   const modelProperties = db.getModelPropertyNames(Model)
 
-  const filterReturn = {}
-  filterReturn[QUERY_LIMIT] = QUERY_LIMIT_DEFAULT
-  filterReturn[QUERY_OFFSET] = QUERY_OFFSET_DEFAULT
-  filterReturn[QUERY_FILTER] = {}
-  filterReturn[EXT_REFS] = []
+  const returnedFilter = {}
+  returnedFilter[QUERY_LIMIT] = QUERY_LIMIT_DEFAULT
+  returnedFilter[QUERY_OFFSET] = QUERY_OFFSET_DEFAULT
+  returnedFilter[QUERY_FILTER] = {}
+  returnedFilter[EXT_REFS] = []
 
   for (const [key, value] of urlSearchParams) {
     if (QUERY_RESERVED_WORDS.includes(key)) {
       // log.d(mod, fun, `Key is a reserved word: ${json.beautify(key)} => ${json.beautify(queryParameters[key])}`)
       switch (key) {
         case QUERY_LIMIT:
-          filterReturn[QUERY_LIMIT] = parseInt(value)
+          returnedFilter[QUERY_LIMIT] = parseInt(value)
           // log.d(mod, fun, `Limit: ${json.beautify(filterReturn[QUERY_LIMIT])}`)
           break
         case QUERY_OFFSET:
-          filterReturn[QUERY_OFFSET] = parseInt(value)
+          returnedFilter[QUERY_OFFSET] = parseInt(value)
           // log.d(mod, fun, `Offset: ${json.beautify(filterReturn[QUERY_OFFSET])}`)
           break
         default:
@@ -127,7 +132,7 @@ async function parseQueryParameters(objectType, urlSearchParams) {
       try {
         const obj = JSON.parse(val)
         // log.d(mod, fun, `parsed String: ${json.beautify(obj)}`)
-        filterReturn[QUERY_FILTER][key] = obj
+        returnedFilter[QUERY_FILTER][key] = obj
       } catch (err) {
         const errMsg = `Error while parsing: '${json.beautify(val)}': ${err}}`
         log.w(mod, fun, errMsg)
@@ -142,30 +147,54 @@ async function parseQueryParameters(objectType, urlSearchParams) {
         try {
           const obj = JSON.parse(value)
           log.d(mod, fun, `nestedField: ${nestedField} / nestedFieldProp: ${nestedFieldProp} / value: ${obj}`)
-          // get the Model for the parent field
-          // retrieve the DB ID of the object corresponding to the parent key
-          const filter = {
-            [nestedFieldProp]: obj
-          }
-          const nestedFieldIds = await db.getNestedObject(objectType, nestedField, filter, DB_ID)
-          log.d(mod, fun, `nestedFieldIds: ${json.beautify(nestedFieldIds)}`)
-          filterReturn[QUERY_FILTER][nestedField] = nestedFieldIds
+
+          returnedFilter[EXT_REFS].push({
+            [EXT_OBJ]: nestedField,
+            [EXT_OBJ_PROP]: nestedFieldProp,
+            [EXT_OBJ_VAL]: obj
+          })
         } catch (err) {
           const errMsg = `Couldn't parse: '${json.beautify(value)}': ${err}}`
           log.w(mod, fun, errMsg)
           throw new Error(errMsg)
         }
-
-        log.d(mod, fun, `parentKey: ${nestedField}`)
       } else {
         log.w(mod, fun, `Key is unkown and ignored: ${json.beautify(key)}`)
-        log.w(mod, fun, `Model properties: ${json.beautify(modelProperties)}`)
+        // log.w(mod, fun, `Model properties: ${json.beautify(modelProperties)}`)
       }
     }
   }
   // log.d(mod, fun, `filterReturn: ${json.beautify(filterReturn)}`)
 
-  return filterReturn
+  const extRefs = returnedFilter[EXT_REFS]
+  if (utils.isNotEmptyArray(extRefs)) {
+    await Promise.all(extRefs.map(async (extRef) => {
+      const extObj = extRef[EXT_OBJ]
+      const extObjProp = extRef[EXT_OBJ_PROP]
+      const extObjVal = extRef[EXT_OBJ_VAL]
+      /* beautify ignore:start */
+      const objFilter = { [extObjProp]: extObjVal }
+      /* beautify ignore:end */
+      log.d(mod, fun, `objFilter: ${json.beautify(objFilter)}`)
+      const nestedFieldIds = await db.getNestedObject(objectType, extObj, objFilter, DB_ID)
+      let queryFilter
+      if (utils.isNotEmptyArray(nestedFieldIds)) {
+        const ids = []
+        await Promise.all(nestedFieldIds.map(async (foundObj) => {
+          log.d(mod, fun, `nestedFieldId: ${json.beautify(foundObj[DB_ID])}`)
+          ids.push(foundObj[DB_ID])
+        }))
+        /* beautify ignore:start */
+        returnedFilter[QUERY_FILTER][extObj] = { $in: [ids.join(',')] }
+        /* beautify ignore:end */
+        log.d(mod, fun, `filterReturn: ${json.beautify(returnedFilter)}`)
+      } else {
+        returnedFilter[QUERY_FILTER][extObj] = 0
+      }
+    }))
+  }
+
+  return returnedFilter
 }
 
 function checkIsUrlObject(objectType) {

@@ -42,28 +42,28 @@ let LICENCE_CODE_LIST
 
 exports.getLicences = async () => {
   const fun = 'getLicenceList'
-  if (!LICENCE_LIST) {
+  if (!this.LICENCE_LIST) {
     log.d(mod, fun, `Init LICENCE_LIST`)
     let dbLicenseList = await db.getAllConceptsWithRole(this.LicenceConceptRole)
     if (!utils.isNotEmptyArray(dbLicenseList)) {
       await initLicenses()
       dbLicenseList = await db.getAllConceptsWithRole(this.LicenceConceptRole)
     }
-    LICENCE_LIST = await skosController.dbConceptListToRudiRecursive(dbLicenseList)
+    this.LICENCE_LIST = await skosController.dbConceptListToRudiRecursive(dbLicenseList)
   }
-  return LICENCE_LIST
+  return this.LICENCE_LIST
 }
 
 exports.getLicenceCodes = async () => {
   // const fun = `getAllLicenceCodes`
-  if (!LICENCE_CODE_LIST) {
+  if (!this.LICENCE_CODE_LIST) {
     const licenceList = await this.getLicences()
     // log.d(mod, fun, `licence list: ${json.beautify(licenceList)}`)
 
-    LICENCE_CODE_LIST = await licenceList.map(obj => obj[API_SKOS_CONCEPT_CODE])
+    this.LICENCE_CODE_LIST = await licenceList.map(obj => obj[API_SKOS_CONCEPT_CODE])
   }
   // log.d(mod, fun, `licence codes: ${json.beautify(this.LICENCE_CODE_LIST)}`)
-  return LICENCE_CODE_LIST
+  return this.LICENCE_CODE_LIST
 }
 
 async function initLicenses() {

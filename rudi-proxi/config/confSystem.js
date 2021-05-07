@@ -133,5 +133,5 @@ utils.consoleLog(mod, fun, `DB_NAME: ${this.DB_NAME}`)
 utils.consoleLog(mod, fun, `DB_URL: ${this.DB_URL}`)
 
 exports.getHost = () => {
-  return `https://${this.LISTENING_ADDR}:${this.LISTENING_PORT}`
+  return `http://${this.LISTENING_ADDR}:${this.LISTENING_PORT}`
 }

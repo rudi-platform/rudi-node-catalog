@@ -39,7 +39,7 @@ const FileTypes = [
   'text/html',
   'text/php',
   'text/plain',
-  'text/xml',
+  'text/xml'
 ]
 
 // ---------------------------------------------------------------
