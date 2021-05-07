@@ -1775,7 +1775,7 @@
 									"pm.test(\"Count by API version\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const metadataList = pm.response.json();",
-									"    pm.expect(metadataList.length).to.eq(1);",
+									"    pm.expect(metadataList.length).to.gte(1);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1798,6 +1798,49 @@
 								{
 									"key": "count_by",
 									"value": "metadata_info.api_version"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Group metadata (api_version)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Group by API version\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const metadataList = pm.response.json();",
+									"    pm.expect(metadataList.length).to.gte(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?group_by=metadata_info.api_version&limit=3",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}"
+							],
+							"query": [
+								{
+									"key": "group_by",
+									"value": "metadata_info.api_version"
+								},
+								{
+									"key": "limit",
+									"value": "3"
 								}
 							]
 						}
@@ -1872,49 +1915,6 @@
 								{
 									"key": "count_by",
 									"value": "metadata_info.metadata_contacts"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Group metadata (api_version)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Group by API version\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const metadataList = pm.response.json();",
-									"    pm.expect(metadataList.length).to.eq(1);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?group_by=metadata_info.api_version&limit=3",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{apiUrl}}",
-								"{{data}}"
-							],
-							"query": [
-								{
-									"key": "group_by",
-									"value": "metadata_info.api_version"
-								},
-								{
-									"key": "limit",
-									"value": "3"
 								}
 							]
 						}
