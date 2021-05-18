@@ -123,11 +123,11 @@ exports.missingObjectProperty = (jsonObject, property) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `The property '${property}' must be defined for object: ${json.beautify(jsonObject)} `.replace(/\"/g, '\'')
+      return `The property '${property}' must be defined for object: ${utils.beautify(jsonObject)} `.replace(/\"/g, '\'')
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `La propriété '${property}' doit être définie pour l'object : ${json.beautify(jsonObject)} `.replace(/\"/g, '\'')
+      return `La propriété '${property}' doit être définie pour l'object : ${utils.beautify(jsonObject)} `.replace(/\"/g, '\'')
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }

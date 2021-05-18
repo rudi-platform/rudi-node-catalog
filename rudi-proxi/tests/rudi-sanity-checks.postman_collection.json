@@ -601,7 +601,7 @@
 									"pm.test(\"Contact 1 created\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
-									"    console.log(responseJson);",
+									"    // console.log(responseJson);",
 									"    const contId = pm.variables.get('contId1');",
 									"    pm.expect(responseJson.contact_id).to.eq(contId);",
 									"});"
@@ -645,7 +645,7 @@
 									"pm.test(\"Contact 2 created\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
-									"    console.log(responseJson);",
+									"    // console.log(responseJson);",
 									"    const contId = pm.variables.get('contId2');",
 									"    pm.expect(responseJson.contact_id).to.eq(contId);",
 									"});"
@@ -867,7 +867,7 @@
 									"pm.test(\"Producer 1 created\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
-									"    console.log(responseJson);",
+									"    // console.log(responseJson);",
 									"    const orgId = pm.variables.get('orgId1');",
 									"    pm.expect(responseJson.organization_id).to.eq(orgId);",
 									"});"
@@ -911,7 +911,7 @@
 									"pm.test(\"Producer 2 created\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
-									"    console.log(responseJson);",
+									"    // console.log(responseJson);",
 									"    const orgId = pm.variables.get('orgId2');",
 									"    pm.expect(responseJson.organization_id).to.eq(orgId);",
 									"});"

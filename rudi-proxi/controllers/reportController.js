@@ -19,6 +19,7 @@ const log = require('../utils/logging')
 const msg = require('../utils/msg')
 
 const db = require('../db/dbQueries')
+const utils = require('../utils/jsUtils')
 const json = require('../utils/jsonAccess')
 
 const genericController = require('../controllers/genericController')
@@ -70,7 +71,7 @@ exports.addSingleReportForObject = async (req, reply) => {
     const reportId = json.accessProperty(reportBody, API_REPORT_ID)
     const bodyObjectId = json.accessProperty(reportBody, API_REPORT_RESOURCE_ID)
 
-    log.d(mod, fun, `Report for objectType: '${objectType}', report: '${json.beautify(reportBody)}'\n`)
+    log.d(mod, fun, `Report for objectType: '${objectType}', report: '${utils.beautify(reportBody)}'\n`)
 
     // ensure url object id and body object id match
     if (urlObjectId !== bodyObjectId) throw new Error(`${msg.parametersMismatch(urlObjectId, bodyObjectId)}`)
@@ -86,7 +87,7 @@ exports.addSingleReportForObject = async (req, reply) => {
     // add new integration report
     const dbReadyReport = await new Report(reportBody)
     await dbReadyReport.save()
-    log.i(mod, fun, `Report saved: ${json.beautify(dbReadyReport)}`)
+    log.i(mod, fun, `Report saved: ${utils.beautify(dbReadyReport)}`)
 
     if (IntegrationStatus.OK === reportBody[API_REPORT_STATUS]) {
       await genericController.setPublishedFlag(dbObject)
@@ -130,11 +131,11 @@ exports.addOrEditSingleReportForObject = async (req, reply) => {
       // add new integration report
       dbReadyReport = await new Report(reportBody)
       await dbReadyReport.save()
-      log.i(mod, fun, `Report created: ${json.beautify(dbReadyReport)}`)
+      log.i(mod, fun, `Report created: ${utils.beautify(dbReadyReport)}`)
     } else { // updating existing report
       log.d(mod, fun, `Updating existing report`)
       dbReadyReport = await db.updateObject(URL_ACTION_REPORT, reportBody)
-      log.i(mod, fun, `Report edited: ${json.beautify(dbReadyReport)}`)
+      log.i(mod, fun, `Report edited: ${utils.beautify(dbReadyReport)}`)
     }
 
     return dbReadyReport

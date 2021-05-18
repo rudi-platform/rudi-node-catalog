@@ -10,7 +10,6 @@ const _ = require('lodash')
 // Internal dependancies
 // ---------------------------------------------------------------
 const ids = require('../schemas/Identifiers')
-const Validation = require('../schemaValidators')
 
 const {
   FIELDS_TO_SKIP
@@ -32,7 +31,7 @@ const OrganizationSchema = new mongoose.Schema({
 
   // Updated offical postal address of the organization
   organization_address: {
-    type: String,
+    type: String
   },
 
   // Time when this organization was succesfully published on RUDI portal
@@ -42,7 +41,7 @@ const OrganizationSchema = new mongoose.Schema({
 }, {
   // Adds mongoose fields 'updatedAt' and 'createdAt'
   timestamps: true,
-  id: false,
+  id: false
 
   // optimisticConcurrency: true,
   // strict: true,

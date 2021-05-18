@@ -103,7 +103,7 @@ exports.newSkosScheme = async (rudiScheme) => {
 
   if (!rudiScheme) throw new Error(`${msg.parameterExpected(fun, 'rudiScheme')}`)
 
-  const topConcepts = await json.deepClone(rudiScheme[API_SCHEME_TOPS_PROPERTY])
+  const topConcepts = await utils.deepClone(rudiScheme[API_SCHEME_TOPS_PROPERTY])
 
   delete rudiScheme[API_SCHEME_TOPS_PROPERTY]
 
@@ -134,7 +134,7 @@ exports.dbSchemeToRudi = async (dbScheme) => {
   const fun = 'dbSchemeToRudi'
   log.d(mod, fun, ``)
 
-  log.d(mod, fun, `dbScheme: ${json.beautify(dbScheme)}`)
+  log.d(mod, fun, `dbScheme: ${utils.beautify(dbScheme)}`)
 
   const rudiScheme = await dbScheme
     .populate({
@@ -170,17 +170,17 @@ exports.createConceptHierarchy = async (listConcepts, schemeDbId, parentConcept)
   const conceptDbIds = []
   await Promise.all(listConcepts.map(async (conceptJson) => {
     let dbConcept = db.getConceptWithJson(conceptJson)
-    log.d(mod, fun, `dbConcept: ${json.beautify(dbConcept)}`)
+    log.d(mod, fun, `dbConcept: ${utils.beautify(dbConcept)}`)
 
     if (utils.isNotEmptyObject(dbConcept)) {
-      log.d(mod, fun, `Concept already created: ${json.beautify(dbConcept[API_SKOS_CONCEPT_ID])} `)
+      log.d(mod, fun, `Concept already created: ${utils.beautify(dbConcept[API_SKOS_CONCEPT_ID])} `)
     } else {
       log.d(mod, fun, `Creating new concept: ${conceptJson[API_SKOS_CONCEPT_ID]} `)
 
       // Backup reference lists
       let conceptChildren = []
       if (utils.isNotEmptyArray(conceptJson[API_CONCEPT_CHILDREN_PROPERTY])) {
-        conceptChildren = json.deepClone(conceptJson[API_CONCEPT_CHILDREN_PROPERTY])
+        conceptChildren = utils.deepClone(conceptJson[API_CONCEPT_CHILDREN_PROPERTY])
       }
 
       // Remove references to other concepts
@@ -193,7 +193,7 @@ exports.createConceptHierarchy = async (listConcepts, schemeDbId, parentConcept)
 
       // Create concept without references
       // log.d(mod, fun, `Saving the new Concept`)
-      log.d(mod, fun, `conceptJson: ${json.beautify(conceptJson)}`)
+      log.d(mod, fun, `conceptJson: ${utils.beautify(conceptJson)}`)
       dbConcept = await new SkosConcept(conceptJson)
       await dbConcept.save()
       // log.d(mod, fun, `=> done`)
@@ -208,7 +208,7 @@ exports.createConceptHierarchy = async (listConcepts, schemeDbId, parentConcept)
         dbConcept[API_CONCEPT_CHILDREN_PROPERTY] = childrenDbIds
       }
 
-      log.d(mod, fun, `${json.beautify(conceptJson)} -> ${conceptDbId}`)
+      log.d(mod, fun, `${utils.beautify(conceptJson)} -> ${conceptDbId}`)
     }
 
     // Update parents property
@@ -218,7 +218,7 @@ exports.createConceptHierarchy = async (listConcepts, schemeDbId, parentConcept)
       const parents = dbConcept[API_CONCEPT_PARENTS_PROPERTY]
       log.d(mod, fun, `Updating 'parents' property`)
       if (!utils.isNotEmptyArray(parents)) {
-        // log.d(mod, fun, `dbConcept[API_CONCEPT_PARENTS_PROPERTY]: ${json.beautify(dbConcept[API_CONCEPT_PARENTS_PROPERTY])}`)
+        // log.d(mod, fun, `dbConcept[API_CONCEPT_PARENTS_PROPERTY]: ${utils.beautify(dbConcept[API_CONCEPT_PARENTS_PROPERTY])}`)
         dbConcept[API_CONCEPT_PARENTS_PROPERTY] = []
       }
       if (parents.indexOf(parentConcept) === -1) {
@@ -257,7 +257,7 @@ exports.newSkosConcept = async (rudiConcept, inSchemeDbId) => {
     }))
 
   const dbConcept = await new SkosConcept(rudiConcept)
-  log.d(mod, fun, `dbConcept: ${json.beautify(dbConcept)}`)
+  log.d(mod, fun, `dbConcept: ${utils.beautify(dbConcept)}`)
   await dbConcept.save()
   log.d(mod, fun, `=> saved`)
 
@@ -300,7 +300,7 @@ exports.setDbConceptRefs = async (rudiConcept, prop) => {
 
   const listConceptsReferences = rudiConcept[prop]
 
-  // log.d(mod, fun, `listConceptsReferences: ${json.beautify(listConceptsReferences)}`)
+  // log.d(mod, fun, `listConceptsReferences: ${utils.beautify(listConceptsReferences)}`)
   if (!listConceptsReferences) return
 
   const listRefs = []
@@ -317,7 +317,7 @@ exports.setDbConceptRefs = async (rudiConcept, prop) => {
       log.d(mod, fun, `refConceptDbId: ${refConceptDbId}`)
     }
     if (!refConceptDbId) {
-      log.w(mod, fun, `Referenced concept not created: ${json.beautify(referencedConcept)}`)
+      log.w(mod, fun, `Referenced concept not created: ${utils.beautify(referencedConcept)}`)
       // TODO: throw an error here?
     } else {
       log.d(mod, fun, `refConceptDbId: ${refConceptDbId}`)
@@ -361,7 +361,7 @@ exports.dbConceptToRudiRecursive = async (dbConcept) => {
   // const fun = 'dbConceptToRudiRecursive'
   // log.d(mod, fun, ``)
 
-  // log.d(mod, fun, `dbConcept: ${json.beautify(dbConcept)}`)
+  // log.d(mod, fun, `dbConcept: ${utils.beautify(dbConcept)}`)
   if (!dbConcept) return
 
   const rudiConcept = await dbConcept.populate({
@@ -383,7 +383,7 @@ exports.dbConceptToRudiRecursive = async (dbConcept) => {
 
   rudiConcept[API_CONCEPT_CHILDREN_PROPERTY] =
     await this.dbConceptListToRudiRecursive(rudiConcept[API_CONCEPT_CHILDREN_PROPERTY])
-  // log.d(mod, fun, `rudiConcept: ${json.beautify(rudiConcept)}`)
+  // log.d(mod, fun, `rudiConcept: ${utils.beautify(rudiConcept)}`)
 
   return rudiConcept
   // TODO: populate ref fileds ?
@@ -393,7 +393,7 @@ exports.dbConceptListToRudiRecursive = async (dbConceptList) => {
   // const fun = 'dbConceptListToRudiRecursive'
   // log.d(mod, fun, ``)
 
-  // log.d(mod, fun, `dbConceptList: ${json.beautify(dbConceptList)}`)
+  // log.d(mod, fun, `dbConceptList: ${utils.beautify(dbConceptList)}`)
   if (!dbConceptList) return
 
   const rudiConceptList = []
@@ -423,8 +423,8 @@ exports.getEveryThesaurus = async (req, reply) => {
     log.d(mod, fun, ``)
     const listThesauri = THESAURI
     listThesauri.licences = await licenceController.getAllLicenseCodes()
-    // log.d(mod, fun, `listThesauri: ${json.beautify(listThesauri)}`)
-    // log.d(mod, fun, `THESAURI: ${json.beautify(THESAURI)}`)
+    // log.d(mod, fun, `listThesauri: ${utils.beautify(listThesauri)}`)
+    // log.d(mod, fun, `THESAURI: ${utils.beautify(THESAURI)}`)
     return listThesauri
   } catch (err) {
     log.e(mod, fun, err)
@@ -441,7 +441,7 @@ exports.getSingleThesaurus = (req, reply) => {
     log.d(mod, fun, `thesaurusCode: ${thesaurusCode}`)
 
     const thesaurus = this.getThesaurus(thesaurusCode)
-    if (!thesaurus) throw new Error(`Thesaurus not found for such required code: ${json.beautify(thesaurusCode)}`)
+    if (!thesaurus) throw new Error(`Thesaurus not found for such required code: ${utils.beautify(thesaurusCode)}`)
     return thesaurus
   } catch (err) {
     log.e(mod, fun, err)

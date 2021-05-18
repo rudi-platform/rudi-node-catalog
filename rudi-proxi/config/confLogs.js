@@ -48,12 +48,12 @@ try {
   // first check if directory already exists
   if (!fs.existsSync(sys.LOG_DIR)) {
     fs.mkdirSync(sys.LOG_DIR)
-    utils.consoleLog(mod, '', "Log directory has been created.")
+    utils.consoleLog(mod, '', 'Log directory has been created.')
   } else {
-    utils.consoleLog(mod, '', "Log directory exists.")
+    utils.consoleLog(mod, '', 'Log directory exists.')
   }
 } catch (err) {
-  console.error(utils.nowLocaleFormatted(), `[${mod}]`, "Log directory creation failed:")
+  console.error(utils.nowLocaleFormatted(), `[${mod}]`, 'Log directory creation failed:')
   console.error(utils.nowLocaleFormatted(), `[${mod}]`, err)
 }
 
@@ -80,11 +80,11 @@ winston.addColors({
   debug: 'cyan'
 })
 
-let FORMAT_TIMESTAMP = {}
+const FORMAT_TIMESTAMP = {}
 FORMAT_TIMESTAMP.format = logsTimestamp
-let COLORIZE_ALL = {}
+const COLORIZE_ALL = {}
 COLORIZE_ALL.all = true
-let FORMAT_PRINTF = info => `${info.timestamp} .${info.level}. ${info.message}`
+const FORMAT_PRINTF = info => `${info.timestamp} .${info.level}. ${info.message}`
 
 const formatConsoleLogs =
   winston.format.combine(
@@ -109,7 +109,7 @@ exports.logger = winston.createLogger({
 
   transports: [
     // - Write to the console
-    new(winston.transports.Console)({
+    new (winston.transports.Console)({
       name: 'consoleLogs',
       format: formatConsoleLogs
     }),
@@ -141,8 +141,8 @@ exports.logger = winston.createLogger({
       level: sys.LOG_LVL,
       maxSize: '1m',
       format: formatFileLogs
-    }),
-  ],
+    })
+  ]
 })
 
 function extractErrorFromFastifyMsg(msg) {
@@ -152,7 +152,7 @@ function extractErrorFromFastifyMsg(msg) {
     return msg
   }
 }
-let FORMAT_PRINTFF = info => `${info.timestamp} .${info.level}. [fastify] ${extractErrorFromFastifyMsg(info.message)}`
+const FORMAT_PRINTFF = info => `${info.timestamp} .${info.level}. [fastify] ${extractErrorFromFastifyMsg(info.message)}`
 
 const formatConsoleFastifyLogs =
   winston.format.combine(
@@ -164,18 +164,18 @@ const formatConsoleFastifyLogs =
 
 exports.initFFLogger = (appname) => {
   const fun = 'initFFLogger'
-  //// Here we use winston.containers IoC
+  /// / Here we use winston.containers IoC
   winston.loggers.add('default', {
     level: 'warn',
-    ///// Adding ISO levels of logging from PINO
+    /// // Adding ISO levels of logging from PINO
     levels: Object.assign({
-      'fatal': 0,
-      'warn': 4,
-      'trace': 7
+      fatal: 0,
+      warn: 4,
+      trace: 7
     }, winston.config.syslog.levels),
     // format: format.combine(format.splat(), format.json()),
     defaultMeta: {
-      service: appname + "_" + (process.env.NODE_ENV || "development")
+      service: appname + '_' + (process.env.NODE_ENV || 'development')
     },
     transports: [
       new winston.transports.File({
@@ -185,13 +185,13 @@ exports.initFFLogger = (appname) => {
         maxSize: '20m',
         maxFiles: '7d',
         format: formatFileLogs
-      }),
+      })
 
     ]
   })
 
-  //// Here we use winston.containers IoC get accessor
-  var logger = winston.loggers.get("default")
+  /// / Here we use winston.containers IoC get accessor
+  const logger = winston.loggers.get('default')
 
   if (process.env.NODE_ENV !== 'production') {
     logger.add(new transports.Console({
@@ -203,12 +203,12 @@ exports.initFFLogger = (appname) => {
 
   process.on('uncaughtException', function (err) {
     utils.consoleErr(mod, fun, `UncaughtException processing: ${err}`)
-    console.error("UncaughtException processing: %s", err)
+    console.error('UncaughtException processing: %s', err)
   })
 
   // // PINO like, we link winston.containers to use only one instance of logger
   logger.child = function () {
-    return winston.loggers.get("default")
+    return winston.loggers.get('default')
   }
 
   return logger

@@ -1,29 +1,21 @@
 'use strict'
+
 const mod = 'metaSch'
-// ---------------------------------------------------------------
-// API version
-// ---------------------------------------------------------------
-const {
-  API_VERSION
-} = require('../../config/confApi')
 
 // ---------------------------------------------------------------
 // External dependencies
 // ---------------------------------------------------------------
-const boom = require('@hapi/boom')
 const mongoose = require('mongoose')
 const _ = require('lodash')
 
+// eslint-disable-next-line no-unused-vars
+const GeoJSON = require('mongoose-geojson-schema')
 const Int32 = require('mongoose-int32')
 
 // ---------------------------------------------------------------
 // Internal dependencies
 // ---------------------------------------------------------------
-const db = require('../../db/dbQueries')
 const {
-  API_METADATA_ID,
-  API_ORGANIZATION_ID,
-  API_CONTACT_ID,
   API_DATA_PRODUCER_PROPERTY,
   API_DATA_CONTACTS_PROPERTY,
 
@@ -52,6 +44,7 @@ const {
   API_MEDIA_PROPERTY,
 
   FIELDS_TO_SKIP,
+  API_DATA_DATES_PROPERTY
 } = require('../../db/dbFields')
 
 const log = require('../../utils/logging')
@@ -64,10 +57,9 @@ const Validation = require('../schemaValidators')
 // ---------------------------------------------------------------
 // Schema definitions
 // ---------------------------------------------------------------
-const GeoJSON = require('mongoose-geojson-schema')
 
 /* beautify ignore:start */
-const {DOI,UUIDv4} = require('../schemas/Identifiers')
+const { DOI, UUIDv4 } = require('../schemas/Identifiers')
 /* beautify ignore:end */
 const DictionaryEntry = require('../schemas/DictionaryEntry')
 const ReferenceDates = require('../schemas/ReferenceDates')
@@ -75,11 +67,6 @@ const ReferenceDates = require('../schemas/ReferenceDates')
 // ---------------------------------------------------------------
 // Model definitions
 // ---------------------------------------------------------------
-const Organization = require('./Organization')
-const Contact = require('./Contact')
-/* beautify ignore:start */
-const { Media, MediaFile, MediaSeries } = require('./Media')
-/* beautify ignore:end */
 const Licence = require('./Licence')
 
 // ---------------------------------------------------------------
@@ -93,37 +80,8 @@ const licenceController = require('../../controllers/licenceController')
 const Language = require('../thesaurus/Languages')
 const Keywords = require('../thesaurus/Keywords')
 const Themes = require('../thesaurus/Themes')
-const Projection = require('../thesaurus/Projections')
-const Encoding = require('../thesaurus/Encodings')
-const HashAlgo = require('../thesaurus/HashAlgorithms')
 const Projections = require('../thesaurus/Projections')
-
-// ---------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------
-const UpdateStatus = {
-  modified: 'modified',
-  updated: 'updated',
-  historical: 'historical',
-  obsolete: 'obsolete'
-}
-
-const StorageStatus = {
-  online: 'online',
-  archived: 'archived',
-  unavailable: 'unavailable'
-}
-
-const HashAlgorithms = {
-  MD5: 'MD5',
-  SHA256: 'SHA-256',
-  SHA512: 'SHA-512'
-}
-
-const TransmissionModes = {
-  file: 'FILE',
-  series: 'SERIES'
-}
+const StorageStatus = require('../thesaurus/StorageStatus')
 
 // ---------------------------------------------------------------
 // Validators
@@ -176,10 +134,10 @@ const MetadataSchema = new mongoose.Schema({
       // accept empty values as non-duplicates
       partialFilterExpression: {
         local_id: {
-          $type: "string"
+          $type: 'string'
         }
       }
-    },
+    }
   },
 
   // Digital Object Identifier for the ressource (optional)
@@ -212,7 +170,7 @@ const MetadataSchema = new mongoose.Schema({
 
   /** Context, objectives and final use of the data */
   purpose: {
-    type: [DictionaryEntry],
+    type: [DictionaryEntry]
   },
 
   // ---------------------------
@@ -249,14 +207,14 @@ const MetadataSchema = new mongoose.Schema({
   producer: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Organization',
-    required: true,
+    required: true
   },
 
   /** Persons in charge of maintaining the resource */
   contacts: {
     type: [{
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Contact',
+      ref: 'Contact'
     }],
     required: true,
     validate: validArrayNotNull
@@ -270,7 +228,7 @@ const MetadataSchema = new mongoose.Schema({
   available_formats: {
     type: [{
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Media',
+      ref: 'Media'
     }],
     required: true,
     validate: validArrayNotNull
@@ -286,13 +244,13 @@ const MetadataSchema = new mongoose.Schema({
       type: String,
       enum: Object.values(Language)
     }],
-    default: [Language.fr],
+    default: [Language.fr]
   },
 
   /** Period of time described by the data */
   temporal_spread: {
     start_date: {
-      type: Date,
+      type: Date
       // Custom validation in pre-save hook: required if 'temporal_spread' is defined !
     },
     end_date: {
@@ -318,26 +276,26 @@ const MetadataSchema = new mongoose.Schema({
       west_longitude: {
         type: Number,
         min: -180,
-        max: 180,
+        max: 180
       },
       /* Easternmost latitude given as a decimal number */
       east_longitude: {
         type: Number,
         min: -180,
-        max: 180,
+        max: 180
       },
       /** Southernmost latitude given as a decimal number */
       south_latitude: {
         type: Number,
         min: -90,
-        max: 90,
+        max: 90
       },
       /** Northernmost latitude given as a decimal number */
       north_latitude: {
         type: Number,
         min: -90,
-        max: 90,
-      },
+        max: 90
+      }
     },
 
     /**
@@ -360,7 +318,7 @@ const MetadataSchema = new mongoose.Schema({
      */
     projection: {
       type: String,
-      enum: Object.values(Projection),
+      enum: Object.values(Projections)
       // default: 'WGS 84'
     },
 
@@ -369,7 +327,7 @@ const MetadataSchema = new mongoose.Schema({
      */
     spatial_representation: {
       type: String
-    },
+    }
 
   },
 
@@ -384,7 +342,7 @@ const MetadataSchema = new mongoose.Schema({
     number_of_fields: {
       type: Int32,
       min: 0
-    },
+    }
   },
 
   /**
@@ -425,7 +383,7 @@ const MetadataSchema = new mongoose.Schema({
         gdpr_sensitive: {
           type: Boolean,
           default: false
-        },
+        }
       },
 
       /**
@@ -462,7 +420,7 @@ const MetadataSchema = new mongoose.Schema({
       other_constraints: {
         type: [DictionaryEntry]
       }
-    },
+    }
   },
 
   /** Metadata on the metadata */
@@ -488,13 +446,13 @@ const MetadataSchema = new mongoose.Schema({
     /** Description of the organization that produced the metadata */
     metadata_provider: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Organization',
+      ref: 'Organization'
     },
 
     /** Addresses to get further information on the metadata */
     metadata_contacts: [{
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Contact',
+      ref: 'Contact'
     }]
   },
 
@@ -516,7 +474,7 @@ const MetadataSchema = new mongoose.Schema({
     getters: true,
     setters: true,
     virtuals: true
-  },
+  }
 })
 
 // ---------------------------------------------------------------
@@ -526,40 +484,40 @@ async function checkLicence(metadata) {
   const fun = 'checkLicence'
 
   const accessCondition = json.accessProperty(metadata, API_METADATA_ACCESS_CONDITION)
-  // log.d(mod, fun, `accessCondition: ${json.beautify(accessCondition)}`)
+  // log.d(mod, fun, `accessCondition: ${utils.beautify(accessCondition)}`)
   const licence = json.requireSubProperty(metadata, API_METADATA_ACCESS_CONDITION, API_METADATA_LICENCE)
-  // log.d(mod, fun, `licence: ${json.beautify(licence)}`)
+  // log.d(mod, fun, `licence: ${utils.beautify(licence)}`)
 
   const licenceType = json.requireSubProperty(accessCondition, API_METADATA_LICENCE, API_METADATA_LICENCE_TYPE)
 
   switch (licenceType) {
-    case Licence.LicenceTypes.Standard:
-      // log.d(mod, fun, `licenceType: ${json.beautify(licenceType)}`)
+    case Licence.LicenceTypes.Standard: {
+      // log.d(mod, fun, `licenceType: ${utils.beautify(licenceType)}`)
       const licenceLabel = json.requireSubProperty(accessCondition, API_METADATA_LICENCE, API_METADATA_LICENCE_LABEL,
         API_METADATA_LICENCE_TYPE, Licence.LicenceTypes.Standard)
       const listLicenceCode = await licenceController.getLicenceCodes()
-      // log.d(mod, fun, `licence list: ${json.beautify(listLicenceCode)}`)
-      if (listLicenceCode.indexOf(licenceLabel) == -1) {
+      // log.d(mod, fun, `licence list: ${utils.beautify(listLicenceCode)}`)
+      if (listLicenceCode.indexOf(licenceLabel) === -1) {
         throw (new Error(`Licence label '${licenceLabel}' was not found in licence list '${listLicenceCode}'`))
       } else {
         return licenceLabel
       }
-      break
-    case Licence.LicenceTypes.Custom:
-      // log.d(mod, fun, `licenceType: ${json.beautify(licenceType)}`)
+    }
+    case Licence.LicenceTypes.Custom: {
+      // log.d(mod, fun, `licenceType: ${utils.beautify(licenceType)}`)
       json.requireSubProperty(accessCondition, API_METADATA_LICENCE, API_METADATA_LICENCE_CUSTOM_LABEL,
         API_METADATA_LICENCE_TYPE, Licence.LicenceTypes.Custom)
       json.requireSubProperty(accessCondition, API_METADATA_LICENCE, API_METADATA_LICENCE_CUSTOM_URI,
         API_METADATA_LICENCE_TYPE, Licence.LicenceTypes.Custom)
       return licence[API_METADATA_LICENCE_CUSTOM_LABEL]
-      break
-    default:
-      throw new Error(
-        msg.incorrectValueForEnum(
-          `${API_METADATA_ACCESS_CONDITION}.${API_METADATA_LICENCE}.${API_METADATA_LICENCE_TYPE}`,
-          licenceType))
+    }
+    default: {
+      const errMsg =
+        msg.incorrectValueForEnum(`${API_METADATA_ACCESS_CONDITION}.${API_METADATA_LICENCE}.${API_METADATA_LICENCE_TYPE}`, licenceType)
+      log.e(mod, fun, errMsg)
+      throw new Error(errMsg)
+    }
   }
-
 }
 
 // ---------------------------------------------------------------
@@ -586,14 +544,26 @@ MetadataSchema.pre('save', async function (next) {
   const fun = 'pre save hook'
   log.d(mod, fun, ``)
   try {
-    let metadata = this
+    const metadata = this
+
+    // If 'geography' field is defined, the field 'geography.bbox' is required
     if (json.requireSubProperty(metadata, API_METADATA_GEOGRAPHY_PROPERTY, API_METADATA_BBOX_PROPERTY)) {
-      if (json.isNothing(metadata[API_METADATA_GEOGRAPHY_PROPERTY][API_METADATA_GEO_PROJECTION_PROPERTY]))
+      if (utils.isNothing(metadata[API_METADATA_GEOGRAPHY_PROPERTY][API_METADATA_GEO_PROJECTION_PROPERTY])) {
+        // If 'geography' field is defined, but 'geography.projection' is not, it is initialized to the defaul value.
         metadata[API_METADATA_GEOGRAPHY_PROPERTY][API_METADATA_GEO_PROJECTION_PROPERTY] = 'WGS 84'
+      }
     }
 
+    // If 'temporal_spread' is defined, the field 'start_date' should be defined
     json.requireSubProperty(metadata, API_METADATA_PERIOD_PROPERTY, API_METADATA_START_DATE_PROPERTY)
+
+    // Checking 'licence' field
     await checkLicence(metadata)
+
+    // If 'dataset_dates.updated' is not defined, it is initialized with 'dataset_dates.created'
+    if (utils.isNothing(metadata[API_DATA_DATES_PROPERTY][API_DATES_EDITED_PROPERTY])) {
+      metadata[API_DATA_DATES_PROPERTY][API_DATES_EDITED_PROPERTY] = metadata[API_DATA_DATES_PROPERTY][API_DATES_CREATED_PROPERTY]
+    }
   } catch (err) {
     next(err)
   }

@@ -140,6 +140,18 @@ exports.getObjectAccesses = (objectType) => {
   }
 }
 
+/**
+ * If the input field is not a reference to another Collection, return null
+ * If the input filed is a property from another Collection, return the root
+ * field and the corresponding Model
+ */
+exports.getRootRef = (objectType, field) => {
+  const FieldModel = this.getFieldModel(objectType, field)
+  if (!FieldModel) return [false, false]
+  const rootProp = field.split('.')[0]
+  return [FieldModel, rootProp]
+}
+
 exports.getFieldModel = (objectType, field) => {
   const fun = 'getFieldModel'
   log.d(mod, fun, `field: ${field}`)
@@ -147,7 +159,9 @@ exports.getFieldModel = (objectType, field) => {
   assertIsString(fun, objectType)
   if (objectType !== URL_OBJECT_METADATA) return null
 
-  switch (field) {
+  const prop = field.split('.')[0]
+
+  switch (prop) {
     case API_DATA_PRODUCER_PROPERTY:
     case `${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`:
       return Organization
@@ -199,7 +213,7 @@ exports.getCollections = async () => {
     const collections = await mongoose.connection.db.listCollections().toArray()
 
     collections.map((collection) => {
-      log.v(mod, fun, `${json.beautify(collection.name)}`)
+      log.v(mod, fun, `${utils.beautify(collection.name)}`)
       return collection.name
     })
     return collections
@@ -332,7 +346,7 @@ exports.doesObjectExistWithJson = async (objectType, rudiObject) => {
 
 exports.getNestedObject = async (objectType, nestedObjectProperty, filter, fieldSelection) => {
   const fun = `getNestedObject`
-  log.d(mod, fun, `objectType: ${objectType}, nestedObjectProperty: ${json.beautify(nestedObjectProperty)}, filter : ${json.beautify(filter)}, fieldSelection: ${fieldSelection} `)
+  log.d(mod, fun, `objectType: ${objectType}, nestedObjectProperty: ${utils.beautify(nestedObjectProperty)}, filter : ${utils.beautify(filter)}, fieldSelection: ${fieldSelection} `)
   try {
     if (isArray(fieldSelection)) fieldSelection = fieldSelection.join(' ')
 
@@ -341,7 +355,7 @@ exports.getNestedObject = async (objectType, nestedObjectProperty, filter, field
       return await FieldModel.find(filter)
     } else {
       const dbObjects = await FieldModel.find(filter, fieldSelection)
-      log.d(mod, fun, `dbObjects: ${json.beautify(dbObjects)}`)
+      log.d(mod, fun, `dbObjects: ${utils.beautify(dbObjects)}`)
       return dbObjects
     }
   } catch (err) {
@@ -440,7 +454,7 @@ exports.getEnsuredDbIdWithJson = async (objectType, rudiObject) => {
   log.d(mod, fun, ``)
   // log.d(mod, fun, `objectType: ${objectType}`)
   // log.d(mod, fun, `idField: ${idField}`)
-  // log.d(mod, fun, `jsonObject: ${json.beautify(jsonObject)}`)
+  // log.d(mod, fun, `jsonObject: ${utils.beautify(jsonObject)}`)
   try {
     const idField = this.getObjectIdField(objectType)
     const rudiId = json.accessProperty(rudiObject, idField)
@@ -472,7 +486,7 @@ exports.getObjectWithField = async (Model, fieldName, fieldValue, populateFields
 // ---------------------------------------------------------------
 // Generic functions: get object list
 // ---------------------------------------------------------------
-exports.getObjectList = async (objectType, limit, offset, filter) => {
+exports.getObjectList = async (objectType, limit, offset, filter, fields) => {
   const fun = `getObjectList`
   log.d(mod, fun, ``)
   try {
@@ -482,11 +496,22 @@ exports.getObjectList = async (objectType, limit, offset, filter) => {
     filter = filter || {}
     const populateFields = getPopulateFields(objectType)
 
-    log.d(mod, fun, `objectType: ${objectType}, limit: ${limit}, offset: ${offset}, filter: ${json.beautify(filter)}`)
+    log.d(mod, fun, `objectType: ${objectType}, limit: ${limit}, offset: ${offset}, filter: ${utils.beautify(filter)}, fields: ${utils.beautify(fields)}`)
     if (utils.isEmptyArray(populateFields)) {
-      return await Model.find(filter).limit(limit).skip(offset)
+      const fieldsToKeep = fields ? fields.join(' ') : ``
+      return await Model.find(filter, fieldsToKeep).limit(limit).skip(offset)
     } else {
-      return await Model.find(filter).limit(limit).skip(offset).populate(populateFields)
+      const objectList = await Model.find(filter).limit(limit).skip(offset).populate(getPopulateOptions(objectType))
+      if (!fields) return objectList
+
+      const filteredObjectList = []
+      await Promise.all(objectList.map(async (obj) => {
+        const filteredObj = await utils.keepFields(obj, fields)
+        // log.d(mod, fun, `obj: ${utils.beautify(obj)}`)
+        // log.d(mod, fun, `filteredObj: ${utils.beautify(filteredObj)}`)
+        filteredObjectList.push(filteredObj)
+      }))
+      return filteredObjectList
     }
   } catch (err) {
     log.w(mod, fun, err)
@@ -496,7 +521,7 @@ exports.getObjectList = async (objectType, limit, offset, filter) => {
 
 exports.getObjectListWithProperties = async (objectType, filter, fields, limit, offset) => {
   const fun = `getObjectListWithProperties`
-  // log.d(mod, fun, `fields: ${json.beautify(fields)}`)
+  // log.d(mod, fun, `fields: ${utils.beautify(fields)}`)
   log.d(mod, fun, ``)
   try {
     const Model = this.getObjectModel(objectType)
@@ -519,13 +544,15 @@ exports.getObjectListCount = async (objectType, unionField, limit, offset) => {
   log.d(mod, fun, `objectType: ${objectType}, unionField: ${unionField}, limit: ${limit} / offset: ${offset} `)
   try {
     const Model = this.getObjectModel(objectType)
-    const FieldModel = this.getFieldModel(objectType, unionField)
+
+    const [FieldModel, rootProp] = this.getRootRef(objectType, unionField)
+    const pivot = !FieldModel ? unionField : rootProp
     /* beautify ignore:start */
     const objectList = await Model.aggregate([
-      { $unwind: `$${unionField}` },
+      { $unwind: `$${pivot}` },
       {
         $group: {
-          _id: `$${unionField}`,
+          _id: `$${pivot}`,
           count: { $sum: 1 }
         }
       },
@@ -535,7 +562,7 @@ exports.getObjectListCount = async (objectType, unionField, limit, offset) => {
 
     if (!FieldModel) {
       objectList.map(obj => {
-        obj[unionField] = obj._id
+        obj[pivot] = obj._id
         delete obj._id
         return obj._id
       })
@@ -595,7 +622,7 @@ exports.getObjectListGroup = async (objectType, unionField, limit, offset) => {
       }))
       return objectList
     } else {
-      // log.d(mod, fun, `CollectionFrom: ${json.beautify(FieldModel)}`)
+      // log.d(mod, fun, `CollectionFrom: ${utils.beautify(FieldModel)}`)
 
       const finalObjectList = await FieldModel.populate(objectList, unionField)
       await Promise.all(finalObjectList.map(async (obj) => {
@@ -639,7 +666,7 @@ exports.updateObject = async (objectType, jsonUpdateData) => {
     log.w(mod, fun, err)
     throw err
   }
-  // log.d(mod, fun, `updatedObject: ${json.beautify(updatedObject)}`)
+  // log.d(mod, fun, `updatedObject: ${utils.beautify(updatedObject)}`)
 }
 
 exports.deleteObject = async (objectType, rudiId) => {
@@ -695,7 +722,7 @@ exports.deleteManyWithRudiIds = async (objectType, rudiIdList) => {
   const filter = { [idField]: { $in: rudiIdList } }
   /* beautify ignore:end */
 
-  log.d(mod, fun, json.beautify(filter))
+  log.d(mod, fun, utils.beautify(filter))
 
   try {
     const deletionInfo = await Model.deleteMany(filter)
@@ -1024,8 +1051,8 @@ exports.getMediaDbIdWithJson = async (mediaJson) => {
   log.d(mod, fun, ``)
   // log.d(mod, fun, `URL_OBJECT_MEDIA: ${URL_OBJECT_MEDIA}`)
   // log.d(mod, fun, `API_MEDIA_ID: ${API_MEDIA_ID}`)
-  // log.d(mod, fun, `mediaJson: ${json.beautify(mediaJson)}`)
-  // log.d(mod, fun, `media dbType: ${json.beautify(mediaJson[API_MEDIA_TYPE_PROPERTY])}`)
+  // log.d(mod, fun, `mediaJson: ${utils.beautify(mediaJson)}`)
+  // log.d(mod, fun, `media dbType: ${utils.beautify(mediaJson[API_MEDIA_TYPE_PROPERTY])}`)
   return await this.getDbIdWithJson(URL_OBJECT_MEDIA, mediaJson)
 }
 
@@ -1034,8 +1061,8 @@ exports.getEnsuredMediaDbIdWithJson = async (mediaJson) => {
   log.d(mod, fun, ``)
   // log.d(mod, fun, `URL_OBJECT_MEDIA: ${URL_OBJECT_MEDIA}`)
   // log.d(mod, fun, `API_MEDIA_ID: ${API_MEDIA_ID}`)
-  // log.d(mod, fun, `mediaJson: ${json.beautify(mediaJson)}`)
-  // log.d(mod, fun, `media dbType: ${json.beautify(mediaJson[API_MEDIA_TYPE_PROPERTY])}`)
+  // log.d(mod, fun, `mediaJson: ${utils.beautify(mediaJson)}`)
+  // log.d(mod, fun, `media dbType: ${utils.beautify(mediaJson[API_MEDIA_TYPE_PROPERTY])}`)
   return await this.getEnsuredDbIdWithJson(URL_OBJECT_MEDIA, mediaJson)
 }
 
@@ -1173,7 +1200,7 @@ exports.isReferencedInMetadata = async (objectType, rudiId) => {
   // const truc1 = await (await Contact.findOne({[API_CONTACT_ID]: rudiId}, '_id')).toObject()
   // const truc = await Contact.findOne({[API_CONTACT_ID]: rudiId}, '_id')
   // const truc2 = await truc.toObject()
-  // log.d(mod, fun, `truc: ${json.beautify(truc2)}`)
+  // log.d(mod, fun, `truc: ${utils.beautify(truc2)}`)
   let dbId
   try {
     dbId = await (await this.getObjectPropertiesWithRudiId(objectType, rudiId, [DB_ID])).toObject()[DB_ID]
@@ -1183,7 +1210,7 @@ exports.isReferencedInMetadata = async (objectType, rudiId) => {
     throw new Error(errMsg)
   }
 
-  log.d(mod, fun, `dbId: ${json.beautify(dbId)}`)
+  log.d(mod, fun, `dbId: ${utils.beautify(dbId)}`)
 
   let metadataFilter
   switch (objectType) {
@@ -1216,7 +1243,7 @@ exports.isReferencedInMetadata = async (objectType, rudiId) => {
       throw new Error(msg.objectTypeNotFound(objectType))
   }
   const res = await Metadata.findOne(metadataFilter, API_METADATA_ID)
-  log.d(mod, fun, `res: ${json.beautify(res)}`)
+  log.d(mod, fun, `res: ${utils.beautify(res)}`)
   return !!res
   // res = await Metadata.find(metadataFilter, API_METADATA_ID)
   // return !!utils.isEmptyArray(res)
@@ -1225,7 +1252,7 @@ exports.isReferencedInMetadata = async (objectType, rudiId) => {
 // ensure the organization is not in metadata.metainfo.provider
 exports.isOrgUsedInMetadata = async (dbOrg) => {
   const fun = `isOrgUsedInMetadata`
-  log.d(mod, fun, `dbOrg: ${json.beautify(dbOrg)}`)
+  log.d(mod, fun, `dbOrg: ${utils.beautify(dbOrg)}`)
 
   // retrieving the DB id for the organization
   const orgDbId = dbOrg[DB_ID]
@@ -1234,19 +1261,19 @@ exports.isOrgUsedInMetadata = async (dbOrg) => {
   // checking if the organization is referenced by a metadata in field API_DATA_PRODUCER_PROPERTY
   const orgQuery = {}
   orgQuery[`${API_DATA_PRODUCER_PROPERTY}`] = mongoose.Types.ObjectId(orgDbId)
-  // log.d(mod, fun, `orgQuery: ${json.beautify(orgQuery)}`)
+  // log.d(mod, fun, `orgQuery: ${utils.beautify(orgQuery)}`)
   const metadataWithProducer = await Metadata.findOne(orgQuery)
 
-  log.d(mod, fun, `metadataWithProducer: ${json.beautify(metadataWithProducer)}`)
+  log.d(mod, fun, `metadataWithProducer: ${utils.beautify(metadataWithProducer)}`)
   if (metadataWithProducer != null) return true
 
   // checking if the organization is referenced by a metadata in field API_METAINFO_PROPERTY.API_METAINFO_PROVIDER_PROPERTY
   const metaInfoOrgQuery = {}
   metaInfoOrgQuery[`${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`] = mongoose.Types.ObjectId(orgDbId)
-  // log.d(mod, fun, `metaInfoOrgQuery: ${json.beautify(metaInfoOrgQuery)}`)
+  // log.d(mod, fun, `metaInfoOrgQuery: ${utils.beautify(metaInfoOrgQuery)}`)
 
   const metadataWithMetaInfoProvider = await Metadata.findOne(metaInfoOrgQuery)
-  log.d(mod, fun, `metadataWithMetaInfoProvider: ${json.beautify(metadataWithMetaInfoProvider)}`)
+  log.d(mod, fun, `metadataWithMetaInfoProvider: ${utils.beautify(metadataWithMetaInfoProvider)}`)
   // return (null != metadataWithMetaInfoProvider)
   return (metadataWithMetaInfoProvider != null)
 }
@@ -1258,7 +1285,7 @@ exports.isOrgUsedInMetadata = async (dbOrg) => {
 // ensure the contact is not in metadata.metainfo.contacts
 exports.isContactUsedInMetadata = async (dbContact) => {
   const fun = `isContactUsedInMetadata`
-  log.d(mod, fun, `dbContact: ${json.beautify(dbContact)}`)
+  log.d(mod, fun, `dbContact: ${utils.beautify(dbContact)}`)
 
   // retrieving the DB id for the organization
   const contactDbId = dbContact[DB_ID]
@@ -1267,18 +1294,18 @@ exports.isContactUsedInMetadata = async (dbContact) => {
   // checking if the contact is referenced by a metadata in field API_DATA_CONTACTS_PROPERTY
   const contactsQuery = {}
   contactsQuery[`${API_DATA_CONTACTS_PROPERTY}`] = mongoose.Types.ObjectId(contactDbId)
-  log.d(mod, fun, `contactsQuery: ${json.beautify(contactsQuery)}`)
+  log.d(mod, fun, `contactsQuery: ${utils.beautify(contactsQuery)}`)
 
   const metadataWithContact = await Metadata.findOne(contactsQuery)
-  log.d(mod, fun, `metadataWithContact: ${json.beautify(metadataWithContact)}`)
+  log.d(mod, fun, `metadataWithContact: ${utils.beautify(metadataWithContact)}`)
   if (metadataWithContact != null) return true
 
   // checking if the contact is referenced by a metadata in field API_METAINFO_PROPERTY.API_METAINFO_CONTACTS_PROPERTY
   const metaInfoContactsQuery = {}
   metaInfoContactsQuery[`${API_METAINFO_PROPERTY}.${API_METAINFO_CONTACTS_PROPERTY}`] = mongoose.Types.ObjectId(contactDbId)
-  // log.d(mod, fun, `metaInfoContactsQuery: ${json.beautify(metaInfoContactsQuery)}`)
+  // log.d(mod, fun, `metaInfoContactsQuery: ${utils.beautify(metaInfoContactsQuery)}`)
 
   const metadataWithMetaInfoContact = await Metadata.findOne(metaInfoContactsQuery)
-  log.d(mod, fun, `dbObjectWithMetaInfoContact: ${json.beautify(metadataWithMetaInfoContact)}`)
+  log.d(mod, fun, `dbObjectWithMetaInfoContact: ${utils.beautify(metadataWithMetaInfoContact)}`)
   return (metadataWithMetaInfoContact != null)
 }

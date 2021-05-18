@@ -34,13 +34,13 @@ exports.newContact = async (contactJson) => {
   try {
     dbContact = await new Contact(contactJson)
   } catch (err) {
-    log.w(mod, fun, `New object '${URL_OBJECT_CONTACTS}': ${json.beautify(contactJson)} | Error: ${err}`)
+    log.w(mod, fun, `New object '${URL_OBJECT_CONTACTS}': ${utils.beautify(contactJson)} | Error: ${err}`)
     throw err
   }
   try {
     await dbContact.save()
   } catch (err) {
-    log.w(mod, fun, `Saving object '${URL_OBJECT_CONTACTS}': ${json.beautify(dbContact)} | Error: ${err}`)
+    log.w(mod, fun, `Saving object '${URL_OBJECT_CONTACTS}': ${utils.beautify(dbContact)} | Error: ${err}`)
     throw err
   }
   return dbContact

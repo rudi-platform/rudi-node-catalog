@@ -48,9 +48,12 @@ const {
   URL_ACTION_DELETION,
   PARAM_ID,
   PARAM_OBJECT,
+
+  QUERY_FIELDS,
   QUERY_LIMIT,
-  QUERY_LIMIT_DEFAULT,
   QUERY_OFFSET,
+
+  QUERY_LIMIT_DEFAULT,
   QUERY_OFFSET_DEFAULT,
   QUERY_FILTER,
   QUERY_GROUP_BY,
@@ -91,7 +94,8 @@ const skosController = require('./skosController')
 // ---------------------------------------------------------------
 const QUERY_RESERVED_WORDS = [
   QUERY_LIMIT,
-  QUERY_OFFSET
+  QUERY_OFFSET,
+  QUERY_FIELDS
 ]
 
 const EXT_REFS = 'external_references' // External references needing aggregation
@@ -113,33 +117,39 @@ async function parseQueryParameters(objectType, urlSearchParams) {
 
   for (const [key, value] of urlSearchParams) {
     if (QUERY_RESERVED_WORDS.includes(key)) {
-      // log.d(mod, fun, `Key is a reserved word: ${json.beautify(key)} => ${json.beautify(queryParameters[key])}`)
+      // log.d(mod, fun, `Key is a reserved word: ${utils.beautify(key)} => ${utils.beautify(queryParameters[key])}`)
       switch (key) {
         case QUERY_LIMIT:
           returnedFilter[QUERY_LIMIT] = parseInt(value)
-          // log.d(mod, fun, `Limit: ${json.beautify(filterReturn[QUERY_LIMIT])}`)
+          // log.d(mod, fun, `Limit: ${utils.beautify(filterReturn[QUERY_LIMIT])}`)
           break
         case QUERY_OFFSET:
           returnedFilter[QUERY_OFFSET] = parseInt(value)
-          // log.d(mod, fun, `Offset: ${json.beautify(filterReturn[QUERY_OFFSET])}`)
+          // log.d(mod, fun, `Offset: ${utils.beautify(filterReturn[QUERY_OFFSET])}`)
+          break
+        case QUERY_FIELDS:
+          // log.d(mod, fun, utils.beautify(value))
+          // log.d(mod, fun, utils.beautify(value.split(',')))
+          returnedFilter[QUERY_FIELDS] = value.split(',')
+          log.d(mod, fun, `Fields to keep: ${utils.beautify(returnedFilter[QUERY_FIELDS])}`)
           break
         default:
           log.w(mod, fun, `Query keyword not recognized: '${key}'`)
       }
     } else if (modelProperties.includes(key)) {
-      // log.d(mod, fun, `Key is a ${objectType} property: ${json.beautify(key)}`)
+      // log.d(mod, fun, `Key is a ${objectType} property: ${utils.beautify(key)}`)
       const val = value
       try {
         const obj = JSON.parse(val)
-        // log.d(mod, fun, `parsed String: ${json.beautify(obj)}`)
+        // log.d(mod, fun, `parsed String: ${utils.beautify(obj)}`)
         returnedFilter[QUERY_FILTER][key] = obj
       } catch (err) {
-        const errMsg = `Error while parsing: '${json.beautify(val)}': ${err}}`
+        const errMsg = `Error while parsing: '${utils.beautify(val)}': ${err}}`
         log.w(mod, fun, errMsg)
         throw new Error(errMsg)
       }
     } else {
-      const indexSeparator = key.lastIndexOf('.')
+      const indexSeparator = key.indexOf('.')
       const nestedField = key.substring(0, indexSeparator)
       const nestedFieldProp = key.substring(indexSeparator + 1)
 
@@ -154,17 +164,17 @@ async function parseQueryParameters(objectType, urlSearchParams) {
             [EXT_OBJ_VAL]: obj
           })
         } catch (err) {
-          const errMsg = `Couldn't parse: '${json.beautify(value)}': ${err}}`
+          const errMsg = `Couldn't parse: '${utils.beautify(value)}': ${err}}`
           log.w(mod, fun, errMsg)
           throw new Error(errMsg)
         }
       } else {
-        log.w(mod, fun, `Key is unkown and ignored: ${json.beautify(key)}`)
-        // log.w(mod, fun, `Model properties: ${json.beautify(modelProperties)}`)
+        log.w(mod, fun, `Key is unkown and ignored: ${utils.beautify(key)}`)
+        // log.w(mod, fun, `Model properties: ${utils.beautify(modelProperties)}`)
       }
     }
   }
-  // log.d(mod, fun, `filterReturn: ${json.beautify(filterReturn)}`)
+  // log.d(mod, fun, `filterReturn: ${utils.beautify(filterReturn)}`)
 
   const extRefs = returnedFilter[EXT_REFS]
   if (utils.isNotEmptyArray(extRefs)) {
@@ -175,25 +185,24 @@ async function parseQueryParameters(objectType, urlSearchParams) {
       /* beautify ignore:start */
       const objFilter = { [extObjProp]: extObjVal }
       /* beautify ignore:end */
-      log.d(mod, fun, `objFilter: ${json.beautify(objFilter)}`)
+      log.d(mod, fun, `objFilter: ${utils.beautify(objFilter)}`)
       const nestedFieldIds = await db.getNestedObject(objectType, extObj, objFilter, DB_ID)
       let queryFilter
       if (utils.isNotEmptyArray(nestedFieldIds)) {
         const ids = []
         await Promise.all(nestedFieldIds.map(async (foundObj) => {
-          log.d(mod, fun, `nestedFieldId: ${json.beautify(foundObj[DB_ID])}`)
+          log.d(mod, fun, `nestedFieldId: ${utils.beautify(foundObj[DB_ID])}`)
           ids.push(foundObj[DB_ID])
         }))
         /* beautify ignore:start */
         returnedFilter[QUERY_FILTER][extObj] = { $in: [ids.join(',')] }
         /* beautify ignore:end */
-        log.d(mod, fun, `filterReturn: ${json.beautify(returnedFilter)}`)
+        log.d(mod, fun, `filterReturn: ${utils.beautify(returnedFilter)}`)
       } else {
         returnedFilter[QUERY_FILTER][extObj] = 0
       }
     }))
   }
-
   return returnedFilter
 }
 
@@ -249,7 +258,7 @@ exports.setPublishedFlag = async (dbObject) => {
   if (!dbObject[DB_PUBLISHED_AT]) {
     dbObject[DB_PUBLISHED_AT] = utils.nowISO()
     dbObject.save()
-    log.d(mod, fun, `dbObject published: ${json.beautify(dbObject)}`)
+    log.d(mod, fun, `dbObject published: ${utils.beautify(dbObject)}`)
   } else {
     log.w(mod, fun, `Data was already published on : ${(dbObject[DB_PUBLISHED_AT])}`)
   }
@@ -276,7 +285,7 @@ exports.addSingleObject = async (req, reply) => {
     const rudiObject = req.body
 
     // retrieving the id
-    // log.d(mod, fun, `objectType: '${objectType}', incomingData: '${json.beautify(rudiObject)}' `)
+    // log.d(mod, fun, `objectType: '${objectType}', incomingData: '${utils.beautify(rudiObject)}' `)
     const rudiId = json.accessProperty(rudiObject, idField)
 
     // First: we make sure object doesn't exist already
@@ -333,20 +342,20 @@ exports.getObjectList = async (req, reply) => {
     // retrieve query parameters: 'limit' and 'offset'
     const limit = parseInt(req.query[QUERY_LIMIT]) || QUERY_LIMIT_DEFAULT
     const offset = parseInt(req.query[QUERY_OFFSET]) || QUERY_OFFSET_DEFAULT
-    const filter = req.query[QUERY_FILTER]
     const groupBy = req.query[QUERY_GROUP_BY]
     const countBy = req.query[QUERY_COUNT_BY]
 
     // accessing the objects
     let objectList
     if (!countBy && !groupBy) {
-      objectList = await db.getObjectList(objectType, limit, offset, filter)
+      // objectList = await db.getObjectList(objectType, limit, offset, filter, fields)
+      objectList = await this.getObjectListFiltered(req, reply)
     } else if (groupBy) {
       objectList = await db.getObjectListGroup(objectType, groupBy, limit, offset)
     } else { // if( !!countBy) {
       objectList = await db.getObjectListCount(objectType, countBy, limit, offset)
     }
-    // log.d(mod, fun, `objectList: ${json.beautify(objectList)}`)
+    // log.d(mod, fun, `objectList: ${utils.beautify(objectList)}`)
 
     return objectList
   } catch (err) {
@@ -373,8 +382,9 @@ exports.getObjectListFiltered = async (req, reply) => {
     const limit = parsedParameters[QUERY_LIMIT]
     const offset = parsedParameters[QUERY_OFFSET]
     const filter = parsedParameters[QUERY_FILTER]
+    const fields = parsedParameters[QUERY_FIELDS]
 
-    return await db.getObjectList(objectType, limit, offset, filter)
+    return await db.getObjectList(objectType, limit, offset, filter, fields)
   } catch (err) {
     log.e(mod, fun, err)
     throw boom.boomify(err)
@@ -459,7 +469,7 @@ exports.deleteObjectList = async (req, reply) => {
 
     // retrieve incoming data
     const filter = req.body
-    log.d(mod, fun, json.beautify(filter))
+    log.d(mod, fun, utils.beautify(filter))
     let deletionResult
     if (Array.isArray(filter)) {
       deletionResult = await db.deleteManyWithRudiIds(objectType, filter)
@@ -469,10 +479,10 @@ exports.deleteObjectList = async (req, reply) => {
     return deletionResult
   } catch (err) {
     log.e(mod, fun, err)
-    log.e(mod, fun, `method: ${json.beautify(req.method)}`)
-    log.e(mod, fun, `url: ${json.beautify(req.url)}`)
-    log.e(mod, fun, `params: ${json.beautify(req.params)}`)
-    log.e(mod, fun, `body: ${json.beautify(req.body)}`)
+    log.e(mod, fun, `method: ${utils.beautify(req.method)}`)
+    log.e(mod, fun, `url: ${utils.beautify(req.url)}`)
+    log.e(mod, fun, `params: ${utils.beautify(req.params)}`)
+    log.e(mod, fun, `body: ${utils.beautify(req.body)}`)
     throw boom.boomify(err)
   }
 }

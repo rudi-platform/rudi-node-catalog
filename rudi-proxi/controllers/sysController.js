@@ -18,6 +18,7 @@ const readLastLines = require('read-last-lines')
 // ---------------------------------------------------------------
 const sys = require('../config/confSystem')
 const log = require('../utils/logging')
+const utils = require('../utils/jsUtils')
 const json = require('../utils/jsonAccess')
 
 const {
@@ -75,7 +76,7 @@ exports.getNodeVersion = () => {
       'node version': `${nodeVersion}`.trim(),
       'npm version': `${npmVersion}`.trim()
     }
-    log.d(mod, fun, `${json.beautify(nVersions)}`)
+    log.d(mod, fun, `${utils.beautify(nVersions)}`)
 
     return nVersions
   } catch (err) {

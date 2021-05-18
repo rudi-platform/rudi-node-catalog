@@ -34,13 +34,13 @@ const UpdateStatus = [
   'modified', // the data is in the process of being created but still incomplete
   'updated', // the data is up to date
   'historical', // ancient data that has been updated
-  'obsolete', // dataset that is too old but cannot be updated or replaced with another
+  'obsolete' // dataset that is too old but cannot be updated or replaced with another
 ]
 
 const commonSchemaOptions = {
   discriminatorKey: 'media_type',
   timestamps: true,
-  id: false,
+  id: false
 }
 
 // ---------------------------------------------------------------
@@ -59,6 +59,10 @@ const MediaSchema = new mongoose.Schema({
     required: true
   },
 
+  media_name: {
+    type: String
+  },
+
   // Updated name of the service, or possibly the person
   connector: {
     url: {
@@ -69,7 +73,7 @@ const MediaSchema = new mongoose.Schema({
     // Most likely an enum defined in Rudi that can be handled in
     // a known manner
     interface_contract: String
-  },
+  }
 }, commonSchemaOptions)
 
 // ---------------------------------------------------------------

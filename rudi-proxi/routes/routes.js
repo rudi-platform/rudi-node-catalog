@@ -9,7 +9,6 @@
 // ---------------------------------------------------------------
 // Internal dependencies
 // ---------------------------------------------------------------
-const utils = require('../utils/jsUtils')
 
 // ---------------------------------------------------------------
 // Swagger documentation
@@ -38,7 +37,7 @@ const {
   URL_ACTION_FILTER,
   URL_GIT_HASH_ACCESS,
   URL_APP_HASH_ACCESS,
-  URL_PREFIX_PRIVATE,
+  URL_PREFIX_PRIVATE
 } = require('../config/confApi')
 
 // ---------------------------------------------------------------
@@ -108,7 +107,7 @@ exports.publicRoutes = [
     method: 'GET',
     url: URL_OBJECT_GENERIC,
     // preHandler: logRequest,
-    handler: genericController.getObjectList,
+    handler: genericController.getObjectList
   },
   // Filter
   {
@@ -201,7 +200,7 @@ exports.publicRoutes = [
     url: `${URL_OBJECT_GENERIC}/${URL_ACTION_REPORT}`,
     // preHandler: logRequest,
     handler: reportController.getReportListForObjectType
-  },
+  }
 ]
 
 // ---------------------------------------------------------------
@@ -291,11 +290,9 @@ exports.backOfficeRoutes = [
   }
 ]
 
-exports.devRoutes = [
-  {
-    method: 'GET',
-    url: `${URL_PREFIX_PRIVATE}/test`,
-    // preHandler: logRequest,
-    handler: devController.test
-  }
-]
+exports.devRoutes = [{
+  method: 'GET',
+  url: `${URL_PREFIX_PRIVATE}/test`,
+  // preHandler: logRequest,
+  handler: devController.test
+}]

@@ -17,7 +17,7 @@ const ReferenceDatesSchema = new mongoose.Schema({
     type: Date
   },
   published: {
-    type: Date,
+    type: Date
   },
   updated: {
     type: Date
@@ -25,7 +25,9 @@ const ReferenceDatesSchema = new mongoose.Schema({
   deleted: {
     type: Date
   }
-}, { _id: false })
+}, {
+  _id: false
+})
 
 // ---------------------------------------------------------------
 // Exports
