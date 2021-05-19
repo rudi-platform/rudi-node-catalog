@@ -285,7 +285,7 @@ exports.getEnsuredObjectWithRudiId = async (objectType, rudiId) => {
 }
 
 exports.getObjectWithJson = async (objectType, rudiObject) => {
-  const fun = `getObjectWithJson`
+  // const fun = `getObjectWithJson`
   // log.d(mod, fun, ``)
   const idField = this.getObjectIdField(objectType)
   const rudiId = json.accessProperty(rudiObject, idField)
@@ -1140,7 +1140,7 @@ exports.getConceptRudiIdWithDbId = async (conceptDbId) => {
 }
 
 exports.getConceptWithJson = async (conceptJson) => {
-  const fun = `getConceptWithJson`
+  // const fun = `getConceptWithJson`
   // log.d(mod, fun, ``)
   return await this.getObjectWithJson(URL_OBJECT_SKOS_CONCEPT, conceptJson)
 }
