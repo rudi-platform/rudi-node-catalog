@@ -104,3 +104,9 @@ exports.getAllLicenseCodes = async (req, reply) => {
 
   return await this.getLicenceCodes()
 }
+
+exports.init = async (req, reply) => {
+  const fun = `init`
+  log.v(mod, fun, ``)
+  await initLicenses()
+}

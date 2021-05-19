@@ -81,6 +81,7 @@ const Keywords = require('../definitions/thesaurus/Themes')
 // ---------------------------------------------------------------
 const organisationController = require('./organizationController')
 const contactController = require('./contactController')
+const licenceController = require('./licenceController')
 
 // ---------------------------------------------------------------
 // Atomic treatments of properties: RUDI -> DB
@@ -519,16 +520,20 @@ exports.init = async (req, reply) => {
   const initCont = require(`../data/datarennes_cont.json`)
   const initData = require(`../data/datarennes_meta.json`)
 
-  Themes.init()
-  Keywords.init()
+  await licenceController.init()
+  Themes.init('reset')
+  Keywords.init('reset')
+
   await Promise.all(initProd.map(
     async prod => {
       await organisationController.newOrganization(prod)
     }))
+
   await Promise.all(initCont.map(
     async cont => {
       await contactController.newContact(cont)
     }))
+
   Promise.all(initData.map(
     async metadata => {
       log.d(mod, fun, utils.beautify(metadata))

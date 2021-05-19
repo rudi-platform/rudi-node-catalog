@@ -522,7 +522,7 @@ async function checkLicence(metadata) {
 
 async function checkThesaurus(metadata, next) {
   const fun = 'checkThesaurus'
-  if (metadata.init) log.d(mod, fun, `init`)
+  // if (metadata.init) log.d(mod, fun, `init`)
   const init = metadata.init
 
   try {
