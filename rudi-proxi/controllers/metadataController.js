@@ -515,17 +515,26 @@ exports.init = async (req, reply) => {
   const fun = 'init'
   log.v(mod, fun, `> ${URL_PREFIX_PUBLIC}/${URL_OBJECT_METADATA}/${URL_ACTION_INIT}`)
 
-  const initData = require(`../api/datarennes.json`)
+  const initProd = require(`../data/datarennes_prod.json`)
+  const initCont = require(`../data/datarennes_cont.json`)
+  const initData = require(`../data/datarennes_meta.json`)
 
   Themes.init()
   Keywords.init()
-
+  await Promise.all(initProd.map(
+    async prod => {
+      await organisationController.newOrganization(prod)
+    }))
+  await Promise.all(initCont.map(
+    async cont => {
+      await contactController.newContact(cont)
+    }))
   Promise.all(initData.map(
-    async (metadata) => {
+    async metadata => {
       log.d(mod, fun, utils.beautify(metadata))
       await this.newMetadata(metadata)
       return true
     }
   ))
-  return 'Iniitalization initiated'
+  return 'Initialization initiated'
 }
