@@ -57,7 +57,9 @@ const {
 const {
   URL_OBJECT_CONTACTS,
   URL_OBJECT_MEDIA,
-  URL_OBJECT_METADATA
+  URL_OBJECT_METADATA,
+  URL_PREFIX_PUBLIC,
+  URL_ACTION_INIT
 } = require('../config/confApi')
 
 // ---------------------------------------------------------------
@@ -67,6 +69,12 @@ const {
 const { Metadata } = require('../definitions/models/Metadata')
 const { Media } = require('../definitions/models/Media')
 /* beautify ignore:end */
+
+// ---------------------------------------------------------------
+// Data models
+// ---------------------------------------------------------------
+const Themes = require('../definitions/thesaurus/Themes')
+const Keywords = require('../definitions/thesaurus/Themes')
 
 // ---------------------------------------------------------------
 // Controllers
@@ -501,4 +509,23 @@ exports.updateMetadata = async (incomingRudiMetadata) => {
 
   return completeRudiMetadata
    */
+}
+
+exports.init = async (req, reply) => {
+  const fun = 'init'
+  log.v(mod, fun, `> ${URL_PREFIX_PUBLIC}/${URL_OBJECT_METADATA}/${URL_ACTION_INIT}`)
+
+  const initData = require(`../api/datarennes.json`)
+
+  Themes.init()
+  Keywords.init()
+
+  Promise.all(initData.map(
+    async (metadata) => {
+      log.d(mod, fun, utils.beautify(metadata))
+      await this.newMetadata(metadata)
+      return true
+    }
+  ))
+  return 'Iniitalization initiated'
 }

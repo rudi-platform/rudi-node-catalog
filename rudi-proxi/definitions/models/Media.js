@@ -14,8 +14,8 @@ const Ids = require('../schemas/Identifiers')
 const Validation = require('../schemaValidators')
 
 const Encodings = require('../thesaurus/Encodings')
-const FileTypes = require('../thesaurus/FileTypes')
-const HashAlgorithms = require('../thesaurus/HashAlgorithms')
+const FileTypes = require('../thesaurus/FileTypes').get()
+const HashAlgorithms = require('../thesaurus/HashAlgorithms').get()
 
 const {
   FIELDS_TO_SKIP
@@ -117,7 +117,7 @@ const FileSchema = new mongoose.Schema({
   // Source encoding of the data
   file_encoding: {
     type: String,
-    enum: Object.values(Encodings),
+    enum: Object.values(Encodings.get()),
     default: Encodings.Unicode
   },
 

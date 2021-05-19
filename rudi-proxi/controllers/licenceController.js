@@ -55,7 +55,7 @@ exports.getLicences = async () => {
 }
 
 exports.getLicenceCodes = async () => {
-  // const fun = `getAllLicenceCodes`
+  // const fun = `getLicenceCodes`
   if (!this.LICENCE_CODE_LIST) {
     const licenceList = await this.getLicences()
     // log.d(mod, fun, `licence list: ${utils.beautify(licenceList)}`)
@@ -76,8 +76,12 @@ async function initLicenses() {
     })
     // log.d(mod, fun, licenceData)
     const res = await axios.post(LICENCE_POST_ADDRESS, JSON.parse(licenceData))
-    log.d(mod, fun, `Status: ${utils.beautify(res.status)}`)
-    log.d(mod, fun, `Body: ${utils.beautify(res.data)}`)
+    if (res.status === 200) {
+      log.d(mod, fun, `Integration done`)
+    } else {
+      throw new Error(`Licence integration failed`)
+    }
+    // log.d(mod, fun, `Body: ${utils.beautify(res.data)}`)
   } catch (err) {
     log.e(mod, fun, err)
   }

@@ -20,30 +20,33 @@
 // ---------------------------------------------------------------
 const {
   URL_PREFIX_PUBLIC,
+  URL_PREFIX_PRIVATE,
   URL_OBJECT_GENERIC,
+  URL_OBJECT_METADATA,
   PARAM_ID,
   PARAM_REPORT_ID,
+  PARAM_LOGS_LINES,
   PARAM_THESAURUS_CODE,
-  URL_ACTION_DELETION,
+  URL_ACTION_INIT,
+  URL_ACTION_FILTER,
   URL_ACTION_REPORT,
+  URL_ACTION_DELETION,
   URL_ACTION_UUID_GEN,
   URL_DB_ACCESS,
   URL_LOGS_ACCESS,
+  URL_GIT_HASH_ACCESS,
+  URL_APP_HASH_ACCESS,
   URL_THESAURUS_ACCESS,
   URL_NODE_VERSION_ACCESS,
   URL_LICENCE_ACCESS,
-  URL_LICENCE_CODES_ACCESS,
-  PARAM_LOGS_LINES,
-  URL_ACTION_FILTER,
-  URL_GIT_HASH_ACCESS,
-  URL_APP_HASH_ACCESS,
-  URL_PREFIX_PRIVATE
+  URL_LICENCE_CODES_ACCESS
 } = require('../config/confApi')
 
 // ---------------------------------------------------------------
 // Controllers
 // ---------------------------------------------------------------
 const genericController = require('../controllers/genericController')
+const metadataController = require('../controllers/metadataController')
 const reportController = require('../controllers/reportController')
 
 const dbController = require('../controllers/dbController')
@@ -80,6 +83,13 @@ exports.publicRoutes = [
   // Generic routes for accessing any object
   // ('Metadata', 'Organizations' and 'Contacts')
   // ---------------------------------------------------------------
+  // Mass init with ODS data
+  {
+    method: 'POST',
+    url: `${URL_PREFIX_PUBLIC}/${URL_OBJECT_METADATA}/${URL_ACTION_INIT}`,
+    // preHandler: logRequest,
+    handler: metadataController.init
+  },
   // Delete many
   {
     method: 'POST',

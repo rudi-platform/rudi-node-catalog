@@ -25,7 +25,7 @@
       ],
       "narrower_concepts": [{
           "concept_id": "{{conceptLicence0}}",
-          "concept_code": "licence_public-domain-CC0",
+          "concept_code": "licence_public-domain-cc0",
           "concept_role": "licence",
           "concept_uri": "https://creativecommons.org/share-your-work/public-domain/cc0/",
           "pref_label": [{
@@ -40,7 +40,7 @@
         },
         {
           "concept_id": "{{conceptLicence3}}",
-          "concept_code": "licence_GPL-3.0",
+          "concept_code": "licence_gpl-3.0",
           "concept_role": "licence",
           "concept_uri": "https://www.gnu.org/licenses/gpl-3.0.en.html",
           "pref_label": [{
@@ -93,7 +93,7 @@
       ],
       "narrower_concepts": [{
           "concept_id": "{{conceptLicence1}}",
-          "concept_code": "licence_MIT",
+          "concept_code": "licence_mit",
           "concept_role": "licence",
           "concept_uri": "https://opensource.org/licenses/MIT",
           "pref_label": [{
@@ -108,7 +108,7 @@
         },
         {
           "concept_id": "{{conceptLicence2}}",
-          "concept_code": "licence_Apache-2.0",
+          "concept_code": "licence_apache-2.0",
           "concept_role": "licence",
           "concept_uri": "https://opensource.org/licenses/Apache-2.0",
           "pref_label": [{
@@ -118,6 +118,66 @@
             {
               "lang": "en",
               "text": "Apache License v2"
+            }
+          ]
+        },
+        {
+          "concept_id": "{{conceptLicence3}}",
+          "concept_code": "licence_odbl-1.0",
+          "concept_role": "licence",
+          "concept_uri": "https://opendatacommons.org/licenses/odbl/1-0",
+          "pref_label": [{
+              "lang": "fr",
+              "text": "Licence ODbL 1.0"
+            },
+            {
+              "lang": "en",
+              "text": "Open Data Commons Open Database License 1.0"
+            }
+          ]
+        },
+        {
+          "concept_id": "{{conceptLicence4}}",
+          "concept_code": "licence_etalab-1.0",
+          "concept_role": "licence",
+          "concept_uri": "https://www.etalab.gouv.fr/wp-content/uploads/2014/05/Licence_Ouverte.pdf",
+          "pref_label": [{
+              "lang": "fr",
+              "text": "Licence Ouverte Etalab v1.0"
+            },
+            {
+              "lang": "en",
+              "text": "Etalab Open License 1.0"
+            }
+          ]
+        },
+        {
+          "concept_id": "{{conceptLicence5}}",
+          "concept_code": "licence_etalab-2.0",
+          "concept_role": "licence",
+          "concept_uri": "https://www.etalab.gouv.fr/wp-content/uploads/2017/04/ETALAB-Licence-Ouverte-v2.0.pdf",
+          "pref_label": [{
+              "lang": "fr",
+              "text": "Licence Ouverte Etalab v2.0"
+            },
+            {
+              "lang": "en",
+              "text": "Etalab Open License 2.0"
+            }
+          ]
+        },
+        {
+          "concept_id": "{{conceptLicence6}}",
+          "concept_code": "licence_cc-by-nd-4.0",
+          "concept_role": "licence",
+          "concept_uri": "https://creativecommons.org/licenses/by-nd/4.0/",
+          "pref_label": [{
+              "lang": "fr",
+              "text": "Attribution - Pas de Modification 4.0 International (CC BY-ND 4.0)"
+            },
+            {
+              "lang": "en",
+              "text": "Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)"
             }
           ]
         }

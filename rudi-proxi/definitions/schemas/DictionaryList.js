@@ -4,7 +4,7 @@
 // External dependancies
 // ---------------------------------------------------------------
 const mongoose = require('mongoose')
-const Language = require('../thesaurus/Languages')
+const Language = require('../thesaurus/Languages').get()
 
 // ---------------------------------------------------------------
 // Custom schema definition

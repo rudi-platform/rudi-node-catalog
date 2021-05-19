@@ -347,6 +347,24 @@ exports.metadataDeletedWithCondition = (condition) => {
 }
 
 // ---------------------------------------------------------------
+// Thesaurus
+// ---------------------------------------------------------------
+exports.incorrectVal = (field, val) => {
+  switch (getLanguage()) {
+    case 'en':
+    case 'en-GB':
+    case 'en-US':
+      return `Incorrect value for '${field}': '${val}'`
+    case 'fr':
+    case 'fr-FR':
+    case 'fr-BE':
+      return `Valeur incorrecte au champ '${field}' : '${val}'`
+    default:
+      return `${DEFAULT_MSG}: ${getLanguage()}`
+  }
+}
+
+// ---------------------------------------------------------------
 // Organization
 // ---------------------------------------------------------------
 exports.organizationAdded = (id) => {

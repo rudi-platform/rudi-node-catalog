@@ -266,7 +266,7 @@ exports.getObjectWithDbId = async (objectType, dbId) => {
 
 exports.getObjectWithRudiId = async (objectType, rudiId) => {
   const fun = `getObjectWithRudiId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   if (!rudiId) throw new Error(`${msg.parameterExpected(fun, PARAM_ID)}`)
   /* beautify ignore:start */
   const idField = this.getObjectIdField(objectType)
@@ -286,7 +286,7 @@ exports.getEnsuredObjectWithRudiId = async (objectType, rudiId) => {
 
 exports.getObjectWithJson = async (objectType, rudiObject) => {
   const fun = `getObjectWithJson`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   const idField = this.getObjectIdField(objectType)
   const rudiId = json.accessProperty(rudiObject, idField)
   return await this.getObjectWithRudiId(objectType, rudiId)
@@ -1141,7 +1141,7 @@ exports.getConceptRudiIdWithDbId = async (conceptDbId) => {
 
 exports.getConceptWithJson = async (conceptJson) => {
   const fun = `getConceptWithJson`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getObjectWithJson(URL_OBJECT_SKOS_CONCEPT, conceptJson)
 }
 

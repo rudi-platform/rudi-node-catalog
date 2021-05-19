@@ -77,7 +77,7 @@ const licenceController = require('../../controllers/licenceController')
 // ---------------------------------------------------------------
 // Thesaurus definiitons
 // ---------------------------------------------------------------
-const Language = require('../thesaurus/Languages')
+const Languages = require('../thesaurus/Languages')
 const Keywords = require('../thesaurus/Keywords')
 const Themes = require('../thesaurus/Themes')
 const Projections = require('../thesaurus/Projections')
@@ -180,15 +180,15 @@ const MetadataSchema = new mongoose.Schema({
   /** Category for thematic classification of the data */
   theme: {
     type: String,
-    enum: Object.values(Themes),
+    // enum: Object.values(Themes),
     required: true
   },
 
   /** List of tags that can be used to retrieve the data */
   keywords: {
     type: [{
-      type: String,
-      enum: Object.values(Keywords)
+      type: String
+      // ,enum: Object.values(Keywords)
     }],
     required: true,
     validate: validArrayNotNull
@@ -241,10 +241,10 @@ const MetadataSchema = new mongoose.Schema({
   /** Language used in the dataset, if relevant */
   resource_languages: {
     type: [{
-      type: String,
-      enum: Object.values(Language)
+      type: String
+      // ,enum: Object.values(Languages)
     }],
-    default: [Language.fr]
+    default: [Languages.fr]
   },
 
   /** Period of time described by the data */
@@ -317,8 +317,8 @@ const MetadataSchema = new mongoose.Schema({
      * Cartographic projection used to describe the data
      */
     projection: {
-      type: String,
-      enum: Object.values(Projections)
+      type: String
+      // ,enum: Object.values(Projections)
       // default: 'WGS 84'
     },
 
@@ -360,7 +360,7 @@ const MetadataSchema = new mongoose.Schema({
   //   - unavailable = data were deleted
   storage_status: {
     type: String,
-    enum: Object.values(StorageStatus),
+    // enum: Object.values(StorageStatus),
     required: true
   },
 
@@ -520,6 +520,46 @@ async function checkLicence(metadata) {
   }
 }
 
+async function checkThesaurus(metadata, next) {
+  const fun = 'checkThesaurus'
+  if (metadata.init) log.d(mod, fun, `init`)
+  const init = metadata.init
+
+  try {
+    if (Themes.isValid(metadata.theme, init)) next()
+    next(new Error(msg.incorrectVal('theme', metadata.theme)))
+
+    await Promise.all(metadata.keywords.map(
+      keyword => {
+        if (Keywords.isValid(keyword, init)) next()
+        else next(new Error(msg.incorrectVal('keywords', keyword)))
+        return true
+      }
+    ))
+
+    if (metadata.resource_languages) {
+      await Promise.all(metadata.resource_languages.map(
+        lang => {
+          if (Languages.isValid(lang, init)) next()
+          else next(new Error(msg.incorrectVal('resource_languages', lang)))
+          return true
+        }
+      ))
+    }
+
+    if (metadata.geography && metadata.geography.projection) {
+      if (Projections.isValid(metadata.geography.projection, init)) next()
+      else next(new Error(msg.incorrectVal('geography.projection', metadata.geography.projection)))
+    }
+
+    if (StorageStatus.isValid(metadata.storage_status, init)) next()
+    else next(new Error(msg.incorrectVal('storage_status', metadata.storage_status)))
+  } catch (err) {
+    log.w(mod, fun, err)
+    next(err)
+  }
+}
+
 // ---------------------------------------------------------------
 // Schema refinements
 // ---------------------------------------------------------------
@@ -543,9 +583,9 @@ MetadataSchema.virtual(`${API_METAINFO_PROPERTY}.${API_METAINFO_DATES_PROPERTY}.
 MetadataSchema.pre('save', async function (next) {
   const fun = 'pre save hook'
   log.d(mod, fun, ``)
-  try {
-    const metadata = this
+  const metadata = this
 
+  try {
     // If 'geography' field is defined, the field 'geography.bbox' is required
     if (json.requireSubProperty(metadata, API_METADATA_GEOGRAPHY_PROPERTY, API_METADATA_BBOX_PROPERTY)) {
       if (utils.isNothing(metadata[API_METADATA_GEOGRAPHY_PROPERTY][API_METADATA_GEO_PROJECTION_PROPERTY])) {
@@ -567,6 +607,9 @@ MetadataSchema.pre('save', async function (next) {
   } catch (err) {
     next(err)
   }
+
+  checkThesaurus(metadata, next)
+
   next()
 })
 
