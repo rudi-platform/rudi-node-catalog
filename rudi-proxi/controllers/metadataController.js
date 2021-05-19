@@ -516,6 +516,8 @@ exports.init = async (req, reply) => {
   const fun = 'init'
   log.v(mod, fun, `> ${URL_PREFIX_PUBLIC}/${URL_OBJECT_METADATA}/${URL_ACTION_INIT}`)
 
+  await db.dropDB()
+  
   const initProd = require(`../data/datarennes_prod.json`)
   const initCont = require(`../data/datarennes_cont.json`)
   const initData = require(`../data/datarennes_meta.json`)
