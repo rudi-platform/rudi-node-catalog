@@ -1,6 +1,7 @@
+/* eslint-disable no-unused-vars */
 const {
   DB_ID
-} = require("./dbFields")
+} = require('./dbFields')
 
 const ORG_MAP = new Map()
 const CONT_MAP = new Map()
@@ -13,8 +14,8 @@ exports.getOrganization = (orgDbId) => {
   }
 }
 exports.addOrganization = (dbOrganization) => {
-  const orgdbId = addOrganization[DB_ID]
-  //if it exists already, let's remove it (but it shouldn't so let's put a warning)
+  // const orgdbId = addOrganization[DB_ID]
+  // if it exists already, let's remove it (but it shouldn't so let's put a warning)
   // add new association
 
 }
@@ -29,3 +30,4 @@ exports.removeOrganization = (orgDbId) => {
 
 exports.deleteAllOrganization = () => {
 
+}

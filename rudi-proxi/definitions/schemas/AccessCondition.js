@@ -1,14 +1,8 @@
 'use strict'
 
 // ---------------------------------------------------------------
-// External dependencies
-// ---------------------------------------------------------------
-const mongoose = require('mongoose')
-
-// ---------------------------------------------------------------
 // Schema definitions
 // ---------------------------------------------------------------
-const Validation = require('../schemaValidators')
 const DictionaryEntry = require('./DictionaryEntry')
 
 // ---------------------------------------------------------------
@@ -71,3 +65,4 @@ exports.AccessCondition = {
   other_constraints: {
     type: [DictionaryEntry]
   }
+}

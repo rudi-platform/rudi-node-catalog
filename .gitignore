@@ -1,18 +1,14 @@
-*node_modules/*
-*/node_modules
-.DS_Store
-**/.DS_Store
-**/*.log
-**/.*-audit.json
-**/jest
+# Config
+**/rudi_proxi_custom.ini
+
+# Libs
+**/node_modules
+
+# Logs
+**/logs
+
+# Zip
 **/*.zip
 **/*.gz
-**/rudi_proxi_custom.ini
-**/logs
-todo
-notes
-*.code-workspace
-**/seed
-**/.eslintrc.json
-**/.jsbeautifyrc
-**/demo
+
+

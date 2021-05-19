@@ -27,7 +27,7 @@ exports.UUID = [
 
 // source: https://www.crossref.org/blog/dois-and-matching-regular-expressions/
 // alternative: https://github.com/regexhq/doi-regex/blob/master/index.js
-exports.REGEX_DOI = /^10.\d{4,9}\/[-.;()\/:\w]+$/i
+exports.REGEX_DOI = /^10.\d{4,9}\/[-.;()/:\w]+$/i
 exports.DOI = [
   this.REGEX_DOI,
   `'{VALUE}' is not a valid DOI`
@@ -37,7 +37,7 @@ exports.DOI = [
 // URI
 // ---------------------------------------------------------------
 
-exports.REGEX_URI = /^(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?$/
+exports.REGEX_URI = /^(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:/~+#-]*[\w@?^=%&amp;/~+#-])?$/
 exports.URI = [
   this.REGEX_URI,
   `'{VALUE}' is not a valid URI`

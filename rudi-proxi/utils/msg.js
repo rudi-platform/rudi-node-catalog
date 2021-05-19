@@ -3,11 +3,11 @@ const mod = 'msg'
 // ---------------------------------------------------------------
 // Internal dependancies
 // ---------------------------------------------------------------
+const log = require('../utils/logging')
+const utils = require('../utils/jsUtils')
 const {
   getLanguage
 } = require('../utils/lang')
-
-const json = require('../utils/jsonAccess')
 
 // ---------------------------------------------------------------
 // Constants
@@ -17,9 +17,10 @@ const DEFAULT_MSG = 'Language not found'
 // ---------------------------------------------------------------
 // Generic
 // ---------------------------------------------------------------
-//TODO: store all this in a db
+// TODO: store all this in a db
 
 exports.missingRequestParameter = (req, param) => {
+  const fun = 'missingRequestParameter'
   try {
     switch (getLanguage()) {
       case 'en':
@@ -74,13 +75,11 @@ exports.subPropNeededWhenPropSet = (prop, subProp) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Subproperty '${prop}.${subProp}' is required when parent property '${prop}' is set`.replace(/\"/g, '\'')
-      break
+      return `Subproperty '${prop}.${subProp}' is required when parent property '${prop}' is set`.replace(/\\"/g, '\'')
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `La propriété '${prop}.${subProp}' est requise lorsque la propriété parente '${prop}' est renseignée`.replace(/\"/g, '\'')
-      break
+      return `La propriété '${prop}.${subProp}' est requise lorsque la propriété parente '${prop}' est renseignée`.replace(/\\"/g, '\'')
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -91,13 +90,11 @@ exports.subPropNeededWhenPropSetToEnum = (prop, subProp, enumProp, enumVal) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Subproperty '${prop}.${subProp}' is required when property '${prop}.${enumProp}' is set to '${enumVal}'`.replace(/\"/g, '\'')
-      break
+      return `Subproperty '${prop}.${subProp}' is required when property '${prop}.${enumProp}' is set to '${enumVal}'`.replace(/\\"/g, '\'')
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `La propriété '${prop}.${subProp}' est requise lorsque la propriété '${prop}.${enumProp}' vaut '${enumVal}'`.replace(/\"/g, '\'')
-      break
+      return `La propriété '${prop}.${subProp}' est requise lorsque la propriété '${prop}.${enumProp}' vaut '${enumVal}'`.replace(/\\"/g, '\'')
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -123,11 +120,11 @@ exports.missingObjectProperty = (jsonObject, property) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `The property '${property}' must be defined for object: ${utils.beautify(jsonObject)} `.replace(/\"/g, '\'')
+      return `The property '${property}' must be defined for object: ${utils.beautify(jsonObject)} `.replace(/\\"/g, '\'')
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `La propriété '${property}' doit être définie pour l'object : ${utils.beautify(jsonObject)} `.replace(/\"/g, '\'')
+      return `La propriété '${property}' doit être définie pour l'object : ${utils.beautify(jsonObject)} `.replace(/\\"/g, '\'')
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }

@@ -10,7 +10,7 @@ const mod = 'contCtrl'
 // Internal dependancies
 // ---------------------------------------------------------------
 const log = require('../utils/logging')
-const json = require('../utils/jsonAccess')
+const utils = require('../utils/jsUtils')
 
 // ---------------------------------------------------------------
 // Constants

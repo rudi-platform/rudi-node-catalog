@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 'use strict'
 
 const mod = 'logConf'
@@ -9,15 +10,14 @@ const winston = require('winston')
 require('winston-daily-rotate-file')
 
 const {
-  format,
   transports
 } = winston
-const {
-  combine,
-  timestamp,
-  label,
-  printf
-} = format
+// const {
+//   combine,
+//   timestamp,
+//   label,
+//   printf
+// } = format
 
 const fs = require('fs')
 
@@ -26,9 +26,6 @@ const fs = require('fs')
 // ---------------------------------------------------------------
 const sys = require('../config/confSystem')
 const utils = require('../utils/jsUtils')
-const {
-  log
-} = require('winston')
 
 // ---------------------------------------------------------------
 // Constants
@@ -38,7 +35,7 @@ const errorDBLogsFileName = 'errorDB.log'
 
 const logsTimestamp = 'YYYY/MM/DD HH:mm:ss'
 const fileTimestamp = 'YYYY-MM-DD-HH'
-const fileDatestamp = 'YYYY-MM-DD'
+// const fileDatestamp = 'YYYY-MM-DD'
 
 // ---------------------------------------------------------------
 // Creating local log dir

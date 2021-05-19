@@ -1,35 +1,23 @@
 'use strict'
-const mod = 'SkosConcept'
+// const mod = 'SkosConcept'
 
 // ---------------------------------------------------------------
 // External dependancies
 // ---------------------------------------------------------------
 const mongoose = require('mongoose')
-const _ = require('lodash')
 
 // ---------------------------------------------------------------
 // Internal dependencies
 // ---------------------------------------------------------------
 const utils = require('../../utils/jsUtils')
-const db = require('../../db/dbQueries')
-const json = require('../../utils/jsonAccess')
-const log = require('../../utils/logging')
 const Validation = require('../schemaValidators')
 
 // ---------------------------------------------------------------
 // Other custom schema definitions
 // ---------------------------------------------------------------
 const ids = require('../schemas/Identifiers')
-const Contact = require('./Contact')
 const DictionaryEntry = require('../schemas/DictionaryEntry')
 const DictionaryList = require('../schemas/DictionaryList')
-const {
-  populate
-} = require('./Contact')
-const {
-  DB_ID,
-  DB_V,
-} = require('../../db/dbFields')
 
 // ---------------------------------------------------------------
 // Constants
@@ -143,7 +131,7 @@ const SkosConceptSchema = new mongoose.Schema({
   broader_concepts: {
     type: [{
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'SkosConcept',
+      ref: 'SkosConcept'
     }]
   },
 
@@ -154,7 +142,7 @@ const SkosConceptSchema = new mongoose.Schema({
   narrower_concepts: {
     type: [{
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'SkosConcept',
+      ref: 'SkosConcept'
     }]
   },
 
@@ -165,7 +153,7 @@ const SkosConceptSchema = new mongoose.Schema({
   siblings_concepts: {
     type: [{
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'SkosConcept',
+      ref: 'SkosConcept'
     }]
   },
 
@@ -176,7 +164,7 @@ const SkosConceptSchema = new mongoose.Schema({
   relative_concepts: {
     type: [{
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'SkosConcept',
+      ref: 'SkosConcept'
     }]
   },
 
@@ -196,7 +184,7 @@ const SkosConceptSchema = new mongoose.Schema({
   concept_definition: [DictionaryEntry],
 
   /** Documentation: internationalized example */
-  concept_example: [DictionaryEntry],
+  concept_example: [DictionaryEntry]
 
   /*
   // Documentation: internationalized validation msg
@@ -218,7 +206,7 @@ const SkosConceptSchema = new mongoose.Schema({
     getters: true,
     setters: true,
     virtuals: true
-  },
+  }
 })
 
 // ---------------------------------------------------------------
@@ -227,7 +215,7 @@ const SkosConceptSchema = new mongoose.Schema({
 
 // ----- toJSON cleanup
 SkosConceptSchema.methods.toJSON = function () {
-  var obj = this.toObject()
+  const obj = this.toObject()
   delete obj.id
   delete obj._id
   delete obj.__v

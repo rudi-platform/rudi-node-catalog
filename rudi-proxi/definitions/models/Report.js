@@ -65,7 +65,7 @@ const ReportSchema = new mongoose.Schema({
   // State of the integration of the resource in the Portal
   integration_status: {
     type: String,
-    enum: Object.values(this.IntegrationStatus),
+    enum: Object.values(this.IntegrationStatus)
   },
 
   // Comment on the state of the integration of the resource in the
@@ -89,12 +89,12 @@ const ReportSchema = new mongoose.Schema({
       },
       field_name: {
         type: String
-      },
+      }
     }]
   }
 }, {
   timestamps: true,
-  id: false,
+  id: false
 })
 
 // ----- toJSON cleanup

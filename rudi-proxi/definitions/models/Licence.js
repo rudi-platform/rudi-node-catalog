@@ -37,7 +37,7 @@ const LicenceSchema = new mongoose.Schema({
     type: String,
     enum: Object.values(LicenceTypes),
     required: true
-  },
+  }
 }, options)
 
 // ---------------------------------------------------------------
@@ -49,7 +49,7 @@ const LicenceStandardSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'SkosConcept',
     required: true
-  },
+  }
 }, options)
 
 // ---------------------------------------------------------------
@@ -66,8 +66,8 @@ const LicenceCustomSchema = new mongoose.Schema({
   custom_licence_uri: {
     type: String,
     unique: true,
-    match: Validation.URI,
-  },
+    match: Validation.URI
+  }
 }, options)
 
 // ---------------------------------------------------------------

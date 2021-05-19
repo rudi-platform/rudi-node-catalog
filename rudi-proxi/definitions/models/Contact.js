@@ -44,7 +44,7 @@ const ContactSchema = new mongoose.Schema({
   email: {
     type: String,
     trim: true,
-    required: true, //[true, 'Please enter Email Address'],
+    required: true, // [true, 'Please enter Email Address'],
     unique: true,
     index: true,
     lowercase: true,
@@ -58,7 +58,7 @@ const ContactSchema = new mongoose.Schema({
   }
 }, {
   timestamps: true,
-  id: false,
+  id: false
   // optimisticConcurrency: true,
   // strict: true,
 })

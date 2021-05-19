@@ -9,12 +9,12 @@ const mongoose = require('mongoose')
 // Custom schema definition
 // ---------------------------------------------------------------
 const SensorSchema = new mongoose.Schema({
-   sensor: {
-      type: string
-   }
+  sensor: {
+    type: String
+  }
 }, {
-   timestamps: true,
-   id: false,
+  timestamps: true,
+  id: false
 })
 
 // ---------------------------------------------------------------

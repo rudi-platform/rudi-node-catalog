@@ -1,5 +1,6 @@
 'use strict'
-const mod = 'SkosScheme'
+
+// const mod = 'SkosScheme'
 
 // ---------------------------------------------------------------
 // External dependancies
@@ -55,7 +56,7 @@ const SkosSchemeSchema = new mongoose.Schema({
     unique: true,
     index: true,
     lowercase: true,
-    required: true,
+    required: true
   },
 
   /** Short code for the concept scheme */
@@ -75,7 +76,7 @@ const SkosSchemeSchema = new mongoose.Schema({
   top_concepts: {
     type: [{
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'SkosConcept',
+      ref: 'SkosConcept'
     }]
   }
 }, {
@@ -92,7 +93,7 @@ const SkosSchemeSchema = new mongoose.Schema({
     getters: true,
     setters: true,
     virtuals: true
-  },
+  }
 })
 
 // ---------------------------------------------------------------
@@ -101,7 +102,7 @@ const SkosSchemeSchema = new mongoose.Schema({
 
 // ----- toJSON cleanup
 SkosSchemeSchema.methods.toJSON = function () {
-  var obj = this.toObject()
+  const obj = this.toObject()
   delete obj.id
   delete obj._id
   delete obj.__v
