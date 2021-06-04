@@ -14,25 +14,25 @@ const utils = require('../utils/jsUtils')
 // -----------------------------------------------------------------------------
 
 // Conf file name
-const defPortalConfFile = 'rudi_portal_default.ini'
-const usrPortalConfFile = 'rudi_portal_custom.ini'
+// - user conf
+const usrPortalConfFile = 'rudi_proxi_custom.ini'
+// - default conf
+const defPortalConfFile = 'rudi_proxi_default.ini'
 
+const PORTAL_SECTION = 'portal'
 // Auth section
-const AUTH_SECTION = 'auth'
-const _authUrl = 'portal_auth_url'
-const _authGet = 'portal_auth_get'
+const _authUrl = 'auth_url'
+const _authGet = 'auth_get'
 const _authChk = 'portal_auth_chk'
 
 // Creds section
-const CREDS_SECTION = 'creds'
-const _login = 'portal_login'
-const _passw = 'portal_passw'
-const _secret = 'portal_secret'
+const _login = 'login'
+const _passw = 'passw'
+const _secret = 'secret'
 
 // API section
-const API_SECTION = 'api'
-const _getUrl = 'portal_get_url'
-const _sendUrl = 'portal_put_url'
+const _getUrl = 'get_url'
+const _sendUrl = 'put_url'
 
 // -----------------------------------------------------------------------------
 // Extracting portal configuration
@@ -60,9 +60,9 @@ function getIniValue(section, field) {
 // -----------------------------------------------------------------------------
 
 // ----- Auth
-const AUTH_URL = getIniValue(AUTH_SECTION, _authUrl)
-const AUTH_GET = getIniValue(AUTH_SECTION, _authGet)
-const AUTH_CHK = getIniValue(AUTH_SECTION, _authChk)
+const AUTH_URL = getIniValue(PORTAL_SECTION, _authUrl)
+const AUTH_GET = getIniValue(PORTAL_SECTION, _authGet)
+const AUTH_CHK = getIniValue(PORTAL_SECTION, _authChk)
 
 exports.getAuthUrl = () => {
   return `${AUTH_URL}/${AUTH_GET}`
@@ -73,12 +73,15 @@ exports.getCheckAuthUrl = () => {
 }
 
 // ----- Creds
-exports.LOGIN = getIniValue(CREDS_SECTION, _login)
-exports.PASSW = getIniValue(CREDS_SECTION, _passw)
-exports.SECRET = getIniValue(CREDS_SECTION, _secret)
+exports.LOGIN = getIniValue(PORTAL_SECTION, _login)
+exports.PASSW = getIniValue(PORTAL_SECTION, _passw)
+exports.SECRET = getIniValue(PORTAL_SECTION, _secret)
+
+// ----- API
+exports.API_GET_URL = getIniValue(PORTAL_SECTION, _getUrl)
+exports.API_SEND_URL = getIniValue(PORTAL_SECTION, _sendUrl)
 
 // ----- API: Get
-exports.API_GET_URL = getIniValue(API_SECTION, _getUrl)
 
 const apiGetUrlElements = this.API_GET_URL.split('/')
 exports.API_GET_PROTOCOL = apiGetUrlElements[0].replace(/:/, '')
@@ -96,7 +99,6 @@ exports.apiGetOptions = (id) => {
 }
 
 // ----- API: Send
-exports.API_SEND_URL = getIniValue(API_SECTION, _sendUrl)
 const apiSendUrlElements = this.API_SEND_URL.split('/')
 exports.API_SEND_PROTOCOL = apiSendUrlElements[0].replace(/:/, '')
 exports.API_SEND_PORT = this.API_SEND_PROTOCOL === 'https' ? 443 : 80

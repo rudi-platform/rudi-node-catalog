@@ -400,7 +400,7 @@ exports.getObjectPropertiesWithDbId = async (objectType, dbId, propertyList) => 
 
 exports.getObjectPropertiesWithRudiId = async (objectType, rudiId, propertyList) => {
   const fun = `getObjectPropertiesWithRudiId`
-  log.d(mod, fun, `${objectType}: ${rudiId}`)
+  log.d(mod, fun, `type '${objectType}': ${rudiId}`)
   try {
     /* beautify ignore:start */
     const { Model, idField } = this.getObjectAccesses(objectType)

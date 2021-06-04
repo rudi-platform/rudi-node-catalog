@@ -52,6 +52,8 @@ const {
   API_METADATA_BBOX_NORTH,
   API_METADATA_BBOX_SOUTH,
   API_MEDIA_ID,
+  API_DATES_CREATED_PROPERTY,
+  API_DATES_PUBLISHED_PROPERTY,
 } = require('../db/dbFields')
 
 const {
@@ -168,35 +170,38 @@ exports.mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFound) 
   return mediaDbIds
 }
 
-function customMerger(a, b) {
-  return _.isArray(b) ? b : undefined
+function customMerger(value, srcValue, key, object, source) {
+  const fun ='customMerger'
+  log.v(mod, fun, `'${key}': ${utils.beautify(srcValue)} -> ${utils.beautify(value)}`)
+  if(Array.isArray(value)) return srcValue
+  switch(key){
+    case API_METADATA_ID: return
+  }
+  return value
+  // return _.isArray(b) ? b : undefined
 }
 
 // Parameter 'dbMetadata' gets mutated!
-function metadataCustomMerge(dbMetadata, dbReadyModMetadata) {
+async function metadataCustomMerge(dbMetadata, dbReadyModMetadata) {
   const fun = 'metadataCustomMerge'
   log.d(mod, fun, ``)
   // log.d(mod, fun, `dbMetadata: ${utils.beautify(dbMetadata)}`)
 
-  const dataDates = utils.deepClone(dbMetadata[API_DATA_DATES_PROPERTY])
-  const metaDates = utils.deepClone(dbMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY])
-  log.d(mod, fun, `original data dates: ${utils.beautify(dataDates)}`)
-  log.d(mod, fun, `original meta dates: ${utils.beautify(metaDates)}`)
-  const modDataDates = dbReadyModMetadata[API_DATA_DATES_PROPERTY]
-  const modMetaDates = !dbReadyModMetadata[API_METAINFO_PROPERTY]
-    ? {}
-    : dbReadyModMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY]
+//   const dataDates = dbMetadata[API_DATA_DATES_PROPERTY]
+//   const metaDates = dbMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY]
+//  const modDataDates = dbReadyModMetadata[API_DATA_DATES_PROPERTY]
+//   const modMetaDates = !dbReadyModMetadata[API_METAINFO_PROPERTY]
+//     ? {}
+//     : dbReadyModMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY]
+  
+//   _.extend(dataDates, modDataDates)
+//   _.extend(metaDates, modMetaDates)
+ 
+  await _.mergeWith(dbMetadata, dbReadyModMetadata, customMerger)
 
-  _.extend(dataDates, modDataDates)
-  _.extend(metaDates, modMetaDates)
-  log.d(mod, fun, `modified data dates: ${utils.beautify(dataDates)}`)
-  log.d(mod, fun, `modified meta dates: ${utils.beautify(metaDates)}`)
-
-  _.mergeWith(dbMetadata, dbReadyModMetadata, customMerger)
-
-  dbMetadata[API_DATA_DATES_PROPERTY] = dataDates
-  dbMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY] = metaDates
-
+  // dbMetadata[API_DATA_DATES_PROPERTY] = dataDates
+  // dbMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY] = metaDates
+ 
   // log.d(mod, fun, `dbMetadata updated: ${utils.beautify(dbMetadata)}`)
   return dbMetadata
 }
@@ -506,11 +511,14 @@ exports.updateMetadata = async (incomingRudiMetadata) => {
 
   // Backing up existing dates ('dataset_dates' and 'metadata_info.meadatada_dates' properties)
 
-  metadataCustomMerge(dbMetadata, dbReadyEditedMetadata)
+  await metadataCustomMerge(dbMetadata, dbReadyEditedMetadata)
 
   log.d(mod, fun, `modified metadata: ${utils.beautify(dbMetadata)}`)
 
-  return await dbMetadata.save()
+  const reply = await dbMetadata.save()
+
+  log.d(mod, fun, `metadata saved: ${utils.beautify(reply)}`)
+  return reply
 
   /*
 
