@@ -3,15 +3,13 @@
 
 const mod = 'logConf'
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // External dependencies
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const winston = require('winston')
 require('winston-daily-rotate-file')
 
-const {
-  transports
-} = winston
+const { transports } = winston
 // const {
 //   combine,
 //   timestamp,
@@ -21,15 +19,15 @@ const {
 
 const fs = require('fs')
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Internal dependencies
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const sys = require('../config/confSystem')
 const utils = require('../utils/jsUtils')
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Constants
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const errorLogsFileName = 'error.log'
 const errorDBLogsFileName = 'errorDB.log'
 
@@ -37,9 +35,9 @@ const logsTimestamp = 'YYYY/MM/DD HH:mm:ss'
 const fileTimestamp = 'YYYY-MM-DD-HH'
 // const fileDatestamp = 'YYYY-MM-DD'
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Creating local log dir
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 try {
   // first check if directory already exists
@@ -50,13 +48,17 @@ try {
     utils.consoleLog(mod, '', 'Log directory exists.')
   }
 } catch (err) {
-  console.error(utils.nowLocaleFormatted(), `[${mod}]`, 'Log directory creation failed:')
+  console.error(
+    utils.nowLocaleFormatted(),
+    `[${mod}]`,
+    'Log directory creation failed:'
+  )
   console.error(utils.nowLocaleFormatted(), `[${mod}]`, err)
 }
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Winston logger creation
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 // datedRotatingFile.on('rotate', function (oldFilename, newFilename) {
 //   // perform an action when rotation takes place
@@ -74,41 +76,40 @@ winston.addColors({
   warn: 'italic magenta',
   info: 'italic yellow',
   verbose: 'green',
-  debug: 'cyan'
+  debug: 'cyan',
 })
 
 const FORMAT_TIMESTAMP = {}
 FORMAT_TIMESTAMP.format = logsTimestamp
 const COLORIZE_ALL = {}
 COLORIZE_ALL.all = true
-const FORMAT_PRINTF = info => `${info.timestamp} .${info.level}. ${info.message}`
+const FORMAT_PRINTF = (info) =>
+  `${info.timestamp} .${info.level}. ${info.message}`
 
-const formatConsoleLogs =
-  winston.format.combine(
-    winston.format.json(),
-    winston.format.colorize(COLORIZE_ALL),
-    winston.format.timestamp(FORMAT_TIMESTAMP),
-    winston.format.printf(FORMAT_PRINTF)
-  )
+const formatConsoleLogs = winston.format.combine(
+  winston.format.json(),
+  winston.format.colorize(COLORIZE_ALL),
+  winston.format.timestamp(FORMAT_TIMESTAMP),
+  winston.format.printf(FORMAT_PRINTF)
+)
 
-const formatFileLogs =
-  winston.format.combine(
-    winston.format.simple(),
-    winston.format.timestamp(FORMAT_TIMESTAMP),
-    winston.format.printf(FORMAT_PRINTF)
-  )
+const formatFileLogs = winston.format.combine(
+  winston.format.simple(),
+  winston.format.timestamp(FORMAT_TIMESTAMP),
+  winston.format.printf(FORMAT_PRINTF)
+)
 
 exports.logger = winston.createLogger({
   level: sys.LOG_LVL,
   defaultMeta: {
-    service: 'user-service'
+    service: 'user-service',
   },
 
   transports: [
     // - Write to the console
-    new (winston.transports.Console)({
+    new winston.transports.Console({
       name: 'consoleLogs',
-      format: formatConsoleLogs
+      format: formatConsoleLogs,
     }),
     // - Write to the web
     // new(winston.transports.Http)({host: 'localhost', port: 3000, path: '/logs'}),
@@ -120,7 +121,7 @@ exports.logger = winston.createLogger({
       zippedArchive: true,
       maxSize: '20m',
       maxFiles: '7d',
-      format: formatFileLogs
+      format: formatFileLogs,
     }),
     // - Write all logs with level `error` and below to `error.log`
     new winston.transports.File({
@@ -129,7 +130,7 @@ exports.logger = winston.createLogger({
       level: 'error',
       maxSize: '20m',
       maxFiles: '7d',
-      format: formatFileLogs
+      format: formatFileLogs,
     }),
     // - Write all logs with level `info` and below to `combined.log`
     new winston.transports.File({
@@ -137,9 +138,9 @@ exports.logger = winston.createLogger({
       filename: sys.OUT_LOG,
       level: sys.LOG_LVL,
       maxSize: '1m',
-      format: formatFileLogs
-    })
-  ]
+      format: formatFileLogs,
+    }),
+  ],
 })
 
 function extractErrorFromFastifyMsg(msg) {
@@ -149,15 +150,17 @@ function extractErrorFromFastifyMsg(msg) {
     return msg
   }
 }
-const FORMAT_PRINTFF = info => `${info.timestamp} .${info.level}. [fastify] ${extractErrorFromFastifyMsg(info.message)}`
+const FORMAT_PRINTFF = (info) =>
+  `${info.timestamp} .${info.level}. [fastify] ${extractErrorFromFastifyMsg(
+    info.message
+  )}`
 
-const formatConsoleFastifyLogs =
-  winston.format.combine(
-    winston.format.json(),
-    winston.format.colorize(COLORIZE_ALL),
-    winston.format.timestamp(FORMAT_TIMESTAMP),
-    winston.format.printf(FORMAT_PRINTFF)
-  )
+const formatConsoleFastifyLogs = winston.format.combine(
+  winston.format.json(),
+  winston.format.colorize(COLORIZE_ALL),
+  winston.format.timestamp(FORMAT_TIMESTAMP),
+  winston.format.printf(FORMAT_PRINTFF)
+)
 
 exports.initFFLogger = (appname) => {
   const fun = 'initFFLogger'
@@ -165,14 +168,17 @@ exports.initFFLogger = (appname) => {
   winston.loggers.add('default', {
     level: 'warn',
     /// // Adding ISO levels of logging from PINO
-    levels: Object.assign({
-      fatal: 0,
-      warn: 4,
-      trace: 7
-    }, winston.config.syslog.levels),
+    levels: Object.assign(
+      {
+        fatal: 0,
+        warn: 4,
+        trace: 7,
+      },
+      winston.config.syslog.levels
+    ),
     // format: format.combine(format.splat(), format.json()),
     defaultMeta: {
-      service: appname + '_' + (process.env.NODE_ENV || 'development')
+      service: appname + '_' + (process.env.NODE_ENV || 'development'),
     },
     transports: [
       new winston.transports.File({
@@ -181,21 +187,22 @@ exports.initFFLogger = (appname) => {
         level: 'error',
         maxSize: '20m',
         maxFiles: '7d',
-        format: formatFileLogs
-      })
-
-    ]
+        format: formatFileLogs,
+      }),
+    ],
   })
 
   /// / Here we use winston.containers IoC get accessor
   const logger = winston.loggers.get('default')
 
   if (process.env.NODE_ENV !== 'production') {
-    logger.add(new transports.Console({
-      format: formatConsoleFastifyLogs,
+    logger.add(
+      new transports.Console({
+        format: formatConsoleFastifyLogs,
 
-      handleExceptions: true
-    }))
+        handleExceptions: true,
+      })
+    )
   }
 
   process.on('uncaughtException', function (err) {

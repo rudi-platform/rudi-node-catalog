@@ -1,36 +1,71 @@
 /* eslint-disable no-console */
 'use strict'
 
-// const mod = 'utils'
+const mod = 'utils'
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // External dependancies
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const util = require('util')
 const _ = require('lodash')
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// String
+// -----------------------------------------------------------------------------
+exports.toBase64 = (str) => {
+  return Buffer.from(str, 'utf-8').toString('base64url')
+}
+
+exports.decodeBase64 = (data) => {
+  return Buffer.from(data, 'base64url').toString('utf-8')
+}
+
+// -----------------------------------------------------------------------------
 // Dates
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 exports.nowISO = () => {
   return new Date().toISOString()
 }
+
+exports.nowEpochMs = () => {
+  return new Date().getTime()
+}
+exports.nowEpochS = () => {
+  return _.floor(this.nowEpochMs() / 1000)
+}
+exports.dateEpochSToIso = (utcSeconds) => {
+  const fun = 'dateEpochSToIso'
+  try {
+    return this.dateEpochMsToIso(utcSeconds * 1000)
+  } catch (err) {
+    this.consoleErr(mod, fun, `input: ${utcSeconds} -> err: ${err}`)
+  }
+}
+exports.dateEpochMsToIso = (utcMs) => {
+  const fun = 'dateEpochMsToIso'
+  try {
+    return new Date(utcMs).toISOString()
+  } catch (err) {
+    this.consoleErr(mod, fun, `input: ${utcMs} -> err: ${err}`)
+  }
+}
+
 exports.nowLocaleFormatted = () => {
   const [date, month, year] = new Date().toLocaleDateString('fr-FR').split('/')
   const [h, m, s] = new Date().toLocaleTimeString('fr-FR').split(/:| /)
   return `${year}/${month}/${date} ${h}:${m}:${s}`
 }
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Arrays
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 exports.isString = (str) => {
   return typeof str === 'string'
 }
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Arrays
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 exports.isArray = (anArray) => {
   return Array.isArray(anArray)
 }
@@ -43,15 +78,23 @@ exports.isEmptyArray = (anArray) => {
   return Array.isArray(anArray) && anArray.length === 0
 }
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Objects
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 exports.isEmptyObject = (obj) => {
-  return (!this.isString(obj) || !this.isArray(obj) || Object.keys(obj).length === 0)
+  return !this.isString(obj) || !this.isArray(obj) || Object.keys(obj).length === 0
 }
 
 exports.isNotEmptyObject = (obj) => {
   return Object.keys(obj).length > 0
+}
+
+exports.quietAccess = (obj, prop) => {
+  try {
+    return obj[prop]
+  } catch {
+    return {}
+  }
 }
 
 /** !! TODO: treat object arrays! */
@@ -65,18 +108,20 @@ exports.getPaths = async (root, parentKeyName) => {
 
   // console.log(this.beautify(root))
 
-  await Promise.all(keys.map(async (key) => {
-    const subObj = root[key]
-    if (!subObj) return
-    const keyPath = parentKeyName ? `${parentKeyName}.${key}` : `${key}`
-    // console.log(`keyPath: ${keyPath}`)
-    rootSubPaths.push(keyPath)
-    if (this.isNotEmptyObject(subObj)) {
-      const keyPaths = await this.getPaths(subObj, keyPath)
-      rootSubPaths = rootSubPaths.concat(keyPaths)
-      return true
-    } else return false
-  }))
+  await Promise.all(
+    keys.map(async (key) => {
+      const subObj = root[key]
+      if (!subObj) return
+      const keyPath = parentKeyName ? `${parentKeyName}.${key}` : `${key}`
+      // console.log(`keyPath: ${keyPath}`)
+      rootSubPaths.push(keyPath)
+      if (this.isNotEmptyObject(subObj)) {
+        const keyPaths = await this.getPaths(subObj, keyPath)
+        rootSubPaths = rootSubPaths.concat(keyPaths)
+        return true
+      } else return false
+    })
+  )
   // console.log(this.beautify(rootSubPaths))
   return rootSubPaths
 }
@@ -85,13 +130,15 @@ exports.keepFields = async (obj, fieldList) => {
   const clonedObj = this.deepClone(obj)
   const filteredObj = {}
 
-  await Promise.all(fieldList.map(field => {
-    if (_.has(clonedObj, field)) {
-      const val = _.get(clonedObj, field)
-      filteredObj[field] = val
-      return true
-    } else return false
-  }))
+  await Promise.all(
+    fieldList.map((field) => {
+      if (_.has(clonedObj, field)) {
+        const val = _.get(clonedObj, field)
+        filteredObj[field] = val
+        return true
+      } else return false
+    })
+  )
 
   return filteredObj
 }
@@ -99,26 +146,28 @@ exports.keepFields = async (obj, fieldList) => {
 exports.filterOnValue = async (obj, predicate) => {
   const result = {}
 
-  await Promise.all(Object.keys(obj).map((key) => {
-    if (predicate(obj[key])) {
-      result[key] = obj[key]
-    }
-    return result[key]
-  }))
+  await Promise.all(
+    Object.keys(obj).map((key) => {
+      if (predicate(obj[key])) {
+        result[key] = obj[key]
+      }
+      return result[key]
+    })
+  )
 
   return result
 }
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // JSON
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 exports.isEmpty = (prop) => {
   const strProp = JSON.stringify(prop)
   return prop === '' || prop === '{}' || prop === '[]' || strProp === '{}' || strProp === '[]'
 }
 
 exports.isNothing = (prop) => {
-  return (!prop || this.isEmpty(prop))
+  return !prop || this.isEmpty(prop)
 }
 
 /**
@@ -130,7 +179,9 @@ exports.isNothing = (prop) => {
  */
 exports.beautify = (jsonObject, option) => {
   try {
-    return `${JSON.stringify(jsonObject, null, option).replace(/\\"/g, '"')}${option != null ? '\n' : ''}`
+    return `${JSON.stringify(jsonObject, null, option).replace(/\\"/g, '"')}${
+      option != null ? '\n' : ''
+    }`
   } catch (err) {
     return `${util.inspect(jsonObject)}`
   }
@@ -146,23 +197,29 @@ exports.deepClone = (jsonObject) => {
   return JSON.parse(JSON.stringify(jsonObject))
 }
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Basic logging
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 exports.separateLogs = (insertStr) => {
-  console.log(this.nowLocaleFormatted(), !insertStr
-    ? `--------------------------------------------------------------------------`
-    : `---------------------------------------------------------------[${insertStr}]--`
+  console.log(
+    this.nowLocaleFormatted(),
+    !insertStr
+      ? `--------------------------------------------------------------------------`
+      : `---------------------------------------------------------------[${insertStr}]--`
   )
 }
 
 exports.consoleLog = (mod, fun, msg) => {
-  const where = !mod ? fun : (!fun ? mod : `${mod} • ${fun}`)
-  const what = (!msg || msg === '') ? '<-' : msg
+  const where = !mod ? fun : !fun ? mod : `${mod} • ${fun}`
+  const what = !msg || msg === '' ? '<-' : msg
   console.log(this.nowLocaleFormatted(), 'debug', `[${where}]`, what)
 }
 
 exports.consoleErr = (mod, fun, msg) => {
-  const where = !mod ? fun : (!fun ? mod : `${mod} • ${fun}`)
+  const where = !mod ? fun : !fun ? mod : `${mod} • ${fun}`
   console.error(this.nowLocaleFormatted(), 'error', `[${where}]`, msg.err)
 }
+
+// -----------------------------------------------------------------------------
+// Crypto
+// -----------------------------------------------------------------------------

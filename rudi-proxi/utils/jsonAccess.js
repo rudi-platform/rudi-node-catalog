@@ -1,19 +1,19 @@
 'use strict'
 const mod = 'json'
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Internal dependancies
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const utils = require('./jsUtils')
 const log = require('./logging')
 const msg = require('./msg')
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Functions
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 /**
- * Safe access to a property of a JSON object: ensures the property is defined
+ * Safe access to a property of a request: ensures the parameter is defined
  * @param {JSON} req: the HTTP request
  * @param {String} param: a parameter in the HTTP request that should be defined
  * @returns {String} The value for the parameter
@@ -36,7 +36,8 @@ exports.accessProperty = (jsonObject, jsonProperty) => {
   // log.d(mod, fun, `Accessing property '${jsonProperty}' from object '${utils.beautify(jsonObject)}'`)
   const value = jsonObject[jsonProperty]
   // log.d(mod, fun, `=> value = ${utils.beautify(value)}`)
-  if (!value) throw new Error(`${msg.missingObjectProperty(jsonObject, jsonProperty)}`)
+  if (!value)
+    throw new Error(`${msg.missingObjectProperty(jsonObject, jsonProperty)}`)
   // log.d(mod, fun, `=> ${jsonProperty} = ${utils.beautify(value)}`)
   return value
 }
@@ -63,7 +64,8 @@ exports.requireSubProperty = (obj, prop, subProp, enumProp, enumVal) => {
 
   // log.d(mod, fun, `${prop}: ${this.beautify(propObj)}`)
   // log.d(mod, fun, `${prop}.${subProp}: ${this.beautify(propObj[subProp])}`)
-  if (!enumVal) { // Regular check: if prop is defined, subProp must be defined !
+  if (!enumVal) {
+    // Regular check: if prop is defined, subProp must be defined !
     // log.d(mod, fun, `obj.${prop} / ${enumVal}`)
     if (utils.isNothing(objProp[subProp])) {
       const errMsg = msg.subPropNeededWhenPropSet(prop, subProp)
@@ -72,18 +74,30 @@ exports.requireSubProperty = (obj, prop, subProp, enumProp, enumVal) => {
     }
     // log.d(mod, fun, `${objProp[subProp]}`)
     return objProp[subProp]
-  } else { // Enum conditional check: if prop is defined and enumProp is set to enumVal, subProp must be defined !
+  } else {
+    // Enum conditional check: if prop is defined and enumProp is set to enumVal, subProp must be defined !
     if (objProp[enumProp] === enumVal) {
       // log.d(mod, fun, `obj.${prop}.${enumProp} == ${enumVal}`)
       if (utils.isNothing(objProp[subProp])) {
-        const errMsg = msg.subPropNeededWhenPropSetToEnum(prop, subProp, enumProp, enumVal)
+        const errMsg = msg.subPropNeededWhenPropSetToEnum(
+          prop,
+          subProp,
+          enumProp,
+          enumVal
+        )
         // log.e(mod, fun, errMsg)
         throw new Error(errMsg)
       } else {
         return objProp[subProp]
       }
     } else {
-      log.d(mod, fun, `obj.${prop}.${enumProp} == ${this.beautify(objProp[enumProp])} != ${enumVal}`)
+      log.d(
+        mod,
+        fun,
+        `obj.${prop}.${enumProp} == ${this.beautify(
+          objProp[enumProp]
+        )} != ${enumVal}`
+      )
     }
   }
 }

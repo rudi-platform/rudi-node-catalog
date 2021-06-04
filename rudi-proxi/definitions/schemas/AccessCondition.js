@@ -1,18 +1,18 @@
 'use strict'
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Schema definitions
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const DictionaryEntry = require('./DictionaryEntry')
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Model definitions
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const Licence = require('../models/Licence')
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Custom schema definition: AccessCondition
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 /**
  * Access restrictions for the use of data in the form of licence,
@@ -21,7 +21,6 @@ const Licence = require('../models/Licence')
  * Default is open licence.
  */
 exports.AccessCondition = {
-
   /** Restriction level for the resource */
   confidentiality: {
     type: {
@@ -32,37 +31,37 @@ exports.AccessCondition = {
       restricted_access: Boolean,
 
       /** True if the dataset embeds personal data */
-      gdpr_sensitive: Boolean
+      gdpr_sensitive: Boolean,
     },
-    required: true
+    required: true,
   },
 
   licence: {
     type: Licence,
-    required: true
+    required: true,
   },
 
   /** Describes how constrained is the use of the resource */
   usage_constraint: {
-    type: [DictionaryEntry]
+    type: [DictionaryEntry],
   },
 
   /** Information that MUST be cited every time the data is used */
   bibliographical_reference: {
-    type: [DictionaryEntry]
+    type: [DictionaryEntry],
   },
 
   // Mention that must be cited verbatim in every publication that
   // makes use of the data
   mandatory_mention: {
-    type: [DictionaryEntry]
+    type: [DictionaryEntry],
   },
 
   access_constraint: {
-    type: [DictionaryEntry]
+    type: [DictionaryEntry],
   },
 
   other_constraints: {
-    type: [DictionaryEntry]
-  }
+    type: [DictionaryEntry],
+  },
 }

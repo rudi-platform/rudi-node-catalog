@@ -1,78 +1,86 @@
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // External dependancies
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const mongoose = require('mongoose')
 const _ = require('lodash')
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Schema definitions
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const Validation = require('../schemaValidators')
 const DictionaryEntry = require('../schemas/DictionaryEntry')
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Constants
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const LicenceTypes = {
   Standard: 'STANDARD',
-  Custom: 'CUSTOM'
+  Custom: 'CUSTOM',
 }
 
 const {
   API_METADATA_LICENCE_TYPE,
-  FIELDS_TO_SKIP
+  FIELDS_TO_SKIP,
 } = require('../../db/dbFields')
 const options = {
   discriminatorKey: API_METADATA_LICENCE_TYPE,
   timestamps: true,
-  id: false
+  id: false,
 }
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Custom schema definition: Licence
-// ---------------------------------------------------------------
-const LicenceSchema = new mongoose.Schema({
-  /** Enum to differenciate standard from custom licence */
-  licence_type: {
-    type: String,
-    enum: Object.values(LicenceTypes),
-    required: true
-  }
-}, options)
-
-// ---------------------------------------------------------------
-// Standard licence schema definition
-// ---------------------------------------------------------------
-const LicenceStandardSchema = new mongoose.Schema({
-  /** Standard license (recognized by RUDI system) */
-  licence_label: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'SkosConcept',
-    required: true
-  }
-}, options)
-
-// ---------------------------------------------------------------
-// Custom licence schema definition
-// ---------------------------------------------------------------
-const LicenceCustomSchema = new mongoose.Schema({
-
-  /** Title of the custom licence */
-  custom_licence_label: {
-    type: [DictionaryEntry]
+// -----------------------------------------------------------------------------
+const LicenceSchema = new mongoose.Schema(
+  {
+    /** Enum to differenciate standard from custom licence */
+    licence_type: {
+      type: String,
+      enum: Object.values(LicenceTypes),
+      required: true,
+    },
   },
+  options
+)
 
-  /** Informative URL towards the custom licence */
-  custom_licence_uri: {
-    type: String,
-    unique: true,
-    match: Validation.URI
-  }
-}, options)
+// -----------------------------------------------------------------------------
+// Standard licence schema definition
+// -----------------------------------------------------------------------------
+const LicenceStandardSchema = new mongoose.Schema(
+  {
+    /** Standard licence (recognized by RUDI system) */
+    licence_label: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'SkosConcept',
+      required: true,
+    },
+  },
+  options
+)
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// Custom licence schema definition
+// -----------------------------------------------------------------------------
+const LicenceCustomSchema = new mongoose.Schema(
+  {
+    /** Title of the custom licence */
+    custom_licence_label: {
+      type: [DictionaryEntry],
+    },
+
+    /** Informative URL towards the custom licence */
+    custom_licence_uri: {
+      type: String,
+      unique: true,
+      match: Validation.URI,
+    },
+  },
+  options
+)
+
+// -----------------------------------------------------------------------------
 // Schema refinements
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 // ----- toJSON cleanup
 LicenceSchema.methods.toJSON = function () {
@@ -110,20 +118,26 @@ LicenceSchema.pre('save', function (next) {
 })
  */
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Models definition
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const Licence = mongoose.model('Licence', LicenceSchema)
 
-const LicenceStandard = Licence.discriminator(LicenceTypes.Standard, LicenceStandardSchema)
-const LicenceCustom = Licence.discriminator(LicenceTypes.Custom, LicenceCustomSchema)
+const LicenceStandard = Licence.discriminator(
+  LicenceTypes.Standard,
+  LicenceStandardSchema
+)
+const LicenceCustom = Licence.discriminator(
+  LicenceTypes.Custom,
+  LicenceCustomSchema
+)
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Exports
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 module.exports = {
   Licence,
   LicenceStandard,
   LicenceCustom,
-  LicenceTypes
+  LicenceTypes,
 }

@@ -6,16 +6,16 @@ const mod = 'sysCtrl'
  * action on the contacts (producer or publisher)
  */
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // External dependancies
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const boom = require('@hapi/boom')
 const prcs = require('child_process')
 const readLastLines = require('read-last-lines')
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Internal dependancies
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const sys = require('../config/confSystem')
 const log = require('../utils/logging')
 const utils = require('../utils/jsUtils')
@@ -25,17 +25,17 @@ const {
   URL_LOGS_ACCESS,
   URL_GIT_HASH_ACCESS,
   URL_NODE_VERSION_ACCESS,
-  PARAM_LOGS_LINES
+  PARAM_LOGS_LINES,
 } = require('../config/confApi')
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Cosntants
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const NB_LOG_LINES_DEFAULT = 100
 let CURRENT_APP_HASH
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // App ID
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 /** Returns the actual git hash */
 exports.getGitHash = () => {
@@ -43,7 +43,9 @@ exports.getGitHash = () => {
   // log.d(mod, fun, ``)
   try {
     log.d(mod, fun, ` GET ${URL_GIT_HASH_ACCESS}`)
-    const hashId = require('child_process').execSync('git rev-parse --short HEAD')
+    const hashId = require('child_process').execSync(
+      'git rev-parse --short HEAD'
+    )
     // log.d(mod, fun, `${hashId}`.trim())
 
     return `${hashId}`.trim()
@@ -74,7 +76,7 @@ exports.getNodeVersion = () => {
     const npmVersion = prcs.execSync('npm -v')
     const nVersions = {
       'node version': `${nodeVersion}`.trim(),
-      'npm version': `${npmVersion}`.trim()
+      'npm version': `${npmVersion}`.trim(),
     }
     log.d(mod, fun, `${utils.beautify(nVersions)}`)
 
@@ -85,9 +87,9 @@ exports.getNodeVersion = () => {
   }
 }
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Logs
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 exports.getLogs = async (req, reply) => {
   const fun = 'getLogs'
@@ -112,7 +114,8 @@ exports.getLastLogLines = async (req, reply) => {
   const fun = 'getLogs'
   try {
     log.d(mod, fun, `GET ${URL_LOGS_ACCESS}/:${PARAM_LOGS_LINES}`)
-    const nbLines = json.accessReqParam(req, PARAM_LOGS_LINES) || NB_LOG_LINES_DEFAULT
+    const nbLines =
+      json.accessReqParam(req, PARAM_LOGS_LINES) || NB_LOG_LINES_DEFAULT
     const logs = readLastLines.read(sys.OUT_LOG, nbLines)
     return logs
   } catch (err) {

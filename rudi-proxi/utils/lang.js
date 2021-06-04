@@ -11,6 +11,6 @@ exports.setLanguage = (lang) => {
 
   currentLanguage = lang
 }
-exports.getLanguage = _ => {
+exports.getLanguage = () => {
   return currentLanguage
 }

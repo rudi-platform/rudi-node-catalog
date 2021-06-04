@@ -1,15 +1,15 @@
 'use strict'
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // External dependancies
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // const uuid = require('uuid')
 
-const Validation = require('../schemaValidators')
+const validation = require('../schemaValidators')
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Constants
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 exports.UUIDv4 = {
   type: String,
@@ -19,7 +19,7 @@ exports.UUIDv4 = {
   unique: true,
   index: true,
   lowercase: true,
-  match: Validation.UUID
+  match: validation.VALID_UUID,
 }
 
 exports.UUID = {
@@ -27,7 +27,7 @@ exports.UUID = {
   // default: _ => uuid.v4(),
   trim: true,
   lowercase: true,
-  match: Validation.UUID
+  match: validation.VALID_UUID,
 }
 
 exports.DOI = {
@@ -36,5 +36,5 @@ exports.DOI = {
   unique: true,
   sparse: true, // accept empty values as non-duplicates
   lowercase: true,
-  match: Validation.DOI
+  match: validation.DOI,
 }

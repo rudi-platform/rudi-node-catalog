@@ -7,21 +7,18 @@ const mod = 'genCtrl'
  * action on the objects (producer or publisher)
  */
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // External dependancies
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const boom = require('@hapi/boom')
 const uuid = require('uuid')
 // const url = require('url')
 const _ = require('lodash')
-const {
-  indexOf,
-  isArray
-} = require('lodash')
+const { indexOf, isArray } = require('lodash')
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Internal dependancies
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
 
@@ -32,9 +29,9 @@ const db = require('../db/dbQueries')
 const json = require('../utils/jsonAccess')
 const utils = require('../utils/jsUtils')
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Constants
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 const {
   URL_OBJECT_GENERIC,
@@ -59,17 +56,14 @@ const {
   QUERY_GROUP_BY,
   QUERY_COUNT_BY,
   URL_ACTION_FILTER,
-  URL_OBJECTS
+  URL_OBJECTS,
 } = require('../config/confApi')
 
-const {
-  DB_PUBLISHED_AT,
-  DB_ID
-} = require('../db/dbFields')
+const { DB_PUBLISHED_AT, DB_ID } = require('../db/dbFields')
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Models
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 const Organization = require('../definitions/models/Organization')
 const Contact = require('../definitions/models/Contact')
@@ -81,22 +75,18 @@ const { Metadata } = require('../definitions/models/Metadata')
 const { Media, MediaFile, MediaSeries } = require('../definitions/models/Media')
 /* beautify ignore:end */
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Specific controlelrs
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const metadataController = require('../controllers/metadataController')
 const organizationController = require('../controllers/organizationController')
 const contactController = require('../controllers/contactController')
 const skosController = require('./skosController')
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Specific object type helper functions
-// ---------------------------------------------------------------
-const QUERY_RESERVED_WORDS = [
-  QUERY_LIMIT,
-  QUERY_OFFSET,
-  QUERY_FIELDS
-]
+// -----------------------------------------------------------------------------
+const QUERY_RESERVED_WORDS = [QUERY_LIMIT, QUERY_OFFSET, QUERY_FIELDS]
 
 const EXT_REFS = 'external_references' // External references needing aggregation
 const EXT_OBJ = 'refObj'
@@ -131,7 +121,11 @@ async function parseQueryParameters(objectType, urlSearchParams) {
           // log.d(mod, fun, utils.beautify(value))
           // log.d(mod, fun, utils.beautify(value.split(',')))
           returnedFilter[QUERY_FIELDS] = value.split(',')
-          log.d(mod, fun, `Fields to keep: ${utils.beautify(returnedFilter[QUERY_FIELDS])}`)
+          log.d(
+            mod,
+            fun,
+            `Fields to keep: ${utils.beautify(returnedFilter[QUERY_FIELDS])}`
+          )
           break
         default:
           log.w(mod, fun, `Query keyword not recognized: '${key}'`)
@@ -156,12 +150,16 @@ async function parseQueryParameters(objectType, urlSearchParams) {
       if (modelProperties.includes(nestedField)) {
         try {
           const obj = JSON.parse(value)
-          log.d(mod, fun, `nestedField: ${nestedField} / nestedFieldProp: ${nestedFieldProp} / value: ${obj}`)
+          log.d(
+            mod,
+            fun,
+            `nestedField: ${nestedField} / nestedFieldProp: ${nestedFieldProp} / value: ${obj}`
+          )
 
           returnedFilter[EXT_REFS].push({
             [EXT_OBJ]: nestedField,
             [EXT_OBJ_PROP]: nestedFieldProp,
-            [EXT_OBJ_VAL]: obj
+            [EXT_OBJ_VAL]: obj,
           })
         } catch (err) {
           const errMsg = `Couldn't parse: '${utils.beautify(value)}': ${err}}`
@@ -178,36 +176,50 @@ async function parseQueryParameters(objectType, urlSearchParams) {
 
   const extRefs = returnedFilter[EXT_REFS]
   if (utils.isNotEmptyArray(extRefs)) {
-    await Promise.all(extRefs.map(async (extRef) => {
-      const extObj = extRef[EXT_OBJ]
-      const extObjProp = extRef[EXT_OBJ_PROP]
-      const extObjVal = extRef[EXT_OBJ_VAL]
-      /* beautify ignore:start */
-      const objFilter = { [extObjProp]: extObjVal }
-      /* beautify ignore:end */
-      log.d(mod, fun, `objFilter: ${utils.beautify(objFilter)}`)
-      const nestedFieldIds = await db.getNestedObject(objectType, extObj, objFilter, DB_ID)
-      let queryFilter
-      if (utils.isNotEmptyArray(nestedFieldIds)) {
-        const ids = []
-        await Promise.all(nestedFieldIds.map(async (foundObj) => {
-          log.d(mod, fun, `nestedFieldId: ${utils.beautify(foundObj[DB_ID])}`)
-          ids.push(foundObj[DB_ID])
-        }))
+    await Promise.all(
+      extRefs.map(async (extRef) => {
+        const extObj = extRef[EXT_OBJ]
+        const extObjProp = extRef[EXT_OBJ_PROP]
+        const extObjVal = extRef[EXT_OBJ_VAL]
         /* beautify ignore:start */
-        returnedFilter[QUERY_FILTER][extObj] = { $in: [ids.join(',')] }
+        const objFilter = { [extObjProp]: extObjVal }
         /* beautify ignore:end */
-        log.d(mod, fun, `filterReturn: ${utils.beautify(returnedFilter)}`)
-      } else {
-        returnedFilter[QUERY_FILTER][extObj] = 0
-      }
-    }))
+        log.d(mod, fun, `objFilter: ${utils.beautify(objFilter)}`)
+        const nestedFieldIds = await db.getNestedObject(
+          objectType,
+          extObj,
+          objFilter,
+          DB_ID
+        )
+        let queryFilter
+        if (utils.isNotEmptyArray(nestedFieldIds)) {
+          const ids = []
+          await Promise.all(
+            nestedFieldIds.map(async (foundObj) => {
+              log.d(
+                mod,
+                fun,
+                `nestedFieldId: ${utils.beautify(foundObj[DB_ID])}`
+              )
+              ids.push(foundObj[DB_ID])
+            })
+          )
+          /* beautify ignore:start */
+          returnedFilter[QUERY_FILTER][extObj] = { $in: [ids.join(',')] }
+          /* beautify ignore:end */
+          log.d(mod, fun, `filterReturn: ${utils.beautify(returnedFilter)}`)
+        } else {
+          returnedFilter[QUERY_FILTER][extObj] = 0
+        }
+      })
+    )
   }
   return returnedFilter
 }
 
 function checkIsUrlObject(objectType) {
-  if (URL_OBJECTS.indexOf(objectType) === -1) throw new Error(msg.objectTypeNotFound(objectType))
+  if (URL_OBJECTS.indexOf(objectType) === -1)
+    throw new Error(msg.objectTypeNotFound(objectType))
 }
 
 async function newObject(objectType, objectData) {
@@ -260,13 +272,17 @@ exports.setPublishedFlag = async (dbObject) => {
     dbObject.save()
     log.d(mod, fun, `dbObject published: ${utils.beautify(dbObject)}`)
   } else {
-    log.w(mod, fun, `Data was already published on : ${(dbObject[DB_PUBLISHED_AT])}`)
+    log.w(
+      mod,
+      fun,
+      `Data was already published on : ${dbObject[DB_PUBLISHED_AT]}`
+    )
   }
 }
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Controllers
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 /**
  * Add a new object
@@ -289,12 +305,16 @@ exports.addSingleObject = async (req, reply) => {
     const rudiId = json.accessProperty(rudiObject, idField)
 
     // First: we make sure object doesn't exist already
-    const existsObject = await db.doesObjectExistWithJson(objectType, rudiObject)
-    if (existsObject) throw new Error(`${msg.objectAlreadyExists(objectType, rudiId)}`)
+    const existsObject = await db.doesObjectExistWithJson(
+      objectType,
+      rudiObject
+    )
+    if (existsObject)
+      throw new Error(`${msg.objectAlreadyExists(objectType, rudiId)}`)
 
     // Creating new object + specific treatments
     const createdObject = await newObject(objectType, rudiObject)
-
+    log.v(mod, fun, utils.beautify(createdObject, 2))
     log.i(mod, fun, `${msg.objectAdded(objectType, rudiId)}`)
     return createdObject
   } catch (err) {
@@ -351,9 +371,20 @@ exports.getObjectList = async (req, reply) => {
       // objectList = await db.getObjectList(objectType, limit, offset, filter, fields)
       objectList = await this.getObjectListFiltered(req, reply)
     } else if (groupBy) {
-      objectList = await db.getObjectListGroup(objectType, groupBy, limit, offset)
-    } else { // if( !!countBy) {
-      objectList = await db.getObjectListCount(objectType, countBy, limit, offset)
+      objectList = await db.getObjectListGroup(
+        objectType,
+        groupBy,
+        limit,
+        offset
+      )
+    } else {
+      // if( !!countBy) {
+      objectList = await db.getObjectListCount(
+        objectType,
+        countBy,
+        limit,
+        offset
+      )
     }
     // log.d(mod, fun, `objectList: ${utils.beautify(objectList)}`)
 
@@ -377,7 +408,10 @@ exports.getObjectListFiltered = async (req, reply) => {
 
     // retrieve url query parameters
     const reqSearch = req.url.substring(req.url.indexOf('?'))
-    const parsedParameters = await parseQueryParameters(objectType, new URLSearchParams(reqSearch))
+    const parsedParameters = await parseQueryParameters(
+      objectType,
+      new URLSearchParams(reqSearch)
+    )
 
     const limit = parsedParameters[QUERY_LIMIT]
     const offset = parsedParameters[QUERY_OFFSET]
@@ -409,7 +443,8 @@ exports.updateSingleObject = async (req, reply) => {
     const rudiId = json.accessProperty(updateData, idField)
 
     const existsObject = await db.doesObjectExistWithRudiId(objectType, rudiId)
-    if (!existsObject) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
+    if (!existsObject)
+      throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
 
     if (objectType === URL_OBJECT_METADATA) {
       return await metadataController.updateMetadata(updateData)
@@ -435,10 +470,15 @@ exports.deleteSingleObject = async (req, reply) => {
     const objectRudiId = json.accessReqParam(req, PARAM_ID)
 
     // ensure the object exists
-    const objectToDelete = await db.getEnsuredObjectWithRudiId(objectType, objectRudiId)
+    const objectToDelete = await db.getEnsuredObjectWithRudiId(
+      objectType,
+      objectRudiId
+    )
 
     if (await isObjectReferenced(objectType, objectRudiId)) {
-      const err = new Error(msg.objectNotDeletedBecauseUsed(objectType, objectRudiId))
+      const err = new Error(
+        msg.objectNotDeletedBecauseUsed(objectType, objectRudiId)
+      )
       err.statusCode = 403
       throw err
     }

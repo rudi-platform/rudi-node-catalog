@@ -5,23 +5,23 @@ const mod = 'db'
  * In this file are made the different calls to the database
  */
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // External dependancies
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const mongoose = require('mongoose')
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Internal dependencies
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
 
 const json = require('../utils/jsonAccess')
 const utils = require('../utils/jsUtils')
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Constants
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const {
   PARAM_ID,
   URL_OBJECT_METADATA,
@@ -33,7 +33,7 @@ const {
   URL_ACTION_REPORT,
   URL_LICENCE_SUFFIX,
   QUERY_LIMIT_DEFAULT,
-  QUERY_OFFSET_DEFAULT
+  QUERY_OFFSET_DEFAULT,
 } = require('../config/confApi')
 
 // Fields from the JSON as definied in the API
@@ -54,12 +54,14 @@ const {
   API_SKOS_SCHEME_CODE,
   API_SKOS_CONCEPT_ROLE,
   FIELDS_TO_SKIP,
-  API_MEDIA_PROPERTY
+  API_MEDIA_PROPERTY,
 } = require('./dbFields')
 
-// ---------------------------------------------------------------
+const { JWT_EXP } = require('../config/confPortal')
+
+// -----------------------------------------------------------------------------
 // Data models
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const Organization = require('../definitions/models/Organization')
 const Contact = require('../definitions/models/Contact')
 /* beautify ignore:start */
@@ -70,19 +72,17 @@ const { Report } = require('../definitions/models/Report')
 
 const SkosScheme = require('../definitions/models/SkosScheme')
 const SkosConcept = require('../definitions/models/SkosConcept')
-const {
-  isArray
-} = require('lodash')
+const PortalToken = require('../definitions/models/PortalToken')
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Properties with special treatments
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 /** Fields to skip while populating */
 const SKIP_FIELDS = `-${FIELDS_TO_SKIP.join(' -')}`
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Specific object accesses
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const OBJ_MODEL = {
   [URL_OBJECT_METADATA]: Metadata,
   [URL_OBJECT_ORGANIZATIONS]: Organization,
@@ -91,7 +91,7 @@ const OBJ_MODEL = {
   [URL_OBJECT_SKOS_SCHEME]: SkosScheme,
   [URL_OBJECT_SKOS_CONCEPT]: SkosConcept,
   [URL_LICENCE_SUFFIX]: SkosConcept,
-  [URL_ACTION_REPORT]: Report
+  [URL_ACTION_REPORT]: Report,
 }
 
 const ID_PROP = {
@@ -102,7 +102,7 @@ const ID_PROP = {
   [URL_OBJECT_SKOS_SCHEME]: API_SKOS_SCHEME_ID,
   [URL_OBJECT_SKOS_CONCEPT]: API_SKOS_CONCEPT_ID,
   [URL_LICENCE_SUFFIX]: API_SKOS_CONCEPT_ID,
-  [URL_ACTION_REPORT]: API_REPORT_ID
+  [URL_ACTION_REPORT]: API_REPORT_ID,
 }
 
 function assertIsString(fun, param) {
@@ -136,7 +136,7 @@ exports.getObjectAccesses = (objectType) => {
   // log.d(mod, fun, ``)
   return {
     Model: this.getObjectModel(objectType),
-    idField: this.getObjectIdField(objectType)
+    idField: this.getObjectIdField(objectType),
   }
 }
 
@@ -179,12 +179,10 @@ function getPopulateOptions(objectType) {
   if (objectType === URL_OBJECT_METADATA) {
     return {
       path: METADATA_FIELDS_TO_POPULATE,
-      select: SKIP_FIELDS
+      select: SKIP_FIELDS,
     }
   } else {
-    return {
-      select: SKIP_FIELDS
-    }
+    return SKIP_FIELDS
   }
 }
 
@@ -193,9 +191,9 @@ function getPopulateFields(objectType) {
   return METADATA_FIELDS_TO_POPULATE
 }
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Helper functions
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 exports.getModelPropertyNames = (Model) => {
   return Object.keys(Model.schema.paths)
 }
@@ -204,9 +202,9 @@ exports.isProperty = (Model, prop) => {
   return this.getModelPropertyNames(Model).includes(prop)
 }
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Actions on DB tables
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 exports.getCollections = async () => {
   const fun = `getCollections`
   try {
@@ -235,19 +233,25 @@ exports.dropDB = async () => {
     throw err
   }
 }
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Generic functions: get single object
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 exports.getObject = async (objectType, filter) => {
   const fun = `getObject`
   log.d(mod, fun, ``)
+
   try {
     const Model = this.getObjectModel(objectType)
-    const populateFields = getPopulateFields(objectType)
-    if (utils.isEmptyArray(populateFields)) {
-      return await Model.findOne(filter)
+    const populateOpts = getPopulateOptions(objectType)
+
+    if (utils.isEmptyArray(populateOpts)) {
+      const obj = await Model.findOne(filter)
+      log.v(mod, fun, `obj: ${utils.beautify(obj)}`)
+      return obj
     } else {
-      return await Model.findOne(filter).populate(populateFields)
+      const obj = await Model.findOne(filter).populate(populateOpts)
+      log.v(mod, fun, `obj: ${utils.beautify(obj)}`)
+      return obj
     }
   } catch (err) {
     log.w(mod, fun, err)
@@ -325,7 +329,7 @@ exports.doesObjectExistWithRudiId = async (objectType, rudiId) => {
   log.d(mod, fun, ``)
   try {
     const dbObject = await this.getObjectWithRudiId(objectType, rudiId)
-    return (!!dbObject)
+    return !!dbObject
   } catch (err) {
     log.w(mod, fun, err)
     throw err
@@ -337,7 +341,7 @@ exports.doesObjectExistWithJson = async (objectType, rudiObject) => {
   log.d(mod, fun, ``)
   try {
     const dbObject = await this.getObjectWithJson(objectType, rudiObject)
-    return (!!dbObject)
+    return !!dbObject
   } catch (err) {
     log.w(mod, fun, err)
     throw err
@@ -346,9 +350,15 @@ exports.doesObjectExistWithJson = async (objectType, rudiObject) => {
 
 exports.getNestedObject = async (objectType, nestedObjectProperty, filter, fieldSelection) => {
   const fun = `getNestedObject`
-  log.d(mod, fun, `objectType: ${objectType}, nestedObjectProperty: ${utils.beautify(nestedObjectProperty)}, filter : ${utils.beautify(filter)}, fieldSelection: ${fieldSelection} `)
+  log.d(
+    mod,
+    fun,
+    `objectType: ${objectType}, nestedObjectProperty: ${utils.beautify(
+      nestedObjectProperty
+    )}, filter : ${utils.beautify(filter)}, fieldSelection: ${fieldSelection} `
+  )
   try {
-    if (isArray(fieldSelection)) fieldSelection = fieldSelection.join(' ')
+    if (Array.isArray(fieldSelection)) fieldSelection = fieldSelection.join(' ')
 
     const FieldModel = this.getFieldModel(objectType, nestedObjectProperty)
     if (!fieldSelection) {
@@ -364,9 +374,9 @@ exports.getNestedObject = async (objectType, nestedObjectProperty, filter, field
   }
 }
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Generic functions: get single object / partial access
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 exports.getObjectPropertiesWithDbId = async (objectType, dbId, propertyList) => {
   const fun = `getObjectPropertiesWithDbId`
   log.d(mod, fun, ``)
@@ -483,9 +493,9 @@ exports.getObjectWithField = async (Model, fieldName, fieldValue, populateFields
 }
  */
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Generic functions: get object list
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 exports.getObjectList = async (objectType, limit, offset, filter, fields) => {
   const fun = `getObjectList`
   log.d(mod, fun, ``)
@@ -496,21 +506,32 @@ exports.getObjectList = async (objectType, limit, offset, filter, fields) => {
     filter = filter || {}
     const populateFields = getPopulateFields(objectType)
 
-    log.d(mod, fun, `objectType: ${objectType}, limit: ${limit}, offset: ${offset}, filter: ${utils.beautify(filter)}, fields: ${utils.beautify(fields)}`)
+    log.d(
+      mod,
+      fun,
+      `objectType: ${objectType}, limit: ${limit}, offset: ${offset}, filter: ${utils.beautify(
+        filter
+      )}, fields: ${utils.beautify(fields)}`
+    )
     if (utils.isEmptyArray(populateFields)) {
       const fieldsToKeep = fields ? fields.join(' ') : ``
       return await Model.find(filter, fieldsToKeep).limit(limit).skip(offset)
     } else {
-      const objectList = await Model.find(filter).limit(limit).skip(offset).populate(getPopulateOptions(objectType))
+      const objectList = await Model.find(filter)
+        .limit(limit)
+        .skip(offset)
+        .populate(getPopulateOptions(objectType))
       if (!fields) return objectList
 
       const filteredObjectList = []
-      await Promise.all(objectList.map(async (obj) => {
-        const filteredObj = await utils.keepFields(obj, fields)
-        // log.d(mod, fun, `obj: ${utils.beautify(obj)}`)
-        // log.d(mod, fun, `filteredObj: ${utils.beautify(filteredObj)}`)
-        filteredObjectList.push(filteredObj)
-      }))
+      await Promise.all(
+        objectList.map(async (obj) => {
+          const filteredObj = await utils.keepFields(obj, fields)
+          // log.d(mod, fun, `obj: ${utils.beautify(obj)}`)
+          // log.d(mod, fun, `filteredObj: ${utils.beautify(filteredObj)}`)
+          filteredObjectList.push(filteredObj)
+        })
+      )
       return filteredObjectList
     }
   } catch (err) {
@@ -541,7 +562,11 @@ exports.getObjectListCount = async (objectType, unionField, limit, offset) => {
   const fun = `getObjectListCount`
   log.d(mod, fun, ``)
 
-  log.d(mod, fun, `objectType: ${objectType}, unionField: ${unionField}, limit: ${limit} / offset: ${offset} `)
+  log.d(
+    mod,
+    fun,
+    `objectType: ${objectType}, unionField: ${unionField}, limit: ${limit} / offset: ${offset} `
+  )
   try {
     const Model = this.getObjectModel(objectType)
 
@@ -553,25 +578,27 @@ exports.getObjectListCount = async (objectType, unionField, limit, offset) => {
       {
         $group: {
           _id: `$${pivot}`,
-          count: { $sum: 1 }
-        }
+          count: { $sum: 1 },
+        },
       },
-      { $sort: { count: -1 } }
+      { $sort: { count: -1 } },
     ]).exec()
     /* beautify ignore:end */
 
     if (!FieldModel) {
-      objectList.map(obj => {
+      objectList.map((obj) => {
         obj[pivot] = obj._id
         delete obj._id
         return obj._id
       })
       return objectList
     } else {
-      await Promise.all(objectList.map(async (obj) => {
-        obj[unionField] = await FieldModel.findById(obj._id)
-        delete obj._id
-      }))
+      await Promise.all(
+        objectList.map(async (obj) => {
+          obj[unionField] = await FieldModel.findById(obj._id)
+          delete obj._id
+        })
+      )
 
       return objectList
     }
@@ -584,7 +611,11 @@ exports.getObjectListCount = async (objectType, unionField, limit, offset) => {
 exports.getObjectListGroup = async (objectType, unionField, limit, offset) => {
   const fun = `getObjectListGroup`
   log.d(mod, fun, ``)
-  log.d(mod, fun, `objectType: ${objectType}, unionField: ${unionField}, limit: ${limit} / offset${offset} `)
+  log.d(
+    mod,
+    fun,
+    `objectType: ${objectType}, unionField: ${unionField}, limit: ${limit} / offset${offset} `
+  )
 
   try {
     const Model = this.getObjectModel(objectType)
@@ -597,43 +628,43 @@ exports.getObjectListGroup = async (objectType, unionField, limit, offset) => {
         $group: {
           _id: `$${unionField}`,
           count: { $sum: 1 },
-          list: { $push: { id: '$_id' } }
-        }
+          list: { $push: { id: '$_id' } },
+        },
       },
-      { $sort: { count: -1 } }
+      { $sort: { count: -1 } },
     ]).exec()
     /* beautify ignore:end */
 
-    objectList.map(obj => {
+    objectList.map((obj) => {
       obj[unionField] = obj._id
       delete obj._id
       return obj._id
     })
 
     if (!FieldModel) {
-      await Promise.all(objectList.map(async (obj) => {
-        const objList = obj.list
-          .sort()
-          .slice(offset, offset + limit)
-        obj.list = await Model.populate(objList, {
-          path: 'id',
-          populate: getPopulateOptions(objectType)
+      await Promise.all(
+        objectList.map(async (obj) => {
+          const objList = obj.list.sort().slice(offset, offset + limit)
+          obj.list = await Model.populate(objList, {
+            path: 'id',
+            populate: getPopulateOptions(objectType),
+          })
         })
-      }))
+      )
       return objectList
     } else {
       // log.d(mod, fun, `CollectionFrom: ${utils.beautify(FieldModel)}`)
 
       const finalObjectList = await FieldModel.populate(objectList, unionField)
-      await Promise.all(finalObjectList.map(async (obj) => {
-        const objList = obj.list
-          .sort()
-          .slice(offset, offset + limit)
-        obj.list = await Model.populate(objList, {
-          path: 'id',
-          populate: getPopulateOptions(objectType)
+      await Promise.all(
+        finalObjectList.map(async (obj) => {
+          const objList = obj.list.sort().slice(offset, offset + limit)
+          obj.list = await Model.populate(objList, {
+            path: 'id',
+            populate: getPopulateOptions(objectType),
+          })
         })
-      }))
+      )
       return finalObjectList
     }
   } catch (err) {
@@ -660,7 +691,9 @@ exports.updateObject = async (objectType, jsonUpdateData) => {
     if (utils.isEmptyArray(populateFields)) {
       return await Model.findOneAndUpdate(filter, jsonUpdateData, updateOpts)
     } else {
-      return await Model.findOneAndUpdate(filter, jsonUpdateData, updateOpts).populate(populateFields)
+      return await Model.findOneAndUpdate(filter, jsonUpdateData, updateOpts).populate(
+        populateFields
+      )
     }
   } catch (err) {
     log.w(mod, fun, err)
@@ -713,7 +746,7 @@ exports.deleteManyWithRudiIds = async (objectType, rudiIdList) => {
     return {
       n: 0,
       ok: 0,
-      deletedCount: 0
+      deletedCount: 0,
     }
   }
 
@@ -755,7 +788,7 @@ function changeConditionsIntoRegex(conditions) {
   const fun = `changeConditionsIntoRegex`
 
   const regexConditions = {}
-  Object.keys(conditions).forEach(key => {
+  Object.keys(conditions).forEach((key) => {
     const regexp = new RegExp(conditions[key])
     log.d(mod, fun, regexp)
     regexConditions[key] = new RegExp(`^${conditions[key]}$`)
@@ -764,9 +797,9 @@ function changeConditionsIntoRegex(conditions) {
   return regexConditions
 }
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Specific functions
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 // ----------------------------------------
 // - Metadata
@@ -835,7 +868,7 @@ exports.deleteMetadata = async (metadataRudiId) => {
   }
 
   // Checking that the metadata already exists
-  if (!await this.doesObjectExistWithRudiId(URL_OBJECT_METADATA, metadataRudiId)) {
+  if (!(await this.doesObjectExistWithRudiId(URL_OBJECT_METADATA, metadataRudiId))) {
     throw new Error(`${msg.metadataNotFound(metadataRudiId)}`)
   }
 
@@ -1102,7 +1135,9 @@ exports.getEnsuredSchemeDbIdWithRudiId = async (schemeRudiId) => {
 exports.getSchemeRudiIdWithDbId = async (schemeDbId) => {
   const fun = `getEnsuredSchemeDbIdWithRudiId`
   log.d(mod, fun, ``)
-  return await this.getObjectPropertiesWithDbId(URL_OBJECT_SKOS_SCHEME, schemeDbId, [API_SKOS_SCHEME_ID])
+  return await this.getObjectPropertiesWithDbId(URL_OBJECT_SKOS_SCHEME, schemeDbId, [
+    API_SKOS_SCHEME_ID,
+  ])
 }
 
 exports.getSchemeWithDbId = async (schemeDbId) => {
@@ -1170,7 +1205,7 @@ exports.getAllConceptsFromScheme = async (schemeCode) => {
   log.d(mod, fun, ``)
 
   const conceptList = await SkosConcept.find({
-    [API_SKOS_SCHEME_CODE]: schemeCode
+    [API_SKOS_SCHEME_CODE]: schemeCode,
   })
   return conceptList
 }
@@ -1180,7 +1215,7 @@ exports.getAllConceptsWithRole = async (conceptRole) => {
   log.d(mod, fun, ``)
 
   const conceptList = await SkosConcept.find({
-    [API_SKOS_CONCEPT_ROLE]: conceptRole
+    [API_SKOS_CONCEPT_ROLE]: conceptRole,
   })
   return conceptList
 }
@@ -1203,7 +1238,9 @@ exports.isReferencedInMetadata = async (objectType, rudiId) => {
   // log.d(mod, fun, `truc: ${utils.beautify(truc2)}`)
   let dbId
   try {
-    dbId = await (await this.getObjectPropertiesWithRudiId(objectType, rudiId, [DB_ID])).toObject()[DB_ID]
+    dbId = await (await this.getObjectPropertiesWithRudiId(objectType, rudiId, [DB_ID])).toObject()[
+      DB_ID
+    ]
   } catch (err) {
     const errMsg = msg.objectNotFound(objectType, rudiId)
     log.w(mod, fun, errMsg)
@@ -1219,9 +1256,11 @@ exports.isReferencedInMetadata = async (objectType, rudiId) => {
         $or: [
           /* beautify ignore:start */
           { [API_DATA_PRODUCER_PROPERTY]: dbId },
-          { [`${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`]: dbId }
+          {
+            [`${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`]: dbId,
+          },
           /* beautify ignore:end */
-        ]
+        ],
       }
       break
     case URL_OBJECT_CONTACTS:
@@ -1229,14 +1268,16 @@ exports.isReferencedInMetadata = async (objectType, rudiId) => {
         $or: [
           /* beautify ignore:start */
           { [API_DATA_CONTACTS_PROPERTY]: dbId },
-          { [`${API_METAINFO_PROPERTY}.${API_METAINFO_CONTACTS_PROPERTY}`]: dbId }
+          {
+            [`${API_METAINFO_PROPERTY}.${API_METAINFO_CONTACTS_PROPERTY}`]: dbId,
+          },
           /* beautify ignore:end */
-        ]
+        ],
       }
       break
     case URL_OBJECT_MEDIA:
       metadataFilter = {
-        [`${API_MEDIA_PROPERTY}`]: dbId
+        [`${API_MEDIA_PROPERTY}`]: dbId,
       }
       break
     default:
@@ -1269,13 +1310,14 @@ exports.isOrgUsedInMetadata = async (dbOrg) => {
 
   // checking if the organization is referenced by a metadata in field API_METAINFO_PROPERTY.API_METAINFO_PROVIDER_PROPERTY
   const metaInfoOrgQuery = {}
-  metaInfoOrgQuery[`${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`] = mongoose.Types.ObjectId(orgDbId)
+  metaInfoOrgQuery[`${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`] =
+    mongoose.Types.ObjectId(orgDbId)
   // log.d(mod, fun, `metaInfoOrgQuery: ${utils.beautify(metaInfoOrgQuery)}`)
 
   const metadataWithMetaInfoProvider = await Metadata.findOne(metaInfoOrgQuery)
   log.d(mod, fun, `metadataWithMetaInfoProvider: ${utils.beautify(metadataWithMetaInfoProvider)}`)
   // return (null != metadataWithMetaInfoProvider)
-  return (metadataWithMetaInfoProvider != null)
+  return metadataWithMetaInfoProvider != null
 }
 
 // what? filtering nested array
@@ -1302,10 +1344,55 @@ exports.isContactUsedInMetadata = async (dbContact) => {
 
   // checking if the contact is referenced by a metadata in field API_METAINFO_PROPERTY.API_METAINFO_CONTACTS_PROPERTY
   const metaInfoContactsQuery = {}
-  metaInfoContactsQuery[`${API_METAINFO_PROPERTY}.${API_METAINFO_CONTACTS_PROPERTY}`] = mongoose.Types.ObjectId(contactDbId)
+  metaInfoContactsQuery[`${API_METAINFO_PROPERTY}.${API_METAINFO_CONTACTS_PROPERTY}`] =
+    mongoose.Types.ObjectId(contactDbId)
   // log.d(mod, fun, `metaInfoContactsQuery: ${utils.beautify(metaInfoContactsQuery)}`)
 
   const metadataWithMetaInfoContact = await Metadata.findOne(metaInfoContactsQuery)
   log.d(mod, fun, `dbObjectWithMetaInfoContact: ${utils.beautify(metadataWithMetaInfoContact)}`)
-  return (metadataWithMetaInfoContact != null)
+  return metadataWithMetaInfoContact != null
+}
+
+// ----------------------------------------
+// - Portal token
+// ----------------------------------------
+
+exports.getLatestStoredPortalToken = async () => {
+  const fun = 'getLatestStoredPortalToken'
+  try {
+    const lastToken = await PortalToken.findOne()
+      .sort({
+        field: 'asc',
+        _id: -1,
+      })
+      .limit(1)
+    // log.d(mod, fun, `lastToken: ${utils.beautify(lastToken)}`)
+    return lastToken
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
+}
+
+exports.cleanStoredToken = (dbToken) => {
+  const fun = 'cleanStoredToken'
+  try {
+    const token = utils.deepClone(dbToken)
+    delete token[JWT_EXP]
+    log.d(mod, fun, `token: ${utils.beautify(token)}`)
+    return token
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
+}
+exports.storePortalToken = async (token) => {
+  const fun = 'storePortalToken'
+  try {
+    const dbToken = await PortalToken(token)
+    return await dbToken.save()
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
 }

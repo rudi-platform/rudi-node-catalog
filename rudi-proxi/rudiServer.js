@@ -2,20 +2,21 @@
 
 const mod = 'main'
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Internal dependancies
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const utils = require('./utils/jsUtils')
 const sys = require('./config/confSystem')
 const logConf = require('./config/confLogs')
 const log = require('./utils/logging')
+// const portal = require('./config/confPortal')
 
 const api = require('./config/confApi')
 const sysController = require('./controllers/sysController')
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // External dependancies / init
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Require external modules
 const mongoose = require('mongoose')
 
@@ -23,9 +24,9 @@ const mongoose = require('mongoose')
 const fastify = require('fastify')({
   logger: {
     level: 'warn',
-    logger: logConf.initFFLogger('rudiProxi')
+    logger: logConf.initFFLogger('rudiProxi'),
     // file: sys.OUT_LOG
-  }
+  },
 })
 fastify.addHook('onRequest', (req, res, next) => {
   log.logRequest(req)
@@ -42,9 +43,9 @@ const swagger = require('./config/swagger')
 // Register Swagger
 fastify.register(require('fastify-swagger'), swagger.options)
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // DB connection
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 // Setting flags to avoid deprecation warnings
 mongoose.set('useFindAndModify', false)
@@ -59,28 +60,24 @@ const dbUrl = "rudi.kzlag.mongodb.net"
 const mongoConnectOptions = {
   useUnifiedTopology: true,
   useCreateIndex: true,
-  useNewUrlParser: true
+  useNewUrlParser: true,
 }
 
 log.i(mod, 'mongo', `Connecting to [${sys.DB_URL}]`)
 const mongoConnection = mongoose.connect(sys.DB_URL, mongoConnectOptions)
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // ROUTES
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 // Import Routes
-const {
-  publicRoutes,
-  backOfficeRoutes,
-  devRoutes
-} = require('./routes/routes')
+const { publicRoutes, backOfficeRoutes, devRoutes } = require('./routes/routes')
 
 // Declare a default route
 fastify.get('/', async (request, reply) => {
   log.i(mod, 'routes', 'GET /')
   return {
-    server: 'RUDI'
+    server: 'RUDI',
   }
 })
 
@@ -89,7 +86,7 @@ fastify.get('/api', async (request, reply) => {
   // request.log.info(`GET /api`)
   log.i(mod, 'routes', 'GET /api')
   return {
-    API: 'RUDI API'
+    API: 'RUDI API',
   }
 })
 
@@ -97,13 +94,13 @@ fastify.get('/api', async (request, reply) => {
 fastify.get(api.URL_PREFIX_PUBLIC, async (request, reply) => {
   log.i(mod, 'routes', `GET ${api.URL_PREFIX_PUBLIC}`)
   return {
-    'API version': 'RUDI API v1'
+    'API version': 'RUDI API v1',
   }
 })
 fastify.get(`${api.URL_PREFIX_PUBLIC}/`, async (request, reply) => {
   log.i(mod, 'routes', `GET ${api.URL_PREFIX_PUBLIC}/`)
   return {
-    'API version': 'RUDI API v1'
+    'API version': 'RUDI API v1',
   }
 })
 
@@ -123,13 +120,14 @@ devRoutes.forEach((rouge, index) => {
   fastify.route(rouge)
 })
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // SERVER
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const start = async () => {
   try {
-    await fastify.listen(sys.LISTENING_PORT, sys.LISTENING_ADDR)
-      .catch(err => log.e(mod, 'Fastify listen', `${err}`))
+    await fastify
+      .listen(sys.LISTENING_PORT, sys.LISTENING_ADDR)
+      .catch((err) => log.e(mod, 'Fastify listen', `${err}`))
     fastify.swagger()
     // fastify.log.info(`Listening on ${fastify.server.address().address}:${fastify.server.address().port}`)
   } catch (err) {
@@ -144,7 +142,7 @@ try {
     .then(() => {
       log.i(mod, 'server', 'Ready')
     })
-    .catch(err => log.e(mod, 'server', `Crashed: ${err}`))
+    .catch((err) => log.e(mod, 'server', `Crashed: ${err}`))
 } catch (uncaught) {
   log.e(mod, 'server', `Uncaught error: ${uncaught}`)
 }
@@ -152,13 +150,17 @@ try {
 mongoConnection
   .then(() => {
     log.i(mod, 'mongo', 'MongoDB connected')
-    log.i(mod, 'app', `Application version '${sysController.getAppHash()}' | API ${api.API_VERSION}`)
+    log.i(
+      mod,
+      'app',
+      `Application version '${sysController.getAppHash()}' | API ${api.VERSION}`
+    )
 
     utils.separateLogs('Init OK')
   })
-  .catch(err => log.e(mod, 'mongoConnection', err))
+  .catch((err) => log.e(mod, 'mongoConnection', err))
 
-process.on('uncaughtException', err => {
+process.on('uncaughtException', (err) => {
   log.e(mod, 'process', `Uncaught error: ${err}`)
   // console.error('There was an uncaught error', err)
   // process.exit(1) //mandatory (as per the Node.js docs)

@@ -3,16 +3,16 @@
 const mod = 'sysConf'
 
 require('winston')
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Internal dependecies
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const fa = require('../utils/fileActions')
 const utils = require('../utils/jsUtils')
 
 utils.separateLogs()
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Constants: local ini file configuration settings
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 // Conf files name
 // - user conf
@@ -40,86 +40,73 @@ const _logDir = 'log_dir'
 const _logFileName = 'log_file'
 const _logLevel = 'log_level'
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Constants: default configuration
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 const DEFAULT_CONF = {
   // Node.js server
   [SERVER_SECTION]: {
     [_serverAddress]: '0.0.0.0',
-    [_serverPort]: 3000
+    [_serverPort]: 3003,
   },
   // DB
   [DB_SECTION]: {
     [_dbUrl]: 'mongodb://127.0.0.1/',
     [_dbName]: 'rudi_prod',
-    [_dbPort]: 27017
+    [_dbPort]: 27017,
   },
   // Logs
   [LOG_SECTION]: {
     [_appName]: 'rudiProxi',
     [_logDir]: './logs',
     [_logFileName]: 'rudiProxi.log',
-    [_logLevel]: 'debug'
-  }
+    [_logLevel]: 'debug',
+  },
 }
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Constants: user and local configuration
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Getting user conf file value
 // if null, local conf file value
 // if null , default value
 const USER_CONF = fa.readIniFile(userConfFile)
 const LOCAL_CONF = fa.readIniFile(defConfFile)
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Helper functions
-// ---------------------------------------------------------------
-// Accessing properties without raising errors
-function quietAccess(obj, prop, alt) {
-  try {
-    return obj[prop]
-  } catch {
-    return {}
-  }
-}
+// -----------------------------------------------------------------------------
 
 // Get values from global constants
 // -> gets user conf file value
 //    if null get local conf file value
 //    if null get default value
-function getValue(section, field) {
-  // const fun = 'getVal'
-  const userSection = quietAccess(USER_CONF, section)
-  const userValue = quietAccess(userSection, field)
+function getIniValue(section, field) {
+  const userValue = utils.quietAccess(USER_CONF[section], field)
+  const localValue = utils.quietAccess(LOCAL_CONF[section], field)
 
-  const localSection = quietAccess(LOCAL_CONF, section)
-  const localValue = quietAccess(localSection, field)
-
-  // console.log(mod, fun, confValue)
   return userValue || localValue || DEFAULT_CONF[section][field]
 }
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Extracting and exporting sys configuration
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 // Server
-exports.LISTENING_ADDR = getValue(SERVER_SECTION, _serverAddress)
-exports.LISTENING_PORT = getValue(SERVER_SECTION, _serverPort)
+exports.LISTENING_ADDR = getIniValue(SERVER_SECTION, _serverAddress)
+exports.LISTENING_PORT = getIniValue(SERVER_SECTION, _serverPort)
 
 // DB
-exports.DB_NAME = getValue(DB_SECTION, _dbName)
-const DB_URL_PREFIX = getValue(DB_SECTION, _dbUrl)
+exports.DB_NAME = getIniValue(DB_SECTION, _dbName)
+const DB_URL_PREFIX = getIniValue(DB_SECTION, _dbUrl)
 exports.DB_URL = `${DB_URL_PREFIX}${this.DB_NAME}`
 
 // Logs
-exports.APP_NAME = getValue(LOG_SECTION, _appName)
-exports.LOG_DIR = getValue(LOG_SECTION, _logDir)
-exports.LOG_FILE = getValue(LOG_SECTION, _logFileName)
+exports.APP_NAME = getIniValue(LOG_SECTION, _appName)
+exports.LOG_DIR = getIniValue(LOG_SECTION, _logDir)
+exports.LOG_FILE = getIniValue(LOG_SECTION, _logFileName)
 exports.OUT_LOG = `${this.LOG_DIR}/${this.LOG_FILE}`
-exports.LOG_LVL = getValue(LOG_SECTION, _logLevel)
+exports.LOG_LVL = getIniValue(LOG_SECTION, _logLevel)
 
 const fun = 'export'
 // const now = utils.nowLocaleFormatted()

@@ -5,19 +5,19 @@ const mod = 'geo'
  * Library for treating geography related properties
  */
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // External dependancies
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // const geojson = require('geojson')
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Internal dependancies
-// ---------------------------------------------------------------
-const log = require("./logging")
+// -----------------------------------------------------------------------------
+const log = require('./logging')
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Functions
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
 /**
  * Creates a GeoJSON Polygon object from a set of 4 coordinates
  * describing a bounding box
@@ -31,6 +31,9 @@ exports.bboxToGeoJsonPolygon = (western, southern, eastern, northern) => {
     log.w(mod, fun, errMsg)
     throw new Error(errMsg)
   }
+
+  if(western === eastern && southern === northern)
+  return this.coordsToGeoJsonPoint(western, southern)
   // The values of a "bbox" array are "[west, south, east, north]"
   // given in decimal degrees
   // source: https://tools.ietf.org/html/rfc7946#appendix-B.1
@@ -43,7 +46,7 @@ exports.bboxToGeoJsonPolygon = (western, southern, eastern, northern) => {
     [eastern, southern],
     [eastern, northern],
     [western, northern],
-    [western, southern]
+    [western, southern],
   ]
 
   // Coordinates of a Polygon are an array of linear ring
@@ -54,12 +57,35 @@ exports.bboxToGeoJsonPolygon = (western, southern, eastern, northern) => {
   const geoJsonPolygon = {
     type: 'Polygon',
     coordinates: [polygonExtRing],
-    bbox: geoJsonBbox
+    bbox: geoJsonBbox,
   }
 
   return geoJsonPolygon
 }
 
+
+exports.coordsToGeoJsonPoint = (westLongitude, southLatitude) => {
+  const fun = 'coordsToGeoJsonPoint'
+  log.d(mod, fun, ``)
+
+  // The values of a "bbox" array are "[west, south, east, north]"
+  // given in decimal degrees
+  // source: https://tools.ietf.org/html/rfc7946#appendix-B.1
+  const geoJsonBbox = [westLongitude, southLatitude, westLongitude, southLatitude]
+
+  // Coordinates of a Polygon are an array of linear ring
+  // coordinate arrays.
+  // The first element in the array represents the exterior ring.
+  // Any subsequent elements represent interior rings (or holes).
+  // source: https://tools.ietf.org/html/rfc7946#appendix-A.3
+  const geoJsonPoint = {
+    type: 'Point',
+    coordinates: [westLongitude, southLatitude],
+    bbox: geoJsonBbox,
+  }
+
+  return geoJsonPoint
+}
 /**
  * Creates a GeoJSON Polygon object from a set of 4 coordinates
  * describing a bounding box
