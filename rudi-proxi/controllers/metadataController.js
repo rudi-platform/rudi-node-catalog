@@ -173,11 +173,12 @@ exports.mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFound) 
 function customMerger(value, srcValue, key, object, source) {
   const fun ='customMerger'
   log.v(mod, fun, `'${key}': ${utils.beautify(srcValue)} -> ${utils.beautify(value)}`)
-  if(Array.isArray(value)) return srcValue
-  switch(key){
-    case API_METADATA_ID: return
-  }
-  return value
+  if(_.isArray(srcValue)) return srcValue
+  return undefined
+  // switch(key){
+  //   case API_METADATA_ID: return
+  // }
+  // return value
   // return _.isArray(b) ? b : undefined
 }
 
