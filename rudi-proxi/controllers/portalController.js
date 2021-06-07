@@ -6,7 +6,6 @@ const mod = 'portalCtrl'
 // -----------------------------------------------------------------------------
 // External dependancies
 // -----------------------------------------------------------------------------
-const axios = require('axios')
 const boom = require('@hapi/boom')
 const crypto = require('crypto')
 
@@ -18,7 +17,7 @@ const log = require('../utils/logging')
 const api = require('../config/confApi')
 const utils = require('../utils/jsUtils')
 const portal = require('../config/confPortal')
-const httpReq = require('../utils/httpReq')
+const {httpGet, httpPost} = require('../utils/httpReq')
 const validate = require('../definitions/schemaValidators')
 const json = require('../utils/jsonAccess')
 
@@ -165,10 +164,10 @@ exports.getNewTokenFromPortal = async () => {
       },
     }
 
-    const portalResponse = await axios.post(portalUrl, body, opts)
+    const answer = await httpPost(portalUrl, body, opts)
 
-    if (portalResponse.status === 200) {
-      const portalToken = portalResponse.data
+    if (answer.status === 200) {
+      const portalToken = answer.data
       const jwToken = portalToken[portal.FIELD_TOKEN]
       const jwtBody = this.verifyPortalToken(jwToken)[1]
       portalToken[portal.JWT_EXP] = jwtBody[portal.JWT_EXP]
@@ -199,8 +198,8 @@ exports.getTokenCheckedByPortal = async (token) => {
     const portalUrl = portal.getCheckAuthUrl()
 
     const requestUrl = `${portalUrl}?${portal.PARAM_TOKEN}=${token}`
-    // log.d(mod, fun, requestUrl)
-    const portalResponse = await axios.get(requestUrl)
+    log.d(mod, fun, requestUrl)
+    const portalResponse = await httpGet(requestUrl)
 
     if (portalResponse.status === 200) {
       log.v(mod, fun, `RUDI Portal validated the token`)
@@ -251,9 +250,10 @@ exports.verifyPortalToken = (accessToken) => {
       const errMsg = `Forged token? Computed hash: ${hash} != jwt signature: ${jwtSignature}`
       log.w(mod, fun, errMsg)
       throw new Error(errMsg)
-    } else {
-      log.v(mod, fun, `JWT correctly signed`)
-    }
+    } 
+    // else {
+    //   log.v(mod, fun, `JWT correctly signed`)
+    // }
 
     // Check JWT header
     const jwtHeader = JSON.parse(utils.decodeBase64(jwtHeaderEncoded))
@@ -297,7 +297,7 @@ exports.sendMetadataToPortal = async (metadataId) => {
     const metadataClean = utils.deepClone(metadata)
 
     const token = await this.getPortalToken()
-    const reply = await httpReq.post(metadataClean, portal.apiSendOptions(), token)
+    const reply = await httpPost(portal.postPortalMetaUrl(), metadataClean,  token)
     // log.d(mod, fun, `reply: ${utils.beautify(reply)}`)
     return reply
   } catch (err) {
@@ -313,7 +313,7 @@ exports.getMetadataFromPortal = async (metadataId) => {
     if (!metadataId) throw new Error('Not yet implemented on Portal side') // Can't get the resouces list yet.
 
     const token = await this.getPortalToken()
-    const reply = await httpReq.get(portal.apiGetOptions(metadataId), token)
+    const reply = await httpGet(portal.getPortalMetaUrl(metadataId), token)
     // log.d(mod, fun, `reply: ${utils.beautify(reply)}`)
 
     return reply

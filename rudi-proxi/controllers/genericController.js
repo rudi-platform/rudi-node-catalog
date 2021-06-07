@@ -93,18 +93,24 @@ const EXT_OBJ = 'refObj'
 const EXT_OBJ_PROP = 'refObjProp'
 const EXT_OBJ_VAL = 'refObjVal'
 
-async function parseQueryParameters(objectType, urlSearchParams) {
+async function parseQueryParameters(objectType, reqSearch) {
   const fun = 'parseQueryParameters'
   // identify object model
   const Model = db.getObjectModel(objectType)
   const modelProperties = db.getModelPropertyNames(Model)
+  const urlSearchParams = new URLSearchParams(reqSearch)
 
-  const returnedFilter = {}
-  returnedFilter[QUERY_LIMIT] = QUERY_LIMIT_DEFAULT
-  returnedFilter[QUERY_OFFSET] = QUERY_OFFSET_DEFAULT
-  returnedFilter[QUERY_FILTER] = {}
-  returnedFilter[EXT_REFS] = []
-
+  const returnedFilter = {
+    [QUERY_LIMIT]: QUERY_LIMIT_DEFAULT,
+    [QUERY_OFFSET]: QUERY_OFFSET_DEFAULT,
+    [QUERY_FILTER]: {},
+    [EXT_REFS]: [],
+  }
+  // Check if parameters were actually found by URLSearchParams
+  if(utils.isEmpty(urlSearchParams)){
+    log.d(mod, fun, 'No parameters found')
+    return returnedFilter
+  }
   for (const [key, value] of urlSearchParams) {
     if (QUERY_RESERVED_WORDS.includes(key)) {
       // log.d(mod, fun, `Key is a reserved word: ${utils.beautify(key)} => ${utils.beautify(queryParameters[key])}`)
@@ -121,11 +127,7 @@ async function parseQueryParameters(objectType, urlSearchParams) {
           // log.d(mod, fun, utils.beautify(value))
           // log.d(mod, fun, utils.beautify(value.split(',')))
           returnedFilter[QUERY_FIELDS] = value.split(',')
-          log.d(
-            mod,
-            fun,
-            `Fields to keep: ${utils.beautify(returnedFilter[QUERY_FIELDS])}`
-          )
+          log.d(mod, fun, `Fields to keep: ${utils.beautify(returnedFilter[QUERY_FIELDS])}`)
           break
         default:
           log.w(mod, fun, `Query keyword not recognized: '${key}'`)
@@ -185,22 +187,13 @@ async function parseQueryParameters(objectType, urlSearchParams) {
         const objFilter = { [extObjProp]: extObjVal }
         /* beautify ignore:end */
         log.d(mod, fun, `objFilter: ${utils.beautify(objFilter)}`)
-        const nestedFieldIds = await db.getNestedObject(
-          objectType,
-          extObj,
-          objFilter,
-          DB_ID
-        )
+        const nestedFieldIds = await db.getNestedObject(objectType, extObj, objFilter, DB_ID)
         let queryFilter
         if (utils.isNotEmptyArray(nestedFieldIds)) {
           const ids = []
           await Promise.all(
             nestedFieldIds.map(async (foundObj) => {
-              log.d(
-                mod,
-                fun,
-                `nestedFieldId: ${utils.beautify(foundObj[DB_ID])}`
-              )
+              log.d(mod, fun, `nestedFieldId: ${utils.beautify(foundObj[DB_ID])}`)
               ids.push(foundObj[DB_ID])
             })
           )
@@ -218,8 +211,7 @@ async function parseQueryParameters(objectType, urlSearchParams) {
 }
 
 function checkIsUrlObject(objectType) {
-  if (URL_OBJECTS.indexOf(objectType) === -1)
-    throw new Error(msg.objectTypeNotFound(objectType))
+  if (URL_OBJECTS.indexOf(objectType) === -1) throw new Error(msg.objectTypeNotFound(objectType))
 }
 
 async function newObject(objectType, objectData) {
@@ -272,11 +264,7 @@ exports.setPublishedFlag = async (dbObject) => {
     dbObject.save()
     log.d(mod, fun, `dbObject published: ${utils.beautify(dbObject)}`)
   } else {
-    log.w(
-      mod,
-      fun,
-      `Data was already published on : ${dbObject[DB_PUBLISHED_AT]}`
-    )
+    log.w(mod, fun, `Data was already published on : ${dbObject[DB_PUBLISHED_AT]}`)
   }
 }
 
@@ -305,16 +293,12 @@ exports.addSingleObject = async (req, reply) => {
     const rudiId = json.accessProperty(rudiObject, idField)
 
     // First: we make sure object doesn't exist already
-    const existsObject = await db.doesObjectExistWithJson(
-      objectType,
-      rudiObject
-    )
-    if (existsObject)
-      throw new Error(`${msg.objectAlreadyExists(objectType, rudiId)}`)
+    const existsObject = await db.doesObjectExistWithJson(objectType, rudiObject)
+    if (existsObject) throw new Error(`${msg.objectAlreadyExists(objectType, rudiId)}`)
 
     // Creating new object + specific treatments
     const createdObject = await newObject(objectType, rudiObject)
-    log.v(mod, fun, utils.beautify(createdObject, 2))
+    // log.v(mod, fun, utils.beautify(createdObject, 2))
     log.i(mod, fun, `${msg.objectAdded(objectType, rudiId)}`)
     return createdObject
   } catch (err) {
@@ -371,20 +355,10 @@ exports.getObjectList = async (req, reply) => {
       // objectList = await db.getObjectList(objectType, limit, offset, filter, fields)
       objectList = await this.getObjectListFiltered(req, reply)
     } else if (groupBy) {
-      objectList = await db.getObjectListGroup(
-        objectType,
-        groupBy,
-        limit,
-        offset
-      )
+      objectList = await db.getObjectListGroup(objectType, groupBy, limit, offset)
     } else {
       // if( !!countBy) {
-      objectList = await db.getObjectListCount(
-        objectType,
-        countBy,
-        limit,
-        offset
-      )
+      objectList = await db.getObjectListCount(objectType, countBy, limit, offset)
     }
     // log.d(mod, fun, `objectList: ${utils.beautify(objectList)}`)
 
@@ -408,10 +382,7 @@ exports.getObjectListFiltered = async (req, reply) => {
 
     // retrieve url query parameters
     const reqSearch = req.url.substring(req.url.indexOf('?'))
-    const parsedParameters = await parseQueryParameters(
-      objectType,
-      new URLSearchParams(reqSearch)
-    )
+    const parsedParameters = await parseQueryParameters(objectType, reqSearch)
 
     const limit = parsedParameters[QUERY_LIMIT]
     const offset = parsedParameters[QUERY_OFFSET]
@@ -443,8 +414,7 @@ exports.updateSingleObject = async (req, reply) => {
     const rudiId = json.accessProperty(updateData, idField)
 
     const existsObject = await db.doesObjectExistWithRudiId(objectType, rudiId)
-    if (!existsObject)
-      throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
+    if (!existsObject) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
 
     if (objectType === URL_OBJECT_METADATA) {
       return await metadataController.updateMetadata(updateData)
@@ -470,15 +440,10 @@ exports.deleteSingleObject = async (req, reply) => {
     const objectRudiId = json.accessReqParam(req, PARAM_ID)
 
     // ensure the object exists
-    const objectToDelete = await db.getEnsuredObjectWithRudiId(
-      objectType,
-      objectRudiId
-    )
+    const objectToDelete = await db.getEnsuredObjectWithRudiId(objectType, objectRudiId)
 
     if (await isObjectReferenced(objectType, objectRudiId)) {
-      const err = new Error(
-        msg.objectNotDeletedBecauseUsed(objectType, objectRudiId)
-      )
+      const err = new Error(msg.objectNotDeletedBecauseUsed(objectType, objectRudiId))
       err.statusCode = 403
       throw err
     }

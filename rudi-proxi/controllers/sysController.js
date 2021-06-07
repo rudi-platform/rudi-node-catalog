@@ -43,9 +43,7 @@ exports.getGitHash = () => {
   // log.d(mod, fun, ``)
   try {
     log.d(mod, fun, ` GET ${URL_GIT_HASH_ACCESS}`)
-    const hashId = require('child_process').execSync(
-      'git rev-parse --short HEAD'
-    )
+    const hashId = require('child_process').execSync('git rev-parse --short HEAD')
     // log.d(mod, fun, `${hashId}`.trim())
 
     return `${hashId}`.trim()
@@ -102,7 +100,9 @@ exports.getLogs = async (req, reply) => {
     }
     const logs = fs.readFileSync(sys.OUT_LOG, readOptions)
     */
-    const logs = readLastLines.read(sys.OUT_LOG, NB_LOG_LINES_DEFAULT)
+    const nbLines = req.params[PARAM_LOGS_LINES] || req.params[QUERY_LIMIT] || NB_LOG_LINES_DEFAULT
+    const logs = readLastLines.read(sys.OUT_LOG, nbLines)
+    // const logs = readLastLines.read(sys.OUT_LOG, NB_LOG_LINES_DEFAULT)
     return logs
   } catch (err) {
     log.e(mod, fun, err)
@@ -111,11 +111,10 @@ exports.getLogs = async (req, reply) => {
 }
 
 exports.getLastLogLines = async (req, reply) => {
-  const fun = 'getLogs'
+  const fun = 'getLastLogLines'
   try {
     log.d(mod, fun, `GET ${URL_LOGS_ACCESS}/:${PARAM_LOGS_LINES}`)
-    const nbLines =
-      json.accessReqParam(req, PARAM_LOGS_LINES) || NB_LOG_LINES_DEFAULT
+    const nbLines = req.params[PARAM_LOGS_LINES] || req.params[QUERY_LIMIT] || NB_LOG_LINES_DEFAULT
     const logs = readLastLines.read(sys.OUT_LOG, nbLines)
     return logs
   } catch (err) {

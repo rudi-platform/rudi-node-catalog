@@ -23,7 +23,7 @@ const PORTAL_SECTION = 'portal'
 // Auth section
 const _authUrl = 'auth_url'
 const _authGet = 'auth_get'
-const _authChk = 'portal_auth_chk'
+const _authChk = 'auth_chk'
 
 // Creds section
 const _login = 'login'
@@ -83,6 +83,10 @@ exports.API_SEND_URL = getIniValue(PORTAL_SECTION, _sendUrl)
 
 // ----- API: Get
 
+exports.getPortalMetaUrl = (id) => {
+  return `${this.API_GET_URL.replace(/{{id}}/, id)}`
+}
+
 const apiGetUrlElements = this.API_GET_URL.split('/')
 exports.API_GET_PROTOCOL = apiGetUrlElements[0].replace(/:/, '')
 exports.API_GET_PORT = this.API_GET_PROTOCOL === 'https' ? 443 : 80
@@ -99,6 +103,10 @@ exports.apiGetOptions = (id) => {
 }
 
 // ----- API: Send
+
+exports.postPortalMetaUrl = () => {
+  return `${this.API_SEND_URL}`
+}
 const apiSendUrlElements = this.API_SEND_URL.split('/')
 exports.API_SEND_PROTOCOL = apiSendUrlElements[0].replace(/:/, '')
 exports.API_SEND_PORT = this.API_SEND_PROTOCOL === 'https' ? 443 : 80

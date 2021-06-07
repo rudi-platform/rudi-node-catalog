@@ -70,30 +70,40 @@ function doHttpRequest(options, protocol, data) {
   })
 }
 
-exports.get = async (options, authorizationToken) => {
-  const fun = 'getRequest'
+exports.httpGet = async (destUrl, authorizationToken) => {
+  const fun = 'directGet'
   log.d(mod, fun, ``)
   try {
-    const destUrl = `${options.protocol}://${options.hostname}/${options.path}`
     const reqOpts = {
       headers: {
         'User-Agent': 'Rudi-Producer',
         'Content-Type': 'application/json',
       },
     }
-    if (authorizationToken) {
-      reqOpts.headers.Authorization = `Bearer ${authorizationToken}`
-    }
-    log.d(mod, fun, `reqOpts: ${utils.beautify(reqOpts)}`)
+    if (authorizationToken) reqOpts.headers.Authorization = `Bearer ${authorizationToken}`
 
-    let res
+    let answer
     try {
-      res = await axios.get(destUrl, reqOpts)
+      answer = await axios.get(destUrl, reqOpts)
     } catch (error) {
       log.w(mod, fun, `GET: ${error}`)
       throw error
     }
-    return res.data
+    log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
+    return answer.data
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
+}
+
+exports.getWithOpts = async (options, authorizationToken) => {
+  const fun = 'getRequest'
+  log.d(mod, fun, ``)
+  try {
+    const destUrl = `${options.protocol}://${options.hostname}/${options.path}`
+    const answer = await this.httpGet(destUrl, authorizationToken)
+    return answer.data
   } catch (err) {
     log.w(mod, fun, err)
     throw err
@@ -119,11 +129,10 @@ exports.get = async (options, authorizationToken) => {
      */
 }
 
-exports.post = async (dataToSend, options, authorizationToken) => {
+exports.httpPost = async (destUrl, dataToSend, authorizationToken) => {
   const fun = 'postRequest'
   log.d(mod, fun, ``)
   try {
-    const destUrl = `${options.protocol}://${options.hostname}/${options.path}`
     const reqOpts = {
       headers: {
         'User-Agent': 'Rudi-Producer',
@@ -132,14 +141,8 @@ exports.post = async (dataToSend, options, authorizationToken) => {
     }
     if (authorizationToken) reqOpts.headers.Authorization = `Bearer ${authorizationToken}`
 
-    // log.d(mod, fun, `destUrl: ${destUrl}`)
-    // log.d(mod, fun, `reqOpts: ${utils.beautify(reqOpts, 2)}`)
     const answer = await axios.post(destUrl, dataToSend, reqOpts)
-    // .catch((err) => {
-    //   // const error = {statusCode: 400, message: err.response.data.label}
-    //   // log.w(mod, fun, `POST: ${utils.beautify(err.response.data)}`)
-    //   throw new Error(err.response.data)
-    // })
+
     log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
     return answer.data
   } catch (err) {

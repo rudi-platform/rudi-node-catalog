@@ -7,7 +7,6 @@ const mod = 'licenceCtrl'
 // -----------------------------------------------------------------------------
 // External dependancies
 // -----------------------------------------------------------------------------
-const axios = require('axios')
 const uuid = require('uuid')
 
 // -----------------------------------------------------------------------------
@@ -20,6 +19,7 @@ const json = require('../utils/jsonAccess')
 
 const db = require('../db/dbQueries')
 const api = require('../config/confApi')
+const { httpPost } = require('../utils/httpReq')
 
 const { API_SKOS_CONCEPT_CODE } = require('../db/dbFields')
 
@@ -46,7 +46,7 @@ exports.getLicences = async () => {
     log.d(mod, fun, `Init LICENCE_LIST`)
     let dblicenceList = await db.getAllConceptsWithRole(this.LicenceConceptRole)
     if (!utils.isNotEmptyArray(dblicenceList)) {
-      await initlicences()
+      await initLicences()
       dblicenceList = await db.getAllConceptsWithRole(this.LicenceConceptRole)
     }
     this.LICENCE_LIST = await skosController.dbConceptListToRudiRecursive(
@@ -70,7 +70,7 @@ exports.getLicenceCodes = async () => {
   return this.LICENCE_CODE_LIST
 }
 
-async function initlicences() {
+async function initLicences() {
   const fun = 'initlicences'
   log.v(mod, fun, `${LICENCE_POST_ADDRESS}`)
   try {
@@ -81,7 +81,7 @@ async function initlicences() {
       })
     )
     // log.d(mod, fun, licenceData)
-    const res = await axios.post(LICENCE_POST_ADDRESS, licenceData)
+    const res = await httpPost(LICENCE_POST_ADDRESS, licenceData)
     if (res.status === 200) {
       log.d(mod, fun, `Integration done`)
     } else {
@@ -95,7 +95,7 @@ async function initlicences() {
 // -----------------------------------------------------------------------------
 // Controller
 // -----------------------------------------------------------------------------
-exports.getAlllicences = async (req, reply) => {
+exports.getAllLicences = async (req, reply) => {
   const fun = `getAlllicences`
   log.v(mod, fun, `< GET ${api.URL_LICENCE_ACCESS}`)
   // log.d(mod, fun, ``)
@@ -103,7 +103,7 @@ exports.getAlllicences = async (req, reply) => {
   return await this.getLicences()
 }
 
-exports.getAlllicenceCodes = async (req, reply) => {
+exports.getAllLicenceCodes = async (req, reply) => {
   const fun = `getAlllicenceCodes`
   log.v(mod, fun, `< GET ${api.URL_LICENCE_ACCESS}`)
   // log.d(mod, fun, ``)
@@ -114,5 +114,5 @@ exports.getAlllicenceCodes = async (req, reply) => {
 exports.init = async (req, reply) => {
   const fun = `init`
   log.v(mod, fun, ``)
-  await initlicences()
+  await initLicences()
 }

@@ -12,7 +12,6 @@ const mod = 'tokenMgmt'
 // External dependancies
 // -----------------------------------------------------------------------------
 import https from 'https'
-import 'axios'
 
 // -----------------------------------------------------------------------------
 // Internal dependancies
@@ -25,7 +24,7 @@ import utils from '../../utils/jsUtils'
 // -----------------------------------------------------------------------------
 import { RMToken } from './RMToken'
 import { UUIDv4 } from './UUIDv4'
-import axios from 'axios'
+import { httpGet, httpPost } from '../../utils/httpReq'
 
 /*
  * -----------------------------------------------------------------------------
@@ -146,7 +145,7 @@ export class RMTokenManager {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
       }
-      const portalResponse = await axios.post(portalUrl, body, options)
+      const portalResponse = await httpPost(portalUrl, body, options)
 
       if (portalResponse.status === 200) {
         const newToken = new RMToken(portalResponse.data)
@@ -174,7 +173,7 @@ export class RMTokenManager {
     try {
       const requestUrl = `${this.portal.host}/${this.portal.path_check}?token=${rmToken.jwtString}`
       // log.d(mod, fun, requestUrl)
-      const portalResponse = await axios.get(requestUrl)
+      const portalResponse = await httpGet(requestUrl)
 
       if (portalResponse.status === 200) {
         log.v(mod, fun, `RUDI Portal validated the token`)

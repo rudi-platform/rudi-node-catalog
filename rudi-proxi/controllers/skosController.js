@@ -467,7 +467,7 @@ exports.dbConceptListToRudiRecursive = async (dbConceptList) => {
 exports.getThesaurus = (thesaurusCode) => {
   const thesaurusCodeLowerCase = thesaurusCode.toLowerCase()
   if (thesaurusCodeLowerCase === URL_LICENCE_SUFFIX.toLowerCase()) {
-    return licenceController.getAlllicenceCodes()
+    return licenceController.getAllLicenceCodes()
   } else {
     return THESAURI[thesaurusCodeLowerCase]
   }
@@ -479,7 +479,7 @@ exports.getEveryThesaurus = async (req, reply) => {
     log.v(mod, fun, `< GET ${URL_THESAURUS_ACCESS}`)
     log.d(mod, fun, ``)
     const listThesauri = THESAURI
-    listThesauri.licences = await licenceController.getAlllicenceCodes()
+    listThesauri.licences = await licenceController.getAllLicenceCodes()
     // log.d(mod, fun, `listThesauri: ${utils.beautify(listThesauri)}`)
     // log.d(mod, fun, `THESAURI: ${utils.beautify(THESAURI)}`)
     return listThesauri

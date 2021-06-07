@@ -246,11 +246,11 @@ exports.getObject = async (objectType, filter) => {
 
     if (utils.isEmptyArray(populateOpts)) {
       const obj = await Model.findOne(filter)
-      log.v(mod, fun, `obj: ${utils.beautify(obj)}`)
+      // log.v(mod, fun, `obj: ${utils.beautify(obj)}`)
       return obj
     } else {
       const obj = await Model.findOne(filter).populate(populateOpts)
-      log.v(mod, fun, `obj: ${utils.beautify(obj)}`)
+      // log.v(mod, fun, `obj: ${utils.beautify(obj)}`)
       return obj
     }
   } catch (err) {

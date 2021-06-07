@@ -289,13 +289,13 @@ exports.backOfficeRoutes = [
     method: 'GET',
     url: `${URL_LICENCE_ACCESS}`,
     // preHandler: logRequest,
-    handler: licenceController.getAlllicences,
+    handler: licenceController.getAllLicences,
   },
   {
     method: 'GET',
     url: `${URL_LICENCE_CODES_ACCESS}`,
     // preHandler: logRequest,
-    handler: licenceController.getAlllicenceCodes,
+    handler: licenceController.getAllLicenceCodes,
   },
 
   // -----------------------------------------------------------------------------
