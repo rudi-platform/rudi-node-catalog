@@ -2071,6 +2071,7 @@
 									"",
 									"    const countWithOrg1 = pm.collectionVariables.get('countWithOrg1')",
 									"    pm.expect(countWithOrg1).to.eq(responseJson.length)",
+									"    console.log(responseJson.length)",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2990,14 +2991,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/filter?collection_tag=\"{{stamp}}\"",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?collection_tag=\"{{stamp}}\"",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{apiUrl}}",
-								"{{data}}",
-								"filter"
+								"{{data}}"
 							],
 							"query": [
 								{
