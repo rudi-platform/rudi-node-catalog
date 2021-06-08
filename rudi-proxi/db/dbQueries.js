@@ -366,6 +366,8 @@ exports.getNestedObject = async (objectType, nestedObjectProperty, filter, field
     } else {
       const dbObjects = await FieldModel.find(filter, fieldSelection)
       log.d(mod, fun, `dbObjects: ${utils.beautify(dbObjects)}`)
+      if (utils.isEmptyArray(dbObjects))
+        throw new Error(`Object not found! Type: '${nestedObjectProperty}', filter: ${filter}`)
       return dbObjects
     }
   } catch (err) {

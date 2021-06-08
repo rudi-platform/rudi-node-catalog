@@ -93,11 +93,16 @@ const EXT_OBJ = 'refObj'
 const EXT_OBJ_PROP = 'refObjProp'
 const EXT_OBJ_VAL = 'refObjVal'
 
-async function parseQueryParameters(objectType, reqSearch) {
+async function parseQueryParameters(objectType, reqUrl) {
   const fun = 'parseQueryParameters'
+
+  const reqSearch = reqUrl.substring(reqUrl.indexOf('?'))
   // identify object model
   const Model = db.getObjectModel(objectType)
   const modelProperties = db.getModelPropertyNames(Model)
+
+  // extract request parameters
+  log.d(mod, fun, `reqSearch: ${reqSearch}`)
   const urlSearchParams = new URLSearchParams(reqSearch)
 
   const returnedFilter = {
@@ -107,8 +112,8 @@ async function parseQueryParameters(objectType, reqSearch) {
     [EXT_REFS]: [],
   }
   // Check if parameters were actually found by URLSearchParams
-  if(utils.isEmpty(urlSearchParams)){
-    log.d(mod, fun, 'No parameters found')
+  if (urlSearchParams.keys().length < 1) {
+    log.d(mod, fun, `No parameters found: ${urlSearchParams}`)
     return returnedFilter
   }
   for (const [key, value] of urlSearchParams) {
@@ -187,23 +192,27 @@ async function parseQueryParameters(objectType, reqSearch) {
         const objFilter = { [extObjProp]: extObjVal }
         /* beautify ignore:end */
         log.d(mod, fun, `objFilter: ${utils.beautify(objFilter)}`)
-        const nestedFieldIds = await db.getNestedObject(objectType, extObj, objFilter, DB_ID)
-        let queryFilter
-        if (utils.isNotEmptyArray(nestedFieldIds)) {
-          const ids = []
-          await Promise.all(
-            nestedFieldIds.map(async (foundObj) => {
-              log.d(mod, fun, `nestedFieldId: ${utils.beautify(foundObj[DB_ID])}`)
-              ids.push(foundObj[DB_ID])
-            })
-          )
-          /* beautify ignore:start */
-          returnedFilter[QUERY_FILTER][extObj] = { $in: [ids.join(',')] }
-          /* beautify ignore:end */
-          log.d(mod, fun, `filterReturn: ${utils.beautify(returnedFilter)}`)
-        } else {
-          returnedFilter[QUERY_FILTER][extObj] = 0
+        let nestedFieldIds
+        try {
+          nestedFieldIds = await db.getNestedObject(objectType, extObj, objFilter, DB_ID)
+        } catch (err) {
+          log.w(mod, fun, err)
+          // returnedFilter[QUERY_FILTER][extObj] = 0
+          throw err
         }
+        let queryFilter
+
+        const ids = []
+        await Promise.all(
+          nestedFieldIds.map(async (foundObj) => {
+            log.d(mod, fun, `nestedFieldId: ${utils.beautify(foundObj[DB_ID])}`)
+            ids.push(foundObj[DB_ID])
+          })
+        )
+        /* beautify ignore:start */
+        returnedFilter[QUERY_FILTER][extObj] = { $in: [ids.join(',')] }
+        /* beautify ignore:end */
+        log.d(mod, fun, `filterReturn: ${utils.beautify(returnedFilter)}`)
       })
     )
   }
@@ -381,9 +390,13 @@ exports.getObjectListFiltered = async (req, reply) => {
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
 
     // retrieve url query parameters
-    const reqSearch = req.url.substring(req.url.indexOf('?'))
-    const parsedParameters = await parseQueryParameters(objectType, reqSearch)
-
+    let parsedParameters
+    try {
+      parsedParameters = await parseQueryParameters(objectType, req.url)
+    } catch (err) {
+      log.w(mod, fun, err)
+      return []
+    }
     const limit = parsedParameters[QUERY_LIMIT]
     const offset = parsedParameters[QUERY_OFFSET]
     const filter = parsedParameters[QUERY_FILTER]

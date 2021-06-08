@@ -358,39 +358,6 @@
 					"response": []
 				},
 				{
-					"name": "Get licences",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Licences received\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    pm.collectionVariables.set('licences', responseJson);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/licence_codes",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{adminUrl}}",
-								"licence_codes"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Get all licenses",
 					"event": [
 						{
@@ -477,41 +444,6 @@
 							"path": [
 								"{{adminUrl}}",
 								"licence_codes"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get every thesaurus",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Testing thesaurus access\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    const listEnums = Object.keys(responseJson);",
-									"    pm.expect(listEnums.length).to.eq(8);",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/enum",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{adminUrl}}",
-								"enum"
 							]
 						}
 					},
@@ -1780,6 +1712,7 @@
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const metadataList = pm.response.json();",
 									"    console.log(metadataList.length);",
+									"    pm.expect(metadataList.length).to.eq(1)",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1790,7 +1723,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/filter?limit=10&keywords={\"$in\":[\"population\",\"plu\"]}&temporal_spread.start_date={\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2021-05-28T23:24:51.000Z\"}&perlin=2346&resource_languages=\"fr\"",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/filter?limit=10&keywords={\"$in\":[\"population\",\"plu\"]}&temporal_spread.start_date={\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2022-05-28T23:24:51.000Z\"}&perlin=2346&resource_languages=\"fr\"",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -1810,7 +1743,7 @@
 								},
 								{
 									"key": "temporal_spread.start_date",
-									"value": "{\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2021-05-28T23:24:51.000Z\"}"
+									"value": "{\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2022-05-28T23:24:51.000Z\"}"
 								},
 								{
 									"key": "perlin",
@@ -1834,9 +1767,10 @@
 								"exec": [
 									"pm.test(\"Count by API version\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const version = pm.variables.get('apiVersion')",
 									"    const metadataList = pm.response.json();",
-									"    pm.expect(metadataList.length).to.eq(1);",
-									"    pm.expect(metadataList[0].count).to.eq(2);",
+									"    const thisCountResult = metadataList.find(aCountResult => aCountResult[\"metadata_info.api_version\"] === version)",
+									"    pm.expect(thisCountResult.count).to.gte(2);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1875,7 +1809,11 @@
 									"pm.test(\"Count by producer\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const metadataList = pm.response.json();",
-									"    pm.expect(metadataList.length).to.eq(1);",
+									"    const orgId1 = pm.variables.get('orgId1')",
+									"    const thisCountResult = metadataList.find(aCountResult => aCountResult.producer.organization_id === orgId1)",
+									"    console.log(thisCountResult)",
+									"    pm.expect(thisCountResult.count).to.eq(2);",
+									"    pm.expect(thisCountResult.producer.organization_name).to.eq(\"IRISA\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1913,6 +1851,11 @@
 								"exec": [
 									"pm.test(\"Group by API version\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const version = pm.variables.get('apiVersion')",
+									"    const metadataList = pm.response.json();",
+									"    const thisCountResult = metadataList.find(aCountResult => aCountResult[\"metadata_info.api_version\"] === version)",
+									"    pm.expect(thisCountResult.count).to.gte(2);",
+									"    pm.expect(thisCountResult.list.length).to.gte(2);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1954,20 +1897,16 @@
 								"exec": [
 									"pm.test(\"Count by producer\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json()",
+									"    const result = pm.response.json()",
+									"    pm.expect(result.length).to.be.lte(4) // limit! ",
 									"",
 									"    const orgId = pm.variables.get('orgId1')",
-									"    console.log(`orgId: ${orgId}`)",
-									"    let varWasInitialized = false",
-									"    responseJson.map((res) => {",
-									"        console.log(`res.producer.organization_id: ${res.producer.organization_id}`)",
-									"        if(res.producer.organization_id == orgId) {",
-									"            console.log(res.count)",
-									"            pm.collectionVariables.set('countWithOrg1', res.count)",
-									"            varWasInitialized = true",
-									"        }",
-									"    })",
-									"    pm.expect(varWasInitialized).to.be.true",
+									"    const thisCountResult = result.find(aCountResult => aCountResult.producer.organization_id === orgId)",
+									" ",
+									"    pm.expect(thisCountResult.count).to.be.gte(2)",
+									"    pm.expect(thisCountResult.producer.organization_name).to.eq(\"IRISA\");",
+									"   ",
+									"    pm.collectionVariables.set('countWithOrg1', thisCountResult.count)",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2009,20 +1948,16 @@
 								"exec": [
 									"pm.test(\"Group by producer\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const result = pm.response.json()",
+									"    pm.expect(result.length).to.be.lte(4) // limit! ",
 									"",
-									"    const responseJson = pm.response.json()",
+									"    const orgId = pm.variables.get('orgId1')",
+									"    const thisCountResult = result.find(aCountResult => aCountResult.producer.organization_id === orgId)",
+									" ",
+									"    pm.expect(thisCountResult.count).to.be.gte(2)",
+									"    pm.expect(thisCountResult.producer.organization_name).to.eq(\"IRISA\");",
+									"    pm.expect(thisCountResult.list.length).to.gte(2);",
 									"",
-									"    const orgId = pm.variables.get('org1Id')",
-									"    const countWithOrg1 = pm.collectionVariables.get('countWithOrg1')",
-									"    //console.log(`orgId: ${orgId}`)",
-									"",
-									"    responseJson.map((res) => {",
-									"        //console.log(`res.producer.organization_id: ${res.producer.organization_id}`)",
-									"        if(res.producer.organization_id == orgId) {",
-									"            //console.log(res.count)",
-									"            pm.expect(res.count).to.eq(countWithOrg1)",
-									"        }",
-									"    })",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2066,9 +2001,11 @@
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json()",
 									"",
+									"    const orgId = pm.variables.get('orgId1')",
 									"    const countWithOrg1 = pm.collectionVariables.get('countWithOrg1')",
 									"    // console.log(`should have: ${countWithOrg1} / found: ${responseJson.length}`)",
 									"    pm.expect(countWithOrg1).to.eq(responseJson.length)",
+									"    pm.expect(responseJson[0].producer.organization_id).to.eq(orgId)",
 									"});"
 								],
 								"type": "text/javascript"
