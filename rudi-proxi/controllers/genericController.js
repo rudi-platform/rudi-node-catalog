@@ -95,15 +95,9 @@ const EXT_OBJ_VAL = 'refObjVal'
 
 async function parseQueryParameters(objectType, reqUrl) {
   const fun = 'parseQueryParameters'
-
-  const reqSearch = reqUrl.substring(reqUrl.indexOf('?'))
   // identify object model
   const Model = db.getObjectModel(objectType)
   const modelProperties = db.getModelPropertyNames(Model)
-
-  // extract request parameters
-  log.d(mod, fun, `reqSearch: ${reqSearch}`)
-  const urlSearchParams = new URLSearchParams(reqSearch)
 
   const returnedFilter = {
     [QUERY_LIMIT]: QUERY_LIMIT_DEFAULT,
@@ -111,6 +105,16 @@ async function parseQueryParameters(objectType, reqUrl) {
     [QUERY_FILTER]: {},
     [EXT_REFS]: [],
   }
+
+  // extract request parameters
+  if (reqUrl.indexOf('?') === -1) {
+    log.d(mod, fun, `No parameters found: ${reqUrl}`)
+    return returnedFilter
+  }
+  const reqSearch = reqUrl.substring(reqUrl.indexOf('?'))
+  log.d(mod, fun, `reqSearch: ${reqSearch}`)
+  const urlSearchParams = new URLSearchParams(reqSearch)
+
   // Check if parameters were actually found by URLSearchParams
   if (urlSearchParams.keys().length < 1) {
     log.d(mod, fun, `No parameters found: ${urlSearchParams}`)
@@ -384,7 +388,8 @@ exports.getObjectList = async (req, reply) => {
  */
 exports.getObjectListFiltered = async (req, reply) => {
   const fun = 'getObjectListFiltered'
-  log.v(mod, fun, `< GET ${URL_OBJECT_GENERIC}/${URL_ACTION_FILTER}`)
+  log.d(mod, fun, ``)
+  // log.v(mod, fun, `< GET ${URL_OBJECT_GENERIC}/${URL_ACTION_FILTER}`)
   try {
     // retrieve url parameter: object type
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
