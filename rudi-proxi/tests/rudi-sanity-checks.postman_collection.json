@@ -1768,8 +1768,8 @@
 									"pm.test(\"Count by API version\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const version = pm.variables.get('apiVersion')",
-									"    const metadataList = pm.response.json();",
-									"    const thisCountResult = metadataList.find(aCountResult => aCountResult[\"metadata_info.api_version\"] === version)",
+									"    const result = pm.response.json();",
+									"    const thisCountResult = result.find(aCountResult => aCountResult[\"metadata_info.api_version\"] === version)",
 									"    pm.expect(thisCountResult.count).to.gte(2);",
 									"});"
 								],
@@ -1808,9 +1808,9 @@
 								"exec": [
 									"pm.test(\"Count by producer\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const metadataList = pm.response.json();",
 									"    const orgId1 = pm.variables.get('orgId1')",
-									"    const thisCountResult = metadataList.find(aCountResult => aCountResult.producer.organization_id === orgId1)",
+									"    const result = pm.response.json();",
+									"    const thisCountResult = result.find(aCountResult => aCountResult.producer.organization_id === orgId1)",
 									"    console.log(thisCountResult)",
 									"    pm.expect(thisCountResult.count).to.eq(2);",
 									"    pm.expect(thisCountResult.producer.organization_name).to.eq(\"IRISA\");",
@@ -1852,8 +1852,8 @@
 									"pm.test(\"Group by API version\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const version = pm.variables.get('apiVersion')",
-									"    const metadataList = pm.response.json();",
-									"    const thisCountResult = metadataList.find(aCountResult => aCountResult[\"metadata_info.api_version\"] === version)",
+									"    const result = pm.response.json();",
+									"    const thisCountResult = result.find(aCountResult => aCountResult[\"metadata_info.api_version\"] === version)",
 									"    pm.expect(thisCountResult.count).to.gte(2);",
 									"    pm.expect(thisCountResult.list.length).to.gte(2);",
 									"});"

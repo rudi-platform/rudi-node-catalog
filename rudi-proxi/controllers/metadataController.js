@@ -575,8 +575,8 @@ exports.init = async (req, reply) => {
   const initData = require(`../data/datarennes_meta.json`)
 
   await licenceController.init()
-  Themes.init('reset')
-  Keywords.init('reset')
+  // Themes.init('reset')
+  // Keywords.init('reset')
 
   await Promise.all(
     initProd.map(async (prod) => {
