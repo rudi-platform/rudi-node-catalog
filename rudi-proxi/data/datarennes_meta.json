@@ -283,7 +283,10 @@
           }
       ],
       "theme": "Réseaux, Energie",
-      "keywords": [],
+      "keywords": [
+          "Réseaux",
+          "Energie"
+      ],
       "producer": {
           "organization_id": "34914f7d-a9a5-4817-86d8-4fa69a3da65d",
           "organization_name": "Gestionnaires de Réseaux Electricité"
@@ -347,7 +350,9 @@
           }
       ],
       "theme": "Citoyenneté",
-      "keywords": [],
+      "keywords": [
+          "Citoyenneté"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -1216,7 +1221,10 @@
           }
       ],
       "theme": "Mobilité, Transport",
-      "keywords": [],
+      "keywords": [
+          "Mobilité",
+          "Transport"
+      ],
       "producer": {
           "organization_id": "6588624a-92c7-43e6-ad9b-cb4faaf57791",
           "organization_name": "STAR"
@@ -1664,7 +1672,9 @@
           }
       ],
       "theme": "Urbanisme",
-      "keywords": [],
+      "keywords": [
+          "Urbanisme"
+      ],
       "producer": {
           "organization_id": "7448dbe3-ac18-4e99-a2e5-8a8dd1833927",
           "organization_name": "Rennes Métropole"
@@ -2051,7 +2061,10 @@
           }
       ],
       "theme": "Mobilité, Transport",
-      "keywords": [],
+      "keywords": [
+          "Mobilité",
+          "Transport"
+      ],
       "producer": {
           "organization_id": "6588624a-92c7-43e6-ad9b-cb4faaf57791",
           "organization_name": "STAR"
@@ -2181,7 +2194,9 @@
           }
       ],
       "theme": "Citoyenneté",
-      "keywords": [],
+      "keywords": [
+          "Citoyenneté"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -3096,7 +3111,9 @@
           }
       ],
       "theme": "Citoyenneté",
-      "keywords": [],
+      "keywords": [
+          "Citoyenneté"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -3460,7 +3477,7 @@
       "access_condition": {
           "licence": {
               "licence_type": "STANDARD",
-              "licence_label": "licence_cc-by-nd-4.0licence_cc-by-nd-4.0"
+              "licence_label": "licence_cc-by-nd-4.0"
           }
       },
       "metadata_info": {
@@ -3484,7 +3501,9 @@
           }
       ],
       "theme": "Citoyenneté",
-      "keywords": [],
+      "keywords": [
+          "Citoyenneté"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -3548,7 +3567,9 @@
           }
       ],
       "theme": "Economie",
-      "keywords": [],
+      "keywords": [
+          "Economie"
+      ],
       "producer": {
           "organization_id": "270b88a0-74d0-4305-b36f-0eca25cd992b",
           "organization_name": "INSEE"
@@ -4754,7 +4775,9 @@
           }
       ],
       "theme": "Citoyenneté",
-      "keywords": [],
+      "keywords": [
+          "Citoyenneté"
+      ],
       "producer": {
           "organization_id": "6e0e995b-1101-40cd-956a-c305ba547d5e",
           "organization_name": "Ville de Thorigné-Fouillard"
@@ -4818,7 +4841,9 @@
           }
       ],
       "theme": "Citoyenneté",
-      "keywords": [],
+      "keywords": [
+          "Citoyenneté"
+      ],
       "producer": {
           "organization_id": "7448dbe3-ac18-4e99-a2e5-8a8dd1833927",
           "organization_name": "Rennes Métropole"
@@ -4882,7 +4907,11 @@
           }
       ],
       "theme": "Culture, Sports, Loisirs",
-      "keywords": [],
+      "keywords": [
+          "Culture",
+          "Sports",
+          "Loisirs"
+      ],
       "producer": {
           "organization_id": "085da795-5551-4c1d-a924-51a56afc0ec4",
           "organization_name": "Aucun contact"
@@ -4946,7 +4975,10 @@
           }
       ],
       "theme": "Mobilité, Transport",
-      "keywords": [],
+      "keywords": [
+          "Mobilité",
+          "Transport"
+      ],
       "producer": {
           "organization_id": "6588624a-92c7-43e6-ad9b-cb4faaf57791",
           "organization_name": "STAR"
@@ -5010,7 +5042,10 @@
           }
       ],
       "theme": "Mobilité, Transport",
-      "keywords": [],
+      "keywords": [
+          "Mobilité",
+          "Transport"
+      ],
       "producer": {
           "organization_id": "6588624a-92c7-43e6-ad9b-cb4faaf57791",
           "organization_name": "STAR"
@@ -5799,7 +5834,11 @@
           }
       ],
       "theme": "Culture, Sports, Loisirs",
-      "keywords": [],
+      "keywords": [
+          "Culture",
+          "Sports",
+          "Loisirs"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -5863,7 +5902,10 @@
           }
       ],
       "theme": "Mobilité, Transport",
-      "keywords": [],
+      "keywords": [
+          "Mobilité",
+          "Transport"
+      ],
       "producer": {
           "organization_id": "6588624a-92c7-43e6-ad9b-cb4faaf57791",
           "organization_name": "STAR"
@@ -6061,7 +6103,11 @@
           }
       ],
       "theme": "Culture, Sports, Loisirs",
-      "keywords": [],
+      "keywords": [
+          "Culture",
+          "Sports",
+          "Loisirs"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -6872,7 +6918,9 @@
           }
       ],
       "theme": "Citoyenneté",
-      "keywords": [],
+      "keywords": [
+          "Citoyenneté"
+      ],
       "producer": {
           "organization_id": "d5932bcc-2d11-4c5b-8299-0300195a7af3",
           "organization_name": "Ville de Saint-Jacques de la Lande"
@@ -6936,7 +6984,9 @@
           }
       ],
       "theme": "Citoyenneté",
-      "keywords": [],
+      "keywords": [
+          "Citoyenneté"
+      ],
       "producer": {
           "organization_id": "7448dbe3-ac18-4e99-a2e5-8a8dd1833927",
           "organization_name": "Rennes Métropole"
@@ -7067,7 +7117,10 @@
           }
       ],
       "theme": "Mobilité, Transport",
-      "keywords": [],
+      "keywords": [
+          "Mobilité",
+          "Transport"
+      ],
       "producer": {
           "organization_id": "6588624a-92c7-43e6-ad9b-cb4faaf57791",
           "organization_name": "STAR"
@@ -7530,7 +7583,9 @@
           }
       ],
       "theme": "Citoyenneté",
-      "keywords": [],
+      "keywords": [
+          "Citoyenneté"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -7668,7 +7723,9 @@
           }
       ],
       "theme": "Economie",
-      "keywords": [],
+      "keywords": [
+          "Economie"
+      ],
       "producer": {
           "organization_id": "270b88a0-74d0-4305-b36f-0eca25cd992b",
           "organization_name": "INSEE"
@@ -7798,7 +7855,10 @@
           }
       ],
       "theme": "Mobilité, Transport",
-      "keywords": [],
+      "keywords": [
+          "Mobilité",
+          "Transport"
+      ],
       "producer": {
           "organization_id": "6588624a-92c7-43e6-ad9b-cb4faaf57791",
           "organization_name": "STAR"
@@ -9921,7 +9981,7 @@
       "access_condition": {
           "licence": {
               "licence_type": "STANDARD",
-              "licence_label": "licence_cc-by-nd-4.0licence_cc-by-nd-4.0"
+              "licence_label": "licence_cc-by-nd-4.0"
           }
       },
       "metadata_info": {
@@ -10011,7 +10071,9 @@
           }
       ],
       "theme": "Citoyenneté",
-      "keywords": [],
+      "keywords": [
+          "Citoyenneté"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -10195,7 +10257,9 @@
           }
       ],
       "theme": "Citoyenneté",
-      "keywords": [],
+      "keywords": [
+          "Citoyenneté"
+      ],
       "producer": {
           "organization_id": "d5932bcc-2d11-4c5b-8299-0300195a7af3",
           "organization_name": "Ville de Saint-Jacques de la Lande"
@@ -10259,7 +10323,9 @@
           }
       ],
       "theme": "Espace public",
-      "keywords": [],
+      "keywords": [
+          "Espace public"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -10458,7 +10524,10 @@
           }
       ],
       "theme": "Mobilité, Transport",
-      "keywords": [],
+      "keywords": [
+          "Mobilité",
+          "Transport"
+      ],
       "producer": {
           "organization_id": "6588624a-92c7-43e6-ad9b-cb4faaf57791",
           "organization_name": "STAR"
@@ -11006,7 +11075,10 @@
           }
       ],
       "theme": "Mobilité, Transport",
-      "keywords": [],
+      "keywords": [
+          "Mobilité",
+          "Transport"
+      ],
       "producer": {
           "organization_id": "6588624a-92c7-43e6-ad9b-cb4faaf57791",
           "organization_name": "STAR"
@@ -11136,7 +11208,9 @@
           }
       ],
       "theme": "Espace public",
-      "keywords": [],
+      "keywords": [
+          "Espace public"
+      ],
       "producer": {
           "organization_id": "270b88a0-74d0-4305-b36f-0eca25cd992b",
           "organization_name": "INSEE"
@@ -12044,7 +12118,7 @@
       "access_condition": {
           "licence": {
               "licence_type": "STANDARD",
-              "licence_label": "licence_cc-by-nd-4.0licence_cc-by-nd-4.0"
+              "licence_label": "licence_cc-by-nd-4.0"
           }
       },
       "metadata_info": {
@@ -12068,7 +12142,11 @@
           }
       ],
       "theme": "Culture, Sports, Loisirs",
-      "keywords": [],
+      "keywords": [
+          "Culture",
+          "Sports",
+          "Loisirs"
+      ],
       "producer": {
           "organization_id": "4c74874d-b994-4af4-8261-c90f9eb79533",
           "organization_name": "Archives de Rennes"
@@ -12482,7 +12560,9 @@
           }
       ],
       "theme": "Référentiels géographiques",
-      "keywords": [],
+      "keywords": [
+          "Référentiels géographiques"
+      ],
       "producer": {
           "organization_id": "7448dbe3-ac18-4e99-a2e5-8a8dd1833927",
           "organization_name": "Rennes Métropole"
@@ -13470,7 +13550,9 @@
           }
       ],
       "theme": "Citoyenneté",
-      "keywords": [],
+      "keywords": [
+          "Citoyenneté"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -13602,7 +13684,9 @@
           }
       ],
       "theme": "Citoyenneté",
-      "keywords": [],
+      "keywords": [
+          "Citoyenneté"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -14064,7 +14148,9 @@
           }
       ],
       "theme": "Citoyenneté",
-      "keywords": [],
+      "keywords": [
+          "Citoyenneté"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -14262,7 +14348,9 @@
           }
       ],
       "theme": "Citoyenneté",
-      "keywords": [],
+      "keywords": [
+          "Citoyenneté"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -14392,7 +14480,9 @@
           }
       ],
       "theme": "Espace public",
-      "keywords": [],
+      "keywords": [
+          "Espace public"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -14962,7 +15052,9 @@
           }
       ],
       "theme": "Citoyenneté",
-      "keywords": [],
+      "keywords": [
+          "Citoyenneté"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -15169,7 +15261,10 @@
           }
       ],
       "theme": "Mobilité, Transport",
-      "keywords": [],
+      "keywords": [
+          "Mobilité",
+          "Transport"
+      ],
       "producer": {
           "organization_id": "6588624a-92c7-43e6-ad9b-cb4faaf57791",
           "organization_name": "STAR"
@@ -15606,7 +15701,9 @@
           }
       ],
       "theme": "Citoyenneté",
-      "keywords": [],
+      "keywords": [
+          "Citoyenneté"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -15736,7 +15833,9 @@
           }
       ],
       "theme": "Citoyenneté",
-      "keywords": [],
+      "keywords": [
+          "Citoyenneté"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -15800,7 +15899,9 @@
           }
       ],
       "theme": "Economie",
-      "keywords": [],
+      "keywords": [
+          "Economie"
+      ],
       "producer": {
           "organization_id": "270b88a0-74d0-4305-b36f-0eca25cd992b",
           "organization_name": "INSEE"
@@ -16068,7 +16169,9 @@
           }
       ],
       "theme": "Espace public",
-      "keywords": [],
+      "keywords": [
+          "Espace public"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -16801,7 +16904,9 @@
           }
       ],
       "theme": "Citoyenneté",
-      "keywords": [],
+      "keywords": [
+          "Citoyenneté"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -16999,7 +17104,9 @@
           }
       ],
       "theme": "Logement",
-      "keywords": [],
+      "keywords": [
+          "Logement"
+      ],
       "producer": {
           "organization_id": "270b88a0-74d0-4305-b36f-0eca25cd992b",
           "organization_name": "INSEE"
@@ -17595,7 +17702,9 @@
           }
       ],
       "theme": "Citoyenneté",
-      "keywords": [],
+      "keywords": [
+          "Citoyenneté"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -17727,7 +17836,9 @@
           }
       ],
       "theme": "Economie",
-      "keywords": [],
+      "keywords": [
+          "Economie"
+      ],
       "producer": {
           "organization_id": "270b88a0-74d0-4305-b36f-0eca25cd992b",
           "organization_name": "INSEE"
@@ -17791,7 +17902,10 @@
           }
       ],
       "theme": "Mobilité, Transport",
-      "keywords": [],
+      "keywords": [
+          "Mobilité",
+          "Transport"
+      ],
       "producer": {
           "organization_id": "6588624a-92c7-43e6-ad9b-cb4faaf57791",
           "organization_name": "STAR"
@@ -18523,7 +18637,9 @@
           }
       ],
       "theme": "Citoyenneté",
-      "keywords": [],
+      "keywords": [
+          "Citoyenneté"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -18829,7 +18945,7 @@
       "access_condition": {
           "licence": {
               "licence_type": "STANDARD",
-              "licence_label": "licence_cc-by-nd-4.0licence_cc-by-nd-4.0"
+              "licence_label": "licence_cc-by-nd-4.0"
           }
       },
       "metadata_info": {
@@ -18971,7 +19087,9 @@
           }
       ],
       "theme": "Espace public",
-      "keywords": [],
+      "keywords": [
+          "Espace public"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -20295,7 +20413,9 @@
           }
       ],
       "theme": "Citoyenneté",
-      "keywords": [],
+      "keywords": [
+          "Citoyenneté"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -20425,7 +20545,11 @@
           }
       ],
       "theme": "Culture, Sports, Loisirs",
-      "keywords": [],
+      "keywords": [
+          "Culture",
+          "Sports",
+          "Loisirs"
+      ],
       "producer": {
           "organization_id": "7448dbe3-ac18-4e99-a2e5-8a8dd1833927",
           "organization_name": "Rennes Métropole"
@@ -22514,7 +22638,9 @@
           }
       ],
       "theme": "Citoyenneté",
-      "keywords": [],
+      "keywords": [
+          "Citoyenneté"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -22637,7 +22763,11 @@
           }
       ],
       "theme": "Culture, Sports, Loisirs",
-      "keywords": [],
+      "keywords": [
+          "Culture",
+          "Sports",
+          "Loisirs"
+      ],
       "producer": {
           "organization_id": "4c74874d-b994-4af4-8261-c90f9eb79533",
           "organization_name": "Archives de Rennes"
@@ -23263,7 +23393,7 @@
       "access_condition": {
           "licence": {
               "licence_type": "STANDARD",
-              "licence_label": "licence_cc-by-nd-4.0licence_cc-by-nd-4.0"
+              "licence_label": "licence_cc-by-nd-4.0"
           }
       },
       "metadata_info": {
@@ -23538,7 +23668,10 @@
           }
       ],
       "theme": "Réseaux, Energie",
-      "keywords": [],
+      "keywords": [
+          "Réseaux",
+          "Energie"
+      ],
       "producer": {
           "organization_id": "7448dbe3-ac18-4e99-a2e5-8a8dd1833927",
           "organization_name": "Rennes Métropole"
@@ -23999,7 +24132,9 @@
           }
       ],
       "theme": "Enfance",
-      "keywords": [],
+      "keywords": [
+          "Enfance"
+      ],
       "producer": {
           "organization_id": "349b050c-cd74-447c-b82e-b7e7b2553c1d",
           "organization_name": "Ville de Rennes"
@@ -24868,7 +25003,9 @@
           }
       ],
       "theme": "Education",
-      "keywords": [],
+      "keywords": [
+          "Education"
+      ],
       "producer": {
           "organization_id": "598de5db-35da-4ea5-9fb5-cdab76a0a0fb",
           "organization_name": "Commune d'Acigné"
