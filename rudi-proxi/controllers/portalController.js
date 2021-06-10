@@ -17,7 +17,7 @@ const log = require('../utils/logging')
 const api = require('../config/confApi')
 const utils = require('../utils/jsUtils')
 const portal = require('../config/confPortal')
-const {httpGet, httpPost} = require('../utils/httpReq')
+const { httpGet, httpPost, directPost, directGet } = require('../utils/httpReq')
 const validate = require('../definitions/schemaValidators')
 const json = require('../utils/jsonAccess')
 
@@ -70,15 +70,16 @@ exports.getPortalToken = async () => {
     // log.d(mod, fun, `token: ${utils.beautify(token)}`)
     await this.verifyPortalToken(token)
     log.d(mod, fun, 'Stored token seems OK')
-    
+
     await this.getTokenCheckedByPortal(token)
-    log.d(mod, fun, 'Stored token was validated by the Portal')
+    // log.d(mod, fun, 'Stored token was validated by the Portal')
   } catch (err) {
     log.w(mod, fun, err)
     try {
       const rmToken = await this.getNewTokenFromPortal()
       token = json.accessProperty(rmToken, portal.FIELD_TOKEN)
     } catch (err) {
+      log.w(mod, fun, err)
       throw new Error(`Failed to get a new token from the portal: ${err}`)
     }
   }
@@ -158,13 +159,14 @@ exports.getNewTokenFromPortal = async () => {
 
     const opts = {
       headers: {
-        Authorization: `Basic ${basicAuth}`,
         'Content-Type': 'application/x-www-form-urlencoded',
         'User-Agent': `RudiProd/${api.VERSION}`,
+        Authorization: `Basic ${basicAuth}`,
       },
     }
 
-    const answer = await httpPost(portalUrl, body, opts)
+    const answer = await directPost(portalUrl, body, opts)
+    // log.d(mod, fun, `answer.status: ${answer.status}`)
 
     if (answer.status === 200) {
       const portalToken = answer.data
@@ -180,14 +182,12 @@ exports.getNewTokenFromPortal = async () => {
 
       return portalToken
     } else {
-      const errMsg = `Portal couldn't deliver a token`
-      log.w(mod, fun, errMsg)
-      throw new Error(errMsg)
+      throw new Error(utils.beautify(answer))
     }
   } catch (err) {
     const errMsg = `Portal couldn't deliver a token: ${err}`
     log.w(mod, fun, errMsg)
-    throw new Error(errMsg)
+    throw err
   }
 }
 
@@ -198,8 +198,8 @@ exports.getTokenCheckedByPortal = async (token) => {
     const portalUrl = portal.getCheckAuthUrl()
 
     const requestUrl = `${portalUrl}?${portal.PARAM_TOKEN}=${token}`
-    log.d(mod, fun, requestUrl)
-    const portalResponse = await httpGet(requestUrl)
+    // log.d(mod, fun, requestUrl)
+    const portalResponse = await directGet(requestUrl)
 
     if (portalResponse.status === 200) {
       log.v(mod, fun, `RUDI Portal validated the token`)
@@ -250,7 +250,7 @@ exports.verifyPortalToken = (accessToken) => {
       const errMsg = `Forged token? Computed hash: ${hash} != jwt signature: ${jwtSignature}`
       log.w(mod, fun, errMsg)
       throw new Error(errMsg)
-    } 
+    }
     // else {
     //   log.v(mod, fun, `JWT correctly signed`)
     // }
@@ -297,7 +297,7 @@ exports.sendMetadataToPortal = async (metadataId) => {
     const metadataClean = utils.deepClone(metadata)
 
     const token = await this.getPortalToken()
-    const reply = await httpPost(portal.postPortalMetaUrl(), metadataClean,  token)
+    const reply = await httpPost(portal.postPortalMetaUrl(), metadataClean, token)
     // log.d(mod, fun, `reply: ${utils.beautify(reply)}`)
     return reply
   } catch (err) {

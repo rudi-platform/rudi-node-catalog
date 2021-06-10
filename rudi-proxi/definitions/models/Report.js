@@ -92,6 +92,11 @@ const ReportSchema = new mongoose.Schema(
         },
       ],
     },
+
+    report_treatment_error: {
+      error_type: String,
+      error_message: String,
+    },
   },
   {
     timestamps: true,

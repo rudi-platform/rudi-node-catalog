@@ -7,7 +7,7 @@ const mod = 'http'
 // -----------------------------------------------------------------------------
 const https = require('https')
 const http = require('http')
-const axios = require('axios')
+const { get, post } = require('axios')
 
 // -----------------------------------------------------------------------------
 // Internal dependecies
@@ -71,7 +71,7 @@ function doHttpRequest(options, protocol, data) {
 }
 
 exports.httpGet = async (destUrl, authorizationToken) => {
-  const fun = 'directGet'
+  const fun = 'getResquest'
   log.d(mod, fun, ``)
   try {
     const reqOpts = {
@@ -84,7 +84,7 @@ exports.httpGet = async (destUrl, authorizationToken) => {
 
     let answer
     try {
-      answer = await axios.get(destUrl, reqOpts)
+      answer = await get(destUrl, reqOpts)
     } catch (error) {
       log.w(mod, fun, `GET: ${error}`)
       throw error
@@ -140,8 +140,9 @@ exports.httpPost = async (destUrl, dataToSend, authorizationToken) => {
       },
     }
     if (authorizationToken) reqOpts.headers.Authorization = `Bearer ${authorizationToken}`
-
-    const answer = await axios.post(destUrl, dataToSend, reqOpts)
+    // log.d(mod, fun, `reqOpts: ${utils.beautify(reqOpts)}`)
+    // log.d(mod, fun, `authorizationToken: ${utils.beautify(authorizationToken)}`)
+    const answer = await this.directPost(destUrl, dataToSend, reqOpts)
 
     log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
     return answer.data
@@ -165,4 +166,28 @@ exports.httpPost = async (destUrl, dataToSend, authorizationToken) => {
 
   return await doHttpRequest(options, sendOptions.protocol, data)
     */
+}
+
+exports.directPost = async (destUrl, dataToSend, reqOpts) => {
+  const fun = 'directPost'
+  log.d(mod, fun, ``)
+  try {
+    const answer = await post(destUrl, dataToSend, reqOpts)
+    return answer
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
+}
+
+exports.directGet = async (destUrl, reqOpts) => {
+  const fun = 'directGet'
+  log.d(mod, fun, ``)
+  try {
+    const answer = await get(destUrl, reqOpts)
+    return answer
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
 }

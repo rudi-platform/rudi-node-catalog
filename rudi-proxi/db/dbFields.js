@@ -89,6 +89,9 @@ exports.API_DATES_PUBLISHED_PROPERTY = 'published'
 exports.API_REPORT_ID = 'report_id'
 exports.API_REPORT_RESOURCE_ID = 'resource_id'
 exports.API_REPORT_STATUS = 'integration_status'
+exports.LOCAL_REPORT_ERROR = 'report_treatment_error'
+exports.LOCAL_REPORT_ERROR_TYPE = 'error_type'
+exports.LOCAL_REPORT_ERROR_MSG = 'error_message'
 
 // -----------------------------------------------------------------------------
 // SKOS
