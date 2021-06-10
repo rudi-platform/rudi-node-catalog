@@ -109,6 +109,14 @@ ReportSchema.methods.toJSON = function () {
   return _.omit(this.toObject(), FIELDS_TO_SKIP)
 }
 
+
+ReportSchema.pre('save', async function (next) {
+  const fun = 'pre save hook'
+  log.d(mod, fun, ``)
+
+  if(this.version == 'v1') this.version = api.VERSION
+  next()
+}
 // -----------------------------------------------------------------------------
 // Models definition
 // -----------------------------------------------------------------------------

@@ -314,7 +314,6 @@ exports.getMetadataFromPortal = async (metadataId) => {
 
     const token = await this.getPortalToken()
     const reply = await httpGet(portal.getPortalMetaUrl(metadataId), token)
-    // log.d(mod, fun, `reply: ${utils.beautify(reply)}`)
 
     return reply
   } catch (err) {

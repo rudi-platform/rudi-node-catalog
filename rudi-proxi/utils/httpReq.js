@@ -73,27 +73,22 @@ function doHttpRequest(options, protocol, data) {
 exports.httpGet = async (destUrl, authorizationToken) => {
   const fun = 'getResquest'
   log.d(mod, fun, ``)
-  try {
-    const reqOpts = {
-      headers: {
-        'User-Agent': 'Rudi-Producer',
-        'Content-Type': 'application/json',
-      },
-    }
-    if (authorizationToken) reqOpts.headers.Authorization = `Bearer ${authorizationToken}`
 
-    let answer
-    try {
-      answer = await get(destUrl, reqOpts)
-    } catch (error) {
-      log.w(mod, fun, `GET: ${error}`)
-      throw error
-    }
+  const reqOpts = {
+    headers: {
+      'User-Agent': 'Rudi-Producer',
+      'Content-Type': 'application/json',
+    },
+  }
+  if (authorizationToken) reqOpts.headers.Authorization = `Bearer ${authorizationToken}`
+
+  try {
+    const answer = await get(destUrl, reqOpts)
     log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
     return answer.data
-  } catch (err) {
-    log.w(mod, fun, err)
-    throw err
+  } catch (error) {
+    log.w(mod, fun, `GET: ${error}`)
+    throw error
   }
 }
 
