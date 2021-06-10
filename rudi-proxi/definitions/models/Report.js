@@ -18,6 +18,7 @@ const api = require('../../config/confApi')
 
 const Validation = require('../schemaValidators')
 const { FIELDS_TO_SKIP } = require('../../db/dbFields')
+const { beautify } = require('../../utils/jsUtils')
 // const IntegrationStatus = require('../enums/IntegrationStatus')
 
 // -----------------------------------------------------------------------------
@@ -114,9 +115,9 @@ ReportSchema.methods.toJSON = function () {
 
 ReportSchema.pre('save', async function (next) {
   const fun = 'pre save hook'
-  log.d(mod, fun, ``)
-
   if(this.version == 'v1') this.version = api.VERSION
+  log.d(mod, fun, `this: ${beautify(this)}`)
+
   next()
 })
 

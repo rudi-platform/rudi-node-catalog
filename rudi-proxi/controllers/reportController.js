@@ -34,6 +34,7 @@ const {
   LOCAL_REPORT_ERROR,
   LOCAL_REPORT_ERROR_TYPE,
   LOCAL_REPORT_ERROR_MSG,
+  API_REPORT_VERSION,
 } = require('../db/dbFields')
 
 const {
@@ -43,8 +44,9 @@ const {
   QUERY_LIMIT,
   QUERY_OFFSET,
   URL_ACTION_REPORT,
-  URL_OBJECT: URL_OBJECT_GENERIC,
+  URL_OBJECT_GENERIC,
   URL_ACTION_DELETION,
+  VERSION,
 } = require('../config/confApi')
 
 // -----------------------------------------------------------------------------
@@ -66,16 +68,11 @@ exports.addSingleReportForObject = async (req, reply) => {
     const urlObjectId = json.accessReqParam(req, PARAM_ID)
 
     const reportBody = req.body
+    if(reportBody[API_REPORT_VERSION] === 'v1') reportBody[API_REPORT_VERSION] = VERSION
 
     // retrieve body parameters: object id, report id
     const reportId = json.accessProperty(reportBody, API_REPORT_ID)
     const bodyObjectId = json.accessProperty(reportBody, API_REPORT_RESOURCE_ID)
-
-    log.d(
-      mod,
-      fun,
-      `Report for objectType: '${objectType}', report: '${utils.beautify(reportBody)}'`
-    )
 
     // ensure url object id and body object id match
     if (urlObjectId !== bodyObjectId)
@@ -93,13 +90,14 @@ exports.addSingleReportForObject = async (req, reply) => {
     // ensure report doesn't exist
     const existsReport = await db.doesObjectExistWithRudiId(
       URL_ACTION_REPORT,
-      API_REPORT_ID,
       reportId
     )
     if (existsReport) throw new Error(`${msg.objectAlreadyExists(URL_ACTION_REPORT, reportId)}`)
 
     // add new integration report
+    log.d(mod, fun, `add new integration report`)
     const dbReadyReport = await new Report(reportBody)
+    log.d(mod, fun, `save new integration report`)
     await dbReadyReport.save()
     log.i(mod, fun, `Report saved: ${utils.beautify(dbReadyReport)}`)
 
@@ -124,6 +122,7 @@ exports.addOrEditSingleReportForObject = async (req, reply) => {
     const urlObjectId = json.accessReqParam(req, PARAM_ID)
 
     const reportBody = req.body
+    if(reportBody[API_REPORT_VERSION] === 'v1') reportBody[API_REPORT_VERSION] = VERSION
 
     // retrieve body parameters: object id, report id
     const reportId = json.accessProperty(reportBody, API_REPORT_ID)
@@ -134,8 +133,14 @@ exports.addOrEditSingleReportForObject = async (req, reply) => {
       throw new Error(`${msg.parametersMismatch(urlObjectId, bodyObjectId)}`)
 
     // ensure object exists
-    const existsObject = await db.doesObjectExistWithRudiId(objectType, urlObjectId)
-    if (!existsObject) throw new Error(`${msg.objectNotFound(objectType, urlObjectId)}`)
+    const dbObject = await db.getObjectWithRudiId(objectType, urlObjectId)
+    if (!dbObject) {
+      reportBody[LOCAL_REPORT_ERROR] = {
+        [LOCAL_REPORT_ERROR_TYPE]: 'Object not found',
+        [LOCAL_REPORT_ERROR_MSG]: `The '${objectType}' object concerned by the report was not found`,
+      }
+    }
+    // if (!existsObject) throw new Error(`${msg.objectNotFound(objectType, urlObjectId)}`)
 
     // check if the report exists
     const dbReport = await db.getObjectWithRudiId(URL_ACTION_REPORT, reportId)
