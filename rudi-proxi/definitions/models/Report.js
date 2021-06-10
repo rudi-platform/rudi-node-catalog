@@ -1,5 +1,7 @@
 'use strict'
 
+const mod = 'reportSch'
+
 // -----------------------------------------------------------------------------
 // External dependancies
 // -----------------------------------------------------------------------------
@@ -10,7 +12,7 @@ const _ = require('lodash')
 // -----------------------------------------------------------------------------
 // Internal dependancies
 // -----------------------------------------------------------------------------
-
+const log = require('../../utils/logging')
 const ids = require('../schemas/Identifiers')
 const api = require('../../config/confApi')
 

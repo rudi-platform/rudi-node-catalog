@@ -2437,6 +2437,67 @@
 					"response": []
 				},
 				{
+					"name": "Add report unkown meta",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Create Integration report for unkown metadata\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    console.log(responseJson);",
+									"    const metaId = pm.variables.get('unkownMetaId');",
+									"    const reportId = pm.variables.get('softReport3Id');",
+									"    pm.expect(responseJson.report_id).to.eq(reportId);",
+									"    pm.expect(responseJson.resource_id).to.eq(metaId);",
+									"    pm.expect(responseJson.integration_status).to.eq(\"KO\");",
+									"    pm.expect(responseJson.report_treatment_error.error_type).to.eq(\"Object not found\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set('unkownMetaId', rand.get('{{$randomUUID}}'));",
+									"pm.collectionVariables.set('softReport3Id', rand.get('{{$randomUUID}}'));",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"report_id\": \"{{softReport3Id}}\",\n    \"resource_id\": \"{{unkownMetaId}}\",\n    \"integration_status\": \"KO\",\n    \"version\": \"{{apiVersion}}\",\n    \"comment\": \"test report for unkown metadata\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{unkownMetaId}}/{{reports}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}",
+								"{{unkownMetaId}}",
+								"{{reports}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get all reports (meta 1)",
 					"event": [
 						{
@@ -2745,7 +2806,7 @@
 					"response": []
 				},
 				{
-					"name": "Delete report 1 & 2 (meta 1)",
+					"name": "Delete reports 1, 2 & 3 (meta 1)",
 					"event": [
 						{
 							"listen": "test",
@@ -2754,9 +2815,9 @@
 									"pm.test(\"Delete report 1 & 2\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
-									"    pm.expect(responseJson.n).to.eq(2);",
+									"    pm.expect(responseJson.n).to.eq(3);",
 									"    pm.expect(responseJson.ok).to.eq(1);",
-									"    pm.expect(responseJson.deletedCount).to.eq(2);",
+									"    pm.expect(responseJson.deletedCount).to.eq(3);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2768,7 +2829,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n    \"{{softReport1Id}}\",\n    \"{{softReport2Id}}\"\n]",
+							"raw": "[\n    \"{{softReport1Id}}\",\n    \"{{softReport2Id}}\",\n    \"{{softReport3Id}}\"\n]",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3244,6 +3305,18 @@
 		},
 		{
 			"key": "countWithOrg1",
+			"value": ""
+		},
+		{
+			"key": "unkown",
+			"value": ""
+		},
+		{
+			"key": "unkownMetaId",
+			"value": ""
+		},
+		{
+			"key": "softReport3Id",
 			"value": ""
 		}
 	]
