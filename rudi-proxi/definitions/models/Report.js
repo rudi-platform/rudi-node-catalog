@@ -116,7 +116,8 @@ ReportSchema.pre('save', async function (next) {
 
   if(this.version == 'v1') this.version = api.VERSION
   next()
-}
+})
+
 // -----------------------------------------------------------------------------
 // Models definition
 // -----------------------------------------------------------------------------
