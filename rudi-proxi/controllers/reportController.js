@@ -122,6 +122,7 @@ exports.addOrEditSingleReportForObject = async (req, reply) => {
     const urlObjectId = json.accessReqParam(req, PARAM_ID)
 
     const reportBody = req.body
+    log.v(mod, fun, `new report: ${utils.beautify(reportBody)}`)
     if(reportBody[API_REPORT_VERSION] === 'v1') reportBody[API_REPORT_VERSION] = VERSION
 
     // retrieve body parameters: object id, report id
