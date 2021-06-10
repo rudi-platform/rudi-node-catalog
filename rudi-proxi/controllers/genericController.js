@@ -108,7 +108,7 @@ async function parseQueryParameters(objectType, reqUrl) {
 
   // extract request parameters
   if (reqUrl.indexOf('?') === -1) {
-    log.d(mod, fun, `No parameters found: ${reqUrl}`)
+    log.d(mod, fun, `No question mark was found in url: ${reqUrl}`)
     return returnedFilter
   }
   const reqSearch = reqUrl.substring(reqUrl.indexOf('?'))
@@ -117,7 +117,7 @@ async function parseQueryParameters(objectType, reqUrl) {
 
   // Check if parameters were actually found by URLSearchParams
   if (urlSearchParams.keys().length < 1) {
-    log.d(mod, fun, `No parameters found: ${urlSearchParams}`)
+    log.d(mod, fun, `No parameters found after the question mark: ${urlSearchParams}`)
     return returnedFilter
   }
   for (const [key, value] of urlSearchParams) {

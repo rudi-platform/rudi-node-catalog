@@ -43,7 +43,7 @@ const {
   QUERY_LIMIT,
   QUERY_OFFSET,
   URL_ACTION_REPORT,
-  URL_OBJECT,
+  URL_OBJECT: URL_OBJECT_GENERIC,
   URL_ACTION_DELETION,
 } = require('../config/confApi')
 
@@ -59,7 +59,7 @@ const { Report, IntegrationStatus } = require('../definitions/models/Report')
 // Add a new report for one object integration
 exports.addSingleReportForObject = async (req, reply) => {
   const fun = 'addSingleReportForObject'
-  log.d(mod, fun, `< POST ${URL_OBJECT}/:${PARAM_ID}/${URL_ACTION_REPORT}`)
+  log.d(mod, fun, `< POST ${URL_OBJECT_GENERIC}/:${PARAM_ID}/${URL_ACTION_REPORT}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -117,7 +117,7 @@ exports.addSingleReportForObject = async (req, reply) => {
 // Update an existing report for one object integration
 exports.addOrEditSingleReportForObject = async (req, reply) => {
   const fun = 'addOrEditSingleReportForObject'
-  log.d(mod, fun, `< PUT ${URL_OBJECT}/:${PARAM_ID}/${URL_ACTION_REPORT}`)
+  log.d(mod, fun, `< PUT ${URL_OBJECT_GENERIC}/:${PARAM_ID}/${URL_ACTION_REPORT}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -165,7 +165,7 @@ exports.addOrEditSingleReportForObject = async (req, reply) => {
 // Get every reports for one object integration
 exports.getReportListForObject = async (req, reply) => {
   const fun = 'getReportListForObject'
-  log.d(mod, fun, `< GET ${URL_OBJECT}/:${PARAM_ID}/${URL_ACTION_REPORT}`)
+  log.d(mod, fun, `< GET ${URL_OBJECT_GENERIC}/:${PARAM_ID}/${URL_ACTION_REPORT}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -195,7 +195,7 @@ exports.getReportListForObject = async (req, reply) => {
 // Get every reports for one object integration
 exports.getSingleReportForObject = async (req, reply) => {
   const fun = 'getSingleReportForObject'
-  log.d(mod, fun, `< GET ${URL_OBJECT}/:${PARAM_ID}/${URL_ACTION_REPORT}/:${PARAM_REPORT_ID}`)
+  log.d(mod, fun, `< GET ${URL_OBJECT_GENERIC}/:${PARAM_ID}/${URL_ACTION_REPORT}/:${PARAM_REPORT_ID}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -224,7 +224,7 @@ exports.getSingleReportForObject = async (req, reply) => {
 // Get every reports for one object integration
 exports.deleteSingleReportForObject = async (req, reply) => {
   const fun = 'deleteSingleReportForObject'
-  log.d(mod, fun, `< DELETE ${URL_OBJECT}/:${PARAM_ID}/${URL_ACTION_REPORT}/:${PARAM_REPORT_ID}`)
+  log.d(mod, fun, `< DELETE ${URL_OBJECT_GENERIC}/:${PARAM_ID}/${URL_ACTION_REPORT}/:${PARAM_REPORT_ID}`)
   try {
     // retrieve url parameters: object id
     // retrieve body parameters: report id
@@ -243,7 +243,7 @@ exports.deleteSingleReportForObject = async (req, reply) => {
 // Get every reports for one object integration
 exports.deleteEveryReportForObject = async (req, reply) => {
   const fun = 'deleteEveryReportForObject'
-  log.d(mod, fun, `< DELETE ${URL_OBJECT}/:${PARAM_ID}/${URL_ACTION_REPORT}`)
+  log.d(mod, fun, `< DELETE ${URL_OBJECT_GENERIC}/:${PARAM_ID}/${URL_ACTION_REPORT}`)
   try {
     // retrieve url parameters: object id
 
@@ -260,7 +260,7 @@ exports.deleteEveryReportForObject = async (req, reply) => {
 // Get every reports for one object integration
 exports.deleteManyReportForObject = async (req, reply) => {
   const fun = 'deleteManyReportForObject'
-  log.d(mod, fun, `< POST ${URL_OBJECT}/:${PARAM_ID}/${URL_ACTION_REPORT}/${URL_ACTION_DELETION}`)
+  log.d(mod, fun, `< POST ${URL_OBJECT_GENERIC}/:${PARAM_ID}/${URL_ACTION_REPORT}/${URL_ACTION_DELETION}`)
   try {
     // retrieve url parameters: object id
 
@@ -277,7 +277,7 @@ exports.deleteManyReportForObject = async (req, reply) => {
 // Get every reports for one object integration
 exports.getReportListForObjectType = async (req, reply) => {
   const fun = 'getReportListForObjectType'
-  log.d(mod, fun, `< GET ${URL_OBJECT}/${URL_ACTION_REPORT}`)
+  log.d(mod, fun, `< GET ${URL_OBJECT_GENERIC}/${URL_ACTION_REPORT}`)
   try {
     // delete every integration report for all objects
     return `Function '${fun}' still needs to be implemented in module ${mod}`
