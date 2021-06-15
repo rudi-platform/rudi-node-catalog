@@ -86,6 +86,7 @@ const Keywords = require('../definitions/thesaurus/Themes')
 const organisationController = require('./organizationController')
 const contactController = require('./contactController')
 const licenceController = require('./licenceController')
+const portalController = require('./portalController')
 
 // -----------------------------------------------------------------------------
 // Atomic treatments of properties: RUDI -> DB
@@ -173,9 +174,9 @@ exports.mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFound) 
 }
 
 function customMerger(value, srcValue, key, object, source) {
-  const fun ='customMerger'
+  const fun = 'customMerger'
   log.v(mod, fun, `'${key}': ${utils.beautify(srcValue)} -> ${utils.beautify(value)}`)
-  if(_.isArray(srcValue)) return srcValue
+  if (_.isArray(srcValue)) return srcValue
   return undefined
   // switch(key){
   //   case API_METADATA_ID: return
@@ -190,21 +191,21 @@ async function metadataCustomMerge(dbMetadata, dbReadyModMetadata) {
   log.d(mod, fun, ``)
   // log.d(mod, fun, `dbMetadata: ${utils.beautify(dbMetadata)}`)
 
-//   const dataDates = dbMetadata[API_DATA_DATES_PROPERTY]
-//   const metaDates = dbMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY]
-//  const modDataDates = dbReadyModMetadata[API_DATA_DATES_PROPERTY]
-//   const modMetaDates = !dbReadyModMetadata[API_METAINFO_PROPERTY]
-//     ? {}
-//     : dbReadyModMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY]
-  
-//   _.extend(dataDates, modDataDates)
-//   _.extend(metaDates, modMetaDates)
- 
+  //   const dataDates = dbMetadata[API_DATA_DATES_PROPERTY]
+  //   const metaDates = dbMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY]
+  //  const modDataDates = dbReadyModMetadata[API_DATA_DATES_PROPERTY]
+  //   const modMetaDates = !dbReadyModMetadata[API_METAINFO_PROPERTY]
+  //     ? {}
+  //     : dbReadyModMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY]
+
+  //   _.extend(dataDates, modDataDates)
+  //   _.extend(metaDates, modMetaDates)
+
   await _.mergeWith(dbMetadata, dbReadyModMetadata, customMerger)
 
   // dbMetadata[API_DATA_DATES_PROPERTY] = dataDates
   // dbMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY] = metaDates
- 
+
   // log.d(mod, fun, `dbMetadata updated: ${utils.beautify(dbMetadata)}`)
   return dbMetadata
 }
@@ -481,7 +482,7 @@ exports.newMetadata = async (rudiMetadata) => {
     throw err
   }
   try {
-    await await dbMetadata.save()
+    await dbMetadata.save()
   } catch (err) {
     log.w(
       mod,
@@ -490,6 +491,7 @@ exports.newMetadata = async (rudiMetadata) => {
     )
     throw err
   }
+  this.sendToPortal(dbMetadata)
   return dbMetadata
   // return this.dbMetadataToRudi(dbMetadata)
 }
@@ -515,55 +517,29 @@ exports.updateMetadata = async (incomingRudiMetadata) => {
   // Backing up existing dates ('dataset_dates' and 'metadata_info.meadatada_dates' properties)
 
   await metadataCustomMerge(dbMetadata, dbReadyEditedMetadata)
-
   log.d(mod, fun, `modified metadata: ${utils.beautify(dbMetadata)}`)
 
   const reply = await dbMetadata.save()
-
   log.d(mod, fun, `metadata saved: ${utils.beautify(reply)}`)
+
+  this.sendToPortal(dbMetadata)
+
   return reply
+}
 
-  /*
-
-  // Updating 'dataset_dates' field with changed ones while keeping other dates
-  const updatedDataDates = dbReadyEditedMetadata[API_DATA_DATES_PROPERTY]
-  log.d(mod, fun, `updatedDataDates: ${utils.beautify(updatedDataDates)}`)
-
-  if (!updatedDataDates) {
-    dbReadyEditedMetadata[API_DATA_DATES_PROPERTY] = existingDataDates
-  } else {
-    let dataDates = utils.deepClone(existingDataDates)
-    for (let [dateField, refDate] of Object.entries(updatedDataDates)) {
-      dataDates[dateField] = refDate
-    }
-    dbReadyEditedMetadata[API_DATA_DATES_PROPERTY] = dataDates
+exports.sendToPortal = async (metadata) => {
+  const fun = 'sendToPortal'
+  if (!metadata.init || utils.isNotEmptyArray(metadata.purpose)) {
+    log.d(mod, fun, `Not sending to portal: ${metadata[API_METADATA_ID]}}`)
+    return
   }
-
-  // Updating 'metadata_info.metadata_dates' field with changed ones while keeping other dates
-  // Special :
-  // - 'metadata_info.reference_dates.created' must not be updated!
-  // - 'metadata_info.reference_dates.updated' must be updated!
-  const existingMetaDates = dbMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY]
-  const existingMetaCreateDate = existingMetaDates[API_DATES_CREATED_PROPERTY]
-  const updatedMetaDates = dbReadyEditedMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY]
-
-  let metaDates = utils.deepClone(existingMetaDates)
-  for (let [dateField, refDate] of Object.entries(updatedMetaDates)) {
-    // - 'metadata_info.reference_dates.created' must not be updated!
-    if (dateField == API_DATES_CREATED_PROPERTY) continue // metainfo 'created' should stay immutable
-    metaDates[dateField] = refDate
+  try {
+    log.v(mod, fun, `Sending to portal: ${metadata[API_METADATA_ID]}}`)
+    await portalController.sendMetadataToPortal(metadata[API_METADATA_ID])
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
   }
-  dbReadyEditedMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY] = metaDates
-  // - 'metadata_info.reference_dates.updated' must be updated!
-  this.setEditDateInRudiObject(dbReadyEditedMetadata) // metainfo 'updated' is updated to now
-
-  log.d(mod, fun, `DB ready object: ${utils.beautify(dbReadyEditedMetadata)}`)
-
-  const completeRudiMetadata = await this.dbToRudiFormat(dbReadyEditedMetadata)
-  log.d(mod, fun, `returned object: ${utils.beautify(completeRudiMetadata)}`)
-
-  return completeRudiMetadata
-   */
 }
 
 exports.init = async (req, reply) => {
@@ -601,4 +577,3 @@ exports.init = async (req, reply) => {
   )
   return 'Initialization initiated'
 }
-
