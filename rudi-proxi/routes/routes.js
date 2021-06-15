@@ -297,7 +297,12 @@ exports.backOfficeRoutes = [
     // preHandler: logRequest,
     handler: licenceController.getAllLicenceCodes,
   },
-
+  {
+    method: 'GET',
+    url: `${URL_LICENCE_ACCESS}/init`,
+    // preHandler: logRequest,
+    handler: licenceController.init,
+  },
   // -----------------------------------------------------------------------------
   // (distant dev) Route for accessing
   // -----------------------------------------------------------------------------

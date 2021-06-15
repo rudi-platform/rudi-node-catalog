@@ -178,7 +178,7 @@ exports.createConceptHierarchy = async (listConcepts, schemeDbId, parentConcept)
   await Promise.all(
     listConcepts.map(async (conceptJson) => {
       let dbConcept = db.getConceptWithJson(conceptJson)
-      log.d(mod, fun, `dbConcept: ${utils.beautify(dbConcept)}`)
+      // log.d(mod, fun, `dbConcept: ${utils.beautify(dbConcept)}`)
 
       if (utils.isNotEmptyObject(dbConcept)) {
         // log.d(mod, fun, `Concept already created: ${utils.beautify(dbConcept[API_SKOS_CONCEPT_ID])} `)

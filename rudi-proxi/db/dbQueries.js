@@ -222,7 +222,7 @@ exports.getCollections = async () => {
 }
 
 exports.dropDB = async () => {
-  const fun = `cleanDb`
+  const fun = `dropDB`
   try {
     /* Drop the whole DB !!! */
     const dbActionResult = await mongoose.connection.db.dropDatabase()
@@ -233,6 +233,42 @@ exports.dropDB = async () => {
     throw err
   }
 }
+
+exports.cleanLicences = async () => {
+  const fun = `cleanLicences`
+
+  const CONCEPTS_COLLECTION_NAME = 'skosconcepts'
+  const SCHEMES_COLLECTION_NAME = 'skosschemes'
+
+  try {
+    // TODO: target only licences hierarchy!
+    await dropCollection(CONCEPTS_COLLECTION_NAME)
+    await dropCollection(SCHEMES_COLLECTION_NAME)
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
+}
+
+async function dropCollection(collectionName) {
+  const fun = `dropCollection`
+  try {
+    const listCollections = await mongoose.connection.db.listCollections().toArray()
+    // log.d(mod, fun, `listCollections: ${utils.beautify(listCollections)}`)
+    for (const collection of listCollections) {
+      if (collection.name === collectionName) {
+        await mongoose.connection.db.dropCollection(collectionName)
+        log.d(mod, fun, `Dropped collection '${collectionName}'`)
+        return true
+      }
+    }
+    log.d(mod, fun, `Collection '${collectionName}' was not found`)
+    return false
+  } catch (err) {
+    log.w(mod, fun, err)
+  }
+}
+
 // -----------------------------------------------------------------------------
 // Generic functions: get single object
 // -----------------------------------------------------------------------------
@@ -1225,9 +1261,7 @@ exports.getAllConceptsWithRole = async (conceptRole) => {
 // ----------------------------------------
 // - SKOS: Thesaurus (temp)
 // ----------------------------------------
-exports.storeThesaurus = async (typeThesaurus, listValues) => {
-  
-}
+exports.storeThesaurus = async (typeThesaurus, listValues) => {}
 
 // ----------------------------------------
 // - Filters

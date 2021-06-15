@@ -47,12 +47,10 @@ exports.getLicences = async () => {
     log.d(mod, fun, `Init LICENCE_LIST`)
     let dblicenceList = await db.getAllConceptsWithRole(this.LicenceConceptRole)
     if (utils.isEmptyArray(dblicenceList)) {
-      await initLicences()
+      await this.initLicences()
       dblicenceList = await db.getAllConceptsWithRole(this.LicenceConceptRole)
     }
-    this.LICENCE_LIST = await skosController.dbConceptListToRudiRecursive(
-      dblicenceList
-    )
+    this.LICENCE_LIST = await skosController.dbConceptListToRudiRecursive(dblicenceList)
   }
   return this.LICENCE_LIST
 }
@@ -63,18 +61,17 @@ exports.getLicenceCodes = async () => {
     const licenceList = await this.getLicences()
     // log.d(mod, fun, `licence list: ${utils.beautify(licenceList)}`)
 
-    this.LICENCE_CODE_LIST = await licenceList.map(
-      (obj) => obj[API_SKOS_CONCEPT_CODE]
-    )
+    this.LICENCE_CODE_LIST = await licenceList.map((obj) => obj[API_SKOS_CONCEPT_CODE])
   }
   // log.d(mod, fun, `licence codes: ${utils.beautify(this.LICENCE_CODE_LIST)}`)
   return this.LICENCE_CODE_LIST
 }
 
-async function initLicences() {
+exports.initLicences = async () => {
   const fun = 'initlicences'
-  log.v(mod, fun, `${LICENCE_POST_ADDRESS}`)
+  // log.v(mod, fun, `${LICENCE_POST_ADDRESS}`)
   try {
+    await db.cleanLicences()
     const licenceStr = JSON.stringify(require(LICENCES_FILE))
     const licenceData = JSON.parse(
       licenceStr.replace(/\{\{\w+\}\}/g, function (matched) {
@@ -85,14 +82,18 @@ async function initLicences() {
     const res = await directPost(LICENCE_POST_ADDRESS, licenceData)
     if (res.status === 200) {
       log.d(mod, fun, `Integration done`)
+      return await this.getLicenceCodes()
     } else {
       throw new Error(`Licence integration failed`)
     }
     // log.d(mod, fun, `Body: ${utils.beautify(res.data)}`)
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
+    throw err
   }
 }
+
+
 // -----------------------------------------------------------------------------
 // Controller
 // -----------------------------------------------------------------------------
@@ -115,5 +116,5 @@ exports.getAllLicenceCodes = async (req, reply) => {
 exports.init = async (req, reply) => {
   const fun = `init`
   log.v(mod, fun, ``)
-  await initLicences()
+  return await this.initLicences()
 }
