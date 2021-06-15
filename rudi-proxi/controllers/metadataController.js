@@ -529,7 +529,7 @@ exports.updateMetadata = async (incomingRudiMetadata) => {
 
 exports.sendToPortal = async (metadata) => {
   const fun = 'sendToPortal'
-  if (!metadata.init || utils.isNotEmptyArray(metadata.purpose)) {
+  if (metadata.init || utils.isNotEmptyArray(metadata.purpose)) {
     log.d(mod, fun, `Not sending to portal: ${metadata[API_METADATA_ID]}}`)
     return
   }
