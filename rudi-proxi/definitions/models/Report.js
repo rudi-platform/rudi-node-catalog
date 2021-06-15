@@ -60,13 +60,13 @@ const ReportSchema = new mongoose.Schema(
     version: {
       type: String,
       required: true,
-      match: Validation.API_VERSION,
+      // match: Validation.API_VERSION,
     },
 
     // State of the integration of the resource in the Portal
     integration_status: {
       type: String,
-      enum: Object.values(this.IntegrationStatus),
+      // enum: Object.values(this.IntegrationStatus),
     },
 
     // Comment on the state of the integration of the resource in the
@@ -81,8 +81,9 @@ const ReportSchema = new mongoose.Schema(
       type: [
         {
           error_code: {
-            type: Int32,
-            min: 0,
+            type: String,
+            // type: Int32,
+            // min: 0,
             required: true,
           },
           error_message: {
