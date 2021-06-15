@@ -72,6 +72,7 @@ exports.initLicences = async () => {
   // log.v(mod, fun, `${LICENCE_POST_ADDRESS}`)
   try {
     await db.cleanLicences()
+    LICENCE_CODE_LIST = null
     const licenceStr = JSON.stringify(require(LICENCES_FILE))
     const licenceData = JSON.parse(
       licenceStr.replace(/\{\{\w+\}\}/g, function (matched) {

@@ -274,7 +274,7 @@ async function dropCollection(collectionName) {
 // -----------------------------------------------------------------------------
 exports.getObject = async (objectType, filter) => {
   const fun = `getObject`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
 
   try {
     const Model = this.getObjectModel(objectType)
