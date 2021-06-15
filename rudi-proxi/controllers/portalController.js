@@ -21,6 +21,8 @@ const { httpGet, httpPost, directPost, directGet } = require('../utils/httpReq')
 const validate = require('../definitions/schemaValidators')
 const json = require('../utils/jsonAccess')
 
+const {Metadata} = require('../definitions/models/Metadata')
+
 // -----------------------------------------------------------------------------
 // Token manager
 // -----------------------------------------------------------------------------
@@ -320,4 +322,9 @@ exports.getMetadataFromPortal = async (metadataId) => {
     log.w(mod, fun, err)
     throw err
   }
+}
+
+
+exports.convertToPortalFormat = (metadata) => {
+  // metadata[]
 }

@@ -35,6 +35,7 @@ const {
   LOCAL_REPORT_ERROR_TYPE,
   LOCAL_REPORT_ERROR_MSG,
   API_REPORT_VERSION,
+  API_REPORT_ERRORS,
 } = require('../db/dbFields')
 
 const {
@@ -55,6 +56,19 @@ const {
 const { Report, IntegrationStatus } = require('../definitions/models/Report')
 
 // -----------------------------------------------------------------------------
+// Comformity functions
+// -----------------------------------------------------------------------------
+function toRudi(reportBody) {
+  if (reportBody[API_REPORT_VERSION] === 'v1') {
+    reportBody[API_REPORT_VERSION] = VERSION
+  }
+  if (!reportBody[API_REPORT_ERRORS] && !!reportBody.errors) {
+    reportBody[API_REPORT_ERRORS] = reportBody.errors
+  }
+  return reportBody
+}
+
+// -----------------------------------------------------------------------------
 // Controllers: integration report for any object
 // -----------------------------------------------------------------------------
 
@@ -67,8 +81,7 @@ exports.addSingleReportForObject = async (req, reply) => {
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
     const urlObjectId = json.accessReqParam(req, PARAM_ID)
 
-    const reportBody = req.body
-    if(reportBody[API_REPORT_VERSION] === 'v1') reportBody[API_REPORT_VERSION] = VERSION
+    const reportBody = toRudi(req.body)
 
     // retrieve body parameters: object id, report id
     const reportId = json.accessProperty(reportBody, API_REPORT_ID)
@@ -88,10 +101,7 @@ exports.addSingleReportForObject = async (req, reply) => {
     }
 
     // ensure report doesn't exist
-    const existsReport = await db.doesObjectExistWithRudiId(
-      URL_ACTION_REPORT,
-      reportId
-    )
+    const existsReport = await db.doesObjectExistWithRudiId(URL_ACTION_REPORT, reportId)
     if (existsReport) throw new Error(`${msg.objectAlreadyExists(URL_ACTION_REPORT, reportId)}`)
 
     // add new integration report
@@ -121,9 +131,8 @@ exports.addOrEditSingleReportForObject = async (req, reply) => {
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
     const urlObjectId = json.accessReqParam(req, PARAM_ID)
 
-    const reportBody = req.body
-    log.v(mod, fun, `new report: ${utils.beautify(reportBody)}`)
-    if(reportBody[API_REPORT_VERSION] === 'v1') reportBody[API_REPORT_VERSION] = VERSION
+    const reportBody = toRudi(req.body)
+    // log.v(mod, fun, `new report: ${utils.beautify(reportBody)}`)
 
     // retrieve body parameters: object id, report id
     const reportId = json.accessProperty(reportBody, API_REPORT_ID)
@@ -201,7 +210,11 @@ exports.getReportListForObject = async (req, reply) => {
 // Get every reports for one object integration
 exports.getSingleReportForObject = async (req, reply) => {
   const fun = 'getSingleReportForObject'
-  log.d(mod, fun, `< GET ${URL_OBJECT_GENERIC}/:${PARAM_ID}/${URL_ACTION_REPORT}/:${PARAM_REPORT_ID}`)
+  log.d(
+    mod,
+    fun,
+    `< GET ${URL_OBJECT_GENERIC}/:${PARAM_ID}/${URL_ACTION_REPORT}/:${PARAM_REPORT_ID}`
+  )
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -230,7 +243,11 @@ exports.getSingleReportForObject = async (req, reply) => {
 // Get every reports for one object integration
 exports.deleteSingleReportForObject = async (req, reply) => {
   const fun = 'deleteSingleReportForObject'
-  log.d(mod, fun, `< DELETE ${URL_OBJECT_GENERIC}/:${PARAM_ID}/${URL_ACTION_REPORT}/:${PARAM_REPORT_ID}`)
+  log.d(
+    mod,
+    fun,
+    `< DELETE ${URL_OBJECT_GENERIC}/:${PARAM_ID}/${URL_ACTION_REPORT}/:${PARAM_REPORT_ID}`
+  )
   try {
     // retrieve url parameters: object id
     // retrieve body parameters: report id
@@ -266,7 +283,11 @@ exports.deleteEveryReportForObject = async (req, reply) => {
 // Get every reports for one object integration
 exports.deleteManyReportForObject = async (req, reply) => {
   const fun = 'deleteManyReportForObject'
-  log.d(mod, fun, `< POST ${URL_OBJECT_GENERIC}/:${PARAM_ID}/${URL_ACTION_REPORT}/${URL_ACTION_DELETION}`)
+  log.d(
+    mod,
+    fun,
+    `< POST ${URL_OBJECT_GENERIC}/:${PARAM_ID}/${URL_ACTION_REPORT}/${URL_ACTION_DELETION}`
+  )
   try {
     // retrieve url parameters: object id
 

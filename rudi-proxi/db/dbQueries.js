@@ -1223,6 +1223,13 @@ exports.getAllConceptsWithRole = async (conceptRole) => {
 }
 
 // ----------------------------------------
+// - SKOS: Thesaurus (temp)
+// ----------------------------------------
+exports.storeThesaurus = async (typeThesaurus, listValues) => {
+  
+}
+
+// ----------------------------------------
 // - Filters
 // ----------------------------------------
 exports.findNotReferencedInMetadata = (objectType) => {

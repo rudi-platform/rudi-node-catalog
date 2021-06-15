@@ -78,10 +78,14 @@ const licenceController = require('../../controllers/licenceController')
 // Thesaurus definiitons
 // -----------------------------------------------------------------------------
 const Languages = require('../thesaurus/Languages')
-const Keywords = require('../thesaurus/Keywords')
-const Themes = require('../thesaurus/Themes')
 const Projections = require('../thesaurus/Projections')
 const StorageStatus = require('../thesaurus/StorageStatus')
+
+const Keywords = require('../thesaurus/Keywords')
+const Themes = require('../thesaurus/Themes')
+// import { Keywords } from '../definitions/thesaurus/Keywords'
+// import { Themes } from '../definitions/thesaurus/Themes'
+
 
 // -----------------------------------------------------------------------------
 // Validators
@@ -613,6 +617,13 @@ async function checkThesaurus(metadata, next) {
 // -----------------------------------------------------------------------------
 // Schema refinements
 // -----------------------------------------------------------------------------
+
+// ----- Conversion to Portal format
+MetadataSchema.methods.toPortalFormat = function () {
+  const metadata = this.toJSON()
+  delete metadata.geography.geographic_distribution
+  metadata.metadata_info.api_version = 'v1'
+}
 
 // ----- toJSON cleanup
 MetadataSchema.methods.toJSON = function () {

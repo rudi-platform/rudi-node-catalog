@@ -18,7 +18,7 @@
                 "email": "feya@irisa.fr"
             }
         ],
-        "api_version": "1.1.0",
+        "api_version": "1.2.0",
         "metadata_provider": {
             "organization_id": "25a8ea2b-13c5-4140-bc09-a60ba255fda7",
             "organization_name": "UR1",

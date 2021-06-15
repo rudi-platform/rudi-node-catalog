@@ -33,22 +33,23 @@ const SkosConcept = require('../definitions/models/SkosConcept')
 // -----------------------------------------------------------------------------
 // Thesauri
 // -----------------------------------------------------------------------------
-const Encodings = require('../definitions/thesaurus/Encodings').get()
-const FileTypes = require('../definitions/thesaurus/FileTypes').get()
-const HashAlgorithms = require('../definitions/thesaurus/HashAlgorithms').get()
-const Keywords = require('../definitions/thesaurus/Keywords').get()
-const Languages = require('../definitions/thesaurus/Languages').get()
-const Projections = require('../definitions/thesaurus/Projections').get()
-const Themes = require('../definitions/thesaurus/Themes').get()
+const Encodings = require('../definitions/thesaurus/Encodings')
+const FileTypes = require('../definitions/thesaurus/FileTypes')
+const HashAlgorithms = require('../definitions/thesaurus/HashAlgorithms')
+const Languages = require('../definitions/thesaurus/Languages')
+const Projections = require('../definitions/thesaurus/Projections')
+
+const Themes = require('../definitions/thesaurus/Themes')
+const Keywords = require('../definitions/thesaurus/Keywords')
 
 const THESAURI = {
-  encodings: Encodings,
-  filetypes: FileTypes,
-  hashalgorithms: HashAlgorithms,
-  keywords: Keywords,
-  languages: Languages,
-  projections: Projections,
-  themes: Themes,
+  encodings: Encodings.get(),
+  filetypes: FileTypes.get(),
+  hashalgorithms: HashAlgorithms.get(),
+  keywords: Keywords.get(),
+  languages: Languages.get(),
+  projections: Projections.get(),
+  themes: Themes.get(),
 }
 
 // -----------------------------------------------------------------------------
@@ -101,12 +102,9 @@ exports.newSkosScheme = async (rudiScheme) => {
   const fun = 'newScheme'
   log.d(mod, fun, ``)
 
-  if (!rudiScheme)
-    throw new Error(`${msg.parameterExpected(fun, 'rudiScheme')}`)
+  if (!rudiScheme) throw new Error(`${msg.parameterExpected(fun, 'rudiScheme')}`)
 
-  const topConcepts = await utils.deepClone(
-    rudiScheme[API_SCHEME_TOPS_PROPERTY]
-  )
+  const topConcepts = await utils.deepClone(rudiScheme[API_SCHEME_TOPS_PROPERTY])
 
   delete rudiScheme[API_SCHEME_TOPS_PROPERTY]
 
@@ -149,10 +147,9 @@ exports.dbSchemeToRudi = async (dbScheme) => {
     })
     .execPopulate()
 
-  rudiScheme[API_SCHEME_TOPS_PROPERTY] =
-    await this.dbConceptListToRudiRecursive(
-      rudiScheme[API_SCHEME_TOPS_PROPERTY]
-    )
+  rudiScheme[API_SCHEME_TOPS_PROPERTY] = await this.dbConceptListToRudiRecursive(
+    rudiScheme[API_SCHEME_TOPS_PROPERTY]
+  )
   // log.d(mod, fun, `rudiScheme: ${rudiScheme}`)
 
   return rudiScheme
@@ -168,19 +165,13 @@ exports.dbSchemeToRudi = async (dbScheme) => {
  * @param {The current Scheme class object ID} schemeDbId
  * @returns
  */
-exports.createConceptHierarchy = async (
-  listConcepts,
-  schemeDbId,
-  parentConcept
-) => {
+exports.createConceptHierarchy = async (listConcepts, schemeDbId, parentConcept) => {
   const fun = 'createConceptHierarchy'
   // log.d(mod, fun, ``)
 
   // Check input parameters
-  if (!listConcepts)
-    throw new Error(`${msg.parameterExpected(fun, 'listConcepts')}`)
-  if (!schemeDbId)
-    throw new Error(`${msg.parameterExpected(fun, 'schemeDbId')}`)
+  if (!listConcepts) throw new Error(`${msg.parameterExpected(fun, 'listConcepts')}`)
+  if (!schemeDbId) throw new Error(`${msg.parameterExpected(fun, 'schemeDbId')}`)
 
   // Create all concept in the list
   const conceptDbIds = []
@@ -197,17 +188,13 @@ exports.createConceptHierarchy = async (
         // Backup reference lists
         let conceptChildren = []
         if (utils.isNotEmptyArray(conceptJson[API_CONCEPT_CHILDREN_PROPERTY])) {
-          conceptChildren = utils.deepClone(
-            conceptJson[API_CONCEPT_CHILDREN_PROPERTY]
-          )
+          conceptChildren = utils.deepClone(conceptJson[API_CONCEPT_CHILDREN_PROPERTY])
         }
 
         // Remove references to other concepts
-        PROPERTIES_WITH_CONCEPT_REFS.forEach(
-          (propertyReferencingOtherconcepts) => {
-            delete conceptJson[propertyReferencingOtherconcepts]
-          }
-        )
+        PROPERTIES_WITH_CONCEPT_REFS.forEach((propertyReferencingOtherconcepts) => {
+          delete conceptJson[propertyReferencingOtherconcepts]
+        })
 
         // Ensure the current scheme is the one referenced in the class property
         conceptJson[API_CONCEPT_CLASS_PROPERTY] = schemeDbId
@@ -306,16 +293,10 @@ exports.setDbScheme = async (rudiConcept, inSchemeDbId) => {
   let schemeDbId
   if (!inSchemeDbId) {
     // Retrieveing Scheme information
-    const conceptScheme = json.accessProperty(
-      rudiConcept,
-      API_CONCEPT_CLASS_PROPERTY
-    )
+    const conceptScheme = json.accessProperty(rudiConcept, API_CONCEPT_CLASS_PROPERTY)
     schemeDbId = rudiConcept[API_CONCEPT_CLASS_PROPERTY][DB_ID]
     if (!schemeDbId) {
-      const schemeRudiId = json.accessProperty(
-        conceptScheme,
-        API_SKOS_SCHEME_ID
-      )
+      const schemeRudiId = json.accessProperty(conceptScheme, API_SKOS_SCHEME_ID)
       schemeDbId = await db.getEnsuredSchemeDbIdWithRudiId(schemeRudiId)
     }
     // log.d(mod, fun, `schemeDbId: ${schemeDbId}`)
@@ -345,20 +326,13 @@ exports.setDbConceptRefs = async (rudiConcept, prop) => {
 
       if (!refConceptDbId) {
         // The property isn't already a DB object : let's fetch it
-        const refConceptRudiId = json.accessProperty(
-          referencedConcept,
-          API_SKOS_CONCEPT_ID
-        )
+        const refConceptRudiId = json.accessProperty(referencedConcept, API_SKOS_CONCEPT_ID)
         log.d(mod, fun, `refConceptRudiId: ${refConceptRudiId}`)
         refConceptDbId = await db.getConceptDbIdWithRudiId(refConceptRudiId)
         log.d(mod, fun, `refConceptDbId: ${refConceptDbId}`)
       }
       if (!refConceptDbId) {
-        log.w(
-          mod,
-          fun,
-          `Referenced concept not created: ${utils.beautify(referencedConcept)}`
-        )
+        log.w(mod, fun, `Referenced concept not created: ${utils.beautify(referencedConcept)}`)
         // TODO: throw an error here?
       } else {
         log.d(mod, fun, `refConceptDbId: ${refConceptDbId}`)
@@ -434,10 +408,9 @@ exports.dbConceptToRudiRecursive = async (dbConcept) => {
     })
     .execPopulate()
 
-  rudiConcept[API_CONCEPT_CHILDREN_PROPERTY] =
-    await this.dbConceptListToRudiRecursive(
-      rudiConcept[API_CONCEPT_CHILDREN_PROPERTY]
-    )
+  rudiConcept[API_CONCEPT_CHILDREN_PROPERTY] = await this.dbConceptListToRudiRecursive(
+    rudiConcept[API_CONCEPT_CHILDREN_PROPERTY]
+  )
   // log.d(mod, fun, `rudiConcept: ${utils.beautify(rudiConcept)}`)
 
   return rudiConcept
@@ -500,9 +473,7 @@ exports.getSingleThesaurus = (req, reply) => {
     const thesaurus = this.getThesaurus(thesaurusCode)
     if (!thesaurus)
       throw new Error(
-        `Thesaurus not found for such required code: ${utils.beautify(
-          thesaurusCode
-        )}`
+        `Thesaurus not found for such required code: ${utils.beautify(thesaurusCode)}`
       )
     return thesaurus
   } catch (err) {

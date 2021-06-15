@@ -19,7 +19,7 @@ const json = require('../utils/jsonAccess')
 
 const db = require('../db/dbQueries')
 const api = require('../config/confApi')
-const { httpPost } = require('../utils/httpReq')
+const { httpPost, directPost } = require('../utils/httpReq')
 
 const { API_SKOS_CONCEPT_CODE } = require('../db/dbFields')
 
@@ -30,6 +30,7 @@ const skosController = require('./skosController')
 exports.LicenceSchemeCode = 'software_licences'
 exports.LicenceConceptRole = 'licence'
 
+const LICENCES_FILE = `../api/licences.json`
 const LICENCE_POST_ADDRESS = `${sys.getHost()}${api.URL_PREFIX_PUBLIC}/${
   api.URL_OBJECT_SKOS_SCHEME
 }`
@@ -45,7 +46,7 @@ exports.getLicences = async () => {
   if (!this.LICENCE_LIST) {
     log.d(mod, fun, `Init LICENCE_LIST`)
     let dblicenceList = await db.getAllConceptsWithRole(this.LicenceConceptRole)
-    if (!utils.isNotEmptyArray(dblicenceList)) {
+    if (utils.isEmptyArray(dblicenceList)) {
       await initLicences()
       dblicenceList = await db.getAllConceptsWithRole(this.LicenceConceptRole)
     }
@@ -74,14 +75,14 @@ async function initLicences() {
   const fun = 'initlicences'
   log.v(mod, fun, `${LICENCE_POST_ADDRESS}`)
   try {
-    const licenceStr = JSON.stringify(require(`../api/licences.json`))
+    const licenceStr = JSON.stringify(require(LICENCES_FILE))
     const licenceData = JSON.parse(
       licenceStr.replace(/\{\{\w+\}\}/g, function (matched) {
         return uuid.v4()
       })
     )
     // log.d(mod, fun, licenceData)
-    const res = await httpPost(LICENCE_POST_ADDRESS, licenceData)
+    const res = await directPost(LICENCE_POST_ADDRESS, licenceData)
     if (res.status === 200) {
       log.d(mod, fun, `Integration done`)
     } else {
