@@ -10,7 +10,7 @@ const StorageStatus = ['online', 'archived', 'unavailable']
 // -----------------------------------------------------------------------------
 let Thesaurus = StorageStatus
 
-exports.init = (arg) => {
+exports.initialize = (arg) => {
   if (arg) Thesaurus = []
 }
 

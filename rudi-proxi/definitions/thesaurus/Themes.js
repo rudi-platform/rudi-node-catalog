@@ -58,7 +58,7 @@ const Themes = [
 // -----------------------------------------------------------------------------
 let Thesaurus = Themes
 
-exports.init = (arg) => {
+exports.initialize = (arg) => {
   if (arg) Thesaurus = []
 }
 

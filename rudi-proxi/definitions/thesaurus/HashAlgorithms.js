@@ -12,7 +12,7 @@ const HashAlgorithms = ['MD5', 'SHA-256', 'SHA-512']
 // -----------------------------------------------------------------------------
 let Thesaurus = HashAlgorithms
 
-exports.init = (arg) => {
+exports.initialize = (arg) => {
   if (arg) Thesaurus = []
 }
 

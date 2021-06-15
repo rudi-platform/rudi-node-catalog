@@ -118,3 +118,8 @@ exports.API_CONCEPT_PARENTS_PROPERTY = 'broader_concepts'
 exports.API_CONCEPT_CHILDREN_PROPERTY = 'narrower_concepts'
 exports.API_CONCEPT_SIBLINGS_PROPERTY = 'siblings_concepts'
 exports.API_CONCEPT_RELATIVE_PROPERTY = 'relative_concepts'
+
+// -----------------------------------------------------------------------------
+// Classification
+// -----------------------------------------------------------------------------
+exports.API_COLLECTION_TAG = 'collection_tag'

@@ -45,6 +45,8 @@ const {
 
   FIELDS_TO_SKIP,
   API_DATA_DATES_PROPERTY,
+  API_METADATA_ID,
+  API_COLLECTION_TAG,
 } = require('../../db/dbFields')
 
 const log = require('../../utils/logging')
@@ -566,15 +568,15 @@ async function checkLicence(metadata) {
 async function checkThesaurus(metadata, next) {
   const fun = 'checkThesaurus'
   // if (metadata.init) log.d(mod, fun, `init`)
-  const init = metadata.init
+  const shouldInit = metadata[API_COLLECTION_TAG] == 'init'
 
   try {
-    if (Themes.isValid(metadata.theme, init)) next()
+    if (Themes.isValid(metadata.theme, shouldInit)) next()
     next(new Error(msg.incorrectVal('theme', metadata.theme)))
 
     await Promise.all(
       metadata.keywords.map((keyword) => {
-        if (Keywords.isValid(keyword, init)) next()
+        if (Keywords.isValid(keyword, shouldInit)) next()
         else next(new Error(msg.incorrectVal('keywords', keyword)))
         return true
       })
@@ -583,7 +585,7 @@ async function checkThesaurus(metadata, next) {
     if (metadata.resource_languages) {
       await Promise.all(
         metadata.resource_languages.map((lang) => {
-          if (Languages.isValid(lang, init)) next()
+          if (Languages.isValid(lang, shouldInit)) next()
           else next(new Error(msg.incorrectVal('resource_languages', lang)))
           return true
         })
@@ -591,7 +593,7 @@ async function checkThesaurus(metadata, next) {
     }
 
     if (metadata.geography && metadata.geography.projection) {
-      if (Projections.isValid(metadata.geography.projection, init)) next()
+      if (Projections.isValid(metadata.geography.projection, shouldInit)) next()
       else
         next(
           new Error(
@@ -603,7 +605,7 @@ async function checkThesaurus(metadata, next) {
         )
     }
 
-    if (StorageStatus.isValid(metadata.storage_status, init)) next()
+    if (StorageStatus.isValid(metadata.storage_status, shouldInit)) next()
     else
       next(
         new Error(msg.incorrectVal('storage_status', metadata.storage_status))
@@ -698,7 +700,7 @@ MetadataSchema.pre('save', async function (next) {
     next(err)
   }
 
-  checkThesaurus(metadata, next)
+  await checkThesaurus(metadata, next)
 
   next()
 })

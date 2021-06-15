@@ -39,7 +39,7 @@ const Keywords = [
 // -----------------------------------------------------------------------------
 let Thesaurus = Keywords
 
-exports.init = (arg) => {
+exports.initialize = (arg) => {
   if (arg) Thesaurus = []
 }
 

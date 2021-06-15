@@ -47,7 +47,7 @@ const FileTypes = [
 // -----------------------------------------------------------------------------
 let Thesaurus = FileTypes
 
-exports.init = (arg) => {
+exports.initialize = (arg) => {
   if (arg) Thesaurus = []
 }
 

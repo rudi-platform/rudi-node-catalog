@@ -54,6 +54,7 @@ const {
   API_MEDIA_ID,
   API_DATES_CREATED_PROPERTY,
   API_DATES_PUBLISHED_PROPERTY,
+  API_COLLECTION_TAG,
 } = require('../db/dbFields')
 
 const {
@@ -491,7 +492,7 @@ exports.newMetadata = async (rudiMetadata) => {
     )
     throw err
   }
-  this.sendToPortal(dbMetadata)
+  await this.sendToPortal(dbMetadata)
   return dbMetadata
   // return this.dbMetadataToRudi(dbMetadata)
 }
@@ -529,21 +530,23 @@ exports.updateMetadata = async (incomingRudiMetadata) => {
 
 exports.sendToPortal = async (metadata) => {
   const fun = 'sendToPortal'
-  if (metadata.init || utils.isNotEmptyArray(metadata.purpose)) {
-    log.d(mod, fun, `Not sending to portal: ${metadata[API_METADATA_ID]}}`)
-    return
-  }
   try {
-    log.v(mod, fun, `Sending to portal: ${metadata[API_METADATA_ID]}}`)
-    await portalController.sendMetadataToPortal(metadata[API_METADATA_ID])
+    const metadataId = metadata[API_METADATA_ID]
+    const collectionTag = metadata[API_COLLECTION_TAG]
+    if (collectionTag) {
+      log.d(mod, fun, `Not sending to portal: ${metadataId} (${collectionTag})`)
+      return
+    }
+    await portalController.sendMetadataToPortal(metadataId)
+    log.v(mod, fun, `Sent to portal: ${metadataId}`)
   } catch (err) {
     log.w(mod, fun, err)
     throw err
   }
 }
 
-exports.init = async (req, reply) => {
-  const fun = 'init'
+exports.massInit = async (req, reply) => {
+  const fun = 'massInit'
   log.v(mod, fun, `> ${URL_PREFIX_PUBLIC}/${URL_OBJECT_METADATA}/${URL_ACTION_INIT}`)
 
   await db.dropDB()

@@ -91,7 +91,7 @@ exports.publicRoutes = [
     method: 'POST',
     url: `${URL_PREFIX_PUBLIC}/${URL_OBJECT_METADATA}/${URL_ACTION_INIT}`,
     // preHandler: logRequest,
-    handler: metadataController.init,
+    handler: metadataController.massInit,
   },
   // Delete many
   {

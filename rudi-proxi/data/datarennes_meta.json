@@ -63,7 +63,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2018 - Ville de Rennes - Subventions aux associations",
@@ -129,7 +129,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2013 - Subventions d'équipement aux associations",
@@ -197,7 +197,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2009 - Ville de Rennes - Budget Principal",
@@ -265,7 +265,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Consommation annuelle d’électricité et gaz par commune et par secteur d’activité - Rennes Métropole",
@@ -332,7 +332,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections cantonales à Rennes de 2008",
@@ -398,7 +398,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Subventions versées en 2018 aux associations Noyal-Châtillon-sur-Seiche",
@@ -464,7 +464,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Carte des mesures photométriques des rues de Rennes",
@@ -530,7 +530,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2012 - Ville de Rennes - Subventions d'équipement aux associations",
@@ -598,7 +598,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2009 - Ville de Rennes - Budgets Annexes",
@@ -666,7 +666,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2012 - Ville de Rennes - Budget Principal par sous fonction",
@@ -734,7 +734,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Statistiques de prêts de la bibliothèque des Champs Libres en 2009",
@@ -800,7 +800,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2019 - Ville De Rennes - Budgets Annexes",
@@ -866,7 +866,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Lignes de bus du réseau STAR",
@@ -932,7 +932,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Prénoms - Cesson-Sévigné",
@@ -999,7 +999,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2012 - Ville de Rennes - Subventions exceptionnelles aux associations",
@@ -1067,7 +1067,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2016 - Ville de Rennes - Budgets Annexes",
@@ -1135,7 +1135,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2008 - Ville de Rennes - Budgets Annexes",
@@ -1203,7 +1203,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Lignes de métro du réseau STAR",
@@ -1270,7 +1270,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2012 - Ville de Rennes - Budget Principal par article",
@@ -1338,7 +1338,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2013 - BUDGET PRINCIPAL",
@@ -1404,7 +1404,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Végétation fine 2011 sur Rennes Métropole",
@@ -1456,7 +1456,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2014 - Ville de Rennes - Subventions ordinaires aux associations",
@@ -1522,7 +1522,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2012 - Ville de Rennes - Budgets Annexes",
@@ -1588,7 +1588,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Statistiques Etat civil Noyal-Châtillon-sur-Seiche",
@@ -1654,7 +1654,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Plan Local d'Urbanisme Intercommunal (PLUi) de Rennes Métropole - Mise à jour n°3",
@@ -1706,7 +1706,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Tonnages des matières collectées en déchèteries à Rennes Métropole",
@@ -1775,7 +1775,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2014 - Ville de Rennes - Subventions exceptionnelles aux associations",
@@ -1843,7 +1843,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Mariages - Noyal-Châtillon-sur-Seiche",
@@ -1909,7 +1909,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Délinquance 2014 à Rennes",
@@ -1977,7 +1977,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2016 - Ville de Rennes - Subventions aux associations",
@@ -2043,7 +2043,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Rames de métro utilisées sur le réseau STAR",
@@ -2110,7 +2110,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2016 - Ville de Rennes - Budget Principal",
@@ -2176,7 +2176,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections Européennes 2019 à Rennes - Tour 1",
@@ -2242,7 +2242,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Consommation électrique annuelle à la maille commune - Rennes Métropole",
@@ -2323,7 +2323,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Photographies : Fonds de la guerre 14-18 [Rennes]",
@@ -2389,7 +2389,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2012 - Ville de Rennes - Subventions ordinaires aux associations",
@@ -2455,7 +2455,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Statistiques de prêts de la bibliothèque des Champs Libres en 2012",
@@ -2521,7 +2521,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Courbes de niveaux issues du modèle Numérique de Terrain de 2018 Rennes Métropole",
@@ -2573,7 +2573,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "API Parkings Rennes Métropole",
@@ -2641,7 +2641,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2014 - Ville de Rennes - Budgets Annexes",
@@ -2709,7 +2709,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Etat des équipements des stations de métro du réseau STAR en temps réel",
@@ -2775,7 +2775,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2012 - Ville de Rennes - Budgets annexes",
@@ -2843,7 +2843,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2013 - Ville de Rennes - Subventions d'équipement aux associations",
@@ -2909,7 +2909,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections cantonales 2011 - Rennes",
@@ -2975,7 +2975,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Constructions bâties sur Rennes Métropole",
@@ -3027,7 +3027,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Immeubles protégés au titre des Monuments Historiques - Rennes Métropole",
@@ -3093,7 +3093,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections législatives 2017 à Rennes Tour 2",
@@ -3159,7 +3159,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Niveau de fréquentation maximale par ligne STAR",
@@ -3217,7 +3217,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "API RVA Rennes Métropole",
@@ -3283,7 +3283,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2017 - Rennes Métropole",
@@ -3349,7 +3349,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2014 - Ville de Rennes - Budget Principal par article",
@@ -3417,7 +3417,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Pictogrammes des lignes de métro du réseau STAR",
@@ -3483,7 +3483,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections municipales à Rennes - 2008 à 2014",
@@ -3549,7 +3549,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Base SIRENE - Ville de Rennes",
@@ -3615,7 +3615,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2015 - Ville de Rennes - Subventions exceptionnelles aux associations",
@@ -3681,7 +3681,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Mariages à Rennes",
@@ -3747,7 +3747,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2013 - Ville de Rennes - Subventions exceptionnelles aux associations",
@@ -3813,7 +3813,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Liste des fournisseurs des cantines à Rennes",
@@ -3880,7 +3880,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Perimetres des cantons Rennes 2014",
@@ -3946,7 +3946,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Production électrique annuelle par filière par commune - Rennes Métropole",
@@ -4019,7 +4019,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Dessertes des parcours de bus du réseau STAR",
@@ -4089,7 +4089,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2013 - Ville de Rennes - Budget Annexes",
@@ -4155,7 +4155,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2015 - Ville de Rennes - Budget Principal par sous fonctions",
@@ -4219,7 +4219,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Budget Participatif - Ville de Rennes - Saison 2",
@@ -4286,7 +4286,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2010 - Budgets Annexes",
@@ -4354,7 +4354,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Décès - Noyal-Châtillon-sur-Seiche",
@@ -4420,7 +4420,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Garages partenaires du réseau STAR",
@@ -4488,7 +4488,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2015 - Ville de Rennes - Budget Principal",
@@ -4556,7 +4556,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2017 - Rennes Métropole",
@@ -4624,7 +4624,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Budget Participatif - Ville de Rennes - Saison 1 - Votes",
@@ -4691,7 +4691,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2014 - Ville de Rennes - Subventions d'équipement aux associations",
@@ -4757,7 +4757,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats élections européennes 2019 Thorigné-Fouillard - Dataviz",
@@ -4823,7 +4823,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Base élus Rennes Ville et Métropole 2017",
@@ -4889,7 +4889,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Datamix Europe Transmusicales",
@@ -4957,7 +4957,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Bus utilisés sur le réseau STAR",
@@ -5024,7 +5024,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Agences commerciales du réseau STAR",
@@ -5091,7 +5091,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2014 - Ville de Rennes - Subventions ordinaires aux associations",
@@ -5159,7 +5159,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2013 - Ville de Rennes - Subventions exceptionnelles aux associations",
@@ -5227,7 +5227,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Indicateurs financiers relatifs à la gestion des déchets",
@@ -5295,7 +5295,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Frequentation des expositions Musee de Bretagne et Les Champs Libres",
@@ -5362,7 +5362,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2014 - Ville de Rennes - Budget Principal par sous fonction",
@@ -5428,7 +5428,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2012 - Ville de Rennes - Budget Principal",
@@ -5494,7 +5494,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2019 - Ville de Rennes - Subventions aux associations",
@@ -5548,7 +5548,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2017 - Ville de Rennes - Budgets Annexes",
@@ -5616,7 +5616,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Statistiques de fréquentation du site de la Fabrique Citoyenne",
@@ -5683,7 +5683,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats élections européennes 2019 Thorigné-Fouillard",
@@ -5750,7 +5750,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Statistiques de prêts de la bibliothèque des Champs Libres en 2007",
@@ -5816,7 +5816,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Statistiques de fréquentation des expositions du Musée des Beaux-Arts de Rennes",
@@ -5884,7 +5884,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Equipements des stations de métro du réseau STAR",
@@ -5951,7 +5951,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2013 - Ville de Rennes - Subventions ordinaires aux associations",
@@ -6019,7 +6019,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2015 - Ville de Rennes - Budgets Annexes",
@@ -6085,7 +6085,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Prêts d'oeuvres du musée des Beaux-Arts de Rennes",
@@ -6153,7 +6153,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Documents-actes d'urbanisme délivrés - Cesson-Sévigné",
@@ -6221,7 +6221,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Topologie des stations de vélos en libre-service",
@@ -6292,7 +6292,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2015 - Ville de Rennes - Subventions aux associations",
@@ -6360,7 +6360,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Statistiques de fréquentation du site Rennes Métropole en acces libre",
@@ -6426,7 +6426,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2015 - Ville de Rennes - Subventions ordinaires aux associations",
@@ -6492,7 +6492,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Effectifs scolaires - Cesson-Sévigné",
@@ -6561,7 +6561,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Orthophotographie aérienne 2004 sur Rennes Métropole",
@@ -6627,7 +6627,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Titres et tarifs du réseau STAR",
@@ -6697,7 +6697,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2015 - Ville de Rennes - Budgets Annexes",
@@ -6765,7 +6765,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2013 - Ville de Rennes - Budget Principal par article",
@@ -6833,7 +6833,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Adresses des Labfab",
@@ -6900,7 +6900,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Emplacement des panneaux d'affichage libre sur Saint-Jacques de la Lande",
@@ -6966,7 +6966,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections municipales - Rennes Métropole - 2014",
@@ -7032,7 +7032,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "API Travaux Rennes Métropole",
@@ -7099,7 +7099,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Topologie des points d'arrêt de métro du réseau STAR",
@@ -7166,7 +7166,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2016 - Rennes Métropole",
@@ -7232,7 +7232,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Population légale - Cesson-Sévigné",
@@ -7299,7 +7299,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Horodateurs sur la ville de Rennes",
@@ -7365,7 +7365,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections législatives 2017 - 2ème tour - Saint-Jacques de la Lande",
@@ -7431,7 +7431,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2011 - Ville de Rennes - Subventions ordinaires aux associations",
@@ -7499,7 +7499,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2018 - Ville de Rennes - Budget principal",
@@ -7565,7 +7565,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections Européennes 2019 à Rennes - Tour 1 – Dataviz",
@@ -7631,7 +7631,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Population à Rennes Métropole par sexe, âge et nationalité par commune (2014)",
@@ -7705,7 +7705,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Base SIRENE - Saint-Jacques de la Lande",
@@ -7771,7 +7771,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2012 - Ville de Rennes - Subventions d'équipement aux associations",
@@ -7837,7 +7837,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Dessertes des parcours de métro du réseau STAR",
@@ -7904,7 +7904,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2020 - Rennes Métropole",
@@ -7956,7 +7956,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Occupation du sol à grande échelle 2017 sur Rennes Métropole",
@@ -8008,7 +8008,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Décès à Rennes",
@@ -8074,7 +8074,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2018 - Ville de Rennes - Subventions aux associations",
@@ -8142,7 +8142,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Emprise de Rennes Métropole",
@@ -8215,7 +8215,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Limites communales référentielles de Rennes Métropole (polylignes)",
@@ -8288,7 +8288,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Cantons d'Ille-et-Vilaine (version Rennes Métropole)",
@@ -8360,7 +8360,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Périmètres des 6 directions de quartier de la Ville de Rennes",
@@ -8432,7 +8432,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Périmètres des 45 sous-quartiers de la Ville de Rennes",
@@ -8504,7 +8504,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Aires de jeux des espaces verts de la Ville de Rennes",
@@ -8570,7 +8570,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Points de présentation des bacs roulants sur Rennes Métropole",
@@ -8639,7 +8639,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Points de regroupement des bacs roulants sur Rennes Métropole",
@@ -8708,7 +8708,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Participations financieres pour la réalisation d'équipements et d'aménagements publics de Zones d'Aménagement Concertées (ZAC) sur Rennes Métropole",
@@ -8774,7 +8774,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Périmètres des marchés sur Rennes Métropole",
@@ -8843,7 +8843,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Écoles primaires sur Rennes Métropole",
@@ -8897,7 +8897,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Périmètres de gestion de la Direction de la Voirie de Rennes Métropole",
@@ -8950,7 +8950,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Panneaux d'entrée-sortie d'agglomération sur Rennes Métropole",
@@ -9018,7 +9018,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Fibre optique Rennes Métropole : armoires",
@@ -9070,7 +9070,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Fibre optique Rennes Métropole : sites raccordés",
@@ -9122,7 +9122,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Fibre optique Rennes Métropole : conduites / infrastructure",
@@ -9174,7 +9174,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Fibre optique Rennes Métropole : zones d'éligibilité à la fibre professionnelle",
@@ -9232,7 +9232,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Périmètres d'agglomération de la Police de la circulation et du stationnement sur le territoire de Rennes Métropole",
@@ -9287,7 +9287,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Terrains d'accueil des gens du voyage sur Rennes Métropole",
@@ -9346,7 +9346,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Equipements sportifs de proximité sur la Ville de Rennes",
@@ -9399,7 +9399,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Limites d'intervention des opérations d'aménagement sur Rennes Métropole",
@@ -9452,7 +9452,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Synthèse des zonages POS et PLU des communes de Rennes Métropole (au 31/12/2019)",
@@ -9504,7 +9504,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Topologie des points d'arrêt de bus du réseau STAR",
@@ -9570,7 +9570,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Tronçons de voies du référentiel voies et adresses de Rennes Métropole",
@@ -9636,7 +9636,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Localisation des stations de vélo en libre service sur Rennes Métropole",
@@ -9703,7 +9703,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Bornes de recharge dédiées aux véhicules électriques sur le territoire de Rennes Métropole",
@@ -9776,7 +9776,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2018 - Subvention aux associations - Ville de Thorigné-Fouillard",
@@ -9846,7 +9846,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Adresses du référentiel voies et adresses au format BAL",
@@ -9914,7 +9914,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Set de données graphiques des modes de transport",
@@ -9987,7 +9987,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections municipales 2020 Dataviz",
@@ -10053,7 +10053,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections européennes à Rennes de 2004 à 2019",
@@ -10119,7 +10119,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Orthophotographie aérienne 2017-2018 sur Rennes Métropole",
@@ -10172,7 +10172,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Mobilités professionnelles (déplacements domicile - lieu de travail) en 2010 - Rennes",
@@ -10239,7 +10239,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Emplacement des bureaux de vote - Saint-Jacques de la Lande",
@@ -10305,7 +10305,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Massifs de rosiers du jardin du Thabor",
@@ -10371,7 +10371,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Prévision Météo - Rennes - AROME",
@@ -10439,7 +10439,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Consommation annuelle par IRIS sur les réseaux RTE et GRTgaz - Rennes Métropole",
@@ -10506,7 +10506,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Points de vente partenaires agréés par le réseau STAR",
@@ -10573,7 +10573,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Rennes 2030 - Réponses par thème",
@@ -10639,7 +10639,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Déchèteries et plateformes végétaux sur Rennes Métropole",
@@ -10708,7 +10708,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections législatives 2017 2ème tour Thorigné-Fouillard",
@@ -10775,7 +10775,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Toilettes publiques sur la Ville de Rennes",
@@ -10843,7 +10843,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Routes à Grande Circulation (RGC) sur Rennes Métropole",
@@ -10909,7 +10909,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Points d'apport volontaire des déchets ménagers sur Rennes Métropole",
@@ -10984,7 +10984,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Murs d'expression libre (Street Art et graffitis) sur le territoire de la Ville de Rennes",
@@ -11057,7 +11057,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Versions des horaires théoriques des lignes du réseau STAR au format GTFS",
@@ -11124,7 +11124,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Zones d'aménagement concerté (ZAC) sur Rennes Métropole",
@@ -11190,7 +11190,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Codes INSEE et postaux des communes de Rennes Métropole géolocalisées",
@@ -11256,7 +11256,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Fibre optique Rennes Métropole : câbles",
@@ -11308,7 +11308,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Carte scolaire de l'enseignement primaire sur la Ville de Rennes",
@@ -11376,7 +11376,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Catalogue des données disponibles",
@@ -11444,7 +11444,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Topologie des stations de vélos en libre-service",
@@ -11510,7 +11510,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Stations du canevas géodésique de Rennes Métropole",
@@ -11582,7 +11582,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2017 - Ville de St-Jacques de la Lande - Subvention aux associations",
@@ -11648,7 +11648,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Budget Participatif - Ville de Rennes - Saison 1 - Projets",
@@ -11715,7 +11715,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Parcours pédestres sur la Ville de Rennes",
@@ -11781,7 +11781,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Stations de réparation et gonflage pour vélo sur Rennes Métropole",
@@ -11847,7 +11847,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Périmètres des bureaux de vote sur Rennes",
@@ -11913,7 +11913,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Conditions de circulation hivernales",
@@ -11988,7 +11988,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Prochains passages des lignes de bus du réseau STAR en temps réel",
@@ -12055,7 +12055,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Set de données graphiques d'illustration de points",
@@ -12124,7 +12124,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Collecte des Archives Municipales",
@@ -12192,7 +12192,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Limites communales référentielles de Rennes Métropole (polygones)",
@@ -12265,7 +12265,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Comités de secteur de Rennes Métropole",
@@ -12337,7 +12337,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Position des bus en circulation sur le réseau STAR en temps réel",
@@ -12404,7 +12404,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Consommation électrique annuelle à la maille IRIS - Rennes Métropole",
@@ -12476,7 +12476,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Statistiques sur la collecte et le traitement des déchets à  Rennes Métropole",
@@ -12542,7 +12542,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Adresses du référentiel voies et adresses de Rennes Métropole",
@@ -12608,7 +12608,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Etat des stations de vélos en libre-service en temps réel",
@@ -12680,7 +12680,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Occupation et tarifs des parkings Rennes",
@@ -12747,7 +12747,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Base élus de Rennes Ville et Métropole 2020",
@@ -12813,7 +12813,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Sondages pour diagnostic de la présence d'amiante dans les enrobés de voirie",
@@ -12889,7 +12889,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections Municipales 2020 à Acigné - Dataviz",
@@ -12955,7 +12955,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Localisation des espaces de médiation numériques en Ille-et-Vilaine",
@@ -13009,7 +13009,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Alertes trafic en temps réel sur les lignes du réseau STAR",
@@ -13077,7 +13077,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Menus des cantines des écoles - Ville de Rennes",
@@ -13143,7 +13143,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Orthophotographie aérienne 2020 sur Rennes Métropole",
@@ -13196,7 +13196,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Tronçons de voies support pour les données de trafic routier temps réel",
@@ -13262,7 +13262,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Base organismes et équipements \"Vivre à Rennes\"",
@@ -13329,7 +13329,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Couverture 2G, 3G, 4G à Rennes par opérateur Juillet 2015",
@@ -13397,7 +13397,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Prénoms à Rennes",
@@ -13463,7 +13463,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Aménagements vélo et zones de circulation apaisée sur Rennes Métropole",
@@ -13532,7 +13532,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats du référendum à Rennes en 2005",
@@ -13598,7 +13598,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2011 - Ville de Rennes - Budget Principal",
@@ -13666,7 +13666,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections présidentielles 2017 à Rennes Tour 2",
@@ -13732,7 +13732,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Etat des agences commerciales du réseau STAR en temps réel",
@@ -13798,7 +13798,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2009 - Ville de Rennes - Subventions exceptionnelles aux associations",
@@ -13866,7 +13866,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections présidentielles - 2ème tour- Saint-Jacques de la Lande",
@@ -13932,7 +13932,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2016 - Ville De Rennes - Budgets Annexes",
@@ -13998,7 +13998,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2014 - Ville de Rennes - Subventions exceptionnelles aux associations",
@@ -14064,7 +14064,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Localisation des centres de vote 2014",
@@ -14130,7 +14130,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections présidentielles à Rennes depuis 2007",
@@ -14196,7 +14196,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2010 - Ville de Rennes - Subventions d'équipement aux associations",
@@ -14264,7 +14264,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2018 - Rennes Métropole",
@@ -14330,7 +14330,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections législatives 2017 à Rennes Tour 1 - Dataviz",
@@ -14396,7 +14396,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Perimetres des bureaux de vote 2014",
@@ -14462,7 +14462,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Surfaces minérales du jardin du Thabor",
@@ -14528,7 +14528,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Végétation fine 2017 sur Rennes Métropole",
@@ -14580,7 +14580,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2019 - Ville de Rennes - Budgets Annexes",
@@ -14634,7 +14634,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2018 - Ville de Rennes - Budget Principal",
@@ -14702,7 +14702,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Perimetres des centres de vote 2014",
@@ -14768,7 +14768,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2012 - Ville de Rennes - Subventions ordinaires aux associations",
@@ -14836,7 +14836,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections Européennes 2019 à Acigné - Dataviz",
@@ -14902,7 +14902,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2017 - Ville de Rennes - Budget Principal",
@@ -14968,7 +14968,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Statistiques de fréquentation du site de Rennes Ville et Métropole",
@@ -15034,7 +15034,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections présidentielles 2017 à Rennes Tour 1 - Dataviz",
@@ -15100,7 +15100,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Effectifs d'étudiants inscrits dans les établissements et les formations de l'enseignement supérieur - Rennes",
@@ -15176,7 +15176,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Topologie des parcs-relais du réseau STAR",
@@ -15243,7 +15243,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Parcours des lignes de métro du réseau STAR",
@@ -15310,7 +15310,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2018 - Ville De Rennes - Budgets Annexes",
@@ -15376,7 +15376,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2019 - Ville de Rennes - Budget Principal",
@@ -15430,7 +15430,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2008 - Ville de Rennes - Budget Principal",
@@ -15498,7 +15498,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Emplacement des panneaux d'affichage libre à Cesson-Sévigné",
@@ -15565,7 +15565,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections Européennes 2019 à Acigné",
@@ -15631,7 +15631,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Cartographie du bruit sur Rennes Métropole 2010-2018",
@@ -15683,7 +15683,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections présidentielles 2017 à Rennes Tour 2 - Dataviz",
@@ -15749,7 +15749,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Subventions versées en 2017 aux associations Noyal-Châtillon-sur-Seiche",
@@ -15815,7 +15815,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections départementales à Rennes - 2015",
@@ -15881,7 +15881,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Base SIRENE - Cesson-Sévigné",
@@ -15947,7 +15947,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2008 - Ville de Rennes - Subventions exceptionnelles aux associations",
@@ -16013,7 +16013,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2016 - Ville de Rennes - Subventions aux associations",
@@ -16081,7 +16081,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP-2018-Ville-Thorigne-Fouillard",
@@ -16151,7 +16151,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Massifs arbustifs du jardin du Thabor",
@@ -16217,7 +16217,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections départementales depuis 2008 à Rennes",
@@ -16289,7 +16289,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections présidentielles de 2017 - 1er tour - Saint-Jacques de la Lande",
@@ -16355,7 +16355,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2013 - Ville de Rennes - Budgets annexes",
@@ -16423,7 +16423,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2015 - Ville de Rennes - Subventions d'équipement aux associations",
@@ -16489,7 +16489,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Statistiques de prêts de la bibliothèque des Champs Libres en 2008",
@@ -16555,7 +16555,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Prénoms à Saint-Jacques de la Lande",
@@ -16621,7 +16621,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Fréquentation du Musée des Beaux Arts",
@@ -16687,7 +16687,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2019 - Ville de Rennes - Budget principal",
@@ -16753,7 +16753,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Naissances - Noyal-Châtillon-sur-Seiche",
@@ -16819,7 +16819,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Données Plan de Ville Communal et Intercommunal de Rennes Métropole",
@@ -16886,7 +16886,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections présidentielles 2017 à Rennes - Tour 1",
@@ -16952,7 +16952,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections législatives 2017 - 1er tour - Saint-Jacques de la Lande",
@@ -17018,7 +17018,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2014 - Ville de Rennes - Budget Principal",
@@ -17086,7 +17086,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Ancienneté d'emménagement par age",
@@ -17158,7 +17158,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Statistiques de prêts de DVD à la médiathèque en 2017 - Cesson-Sévigné",
@@ -17226,7 +17226,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "ZA raccordées au réseau optique métropolitain",
@@ -17292,7 +17292,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Référentiel bâtiment sur Rennes Métropole",
@@ -17344,7 +17344,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Budget participatif - Ville de Rennes - Saison 4",
@@ -17412,7 +17412,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Structure Population Rennes Metropole 2016 - rectangle 1 km",
@@ -17483,7 +17483,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2010 - Ville de Rennes - Subventions exceptionnelles aux associations",
@@ -17549,7 +17549,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Budget Participatif - Ville de Rennes - Saison 1",
@@ -17616,7 +17616,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Qualité de Service selon opérateurs et axe de transport - 2G, 3G, 4G",
@@ -17684,7 +17684,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections législatives 2017 à Rennes Tour 2 - Dataviz",
@@ -17750,7 +17750,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2010 - Ville de Rennes - Budget principal",
@@ -17818,7 +17818,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Base SIRENE - Noyal-Châtillon-sur-Seiche",
@@ -17884,7 +17884,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Topologie des stations de métro du réseau STAR",
@@ -17951,7 +17951,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Orthophotographie aérienne 2014 sur Rennes Métropole",
@@ -18017,7 +18017,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Budget primitif 2019 Commune de Thorigné-Fouillard",
@@ -18086,7 +18086,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Défibrillateurs - Saint-Jacques de la Lande",
@@ -18153,7 +18153,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2014 - Ville de Rennes - Budget Principal par article",
@@ -18219,7 +18219,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2009 - Ville de Rennes - Subventions d'équipement aux associations",
@@ -18285,7 +18285,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2019 - Rennes Métropole",
@@ -18351,7 +18351,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Effectifs des écoles de St-Jacques de la Lande",
@@ -18417,7 +18417,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2011 - Ville de Rennes - Subventions exceptionnelles aux associations",
@@ -18485,7 +18485,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2012 - Ville de Rennes - Subventions exceptionnelles aux associations",
@@ -18551,7 +18551,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Budget participatif - Ville de Rennes - Saison 3",
@@ -18619,7 +18619,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections législatives à Rennes depuis 2007",
@@ -18685,7 +18685,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2010 - Ville de Rennes - Subventions ordinaires aux associations",
@@ -18753,7 +18753,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Défibrillateurs - Cesson-Sévigné",
@@ -18819,7 +18819,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Aires de jeux - Cesson-Sévigné",
@@ -18885,7 +18885,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Pictogrammes des lignes de bus du réseau STAR",
@@ -18951,7 +18951,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2014 - Ville de Rennes - Budget Annexes",
@@ -19017,7 +19017,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2021 - Rennes Métropole",
@@ -19069,7 +19069,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Massifs floraux du jardin du Thabor",
@@ -19135,7 +19135,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Végétation fine 2014 sur Rennes Métropole",
@@ -19187,7 +19187,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2014 - Ville de Rennes - Subventions d'équipement aux associations",
@@ -19255,7 +19255,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2017 - Ville De Rennes - Budgets Annexes",
@@ -19321,7 +19321,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Etat des stations de métro du réseau STAR en temps réel",
@@ -19392,7 +19392,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Statistiques de prêts de la bibliothèque des Champs Libres en 2010",
@@ -19458,7 +19458,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Statistiques de prêts de la bibliothèque des Champs Libres en 2011",
@@ -19524,7 +19524,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Aire de camping car - Cesson-Sévigné",
@@ -19591,7 +19591,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2017 - Ville de Rennes - Subventions aux associations",
@@ -19659,7 +19659,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2016 - Ville de Rennes - Budget Principal",
@@ -19727,7 +19727,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2015 - Ville de Rennes - Budget Principal par article",
@@ -19793,7 +19793,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Parcours des lignes de bus du réseau STAR",
@@ -19859,7 +19859,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2011- Ville de Rennes - Subventions d'équipement aux associations",
@@ -19927,7 +19927,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2017 - Ville de Rennes - Subventions aux associations",
@@ -19993,7 +19993,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2011 - Ville de Rennes - Budgets annexes",
@@ -20061,7 +20061,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Etat des lignes de métro du réseau STAR en temps réel",
@@ -20127,7 +20127,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Orthophotographie aérienne 2011 sur Rennes Métropole",
@@ -20193,7 +20193,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2008 - Ville de Rennes - Subventions d'équipement aux associations",
@@ -20261,7 +20261,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2009 - Ville de Rennes - Subventions ordinaires aux associations",
@@ -20329,7 +20329,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2019 - Ville de Rennes - Subventions aux associations",
@@ -20395,7 +20395,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections régionales à Rennes de 2004 à 2015",
@@ -20461,7 +20461,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "BP 2013 - Ville de Rennes - Subventions ordinaires aux associations",
@@ -20527,7 +20527,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Effectifs des disciplines sportives pratiquées",
@@ -20595,7 +20595,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2008 - Ville de Rennes - Subventions ordinaires aux associations",
@@ -20663,7 +20663,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2018 - Ville de Rennes - Budgets Annexes",
@@ -20731,7 +20731,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2017 - Ville de Rennes - Budget Principal",
@@ -20799,7 +20799,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Statistiques de prêts de la bibliothèque des Champs Libres en 2006",
@@ -20865,7 +20865,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Statistiques de fréquentation du site Rennes 2030",
@@ -20932,7 +20932,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Périmètres des 12 quartiers de la Ville de Rennes",
@@ -21004,7 +21004,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Inventaire 2014 des commerces du Pays de Rennes : cellules commerciales",
@@ -21077,7 +21077,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Centres de vote sur Rennes Métropole",
@@ -21143,7 +21143,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Parcs vélos sécurisés gérés par Rennes Métropole",
@@ -21215,7 +21215,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Données géographiques du réseau STAR : arrêts physiques",
@@ -21293,7 +21293,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Données géographiques du réseau STAR : arrêts logiques",
@@ -21371,7 +21371,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Arbres d'alignement en accompagnement de voirie sur la ville de Rennes",
@@ -21439,7 +21439,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Composteurs collectifs sur Rennes Métropole",
@@ -21495,7 +21495,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Sites de la base de données Sites & Organismes sur le territoire de Rennes Métropole",
@@ -21566,7 +21566,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Lotissements sur Rennes Métropole",
@@ -21632,7 +21632,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Supports vélos sur le territoire de Rennes Métropole",
@@ -21698,7 +21698,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Boucles vélo sur le territoire de Rennes Métropole",
@@ -21756,7 +21756,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Structures relais mettant à disposition des matériels de broyage sur le territoire de Rennes Métropole",
@@ -21816,7 +21816,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Synthèse des zonages POS et PLU des communes de Rennes Métropole (décembre 2016)",
@@ -21868,7 +21868,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Synthèse des zonages POS et PLU des communes de Rennes Métropole (décembre 2017)",
@@ -21920,7 +21920,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Synthèse des zonages POS et PLU des communes de Rennes Métropole (décembre 2018)",
@@ -21972,7 +21972,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Programmes des opérations d'aménagement sur Rennes Métropole",
@@ -22025,7 +22025,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Fibre optique Rennes Métropole : boîtiers de protection d'épissure",
@@ -22077,7 +22077,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Bâtiments projets des opérations d'aménagement sur Rennes Métropole",
@@ -22130,7 +22130,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Fibre optique Rennes Métropole : chambres",
@@ -22182,7 +22182,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Périmètres des plateformes voirie de Rennes Métropole",
@@ -22235,7 +22235,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Emprise des cimetières sur le territoire de Rennes Métropole",
@@ -22287,7 +22287,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Les ouvrages d'art liés à la voirie sur le territoire de Rennes Métropole",
@@ -22339,7 +22339,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Domanialité et gestionnaire de la voirie sur Rennes Métropole",
@@ -22405,7 +22405,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Réseau ferré de Rennes Métropole",
@@ -22464,7 +22464,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Sections de voirie en sens unique ou interdites à la circulation pour les véhicules légers sur Rennes Métropole",
@@ -22516,7 +22516,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Droit de préemption (DP) sur Rennes Métropole",
@@ -22568,7 +22568,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Viabilité Hivernale (VH) sur Rennes Métropole",
@@ -22620,7 +22620,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections législatives 2017 à Rennes Tour 1",
@@ -22686,7 +22686,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Codes postaux sur Rennes Métropole",
@@ -22745,7 +22745,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Fréquentation du service éducatif des Archives de Rennes",
@@ -22813,7 +22813,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Menus des cantines de St-Jacques de la Lande",
@@ -22879,7 +22879,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Topologie des stations Citiz",
@@ -22935,7 +22935,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Toilettes publiques - Cesson-Sévigné",
@@ -23001,7 +23001,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections Municipales 2020 à Rennes",
@@ -23076,7 +23076,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Itinéraires des convois exceptionnels selon leur tonnage sur Rennes Métropole",
@@ -23128,7 +23128,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Panneaux d'affichage associatif sur le territoire de Rennes",
@@ -23194,7 +23194,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Ilots géographiques sur le territoire de Rennes Métropole",
@@ -23252,7 +23252,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections Municipales 2020 à Acigné",
@@ -23321,7 +23321,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Horaires et plans du réseau STAR au format PDF",
@@ -23399,7 +23399,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Naissances à Rennes",
@@ -23465,7 +23465,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Fréquentation détaillée du Musée des Beaux Arts",
@@ -23531,7 +23531,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Emplacement des bureaux de vote - Cesson-Sévigné",
@@ -23597,7 +23597,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Secteurs d'études du service Aménagement de Rennes Métropole sur la Ville de Rennes",
@@ -23650,7 +23650,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Reseau Fibre Metropolitain",
@@ -23717,7 +23717,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Principaux établissements d'enseignement supérieur - Rennes Métropole",
@@ -23789,7 +23789,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Etat des parcs-relais du réseau STAR en temps réel",
@@ -23862,7 +23862,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Portions de voies en stationnement payant sur la ville de Rennes",
@@ -23928,7 +23928,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "CA 2018 - Rennes Métropole",
@@ -23996,7 +23996,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Sites de comptage vélo et piétons",
@@ -24062,7 +24062,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Périmètres des zones d'activités identifiées au titre du Schéma d'Aménagement Économique (SAE) de Rennes Métropole",
@@ -24114,7 +24114,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Menus des cantines des crèches - Ville de Rennes",
@@ -24180,7 +24180,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Résultats des élections Municipales 2020 à Rennes – Tour 2",
@@ -24241,7 +24241,7 @@
       "available_formats": [
           null
       ],
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Base Sirene v3 ß - Rennes Métropole",
@@ -24312,7 +24312,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Organismes de la base de données Sites & Organismes sur le territoire de Rennes Métropole",
@@ -24383,7 +24383,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Prochains passages des lignes de métro du réseau STAR en temps réel",
@@ -24449,7 +24449,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Actes d'état civil à Rennes",
@@ -24515,7 +24515,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Liste des équipements et organismes culturels de Rennes Métropole",
@@ -24581,7 +24581,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Fréquentation par heure des Champs Libres",
@@ -24647,7 +24647,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Métro du réseau STAR : localisation des stations",
@@ -24714,7 +24714,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Programmes immobiliers neufs",
@@ -24781,7 +24781,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Etat du trafic en temps réel",
@@ -24850,7 +24850,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Consommation annuelle de gaz agrégée à la maille IRIS - Rennes Métropole",
@@ -24919,7 +24919,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Comptages vélo et piétons",
@@ -24985,7 +24985,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Menus du Restaurant Municipal d'Enfants d'Acigné",
@@ -25051,7 +25051,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Métro du réseau STAR : tracés de l'axe des lignes",
@@ -25118,7 +25118,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Localisation et état des projets du Budget Participatif",
@@ -25184,7 +25184,7 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   },
   {
       "resource_title": "Ecoles maternelles et primaires de Rennes",
@@ -25250,6 +25250,6 @@
       "metadata_info": {
           "api_version": "1.2.0"
       },
-      "init": true
+      "collection_tag": "init"
   }
 ]

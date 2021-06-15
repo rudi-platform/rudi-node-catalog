@@ -14,7 +14,7 @@ const Projections = [
 // -----------------------------------------------------------------------------
 let Thesaurus = Projections
 
-exports.init = (arg) => {
+exports.initialize = (arg) => {
   if (arg) Thesaurus = []
 }
 

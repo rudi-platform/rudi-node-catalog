@@ -20,7 +20,7 @@ const Encodings = [
 // -----------------------------------------------------------------------------
 let Thesaurus = Encodings
 
-exports.init = (arg) => {
+exports.initialize = (arg) => {
   if (arg) Thesaurus = []
 }
 

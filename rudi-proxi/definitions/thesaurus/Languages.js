@@ -50,7 +50,7 @@ const Languages = [
 // -----------------------------------------------------------------------------
 let Thesaurus = Languages
 
-exports.init = (arg) => {
+exports.initialize = (arg) => {
   if (arg) Thesaurus = []
 }
 
