@@ -174,10 +174,10 @@ const MetadataSchema = new mongoose.Schema(
       validate: validArrayNotNull,
     },
 
-    /** Context, objectives and final use of the data */
-    purpose: {
-      type: [DictionaryEntry],
-    },
+    // /** Context, objectives and final use of the data */
+    // purpose: {
+    //   type: [DictionaryEntry],
+    // },
 
     // ---------------------------
     // Dataset classification
