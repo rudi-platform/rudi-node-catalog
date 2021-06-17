@@ -650,8 +650,10 @@ function checkMedia(metadata) {
 // ----- Conversion to Portal format
 MetadataSchema.methods.toPortalFormat = function () {
   const metadata = this.toJSON()
-  delete metadata.geography.geographic_distribution
-  metadata.metadata_info.api_version = 'v1'
+  
+  // TODO / TEMP : Portal doesn't handle GeoJSON well!
+  delete metadata[API_GEOGRAPHY_PROPERTY][API_GEO_GEOJSON_PROPERTY]
+  metadata[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = 'v1'
 }
 
 // ----- toJSON cleanup

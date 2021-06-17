@@ -51,6 +51,7 @@ exports.API_METAINFO_PROPERTY = 'metadata_info'
 exports.API_METAINFO_PROVIDER_PROPERTY = 'metadata_provider'
 exports.API_METAINFO_CONTACTS_PROPERTY = 'metadata_contacts'
 exports.API_METAINFO_DATES_PROPERTY = 'metadata_dates'
+exports.API_METAINFO_VERSION_PROPERTY = 'api_version'
 
 // -----------------------------------------------------------------------------
 // Metadata properties: geospatial

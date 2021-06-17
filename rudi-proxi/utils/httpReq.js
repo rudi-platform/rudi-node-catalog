@@ -170,9 +170,15 @@ exports.directPost = async (destUrl, dataToSend, reqOpts) => {
     const answer = await post(destUrl, dataToSend, reqOpts)
     return answer
   } catch (err) {
-    log.w(mod, fun, err)
-    log.w(mod, fun, utils.beautify(err.label))
-    throw err
+    // log.w(mod, fun, err)
+    if (err.response && err.response.data) {
+      log.w(mod, fun, utils.beautify(err.response.data))
+      const postErr = new Error(`${err.response.data.code}: ${err.response.data.label}`)
+      postErr.status = err.status
+      throw new Error(`${err.response.data.code}: ${err.response.data.label}`)
+    } else {
+      throw err
+    }
   }
 }
 
@@ -183,7 +189,8 @@ exports.directGet = async (destUrl, reqOpts) => {
     const answer = await get(destUrl, reqOpts)
     return answer
   } catch (err) {
-    log.w(mod, fun, err)
-    throw err
+    // log.w(mod, fun, err)
+    log.w(mod, fun, utils.beautify(err.response.data))
+    throw new Error(`${err.response.data.code}: ${err.response.data.label}`)
   }
 }
