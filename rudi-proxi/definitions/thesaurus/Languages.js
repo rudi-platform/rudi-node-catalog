@@ -1,8 +1,12 @@
 'use strict'
 
+const mod = 'langThes'
+
 // -----------------------------------------------------------------------------
-// External dependancies
+// Internal dependencies
 // -----------------------------------------------------------------------------
+const log = require('../../utils/logging')
+const { parameterExpected } = require('../../utils/msg')
 
 // -----------------------------------------------------------------------------
 // Custom schema definition
@@ -58,16 +62,19 @@ exports.get = () => {
   return Thesaurus
 }
 
-exports.set = (newVal) => {
-  newVal = newVal.trim()
-  if (Thesaurus.indexOf(newVal) === -1) Thesaurus.push(newVal)
+exports.set = (newValue) => {
+  const fun = 'set'
+  if (!newValue) parameterExpected(fun, 'newValue')
+  newVal = `${newVal}`.trim()
+  if (Thesaurus.indexOf(newValue) === -1) Thesaurus.push(newValue)
 }
 
-exports.isValid = (val, shouldInit) => {
-  val = val.trim()
-  const isIn = Thesaurus.indexOf(val) > -1
+exports.isValid = (value, shouldInit) => {
+  const fun = 'isValid'
+  if (!value) parameterExpected(fun, 'value')
+  const isIn = Thesaurus.indexOf(value) > -1
   if (!isIn && shouldInit) {
-    this.set(val)
+    this.set(value)
     return true
   }
   return isIn

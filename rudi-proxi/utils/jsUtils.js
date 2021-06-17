@@ -86,7 +86,7 @@ exports.isEmptyObject = (obj) => {
 }
 
 exports.isNotEmptyObject = (obj) => {
-  return Object.keys(obj).length > 0
+  return obj && Object.keys(obj).length > 0
 }
 
 exports.quietAccess = (obj, prop) => {

@@ -171,6 +171,7 @@ exports.directPost = async (destUrl, dataToSend, reqOpts) => {
     return answer
   } catch (err) {
     log.w(mod, fun, err)
+    log.w(mod, fun, utils.beautify(err.label))
     throw err
   }
 }

@@ -19,12 +19,11 @@ export class Thesaurus {
   }
 
   static addValue(newVal: string): void {
-    newVal = newVal.trim()
+    newVal = `${newVal}`.trim()
     if (Thesaurus.values.indexOf(newVal) === -1) Thesaurus.values.push(newVal)
   }
 
   static isValid(val: string, shouldInit: boolean) {
-    val = val.trim()
     const isIn = Thesaurus.values.indexOf(val) > -1
     if (!isIn && shouldInit) {
       Thesaurus.addValue(val)

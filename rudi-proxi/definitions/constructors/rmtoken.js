@@ -38,7 +38,7 @@ function RMToken(data) {
     this.scope = data['scope'];
     this.jti = data['jti'];
 
-    if (this.token_type.toLowerCase().trim() != 'bearer') {
+    if (`${this.token_type}`.toLowerCase().trim() != 'bearer') {
         this.error = 'Token: token type not supported '+this.token_type+' ("Bearer" supported)'; return;
     }
     if (!this.jti || !this.access_token) {

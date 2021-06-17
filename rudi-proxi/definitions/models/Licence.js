@@ -18,12 +18,9 @@ const LicenceTypes = {
   Custom: 'CUSTOM',
 }
 
-const {
-  API_METADATA_LICENCE_TYPE,
-  FIELDS_TO_SKIP,
-} = require('../../db/dbFields')
+const { API_LICENCE_TYPE, FIELDS_TO_SKIP } = require('../../db/dbFields')
 const options = {
-  discriminatorKey: API_METADATA_LICENCE_TYPE,
+  discriminatorKey: API_LICENCE_TYPE,
   timestamps: true,
   id: false,
 }
@@ -123,14 +120,8 @@ LicenceSchema.pre('save', function (next) {
 // -----------------------------------------------------------------------------
 const Licence = mongoose.model('Licence', LicenceSchema)
 
-const LicenceStandard = Licence.discriminator(
-  LicenceTypes.Standard,
-  LicenceStandardSchema
-)
-const LicenceCustom = Licence.discriminator(
-  LicenceTypes.Custom,
-  LicenceCustomSchema
-)
+const LicenceStandard = Licence.discriminator(LicenceTypes.Standard, LicenceStandardSchema)
+const LicenceCustom = Licence.discriminator(LicenceTypes.Custom, LicenceCustomSchema)
 
 // -----------------------------------------------------------------------------
 // Exports

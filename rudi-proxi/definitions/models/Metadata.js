@@ -15,40 +15,6 @@ const Int32 = require('mongoose-int32')
 // -----------------------------------------------------------------------------
 // Internal dependencies
 // -----------------------------------------------------------------------------
-const {
-  API_DATA_PRODUCER_PROPERTY,
-  API_DATA_CONTACTS_PROPERTY,
-
-  API_METADATA_ACCESS_CONDITION,
-  API_METADATA_LICENCE,
-  API_METADATA_LICENCE_TYPE,
-  API_METADATA_LICENCE_LABEL,
-  API_METADATA_LICENCE_CUSTOM_LABEL,
-  API_METADATA_LICENCE_CUSTOM_URI,
-
-  API_METADATA_GEOGRAPHY_PROPERTY,
-  API_METADATA_BBOX_PROPERTY,
-  API_METADATA_GEO_PROJECTION_PROPERTY,
-  API_METADATA_PERIOD_PROPERTY,
-  API_METADATA_START_DATE_PROPERTY,
-
-  API_METAINFO_PROPERTY,
-  API_METAINFO_CONTACTS_PROPERTY,
-  API_METAINFO_PROVIDER_PROPERTY,
-  API_METAINFO_DATES_PROPERTY,
-
-  API_DATES_CREATED_PROPERTY,
-  API_DATES_EDITED_PROPERTY,
-  API_DATES_PUBLISHED_PROPERTY,
-
-  API_MEDIA_PROPERTY,
-
-  FIELDS_TO_SKIP,
-  API_DATA_DATES_PROPERTY,
-  API_METADATA_ID,
-  API_COLLECTION_TAG,
-} = require('../../db/dbFields')
-
 const log = require('../../utils/logging')
 const msg = require('../../utils/msg')
 const json = require('../../utils/jsonAccess')
@@ -85,9 +51,9 @@ const StorageStatus = require('../thesaurus/StorageStatus')
 
 const Keywords = require('../thesaurus/Keywords')
 const Themes = require('../thesaurus/Themes')
+const { Media, MediaTypes } = require('./Media')
 // import { Keywords } from '../definitions/thesaurus/Keywords'
 // import { Themes } from '../definitions/thesaurus/Themes'
-
 
 // -----------------------------------------------------------------------------
 // Validators
@@ -101,6 +67,48 @@ const validObjectNotEmpty = {
   message: `'{PATH}' property should not be empty`,
 }
 
+// -----------------------------------------------------------------------------
+// Fields
+// -----------------------------------------------------------------------------
+const {
+  API_DATA_PRODUCER_PROPERTY,
+  API_DATA_CONTACTS_PROPERTY,
+
+  API_ACCESS_CONDITION,
+  API_LICENCE,
+  API_LICENCE_TYPE,
+  API_LICENCE_LABEL,
+  API_LICENCE_CUSTOM_LABEL,
+  API_LICENCE_CUSTOM_URI,
+
+  API_GEOGRAPHY_PROPERTY,
+  API_GEO_BBOX_PROPERTY,
+  API_GEO_PROJECTION_PROPERTY,
+  API_PERIOD_PROPERTY,
+  API_START_DATE_PROPERTY,
+
+  API_METAINFO_PROPERTY,
+  API_METAINFO_CONTACTS_PROPERTY,
+  API_METAINFO_PROVIDER_PROPERTY,
+  API_METAINFO_DATES_PROPERTY,
+
+  API_DATES_CREATED_PROPERTY,
+  API_DATES_EDITED_PROPERTY,
+  API_DATES_PUBLISHED_PROPERTY,
+
+  API_MEDIA_PROPERTY,
+
+  FIELDS_TO_SKIP,
+  API_DATA_DATES_PROPERTY,
+  API_METADATA_ID,
+  API_THEME_PROPERTY,
+  API_KEYWORDS_PROPERTY,
+  API_LANGUAGES_PROPERTY,
+  API_COLLECTION_TAG,
+  API_PURPOSE,
+  API_MEDIA_CHECKSUM_PROPERTY,
+  API_MEDIA_TYPE_PROPERTY,
+} = require('../../db/dbFields')
 // -----------------------------------------------------------------------------
 // Fields with specific treatments
 // -----------------------------------------------------------------------------
@@ -174,10 +182,11 @@ const MetadataSchema = new mongoose.Schema(
       validate: validArrayNotNull,
     },
 
-    // /** Context, objectives and final use of the data */
-    // purpose: {
-    //   type: [DictionaryEntry],
-    // },
+    /** Context, objectives and final use of the data */
+    purpose: {
+      type: [DictionaryEntry],
+      default: undefined,
+    },
 
     // ---------------------------
     // Dataset classification
@@ -258,7 +267,7 @@ const MetadataSchema = new mongoose.Schema(
           // ,enum: Object.values(Languages)
         },
       ],
-      default: [Languages.fr],
+      default: undefined,
     },
 
     /** Period of time described by the data */
@@ -461,12 +470,15 @@ const MetadataSchema = new mongoose.Schema(
       },
 
       /** Addresses to get further information on the metadata */
-      metadata_contacts: [
-        {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Contact',
-        },
-      ],
+      metadata_contacts: {
+        type: [
+          {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Contact',
+          },
+        ],
+        default: undefined,
+      },
     },
 
     /** Date when the resource has been successfully integrated on Rudi Portal for the first time */
@@ -498,32 +510,21 @@ const MetadataSchema = new mongoose.Schema(
 async function checkLicence(metadata) {
   const fun = 'checkLicence'
 
-  const accessCondition = json.accessProperty(
-    metadata,
-    API_METADATA_ACCESS_CONDITION
-  )
+  const accessCondition = json.accessProperty(metadata, API_ACCESS_CONDITION)
   // log.d(mod, fun, `accessCondition: ${utils.beautify(accessCondition)}`)
-  const licence = json.requireSubProperty(
-    metadata,
-    API_METADATA_ACCESS_CONDITION,
-    API_METADATA_LICENCE
-  )
+  const licence = json.requireSubProperty(metadata, API_ACCESS_CONDITION, API_LICENCE)
   // log.d(mod, fun, `licence: ${utils.beautify(licence)}`)
 
-  const licenceType = json.requireSubProperty(
-    accessCondition,
-    API_METADATA_LICENCE,
-    API_METADATA_LICENCE_TYPE
-  )
+  const licenceType = json.requireSubProperty(accessCondition, API_LICENCE, API_LICENCE_TYPE)
 
   switch (licenceType) {
     case Licence.LicenceTypes.Standard: {
       // log.d(mod, fun, `licenceType: ${utils.beautify(licenceType)}`)
       const licenceLabel = json.requireSubProperty(
         accessCondition,
-        API_METADATA_LICENCE,
-        API_METADATA_LICENCE_LABEL,
-        API_METADATA_LICENCE_TYPE,
+        API_LICENCE,
+        API_LICENCE_LABEL,
+        API_LICENCE_TYPE,
         Licence.LicenceTypes.Standard
       )
       const listLicenceCode = await licenceController.getLicenceCodes()
@@ -540,23 +541,23 @@ async function checkLicence(metadata) {
       // log.d(mod, fun, `licenceType: ${utils.beautify(licenceType)}`)
       json.requireSubProperty(
         accessCondition,
-        API_METADATA_LICENCE,
-        API_METADATA_LICENCE_CUSTOM_LABEL,
-        API_METADATA_LICENCE_TYPE,
+        API_LICENCE,
+        API_LICENCE_CUSTOM_LABEL,
+        API_LICENCE_TYPE,
         Licence.LicenceTypes.Custom
       )
       json.requireSubProperty(
         accessCondition,
-        API_METADATA_LICENCE,
-        API_METADATA_LICENCE_CUSTOM_URI,
-        API_METADATA_LICENCE_TYPE,
+        API_LICENCE,
+        API_LICENCE_CUSTOM_URI,
+        API_LICENCE_TYPE,
         Licence.LicenceTypes.Custom
       )
-      return licence[API_METADATA_LICENCE_CUSTOM_LABEL]
+      return licence[API_LICENCE_CUSTOM_LABEL]
     }
     default: {
       const errMsg = msg.incorrectValueForEnum(
-        `${API_METADATA_ACCESS_CONDITION}.${API_METADATA_LICENCE}.${API_METADATA_LICENCE_TYPE}`,
+        `${API_ACCESS_CONDITION}.${API_LICENCE}.${API_LICENCE_TYPE}`,
         licenceType
       )
       log.e(mod, fun, errMsg)
@@ -565,54 +566,80 @@ async function checkLicence(metadata) {
   }
 }
 
-async function checkThesaurus(metadata, next) {
+async function checkThesaurus(metadata) {
   const fun = 'checkThesaurus'
   // if (metadata.init) log.d(mod, fun, `init`)
   const shouldInit = metadata[API_COLLECTION_TAG] == 'init'
 
   try {
-    if (Themes.isValid(metadata.theme, shouldInit)) next()
-    next(new Error(msg.incorrectVal('theme', metadata.theme)))
+    const theme = metadata[API_THEME_PROPERTY]
+    if (!Themes.isValid(theme, shouldInit))
+      throw new Error(msg.incorrectVal(API_THEME_PROPERTY, theme))
 
+    const keywords = metadata[API_KEYWORDS_PROPERTY]
+    log.d(mod, fun, `keywords: ${utils.beautify(keywords)}`)
     await Promise.all(
-      metadata.keywords.map((keyword) => {
-        if (Keywords.isValid(keyword, shouldInit)) next()
-        else next(new Error(msg.incorrectVal('keywords', keyword)))
+      keywords.map((keyword) => {
+        log.d(mod, fun, `keyword: ${keyword}`)
+        if (!Keywords.isValid(keyword, shouldInit))
+          throw new Error(msg.incorrectVal('keywords', keyword))
         return true
       })
     )
 
-    if (metadata.resource_languages) {
-      await Promise.all(
-        metadata.resource_languages.map((lang) => {
-          if (Languages.isValid(lang, shouldInit)) next()
-          else next(new Error(msg.incorrectVal('resource_languages', lang)))
-          return true
-        })
-      )
-    }
-
-    if (metadata.geography && metadata.geography.projection) {
-      if (Projections.isValid(metadata.geography.projection, shouldInit)) next()
-      else
-        next(
-          new Error(
-            msg.incorrectVal(
-              'geography.projection',
-              metadata.geography.projection
-            )
-          )
+    const languages = metadata[API_LANGUAGES_PROPERTY]
+    if (languages) {
+      const langStr = utils.beautify(languages)
+      if (langStr === '[]' || langStr === '[null]') {
+        delete metadata[API_LANGUAGES_PROPERTY]
+      } else {
+        await Promise.all(
+          languages.map((lang) => {
+            if (!Languages.isValid(lang, shouldInit))
+              throw new Error(msg.incorrectVal(API_LANGUAGES_PROPERTY, lang))
+            return true
+          })
         )
+      }
     }
 
-    if (StorageStatus.isValid(metadata.storage_status, shouldInit)) next()
-    else
-      next(
-        new Error(msg.incorrectVal('storage_status', metadata.storage_status))
-      )
+    const geography = metadata[API_GEOGRAPHY_PROPERTY]
+    if (geography) {
+      const projection = geography[API_GEO_PROJECTION_PROPERTY]
+      if (projection) {
+        if (!Projections.isValid(projection, shouldInit))
+          throw new Error(
+            msg.incorrectVal(`${API_GEOGRAPHY_PROPERTY}.${API_GEO_PROJECTION_PROPERTY}`, projection)
+          )
+      }
+    }
+
+    if (!StorageStatus.isValid(metadata.storage_status, shouldInit)) {
+      throw new Error(msg.incorrectVal('storage_status', metadata.storage_status))
+    }
   } catch (err) {
     log.w(mod, fun, err)
-    next(err)
+    throw err
+  }
+}
+
+function checkMedia(metadata) {
+  const fun = 'checkMedia'
+  log.d(mod, fun, `metadata: ${utils.beautify(metadata)}`)
+  try {
+    const media = metadata[API_MEDIA_PROPERTY]
+    if (!media) throw new Error(msg.missingField(API_MEDIA_PROPERTY))
+    if (media[API_MEDIA_TYPE_PROPERTY] === MediaTypes.File) {
+      if (!utils.isNotEmptyObject(media[API_MEDIA_CHECKSUM_PROPERTY])) {
+        throw new Error(msg.missingObjectProperty(this, API_MEDIA_CHECKSUM_PROPERTY))
+      }
+    } else {
+      log.d(mod, fun, `media: ${utils.beautify(metadata[API_MEDIA_PROPERTY])}`)
+      log.d(mod, fun, `type: ${media[API_MEDIA_TYPE_PROPERTY]}`)
+    }
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
   }
 }
 
@@ -656,53 +683,33 @@ MetadataSchema.pre('save', async function (next) {
 
   try {
     // If 'geography' field is defined, the field 'geography.bbox' is required
-    if (
-      json.requireSubProperty(
-        metadata,
-        API_METADATA_GEOGRAPHY_PROPERTY,
-        API_METADATA_BBOX_PROPERTY
-      )
-    ) {
-      if (
-        utils.isNothing(
-          metadata[API_METADATA_GEOGRAPHY_PROPERTY][
-            API_METADATA_GEO_PROJECTION_PROPERTY
-          ]
-        )
-      ) {
+    if (json.requireSubProperty(metadata, API_GEOGRAPHY_PROPERTY, API_GEO_BBOX_PROPERTY)) {
+      if (utils.isNothing(metadata[API_GEOGRAPHY_PROPERTY][API_GEO_PROJECTION_PROPERTY])) {
         // If 'geography' field is defined, but 'geography.projection' is not, it is initialized to the defaul value.
-        metadata[API_METADATA_GEOGRAPHY_PROPERTY][
-          API_METADATA_GEO_PROJECTION_PROPERTY
-        ] = 'WGS 84'
+        metadata[API_GEOGRAPHY_PROPERTY][API_GEO_PROJECTION_PROPERTY] = 'WGS 84'
       }
     }
 
     // If 'temporal_spread' is defined, the field 'start_date' should be defined
-    json.requireSubProperty(
-      metadata,
-      API_METADATA_PERIOD_PROPERTY,
-      API_METADATA_START_DATE_PROPERTY
-    )
+    json.requireSubProperty(metadata, API_PERIOD_PROPERTY, API_START_DATE_PROPERTY)
 
     // Checking 'licence' field
     await checkLicence(metadata)
 
     // If 'dataset_dates.updated' is not defined, it is initialized with 'dataset_dates.created'
-    if (
-      utils.isNothing(
-        metadata[API_DATA_DATES_PROPERTY][API_DATES_EDITED_PROPERTY]
-      )
-    ) {
+    if (utils.isNothing(metadata[API_DATA_DATES_PROPERTY][API_DATES_EDITED_PROPERTY])) {
       metadata[API_DATA_DATES_PROPERTY][API_DATES_EDITED_PROPERTY] =
         metadata[API_DATA_DATES_PROPERTY][API_DATES_CREATED_PROPERTY]
     }
+
+    await checkThesaurus(metadata)
+
+    // await checkMedia(metadata)
   } catch (err) {
     next(err)
   }
 
-  await checkThesaurus(metadata, next)
-
-  next()
+  // next()
 })
 
 MetadataSchema.post('save', async function (doc, next) {
@@ -714,7 +721,7 @@ MetadataSchema.post('save', async function (doc, next) {
   } catch (err) {
     next(err)
   }
-  next()
+  // next()
 })
 
 /*

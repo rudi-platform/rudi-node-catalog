@@ -1,5 +1,7 @@
 'use strict'
 
+const mod = 'mediaSch'
+
 // -----------------------------------------------------------------------------
 // External dependancies
 // -----------------------------------------------------------------------------
@@ -10,6 +12,7 @@ const _ = require('lodash')
 // -----------------------------------------------------------------------------
 // Internal dependancies
 // -----------------------------------------------------------------------------
+const log = require('../../utils/logging')
 const Ids = require('../schemas/Identifiers')
 const Validation = require('../schemaValidators')
 
@@ -17,7 +20,13 @@ const Encodings = require('../thesaurus/Encodings')
 const FileTypes = require('../thesaurus/FileTypes').get()
 const HashAlgorithms = require('../thesaurus/HashAlgorithms').get()
 
-const { FIELDS_TO_SKIP } = require('../../db/dbFields')
+const {
+  FIELDS_TO_SKIP,
+  API_MEDIA_TYPE_PROPERTY,
+  API_MEDIA_CHECKSUM_PROPERTY,
+} = require('../../db/dbFields')
+const { isNotEmptyObject } = require('../../utils/jsUtils')
+const { missingObjectProperty, missingField } = require('../../utils/msg')
 
 // -----------------------------------------------------------------------------
 // Constants
@@ -77,6 +86,17 @@ const MediaSchema = new mongoose.Schema(
   commonSchemaOptions
 )
 
+MediaSchema.pre('save', function (next) {
+  const fun = 'pre save hook'
+  log.d(mod, fun, ``)
+  if (
+    this[API_MEDIA_TYPE_PROPERTY] === MediaTypes.File &&
+    !isNotEmptyObject(this[API_MEDIA_CHECKSUM_PROPERTY])
+  ) {
+    next(new Error(missingField(API_MEDIA_CHECKSUM_PROPERTY)))
+  } else next()
+})
+
 // -----------------------------------------------------------------------------
 // File schema definition
 // -----------------------------------------------------------------------------
@@ -97,15 +117,18 @@ const FileSchema = new mongoose.Schema(
 
     // Makes it possible to check data integrity
     checksum: {
-      algo: {
-        type: String,
-        enum: Object.values(HashAlgorithms),
-        require: true,
+      type: {
+        algo: {
+          type: String,
+          enum: Object.values(HashAlgorithms),
+          require: true,
+        },
+        hash: {
+          type: String,
+          require: true,
+        },
       },
-      hash: {
-        type: String,
-        require: true,
-      },
+      require: true,
     },
 
     // Link towards the resource that describes the structure of the data
@@ -136,6 +159,16 @@ const FileSchema = new mongoose.Schema(
   },
   commonSchemaOptions
 )
+
+FileSchema.pre('save', function (next) {
+  const fun = 'pre save hook'
+  log.d('FileSchema', fun, ``)
+  if (!isNotEmptyObject(this[API_MEDIA_CHECKSUM_PROPERTY])) {
+    next(new Error(missingField(API_MEDIA_CHECKSUM_PROPERTY)))
+  } else {
+    next()
+  }
+})
 
 // -----------------------------------------------------------------------------
 // Series schema definition

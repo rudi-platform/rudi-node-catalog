@@ -42,6 +42,7 @@ exports.API_DATA_DATES_PROPERTY = 'dataset_dates'
 // -----------------------------------------------------------------------------
 exports.API_MEDIA_PROPERTY = 'available_formats'
 exports.API_MEDIA_TYPE_PROPERTY = 'media_type'
+exports.API_MEDIA_CHECKSUM_PROPERTY = 'checksum'
 
 // -----------------------------------------------------------------------------
 // Metadata properties: metadata info
@@ -54,28 +55,28 @@ exports.API_METAINFO_DATES_PROPERTY = 'metadata_dates'
 // -----------------------------------------------------------------------------
 // Metadata properties: geospatial
 // -----------------------------------------------------------------------------
-exports.API_METADATA_GEOGRAPHY_PROPERTY = 'geography'
-exports.API_METADATA_GEOJSON_PROPERTY = 'geographic_distribution'
-exports.API_METADATA_GEO_PROJECTION_PROPERTY = 'projection'
+exports.API_GEOGRAPHY_PROPERTY = 'geography'
+exports.API_GEO_GEOJSON_PROPERTY = 'geographic_distribution'
+exports.API_GEO_PROJECTION_PROPERTY = 'projection'
 
-exports.API_METADATA_BBOX_PROPERTY = 'bounding_box'
-exports.API_METADATA_BBOX_WEST = 'west_longitude'
-exports.API_METADATA_BBOX_EAST = 'east_longitude'
-exports.API_METADATA_BBOX_SOUTH = 'south_latitude'
-exports.API_METADATA_BBOX_NORTH = 'north_latitude'
+exports.API_GEO_BBOX_PROPERTY = 'bounding_box'
+exports.API_GEO_BBOX_WEST = 'west_longitude'
+exports.API_GEO_BBOX_EAST = 'east_longitude'
+exports.API_GEO_BBOX_SOUTH = 'south_latitude'
+exports.API_GEO_BBOX_NORTH = 'north_latitude'
 
-exports.API_METADATA_PERIOD_PROPERTY = 'temporal_spread'
-exports.API_METADATA_START_DATE_PROPERTY = 'start_date'
+exports.API_PERIOD_PROPERTY = 'temporal_spread'
+exports.API_START_DATE_PROPERTY = 'start_date'
 
 // -----------------------------------------------------------------------------
 // Metadata properties: access condition / licence
 // -----------------------------------------------------------------------------
-exports.API_METADATA_ACCESS_CONDITION = 'access_condition'
-exports.API_METADATA_LICENCE = 'licence'
-exports.API_METADATA_LICENCE_TYPE = 'licence_type'
-exports.API_METADATA_LICENCE_LABEL = 'licence_label'
-exports.API_METADATA_LICENCE_CUSTOM_LABEL = 'custom_licence_label'
-exports.API_METADATA_LICENCE_CUSTOM_URI = 'custom_licence_uri'
+exports.API_ACCESS_CONDITION = 'access_condition'
+exports.API_LICENCE = 'licence'
+exports.API_LICENCE_TYPE = 'licence_type'
+exports.API_LICENCE_LABEL = 'licence_label'
+exports.API_LICENCE_CUSTOM_LABEL = 'custom_licence_label'
+exports.API_LICENCE_CUSTOM_URI = 'custom_licence_uri'
 
 // -----------------------------------------------------------------------------
 // Dates
@@ -83,6 +84,21 @@ exports.API_METADATA_LICENCE_CUSTOM_URI = 'custom_licence_uri'
 exports.API_DATES_CREATED_PROPERTY = 'created'
 exports.API_DATES_EDITED_PROPERTY = 'updated'
 exports.API_DATES_PUBLISHED_PROPERTY = 'published'
+
+// -----------------------------------------------------------------------------
+// Producer Specific fields
+// -----------------------------------------------------------------------------
+exports.API_COLLECTION_TAG = 'collection_tag'
+exports.API_PURPOSE = 'purpose'
+
+// -----------------------------------------------------------------------------
+// Properties with restricted values
+// -----------------------------------------------------------------------------
+exports.API_THEME_PROPERTY = 'theme'
+exports.API_KEYWORDS_PROPERTY = 'keywords'
+exports.API_LANGUAGES_PROPERTY = 'resource_languages'
+
+//——————————————————————————————————————————————————————————————————————————————
 
 // -----------------------------------------------------------------------------
 // Integration reports
@@ -118,8 +134,3 @@ exports.API_CONCEPT_PARENTS_PROPERTY = 'broader_concepts'
 exports.API_CONCEPT_CHILDREN_PROPERTY = 'narrower_concepts'
 exports.API_CONCEPT_SIBLINGS_PROPERTY = 'siblings_concepts'
 exports.API_CONCEPT_RELATIVE_PROPERTY = 'relative_concepts'
-
-// -----------------------------------------------------------------------------
-// Classification
-// -----------------------------------------------------------------------------
-exports.API_COLLECTION_TAG = 'collection_tag'

@@ -44,17 +44,19 @@ const {
   API_METAINFO_CONTACTS_PROPERTY,
   API_METAINFO_DATES_PROPERTY,
 
-  API_METADATA_GEOGRAPHY_PROPERTY,
-  API_METADATA_GEOJSON_PROPERTY,
-  API_METADATA_BBOX_PROPERTY,
-  API_METADATA_BBOX_WEST,
-  API_METADATA_BBOX_EAST,
-  API_METADATA_BBOX_NORTH,
-  API_METADATA_BBOX_SOUTH,
+  API_GEOGRAPHY_PROPERTY,
+  API_GEOJSON_PROPERTY,
+  API_GEO_BBOX_PROPERTY,
+  API_GEO_BBOX_WEST,
+  API_GEO_BBOX_EAST,
+  API_GEO_BBOX_NORTH,
+  API_GEO_BBOX_SOUTH,
   API_MEDIA_ID,
   API_DATES_CREATED_PROPERTY,
   API_DATES_PUBLISHED_PROPERTY,
   API_COLLECTION_TAG,
+  API_PURPOSE,
+  API_LANGUAGES_PROPERTY,
 } = require('../db/dbFields')
 
 const {
@@ -269,6 +271,10 @@ exports.mediaListDbToRudiFormat = async (mediaDbIds) => {
 // Global treatments of properties: RUDI -> DB
 // -----------------------------------------------------------------------------
 
+// Flag that sets if organizations, contacts and media should be created
+// if they don't already exist in the DB
+const SHOULD_CREATE_IF_NOT_FOUND = true
+
 /**
  * Format a RUDI Metadata document (JSON):
  * @param rudiMetadata: the RUDI Metadata JSON object
@@ -288,10 +294,6 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
   } else {
     dbReadyMetadata = rudiMetadata
   }
-
-  const SHOULD_CREATE_IF_NOT_FOUND = true
-  // Flag that sets if organizations, contacts and media should be created
-  // if they don't already exist in the DB
 
   try {
     // ----- Updating producer field with db instead of incoming data
@@ -325,7 +327,6 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
         SHOULD_CREATE_IF_NOT_FOUND
       )
     }
-    // log.d(mod, fun, `objectData: ${utils.beautify(objectData)}`)
 
     // ----- Updating contacts field with db instead of incoming data
     // TODO[VALIDATE]: The contact info already in database is not updated with possible new data,
@@ -369,6 +370,15 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
       }
     }
 
+    if (utils.isEmptyArray(dbReadyMetadata[API_PURPOSE])) {
+      delete dbReadyMetadata[API_PURPOSE]
+    }
+    const langStr = utils.beautify(dbReadyMetadata[API_LANGUAGES_PROPERTY])
+    log.d(mod, fun, `langStr: ${langStr}`)
+    if (langStr === '[]' || langStr === '[null]') {
+      log.d(mod, fun, `removing lang field: ${langStr}`)
+      delete dbReadyMetadata[API_LANGUAGES_PROPERTY]
+    }
     // this.setGeography(dbReadyMetadata)
 
     // log.d(mod, fun, `dbReadyMetadata: ${utils.beautify(dbReadyMetadata, 2)}`)
@@ -394,22 +404,22 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
 exports.setGeography = (metadata) => {
   const fun = 'setGeography'
   log.d(mod, fun, ``)
-  const geography = metadata[API_METADATA_GEOGRAPHY_PROPERTY]
+  const geography = metadata[API_GEOGRAPHY_PROPERTY]
   if (utils.isNothing(geography)) {
     // No 'geography' property => exit
-    log.d(mod, fun, `No '${API_METADATA_GEOGRAPHY_PROPERTY}' property was set`)
+    log.d(mod, fun, `No '${API_GEOGRAPHY_PROPERTY}' property was set`)
     return
   }
 
-  const bbox = geography[API_METADATA_BBOX_PROPERTY]
-  const geojson = geography[API_METADATA_GEOJSON_PROPERTY]
+  const bbox = geography[API_GEO_BBOX_PROPERTY]
+  const geojson = geography[API_GEOJSON_PROPERTY]
 
   if (utils.isNothing(bbox)) {
     // No 'bounding_box' property
-    log.d(mod, fun, `No '${API_METADATA_BBOX_PROPERTY}' property was set`)
+    log.d(mod, fun, `No '${API_GEO_BBOX_PROPERTY}' property was set`)
     if (utils.isNothing(geojson)) {
       // No 'bounding_box' property nor GeoJSON => problem
-      log.d(mod, fun, `No '${API_METADATA_GEOJSON_PROPERTY}' property was set`)
+      log.d(mod, fun, `No '${API_GEOJSON_PROPERTY}' property was set`)
       // No geographic information
       // TODO: (If shouldBeStrict: error => bbox is mandatory if 'geography' is set!)
       return
@@ -425,12 +435,12 @@ exports.setGeography = (metadata) => {
   if (!utils.isNothing(geojson)) {
     // Both GeoJSON and 'bounding_box' properties are set => exit
     const msg =
-      `Both '${API_METADATA_BBOX_PROPERTY}' ` +
-      `and '${API_METADATA_GEOJSON_PROPERTY}' properties are already set`
+      `Both '${API_GEO_BBOX_PROPERTY}' ` +
+      `and '${API_GEOJSON_PROPERTY}' properties are already set`
 
     log.d(mod, fun, msg)
-    log.d(mod, fun, `'${API_METADATA_BBOX_PROPERTY}' = ${utils.beautify(bbox)}`)
-    log.d(mod, fun, `'${API_METADATA_GEOJSON_PROPERTY}' = ${utils.beautify(geojson)}`)
+    log.d(mod, fun, `'${API_GEO_BBOX_PROPERTY}' = ${utils.beautify(bbox)}`)
+    log.d(mod, fun, `'${API_GEOJSON_PROPERTY}' = ${utils.beautify(geojson)}`)
     // TODO: check that 'geographic_distribution' property is a valid GeoJSON
     // TODO: set bbox property if not set
     // TODO: check that bbox subproperty is coherent with 'geography.bounding_box' coordinates
@@ -444,13 +454,17 @@ exports.setGeography = (metadata) => {
   //      2. Create a GeoJSON Polygon with 'bbox' property
   //      3. set 'geography.geographic_distribution' property
 
-  const west = bbox[API_METADATA_BBOX_WEST]
-  const south = bbox[API_METADATA_BBOX_SOUTH]
-  const east = bbox[API_METADATA_BBOX_EAST]
-  const north = bbox[API_METADATA_BBOX_NORTH]
+  const west = bbox[API_GEO_BBOX_WEST]
+  const south = bbox[API_GEO_BBOX_SOUTH]
+  const east = bbox[API_GEO_BBOX_EAST]
+  const north = bbox[API_GEO_BBOX_NORTH]
 
-  metadata[API_METADATA_GEOGRAPHY_PROPERTY][API_METADATA_GEOJSON_PROPERTY] =
-    geo.bboxToGeoJsonPolygon(west, south, east, north)
+  metadata[API_GEOGRAPHY_PROPERTY][API_GEOJSON_PROPERTY] = geo.bboxToGeoJsonPolygon(
+    west,
+    south,
+    east,
+    north
+  )
 }
 
 // -----------------------------------------------------------------------------
@@ -465,11 +479,9 @@ exports.newMetadata = async (rudiMetadata) => {
 
   // Special treatment!
   const dbReadyObject = await this.rudiToDbFormat(rudiMetadata, true)
+  log.d(mod, fun, `dbReadyObject: ${utils.beautify(dbReadyObject)}`)
 
   // Special update for metadataInfo.referenceDates: update 'createdDate'
-  // this.setCreateDateInRudiObject(dbReadyObject)
-
-  // log.d(mod, fun, `DB ready object: ${utils.beautify(dbReadyObject)}`)
 
   let dbMetadata
   try {
@@ -492,7 +504,10 @@ exports.newMetadata = async (rudiMetadata) => {
     )
     throw err
   }
+  log.d(mod, fun, `dbMetadata: ${utils.beautify(dbMetadata)}`)
+
   await this.sendToPortal(dbMetadata)
+
   return dbMetadata
   // return this.dbMetadataToRudi(dbMetadata)
 }

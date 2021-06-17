@@ -84,7 +84,7 @@ export class RMToken {
     try {
       this.tokenInfo = data
 
-      if (this.tokenInfo.token_type.toLowerCase().trim() != 'bearer') {
+      if (`${this.tokenInfo.token_type}`.toLowerCase().trim() != 'bearer') {
         this.errorDescription =
           'Token: token type not supported ' + this.tokenInfo.token_type + ' ("Bearer" supported)'
         return

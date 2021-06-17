@@ -368,11 +368,11 @@ exports.incorrectVal = (field, val) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Incorrect value for '${field}': '${val}'`
+      return `Incorrect value for '${field}': '${val}' `
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Valeur incorrecte au champ '${field}' : '${val}'`
+      return `Valeur incorrecte pour le champ '${field}' : '${val}' `
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
