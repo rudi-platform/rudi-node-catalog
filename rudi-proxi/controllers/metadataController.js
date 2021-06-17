@@ -479,7 +479,7 @@ exports.newMetadata = async (rudiMetadata) => {
 
   // Special treatment!
   const dbReadyObject = await this.rudiToDbFormat(rudiMetadata, true)
-  log.d(mod, fun, `dbReadyObject: ${utils.beautify(dbReadyObject)}`)
+  // log.d(mod, fun, `dbReadyObject: ${utils.beautify(dbReadyObject)}`)
 
   // Special update for metadataInfo.referenceDates: update 'createdDate'
 
@@ -504,7 +504,7 @@ exports.newMetadata = async (rudiMetadata) => {
     )
     throw err
   }
-  log.d(mod, fun, `dbMetadata: ${utils.beautify(dbMetadata)}`)
+  // log.d(mod, fun, `dbMetadata: ${utils.beautify(dbMetadata)}`)
 
   await this.sendToPortal(dbMetadata)
 
@@ -519,13 +519,13 @@ exports.updateMetadata = async (incomingRudiMetadata) => {
 
   if (incomingRudiMetadata == null)
     throw new Error(`${msg.parameterExpected(fun, 'incomingRudiMetadata')}`)
-  log.d(mod, fun, `edited metadata: ${utils.beautify(incomingRudiMetadata)}\n`)
+  // log.d(mod, fun, `edited metadata: ${utils.beautify(incomingRudiMetadata)}\n`)
 
   // ensure the metadata already exist
   const rudiId = json.accessProperty(incomingRudiMetadata, API_METADATA_ID)
   // // let dbMetadata = await db.getEnsuredMetadataWithRudiId(rudiId) // No => no populate please !
   const dbMetadata = await db.getEnsuredObjectWithRudiId(URL_OBJECT_METADATA, rudiId)
-  log.v(mod, fun, `corresponding db object: ${utils.beautify(dbMetadata)}\n`)
+  // log.v(mod, fun, `corresponding db object: ${utils.beautify(dbMetadata)}\n`)
 
   const dbReadyEditedMetadata = await this.rudiToDbFormat(incomingRudiMetadata)
   // log.v(mod, fun, `dbReadyEditedMetadata: ${utils.beautify(dbReadyEditedMetadata)}\n`)
@@ -533,10 +533,10 @@ exports.updateMetadata = async (incomingRudiMetadata) => {
   // Backing up existing dates ('dataset_dates' and 'metadata_info.meadatada_dates' properties)
 
   await metadataCustomMerge(dbMetadata, dbReadyEditedMetadata)
-  log.d(mod, fun, `modified metadata: ${utils.beautify(dbMetadata)}`)
+  // log.d(mod, fun, `modified metadata: ${utils.beautify(dbMetadata)}`)
 
   const reply = await dbMetadata.save()
-  log.d(mod, fun, `metadata saved: ${utils.beautify(reply)}`)
+  // log.d(mod, fun, `metadata saved: ${utils.beautify(reply)}`)
 
   this.sendToPortal(dbMetadata)
 
