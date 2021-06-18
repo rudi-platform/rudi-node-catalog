@@ -30,14 +30,26 @@ exports.get = () => {
 
 exports.set = (newValue) => {
   const fun = 'set'
-  if (!newValue) parameterExpected(fun, 'newValue')
-  newVal = `${newVal}`.trim()
-  if (Thesaurus.indexOf(newValue) === -1) Thesaurus.push(newValue)
+  try {
+    if (!newValue) {
+      const errMsg = parameterExpected(fun, 'newValue')
+      log.w(mod, fun, errMsg)
+      throw new Error(errMsg)
+    }
+    newValue = `${newValue}`.trim()
+    if (Thesaurus.indexOf(newValue) === -1) Thesaurus.push(newValue)
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
 }
 
 exports.isValid = (value, shouldInit) => {
   const fun = 'isValid'
-  if (!value) parameterExpected(fun, 'value')
+  if (!value) {
+    log.w(mod, fun, parameterExpected(fun, 'value'))
+    return false
+  }
   const isIn = Thesaurus.indexOf(value) > -1
   if (!isIn && shouldInit) {
     this.set(value)
