@@ -147,7 +147,7 @@ module.exports = class Thesaurus {
     try {
       const dbEnum = await DynamicEnum.findOne({ code: typeThesaurus })
       if (dbEnum) return dbEnum.values
-      else throw new Error(`Enum '${typeThesaurus} not found`)
+      else throw new Error(`Enum '${typeThesaurus}' was not found`)
     } catch (err) {
       log.w(mod, fun, err)
       throw err
