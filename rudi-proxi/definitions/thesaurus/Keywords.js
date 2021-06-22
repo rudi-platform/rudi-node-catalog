@@ -1,19 +1,19 @@
 'use strict'
 
-const mod = 'kwdThes'
+const mod = 'keywThes'
 
 // -----------------------------------------------------------------------------
 // Internal dependencies
 // -----------------------------------------------------------------------------
 const log = require('../../utils/logging')
-const { parameterExpected } = require("../../utils/msg")
+const Thesaurus = require('./Thesaurus')
 
 // -----------------------------------------------------------------------------
-// Custom schema definition
+// Dynamic enum init
 // -----------------------------------------------------------------------------
 
-// Method for computing the integrity hash of the data
-const Keywords = [
+const CODE = 'keywords'
+const INIT_VALUES = [
   'agriculture',
   'bike',
   'biogaz',
@@ -42,45 +42,16 @@ const Keywords = [
   'wind',
 ]
 
-// -----------------------------------------------------------------------------
-// Getter / setter
-// -----------------------------------------------------------------------------
-let Thesaurus = Keywords
+const keywords = new Thesaurus(CODE, INIT_VALUES)
 
-exports.initialize = (arg) => {
-  if (arg) Thesaurus = []
-}
+const fun = `init ${CODE}`
+keywords
+  .init()
+  .then(() => {
+    // log.d(mod, fun, `Keywords: ${keywords.get()}`)
+  })
+  .catch((err) => {
+    log.w(mod, fun, `Init failed: ${err}`)
+  })
 
-exports.get = () => {
-  return Thesaurus
-}
-
-exports.set = (newValue) => {
-  const fun = 'set'
-  try {
-    if (!newValue) {
-      const errMsg = parameterExpected(fun, 'newValue')
-      log.w(mod, fun, errMsg)
-      throw new Error(errMsg)
-    }
-    newValue = `${newValue}`.trim()
-    if (Thesaurus.indexOf(newValue) === -1) Thesaurus.push(newValue)
-  } catch (err) {
-    log.w(mod, fun, err)
-    throw err
-  }
-}
-
-exports.isValid = (value, shouldInit) => {
-  const fun = 'isValid'
-  if (!value) {
-    log.w(mod, fun, parameterExpected(fun, 'value'))
-    return false
-  }
-  const isIn = Thesaurus.indexOf(value) > -1
-  if (!isIn && shouldInit) {
-    this.set(value)
-    return true
-  }
-  return isIn
-}
+module.exports = keywords

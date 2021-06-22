@@ -62,17 +62,16 @@ const { JWT_EXP } = require('../config/confPortal')
 // -----------------------------------------------------------------------------
 // Data models
 // -----------------------------------------------------------------------------
-const Organization = require('../definitions/models/Organization')
-const Contact = require('../definitions/models/Contact')
-/* beautify ignore:start */
-const { Metadata, METADATA_FIELDS_TO_POPULATE } = require('../definitions/models/Metadata')
-const { Media } = require('../definitions/models/Media')
-const { Report } = require('../definitions/models/Report')
-/* beautify ignore:end */
-
 const SkosScheme = require('../definitions/models/SkosScheme')
 const SkosConcept = require('../definitions/models/SkosConcept')
 const PortalToken = require('../definitions/models/PortalToken')
+
+const Organization = require('../definitions/models/Organization')
+const Contact = require('../definitions/models/Contact')
+
+const { Media } = require('../definitions/models/Media')
+const { Metadata, METADATA_FIELDS_TO_POPULATE } = require('../definitions/models/Metadata')
+const { Report } = require('../definitions/models/Report')
 
 // -----------------------------------------------------------------------------
 // Properties with special treatments
@@ -438,7 +437,7 @@ exports.getObjectPropertiesWithDbId = async (objectType, dbId, propertyList) => 
 
 exports.getObjectPropertiesWithRudiId = async (objectType, rudiId, propertyList) => {
   const fun = `getObjectPropertiesWithRudiId`
-  log.d(mod, fun, `type '${objectType}': ${rudiId}`)
+  // log.d(mod, fun, `type '${objectType}': ${rudiId}`)
   try {
     /* beautify ignore:start */
     const { Model, idField } = this.getObjectAccesses(objectType)
@@ -1257,11 +1256,6 @@ exports.getAllConceptsWithRole = async (conceptRole) => {
   })
   return conceptList
 }
-
-// ----------------------------------------
-// - SKOS: Thesaurus (temp)
-// ----------------------------------------
-exports.storeThesaurus = async (typeThesaurus, listValues) => {}
 
 // ----------------------------------------
 // - Filters

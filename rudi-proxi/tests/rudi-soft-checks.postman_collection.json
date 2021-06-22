@@ -382,7 +382,7 @@
 									"pm.test(\"All licence codes retrieved\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
-									"    pm.expect(responseJson.indexOf('licence_MIT')).to.gte(0)",
+									"    pm.expect(responseJson.indexOf('mit')).to.gte(0)",
 									"    pm.collectionVariables.set('softLicence', responseJson[1])",
 									"});",
 									""

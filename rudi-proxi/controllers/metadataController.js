@@ -80,8 +80,6 @@ const { Media } = require('../definitions/models/Media')
 // -----------------------------------------------------------------------------
 const Themes = require('../definitions/thesaurus/Themes')
 const Keywords = require('../definitions/thesaurus/Themes')
-// import { Keywords } from '../definitions/thesaurus/Keywords_bak'
-// import { Themes } from '../definitions/thesaurus/Themes'
 
 // -----------------------------------------------------------------------------
 // Controllers
@@ -109,9 +107,11 @@ exports.organizationRudiToDbFormat = async (rudiProducer, shouldCreateIfNotFound
       throw new Error(errMsg)
     }
     const newOrg = await organisationController.newOrganization(rudiProducer)
+    log.d(mod, fun, `new Organization: ${utils.beautify(rudiProducer)}`)
+
     organizationDbId = newOrg[DB_ID]
   }
-  log.d(mod, fun, `${utils.beautify(rudiProducer)} -> ${organizationDbId} `)
+  // log.d(mod, fun, `${utils.beautify(rudiProducer)} -> ${organizationDbId} `)
   return organizationDbId
 }
 
@@ -130,11 +130,12 @@ exports.contactListRudiToDbFormat = async (rudiContactList, shouldCreateIfNotFou
           throw new Error(`${msg.objectNotFound(URL_OBJECT_CONTACTS, rudiContact[API_CONTACT_ID])}`)
 
         const dbContact = await contactController.newContact(rudiContact)
+        log.d(mod, fun, `new Contact: ${utils.beautify(rudiContact)}`)
 
         contactDbId = dbContact[DB_ID]
       }
       contactDbIds.push(contactDbId)
-      log.d(mod, fun, `${utils.beautify(rudiContact)} -> ${contactDbId}`)
+      // log.d(mod, fun, `${utils.beautify(rudiContact)} -> ${contactDbId}`)
     })
   )
   return contactDbIds
@@ -164,13 +165,13 @@ exports.mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFound) 
 
         // log.d(mod, fun, media)
         const dbActionResult = await media.save()
-        log.d(mod, fun, `dbActionResult: ${utils.beautify(dbActionResult)}`)
+        // log.d(mod, fun, `dbActionResult: ${utils.beautify(dbActionResult)}`)
 
         mediaDbId = media[DB_ID]
-        log.d(mod, fun, `newly created mediaDbId: ${utils.beautify(mediaDbId)}`)
+        // log.d(mod, fun, `newly created mediaDbId: ${utils.beautify(mediaDbId)}`)
       }
       mediaDbIds.push(mediaDbId)
-      log.d(mod, fun, `${utils.beautify(rudiMedia)} -> ${mediaDbId} `)
+      // log.d(mod, fun, `${utils.beautify(rudiMedia)} -> ${mediaDbId} `)
     })
   )
   return mediaDbIds
@@ -337,7 +338,7 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
     } else {
       mediaList = dbReadyMetadata[API_MEDIA_PROPERTY]
     }
-    log.d(mod, fun, `mediaList: ${utils.beautify(mediaList)}`)
+    // log.d(mod, fun, `mediaList: ${utils.beautify(mediaList)}`)
     if (utils.isNotEmptyArray(mediaList)) {
       dbReadyMetadata[API_MEDIA_PROPERTY] = await this.mediaListRudiToDbFormat(
         mediaList,
@@ -548,7 +549,7 @@ exports.sendToPortal = async (metadata) => {
   try {
     const metadataId = metadata[API_METADATA_ID]
     const collectionTag = metadata[API_COLLECTION_TAG]
-    if (collectionTag) {
+    if (collectionTag || metadata.init) {
       log.d(mod, fun, `Not sending to portal: ${metadataId} (${collectionTag})`)
       return
     }

@@ -22,13 +22,9 @@ const utils = require('../utils/jsUtils')
 
 const db = require('../db/dbQueries')
 
-const licenceController = require('./licenceController')
-
-// -----------------------------------------------------------------------------
-// Data models
-// -----------------------------------------------------------------------------
-const SkosScheme = require('../definitions/models/SkosScheme')
-const SkosConcept = require('../definitions/models/SkosConcept')
+log.d(mod, 'init', 'Schemas, Models and definitions')
+const Themes = require('../definitions/thesaurus/Themes')
+const Keywords = require('../definitions/thesaurus/Keywords')
 
 // -----------------------------------------------------------------------------
 // Thesauri
@@ -39,18 +35,16 @@ const HashAlgorithms = require('../definitions/thesaurus/HashAlgorithms')
 const Languages = require('../definitions/thesaurus/Languages')
 const Projections = require('../definitions/thesaurus/Projections')
 
-const Themes = require('../definitions/thesaurus/Themes')
-const Keywords = require('../definitions/thesaurus/Keywords')
+// -----------------------------------------------------------------------------
+// Controllers
+// -----------------------------------------------------------------------------
+const licenceController = require('./licenceController')
 
-const THESAURI = {
-  encodings: Encodings.get(),
-  filetypes: FileTypes.get(),
-  hashalgorithms: HashAlgorithms.get(),
-  keywords: Keywords.get(),
-  languages: Languages.get(),
-  projections: Projections.get(),
-  themes: Themes.get(),
-}
+// -----------------------------------------------------------------------------
+// Data models
+// -----------------------------------------------------------------------------
+const SkosScheme = require('../definitions/models/SkosScheme')
+const SkosConcept = require('../definitions/models/SkosConcept')
 
 // -----------------------------------------------------------------------------
 // Constants
@@ -437,24 +431,63 @@ exports.dbConceptListToRudiRecursive = async (dbConceptList) => {
 // -----------------------------------------------------------------------------
 // Thesaurus
 // -----------------------------------------------------------------------------
-exports.getThesaurus = (thesaurusCode) => {
-  const thesaurusCodeLowerCase = thesaurusCode.toLowerCase()
-  if (thesaurusCodeLowerCase === URL_LICENCE_SUFFIX.toLowerCase()) {
-    return licenceController.getAllLicenceCodes()
-  } else {
-    return THESAURI[thesaurusCodeLowerCase]
+
+exports.getThesaurusList = async (code) => {
+  const keywords = await Keywords.get()
+  const themes = await Themes.get()
+  const licences = await await licenceController.getAllLicenceCodes()
+
+  const thesauri = {
+    encodings: Encodings.get(),
+    filetypes: FileTypes.get(),
+    hashalgorithms: HashAlgorithms.get(),
+    keywords: keywords,
+    languages: Languages.get(),
+    licences: licences,
+    projections: Projections.get(),
+    themes: themes,
+  }
+
+  return thesauri
+}
+
+exports.getThesaurus = async (thesaurusCode) => {
+  const code = thesaurusCode.toLowerCase()
+
+  const keywords = await Keywords.get()
+  const themes = await Themes.get()
+  const licences = await await licenceController.getAllLicenceCodes()
+
+  switch (code) {
+    case 'encodings':
+      return Encodings.get()
+    case 'filetypes':
+      return FileTypes.get()
+    case 'hashalgorithms':
+      return HashAlgorithms.get()
+    case 'keywords':
+      return keywords
+    case 'languages':
+      return Languages.get()
+    case 'projections':
+      return Projections.get()
+    case 'themes':
+      return themes
+    case 'licences':
+      return licences
   }
 }
 
+// -----------------------------------------------------------------------------
+// API functions
+// -----------------------------------------------------------------------------
 exports.getEveryThesaurus = async (req, reply) => {
   const fun = 'getEveryThesaurus'
   try {
     log.v(mod, fun, `< GET ${URL_THESAURUS_ACCESS}`)
     log.d(mod, fun, ``)
-    const listThesauri = THESAURI
-    listThesauri.licences = await licenceController.getAllLicenceCodes()
-    // log.d(mod, fun, `listThesauri: ${utils.beautify(listThesauri)}`)
-    // log.d(mod, fun, `THESAURI: ${utils.beautify(THESAURI)}`)
+    const listThesauri = await this.getThesaurusList()
+
     return listThesauri
   } catch (err) {
     log.e(mod, fun, err)
@@ -462,7 +495,7 @@ exports.getEveryThesaurus = async (req, reply) => {
   }
 }
 
-exports.getSingleThesaurus = (req, reply) => {
+exports.getSingleThesaurus = async (req, reply) => {
   const fun = 'getSingleThesaurus'
   try {
     log.v(mod, fun, `< GET ${URL_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}`)
@@ -470,7 +503,7 @@ exports.getSingleThesaurus = (req, reply) => {
     const thesaurusCode = json.accessReqParam(req, PARAM_THESAURUS_CODE)
     log.d(mod, fun, `thesaurusCode: ${thesaurusCode}`)
 
-    const thesaurus = this.getThesaurus(thesaurusCode)
+    const thesaurus = await this.getThesaurus(thesaurusCode)
     if (!thesaurus)
       throw new Error(
         `Thesaurus not found for such required code: ${utils.beautify(thesaurusCode)}`

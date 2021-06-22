@@ -7,33 +7,12 @@ const mod = 'themeThes'
 // -----------------------------------------------------------------------------
 const log = require('../../utils/logging')
 const { parameterExpected } = require('../../utils/msg')
+const Thesaurus = require('./Thesaurus')
 
 // -----------------------------------------------------------------------------
-// Custom schema definition
+// Dynamic enum init
 // -----------------------------------------------------------------------------
 
-// Method for computing the integrity hash of the data
-const Themes = [
-  'farming',
-  'biota',
-  'boundaries',
-  'climatologyMeteorologyAtmosphere',
-  'economy',
-  'elevation',
-  'environment',
-  'geoscientificInformation',
-  'health',
-  'imageryBaseMapsEarthCover',
-  'intelligenceMilitary',
-  'inlandWaters',
-  'location',
-  'oceans',
-  'planningCadastre',
-  'society',
-  'structure',
-  'transportation',
-  'utilitiesCommunication',
-]
 /*   farming: "Agriculture",
   biota: "Biote",
   biota: "Biote",
@@ -55,47 +34,42 @@ const Themes = [
   transportation: "Transport",
   utilitiesCommunication: "Services d’utilité publique/Communication",
 }
-  */
+*/
 
-// -----------------------------------------------------------------------------
-// Getter / setter
-// -----------------------------------------------------------------------------
-let Thesaurus = Themes
+const CODE = 'themes'
+const INIT_VALUES = [
+  'farming',
+  'biota',
+  'boundaries',
+  'climatologyMeteorologyAtmosphere',
+  'economy',
+  'elevation',
+  'environment',
+  'geoscientificInformation',
+  'health',
+  'imageryBaseMapsEarthCover',
+  'intelligenceMilitary',
+  'inlandWaters',
+  'location',
+  'oceans',
+  'planningCadastre',
+  'society',
+  'structure',
+  'transportation',
+  'utilitiesCommunication',
+]
 
-exports.initialize = (arg) => {
-  if (arg) Thesaurus = []
-}
+const themes = new Thesaurus(CODE, INIT_VALUES)
 
-exports.get = () => {
-  return Thesaurus
-}
+const fun = `init ${CODE}`
+log.d(mod, fun, ``)
+themes
+  .init()
+  .then(() => {
+    // log.d(mod, fun, `Themes: ${themes.get()}`)
+  })
+  .catch((err) => {
+    log.w(mod, fun, `Init failed: ${err}`)
+  })
 
-exports.set = (newValue) => {
-  const fun = 'set'
-  try {
-    if (!newValue) {
-      const errMsg = parameterExpected(fun, 'newValue')
-      log.w(mod, fun, errMsg)
-      throw new Error(errMsg)
-    }
-    newValue = `${newValue}`.trim()
-    if (Thesaurus.indexOf(newValue) === -1) Thesaurus.push(newValue)
-  } catch (err) {
-    log.w(mod, fun, err)
-    throw err
-  }
-}
-
-exports.isValid = (value, shouldInit) => {
-  const fun = 'isValid'
-  if (!value) {
-    log.w(mod, fun, parameterExpected(fun, 'value'))
-    return false
-  }
-  const isIn = Thesaurus.indexOf(value) > -1
-  if (!isIn && shouldInit) {
-    this.set(value)
-    return true
-  }
-  return isIn
-}
+module.exports = themes

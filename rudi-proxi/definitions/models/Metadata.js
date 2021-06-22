@@ -1,7 +1,6 @@
 'use strict'
 
 const mod = 'metaSch'
-
 // -----------------------------------------------------------------------------
 // External dependencies
 // -----------------------------------------------------------------------------
@@ -23,12 +22,20 @@ const utils = require('../../utils/jsUtils')
 const Validation = require('../schemaValidators')
 
 // -----------------------------------------------------------------------------
+// Thesaurus definiitons
+// -----------------------------------------------------------------------------
+log.d(mod, 'init', 'Schemas, Models and definitions')
+const Keywords = require('../thesaurus/Keywords')
+const Themes = require('../thesaurus/Themes')
+
+const Languages = require('../thesaurus/Languages')
+const Projections = require('../thesaurus/Projections')
+const StorageStatus = require('../thesaurus/StorageStatus')
+// -----------------------------------------------------------------------------
 // Schema definitions
 // -----------------------------------------------------------------------------
-
-/* beautify ignore:start */
 const { DOI, UUIDv4 } = require('../schemas/Identifiers')
-/* beautify ignore:end */
+
 const DictionaryEntry = require('../schemas/DictionaryEntry')
 const ReferenceDates = require('../schemas/ReferenceDates')
 
@@ -36,24 +43,13 @@ const ReferenceDates = require('../schemas/ReferenceDates')
 // Model definitions
 // -----------------------------------------------------------------------------
 const Licence = require('./Licence')
+const { Media, MediaTypes } = require('./Media')
+
 
 // -----------------------------------------------------------------------------
 // Other controllers
 // -----------------------------------------------------------------------------
 const licenceController = require('../../controllers/licenceController')
-
-// -----------------------------------------------------------------------------
-// Thesaurus definiitons
-// -----------------------------------------------------------------------------
-const Languages = require('../thesaurus/Languages')
-const Projections = require('../thesaurus/Projections')
-const StorageStatus = require('../thesaurus/StorageStatus')
-
-const Keywords = require('../thesaurus/Keywords')
-const Themes = require('../thesaurus/Themes')
-const { Media, MediaTypes } = require('./Media')
-// import { Keywords } from '../definitions/thesaurus/Keywords'
-// import { Themes } from '../definitions/thesaurus/Themes'
 
 // -----------------------------------------------------------------------------
 // Validators
@@ -109,6 +105,7 @@ const {
   API_MEDIA_CHECKSUM_PROPERTY,
   API_MEDIA_TYPE_PROPERTY,
 } = require('../../db/dbFields')
+
 // -----------------------------------------------------------------------------
 // Fields with specific treatments
 // -----------------------------------------------------------------------------
@@ -195,7 +192,6 @@ const MetadataSchema = new mongoose.Schema(
     /** Category for thematic classification of the data */
     theme: {
       type: String,
-      // enum: Object.values(Themes),
       required: true,
     },
 
@@ -204,7 +200,6 @@ const MetadataSchema = new mongoose.Schema(
       type: [
         {
           type: String,
-          // ,enum: Object.values(Keywords)
         },
       ],
       required: true,

@@ -3,12 +3,10 @@
   "scheme_code": "scheme-licence",
   "scheme_label": [
     {
-      "uuid": "f4240872-2e43-406d-abe1-f6e9c7f5a82b",
       "lang": "en",
       "text": "software licences"
     },
     {
-      "uuid": "940c3d1b-c1bc-4eaf-b975-b4712e0b8246",
       "lang": "fr",
       "text": "licences logicielles"
     }
@@ -23,12 +21,10 @@
       "concept_uri": "https://www.gnu.org/philosophy/free-sw.html",
       "pref_label": [
         {
-          "uuid": "9996d693-99d2-4a0c-ac6f-84d0f260c9a0",
           "lang": "fr",
           "text": "Logiciel Libre"
         },
         {
-          "uuid": "3a8e6a04-f9df-4cad-bccc-247855931b07",
           "lang": "en",
           "text": "Free-software license"
         }
@@ -41,12 +37,10 @@
           "concept_uri": "https://creativecommons.org/share-your-work/public-domain/cc0/",
           "pref_label": [
             {
-              "uuid": "7cf3d8c2-5bf1-4c12-a436-81c1f7b24e07",
               "lang": "fr",
               "text": "Domaine Public"
             },
             {
-              "uuid": "e43516c7-d731-4a6e-9363-7111009cbdaa",
               "lang": "en",
               "text": "Public Domain"
             }
@@ -60,12 +54,10 @@
           "concept_icon": "icon3",
           "pref_label": [
             {
-              "uuid": "9ccbbe54-751e-48f0-bbce-8d34cd1c11e7",
               "lang": "fr",
               "text": "GNU General Public License v3"
             },
             {
-              "uuid": "225bb7fb-d3c2-4935-a4e9-0ca4aa8e2819",
               "lang": "en",
               "text": "GNU General Public License v3"
             }
@@ -104,12 +96,10 @@
       "concept_uri": "https://opensource.org/licenses",
       "pref_label": [
         {
-          "uuid": "5c97495a-bf39-402b-b7ce-75cfaa6bd638",
           "lang": "fr",
           "text": "Licence Open-Source"
         },
         {
-          "uuid": "ff3e657c-9de6-4c02-ad81-a135d95635c1",
           "lang": "en",
           "text": "Open-Source Licence"
         }
@@ -122,12 +112,10 @@
           "concept_uri": "https://opensource.org/licenses/MIT",
           "pref_label": [
             {
-              "uuid": "68a6961b-b303-4e0e-8d87-be711b13b55b",
               "lang": "fr",
               "text": "Licence MIT"
             },
             {
-              "uuid": "8bff3e0d-506c-49ca-828b-3222be1da975",
               "lang": "en",
               "text": "MIT License"
             }
@@ -140,12 +128,10 @@
           "concept_uri": "https://opensource.org/licenses/Apache-2.0",
           "pref_label": [
             {
-              "uuid": "6b5d0730-dd95-42d9-8c68-e4aaa9c4dc80",
               "lang": "fr",
               "text": "Licence Apache v2"
             },
             {
-              "uuid": "abfe0588-8677-4139-bb2f-4293c3cb4a11",
               "lang": "en",
               "text": "Apache License v2"
             }
@@ -158,12 +144,10 @@
           "concept_uri": "https://opendatacommons.org/licenses/odbl/1-0",
           "pref_label": [
             {
-              "uuid": "2094f472-0fe3-4f94-84cc-0269245e22541",
               "lang": "fr",
               "text": "Licence ODbL 1.0"
             },
             {
-              "uuid": "0c209dd0-9852-4285-a286-33197bb9136f",
               "lang": "en",
               "text": "Open Data Commons Open Database License 1.0"
             }
@@ -176,12 +160,10 @@
           "concept_uri": "https://www.etalab.gouv.fr/wp-content/uploads/2014/05/Ouverte.pdf",
           "pref_label": [
             {
-              "uuid": "d131f17a-900d-4e56-a9f0-4caabedb7317",
               "lang": "fr",
               "text": "Licence Ouverte Etalab v1.0"
             },
             {
-              "uuid": "e3160d26-4661-42d5-a3f6-99e24f82b48b",
               "lang": "en",
               "text": "Etalab Open License 1.0"
             }
@@ -194,12 +176,10 @@
           "concept_uri": "https://www.etalab.gouv.fr/wp-content/uploads/2017/04/ETALAB-Licence-Ouverte-v2.0.pdf",
           "pref_label": [
             {
-              "uuid": "6b1198f1-cfd0-42cb-8c0f-aebd37db2a51",
               "lang": "fr",
               "text": "Licence Ouverte Etalab v2.0"
             },
             {
-              "uuid": "07d382d4-95e5-420d-b62b-681896251243",
               "lang": "en",
               "text": "Etalab Open License 2.0"
             }
@@ -212,12 +192,10 @@
           "concept_uri": "https://creativecommons.org/licenses/by-nd/4.0/",
           "pref_label": [
             {
-              "uuid": "9e033e40-6058-40ed-875a-89b09624abc2",
               "lang": "fr",
               "text": "Attribution - Pas de Modification 4.0 International (CC BY-ND 4.0)"
             },
             {
-              "uuid": "7700fc11-49df-4dc1-9e75-f5a951fb6988",
               "lang": "en",
               "text": "Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)"
             }
