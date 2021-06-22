@@ -214,7 +214,7 @@ exports.createConceptHierarchy = async (listConcepts, schemeDbId, parentConcept)
           dbConcept[API_CONCEPT_CHILDREN_PROPERTY] = childrenDbIds
         }
 
-        log.d(mod, fun, `${utils.beautify(conceptJson)} -> ${conceptDbId}`)
+        // log.d(mod, fun, `${utils.beautify(conceptJson)} -> ${conceptDbId}`)
       }
 
       // Update parents property

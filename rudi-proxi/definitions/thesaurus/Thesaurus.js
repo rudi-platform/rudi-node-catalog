@@ -58,7 +58,7 @@ module.exports = class Thesaurus {
       }
     }
     this.#isInit = true
-    log.d(mod, fun, `Thesaurus initialized: ${this.#code}`)
+    // log.d(mod, fun, `Thesaurus initialized: ${this.#code}`)
   }
 
   get() {
