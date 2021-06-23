@@ -70,10 +70,10 @@ const {
 // -----------------------------------------------------------------------------
 // Data models
 // -----------------------------------------------------------------------------
-/* beautify ignore:start */
+
 const { Metadata } = require('../definitions/models/Metadata')
 const { Media } = require('../definitions/models/Media')
-/* beautify ignore:end */
+
 
 // -----------------------------------------------------------------------------
 // Data models
@@ -375,7 +375,7 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
       delete dbReadyMetadata[API_PURPOSE]
     }
     const langStr = utils.beautify(dbReadyMetadata[API_LANGUAGES_PROPERTY])
-    log.d(mod, fun, `langStr: ${langStr}`)
+    // log.d(mod, fun, `langStr: ${langStr}`)
     if (langStr === '[]' || langStr === '[null]') {
       log.d(mod, fun, `removing lang field: ${langStr}`)
       delete dbReadyMetadata[API_LANGUAGES_PROPERTY]

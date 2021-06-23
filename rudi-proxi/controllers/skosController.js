@@ -22,7 +22,7 @@ const utils = require('../utils/jsUtils')
 
 const db = require('../db/dbQueries')
 
-log.d(mod, 'init', 'Schemas, Models and definitions')
+// log.d(mod, 'init', 'Schemas, Models and definitions')
 const Themes = require('../definitions/thesaurus/Themes')
 const Keywords = require('../definitions/thesaurus/Keywords')
 

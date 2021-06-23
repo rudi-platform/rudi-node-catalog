@@ -2083,19 +2083,22 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/filter?producer.organization_id=\"{{softOrg1Id}}\"",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?producer.organization_id=\"{{softOrg1Id}}\"&fields=global_id,resource_title",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{apiUrl}}",
-								"{{data}}",
-								"filter"
+								"{{data}}"
 							],
 							"query": [
 								{
 									"key": "producer.organization_id",
 									"value": "\"{{softOrg1Id}}\""
+								},
+								{
+									"key": "fields",
+									"value": "global_id,resource_title"
 								}
 							]
 						}

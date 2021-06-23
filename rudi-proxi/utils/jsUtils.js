@@ -126,21 +126,9 @@ exports.getPaths = async (root, parentKeyName) => {
   return rootSubPaths
 }
 
-exports.keepFields = async (obj, fieldList) => {
-  const clonedObj = this.deepClone(obj)
-  const filteredObj = {}
-
-  await Promise.all(
-    fieldList.map((field) => {
-      if (_.has(clonedObj, field)) {
-        const val = _.get(clonedObj, field)
-        filteredObj[field] = val
-        return true
-      } else return false
-    })
-  )
-
-  return filteredObj
+exports.listPick = async (objList, fieldList) => {
+  const reshapedList = await Promise.all(objList.map((obj) => _.pick(obj, fieldList)))
+  return reshapedList
 }
 
 exports.filterOnValue = async (obj, predicate) => {

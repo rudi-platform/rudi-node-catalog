@@ -24,7 +24,7 @@ const Validation = require('../schemaValidators')
 // -----------------------------------------------------------------------------
 // Thesaurus definiitons
 // -----------------------------------------------------------------------------
-log.d(mod, 'init', 'Schemas, Models and definitions')
+// log.d(mod, 'init', 'Schemas, Models and definitions')
 const Keywords = require('../thesaurus/Keywords')
 const Themes = require('../thesaurus/Themes')
 

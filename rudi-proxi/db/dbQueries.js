@@ -9,6 +9,7 @@ const mod = 'db'
 // External dependancies
 // -----------------------------------------------------------------------------
 const mongoose = require('mongoose')
+const _ = require('lodash')
 
 // -----------------------------------------------------------------------------
 // Internal dependencies
@@ -34,6 +35,12 @@ const {
   URL_LICENCE_SUFFIX,
   QUERY_LIMIT_DEFAULT,
   QUERY_OFFSET_DEFAULT,
+  QUERY_LIMIT,
+  QUERY_OFFSET,
+  QUERY_FILTER,
+  QUERY_FIELDS,
+  QUERY_GROUP_LIMIT,
+  QUERY_GROUP_OFFSET,
 } = require('../config/confApi')
 
 // Fields from the JSON as definied in the API
@@ -153,9 +160,11 @@ exports.getRootRef = (objectType, field) => {
 
 exports.getFieldModel = (objectType, field) => {
   const fun = 'getFieldModel'
-  log.d(mod, fun, `field: ${field}`)
+  log.d(mod, fun, `field: ${utils.beautify(field)}`)
 
   assertIsString(fun, objectType)
+  assertIsString(fun, field)
+
   if (objectType !== URL_OBJECT_METADATA) return null
 
   const prop = field.split('.')[0]
@@ -297,9 +306,9 @@ exports.getObject = async (objectType, filter) => {
 exports.getObjectWithDbId = async (objectType, dbId) => {
   const fun = `getObjectWithDbId`
   log.d(mod, fun, ``)
-  /* beautify ignore:start */
+
   const filter = { [DB_ID]: dbId }
-  /* beautify ignore:end */
+
   return await this.getObject(objectType, filter)
 }
 
@@ -307,10 +316,10 @@ exports.getObjectWithRudiId = async (objectType, rudiId) => {
   const fun = `getObjectWithRudiId`
   // log.d(mod, fun, ``)
   if (!rudiId) throw new Error(`${msg.parameterExpected(fun, PARAM_ID)}`)
-  /* beautify ignore:start */
+
   const idField = this.getObjectIdField(objectType)
   const filter = { [idField]: rudiId }
-  /* beautify ignore:end */
+
   return await this.getObject(objectType, filter)
 }
 
@@ -421,9 +430,8 @@ exports.getObjectPropertiesWithDbId = async (objectType, dbId, propertyList) => 
     const Model = this.getObjectModel(objectType)
     const populateFields = getPopulateFields(objectType)
     const fields = propertyList.join(' ')
-    /* beautify ignore:start */
     const filter = { [DB_ID]: dbId }
-    /* beautify ignore:end */
+
     if (utils.isEmptyArray(populateFields)) {
       return await Model.findOne(filter, fields)
     } else {
@@ -439,10 +447,9 @@ exports.getObjectPropertiesWithRudiId = async (objectType, rudiId, propertyList)
   const fun = `getObjectPropertiesWithRudiId`
   // log.d(mod, fun, `type '${objectType}': ${rudiId}`)
   try {
-    /* beautify ignore:start */
     const { Model, idField } = this.getObjectAccesses(objectType)
     const filter = { [idField]: rudiId }
-    /* beautify ignore:end */
+
     const fields = propertyList.join(' ')
     const populateFields = getPopulateFields(objectType)
     if (!populateFields) {
@@ -533,43 +540,36 @@ exports.getObjectWithField = async (Model, fieldName, fieldValue, populateFields
 // -----------------------------------------------------------------------------
 // Generic functions: get object list
 // -----------------------------------------------------------------------------
-exports.getObjectList = async (objectType, limit, offset, filter, fields) => {
+exports.getObjectList = async (objectType, options) => {
   const fun = `getObjectList`
   log.d(mod, fun, ``)
   try {
-    const Model = this.getObjectModel(objectType)
-    limit = limit || QUERY_LIMIT_DEFAULT
-    offset = offset || QUERY_OFFSET_DEFAULT
-    filter = filter || {}
+    const { Model, idField } = this.getObjectAccesses(objectType)
+
+    const limit = options[QUERY_LIMIT] || QUERY_LIMIT_DEFAULT
+    const offset = options[QUERY_OFFSET] || QUERY_OFFSET_DEFAULT
+    const filter = options[QUERY_FILTER] || {}
+    const fields = options[QUERY_FIELDS]
     const populateFields = getPopulateFields(objectType)
 
-    log.d(
-      mod,
-      fun,
-      `objectType: ${objectType}, limit: ${limit}, offset: ${offset}, filter: ${utils.beautify(
-        filter
-      )}, fields: ${utils.beautify(fields)}`
-    )
+    log.d(mod, fun, `options: ${utils.beautify(options)}`)
+    
     if (utils.isEmptyArray(populateFields)) {
       const fieldsToKeep = fields ? fields.join(' ') : ``
-      return await Model.find(filter, fieldsToKeep).limit(limit).skip(offset)
+      return await Model.find(filter, fieldsToKeep)
+        .sort({ [idField]: 1 })
+        .limit(limit)
+        .skip(offset)
     } else {
       const objectList = await Model.find(filter)
+        .sort({ [idField]: 1 })
         .limit(limit)
         .skip(offset)
         .populate(getPopulateOptions(objectType))
+
       if (!fields) return objectList
 
-      const filteredObjectList = []
-      await Promise.all(
-        objectList.map(async (obj) => {
-          const filteredObj = await utils.keepFields(obj, fields)
-          // log.d(mod, fun, `obj: ${utils.beautify(obj)}`)
-          // log.d(mod, fun, `filteredObj: ${utils.beautify(filteredObj)}`)
-          filteredObjectList.push(filteredObj)
-        })
-      )
-      return filteredObjectList
+      return await utils.listPick(objectList, fields)
     }
   } catch (err) {
     log.w(mod, fun, err)
@@ -577,39 +577,25 @@ exports.getObjectList = async (objectType, limit, offset, filter, fields) => {
   }
 }
 
-exports.getObjectListWithProperties = async (objectType, filter, fields, limit, offset) => {
-  const fun = `getObjectListWithProperties`
-  // log.d(mod, fun, `fields: ${utils.beautify(fields)}`)
-  log.d(mod, fun, ``)
-  try {
-    const Model = this.getObjectModel(objectType)
-    const populateFields = getPopulateFields(objectType)
-    if (utils.isEmptyArray(populateFields)) {
-      return await Model.findOne(filter, fields)
-    } else {
-      return await Model.findOne(filter, fields).populate(populateFields)
-    }
-  } catch (err) {
-    log.w(mod, fun, err)
-    throw err
-  }
-}
-
-exports.getObjectListCount = async (objectType, unionField, limit, offset) => {
+exports.getObjectListCount = async (objectType, unionField, options) => {
   const fun = `getObjectListCount`
   log.d(mod, fun, ``)
 
-  log.d(
-    mod,
-    fun,
-    `objectType: ${objectType}, unionField: ${unionField}, limit: ${limit} / offset: ${offset} `
-  )
   try {
-    const Model = this.getObjectModel(objectType)
+    //--- Parameters
+    // Identify object type characteristics
+    const { Model, idField } = this.getObjectAccesses(objectType)
 
+    // Check if the given unionField is a subproperty of a different Model
     const [FieldModel, rootProp] = this.getRootRef(objectType, unionField)
     const pivot = !FieldModel ? unionField : rootProp
-    /* beautify ignore:start */
+
+    // Extract options
+    const limit = options[QUERY_LIMIT] || QUERY_LIMIT_DEFAULT // Limits the number of results in the final list
+    const offset = options[QUERY_OFFSET] || QUERY_OFFSET_DEFAULT
+    const filter = options[QUERY_FILTER] || {}
+    const fields = options[QUERY_FIELDS]
+
     const objectList = await Model.aggregate([
       { $unwind: `$${pivot}` },
       {
@@ -618,15 +604,15 @@ exports.getObjectListCount = async (objectType, unionField, limit, offset) => {
           count: { $sum: 1 },
         },
       },
-      { $sort: { count: -1 } },
+      { $sort: { count: -1, _id: 1 } },
+      { $limit: limit },
+      { $skip: offset },
     ]).exec()
-    /* beautify ignore:end */
 
     if (!FieldModel) {
       objectList.map((obj) => {
         obj[pivot] = obj._id
         delete obj._id
-        return obj._id
       })
       return objectList
     } else {
@@ -645,65 +631,80 @@ exports.getObjectListCount = async (objectType, unionField, limit, offset) => {
   }
 }
 
-exports.getObjectListGroup = async (objectType, unionField, limit, offset) => {
+exports.getObjectListGroup = async (objectType, unionField, options) => {
   const fun = `getObjectListGroup`
   log.d(mod, fun, ``)
-  log.d(
-    mod,
-    fun,
-    `objectType: ${objectType}, unionField: ${unionField}, limit: ${limit} / offset${offset} `
-  )
 
   try {
-    const Model = this.getObjectModel(objectType)
-    const FieldModel = this.getFieldModel(objectType, unionField)
+    //--- Parameters
+    // Identify object type characteristics
+    const { Model, idField } = this.getObjectAccesses(objectType)
 
-    /* beautify ignore:start */
-    const objectList = await Model.aggregate([
-      { $unwind: `$${unionField}` },
+    // Check if the given unionField is a subproperty of a different Model
+    const [FieldModel, rootProp] = this.getRootRef(objectType, unionField)
+    const pivot = !FieldModel ? unionField : rootProp
+
+    // Extract options
+    const limit = options[QUERY_LIMIT] || QUERY_LIMIT_DEFAULT // Limits the number of results in the final list
+    const offset = options[QUERY_OFFSET] || QUERY_OFFSET_DEFAULT
+    const groupLimit = options[QUERY_GROUP_LIMIT] || QUERY_LIMIT_DEFAULT // For each result, limit the number of objects
+    const groupOffset = options[QUERY_GROUP_OFFSET] || QUERY_OFFSET_DEFAULT
+    const filter = options[QUERY_FILTER] || {}
+    const fields = options[QUERY_FIELDS]
+
+    //--- Aggregation
+    let aggregateOptions = [
+      { $unwind: `$${pivot}` },
       {
         $group: {
-          _id: `$${unionField}`,
+          _id: `$${pivot}`,
           count: { $sum: 1 },
           list: { $push: { id: '$_id' } },
         },
       },
-      { $sort: { count: -1 } },
-    ]).exec()
-    /* beautify ignore:end */
+      { $sort: { count: -1, _id: 1 } },
+      { $limit: limit },
+      { $skip: offset },
+    ]
+    if (filter) aggregateOptions.unshift({ $match: filter }) // Place the filter in first position in aggregateOptions
+    let objectList = await Model.aggregate(aggregateOptions).exec()
 
-    objectList.map((obj) => {
-      obj[unionField] = obj._id
-      delete obj._id
-      return obj._id
-    })
+    //--- Populating the object list found for each group
+    let populateOptions = getPopulateOptions(objectType)
 
-    if (!FieldModel) {
-      await Promise.all(
-        objectList.map(async (obj) => {
-          const objList = obj.list.sort().slice(offset, offset + limit)
-          obj.list = await Model.populate(objList, {
-            path: 'id',
-            populate: getPopulateOptions(objectType),
+    const finalGroupList = await Promise.all(
+      objectList.map(async (group) => {
+        const objList = group.list
+          .sort((a, b) => {
+            return a.id[idField] < b.id[idField]
           })
+          .slice(groupOffset, groupOffset + groupLimit)
+        const objListPopulated = await Model.populate(objList, {
+          path: 'id',
+          populate: populateOptions,
         })
-      )
-      return objectList
-    } else {
-      // log.d(mod, fun, `CollectionFrom: ${utils.beautify(FieldModel)}`)
 
-      const finalObjectList = await FieldModel.populate(objectList, unionField)
-      await Promise.all(
-        finalObjectList.map(async (obj) => {
-          const objList = obj.list.sort().slice(offset, offset + limit)
-          obj.list = await Model.populate(objList, {
-            path: 'id',
-            populate: getPopulateOptions(objectType),
-          })
-        })
-      )
-      return finalObjectList
-    }
+        let finalObjList
+        if (!fields) {
+          finalObjList = await Promise.all(objListPopulated.map((obj) => obj.id))
+        } else {
+          finalObjList = await Promise.all(objListPopulated.map((obj) => _.pick(obj.id, fields)))
+        }
+        const reshapedResult = {
+          count: group.count,
+          [pivot]: group._id,
+          list: finalObjList,
+        }
+        log.d(mod, fun, `reshapedResult: ${utils.beautify(reshapedResult)}`)
+        return reshapedResult
+      })
+    )
+
+    // Should we populate the union field?
+    if (!FieldModel) return finalGroupList
+    return await FieldModel.populate(finalGroupList, pivot)
+
+    return objectList
   } catch (err) {
     log.w(mod, fun, err)
     throw err
@@ -717,12 +718,11 @@ exports.updateObject = async (objectType, jsonUpdateData) => {
     assertIsString(fun, objectType)
 
     log.d(mod, fun, `objectType: ${objectType}`)
-    /* beautify ignore:start */
+
     const { Model, idField } = this.getObjectAccesses(objectType)
     const rudiId = json.accessProperty(jsonUpdateData, idField)
     const filter = { [idField]: rudiId }
     const updateOpts = { new: true }
-    /* beautify ignore:end */
 
     const populateFields = getPopulateFields(objectType)
     if (utils.isEmptyArray(populateFields)) {
@@ -743,10 +743,9 @@ exports.deleteObject = async (objectType, rudiId) => {
   const fun = `deleteObject`
   log.d(mod, fun, ``)
   try {
-    /* beautify ignore:start */
     const { Model, idField } = this.getObjectAccesses(objectType)
     const filter = { [idField]: rudiId }
-    /* beautify ignore:end */
+
     const populateFields = getPopulateFields(objectType)
     if (utils.isEmptyArray(populateFields)) {
       return await Model.findOneAndRemove(filter)
@@ -787,10 +786,8 @@ exports.deleteManyWithRudiIds = async (objectType, rudiIdList) => {
     }
   }
 
-  /* beautify ignore:start */
   const { Model, idField } = this.getObjectAccesses(objectType)
   const filter = { [idField]: { $in: rudiIdList } }
-  /* beautify ignore:end */
 
   log.d(mod, fun, utils.beautify(filter))
 
@@ -863,14 +860,6 @@ exports.getEnsuredMetadataWithRudiId = async (rudiId) => {
   const fun = `getEnsuredMetadataWithRudiId`
   log.d(mod, fun, ``)
   return await this.getEnsuredObjectWithRudiId(URL_OBJECT_METADATA, rudiId)
-}
-
-exports.getMetadataList = async (limit, offset, filter, extRefs) => {
-  const fun = `getAllMetadata`
-  log.d(mod, fun, ``)
-  // log.d(mod, fun, `METADATA_FIELDS_TO_POPULATE: ${METADATA_FIELDS_TO_POPULATE}`)
-
-  return await this.getObjectList(URL_OBJECT_METADATA, limit, offset, filter, extRefs)
 }
 
 exports.updateMetadata = async (jsonMetadata) => {
@@ -1291,24 +1280,20 @@ exports.isReferencedInMetadata = async (objectType, rudiId) => {
     case URL_OBJECT_ORGANIZATIONS:
       metadataFilter = {
         $or: [
-          /* beautify ignore:start */
           { [API_DATA_PRODUCER_PROPERTY]: dbId },
           {
             [`${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`]: dbId,
           },
-          /* beautify ignore:end */
         ],
       }
       break
     case URL_OBJECT_CONTACTS:
       metadataFilter = {
         $or: [
-          /* beautify ignore:start */
           { [API_DATA_CONTACTS_PROPERTY]: dbId },
           {
             [`${API_METAINFO_PROPERTY}.${API_METAINFO_CONTACTS_PROPERTY}`]: dbId,
           },
-          /* beautify ignore:end */
         ],
       }
       break

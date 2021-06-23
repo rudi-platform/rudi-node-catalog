@@ -13,8 +13,7 @@ const mod = 'genCtrl'
 const boom = require('@hapi/boom')
 const uuid = require('uuid')
 // const url = require('url')
-const _ = require('lodash')
-const { indexOf, isArray } = require('lodash')
+const { pick } = require('lodash')
 
 // -----------------------------------------------------------------------------
 // Internal dependancies
@@ -53,8 +52,11 @@ const {
   QUERY_LIMIT_DEFAULT,
   QUERY_OFFSET_DEFAULT,
   QUERY_FILTER,
-  QUERY_GROUP_BY,
   QUERY_COUNT_BY,
+  QUERY_GROUP_BY,
+  QUERY_GROUP_LIMIT,
+  QUERY_GROUP_OFFSET,
+
   URL_ACTION_FILTER,
   URL_OBJECTS,
 } = require('../config/confApi')
@@ -70,13 +72,12 @@ const Contact = require('../definitions/models/Contact')
 const Report = require('../definitions/models/Report')
 const SkosConcept = require('../definitions/models/SkosConcept')
 const SkosScheme = require('../definitions/models/SkosScheme')
-/* beautify ignore:start */
+
 const { Metadata } = require('../definitions/models/Metadata')
 const { Media, MediaFile, MediaSeries } = require('../definitions/models/Media')
-/* beautify ignore:end */
 
 // -----------------------------------------------------------------------------
-// Specific controlelrs
+// Specific controllers
 // -----------------------------------------------------------------------------
 const metadataController = require('../controllers/metadataController')
 const organizationController = require('../controllers/organizationController')
@@ -86,7 +87,15 @@ const skosController = require('./skosController')
 // -----------------------------------------------------------------------------
 // Specific object type helper functions
 // -----------------------------------------------------------------------------
-const QUERY_RESERVED_WORDS = [QUERY_LIMIT, QUERY_OFFSET, QUERY_FIELDS]
+const QUERY_RESERVED_WORDS = [
+  QUERY_LIMIT,
+  QUERY_OFFSET,
+  QUERY_FIELDS,
+  QUERY_COUNT_BY,
+  QUERY_GROUP_BY,
+  QUERY_GROUP_LIMIT,
+  QUERY_GROUP_OFFSET,
+]
 
 const EXT_REFS = 'external_references' // External references needing aggregation
 const EXT_OBJ = 'refObj'
@@ -95,13 +104,16 @@ const EXT_OBJ_VAL = 'refObjVal'
 
 async function parseQueryParameters(objectType, reqUrl) {
   const fun = 'parseQueryParameters'
+
   // identify object model
   const Model = db.getObjectModel(objectType)
   const modelProperties = db.getModelPropertyNames(Model)
 
   const returnedFilter = {
     [QUERY_LIMIT]: QUERY_LIMIT_DEFAULT,
+    [QUERY_GROUP_LIMIT]: QUERY_LIMIT_DEFAULT,
     [QUERY_OFFSET]: QUERY_OFFSET_DEFAULT,
+    [QUERY_GROUP_OFFSET]: QUERY_OFFSET_DEFAULT,
     [QUERY_FILTER]: {},
     [EXT_REFS]: [],
   }
@@ -125,18 +137,21 @@ async function parseQueryParameters(objectType, reqUrl) {
       // log.d(mod, fun, `Key is a reserved word: ${utils.beautify(key)} => ${utils.beautify(queryParameters[key])}`)
       switch (key) {
         case QUERY_LIMIT:
-          returnedFilter[QUERY_LIMIT] = parseInt(value)
-          // log.d(mod, fun, `Limit: ${utils.beautify(filterReturn[QUERY_LIMIT])}`)
-          break
         case QUERY_OFFSET:
-          returnedFilter[QUERY_OFFSET] = parseInt(value)
-          // log.d(mod, fun, `Offset: ${utils.beautify(filterReturn[QUERY_OFFSET])}`)
+        case QUERY_GROUP_LIMIT:
+        case QUERY_GROUP_OFFSET:
+          returnedFilter[key] = parseInt(value)
+          // log.d(mod, fun, `Limit: ${utils.beautify(filterReturn[QUERY_LIMIT])}`)
           break
         case QUERY_FIELDS:
           // log.d(mod, fun, utils.beautify(value))
           // log.d(mod, fun, utils.beautify(value.split(',')))
-          returnedFilter[QUERY_FIELDS] = value.split(',')
+          returnedFilter[QUERY_FIELDS] = value.split(',').map((field) => field.trim())
           log.d(mod, fun, `Fields to keep: ${utils.beautify(returnedFilter[QUERY_FIELDS])}`)
+          break
+        case QUERY_GROUP_BY:
+        case QUERY_COUNT_BY:
+          returnedFilter[key] = value
           break
         default:
           log.w(mod, fun, `Query keyword not recognized: '${key}'`)
@@ -192,9 +207,9 @@ async function parseQueryParameters(objectType, reqUrl) {
         const extObj = extRef[EXT_OBJ]
         const extObjProp = extRef[EXT_OBJ_PROP]
         const extObjVal = extRef[EXT_OBJ_VAL]
-        /* beautify ignore:start */
+
         const objFilter = { [extObjProp]: extObjVal }
-        /* beautify ignore:end */
+
         log.d(mod, fun, `objFilter: ${utils.beautify(objFilter)}`)
         let nestedFieldIds
         try {
@@ -213,9 +228,9 @@ async function parseQueryParameters(objectType, reqUrl) {
             ids.push(foundObj[DB_ID])
           })
         )
-        /* beautify ignore:start */
+
         returnedFilter[QUERY_FILTER][extObj] = { $in: [ids.join(',')] }
-        /* beautify ignore:end */
+
         log.d(mod, fun, `filterReturn: ${utils.beautify(returnedFilter)}`)
       })
     )
@@ -356,22 +371,53 @@ exports.getObjectList = async (req, reply) => {
     // retrieve url parameter: object type
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
 
-    // retrieve query parameters: 'limit' and 'offset'
-    const limit = parseInt(req.query[QUERY_LIMIT]) || QUERY_LIMIT_DEFAULT
-    const offset = parseInt(req.query[QUERY_OFFSET]) || QUERY_OFFSET_DEFAULT
-    const groupBy = req.query[QUERY_GROUP_BY]
-    const countBy = req.query[QUERY_COUNT_BY]
+    let parsedParameters
+    try {
+      parsedParameters = await parseQueryParameters(objectType, req.url)
+    } catch (err) {
+      log.w(mod, fun, err)
+      return []
+    }
+
+    const countBy = parsedParameters[QUERY_COUNT_BY]
+    const groupBy = parsedParameters[QUERY_GROUP_BY]
 
     // accessing the objects
     let objectList
     if (!countBy && !groupBy) {
-      // objectList = await db.getObjectList(objectType, limit, offset, filter, fields)
-      objectList = await this.getObjectListFiltered(req, reply)
+      const options = pick(parsedParameters, [
+        QUERY_LIMIT,
+        QUERY_OFFSET,
+        QUERY_FILTER,
+        QUERY_FIELDS,
+      ])
+      objectList = await db.getObjectList(objectType, options)
     } else if (groupBy) {
-      objectList = await db.getObjectListGroup(objectType, groupBy, limit, offset)
+      if (countBy)
+        log.w(
+          mod,
+          fun,
+          `'${QUERY_GROUP_BY}' parameter found, '${QUERY_COUNT_BY}' is redondant and ignored`
+        )
+      const options = pick(parsedParameters, [
+        QUERY_LIMIT,
+        QUERY_OFFSET,
+        QUERY_FILTER,
+        QUERY_FIELDS,
+        QUERY_GROUP_LIMIT,
+        QUERY_GROUP_OFFSET,
+      ])
+      objectList = await db.getObjectListGroup(objectType, groupBy, options)
     } else {
-      // if( !!countBy) {
-      objectList = await db.getObjectListCount(objectType, countBy, limit, offset)
+      // if( !!countBy)
+      const options = pick(parsedParameters, [
+        QUERY_LIMIT,
+        QUERY_OFFSET,
+        QUERY_FILTER,
+        QUERY_FIELDS,
+      ])
+
+      objectList = await db.getObjectListCount(objectType, countBy, options)
     }
     // log.d(mod, fun, `objectList: ${utils.beautify(objectList)}`)
 
@@ -485,10 +531,8 @@ exports.deleteObjectList = async (req, reply) => {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
 
-    /* beautify ignore:start */
     // identify object model
     const { Model, idField } = db.getObjectAccesses(objectType)
-    /* beautify ignore:end */
 
     // retrieve incoming data
     const filter = req.body

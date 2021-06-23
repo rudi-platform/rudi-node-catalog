@@ -195,11 +195,11 @@ exports.getReportListForObject = async (req, reply) => {
     if (!existsObject) throw new Error(`${msg.objectNotFound(objectType, urlObjectId)}`)
 
     // get all reports for this object
-    /* beautify ignore:start */
+    
     const dbReportList = await db.getObjectList(URL_ACTION_REPORT, limit, offset, {
       [API_REPORT_RESOURCE_ID]: urlObjectId,
     })
-    /* beautify ignore:end */
+    
     return dbReportList
   } catch (err) {
     log.e(mod, fun, err)
