@@ -122,13 +122,7 @@ exports.publicRoutes = [
     // preHandler: logRequest,
     handler: genericController.getObjectList,
   },
-  // Filter
-  {
-    method: 'GET',
-    url: `${URL_OBJECT_GENERIC}/${URL_ACTION_FILTER}`,
-    // preHandler: logRequest,
-    handler: genericController.getObjectListFiltered,
-  }, // Get 1
+  // Get 1
   {
     method: 'GET',
     url: `${URL_OBJECT_GENERIC}/:${PARAM_ID}`,

@@ -391,13 +391,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/licences",
+							"raw": "{{baseUrl}}/{{adminUrl}}/licences/init",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{adminUrl}}",
-								"licences"
+								"licences",
+								"init"
 							]
 						}
 					},
@@ -1724,14 +1725,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/filter?limit=10&keywords={\"$in\":[\"population\",\"plu\"]}&temporal_spread.start_date={\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2022-05-28T23:24:51.000Z\"}&perlin=2346&resource_languages=\"fr\"",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?limit=10&keywords={\"$in\":[\"population\",\"plu\"]}&temporal_spread.start_date={\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2022-05-28T23:24:51.000Z\"}&perlin=2346&resource_languages=\"fr\"",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{apiUrl}}",
-								"{{data}}",
-								"filter"
+								"{{data}}"
 							],
 							"query": [
 								{
@@ -2017,14 +2017,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/filter?producer.organization_id=\"{{orgId1}}\"",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?producer.organization_id=\"{{orgId1}}\"",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{apiUrl}}",
-								"{{data}}",
-								"filter"
+								"{{data}}"
 							],
 							"query": [
 								{
