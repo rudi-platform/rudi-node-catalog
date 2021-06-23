@@ -2978,14 +2978,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/filter?collection_tag=\"{{stamp}}\"",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?collection_tag=\"{{stamp}}\"",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{apiUrl}}",
-								"{{data}}",
-								"filter"
+								"{{data}}"
 							],
 							"query": [
 								{

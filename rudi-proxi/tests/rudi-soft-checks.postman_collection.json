@@ -1765,62 +1765,6 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/filter?limit=10&keywords={\"$in\":[\"population\",\"plu\"]}&temporal_spread.start_date={\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2021-05-28T23:24:51.000Z\"}&perlin=2346&resource_languages=\"fr\"",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{apiUrl}}",
-								"{{data}}",
-								"filter"
-							],
-							"query": [
-								{
-									"key": "limit",
-									"value": "10"
-								},
-								{
-									"key": "keywords",
-									"value": "{\"$in\":[\"population\",\"plu\"]}"
-								},
-								{
-									"key": "temporal_spread.start_date",
-									"value": "{\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2021-05-28T23:24:51.000Z\"}"
-								},
-								{
-									"key": "perlin",
-									"value": "2346"
-								},
-								{
-									"key": "resource_languages",
-									"value": "\"fr\""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get all metadata filtered alt",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"2 metadata created\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const metadataList = pm.response.json();",
-									"    console.log(metadataList.length);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
 							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?limit=10&keywords={\"$in\":[\"population\",\"plu\"]}&temporal_spread.start_date={\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2021-05-28T23:24:51.000Z\"}&perlin=2346&resource_languages=\"fr\"",
 							"host": [
 								"{{baseUrl}}"
@@ -2511,7 +2455,7 @@
 									"pm.test(\"2 integration reports created for metadata 1\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const reportList = pm.response.json();",
-									"    pm.expect(reportList.length).to.eq(2);",
+									"    pm.expect(reportList.length).to.eq(3);",
 									"});"
 								],
 								"type": "text/javascript"
