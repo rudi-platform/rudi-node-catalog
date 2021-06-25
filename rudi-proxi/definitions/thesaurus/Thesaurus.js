@@ -27,7 +27,7 @@ module.exports = class Thesaurus {
    */
   constructor(code, initValues) {
     const fun = 'constructor'
-    log.d(mod, fun, `${code}`)
+    // log.d(mod, fun, `${code}`)
 
     this.#isInit = false
     this.#code = code
@@ -42,7 +42,7 @@ module.exports = class Thesaurus {
    */
   init = async (shouldReset) => {
     const fun = 'init'
-    log.d(mod, fun, `Thesaurus: ${this.#code}`)
+    // log.d(mod, fun, `Thesaurus: ${this.#code}`)
     if (this.#isInit) throw new Error('Init should be called only once.')
 
     if (shouldReset) {
@@ -142,7 +142,7 @@ module.exports = class Thesaurus {
 
   #getEnum = async (typeThesaurus) => {
     const fun = 'getEnum'
-    log.d(mod, fun, ``)
+    // log.d(mod, fun, ``)
 
     try {
       const dbEnum = await DynamicEnum.findOne({ code: typeThesaurus })

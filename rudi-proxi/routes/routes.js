@@ -142,7 +142,7 @@ exports.publicRoutes = [
     method: 'DELETE',
     url: URL_OBJECT_GENERIC,
     // preHandler: logRequest,
-    handler: genericController.deleteEveryObject,
+    handler: genericController.deleteManyObjects,
   },
 
   // -----------------------------------------------------------------------------

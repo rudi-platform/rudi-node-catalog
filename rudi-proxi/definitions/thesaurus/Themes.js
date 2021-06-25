@@ -62,7 +62,7 @@ const INIT_VALUES = [
 const themes = new Thesaurus(CODE, INIT_VALUES)
 
 const fun = `init ${CODE}`
-log.d(mod, fun, ``)
+// log.d(mod, fun, ``)
 themes
   .init()
   .then(() => {

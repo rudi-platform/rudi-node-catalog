@@ -1745,6 +1745,54 @@
 					"response": []
 				},
 				{
+					"name": "Sort metadata",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"2 metadata created\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const metadataList = pm.response.json();",
+									"    console.log(metadataList.length)",
+									"    pm.expect(metadataList.length).to.gte(2);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?limit=50&sort_by=-createdAt&fields=resource_title,global_id,createdAt",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "50"
+								},
+								{
+									"key": "sort_by",
+									"value": "-createdAt"
+								},
+								{
+									"key": "fields",
+									"value": "resource_title,global_id,createdAt"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get all metadata filtered",
 					"event": [
 						{
@@ -1765,7 +1813,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?limit=10&keywords={\"$in\":[\"population\",\"plu\"]}&temporal_spread.start_date={\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2021-05-28T23:24:51.000Z\"}&perlin=2346&resource_languages=\"fr\"",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?limit=10&keywords={\"$in\":[\"population\",\"plu\"]}&temporal_spread.start_date={\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2021-05-28T23:24:51.000Z\"}&perlin=2346&resource_languages=fr",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -1792,7 +1840,7 @@
 								},
 								{
 									"key": "resource_languages",
-									"value": "\"fr\""
+									"value": "fr"
 								}
 							]
 						}
@@ -2082,7 +2130,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?group_by=producer&limit=3",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?group_by=producer&limit=3&group_limit=4&keywords=CA&fields=keywords,global_id,createdAt,updatedAt&sort_by=-createdAt",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -2098,6 +2146,22 @@
 								{
 									"key": "limit",
 									"value": "3"
+								},
+								{
+									"key": "group_limit",
+									"value": "4"
+								},
+								{
+									"key": "keywords",
+									"value": "CA"
+								},
+								{
+									"key": "fields",
+									"value": "keywords,global_id,createdAt,updatedAt"
+								},
+								{
+									"key": "sort_by",
+									"value": "-createdAt"
 								}
 							]
 						}
@@ -3009,6 +3073,50 @@
 								"{{data}}"
 							],
 							"query": [
+								{
+									"key": "collection_tag",
+									"value": "\"{{stamp}}\""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "No metadata left (count)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const stamp = pm.collectionVariables.get('stamp')",
+									"pm.test(`No metadata left with '${stamp}' stamp'`, () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const metadataList = pm.response.json();",
+									"    pm.expect(metadataList.length).to.eq(0)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?group_by=collection_tag&collection_tag=\"{{stamp}}\"",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}"
+							],
+							"query": [
+								{
+									"key": "group_by",
+									"value": "collection_tag"
+								},
 								{
 									"key": "collection_tag",
 									"value": "\"{{stamp}}\""

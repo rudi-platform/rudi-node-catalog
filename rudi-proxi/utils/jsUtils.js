@@ -126,8 +126,8 @@ exports.getPaths = async (root, parentKeyName) => {
   return rootSubPaths
 }
 
-exports.listPick = async (objList, fieldList) => {
-  const reshapedList = await Promise.all(objList.map((obj) => _.pick(obj, fieldList)))
+exports.listPick = (objList, fieldList) => {
+  const reshapedList = objList.map((obj) => _.pick(obj, fieldList))
   return reshapedList
 }
 

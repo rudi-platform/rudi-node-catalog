@@ -52,6 +52,7 @@ const {
   QUERY_LIMIT_DEFAULT,
   QUERY_OFFSET_DEFAULT,
   QUERY_FILTER,
+  QUERY_SORT_BY,
   QUERY_COUNT_BY,
   QUERY_GROUP_BY,
   QUERY_GROUP_LIMIT,
@@ -59,9 +60,20 @@ const {
 
   URL_ACTION_FILTER,
   URL_OBJECTS,
+  QUERY_CONFIRM,
 } = require('../config/confApi')
 
-const { DB_PUBLISHED_AT, DB_ID } = require('../db/dbFields')
+const {
+  DB_PUBLISHED_AT,
+  DB_ID,
+  API_METAINFO_PROPERTY,
+  API_METAINFO_DATES_PROPERTY,
+  API_DATES_CREATED_PROPERTY,
+  API_DATES_EDITED_PROPERTY,
+  DB_UPDATED_AT,
+  API_DATES_PUBLISHED_PROPERTY,
+  DB_CREATE_AT,
+} = require('../db/dbFields')
 
 // -----------------------------------------------------------------------------
 // Models
@@ -91,10 +103,12 @@ const QUERY_RESERVED_WORDS = [
   QUERY_LIMIT,
   QUERY_OFFSET,
   QUERY_FIELDS,
+  QUERY_SORT_BY,
   QUERY_COUNT_BY,
   QUERY_GROUP_BY,
   QUERY_GROUP_LIMIT,
   QUERY_GROUP_OFFSET,
+  QUERY_CONFIRM,
 ]
 
 const EXT_REFS = 'external_references' // External references needing aggregation
@@ -115,6 +129,7 @@ async function parseQueryParameters(objectType, reqUrl) {
     [QUERY_OFFSET]: QUERY_OFFSET_DEFAULT,
     [QUERY_GROUP_OFFSET]: QUERY_OFFSET_DEFAULT,
     [QUERY_FILTER]: {},
+    [QUERY_CONFIRM]: false,
     [EXT_REFS]: [],
   }
 
@@ -124,7 +139,7 @@ async function parseQueryParameters(objectType, reqUrl) {
     return returnedFilter
   }
   const reqSearch = reqUrl.substring(reqUrl.indexOf('?'))
-  log.d(mod, fun, `reqSearch: ${reqSearch}`)
+  // log.d(mod, fun, `reqSearch: ${reqSearch}`)
   const urlSearchParams = new URLSearchParams(reqSearch)
 
   // Check if parameters were actually found by URLSearchParams
@@ -132,7 +147,9 @@ async function parseQueryParameters(objectType, reqUrl) {
     log.d(mod, fun, `No parameters found after the question mark: ${urlSearchParams}`)
     return returnedFilter
   }
-  for (const [key, value] of urlSearchParams) {
+  //  log.d(mod, fun, `urlSearchParams: ${urlSearchParams}`)
+
+   for (const [key, value] of urlSearchParams) {
     if (QUERY_RESERVED_WORDS.includes(key)) {
       // log.d(mod, fun, `Key is a reserved word: ${utils.beautify(key)} => ${utils.beautify(queryParameters[key])}`)
       switch (key) {
@@ -141,17 +158,40 @@ async function parseQueryParameters(objectType, reqUrl) {
         case QUERY_GROUP_LIMIT:
         case QUERY_GROUP_OFFSET:
           returnedFilter[key] = parseInt(value)
-          // log.d(mod, fun, `Limit: ${utils.beautify(filterReturn[QUERY_LIMIT])}`)
-          break
-        case QUERY_FIELDS:
-          // log.d(mod, fun, utils.beautify(value))
-          // log.d(mod, fun, utils.beautify(value.split(',')))
-          returnedFilter[QUERY_FIELDS] = value.split(',').map((field) => field.trim())
-          log.d(mod, fun, `Fields to keep: ${utils.beautify(returnedFilter[QUERY_FIELDS])}`)
           break
         case QUERY_GROUP_BY:
         case QUERY_COUNT_BY:
           returnedFilter[key] = value
+          break
+        case QUERY_CONFIRM:
+          if (['false', '0', 'null', 'no'].includes(value)) break
+          returnedFilter[key] = !!value
+          break
+        case QUERY_FIELDS:
+          returnedFilter[key] = value.split(',').map((field) => field.trim())
+          break
+        case QUERY_SORT_BY:
+          returnedFilter[key] = value.split(',').map((field) => {
+            let trimmedField = field.trim()
+            let minus = ''
+            let absoluteField = trimmedField
+            if (trimmedField[0] === '-') {
+              minus = '-'
+              absoluteField = trimmedField.substring(1)
+            }
+            // Dealing with virtual fields
+            const metaDates = `${API_METAINFO_PROPERTY}.${API_METAINFO_DATES_PROPERTY}.`
+            switch (absoluteField) {
+              case `${metaDates}${API_DATES_CREATED_PROPERTY}`:
+                return `${minus}${DB_CREATE_AT}`
+              case `${metaDates}${API_DATES_EDITED_PROPERTY}`:
+                return `${minus}${DB_UPDATED_AT}`
+              case `${metaDates}${API_DATES_PUBLISHED_PROPERTY}`:
+                return `${minus}${DB_PUBLISHED_AT}`
+              default:
+                return trimmedField
+            }
+          })
           break
         default:
           log.w(mod, fun, `Query keyword not recognized: '${key}'`)
@@ -165,8 +205,9 @@ async function parseQueryParameters(objectType, reqUrl) {
         returnedFilter[QUERY_FILTER][key] = obj
       } catch (err) {
         const errMsg = `Error while parsing: '${utils.beautify(val)}': ${err}}`
-        log.w(mod, fun, errMsg)
-        throw new Error(errMsg)
+        // log.w(mod, fun, errMsg)
+        returnedFilter[QUERY_FILTER][key] = val
+        // throw new Error(errMsg)
       }
     } else {
       const indexSeparator = key.indexOf('.')
@@ -193,7 +234,7 @@ async function parseQueryParameters(objectType, reqUrl) {
           throw new Error(errMsg)
         }
       } else {
-        log.w(mod, fun, `Key is unkown and ignored: ${utils.beautify(key)}`)
+        log.w(mod, fun, `Key is unkown and ignored for ${objectType}: ${utils.beautify(key)}`)
         // log.w(mod, fun, `Model properties: ${utils.beautify(modelProperties)}`)
       }
     }
@@ -388,26 +429,26 @@ exports.getObjectList = async (req, reply) => {
       const options = pick(parsedParameters, [
         QUERY_LIMIT,
         QUERY_OFFSET,
+        QUERY_SORT_BY,
         QUERY_FILTER,
         QUERY_FIELDS,
       ])
       objectList = await db.getObjectList(objectType, options)
     } else if (groupBy) {
-      if (countBy)
-        log.w(
-          mod,
-          fun,
-          `'${QUERY_GROUP_BY}' parameter found, '${QUERY_COUNT_BY}' is redondant and ignored`
-        )
+      if (countBy) {
+        const msg = `'${QUERY_GROUP_BY}' parameter found, '${QUERY_COUNT_BY}' is redondant and ignored`
+        log.w(mod, fun, msg)
+      }
       const options = pick(parsedParameters, [
         QUERY_LIMIT,
         QUERY_OFFSET,
         QUERY_FILTER,
         QUERY_FIELDS,
+        QUERY_SORT_BY,
         QUERY_GROUP_LIMIT,
         QUERY_GROUP_OFFSET,
       ])
-      objectList = await db.getObjectListGroup(objectType, groupBy, options)
+      objectList = await db.groupObjectList(objectType, groupBy, options)
     } else {
       // if( !!countBy)
       const options = pick(parsedParameters, [
@@ -417,7 +458,7 @@ exports.getObjectList = async (req, reply) => {
         QUERY_FIELDS,
       ])
 
-      objectList = await db.getObjectListCount(objectType, countBy, options)
+      objectList = await db.countObjectList(objectType, countBy, options)
     }
     // log.d(mod, fun, `objectList: ${utils.beautify(objectList)}`)
 
@@ -558,12 +599,28 @@ exports.deleteObjectList = async (req, reply) => {
  * Delete every object
  * => DELETE /{object}
  */
-exports.deleteEveryObject = async (req, reply) => {
-  const fun = 'deleteEveryObject'
+exports.deleteManyObjects = async (req, reply) => {
+  const fun = 'deleteManyObjects'
   log.v(mod, fun, `< DELETE ${URL_OBJECT_GENERIC}`)
   try {
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
-    return await db.deleteAll(objectType)
+
+    let parsedParameters = await parseQueryParameters(objectType, req.url)
+    log.d(mod, fun, `parsedParameters: ${utils.beautify(parsedParameters)}`)
+    const filter = parsedParameters[QUERY_FILTER]
+    const fields = parsedParameters[QUERY_FIELDS]
+    const confirmation = parsedParameters[QUERY_CONFIRM] || false
+
+    if (utils.isEmptyObject(filter)) {
+      if (confirmation) return await db.deleteAll(objectType)
+      else {
+        const msg = `use confirm=true as a parameter to confirm the deletion of all ${objectType}`
+        log.w(mod, fun, msg)
+        return msg
+      }
+    }
+
+    return await db.deleteManyWithFilter(objectType, filter)
   } catch (err) {
     log.e(mod, fun, err)
     throw boom.boomify(err)

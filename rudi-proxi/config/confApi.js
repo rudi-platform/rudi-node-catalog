@@ -28,10 +28,12 @@ exports.QUERY_LIMIT = 'limit'
 exports.QUERY_OFFSET = 'offset'
 exports.QUERY_FILTER = 'filter'
 exports.QUERY_FIELDS = 'fields'
+exports.QUERY_SORT_BY = 'sort_by'
 exports.QUERY_COUNT_BY = 'count_by'
 exports.QUERY_GROUP_BY = 'group_by'
 exports.QUERY_GROUP_LIMIT = 'group_limit'
 exports.QUERY_GROUP_OFFSET = 'group_offset'
+exports.QUERY_CONFIRM = 'confirm'
 
 exports.QUERY_LIMIT_DEFAULT = 100
 exports.QUERY_OFFSET_DEFAULT = 0

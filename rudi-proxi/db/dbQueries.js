@@ -9,7 +9,7 @@ const mod = 'db'
 // External dependancies
 // -----------------------------------------------------------------------------
 const mongoose = require('mongoose')
-const _ = require('lodash')
+const { pick, orderBy } = require('lodash')
 
 // -----------------------------------------------------------------------------
 // Internal dependencies
@@ -41,6 +41,7 @@ const {
   QUERY_FIELDS,
   QUERY_GROUP_LIMIT,
   QUERY_GROUP_OFFSET,
+  QUERY_SORT_BY,
 } = require('../config/confApi')
 
 // Fields from the JSON as definied in the API
@@ -160,7 +161,7 @@ exports.getRootRef = (objectType, field) => {
 
 exports.getFieldModel = (objectType, field) => {
   const fun = 'getFieldModel'
-  log.d(mod, fun, `field: ${utils.beautify(field)}`)
+  // log.d(mod, fun, `field: ${utils.beautify(field)}`)
 
   assertIsString(fun, objectType)
   assertIsString(fun, field)
@@ -540,36 +541,85 @@ exports.getObjectWithField = async (Model, fieldName, fieldValue, populateFields
 // -----------------------------------------------------------------------------
 // Generic functions: get object list
 // -----------------------------------------------------------------------------
+/* const LIST = 'list'
+const FIELD = 'field'
+const ID = 'id'
+
+function toMongoSortOptions(initialCriteria, sortByFields, conculsionCriteria) {
+  const fun = 'toMongoSortOptions'
+  const sortOptions = {}
+  const listOptions = { id: '$_id' }
+
+  if (sortByFields) {
+    let i = 1
+    sortByFields.map((field) => {
+      let absoluteField
+      const genericName = `${FIELD}${i}`
+      const genericField = `${LIST}.${genericName}`
+      if (field[0] === '-') {
+        absoluteField = field.substring(1)
+        sortOptions[genericField] = -1
+      } else {
+        absoluteField = field
+        sortOptions[genericField] = 1
+      }
+      listOptions[genericName] = `$${absoluteField}`
+
+      ++i
+    })
+    // log.d(mod, fun, utils.beautify(sortOptions))
+  }
+  return [{ ...initialCriteria, ...sortOptions, ...conculsionCriteria }, listOptions]
+}
+ */
 exports.getObjectList = async (objectType, options) => {
   const fun = `getObjectList`
   log.d(mod, fun, ``)
   try {
+    //--- Parameters
+    // Identify object type characteristics
     const { Model, idField } = this.getObjectAccesses(objectType)
 
+    // Extract options
     const limit = options[QUERY_LIMIT] || QUERY_LIMIT_DEFAULT
     const offset = options[QUERY_OFFSET] || QUERY_OFFSET_DEFAULT
     const filter = options[QUERY_FILTER] || {}
     const fields = options[QUERY_FIELDS]
+    const sortByFields = options[QUERY_SORT_BY]
     const populateFields = getPopulateFields(objectType)
 
     log.d(mod, fun, `options: ${utils.beautify(options)}`)
-    
+
+    // const [sortOptions] = toMongoSortOptions({}, sortBy, { [idField]: 1 })
+    const sortOptions = {}
+    if (sortByFields) {
+      sortByFields.map((field) => {
+        if (field[0] === '-') {
+          sortOptions[field.substring(1)] = -1
+        } else {
+          sortOptions[field] = 1
+        }
+      })
+    }
+    sortOptions._id = 1 // Default sort to get consistent offset/limit results
+
+    log.d(mod, fun, `sortOptions: ${utils.beautify(sortOptions)}`)
+
+    //--- Find
     if (utils.isEmptyArray(populateFields)) {
       const fieldsToKeep = fields ? fields.join(' ') : ``
-      return await Model.find(filter, fieldsToKeep)
-        .sort({ [idField]: 1 })
-        .limit(limit)
-        .skip(offset)
+      return await Model.find(filter, fieldsToKeep).sort(sortOptions).limit(limit).skip(offset)
     } else {
+      // Populate
       const objectList = await Model.find(filter)
-        .sort({ [idField]: 1 })
+        .sort(sortOptions)
         .limit(limit)
         .skip(offset)
         .populate(getPopulateOptions(objectType))
 
       if (!fields) return objectList
 
-      return await utils.listPick(objectList, fields)
+      return utils.listPick(objectList, fields)
     }
   } catch (err) {
     log.w(mod, fun, err)
@@ -577,63 +627,22 @@ exports.getObjectList = async (objectType, options) => {
   }
 }
 
-exports.getObjectListCount = async (objectType, unionField, options) => {
-  const fun = `getObjectListCount`
+/**
+ * This function makes it possible to perform an aggregation on a type of object
+ * @param {String} objectType The type of object: 'resources', 'organizations', 'contacts', etc.
+ * @param {String} unionField The (unique) field used to group the data
+ * @param {Object} options Here is a list of options that can be used to customize the grouping result:
+ *    - limit / offset: browse the list of resulting groups
+ *    - group_limit / group_offset: browse the lists of aggregated objects within a group
+ *    - fields: array of properties to keep for the aggregated objects
+ *    - sort_by: array of properties used to order the aggregated objects (use minus sign for descending order)
+ * @returns list of objects with count, the property used for grouping, and the
+ * list of aggregated objects that share this property
+ */
+exports.groupObjectList = async (objectType, unionField, options) => {
+  const fun = `groupObjectList`
   log.d(mod, fun, ``)
-
-  try {
-    //--- Parameters
-    // Identify object type characteristics
-    const { Model, idField } = this.getObjectAccesses(objectType)
-
-    // Check if the given unionField is a subproperty of a different Model
-    const [FieldModel, rootProp] = this.getRootRef(objectType, unionField)
-    const pivot = !FieldModel ? unionField : rootProp
-
-    // Extract options
-    const limit = options[QUERY_LIMIT] || QUERY_LIMIT_DEFAULT // Limits the number of results in the final list
-    const offset = options[QUERY_OFFSET] || QUERY_OFFSET_DEFAULT
-    const filter = options[QUERY_FILTER] || {}
-    const fields = options[QUERY_FIELDS]
-
-    const objectList = await Model.aggregate([
-      { $unwind: `$${pivot}` },
-      {
-        $group: {
-          _id: `$${pivot}`,
-          count: { $sum: 1 },
-        },
-      },
-      { $sort: { count: -1, _id: 1 } },
-      { $limit: limit },
-      { $skip: offset },
-    ]).exec()
-
-    if (!FieldModel) {
-      objectList.map((obj) => {
-        obj[pivot] = obj._id
-        delete obj._id
-      })
-      return objectList
-    } else {
-      await Promise.all(
-        objectList.map(async (obj) => {
-          obj[unionField] = await FieldModel.findById(obj._id)
-          delete obj._id
-        })
-      )
-
-      return objectList
-    }
-  } catch (err) {
-    log.w(mod, fun, err)
-    throw err
-  }
-}
-
-exports.getObjectListGroup = async (objectType, unionField, options) => {
-  const fun = `getObjectListGroup`
-  log.d(mod, fun, ``)
+  log.d(mod, fun, `options: ${options}`)
 
   try {
     //--- Parameters
@@ -650,7 +659,43 @@ exports.getObjectListGroup = async (objectType, unionField, options) => {
     const groupLimit = options[QUERY_GROUP_LIMIT] || QUERY_LIMIT_DEFAULT // For each result, limit the number of objects
     const groupOffset = options[QUERY_GROUP_OFFSET] || QUERY_OFFSET_DEFAULT
     const filter = options[QUERY_FILTER] || {}
-    const fields = options[QUERY_FIELDS]
+    const fieldsToKeep = options[QUERY_FIELDS]
+    const sortByFields = options[QUERY_SORT_BY]
+
+    // Prepare sortBy options for MongoDB
+    const groupList = 'list'
+    const genField = 'field'
+    const objId = 'obj_id'
+
+    // const [sortOptions, listOptions] = toMongoSortOptions({ count: -1, _id: 1 }, sortByFields, {
+    //   id: 1,
+    // })
+
+    const sortOptions = { count: -1, _id: 1 }
+    const listOptions = { [objId]: '$_id' }
+
+    if (sortByFields) {
+      let i = 1
+      sortByFields.map((field) => {
+        let absoluteField
+        const genericName = `${field}${i}`
+        const genericField = `${groupList}.${genericName}`
+        if (field[0] === '-') {
+          absoluteField = field.substring(1)
+          sortOptions[genericField] = -1
+        } else {
+          absoluteField = field
+          sortOptions[genericField] = 1
+        }
+        listOptions[genericName] = `$${absoluteField}`
+
+        ++i
+      })
+    }
+    sortOptions[`${groupList}.${objId}`] = 1
+
+    log.d(mod, fun, `listOptions: ${utils.beautify(listOptions)}`)
+    log.d(mod, fun, `sortOptions: ${utils.beautify(sortOptions)}`)
 
     //--- Aggregation
     let aggregateOptions = [
@@ -659,7 +704,95 @@ exports.getObjectListGroup = async (objectType, unionField, options) => {
         $group: {
           _id: `$${pivot}`,
           count: { $sum: 1 },
-          list: { $push: { id: '$_id' } },
+          [groupList]: { $push: listOptions }, //  {"id":"$_id","field1":"$createdAt","field2":"$updatedAt"}
+        },
+      },
+      { $unwind: `$${groupList}` },
+      { $sort: sortOptions },
+      {
+        $group: {
+          _id: `$_id`,
+          count: { $sum: 1 },
+          [groupList]: { $push: `$${groupList}` },
+        },
+      },
+      { $sort: { count: -1, _id: 1 } },
+      { $limit: limit },
+      { $skip: offset },
+    ]
+    if (filter) aggregateOptions.unshift({ $match: filter }) // Place the filter in first position in aggregateOptions
+    log.d(mod, fun, `aggregateOptions: ${utils.beautify(aggregateOptions)}`)
+
+    let objectList = await Model.aggregate(aggregateOptions).exec()
+
+    // log.d(mod, fun, `objectList: ${utils.beau`tify(objectList)}`)
+
+    //--- Reshaping
+    let populateOptions = getPopulateOptions(objectType)
+
+    const finalGroupList = await Promise.all(
+      objectList.map(async (group) => {
+        const objList = group[groupList]
+
+        // Reshaping: sort + limit / offset
+        const objShortList = objList.slice(groupOffset, groupOffset + groupLimit)
+        // Reshaping: populating results
+        const objListPopulated = await Model.populate(objShortList, {
+          path: objId,
+          populate: populateOptions,
+        })
+        // Reshaping: selecting fields
+        let finalObjList
+        if (!fieldsToKeep) {
+          finalObjList = objListPopulated.map((obj) => obj[objId])
+        } else {
+          finalObjList = objListPopulated.map((obj) => pick(obj[objId], fieldsToKeep))
+        }
+        const reshapedResult = {
+          count: group.count,
+          [pivot]: group._id,
+          list: finalObjList,
+        }
+        // log.d(mod, fun, `reshapedResult: ${utils.beautify(reshapedResult)}`)
+        return reshapedResult
+      })
+    )
+
+    // Reshaping: populating the union field
+    if (!FieldModel) return finalGroupList
+    return await FieldModel.populate(finalGroupList, pivot)
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
+}
+
+exports.countObjectList = async (objectType, unionField, options) => {
+  const fun = `countObjectList`
+  log.d(mod, fun, ``)
+
+  try {
+    //--- Parameters
+    // Identify object type characteristics
+    const { Model, idField } = this.getObjectAccesses(objectType)
+
+    // Check if the given unionField is a subproperty of a different Model
+    const [FieldModel, rootProp] = this.getRootRef(objectType, unionField)
+    const pivot = !FieldModel ? unionField : rootProp
+
+    // Extract options
+    const limit = options[QUERY_LIMIT] || QUERY_LIMIT_DEFAULT // Limits the number of results in the final list
+    const offset = options[QUERY_OFFSET] || QUERY_OFFSET_DEFAULT
+    const filter = options[QUERY_FILTER] || {}
+    const sortBy = options[QUERY_SORT_BY]
+
+    //--- Aggregation
+    let aggregateOptions = [
+      { $unwind: `$${pivot}` },
+      {
+        $group: {
+          _id: `$${pivot}`,
+          count: { $sum: 1 },
         },
       },
       { $sort: { count: -1, _id: 1 } },
@@ -669,41 +802,23 @@ exports.getObjectListGroup = async (objectType, unionField, options) => {
     if (filter) aggregateOptions.unshift({ $match: filter }) // Place the filter in first position in aggregateOptions
     let objectList = await Model.aggregate(aggregateOptions).exec()
 
-    //--- Populating the object list found for each group
-    let populateOptions = getPopulateOptions(objectType)
+    //--- Reshaping
 
-    const finalGroupList = await Promise.all(
-      objectList.map(async (group) => {
-        const objList = group.list
-          .sort((a, b) => {
-            return a.id[idField] < b.id[idField]
-          })
-          .slice(groupOffset, groupOffset + groupLimit)
-        const objListPopulated = await Model.populate(objList, {
-          path: 'id',
-          populate: populateOptions,
-        })
-
-        let finalObjList
-        if (!fields) {
-          finalObjList = await Promise.all(objListPopulated.map((obj) => obj.id))
-        } else {
-          finalObjList = await Promise.all(objListPopulated.map((obj) => _.pick(obj.id, fields)))
-        }
-        const reshapedResult = {
-          count: group.count,
-          [pivot]: group._id,
-          list: finalObjList,
-        }
-        log.d(mod, fun, `reshapedResult: ${utils.beautify(reshapedResult)}`)
-        return reshapedResult
+    // Reshaping: renaming the union field
+    if (!FieldModel) {
+      objectList.map((obj) => {
+        obj[pivot] = obj._id
+        delete obj._id
+      })
+      return objectList
+    }
+    // Reshaping: populating the union field
+    await Promise.all(
+      objectList.map(async (obj) => {
+        obj[pivot] = await FieldModel.findById(obj._id)
+        delete obj._id
       })
     )
-
-    // Should we populate the union field?
-    if (!FieldModel) return finalGroupList
-    return await FieldModel.populate(finalGroupList, pivot)
-
     return objectList
   } catch (err) {
     log.w(mod, fun, err)
@@ -802,12 +917,17 @@ exports.deleteManyWithRudiIds = async (objectType, rudiIdList) => {
 
 exports.deleteManyWithFilter = async (objectType, conditions) => {
   const fun = `deleteManyWithFilter`
-  // log.d(mod, fun, `conditions: ${conditions}`)
-  // TODO: to be consolidated!
-  // if (typeof (conditions) == 'string')
-  conditions = changeConditionsIntoRegex(conditions)
-
+  log.d(mod, fun, `conditions: ${conditions}`)
   const Model = this.getObjectModel(objectType)
+
+  // const regexConditions = {
+  //   $and: Object.keys(conditions).map((key) => {
+  //     const rx = new RegExp(conditions[key])
+  //     log.d(mod, fun, `rx: ${rx}`)
+  //     return { [key]: { $regex: rx } }
+  //   }),
+  // }
+  // log.d(mod, fun, `regexConditions: ${utils.beautify(regexConditions)}`)
 
   try {
     const deletionInfo = await Model.deleteMany(conditions)
@@ -821,14 +941,18 @@ exports.deleteManyWithFilter = async (objectType, conditions) => {
 function changeConditionsIntoRegex(conditions) {
   const fun = `changeConditionsIntoRegex`
 
-  const regexConditions = {}
+  const regexConditions = []
   Object.keys(conditions).forEach((key) => {
-    const regexp = new RegExp(conditions[key])
-    log.d(mod, fun, regexp)
-    regexConditions[key] = new RegExp(`^${conditions[key]}$`)
+    // const regexp = new RegExp(conditions[key])
+    // log.d(mod, fun, regexp)
+    // const regexp = new RegExp(`^${conditions[key]}$`)
+    // log.d(mod, fun, regexp)
+    regexConditions.push({ [key]: { $regex: /^${conditions[key]}$/ } })
+    log.d(mod, fun, `${key}: ${regexConditions[key]}`)
   })
+  log.d(mod, fun, `regexConditions: ${utils.beautify(regexConditions)}`)
 
-  return regexConditions
+  return { $match: { $and: regexConditions } }
 }
 
 // -----------------------------------------------------------------------------

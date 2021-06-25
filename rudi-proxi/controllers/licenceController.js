@@ -61,7 +61,7 @@ exports.getLicenceCodes = async () => {
     const licenceList = await this.getLicences()
     // log.d(mod, fun, `licence list: ${utils.beautify(licenceList)}`)
 
-    this.LICENCE_CODE_LIST = await licenceList.map((obj) => obj[API_SKOS_CONCEPT_CODE])
+    this.LICENCE_CODE_LIST = licenceList.map((obj) => obj[API_SKOS_CONCEPT_CODE])
   }
   // log.d(mod, fun, `licence codes: ${utils.beautify(this.LICENCE_CODE_LIST)}`)
   return this.LICENCE_CODE_LIST
