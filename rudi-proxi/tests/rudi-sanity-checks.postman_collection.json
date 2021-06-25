@@ -2407,13 +2407,19 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{reports}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{reports}}?confirm=true",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{apiUrl}}",
 								"{{reports}}"
+							],
+							"query": [
+								{
+									"key": "confirm",
+									"value": "true"
+								}
 							]
 						}
 					},
@@ -2781,13 +2787,19 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?confirm=true",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{apiUrl}}",
 								"{{data}}"
+							],
+							"query": [
+								{
+									"key": "confirm",
+									"value": "true"
+								}
 							]
 						}
 					},
@@ -2899,13 +2911,19 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{media}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{media}}?confirm=true",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{apiUrl}}",
 								"{{media}}"
+							],
+							"query": [
+								{
+									"key": "confirm",
+									"value": "true"
+								}
 							]
 						}
 					},
@@ -3234,13 +3252,19 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{org}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{org}}?confirm=true",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{apiUrl}}",
 								"{{org}}"
+							],
+							"query": [
+								{
+									"key": "confirm",
+									"value": "true"
+								}
 							]
 						}
 					},
@@ -3520,13 +3544,19 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{cont}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{cont}}?confirm=true",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{apiUrl}}",
 								"{{cont}}"
+							],
+							"query": [
+								{
+									"key": "confirm",
+									"value": "true"
+								}
 							]
 						}
 					},

@@ -2130,7 +2130,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?group_by=producer&limit=3&group_limit=4&keywords=CA&fields=keywords,global_id,createdAt,updatedAt&sort_by=-createdAt",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?group_by=producer&limit=3&group_limit=4&keywords=CA&fields=keywords,global_id,createdAt,updatedAt&sort_by=createdAt,-global_id",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -2161,7 +2161,7 @@
 								},
 								{
 									"key": "sort_by",
-									"value": "-createdAt"
+									"value": "createdAt,-global_id"
 								}
 							]
 						}

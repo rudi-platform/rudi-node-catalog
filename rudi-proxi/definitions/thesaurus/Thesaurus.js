@@ -124,7 +124,7 @@ module.exports = class Thesaurus {
         throw new Error(`No values found for thesaurus '${this.#code}'`)
       }
     } catch (err) {
-      log.w(mod, fun, err)
+      log.d(mod, fun, err)
       throw err
     }
   }
@@ -149,7 +149,7 @@ module.exports = class Thesaurus {
       if (dbEnum) return dbEnum.values
       else throw new Error(`Enum '${typeThesaurus}' was not found`)
     } catch (err) {
-      log.w(mod, fun, err)
+      log.d(mod, fun, err)
       throw err
     }
   }
