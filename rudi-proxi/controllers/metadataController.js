@@ -9,7 +9,8 @@ const mod = 'metaCtrl'
 // -----------------------------------------------------------------------------
 // External dependancies
 // -----------------------------------------------------------------------------
-const _ = require('lodash')
+const { mergeWith } = require('lodash')
+const { boomify } = require('@hapi/boom')
 
 // -----------------------------------------------------------------------------
 // Internal dependancies
@@ -60,11 +61,13 @@ const {
 } = require('../db/dbFields')
 
 const {
-  URL_OBJECT_CONTACTS,
-  URL_OBJECT_MEDIA,
-  URL_OBJECT_METADATA,
+  PARAM_OBJECT_CONTACTS,
+  PARAM_OBJECT_MEDIA,
+  PARAM_OBJECT_METADATA,
   URL_PREFIX_PUBLIC,
-  URL_ACTION_INIT,
+  PARAM_ACTION_INIT,
+  URL_PUB_METADATA,
+  PARAM_ID,
 } = require('../config/confApi')
 
 // -----------------------------------------------------------------------------
@@ -73,7 +76,6 @@ const {
 
 const { Metadata } = require('../definitions/models/Metadata')
 const { Media } = require('../definitions/models/Media')
-
 
 // -----------------------------------------------------------------------------
 // Data models
@@ -84,6 +86,7 @@ const Keywords = require('../definitions/thesaurus/Themes')
 // -----------------------------------------------------------------------------
 // Controllers
 // -----------------------------------------------------------------------------
+const genericController = require('./genericController')
 const organisationController = require('./organizationController')
 const contactController = require('./contactController')
 const licenceController = require('./licenceController')
@@ -127,7 +130,9 @@ exports.contactListRudiToDbFormat = async (rudiContactList, shouldCreateIfNotFou
       contactDbId = await db.getContactDbIdWithJson(rudiContact)
       if (!contactDbId) {
         if (!shouldCreateIfNotFound)
-          throw new Error(`${msg.objectNotFound(URL_OBJECT_CONTACTS, rudiContact[API_CONTACT_ID])}`)
+          throw new Error(
+            `${msg.objectNotFound(PARAM_OBJECT_CONTACTS, rudiContact[API_CONTACT_ID])}`
+          )
 
         const dbContact = await contactController.newContact(rudiContact)
         log.d(mod, fun, `new Contact: ${utils.beautify(rudiContact)}`)
@@ -157,7 +162,7 @@ exports.mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFound) 
 
       if (!mediaDbId) {
         if (!shouldCreateIfNotFound)
-          throw new Error(`${msg.objectNotFound(URL_OBJECT_MEDIA, rudiMedia[API_MEDIA_ID])}`)
+          throw new Error(`${msg.objectNotFound(PARAM_OBJECT_MEDIA, rudiMedia[API_MEDIA_ID])}`)
 
         // log.d(mod, fun, `rudiMedia[API_MEDIA_TYPE_PROPERTY]: ${utils.beautify(rudiMedia[API_MEDIA_TYPE_PROPERTY])}`)
         const media = new Media(rudiMedia)
@@ -180,13 +185,13 @@ exports.mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFound) 
 function customMerger(value, srcValue, key, object, source) {
   const fun = 'customMerger'
   log.v(mod, fun, `'${key}': ${utils.beautify(srcValue)} -> ${utils.beautify(value)}`)
-  if (_.isArray(srcValue)) return srcValue
+  if (Array.isArray(srcValue)) return srcValue
   return undefined
   // switch(key){
   //   case API_METADATA_ID: return
   // }
   // return value
-  // return _.isArray(b) ? b : undefined
+  // return Array.isArray(b) ? b : undefined
 }
 
 // Parameter 'dbMetadata' gets mutated!
@@ -205,7 +210,7 @@ async function metadataCustomMerge(dbMetadata, dbReadyModMetadata) {
   //   _.extend(dataDates, modDataDates)
   //   _.extend(metaDates, modMetaDates)
 
-  await _.mergeWith(dbMetadata, dbReadyModMetadata, customMerger)
+  await mergeWith(dbMetadata, dbReadyModMetadata, customMerger)
 
   // dbMetadata[API_DATA_DATES_PROPERTY] = dataDates
   // dbMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY] = metaDates
@@ -491,7 +496,7 @@ exports.newMetadata = async (rudiMetadata) => {
     log.w(
       mod,
       fun,
-      `New object '${URL_OBJECT_METADATA}': ${utils.beautify(dbReadyObject)} | Error: ${err}`
+      `New object '${PARAM_OBJECT_METADATA}': ${utils.beautify(dbReadyObject)} | Error: ${err}`
     )
     throw err
   }
@@ -501,7 +506,7 @@ exports.newMetadata = async (rudiMetadata) => {
     log.w(
       mod,
       fun,
-      `Saving object '${URL_OBJECT_METADATA}': ${utils.beautify(dbMetadata)} | Error: ${err}`
+      `Saving object '${PARAM_OBJECT_METADATA}': ${utils.beautify(dbMetadata)} | Error: ${err}`
     )
     throw err
   }
@@ -525,7 +530,7 @@ exports.updateMetadata = async (incomingRudiMetadata) => {
   // ensure the metadata already exist
   const rudiId = json.accessProperty(incomingRudiMetadata, API_METADATA_ID)
   // // let dbMetadata = await db.getEnsuredMetadataWithRudiId(rudiId) // No => no populate please !
-  const dbMetadata = await db.getEnsuredObjectWithRudiId(URL_OBJECT_METADATA, rudiId)
+  const dbMetadata = await db.getEnsuredObjectWithRudiId(PARAM_OBJECT_METADATA, rudiId)
   // log.v(mod, fun, `corresponding db object: ${utils.beautify(dbMetadata)}\n`)
 
   const dbReadyEditedMetadata = await this.rudiToDbFormat(incomingRudiMetadata)
@@ -563,7 +568,7 @@ exports.sendToPortal = async (metadata) => {
 
 exports.massInit = async (req, reply) => {
   const fun = 'massInit'
-  log.v(mod, fun, `> ${URL_PREFIX_PUBLIC}/${URL_OBJECT_METADATA}/${URL_ACTION_INIT}`)
+  log.v(mod, fun, `> ${URL_PREFIX_PUBLIC}/${PARAM_OBJECT_METADATA}/${PARAM_ACTION_INIT}`)
 
   await db.dropDB()
 
@@ -595,4 +600,45 @@ exports.massInit = async (req, reply) => {
     })
   )
   return 'Initialization initiated'
+}
+
+// -----------------------------------------------------------------------------
+// Portal accessible controllers
+// -----------------------------------------------------------------------------
+
+/**
+ * Get single metadata by ID
+ * => GET /resources/{id}
+ */
+exports.getSingleMetadata = async (req, reply) => {
+  const fun = 'getSingleMetadata'
+  log.v(mod, fun, `< GET ${URL_PUB_METADATA}/:${PARAM_ID}`)
+  try {
+    // retrieve url parameters: object id
+    const objectId = json.accessReqParam(req, PARAM_ID)
+    // ensure the object exists
+    const dbObject = await db.getEnsuredMetadataWithRudiId(objectId)
+    // return the object
+    return dbObject
+
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw boomify(err)
+  }
+}
+
+/**
+ * Get several metadata
+ * => GET /resources
+ */
+exports.getMetadataList = async (req, reply) => {
+  const fun = 'getSingleMetadata'
+  log.v(mod, fun, `< GET ${URL_PUB_METADATA}`)
+  try {
+    return await genericController.getManyObjects(PARAM_OBJECT_METADATA, req, reply)
+
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw boomify(err)
+  }
 }

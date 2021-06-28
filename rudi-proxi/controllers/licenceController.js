@@ -18,8 +18,13 @@ const utils = require('../utils/jsUtils')
 const json = require('../utils/jsonAccess')
 
 const db = require('../db/dbQueries')
-const api = require('../config/confApi')
 const { httpPost, directPost } = require('../utils/httpReq')
+const {
+  URL_PREFIX_PRIVATE,
+  PARAM_OBJECT_SKOS_SCHEME,
+  URL_PV_LICENCE_ACCESS,
+  URL_PV_LICENCE_CODES_ACCESS,
+} = require('../config/confApi')
 
 const { API_SKOS_CONCEPT_CODE } = require('../db/dbFields')
 
@@ -31,9 +36,7 @@ exports.LicenceSchemeCode = 'software_licences'
 exports.LicenceConceptRole = 'licence'
 
 const LICENCES_FILE = `../api/licences.json`
-const LICENCE_POST_ADDRESS = `${sys.getHost()}${api.URL_PREFIX_PUBLIC}/${
-  api.URL_OBJECT_SKOS_SCHEME
-}`
+const LICENCE_POST_ADDRESS = `${sys.getHost()}${URL_PREFIX_PRIVATE}/${PARAM_OBJECT_SKOS_SCHEME}`
 
 // -----------------------------------------------------------------------------
 // Controller
@@ -95,13 +98,12 @@ exports.initLicences = async () => {
   }
 }
 
-
 // -----------------------------------------------------------------------------
 // Controller
 // -----------------------------------------------------------------------------
 exports.getAllLicences = async (req, reply) => {
   const fun = `getAlllicences`
-  log.v(mod, fun, `< GET ${api.URL_LICENCE_ACCESS}`)
+  log.v(mod, fun, `< GET ${URL_PV_LICENCE_ACCESS}`)
   // log.d(mod, fun, ``)
 
   return await this.getLicences()
@@ -109,7 +111,7 @@ exports.getAllLicences = async (req, reply) => {
 
 exports.getAllLicenceCodes = async (req, reply) => {
   const fun = `getAlllicenceCodes`
-  log.v(mod, fun, `< GET ${api.URL_LICENCE_ACCESS}`)
+  log.v(mod, fun, `< GET ${URL_PV_LICENCE_CODES_ACCESS}`)
   // log.d(mod, fun, ``)
 
   return await this.getLicenceCodes()

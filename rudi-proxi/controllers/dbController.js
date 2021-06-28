@@ -22,7 +22,7 @@ const db = require('../db/dbQueries')
 // -----------------------------------------------------------------------------
 // Constants
 // -----------------------------------------------------------------------------
-const { URL_DB_ACCESS } = require('../config/confApi')
+const { URL_PV_DB_ACCESS: URL_DB_ACCESS } = require('../config/confApi')
 
 const { DB_NAME } = require('../config/confSystem')
 

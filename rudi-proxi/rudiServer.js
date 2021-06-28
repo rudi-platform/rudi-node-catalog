@@ -113,7 +113,7 @@ fastify.get(`${api.URL_PREFIX_PUBLIC}/`, async (request, reply) => {
 // Loop over each public route
 publicRoutes.forEach((pubRoute, index) => {
   fastify.route(pubRoute)
-  // log.v(mod, 'routes', `route #${index} = ${pubRoute.method} ${pubRoute.url}`)
+  log.v(mod, 'routes', `route #${index} = ${pubRoute.method} ${pubRoute.url}`)
 })
 
 // Loop over each backoffice route

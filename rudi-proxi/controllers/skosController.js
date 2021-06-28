@@ -75,9 +75,9 @@ const PROPERTIES_WITH_CONCEPT_REFS = [
 ]
 
 const {
-  URL_THESAURUS_ACCESS,
+  URL_PV_THESAURUS_ACCESS: URL_THESAURUS_ACCESS,
   PARAM_THESAURUS_CODE,
-  URL_LICENCE_SUFFIX,
+  URL_SUFFIX_LICENCE: URL_LICENCE_SUFFIX,
 } = require('../config/confApi')
 
 // -----------------------------------------------------------------------------

@@ -290,7 +290,7 @@ exports.sendMetadataToPortal = async (metadataId) => {
   try {
     if (!metadataId) throw new Error('Not yet implemented')
 
-    const metadata = await db.getEnsuredObjectWithRudiId(api.URL_OBJECT_METADATA, metadataId)
+    const metadata = await db.getEnsuredObjectWithRudiId(api.PARAM_OBJECT_METADATA, metadataId)
     if (!metadata) {
       const errMsg = `No data found locally for id '${metadataId}'`
       log.w(mod, fun, errMsg)

@@ -23,6 +23,24 @@ exports.PARAM_OBJECT = 'object'
 exports.PARAM_ID = 'id'
 exports.PARAM_REPORT_ID = 'irid'
 
+// --- "Objects" parameters
+exports.PARAM_OBJECT_METADATA = 'resources'
+exports.PARAM_OBJECT_ORGANIZATIONS = 'organizations'
+exports.PARAM_OBJECT_CONTACTS = 'contacts'
+exports.PARAM_OBJECT_MEDIA = 'media'
+exports.PARAM_OBJECT_SKOS_SCHEME = 'skos_schemes'
+exports.PARAM_OBJECT_SKOS_CONCEPT = 'skos_concepts'
+
+exports.URL_OBJECTS = [
+  this.PARAM_OBJECT_METADATA,
+  this.PARAM_OBJECT_ORGANIZATIONS,
+  this.PARAM_OBJECT_CONTACTS,
+  this.PARAM_OBJECT_MEDIA,
+  this.PARAM_OBJECT_SKOS_CONCEPT,
+  this.PARAM_OBJECT_SKOS_SCHEME,
+  this.PARAM_ACTION_REPORT,
+]
+
 // --- "In query" parameters
 exports.QUERY_LIMIT = 'limit'
 exports.QUERY_OFFSET = 'offset'
@@ -35,8 +53,8 @@ exports.QUERY_GROUP_LIMIT = 'group_limit'
 exports.QUERY_GROUP_OFFSET = 'group_offset'
 exports.QUERY_CONFIRM = 'confirm'
 
-exports.QUERY_LIMIT_DEFAULT = 100
-exports.QUERY_OFFSET_DEFAULT = 0
+exports.DEFAULT_QUERY_LIMIT = 100
+exports.DEFAULT_QUERY_OFFSET = 0
 
 // -----------------------------------------------------------------------------
 // REQ URL
@@ -44,64 +62,48 @@ exports.QUERY_OFFSET_DEFAULT = 0
 exports.URL_PREFIX_PUBLIC = '/api/v1'
 
 // This generic URL will be used to factorize the treatments on resources, organizations, contacts, etc.
-exports.URL_OBJECT_GENERIC = `${this.URL_PREFIX_PUBLIC}/:${this.PARAM_OBJECT}`
+exports.URL_PUB_METADATA = `${this.URL_PREFIX_PUBLIC}/${this.PARAM_OBJECT_METADATA}`
 
-exports.URL_OBJECT_METADATA = 'resources'
-exports.URL_OBJECT_ORGANIZATIONS = 'organizations'
-exports.URL_OBJECT_CONTACTS = 'contacts'
-exports.URL_OBJECT_MEDIA = 'media'
-exports.URL_OBJECT_SKOS_SCHEME = 'skos_schemes'
-exports.URL_OBJECT_SKOS_CONCEPT = 'skos_concepts'
+exports.PARAM_ACTION_UUID_GEN = 'id_generation'
+exports.PARAM_ACTION_INIT = 'init'
+exports.PARAM_ACTION_DELETION = 'deletion'
+exports.PARAM_ACTION_REPORT = 'report'
 
-exports.URL_ACTION_UUID_GEN = 'id_generation'
-exports.URL_ACTION_INIT = 'init'
-exports.URL_ACTION_DELETION = 'deletion'
-exports.URL_ACTION_FILTER = 'filter'
-exports.URL_ACTION_REPORT = 'report'
-
-exports.URL_OBJECTS = [
-  this.URL_OBJECT_METADATA,
-  this.URL_OBJECT_ORGANIZATIONS,
-  this.URL_OBJECT_CONTACTS,
-  this.URL_OBJECT_MEDIA,
-  this.URL_OBJECT_SKOS_CONCEPT,
-  this.URL_OBJECT_SKOS_SCHEME,
-  this.URL_ACTION_REPORT,
-]
 
 // -----------------------------------------------------------------------------
 // DB actions
 // -----------------------------------------------------------------------------
+
 exports.URL_PREFIX_PRIVATE = '/api/admin'
 
-exports.URL_PORTAL_PREFIX = `${this.URL_PREFIX_PRIVATE}/portal`
-exports.URL_TOKEN_GET = 'token'
-exports.URL_TOKEN_CHECK = 'check'
-exports.URL_TOKEN_ACCESS = `${this.URL_PORTAL_PREFIX}/${this.URL_TOKEN_GET}`
-exports.URL_TOKEN_CHECK_ACCESS = `${this.URL_TOKEN_ACCESS}/${this.URL_TOKEN_CHECK}`
+const URL_SUFFIX_PORTAL = 'portal'
+const URL_SUFFIX_LOGS = 'logs'
+const URL_SUFFIX_DB = 'db'
+const URL_SUFFIX_THESAURUS = 'enum'
+const URL_SUFFIX_LICENCE_CODES = 'licence_codes'
 
-const URL_LOGS_SUFFIX = 'logs'
-exports.URL_LOGS_ACCESS = `${this.URL_PREFIX_PRIVATE}/${URL_LOGS_SUFFIX}`
+exports.URL_SUFFIX_TOKEN_GET = 'token'
+exports.URL_SUFFIX_TOKEN_CHECK = 'check'
+exports.URL_SUFFIX_GIT_HASH = 'hash'
+exports.URL_SUFFIX_APP_HASH = 'apphash'
+exports.URL_SUFFIX_NODE_VERSION = 'nv'
+exports.URL_SUFFIX_LICENCE = 'licences'
+
+exports.PARAM_THESAURUS_CODE = `code`
 exports.PARAM_LOGS_LINES = `lines`
 
-exports.URL_GIT_HASH_SUFFIX = 'hash'
-exports.URL_GIT_HASH_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_GIT_HASH_SUFFIX}`
+exports.URL_PV_PORTAL_PREFIX = `${this.URL_PREFIX_PRIVATE}/${URL_SUFFIX_PORTAL}`
+exports.URL_PV_TOKEN_ACCESS = `${this.URL_PV_PORTAL_PREFIX}/${this.URL_SUFFIX_TOKEN_GET}`
+exports.URL_PV_TOKEN_CHECK_ACCESS = `${this.URL_PV_TOKEN_ACCESS}/${this.URL_SUFFIX_TOKEN_CHECK}`
 
-exports.URL_APP_HASH_SUFFIX = 'apphash'
-exports.URL_APP_HASH_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_APP_HASH_SUFFIX}`
+exports.URL_PV_LOGS_ACCESS = `${this.URL_PREFIX_PRIVATE}/${URL_SUFFIX_LOGS}`
+exports.URL_PV_GIT_HASH_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_SUFFIX_GIT_HASH}`
+exports.URL_PV_APP_HASH_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_SUFFIX_APP_HASH}`
+exports.URL_PV_NODE_VERSION_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_SUFFIX_NODE_VERSION}`
 
-exports.URL_NODE_VERSION_SUFFIX = 'nv'
-exports.URL_NODE_VERSION_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_NODE_VERSION_SUFFIX}`
+exports.URL_PV_DB_ACCESS = `${this.URL_PREFIX_PRIVATE}/${URL_SUFFIX_DB}`
+exports.URL_PV_OBJECT_GENERIC = `${this.URL_PREFIX_PRIVATE}/:${this.PARAM_OBJECT}`
 
-const URL_DB_SUFFIX = 'db'
-exports.URL_DB_ACCESS = `${this.URL_PREFIX_PRIVATE}/${URL_DB_SUFFIX}`
-
-const URL_THESAURUS_SUFFIX = 'enum'
-exports.URL_THESAURUS_ACCESS = `${this.URL_PREFIX_PRIVATE}/${URL_THESAURUS_SUFFIX}`
-exports.PARAM_THESAURUS_CODE = `code`
-
-exports.URL_LICENCE_SUFFIX = 'licences'
-exports.URL_LICENCE_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_LICENCE_SUFFIX}`
-
-const URL_LICENCE_CODES_SUFFIX = 'licence_codes'
-exports.URL_LICENCE_CODES_ACCESS = `${this.URL_PREFIX_PRIVATE}/${URL_LICENCE_CODES_SUFFIX}`
+exports.URL_PV_THESAURUS_ACCESS = `${this.URL_PREFIX_PRIVATE}/${URL_SUFFIX_THESAURUS}`
+exports.URL_PV_LICENCE_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_SUFFIX_LICENCE}`
+exports.URL_PV_LICENCE_CODES_ACCESS = `${this.URL_PREFIX_PRIVATE}/${URL_SUFFIX_LICENCE_CODES}`

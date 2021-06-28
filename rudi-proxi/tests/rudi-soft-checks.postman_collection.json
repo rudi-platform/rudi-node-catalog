@@ -141,12 +141,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/id_generation",
+							"raw": "{{baseUrl}}/{{adminUrl}}/id_generation",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"id_generation"
 							]
 						}
@@ -540,12 +540,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{cont}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{cont}}"
 							]
 						}
@@ -598,12 +598,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{cont}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{cont}}"
 							]
 						}
@@ -656,12 +656,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{cont}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{cont}}"
 							]
 						}
@@ -691,12 +691,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{cont}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{cont}}"
 							]
 						}
@@ -746,12 +746,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{cont}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{cont}}"
 							]
 						}
@@ -781,12 +781,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{cont}}/{{softContact1Id}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}/{{softContact1Id}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{cont}}",
 								"{{softContact1Id}}"
 							]
@@ -844,12 +844,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{org}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{org}}"
 							]
 						}
@@ -901,12 +901,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{org}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{org}}"
 							]
 						}
@@ -934,12 +934,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{org}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{org}}"
 							]
 						}
@@ -990,12 +990,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{org}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{org}}"
 							]
 						}
@@ -1026,12 +1026,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{org}}/{{softOrg2Id}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}/{{softOrg2Id}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{org}}",
 								"{{softOrg2Id}}"
 							]
@@ -1137,12 +1137,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							]
 						}
@@ -1190,12 +1190,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							]
 						}
@@ -1243,12 +1243,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							]
 						}
@@ -1296,12 +1296,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							]
 						}
@@ -1349,12 +1349,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							]
 						}
@@ -1406,12 +1406,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							]
 						}
@@ -1463,12 +1463,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							]
 						}
@@ -1520,12 +1520,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							]
 						}
@@ -1577,12 +1577,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							]
 						}
@@ -1634,12 +1634,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							]
 						}
@@ -1692,12 +1692,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							]
 						}
@@ -1705,7 +1705,7 @@
 					"response": []
 				},
 				{
-					"name": "Get all metadata",
+					"name": "[PUB] Get all metadata",
 					"event": [
 						{
 							"listen": "test",
@@ -1745,7 +1745,7 @@
 					"response": []
 				},
 				{
-					"name": "Sort metadata",
+					"name": "[PUB] Sort metadata",
 					"event": [
 						{
 							"listen": "test",
@@ -1813,12 +1813,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?limit=10&keywords={\"$in\":[\"population\",\"plu\"]}&temporal_spread.start_date={\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2021-05-28T23:24:51.000Z\"}&perlin=2346&resource_languages=fr",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?limit=10&keywords={\"$in\":[\"population\",\"plu\"]}&temporal_spread.start_date={\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2021-05-28T23:24:51.000Z\"}&perlin=2346&resource_languages=fr",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							],
 							"query": [
@@ -1848,7 +1848,7 @@
 					"response": []
 				},
 				{
-					"name": "Count metadata (api_version)",
+					"name": "[PUB] Count metadata (api_version)",
 					"event": [
 						{
 							"listen": "test",
@@ -1887,7 +1887,7 @@
 					"response": []
 				},
 				{
-					"name": "Group metadata (api_version)",
+					"name": "[PUB] Group metadata (api_version)",
 					"event": [
 						{
 							"listen": "test",
@@ -1930,7 +1930,7 @@
 					"response": []
 				},
 				{
-					"name": "Count metadata (metadata_provider)",
+					"name": "[PUB] Count metadata (metadata_provider)",
 					"event": [
 						{
 							"listen": "test",
@@ -1967,7 +1967,7 @@
 					"response": []
 				},
 				{
-					"name": "Count metadata (metadata_contacts)",
+					"name": "[PUB] Count metadata (metadata_contacts)",
 					"event": [
 						{
 							"listen": "test",
@@ -2004,7 +2004,7 @@
 					"response": []
 				},
 				{
-					"name": "Count metadata (producer)",
+					"name": "[PUB] Count metadata (producer)",
 					"event": [
 						{
 							"listen": "test",
@@ -2052,7 +2052,7 @@
 					"response": []
 				},
 				{
-					"name": "Filter metadata (producer)",
+					"name": "[PUB] Filter metadata (producer)",
 					"event": [
 						{
 							"listen": "test",
@@ -2098,7 +2098,7 @@
 					"response": []
 				},
 				{
-					"name": "Group metadata (producer)",
+					"name": "[PUB] Group metadata (producer)",
 					"event": [
 						{
 							"listen": "test",
@@ -2218,12 +2218,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							],
 							"query": [
@@ -2238,7 +2238,7 @@
 					"response": []
 				},
 				{
-					"name": "Get meta 1",
+					"name": "[PUB] Get meta 1",
 					"event": [
 						{
 							"listen": "test",
@@ -2312,12 +2312,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{softMeta2Id}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}/{{softMeta2Id}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}",
 								"{{softMeta2Id}}"
 							]
@@ -2331,7 +2331,7 @@
 			"name": "06. Add/edit/get reports",
 			"item": [
 				{
-					"name": "Add report 1 (meta 1)",
+					"name": "[PUB] Add report 1 (meta 1)",
 					"event": [
 						{
 							"listen": "test",
@@ -2434,12 +2434,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{softMeta1Id}}/{{reports}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}/{{softMeta1Id}}/{{reports}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}",
 								"{{softMeta1Id}}",
 								"{{reports}}"
@@ -2449,7 +2449,7 @@
 					"response": []
 				},
 				{
-					"name": "Add report unkown meta",
+					"name": "[PUB] Add report unkown meta",
 					"event": [
 						{
 							"listen": "test",
@@ -2510,7 +2510,7 @@
 					"response": []
 				},
 				{
-					"name": "Get all reports (meta 1)",
+					"name": "[PUB] Get all reports (meta 1)",
 					"event": [
 						{
 							"listen": "test",
@@ -2593,12 +2593,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{softMeta1Id}}/{{reports}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}/{{softMeta1Id}}/{{reports}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}",
 								"{{softMeta1Id}}",
 								"{{reports}}"
@@ -2608,7 +2608,7 @@
 					"response": []
 				},
 				{
-					"name": "Get report 2 (meta 1)",
+					"name": "[PUB] Get report 2 (meta 1)",
 					"event": [
 						{
 							"listen": "test",
@@ -2690,12 +2690,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{reports}}/{{softReport2Id}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{reports}}/{{softReport2Id}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{reports}}",
 								"{{softReport2Id}}"
 							]
@@ -2736,12 +2736,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{reports}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{reports}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{reports}}"
 							]
 						}
@@ -2772,12 +2772,12 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{org}}/{{softOrg1Id}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}/{{softOrg1Id}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{org}}",
 								"{{softOrg1Id}}"
 							]
@@ -2804,12 +2804,12 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{cont}}/{{softContact1Id}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}/{{softContact1Id}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{cont}}",
 								"{{softContact1Id}}"
 							]
@@ -2849,12 +2849,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{reports}}/{{deletion}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{reports}}/{{deletion}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{reports}}",
 								"{{deletion}}"
 							]
@@ -2894,12 +2894,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{deletion}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}/{{deletion}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}",
 								"{{deletion}}"
 							]
@@ -2939,12 +2939,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{media}}/{{deletion}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{media}}/{{deletion}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{media}}",
 								"{{deletion}}"
 							]
@@ -2984,12 +2984,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{org}}/{{deletion}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}/{{deletion}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{org}}",
 								"{{deletion}}"
 							]
@@ -3029,12 +3029,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{cont}}/{{deletion}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}/{{deletion}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{cont}}",
 								"{{deletion}}"
 							]
@@ -3043,7 +3043,7 @@
 					"response": []
 				},
 				{
-					"name": "No metadata left",
+					"name": "[PUB] No metadata left",
 					"event": [
 						{
 							"listen": "test",
@@ -3104,12 +3104,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?count_by=collection_tag&collection_tag={{stamp}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?count_by=collection_tag&collection_tag={{stamp}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							],
 							"query": [
@@ -3219,12 +3219,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							]
 						}
@@ -3253,12 +3253,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?collection_tag={{stamp}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?collection_tag={{stamp}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							],
 							"query": [
@@ -3303,12 +3303,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?collection_tag={{stamp}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?collection_tag={{stamp}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							],
 							"query": [
@@ -3343,12 +3343,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?collection_tag={{stamp}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?collection_tag={{stamp}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							],
 							"query": [

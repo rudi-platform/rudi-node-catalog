@@ -33,15 +33,16 @@ const utils = require('../utils/jsUtils')
 // -----------------------------------------------------------------------------
 
 const {
-  URL_OBJECT_GENERIC,
-  URL_OBJECT_METADATA,
-  URL_OBJECT_ORGANIZATIONS,
-  URL_OBJECT_CONTACTS,
-  URL_OBJECT_MEDIA,
-  URL_OBJECT_SKOS_CONCEPT,
-  URL_OBJECT_SKOS_SCHEME,
-  URL_ACTION_REPORT,
-  URL_ACTION_DELETION,
+  URL_PUB_METADATA,
+
+  PARAM_OBJECT_METADATA,
+  PARAM_OBJECT_ORGANIZATIONS,
+  PARAM_OBJECT_CONTACTS,
+  PARAM_OBJECT_MEDIA,
+  PARAM_OBJECT_SKOS_CONCEPT,
+  PARAM_OBJECT_SKOS_SCHEME,
+  PARAM_ACTION_REPORT,
+  PARAM_ACTION_DELETION,
   PARAM_ID,
   PARAM_OBJECT,
 
@@ -49,18 +50,18 @@ const {
   QUERY_LIMIT,
   QUERY_OFFSET,
 
-  QUERY_LIMIT_DEFAULT,
-  QUERY_OFFSET_DEFAULT,
   QUERY_FILTER,
   QUERY_SORT_BY,
   QUERY_COUNT_BY,
   QUERY_GROUP_BY,
   QUERY_GROUP_LIMIT,
   QUERY_GROUP_OFFSET,
+  DEFAULT_QUERY_LIMIT,
+  DEFAULT_QUERY_OFFSET,
 
-  URL_ACTION_FILTER,
   URL_OBJECTS,
   QUERY_CONFIRM,
+  URL_PV_OBJECT_GENERIC,
 } = require('../config/confApi')
 
 const {
@@ -124,10 +125,10 @@ async function parseQueryParameters(objectType, reqUrl) {
   const modelProperties = db.getModelPropertyNames(Model)
 
   const returnedFilter = {
-    [QUERY_LIMIT]: QUERY_LIMIT_DEFAULT,
-    [QUERY_GROUP_LIMIT]: QUERY_LIMIT_DEFAULT,
-    [QUERY_OFFSET]: QUERY_OFFSET_DEFAULT,
-    [QUERY_GROUP_OFFSET]: QUERY_OFFSET_DEFAULT,
+    [QUERY_LIMIT]: DEFAULT_QUERY_LIMIT,
+    [QUERY_GROUP_LIMIT]: DEFAULT_QUERY_LIMIT,
+    [QUERY_OFFSET]: DEFAULT_QUERY_OFFSET,
+    [QUERY_GROUP_OFFSET]: DEFAULT_QUERY_OFFSET,
     [QUERY_FILTER]: {},
     [QUERY_CONFIRM]: false,
     [EXT_REFS]: [],
@@ -149,7 +150,7 @@ async function parseQueryParameters(objectType, reqUrl) {
   }
   //  log.d(mod, fun, `urlSearchParams: ${urlSearchParams}`)
 
-   for (const [key, value] of urlSearchParams) {
+  for (const [key, value] of urlSearchParams) {
     if (QUERY_RESERVED_WORDS.includes(key)) {
       // log.d(mod, fun, `Key is a reserved word: ${utils.beautify(key)} => ${utils.beautify(queryParameters[key])}`)
       switch (key) {
@@ -290,15 +291,15 @@ async function newObject(objectType, objectData) {
     checkIsUrlObject(objectType)
 
     switch (objectType) {
-      case URL_OBJECT_METADATA:
+      case PARAM_OBJECT_METADATA:
         return await metadataController.newMetadata(objectData)
-      case URL_OBJECT_ORGANIZATIONS:
+      case PARAM_OBJECT_ORGANIZATIONS:
         return await organizationController.newOrganization(objectData)
-      case URL_OBJECT_CONTACTS:
+      case PARAM_OBJECT_CONTACTS:
         return await contactController.newContact(objectData)
-      case URL_OBJECT_SKOS_CONCEPT:
+      case PARAM_OBJECT_SKOS_CONCEPT:
         return await skosController.newSkosConcept(objectData)
-      case URL_OBJECT_SKOS_SCHEME:
+      case PARAM_OBJECT_SKOS_SCHEME:
         // Custom creation to create the children scheme concepts
         return await skosController.newSkosScheme(objectData)
       default:
@@ -316,9 +317,9 @@ async function isObjectReferenced(objectType, rudiId) {
   checkIsUrlObject(objectType)
 
   switch (objectType) {
-    case URL_OBJECT_ORGANIZATIONS:
-    case URL_OBJECT_CONTACTS:
-    case URL_OBJECT_MEDIA:
+    case PARAM_OBJECT_ORGANIZATIONS:
+    case PARAM_OBJECT_CONTACTS:
+    case PARAM_OBJECT_MEDIA:
       return await db.isReferencedInMetadata(objectType, rudiId)
     default:
       return false
@@ -347,7 +348,7 @@ exports.setPublishedFlag = async (dbObject) => {
  */
 exports.addSingleObject = async (req, reply) => {
   const fun = 'addSingleObject'
-  log.v(mod, fun, `< POST ${URL_OBJECT_GENERIC}`)
+  log.v(mod, fun, `< POST ${URL_PV_OBJECT_GENERIC}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -385,7 +386,7 @@ exports.addSingleObject = async (req, reply) => {
  */
 exports.getSingleObject = async (req, reply) => {
   const fun = 'getSingleObject'
-  log.v(mod, fun, `< GET ${URL_OBJECT_GENERIC}/:${PARAM_ID}`)
+  log.v(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -407,11 +408,19 @@ exports.getSingleObject = async (req, reply) => {
  */
 exports.getObjectList = async (req, reply) => {
   const fun = 'getObjectList'
-  log.v(mod, fun, `< GET ${URL_OBJECT_GENERIC}`)
-  try {
-    // retrieve url parameter: object type
-    const objectType = json.accessReqParam(req, PARAM_OBJECT)
+  log.v(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}`)
+  // retrieve url parameter: object type
+  const objectType = json.accessReqParam(req, PARAM_OBJECT)
+  return await this.getManyObjects(objectType, req, reply)
+}
 
+
+/**
+ * Get several objects for an particular object type
+ */
+exports.getManyObjects = async (objectType, req, reply) => {
+  const fun = 'getObjectList'
+  try {
     let parsedParameters
     try {
       parsedParameters = await parseQueryParameters(objectType, req.url)
@@ -464,8 +473,8 @@ exports.getObjectList = async (req, reply) => {
 
     return objectList
   } catch (err) {
-    log.e(mod, fun, err)
-    throw boom.boomify(err)
+    log.w(mod, fun, err)
+    throw err
   }
 }
 
@@ -476,7 +485,6 @@ exports.getObjectList = async (req, reply) => {
 exports.getObjectListFiltered = async (req, reply) => {
   const fun = 'getObjectListFiltered'
   log.d(mod, fun, ``)
-  // log.v(mod, fun, `< GET ${URL_OBJECT_GENERIC}/${URL_ACTION_FILTER}`)
   try {
     // retrieve url parameter: object type
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -507,7 +515,7 @@ exports.getObjectListFiltered = async (req, reply) => {
  */
 exports.updateSingleObject = async (req, reply) => {
   const fun = 'updateSingleObject'
-  log.v(mod, fun, `< PUT ${URL_OBJECT_GENERIC}`)
+  log.v(mod, fun, `< PUT ${URL_PV_OBJECT_GENERIC}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -521,7 +529,7 @@ exports.updateSingleObject = async (req, reply) => {
     const existsObject = await db.doesObjectExistWithRudiId(objectType, rudiId)
     if (!existsObject) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
 
-    if (objectType === URL_OBJECT_METADATA) {
+    if (objectType === PARAM_OBJECT_METADATA) {
       return await metadataController.updateMetadata(updateData)
     } else {
       return await db.updateObject(objectType, updateData)
@@ -538,7 +546,7 @@ exports.updateSingleObject = async (req, reply) => {
  */
 exports.deleteSingleObject = async (req, reply) => {
   const fun = 'deleteSingleObject'
-  log.v(mod, fun, `< DELETE ${URL_OBJECT_GENERIC}/:${PARAM_ID}`)
+  log.v(mod, fun, `< DELETE ${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -567,7 +575,7 @@ exports.deleteSingleObject = async (req, reply) => {
  */
 exports.deleteObjectList = async (req, reply) => {
   const fun = 'deleteObjectList'
-  log.v(mod, fun, `< POST ${URL_OBJECT_GENERIC}/${URL_ACTION_DELETION}`)
+  log.v(mod, fun, `< POST ${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_DELETION}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -601,10 +609,10 @@ exports.deleteObjectList = async (req, reply) => {
  */
 exports.deleteManyObjects = async (req, reply) => {
   const fun = 'deleteManyObjects'
-  log.v(mod, fun, `< DELETE ${URL_OBJECT_GENERIC}`)
+  log.v(mod, fun, `< DELETE ${URL_PV_OBJECT_GENERIC}`)
   try {
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
-    
+
     let parsedParameters = await parseQueryParameters(objectType, req.url)
     log.d(mod, fun, `parsedParameters: ${utils.beautify(parsedParameters)}`)
     const filter = parsedParameters[QUERY_FILTER]

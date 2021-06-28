@@ -22,9 +22,9 @@ const utils = require('../utils/jsUtils')
 const json = require('../utils/jsonAccess')
 
 const {
-  URL_LOGS_ACCESS,
-  URL_GIT_HASH_ACCESS,
-  URL_NODE_VERSION_ACCESS,
+  URL_PV_LOGS_ACCESS: URL_LOGS_ACCESS,
+  URL_PV_GIT_HASH_ACCESS: URL_GIT_HASH_ACCESS,
+  URL_PV_NODE_VERSION_ACCESS: URL_NODE_VERSION_ACCESS,
   PARAM_LOGS_LINES,
 } = require('../config/confApi')
 

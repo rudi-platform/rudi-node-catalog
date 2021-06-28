@@ -16,7 +16,7 @@ const utils = require('../utils/jsUtils')
 // Constants
 // -----------------------------------------------------------------------------
 
-const { URL_OBJECT_ORGANIZATIONS } = require('../config/confApi')
+const { PARAM_OBJECT_ORGANIZATIONS: URL_OBJECT_ORGANIZATIONS } = require('../config/confApi')
 
 // -----------------------------------------------------------------------------
 // Data models

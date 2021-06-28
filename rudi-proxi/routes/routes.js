@@ -20,29 +20,29 @@
 // -----------------------------------------------------------------------------
 const {
   URL_PREFIX_PUBLIC,
+  URL_PUB_METADATA,
   URL_PREFIX_PRIVATE,
-  URL_OBJECT_GENERIC,
-  URL_OBJECT_METADATA,
+  URL_PV_DB_ACCESS,
+  URL_PV_LOGS_ACCESS,
+  URL_PV_GIT_HASH_ACCESS,
+  URL_PV_APP_HASH_ACCESS,
+  URL_PV_THESAURUS_ACCESS,
+  URL_PV_NODE_VERSION_ACCESS,
+  URL_PV_LICENCE_ACCESS,
+  URL_PV_LICENCE_CODES_ACCESS,
+  URL_PV_PORTAL_PREFIX,
+  URL_PV_OBJECT_GENERIC,
+  URL_SUFFIX_TOKEN_GET,
+  URL_SUFFIX_TOKEN_CHECK,
   PARAM_ID,
   PARAM_REPORT_ID,
   PARAM_LOGS_LINES,
   PARAM_THESAURUS_CODE,
-  URL_ACTION_INIT,
-  URL_ACTION_FILTER,
-  URL_ACTION_REPORT,
-  URL_ACTION_DELETION,
-  URL_ACTION_UUID_GEN,
-  URL_DB_ACCESS,
-  URL_LOGS_ACCESS,
-  URL_GIT_HASH_ACCESS,
-  URL_APP_HASH_ACCESS,
-  URL_THESAURUS_ACCESS,
-  URL_NODE_VERSION_ACCESS,
-  URL_LICENCE_ACCESS,
-  URL_LICENCE_CODES_ACCESS,
-  URL_PORTAL_PREFIX,
-  URL_TOKEN_GET,
-  URL_TOKEN_CHECK,
+  PARAM_OBJECT_METADATA,
+  PARAM_ACTION_INIT,
+  PARAM_ACTION_REPORT,
+  PARAM_ACTION_DELETION,
+  PARAM_ACTION_UUID_GEN,
 } = require('../config/confApi')
 
 // -----------------------------------------------------------------------------
@@ -76,137 +76,51 @@ exports.publicRoutes = [
   // /resources POST/PUT/GET
   // /resources/{id} GET/DELETE
   // /resources/{id}/report PUT
-  {
-    method: 'GET',
-    url: `${URL_PREFIX_PUBLIC}/${URL_ACTION_UUID_GEN}`,
-    // preHandler: logRequest,
-    handler: genericController.generateUUID,
-  },
+
   // -----------------------------------------------------------------------------
   // Generic routes for accessing any object
   // ('Metadata', 'Organizations' and 'Contacts')
   // -----------------------------------------------------------------------------
-  // Mass init with ODS data
-  {
-    method: 'POST',
-    url: `${URL_PREFIX_PUBLIC}/${URL_OBJECT_METADATA}/${URL_ACTION_INIT}`,
-    // preHandler: logRequest,
-    handler: metadataController.massInit,
-  },
-  // Delete many
-  {
-    method: 'POST',
-    url: `${URL_OBJECT_GENERIC}/${URL_ACTION_DELETION}`,
-    // preHandler: logRequest,
-    handler: genericController.deleteObjectList,
-  },
-  // Add 1
-  {
-    method: 'POST',
-    url: URL_OBJECT_GENERIC,
-    // preHandler: logRequest,
-    handler: genericController.addSingleObject,
-    // schema: documentation.addMetadataSchema
-  },
-  // Edit 1
-  {
-    method: 'PUT',
-    url: URL_OBJECT_GENERIC,
-    // preHandler: logRequest,
-    handler: genericController.updateSingleObject,
-  },
   // Get all
   {
     method: 'GET',
-    url: URL_OBJECT_GENERIC,
+    url: URL_PUB_METADATA,
     // preHandler: logRequest,
-    handler: genericController.getObjectList,
+    handler: metadataController.getMetadataList,
   },
   // Get 1
   {
     method: 'GET',
-    url: `${URL_OBJECT_GENERIC}/:${PARAM_ID}`,
+    url: `${URL_PUB_METADATA}/:${PARAM_ID}`,
     // preHandler: logRequest,
-    handler: genericController.getSingleObject,
-  },
-
-  // Delete 1
-  {
-    method: 'DELETE',
-    url: `${URL_OBJECT_GENERIC}/:${PARAM_ID}`,
-    // preHandler: logRequest,
-    handler: genericController.deleteSingleObject,
-  },
-  // Delete all
-  {
-    method: 'DELETE',
-    url: URL_OBJECT_GENERIC,
-    // preHandler: logRequest,
-    handler: genericController.deleteManyObjects,
+    handler: metadataController.getSingleMetadata,
   },
 
   // -----------------------------------------------------------------------------
   // Integration reports for one particular object
   // -----------------------------------------------------------------------------
-  // Delete many reports for one object integration
-  {
-    method: 'POST',
-    url: `${URL_OBJECT_GENERIC}/:${PARAM_ID}/${URL_ACTION_REPORT}/${URL_ACTION_DELETION}`,
-    // preHandler: logRequest,
-    handler: reportController.deleteManyReportForObject,
-  },
-  // Add 1 report for one object integration
-  {
-    method: 'POST',
-    url: `${URL_OBJECT_GENERIC}/:${PARAM_ID}/${URL_ACTION_REPORT}`,
-    // preHandler: logRequest,
-    handler: reportController.addSingleReportForObject,
-  },
+
   // Add/edit 1 report for one object integration
   {
     method: 'PUT',
-    url: `${URL_OBJECT_GENERIC}/:${PARAM_ID}/${URL_ACTION_REPORT}`,
+    url: `${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
     // preHandler: logRequest,
-    handler: reportController.addOrEditSingleReportForObject,
+    handler: reportController.addOrEditSingleReportForMetadata,
   },
+
   // Get all reports for one object integration
   {
     method: 'GET',
-    url: `${URL_OBJECT_GENERIC}/:${PARAM_ID}/${URL_ACTION_REPORT}`,
+    url: `${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
     // preHandler: logRequest,
-    handler: reportController.getReportListForObject,
+    handler: reportController.getReportListForMetadata,
   },
   // Get 1 report for one object integration
   {
     method: 'GET',
-    url: `${URL_OBJECT_GENERIC}/:${PARAM_ID}/${URL_ACTION_REPORT}/:${PARAM_REPORT_ID}`,
+    url: `${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}/:${PARAM_REPORT_ID}`,
     // preHandler: logRequest,
-    handler: reportController.getSingleReportForObject,
-  },
-  // Delete 1 report for one object integration
-  {
-    method: 'DELETE',
-    url: `${URL_OBJECT_GENERIC}/:${PARAM_ID}/${URL_ACTION_REPORT}/:${PARAM_REPORT_ID}`,
-    // preHandler: logRequest,
-    handler: reportController.deleteSingleReportForObject,
-  },
-  // Delete all reports for one object integration
-  {
-    method: 'DELETE',
-    url: `${URL_OBJECT_GENERIC}/:${PARAM_ID}/${URL_ACTION_REPORT}`,
-    // preHandler: logRequest,
-    handler: reportController.deleteEveryReportForObject,
-  },
-
-  // -----------------------------------------------------------------------------
-  // Integration reports for one object type
-  // -----------------------------------------------------------------------------
-  // Get all reports for one object integration
-  {
-    method: 'GET',
-    url: `${URL_OBJECT_GENERIC}/${URL_ACTION_REPORT}`,
-    // preHandler: logRequest,
-    handler: reportController.getReportListForObjectType,
+    handler: reportController.getSingleReportForMetadata,
   },
 ]
 
@@ -215,19 +129,28 @@ exports.publicRoutes = [
 // -----------------------------------------------------------------------------
 exports.backOfficeRoutes = [
   // -----------------------------------------------------------------------------
-  // Getting Portal token
+  // UUID v4 generation
   // -----------------------------------------------------------------------------
-
   {
     method: 'GET',
-    url: `${URL_PORTAL_PREFIX}/${URL_TOKEN_GET}`,
+    url: `${URL_PREFIX_PRIVATE}/${PARAM_ACTION_UUID_GEN}`,
+    // preHandler: logRequest,
+    handler: genericController.generateUUID,
+  },
+  // -----------------------------------------------------------------------------
+  // Portal token
+  // -----------------------------------------------------------------------------
+  // Get a new token from the Portal
+  {
+    method: 'GET',
+    url: `${URL_PV_PORTAL_PREFIX}/${URL_SUFFIX_TOKEN_GET}`,
     // preHandler: logRequest,
     handler: portalController.exposedGetPortalToken,
   },
-
+  // Get a token checked by the Portal
   {
     method: 'GET',
-    url: `${URL_PORTAL_PREFIX}/${URL_TOKEN_GET}/${URL_TOKEN_CHECK}`,
+    url: `${URL_PV_PORTAL_PREFIX}/${URL_SUFFIX_TOKEN_GET}/${URL_SUFFIX_TOKEN_CHECK}`,
     // preHandler: logRequest,
     handler: portalController.checkStoredToken,
   },
@@ -237,106 +160,237 @@ exports.backOfficeRoutes = [
   // -----------------------------------------------------------------------------
   {
     method: 'GET',
-    url: `${URL_PORTAL_PREFIX}/${URL_OBJECT_METADATA}/:${PARAM_ID}`,
+    url: `${URL_PV_PORTAL_PREFIX}/${PARAM_OBJECT_METADATA}/:${PARAM_ID}`,
     // preHandler: logRequest,
     handler: portalController.getMetadata,
   },
   {
     method: 'POST',
-    url: `${URL_PORTAL_PREFIX}/${URL_OBJECT_METADATA}/:${PARAM_ID}`,
+    url: `${URL_PV_PORTAL_PREFIX}/${PARAM_OBJECT_METADATA}/:${PARAM_ID}`,
     // preHandler: logRequest,
     handler: portalController.sendMetadata,
   },
 
   // -----------------------------------------------------------------------------
-  // (distant dev) Route for accessing logs
+  // Accessing logs
   // -----------------------------------------------------------------------------
   {
     method: 'GET',
-    url: `${URL_LOGS_ACCESS}`,
+    url: `${URL_PV_LOGS_ACCESS}`,
     // preHandler: logRequest,
     handler: sysController.getLogs,
   },
   {
     method: 'GET',
-    url: `${URL_LOGS_ACCESS}/:${PARAM_LOGS_LINES}`,
+    url: `${URL_PV_LOGS_ACCESS}/:${PARAM_LOGS_LINES}`,
     // preHandler: logRequest,
     handler: sysController.getLastLogLines,
   },
 
   // -----------------------------------------------------------------------------
-  // (distant dev) Route for accessing thesaurus
+  // Accessing thesaurus
   // -----------------------------------------------------------------------------
   {
     method: 'GET',
-    url: `${URL_THESAURUS_ACCESS}`,
+    url: `${URL_PV_THESAURUS_ACCESS}`,
     // preHandler: logRequest,
     handler: skosController.getEveryThesaurus,
   },
   {
     method: 'GET',
-    url: `${URL_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}`,
+    url: `${URL_PV_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}`,
     // preHandler: logRequest,
     handler: skosController.getSingleThesaurus,
   },
   {
     method: 'GET',
-    url: `${URL_LICENCE_ACCESS}`,
+    url: `${URL_PV_LICENCE_ACCESS}`,
     // preHandler: logRequest,
     handler: licenceController.getAllLicences,
   },
   {
     method: 'GET',
-    url: `${URL_LICENCE_CODES_ACCESS}`,
+    url: `${URL_PV_LICENCE_CODES_ACCESS}`,
     // preHandler: logRequest,
     handler: licenceController.getAllLicenceCodes,
   },
   {
     method: 'GET',
-    url: `${URL_LICENCE_ACCESS}/init`,
+    url: `${URL_PV_LICENCE_ACCESS}/init`,
     // preHandler: logRequest,
     handler: licenceController.init,
   },
   // -----------------------------------------------------------------------------
-  // (distant dev) Route for accessing
+  // Accessing app info (git hash)
   // -----------------------------------------------------------------------------
   {
     method: 'GET',
-    url: `${URL_GIT_HASH_ACCESS}`,
+    url: `${URL_PV_GIT_HASH_ACCESS}`,
     // preHandler: logRequest,
     handler: sysController.getGitHash,
   },
   {
     method: 'GET',
-    url: `${URL_APP_HASH_ACCESS}`,
+    url: `${URL_PV_APP_HASH_ACCESS}`,
     // preHandler: logRequest,
     handler: sysController.getAppHash,
   },
   {
     method: 'GET',
-    url: `${URL_NODE_VERSION_ACCESS}`,
+    url: `${URL_PV_NODE_VERSION_ACCESS}`,
     // preHandler: logRequest,
     handler: sysController.getNodeVersion,
   },
   // -----------------------------------------------------------------------------
-  // (distant dev) Routes for actions on DB
+  // Actions on DB
   // -----------------------------------------------------------------------------
   // Get all collections
   {
     method: 'GET',
-    url: `${URL_DB_ACCESS}`,
+    url: `${URL_PV_DB_ACCESS}`,
     // preHandler: logRequest,
     handler: dbController.getCollections,
   },
   // Drop DB
   {
     method: 'DELETE',
-    url: `${URL_DB_ACCESS}`,
+    url: `${URL_PV_DB_ACCESS}`,
     // preHandler: logRequest,
     handler: dbController.dropDB,
   },
-]
 
+  // -----------------------------------------------------------------------------
+  // Generic routes for accessing any object
+  // ('Metadata', 'Organizations' and 'Contacts')
+  // -----------------------------------------------------------------------------
+
+  // Add 1
+  {
+    method: 'POST',
+    url: URL_PV_OBJECT_GENERIC,
+    // preHandler: logRequest,
+    handler: genericController.addSingleObject,
+    // schema: documentation.addMetadataSchema
+  },
+  // Edit 1
+  {
+    method: 'PUT',
+    url: URL_PV_OBJECT_GENERIC,
+    // preHandler: logRequest,
+    handler: genericController.updateSingleObject,
+  },
+  // Get all
+  {
+    method: 'GET',
+    url: URL_PV_OBJECT_GENERIC,
+    // preHandler: logRequest,
+    handler: genericController.getObjectList,
+  },
+  // Get 1
+  {
+    method: 'GET',
+    url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`,
+    // preHandler: logRequest,
+    handler: genericController.getSingleObject,
+  },
+
+  // Delete 1
+  {
+    method: 'DELETE',
+    url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`,
+    // preHandler: logRequest,
+    handler: genericController.deleteSingleObject,
+  },
+  // Delete all
+  {
+    method: 'DELETE',
+    url: URL_PV_OBJECT_GENERIC,
+    // preHandler: logRequest,
+    handler: genericController.deleteManyObjects,
+  },
+  // Delete many
+  {
+    method: 'POST',
+    url: `${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_DELETION}`,
+    // preHandler: logRequest,
+    handler: genericController.deleteObjectList,
+  },
+
+  // -----------------------------------------------------------------------------
+  // Integration reports
+  // -----------------------------------------------------------------------------
+
+  // Add 1 integration report for an identified object
+  {
+    method: 'POST',
+    url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
+    // preHandler: logRequest,
+    handler: reportController.addSingleReportForObject,
+  },
+
+  // Add/edit 1 integration report for an identified object
+  {
+    method: 'PUT',
+    url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
+    // preHandler: logRequest,
+    handler: reportController.addOrEditSingleReportForObject,
+  },
+
+  // Get all integration reports for an identified object
+  {
+    method: 'GET',
+    url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
+    // preHandler: logRequest,
+    handler: reportController.getReportListForObject,
+  },
+  // Get 1 report for one object integration
+  {
+    method: 'GET',
+    url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}/:${PARAM_REPORT_ID}`,
+    // preHandler: logRequest,
+    handler: reportController.getSingleReportForObject,
+  },
+  // Get all integration reports for one object type
+  {
+    method: 'GET',
+    url: `${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_REPORT}`,
+    // preHandler: logRequest,
+    handler: reportController.getReportListForObjectType,
+  },
+
+  // Delete 1 identified integration report for one object
+  {
+    method: 'DELETE',
+    url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}/:${PARAM_REPORT_ID}`,
+    // preHandler: logRequest,
+    handler: reportController.deleteSingleReportForObject,
+  },
+  // Delete all integration reports for one object
+  {
+    method: 'DELETE',
+    url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
+    // preHandler: logRequest,
+    handler: reportController.deleteEveryReportForObject,
+  },
+  // Delete many integration reports for an identified object
+  {
+    method: 'POST',
+    url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}/${PARAM_ACTION_DELETION}`,
+    // preHandler: logRequest,
+    handler: reportController.deleteManyReportForObject,
+  },
+
+  // -----------------------------------------------------------------------------
+  // Init Open Data Rennes
+  // -----------------------------------------------------------------------------
+  // Mass init with ODS data
+  {
+    method: 'POST',
+    url: `${URL_PV_OBJECT_GENERIC}/${PARAM_OBJECT_METADATA}/${PARAM_ACTION_INIT}`,
+    // preHandler: logRequest,
+    handler: metadataController.massInit,
+  },
+]
 exports.devRoutes = [
   {
     method: 'GET',
