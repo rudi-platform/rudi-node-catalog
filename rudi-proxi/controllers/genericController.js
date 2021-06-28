@@ -604,7 +604,7 @@ exports.deleteManyObjects = async (req, reply) => {
   log.v(mod, fun, `< DELETE ${URL_OBJECT_GENERIC}`)
   try {
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
-
+    
     let parsedParameters = await parseQueryParameters(objectType, req.url)
     log.d(mod, fun, `parsedParameters: ${utils.beautify(parsedParameters)}`)
     const filter = parsedParameters[QUERY_FILTER]

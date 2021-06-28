@@ -44,11 +44,15 @@ const UpdateStatus = [
   'obsolete', // dataset that is too old but cannot be updated or replaced with another
 ]
 
+const InterfaceContract = {
+  Dwnl: 'dwnl'
+}
+
 const commonSchemaOptions = {
   discriminatorKey: 'media_type',
   timestamps: true,
   id: false,
-}
+} 
 
 // -----------------------------------------------------------------------------
 // Media schema definition
@@ -80,7 +84,11 @@ const MediaSchema = new mongoose.Schema(
       // TODO: define this properly.
       // Most likely an enum defined in Rudi that can be handled in
       // a known manner
-      interface_contract: String,
+      interface_contract: {
+        type: String,
+        required: true,
+        default: InterfaceContract.Dwnl,
+      },
     },
   },
   commonSchemaOptions
@@ -245,4 +253,5 @@ module.exports = {
   MediaFile,
   MediaSeries,
   MediaTypes,
+  InterfaceContract
 }

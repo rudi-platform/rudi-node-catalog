@@ -82,7 +82,11 @@ exports.isEmptyArray = (anArray) => {
 // Objects
 // -----------------------------------------------------------------------------
 exports.isEmptyObject = (obj) => {
-  return !this.isString(obj) || !this.isArray(obj) || Object.keys(obj).length === 0
+  const fun = 'isEmptyObject'
+  this.consoleLog(mod, fun, `isString: ${this.isString(obj)}`)
+  this.consoleLog(mod, fun, `isArray: ${this.isArray(obj)}`)
+  this.consoleLog(mod, fun, `keys(obj).length: ${Object.keys(obj).length === 0}`)
+  return !this.isString(obj) && !this.isArray(obj) && Object.keys(obj).length === 0
 }
 
 exports.isNotEmptyObject = (obj) => {
