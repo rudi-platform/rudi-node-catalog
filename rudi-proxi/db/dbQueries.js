@@ -826,7 +826,7 @@ exports.countObjectList = async (objectType, unionField, options) => {
   }
 }
 
-exports.updateObject = async (objectType, jsonUpdateData) => {
+exports.updateObject = async (objectType, updateData) => {
   const fun = `updateObject`
   log.d(mod, fun, ``)
   try {
@@ -835,17 +835,41 @@ exports.updateObject = async (objectType, jsonUpdateData) => {
     log.d(mod, fun, `objectType: ${objectType}`)
 
     const { Model, idField } = this.getObjectAccesses(objectType)
-    const rudiId = json.accessProperty(jsonUpdateData, idField)
+    const rudiId = json.accessProperty(updateData, idField)
     const filter = { [idField]: rudiId }
     const updateOpts = { new: true }
 
-    const populateFields = getPopulateFields(objectType)
-    if (utils.isEmptyArray(populateFields)) {
-      return await Model.findOneAndUpdate(filter, jsonUpdateData, updateOpts)
+    const populateOptions = getPopulateOptions(objectType)
+    if (utils.isEmptyArray(populateOptions)) {
+      return await Model.findOneAndUpdate(filter, updateData, updateOpts)
     } else {
-      return await Model.findOneAndUpdate(filter, jsonUpdateData, updateOpts).populate(
-        populateFields
-      )
+      return await Model.findOneAndUpdate(filter, updateData, updateOpts).populate(populateOptions)
+    }
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
+  // log.d(mod, fun, `updatedObject: ${utils.beautify(updatedObject)}`)
+}
+
+exports.overwriteObject = async (objectType, updateData) => {
+  const fun = `updateObject`
+  log.d(mod, fun, ``)
+  try {
+    assertIsString(fun, objectType)
+
+    log.d(mod, fun, `objectType: ${objectType}`)
+
+    const { Model, idField } = this.getObjectAccesses(objectType)
+    const rudiId = json.accessProperty(updateData, idField)
+    const filter = { [idField]: rudiId }
+    const updateOpts = { new: true, overwrite: true }
+
+    const populateOptions = getPopulateOptions(objectType)
+    if (utils.isEmptyArray(populateOptions)) {
+      return await Model.findOneAndUpdate(filter, updateData, updateOpts) 
+    } else {
+      return await Model.findOneAndUpdate(filter, updateData, updateOpts).populate(populateOptions)
     }
   } catch (err) {
     log.w(mod, fun, err)
@@ -1003,7 +1027,7 @@ exports.updateMetadata = async (jsonMetadata) => {
   }
 
   // Updating the ùetadata
-  const updatedMetadata = await this.updateObject(URL_OBJECT_METADATA, jsonMetadata)
+  const updatedMetadata = await this.overwriteObject(URL_OBJECT_METADATA, jsonMetadata)
 
   return updatedMetadata
 }
@@ -1107,7 +1131,7 @@ exports.updateOrganization = async (jsonOrganization) => {
   }
 
   // Updating the organization
-  const updatedOrganization = await this.updateObject(URL_OBJECT_ORGANIZATIONS, jsonOrganization)
+  const updatedOrganization = await this.overwriteObject(URL_OBJECT_ORGANIZATIONS, jsonOrganization)
   log.d(mod, fun, `${msg.organizationUpdated(id)}`)
 
   return updatedOrganization
@@ -1201,7 +1225,7 @@ exports.updateContact = async (jsonContact) => {
   this.getEnsuredContactWithRudiId(rudiId)
 
   // Updating the contact
-  const updatedcontact = await this.updateObject(URL_OBJECT_CONTACTS, jsonContact)
+  const updatedcontact = await this.overwriteObject(URL_OBJECT_CONTACTS, jsonContact)
   log.d(mod, fun, `${msg.contactUpdated(rudiId)}`)
 
   return updatedcontact

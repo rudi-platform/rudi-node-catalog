@@ -530,9 +530,9 @@ exports.updateSingleObject = async (req, reply) => {
     if (!existsObject) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
 
     if (objectType === PARAM_OBJECT_METADATA) {
-      return await metadataController.updateMetadata(updateData)
+      return await metadataController.overwriteMetadata(updateData)
     } else {
-      return await db.updateObject(objectType, updateData)
+      return await db.overwriteObject(objectType, updateData)
     }
   } catch (err) {
     log.e(mod, fun, err)

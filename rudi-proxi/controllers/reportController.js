@@ -181,7 +181,7 @@ exports.addOrEditSingleReport = async (objectType, req, reply) => {
     } else {
       // updating existing report
       log.d(mod, fun, `Updating existing report`)
-      dbReadyReport = await db.updateObject(PARAM_ACTION_REPORT, reportBody)
+      dbReadyReport = await db.overwriteObject(PARAM_ACTION_REPORT, reportBody)
       log.i(mod, fun, `Report edited: ${utils.beautify(dbReadyReport)}`)
     }
 

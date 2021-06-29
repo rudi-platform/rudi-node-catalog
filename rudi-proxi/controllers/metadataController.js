@@ -518,6 +518,28 @@ exports.newMetadata = async (rudiMetadata) => {
   // return this.dbMetadataToRudi(dbMetadata)
 }
 
+// parameter incomingRudiMetadata can't be partial metadata!
+exports.overwriteMetadata = async (incomingRudiMetadata) => {
+  const fun = 'overwriteMetadata'
+  log.d(mod, fun, ``)
+
+  if (incomingRudiMetadata == null)
+    throw new Error(`${msg.parameterExpected(fun, 'incomingRudiMetadata')}`)
+  // log.d(mod, fun, `edited metadata: ${utils.beautify(incomingRudiMetadata)}\n`)
+
+  // ensure the metadata already exist
+  const rudiId = json.accessProperty(incomingRudiMetadata, API_METADATA_ID)
+
+  const dbReadyEditedMetadata = await this.rudiToDbFormat(incomingRudiMetadata)
+  const dbMetadata = await db.overwriteObject(PARAM_OBJECT_METADATA, dbReadyEditedMetadata)
+  // const reply = await dbMetadata.save()
+  // log.d(mod, fun, `metadata saved: ${utils.beautify(reply)}`)
+
+  this.sendToPortal(dbMetadata)
+
+  return dbMetadata
+}
+
 // parameter incomingRudiMetadata can be partial metadata
 exports.updateMetadata = async (incomingRudiMetadata) => {
   const fun = 'updateMetadata'

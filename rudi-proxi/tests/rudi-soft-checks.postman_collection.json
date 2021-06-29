@@ -2585,7 +2585,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"report_id\": \"{{softReport2Id}}\",\n    \"resource_id\": \"{{softMeta1Id}}\",\n    \"comment\": \"edit\",\n    \"method\": \"POST\",\n    \"version\": \"{{apiVersion}}\"\n}",
+							"raw": "{\n    \"report_id\": \"{{softReport2Id}}\",\n    \"resource_id\": \"{{softMeta1Id}}\",\n    \"comment\": \"edit\",\n    \"method\": \"POST\",\n    \"resource_title\": \"Test de RUDI en local 44\",\n    \"treatment_date\": \"{{now}}\",\n    \"integration_status\": \"OK\",\n    \"version\": \"{{apiVersion}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
