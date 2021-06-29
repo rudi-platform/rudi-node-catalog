@@ -45,7 +45,6 @@ const ReferenceDates = require('../schemas/ReferenceDates')
 const Licence = require('./Licence')
 const { Media, MediaTypes } = require('./Media')
 
-
 // -----------------------------------------------------------------------------
 // Other controllers
 // -----------------------------------------------------------------------------
@@ -104,6 +103,7 @@ const {
   API_PURPOSE,
   API_MEDIA_CHECKSUM_PROPERTY,
   API_MEDIA_TYPE_PROPERTY,
+  API_END_DATE_PROPERTY,
 } = require('../../db/dbFields')
 
 // -----------------------------------------------------------------------------
@@ -638,6 +638,41 @@ function checkMedia(metadata) {
   }
 }
 
+function toDate(dateStr) {
+  try {
+    return new Date(dateStr)
+  } catch (err) {
+    throw new Error(`This is not a date: '${dateStr}'`)
+  }
+}
+
+function checkDates(datesObj, firstDateProp, secondDateProp, shouldInitialize) {
+  const fun = 'checkDates'
+  // log.d(mod, fun, ``)
+  try {
+    if (!datesObj) return
+
+    if (!datesObj[secondDateProp]) {
+      if (datesObj[firstDateProp] && shouldInitialize)
+        datesObj[secondDateProp] = datesObj[firstDateProp]
+      return
+    }
+  
+    const date1 = toDate(datesObj[firstDateProp])
+    const date2 = toDate(datesObj[secondDateProp])
+
+    if (date1 <= date2) return true
+
+    throw new Error(
+      `Date '${secondDateProp}' = '${date2.toISOString()}' should be subsequent ` +
+        `to '${firstDateProp}' = '${date1.toISOString()}' `
+    )
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
+}
+
 // -----------------------------------------------------------------------------
 // Schema refinements
 // -----------------------------------------------------------------------------
@@ -645,7 +680,7 @@ function checkMedia(metadata) {
 // ----- Conversion to Portal format
 MetadataSchema.methods.toPortalFormat = function () {
   const metadata = this.toJSON()
-  
+
   // TODO / TEMP : Portal doesn't handle GeoJSON well!
   delete metadata[API_GEOGRAPHY_PROPERTY][API_GEO_GEOJSON_PROPERTY]
   metadata[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = 'v1'
@@ -690,14 +725,23 @@ MetadataSchema.pre('save', async function (next) {
     // If 'temporal_spread' is defined, the field 'start_date' should be defined
     json.requireSubProperty(metadata, API_PERIOD_PROPERTY, API_START_DATE_PROPERTY)
 
+    checkDates(metadata[API_PERIOD_PROPERTY], API_START_DATE_PROPERTY, API_END_DATE_PROPERTY)
+
+    checkDates(
+      metadata[API_DATA_DATES_PROPERTY],
+      API_DATES_CREATED_PROPERTY,
+      API_DATES_EDITED_PROPERTY,
+      true // If 'dataset_dates.updated' is not defined, it is initialized with 'dataset_dates.created'
+    )
+
+    checkDates(
+      metadata[API_DATA_DATES_PROPERTY],
+      API_DATES_CREATED_PROPERTY,
+      API_DATES_PUBLISHED_PROPERTY
+    )
+
     // Checking 'licence' field
     await checkLicence(metadata)
-
-    // If 'dataset_dates.updated' is not defined, it is initialized with 'dataset_dates.created'
-    if (utils.isNothing(metadata[API_DATA_DATES_PROPERTY][API_DATES_EDITED_PROPERTY])) {
-      metadata[API_DATA_DATES_PROPERTY][API_DATES_EDITED_PROPERTY] =
-        metadata[API_DATA_DATES_PROPERTY][API_DATES_CREATED_PROPERTY]
-    }
 
     await checkThesaurus(metadata)
 

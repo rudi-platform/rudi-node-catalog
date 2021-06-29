@@ -68,6 +68,7 @@ exports.API_GEO_BBOX_NORTH = 'north_latitude'
 
 exports.API_PERIOD_PROPERTY = 'temporal_spread'
 exports.API_START_DATE_PROPERTY = 'start_date'
+exports.API_END_DATE_PROPERTY = 'end_date'
 
 // -----------------------------------------------------------------------------
 // Metadata properties: access condition / licence

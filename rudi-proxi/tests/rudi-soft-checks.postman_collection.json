@@ -3230,7 +3230,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Delete metadata 1 & 2\", () => {",
+									"const stamp = pm.collectionVariables.get('stamp')",
+									"pm.test(`Delete metadata with '${stamp}' stamp`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    pm.expect(responseJson.n).to.eq(1);",
