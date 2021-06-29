@@ -440,6 +440,7 @@ exports.getThesaurusList = async (code) => {
   const thesauri = {
     encodings: Encodings.get(),
     filetypes: FileTypes.get(),
+    fileextensions: FileTypes.getExtensions(),
     hashalgorithms: HashAlgorithms.get(),
     keywords: keywords,
     languages: Languages.get(),
@@ -454,27 +455,23 @@ exports.getThesaurusList = async (code) => {
 exports.getThesaurus = async (thesaurusCode) => {
   const code = thesaurusCode.toLowerCase()
 
-  const keywords = await Keywords.get()
-  const themes = await Themes.get()
-  const licences = await await licenceController.getAllLicenceCodes()
+  if (code === 'keywords') return await Keywords.get()
+  if (code === 'themes') return await Themes.get()
+  if (code === 'licences') return await licenceController.getAllLicenceCodes()
 
   switch (code) {
     case 'encodings':
       return Encodings.get()
     case 'filetypes':
       return FileTypes.get()
+    case 'fileextensions':
+      return FileTypes.getExtensions()
     case 'hashalgorithms':
       return HashAlgorithms.get()
-    case 'keywords':
-      return keywords
     case 'languages':
       return Languages.get()
     case 'projections':
       return Projections.get()
-    case 'themes':
-      return themes
-    case 'licences':
-      return licences
   }
 }
 

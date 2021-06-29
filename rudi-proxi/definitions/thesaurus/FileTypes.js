@@ -12,43 +12,146 @@ const { parameterExpected } = require('../../utils/msg')
 // Custom schema definition
 // -----------------------------------------------------------------------------
 
+// MIME types : https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
+
 const FileTypes = [
-  'application/x-executable',
+  'application/epub+zip', // (.epub)
+  'application/geo+json', // (.geojson)
   'application/graphql',
+  'application/gzip', // (.gz, .gzip, .tar.gz, .tgz)
   'application/javascript',
-  'application/json',
-  'application/ld+json',
+  'application/json', // (.json)
+  'application/ld+json', // (.jsonld)
   'application/msword', // (.doc)
-  'application/pdf',
-  'application/sql',
+  'application/octet-stream', // (.bin)
+  'application/pdf', // (.pdf)
+  'application/sql', // (.sql)
   'application/vnd.api+json',
   'application/vnd.ms-excel', // (.xls)
   'application/vnd.ms-powerpoint', // (.ppt)
+  'application/vnd.oasis.opendocument.presentation', // (.odp)
+  'application/vnd.oasis.opendocument.spreadsheet', // (.ods)
   'application/vnd.oasis.opendocument.text', // (.odt)
   'application/vnd.openxmlformats-officedocument.presentationml.presentation', // (.pptx)
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // (.xlsx)
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // (.docx)',
+  'application/x-7z-compressed', // (.7z)
+  'application/x-bzip', // (.bz, .tar.bz)
+  'application/x-bzip2', // (.bz2, .tar.bz2)
+  'application/x-executable', // (.exe)
+  'application/x-tar', //(.tar)
   'application/x-www-form-urlencoded',
-  'application/xml',
-  'application/zip',
+  'application/xml', // (.xml)
+  'application/zip', // (.zip)
   'application/zstd', // (.zst)
-  'audio/mpeg',
-  'audio/ogg',
-  'image/gif',
-  'image/apng',
-  'image/flif',
-  'image/webp',
-  'image/x-mng',
-  'image/jpeg',
-  'image/png',
+  'audio/aac', // (.aac)
+  'audio/m4a', // (.m4a)
+  'audio/mpeg', // (.mp3)
+  'audio/ogg', // (.oga, .ogg)
+  'audio/wav', // (.wav)
+  'audio/webm', // (.weba)
+  'font/otf', // (.otf)
+  'font/ttf', // (.ttf)
+  'image/apng', // (.apng)
+  'image/bmp', // (.bmp)
+  'image/flif', // (.flif)
+  'image/gif', // (.gif)
+  'image/jpeg', // (.jpg, .jpeg)
+  'image/png', // (.png)
+  'image/tiff', // (.tif, .tiff)
+  'image/vnd.microsoft.icon', // (.ico)
+  'image/webp', // (.webp)
+  'image/x-mng', // (.mng)
   'multipart/form-data',
-  'text/css',
-  'text/csv',
-  'text/html',
-  'text/php',
-  'text/plain',
-  'text/xml',
+  'text/css', // (.css)
+  'text/csv', // (.csv)
+  'text/html', // (.htm, .html)
+  'text/php', // (.php)
+  'text/plain', // (.txt)
+  'text/xml', // (.xml)
+  'video/3gpp', // (.3gp, .3gpp)
+  'video/mp4', // (.mp4)
+  'video/mpeg', // (.mpg, .mpeg)
+  'video/ogg', // (.ogv)
+  'video/quicktime', // (.mov)
+  'video/webm', // (.webm)
+  'video/x-matroska', // (.mkv)
+  'video/x-ms-wmv', // (.wmv)
+  'video/x-msvideo', // (.avi)
 ]
+
+exports.Extensions = {
+  '3gp': 'video/3gpp',
+  '3gpp': 'video/3gpp',
+  '7z': 'application/x-7z-compressed',
+  aac: 'audio/aac',
+  apng: 'image/apng',
+  avi: 'video/x-msvideo',
+  bin: 'application/octet-stream',
+  bmp: 'image/bmp',
+  bz: 'application/x-bzip',
+  bz2: 'application/x-bzip2',
+  css: 'text/css',
+  csv: 'text/csv',
+  doc: 'application/msword',
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  epub: 'application/epub+zip',
+  exe: 'application/x-executable',
+  flif: 'image/flif',
+  geojson: 'application/geo+json',
+  gif: 'image/gif',
+  gz: 'application/gzip',
+  gzip: 'application/gzip',
+  htm: 'text/html',
+  html: 'text/html',
+  ico: 'image/vnd.microsoft.icon',
+  jpeg: 'image/jpeg',
+  jpg: 'image/jpeg',
+  js: 'application/javascript',
+  json: 'application/json',
+  jsonld: 'application/ld+json',
+  m4a: 'audio/m4a',
+  mkv: 'video/x-matroska',
+  mng: 'image/x-mng',
+  mov: 'video/quicktime',
+  mp3: 'audio/mpeg',
+  mp4: 'video/mp4',
+  mpeg: 'video/mpeg',
+  mpg: 'video/mpeg',
+  odp: 'application/vnd.oasis.opendocument.presentation',
+  ods: 'application/vnd.oasis.opendocument.spreadsheet',
+  odt: 'application/vnd.oasis.opendocument.text',
+  oga: 'audio/ogg',
+  ogg: 'audio/ogg',
+  ogv: 'video/ogg',
+  otf: 'font/otf',
+  pdf: 'application/pdf',
+  php: 'text/php',
+  png: 'image/png',
+  ppt: 'application/vnd.ms-powerpoint',
+  pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  sql: 'application/sql',
+  tar: 'application/x-tar',
+  'tar.bz': 'application/x-bzip',
+  'tar.bz2': 'application/x-bzip2',
+  'tar.gz': 'application/gzip',
+  tgz: 'application/gzip',
+  tif: 'image/tiff',
+  tiff: 'image/tiff',
+  ttf: 'font/ttf',
+  txt: 'text/plain',
+  wav: 'audio/wav',
+  weba: 'audio/webm',
+  webm: 'video/webm',
+  webp: 'image/webp',
+  wmv: 'video/x-ms-wmv',
+  xls: 'application/vnd.ms-excel',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  xml: 'application/xml',
+  xml: 'text/xml',
+  zip: 'application/zip',
+  zst: 'application/zstd',
+}
 
 // -----------------------------------------------------------------------------
 // Getter / setter
@@ -61,6 +164,10 @@ exports.initialize = (arg) => {
 
 exports.get = () => {
   return Thesaurus
+}
+
+exports.getExtensions = () => {
+  return this.Extensions
 }
 
 exports.set = (newValue) => {

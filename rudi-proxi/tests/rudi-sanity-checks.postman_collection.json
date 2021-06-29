@@ -497,7 +497,7 @@
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    const listEnums = Object.keys(responseJson);",
-									"    pm.expect(listEnums.length).to.eq(8);",
+									"    pm.expect(listEnums.length).to.eq(9);",
 									"});"
 								],
 								"type": "text/javascript"
