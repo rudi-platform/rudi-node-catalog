@@ -83,9 +83,9 @@ exports.isEmptyArray = (anArray) => {
 // -----------------------------------------------------------------------------
 exports.isEmptyObject = (obj) => {
   const fun = 'isEmptyObject'
-  this.consoleLog(mod, fun, `isString: ${this.isString(obj)}`)
-  this.consoleLog(mod, fun, `isArray: ${this.isArray(obj)}`)
-  this.consoleLog(mod, fun, `keys(obj).length: ${Object.keys(obj).length === 0}`)
+  // this.consoleLog(mod, fun, `isString: ${this.isString(obj)}`)
+  // this.consoleLog(mod, fun, `isArray: ${this.isArray(obj)}`)
+  // this.consoleLog(mod, fun, `keys(obj).length: ${Object.keys(obj).length === 0}`)
   return !this.isString(obj) && !this.isArray(obj) && Object.keys(obj).length === 0
 }
 
@@ -158,6 +158,16 @@ exports.isEmpty = (prop) => {
   return prop === '' || prop === '{}' || prop === '[]' || strProp === '{}' || strProp === '[]'
 }
 
+/* 
+  TRUE:
+    !null
+    !undefined
+    !''
+
+  FALSE:
+    !{}
+    ![]
+*/
 exports.isNothing = (prop) => {
   return !prop || this.isEmpty(prop)
 }
