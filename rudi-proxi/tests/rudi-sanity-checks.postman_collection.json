@@ -3116,6 +3116,7 @@
 								"exec": [
 									"pm.test(\"Producer 1 created\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
 									"    // console.log(responseJson);",
 									"    const orgId = pm.variables.get('orgId1');",
 									"    pm.expect(responseJson.organization_id).to.eq(orgId);",
