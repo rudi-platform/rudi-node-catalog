@@ -217,18 +217,30 @@ exports.getTokenCheckedByPortal = async (token) => {
   }
 }
 
-/*
-jwtHeader = {
-      'alg': 'HS256',
-      'typ': 'JWT'
+/* jwtHeader = {
+  alg: 'HS256',                     // RSA 512
+  typ: 'JWT'
 }
 jwtBody = {
-  'exp': 1622063934,
-  'user_name': <uuid>,
-  'authorities': ['PROVIDER'],
-  'jti': <uuid>,
-  'client_id': <uuid>,
-  'scope': ['read']
+  jti: '<uuid>',                    // ID du JWT
+  authorities: ['rudi-prod-admin'], // ID de ton module
+  exp: 1622063934,                  // Date d'expiration (absolue, Epoch, secondes)
+  user_id: '<uuid>',                // Utilisateur qui effectue l'action
+  org_id: '<uuid>',                 // Entreprise/organisation de l'utilisateur
+  roles: ['admin','editor']         // Autorisations de l'utilisateur
+} */
+/*
+jwtHeader = {
+      alg: 'HS256',
+      typ: 'JWT'
+}
+jwtBody = {
+  exp: 1622063934,
+  user_name: '<uuid>',
+  authorities: ['PROVIDER'],
+  jti: '<uuid>',
+  client_id: '<uuid>',
+  scope: ['read']
 }
 */
 exports.verifyPortalToken = (accessToken) => {
