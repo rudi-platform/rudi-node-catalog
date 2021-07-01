@@ -173,9 +173,13 @@ exports.directPost = async (destUrl, dataToSend, reqOpts) => {
     // log.w(mod, fun, err)
     if (err.response && err.response.data) {
       log.w(mod, fun, utils.beautify(err.response.data))
-      const postErr = new Error(`${err.response.data.code}: ${err.response.data.label}`)
-      postErr.status = err.status
-      throw new Error(`${err.response.data.code}: ${err.response.data.label}`)
+      if (err.response.data.code && err.response.data.label) {
+        const postErr = new Error(`${err.response.data.code}: ${err.response.data.label}`)
+        postErr.status = err.status
+        throw new Error(`${err.response.data.code}: ${err.response.data.label}`)
+      } else {
+        throw new Error(`${err.response.data}`)
+      }
     } else {
       throw err
     }

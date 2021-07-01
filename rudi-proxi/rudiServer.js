@@ -113,18 +113,18 @@ fastify.get(`${api.URL_PREFIX_PUBLIC}/`, async (request, reply) => {
 // Loop over each public route
 publicRoutes.forEach((pubRoute, index) => {
   fastify.route(pubRoute)
-  log.v(mod, 'routes', `Public route #${index} = ${pubRoute.method} ${pubRoute.url}`)
+  log.i(mod, 'routes', `Public route #${index} = ${pubRoute.method} ${pubRoute.url}`)
 })
 
 // Loop over each backoffice route
 backOfficeRoutes.forEach((boRoute, index) => {
   fastify.route(boRoute)
-  // log.d(mod, 'routes', `Private route #${index} = ${boRoute.method} ${boRoute.url}`)
+  log.v(mod, 'routes', `Private route #${index} = ${boRoute.method} ${boRoute.url}`)
 })
 
-devRoutes.forEach((rouge, index) => {
-  fastify.route(rouge)
-  // log.d(mod, 'routes', `Dev route #${index} = ${boRoute.method} ${boRoute.url}`)
+devRoutes.forEach((devRoute, index) => {
+  fastify.route(devRoute)
+  log.d(mod, 'routes', `Dev route #${index} = ${devRoute.method} ${devRoute.url}`)
 })
 
 // -----------------------------------------------------------------------------
@@ -156,9 +156,8 @@ try {
 
 mongoConnection
   .then(() => {
-    log.i(mod, 'mongo', 'MongoDB connected')
+    log.i(mod, 'mongo', `MongoDB connected`)
     log.i(mod, 'app', `Application version '${sysController.getAppHash()}' | API ${api.VERSION}`)
-
     utils.separateLogs('Init OK')
   })
   .catch((err) => log.e(mod, 'mongoConnection', err))

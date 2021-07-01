@@ -9,9 +9,11 @@ const mod = 'sysCtrl'
 // -----------------------------------------------------------------------------
 // External dependancies
 // -----------------------------------------------------------------------------
-const boom = require('@hapi/boom')
 const prcs = require('child_process')
 const readLastLines = require('read-last-lines')
+
+const mongoose = require('mongoose')
+const boom = require('@hapi/boom')
 
 // -----------------------------------------------------------------------------
 // Internal dependancies
@@ -22,17 +24,18 @@ const utils = require('../utils/jsUtils')
 const json = require('../utils/jsonAccess')
 
 const {
-  URL_PV_LOGS_ACCESS: URL_LOGS_ACCESS,
-  URL_PV_GIT_HASH_ACCESS: URL_GIT_HASH_ACCESS,
-  URL_PV_NODE_VERSION_ACCESS: URL_NODE_VERSION_ACCESS,
+  URL_PV_LOGS_ACCESS,
+  URL_PV_GIT_HASH_ACCESS,
+  URL_PV_NODE_VERSION_ACCESS,
   PARAM_LOGS_LINES,
 } = require('../config/confApi')
 
 // -----------------------------------------------------------------------------
-// Cosntants
+// Constants
 // -----------------------------------------------------------------------------
 const NB_LOG_LINES_DEFAULT = 100
 let CURRENT_APP_HASH
+
 // -----------------------------------------------------------------------------
 // App ID
 // -----------------------------------------------------------------------------
@@ -42,7 +45,7 @@ exports.getGitHash = () => {
   const fun = 'getGitHash'
   // log.d(mod, fun, ``)
   try {
-    log.d(mod, fun, ` GET ${URL_GIT_HASH_ACCESS}`)
+    // log.d(mod, fun, ` GET ${URL_PV_GIT_HASH_ACCESS}`)
     const hashId = require('child_process').execSync('git rev-parse --short HEAD')
     // log.d(mod, fun, `${hashId}`.trim())
 
@@ -66,17 +69,21 @@ exports.getAppHash = () => {
 }
 
 /** Returns the node and npm versions */
-exports.getNodeVersion = () => {
+exports.getNodeVersion = async () => {
   const fun = 'getNodeVersion'
   try {
-    log.d(mod, fun, ` GET ${URL_NODE_VERSION_ACCESS}`)
+    // log.d(mod, fun, ` GET ${URL_PV_NODE_VERSION_ACCESS}`)
     const nodeVersion = prcs.execSync('node -v')
     const npmVersion = prcs.execSync('npm -v')
+    const mongooseVersion = prcs.execSync('npm view mongoose version')
+    const mongoDbVersion = await getMongDbVersion()
     const nVersions = {
-      'node version': `${nodeVersion}`.trim(),
-      'npm version': `${npmVersion}`.trim(),
+      node: `${nodeVersion}`.trim(),
+      npm: `${npmVersion}`.trim(),
+      mongoose: `${mongooseVersion}`.trim(),
+      mongodb: `${mongoDbVersion}`.trim(),
     }
-    log.d(mod, fun, `${utils.beautify(nVersions)}`)
+    // log.d(mod, fun, `${utils.beautify(nVersions)}`)
 
     return nVersions
   } catch (err) {
@@ -85,6 +92,17 @@ exports.getNodeVersion = () => {
   }
 }
 
+async function getMongDbVersion() {
+  const fun = 'getMongDbVersion'
+  try {
+    const admin = new mongoose.mongo.Admin(mongoose.connection.db)
+    let mongoInfo = await admin.buildInfo()
+    // log.d(mod, fun, `Mongo : ${mongoInfo.version}`)
+    return mongoInfo.version
+  } catch (err) {
+    log.e(mod, fun, err)
+  }
+}
 // -----------------------------------------------------------------------------
 // Logs
 // -----------------------------------------------------------------------------
@@ -92,7 +110,7 @@ exports.getNodeVersion = () => {
 exports.getLogs = async (req, reply) => {
   const fun = 'getLogs'
   try {
-    log.d(mod, fun, `GET ${URL_LOGS_ACCESS}`)
+    log.d(mod, fun, `GET ${URL_PV_LOGS_ACCESS}`)
     /*
     const readOptions = {
       encoding: 'utf8',
@@ -113,7 +131,7 @@ exports.getLogs = async (req, reply) => {
 exports.getLastLogLines = async (req, reply) => {
   const fun = 'getLastLogLines'
   try {
-    log.d(mod, fun, `GET ${URL_LOGS_ACCESS}/:${PARAM_LOGS_LINES}`)
+    log.d(mod, fun, `GET ${URL_PV_LOGS_ACCESS}/:${PARAM_LOGS_LINES}`)
     const nbLines = req.params[PARAM_LOGS_LINES] || req.params[QUERY_LIMIT] || NB_LOG_LINES_DEFAULT
     const logs = readLastLines.read(sys.OUT_LOG, nbLines)
     return logs

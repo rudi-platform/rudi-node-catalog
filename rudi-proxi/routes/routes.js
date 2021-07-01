@@ -129,40 +129,6 @@ exports.publicRoutes = [
 // -----------------------------------------------------------------------------
 exports.backOfficeRoutes = [
   // -----------------------------------------------------------------------------
-  // Accessing thesaurus
-  // -----------------------------------------------------------------------------
-  {
-    method: 'GET',
-    url: `${URL_PV_THESAURUS_ACCESS}`,
-    // preHandler: logRequest,
-    handler: skosController.getEveryThesaurus,
-  },
-  {
-    method: 'GET',
-    url: `${URL_PV_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}`,
-    // preHandler: logRequest,
-    handler: skosController.getSingleThesaurus,
-  },
-  {
-    method: 'GET',
-    url: `${URL_PV_LICENCE_ACCESS}`,
-    // preHandler: logRequest,
-    handler: licenceController.getAllLicences,
-  },
-  {
-    method: 'GET',
-    url: `${URL_PV_LICENCE_CODES_ACCESS}`,
-    // preHandler: logRequest,
-    handler: licenceController.getAllLicenceCodes,
-  },
-  {
-    method: 'GET',
-    url: `${URL_PV_LICENCE_ACCESS}/init`,
-    // preHandler: logRequest,
-    handler: licenceController.init,
-  },
-
-  // -----------------------------------------------------------------------------
   // Generic routes for accessing any object
   // ('Metadata', 'Organizations' and 'Contacts')
   // -----------------------------------------------------------------------------
@@ -285,6 +251,40 @@ exports.backOfficeRoutes = [
 ]
 exports.devRoutes = [
   // -----------------------------------------------------------------------------
+  // Accessing thesaurus
+  // -----------------------------------------------------------------------------
+  {
+    method: 'GET',
+    url: `${URL_PV_THESAURUS_ACCESS}`,
+    // preHandler: logRequest,
+    handler: skosController.getEveryThesaurus,
+  },
+  {
+    method: 'GET',
+    url: `${URL_PV_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}`,
+    // preHandler: logRequest,
+    handler: skosController.getSingleThesaurus,
+  },
+  {
+    method: 'GET',
+    url: `${URL_PV_LICENCE_ACCESS}`,
+    // preHandler: logRequest,
+    handler: licenceController.getAllLicences,
+  },
+  {
+    method: 'GET',
+    url: `${URL_PV_LICENCE_CODES_ACCESS}`,
+    // preHandler: logRequest,
+    handler: licenceController.getAllLicenceCodes,
+  },
+  {
+    method: 'POST',
+    url: `${URL_PV_LICENCE_ACCESS}/init`,
+    // preHandler: logRequest,
+    handler: licenceController.init,
+  },
+
+  // -----------------------------------------------------------------------------
   // Init Open Data Rennes
   // -----------------------------------------------------------------------------
   // Mass init with ODS data
@@ -341,18 +341,27 @@ exports.devRoutes = [
   // -----------------------------------------------------------------------------
   // Accessing app info (git hash)
   // -----------------------------------------------------------------------------
+  /**
+   * Get current git hash
+   */
   {
     method: 'GET',
     url: `${URL_PV_GIT_HASH_ACCESS}`,
     // preHandler: logRequest,
     handler: sysController.getGitHash,
   },
+  /**
+   * Get current git hash from the running application
+   */
   {
     method: 'GET',
     url: `${URL_PV_APP_HASH_ACCESS}`,
     // preHandler: logRequest,
     handler: sysController.getAppHash,
   },
+  /**
+   * Get node and npm versions
+   */
   {
     method: 'GET',
     url: `${URL_PV_NODE_VERSION_ACCESS}`,
