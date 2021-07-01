@@ -290,7 +290,7 @@ exports.devRoutes = [
   // Mass init with ODS data
   {
     method: 'POST',
-    url: `${URL_PV_OBJECT_GENERIC}/${PARAM_OBJECT_METADATA}/${PARAM_ACTION_INIT}`,
+    url: `${URL_PREFIX_PRIVATE}/${PARAM_OBJECT_METADATA}/${PARAM_ACTION_INIT}`,
     // preHandler: logRequest,
     handler: metadataController.massInit,
   },
