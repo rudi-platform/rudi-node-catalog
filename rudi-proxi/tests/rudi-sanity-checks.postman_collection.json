@@ -121,13 +121,13 @@
 								"exec": [
 									"pm.test(\"Node.js version > 14, npm version > 6\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    const nodeVersion = responseJson[\"node version\"];",
+									"    const versions = pm.response.json();",
+									"    const nodeVersion = versions.node;",
 									"    const nodeVersionMajor = parseInt(nodeVersion.split(/[v\\.]/)[1])",
 									"    pm.expect(nodeVersionMajor).to.be.gt(14)",
 									"    //console.log(nodeVersion.split(/[v\\.]/).slice(1,4))",
 									"",
-									"    const npmVersion = responseJson[\"npm version\"];",
+									"    const npmVersion = versions.npm;",
 									"    const npmVersionMajor = parseInt(npmVersion.split('.')[0])",
 									"    pm.expect(npmVersionMajor).to.be.gt(6)",
 									"    //pm.expect(pm.response.stream.toString('utf8')).to.match(/^[0-9a-z]{7}$/)",
@@ -358,13 +358,57 @@
 					"response": []
 				},
 				{
-					"name": "Get all licenses",
+					"name": "Init licenses",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"All licence concept retrieved\", () => {",
+									"pm.test(\"Init licences and get licences codes\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.length).to.gt(0)",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/licences/init",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"licences",
+								"init"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get license concepts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Init licences and get licences codes\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    pm.expect(responseJson.length).to.gt(0)",
@@ -391,14 +435,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/licences/init",
+							"raw": "{{baseUrl}}/{{adminUrl}}/licences",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{adminUrl}}",
-								"licences",
-								"init"
+								"licences"
 							]
 						}
 					},
