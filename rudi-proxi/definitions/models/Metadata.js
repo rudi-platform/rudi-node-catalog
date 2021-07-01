@@ -677,15 +677,6 @@ function checkDates(datesObj, firstDateProp, secondDateProp, shouldInitialize) {
 // Schema refinements
 // -----------------------------------------------------------------------------
 
-// ----- Conversion to Portal format
-MetadataSchema.methods.toPortalFormat = function () {
-  const metadata = this.toJSON()
-
-  // TODO / TEMP : Portal doesn't handle GeoJSON well!
-  delete metadata[API_GEOGRAPHY_PROPERTY][API_GEO_GEOJSON_PROPERTY]
-  metadata[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = 'v1'
-}
-
 // ----- toJSON cleanup
 MetadataSchema.methods.toJSON = function () {
   return _.omit(this.toObject(), FIELDS_TO_SKIP)

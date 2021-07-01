@@ -113,17 +113,18 @@ fastify.get(`${api.URL_PREFIX_PUBLIC}/`, async (request, reply) => {
 // Loop over each public route
 publicRoutes.forEach((pubRoute, index) => {
   fastify.route(pubRoute)
-  log.v(mod, 'routes', `route #${index} = ${pubRoute.method} ${pubRoute.url}`)
+  log.v(mod, 'routes', `Public route #${index} = ${pubRoute.method} ${pubRoute.url}`)
 })
 
 // Loop over each backoffice route
 backOfficeRoutes.forEach((boRoute, index) => {
   fastify.route(boRoute)
-  // log.d(mod, 'routes', `route #${index} = ${boRoute.method} ${boRoute.url}`)
+  // log.d(mod, 'routes', `Private route #${index} = ${boRoute.method} ${boRoute.url}`)
 })
 
 devRoutes.forEach((rouge, index) => {
   fastify.route(rouge)
+  // log.d(mod, 'routes', `Dev route #${index} = ${boRoute.method} ${boRoute.url}`)
 })
 
 // -----------------------------------------------------------------------------

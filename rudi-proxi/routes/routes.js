@@ -129,65 +129,6 @@ exports.publicRoutes = [
 // -----------------------------------------------------------------------------
 exports.backOfficeRoutes = [
   // -----------------------------------------------------------------------------
-  // UUID v4 generation
-  // -----------------------------------------------------------------------------
-  {
-    method: 'GET',
-    url: `${URL_PREFIX_PRIVATE}/${PARAM_ACTION_UUID_GEN}`,
-    // preHandler: logRequest,
-    handler: genericController.generateUUID,
-  },
-  // -----------------------------------------------------------------------------
-  // Portal token
-  // -----------------------------------------------------------------------------
-  // Get a new token from the Portal
-  {
-    method: 'GET',
-    url: `${URL_PV_PORTAL_PREFIX}/${URL_SUFFIX_TOKEN_GET}`,
-    // preHandler: logRequest,
-    handler: portalController.exposedGetPortalToken,
-  },
-  // Get a token checked by the Portal
-  {
-    method: 'GET',
-    url: `${URL_PV_PORTAL_PREFIX}/${URL_SUFFIX_TOKEN_GET}/${URL_SUFFIX_TOKEN_CHECK}`,
-    // preHandler: logRequest,
-    handler: portalController.checkStoredToken,
-  },
-
-  // -----------------------------------------------------------------------------
-  // Get/post resources from/to Portal
-  // -----------------------------------------------------------------------------
-  {
-    method: 'GET',
-    url: `${URL_PV_PORTAL_PREFIX}/${PARAM_OBJECT_METADATA}/:${PARAM_ID}`,
-    // preHandler: logRequest,
-    handler: portalController.getMetadata,
-  },
-  {
-    method: 'POST',
-    url: `${URL_PV_PORTAL_PREFIX}/${PARAM_OBJECT_METADATA}/:${PARAM_ID}`,
-    // preHandler: logRequest,
-    handler: portalController.sendMetadata,
-  },
-
-  // -----------------------------------------------------------------------------
-  // Accessing logs
-  // -----------------------------------------------------------------------------
-  {
-    method: 'GET',
-    url: `${URL_PV_LOGS_ACCESS}`,
-    // preHandler: logRequest,
-    handler: sysController.getLogs,
-  },
-  {
-    method: 'GET',
-    url: `${URL_PV_LOGS_ACCESS}/:${PARAM_LOGS_LINES}`,
-    // preHandler: logRequest,
-    handler: sysController.getLastLogLines,
-  },
-
-  // -----------------------------------------------------------------------------
   // Accessing thesaurus
   // -----------------------------------------------------------------------------
   {
@@ -219,44 +160,6 @@ exports.backOfficeRoutes = [
     url: `${URL_PV_LICENCE_ACCESS}/init`,
     // preHandler: logRequest,
     handler: licenceController.init,
-  },
-  // -----------------------------------------------------------------------------
-  // Accessing app info (git hash)
-  // -----------------------------------------------------------------------------
-  {
-    method: 'GET',
-    url: `${URL_PV_GIT_HASH_ACCESS}`,
-    // preHandler: logRequest,
-    handler: sysController.getGitHash,
-  },
-  {
-    method: 'GET',
-    url: `${URL_PV_APP_HASH_ACCESS}`,
-    // preHandler: logRequest,
-    handler: sysController.getAppHash,
-  },
-  {
-    method: 'GET',
-    url: `${URL_PV_NODE_VERSION_ACCESS}`,
-    // preHandler: logRequest,
-    handler: sysController.getNodeVersion,
-  },
-  // -----------------------------------------------------------------------------
-  // Actions on DB
-  // -----------------------------------------------------------------------------
-  // Get all collections
-  {
-    method: 'GET',
-    url: `${URL_PV_DB_ACCESS}`,
-    // preHandler: logRequest,
-    handler: dbController.getCollections,
-  },
-  // Drop DB
-  {
-    method: 'DELETE',
-    url: `${URL_PV_DB_ACCESS}`,
-    // preHandler: logRequest,
-    handler: dbController.dropDB,
   },
 
   // -----------------------------------------------------------------------------
@@ -379,7 +282,8 @@ exports.backOfficeRoutes = [
     // preHandler: logRequest,
     handler: reportController.deleteManyReportForObject,
   },
-
+]
+exports.devRoutes = [
   // -----------------------------------------------------------------------------
   // Init Open Data Rennes
   // -----------------------------------------------------------------------------
@@ -390,8 +294,108 @@ exports.backOfficeRoutes = [
     // preHandler: logRequest,
     handler: metadataController.massInit,
   },
-]
-exports.devRoutes = [
+
+  // -----------------------------------------------------------------------------
+  // UUID v4 generation
+  // -----------------------------------------------------------------------------
+  {
+    method: 'GET',
+    url: `${URL_PREFIX_PRIVATE}/${PARAM_ACTION_UUID_GEN}`,
+    // preHandler: logRequest,
+    handler: genericController.generateUUID,
+  },
+  // -----------------------------------------------------------------------------
+  // Portal token
+  // -----------------------------------------------------------------------------
+  // Get a new token from the Portal
+  {
+    method: 'GET',
+    url: `${URL_PV_PORTAL_PREFIX}/${URL_SUFFIX_TOKEN_GET}`,
+    // preHandler: logRequest,
+    handler: portalController.exposedGetPortalToken,
+  },
+  // Get a token checked by the Portal
+  {
+    method: 'GET',
+    url: `${URL_PV_PORTAL_PREFIX}/${URL_SUFFIX_TOKEN_GET}/${URL_SUFFIX_TOKEN_CHECK}`,
+    // preHandler: logRequest,
+    handler: portalController.checkStoredToken,
+  },
+
+  // -----------------------------------------------------------------------------
+  // Get/post resources from/to Portal
+  // -----------------------------------------------------------------------------
+  {
+    method: 'GET',
+    url: `${URL_PV_PORTAL_PREFIX}/${PARAM_OBJECT_METADATA}/:${PARAM_ID}`,
+    // preHandler: logRequest,
+    handler: portalController.getMetadata,
+  },
+  {
+    method: 'POST',
+    url: `${URL_PV_PORTAL_PREFIX}/${PARAM_OBJECT_METADATA}/:${PARAM_ID}`,
+    // preHandler: logRequest,
+    handler: portalController.sendMetadata,
+  },
+
+  // -----------------------------------------------------------------------------
+  // Accessing app info (git hash)
+  // -----------------------------------------------------------------------------
+  {
+    method: 'GET',
+    url: `${URL_PV_GIT_HASH_ACCESS}`,
+    // preHandler: logRequest,
+    handler: sysController.getGitHash,
+  },
+  {
+    method: 'GET',
+    url: `${URL_PV_APP_HASH_ACCESS}`,
+    // preHandler: logRequest,
+    handler: sysController.getAppHash,
+  },
+  {
+    method: 'GET',
+    url: `${URL_PV_NODE_VERSION_ACCESS}`,
+    // preHandler: logRequest,
+    handler: sysController.getNodeVersion,
+  },
+
+  // -----------------------------------------------------------------------------
+  // Accessing logs
+  // -----------------------------------------------------------------------------
+  {
+    method: 'GET',
+    url: `${URL_PV_LOGS_ACCESS}`,
+    // preHandler: logRequest,
+    handler: sysController.getLogs,
+  },
+  {
+    method: 'GET',
+    url: `${URL_PV_LOGS_ACCESS}/:${PARAM_LOGS_LINES}`,
+    // preHandler: logRequest,
+    handler: sysController.getLastLogLines,
+  },
+
+  // -----------------------------------------------------------------------------
+  // Actions on DB
+  // -----------------------------------------------------------------------------
+  // Get all collections
+  {
+    method: 'GET',
+    url: `${URL_PV_DB_ACCESS}`,
+    // preHandler: logRequest,
+    handler: dbController.getCollections,
+  },
+  // Drop DB
+  {
+    method: 'DELETE',
+    url: `${URL_PV_DB_ACCESS}`,
+    // preHandler: logRequest,
+    handler: dbController.dropDB,
+  },
+  // -----------------------------------------------------------------------------
+  // Tests entry
+  // -----------------------------------------------------------------------------
   {
     method: 'GET',
     url: `${URL_PREFIX_PRIVATE}/test`,

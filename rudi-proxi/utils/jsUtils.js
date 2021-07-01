@@ -214,12 +214,12 @@ exports.separateLogs = (insertStr) => {
 exports.consoleLog = (mod, fun, msg) => {
   const where = !mod ? fun : !fun ? mod : `${mod} • ${fun}`
   const what = !msg || msg === '' ? '<-' : msg
-  console.log(this.nowLocaleFormatted(), 'debug', `[${where}]`, what)
+  console.log(this.nowLocaleFormatted(), '.debug.', `[ ${where} ]`, what)
 }
 
 exports.consoleErr = (mod, fun, msg) => {
   const where = !mod ? fun : !fun ? mod : `${mod} • ${fun}`
-  console.error(this.nowLocaleFormatted(), 'error', `[${where}]`, msg.err)
+  console.error(this.nowLocaleFormatted(), '.error.', `[ ${where} ]`, msg.err)
 }
 
 // -----------------------------------------------------------------------------

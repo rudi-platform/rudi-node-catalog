@@ -46,7 +46,7 @@ const {
   API_METAINFO_DATES_PROPERTY,
 
   API_GEOGRAPHY_PROPERTY,
-  API_GEOJSON_PROPERTY,
+  API_GEO_GEOJSON_PROPERTY,
   API_GEO_BBOX_PROPERTY,
   API_GEO_BBOX_WEST,
   API_GEO_BBOX_EAST,
@@ -385,7 +385,7 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
       log.d(mod, fun, `removing lang field: ${langStr}`)
       delete dbReadyMetadata[API_LANGUAGES_PROPERTY]
     }
-    // this.setGeography(dbReadyMetadata)
+    this.setGeography(dbReadyMetadata)
 
     // log.d(mod, fun, `dbReadyMetadata: ${utils.beautify(dbReadyMetadata, 2)}`)
     return dbReadyMetadata
@@ -418,18 +418,21 @@ exports.setGeography = (metadata) => {
   }
 
   const bbox = geography[API_GEO_BBOX_PROPERTY]
-  const geojson = geography[API_GEOJSON_PROPERTY]
+  const geojson = geography[API_GEO_GEOJSON_PROPERTY]
+  log.d(mod, fun, `bbox: ${utils.beautify(bbox)}`)
+  log.d(mod, fun, `geojson: ${utils.beautify(geojson)}`)
 
   if (utils.isNothing(bbox)) {
     // No 'bounding_box' property
     log.d(mod, fun, `No '${API_GEO_BBOX_PROPERTY}' property was set`)
     if (utils.isNothing(geojson)) {
       // No 'bounding_box' property nor GeoJSON => problem
-      log.d(mod, fun, `No '${API_GEOJSON_PROPERTY}' property was set`)
+      log.d(mod, fun, `No '${  API_GEO_GEOJSON_PROPERTY}' property was set`)
       // No geographic information
       // TODO: (If shouldBeStrict: error => bbox is mandatory if 'geography' is set!)
       return
     } else {
+      log.d(mod, fun, `'${  API_GEO_GEOJSON_PROPERTY}' property already set`)
       // No 'bounding_box' property but GeoJSON => extract bounding box from GeoJSON !
       // GeoJsonToBbox GeoJSON =
       //    1. extract 'geography.geographic_distribution.bbox'
@@ -442,16 +445,18 @@ exports.setGeography = (metadata) => {
     // Both GeoJSON and 'bounding_box' properties are set => exit
     const msg =
       `Both '${API_GEO_BBOX_PROPERTY}' ` +
-      `and '${API_GEOJSON_PROPERTY}' properties are already set`
+      `and '${  API_GEO_GEOJSON_PROPERTY}' properties are already set`
 
     log.d(mod, fun, msg)
     log.d(mod, fun, `'${API_GEO_BBOX_PROPERTY}' = ${utils.beautify(bbox)}`)
-    log.d(mod, fun, `'${API_GEOJSON_PROPERTY}' = ${utils.beautify(geojson)}`)
+    log.d(mod, fun, `'${  API_GEO_GEOJSON_PROPERTY}' = ${utils.beautify(geojson)}`)
     // TODO: check that 'geographic_distribution' property is a valid GeoJSON
     // TODO: set bbox property if not set
     // TODO: check that bbox subproperty is coherent with 'geography.bounding_box' coordinates
     return
   }
+
+  log.d(mod, fun, `Extracting '${API_GEO_GEOJSON_PROPERTY}' from '${API_GEO_BBOX_PROPERTY}'`)
 
   // No GeoJSON but 'bounding_box' property is set => extract GeoJSON from bbox property
 
@@ -465,7 +470,7 @@ exports.setGeography = (metadata) => {
   const east = bbox[API_GEO_BBOX_EAST]
   const north = bbox[API_GEO_BBOX_NORTH]
 
-  metadata[API_GEOGRAPHY_PROPERTY][API_GEOJSON_PROPERTY] = geo.bboxToGeoJsonPolygon(
+  metadata[API_GEOGRAPHY_PROPERTY][  API_GEO_GEOJSON_PROPERTY] = geo.bboxToGeoJsonPolygon(
     west,
     south,
     east,
@@ -580,6 +585,7 @@ exports.sendToPortal = async (metadata) => {
       log.d(mod, fun, `Not sending to portal: ${metadataId} (${collectionTag})`)
       return
     }
+
     await portalController.sendMetadataToPortal(metadataId)
     log.v(mod, fun, `Sent to portal: ${metadataId}`)
   } catch (err) {

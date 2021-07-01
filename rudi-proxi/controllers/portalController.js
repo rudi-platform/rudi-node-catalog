@@ -298,6 +298,9 @@ exports.sendMetadataToPortal = async (metadataId) => {
     }
     const metadataClean = utils.deepClone(metadata)
 
+    // delete metadataClean[API_GEOGRAPHY_PROPERTY][API_GEO_GEOJSON_PROPERTY] // 
+    // metadataClean[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = 'v1'
+
     const token = await this.getPortalToken()
     const reply = await httpPost(portal.postPortalMetaUrl(), metadataClean, token)
     // log.d(mod, fun, `reply: ${utils.beautify(reply)}`)
