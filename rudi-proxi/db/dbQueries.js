@@ -79,7 +79,7 @@ const Contact = require('../definitions/models/Contact')
 
 const { Media } = require('../definitions/models/Media')
 const { Metadata, METADATA_FIELDS_TO_POPULATE } = require('../definitions/models/Metadata')
-const Report = require('../definitions/models/Report')
+const { Report } = require('../definitions/models/Report')
 
 // -----------------------------------------------------------------------------
 // Properties with special treatments
@@ -185,15 +185,17 @@ exports.getFieldModel = (objectType, field) => {
 }
 
 exports.getMetadataFieldsWithObjectType = (objectType) => {
+  const fun = 'getMetadataFieldsWithObjectType'
   assertIsString(fun, objectType)
+
   if (objectType == PARAM_OBJECT_METADATA) return null
+
   switch (objectType) {
     case PARAM_OBJECT_ORGANIZATIONS:
       return [
         Organization,
         [API_DATA_PRODUCER_PROPERTY, `${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`],
       ]
-
     case PARAM_OBJECT_CONTACTS:
       return [
         Contact,
@@ -420,9 +422,8 @@ exports.getNestedObject = async (objectType, nestedObjectProperty, filter, field
   log.d(
     mod,
     fun,
-    `objectType: ${objectType}, nestedObjectProperty: ${utils.beautify(
-      nestedObjectProperty
-    )}, filter : ${utils.beautify(filter)}, fieldSelection: ${fieldSelection} `
+    `objectType: ${objectType}, nestedObjectProperty: ${utils.beautify(nestedObjectProperty)}, ` +
+      `filter : ${utils.beautify(filter)}, fieldSelection: ${utils.beautify(fieldSelection)} `
   )
   try {
     if (Array.isArray(fieldSelection)) fieldSelection = fieldSelection.join(' ')
@@ -432,10 +433,13 @@ exports.getNestedObject = async (objectType, nestedObjectProperty, filter, field
       return await FieldModel.find(filter)
     } else {
       const dbObjects = await FieldModel.find(filter, fieldSelection)
-      log.d(mod, fun, `dbObjects: ${utils.beautify(dbObjects)}`)
+      log.d(mod, fun, `dbObjects: ${dbObjects}`)
       if (utils.isEmptyArray(dbObjects))
-        throw new Error(`Object not found! Type: '${nestedObjectProperty}', filter: ${filter}`)
-      return dbObjects
+        throw new Error(
+          `Object not found! Type: '${nestedObjectProperty}', filter: ${utils.beautify(filter)}`
+        )
+
+      return dbObjects // .map((obj) => new mongoose.Types.ObjectId(obj._id))
     }
   } catch (err) {
     log.w(mod, fun, err)
@@ -721,6 +725,7 @@ exports.groupObjectList = async (objectType, unionField, options) => {
 
     //--- Aggregation
     let aggregateOptions = [
+      { $match: filter },
       { $unwind: `$${pivot}` },
       {
         $group: {
@@ -742,12 +747,11 @@ exports.groupObjectList = async (objectType, unionField, options) => {
       { $limit: limit },
       { $skip: offset },
     ]
-    if (filter) aggregateOptions.unshift({ $match: filter }) // Place the filter in first position in aggregateOptions
     log.d(mod, fun, `aggregateOptions: ${utils.beautify(aggregateOptions)}`)
 
     let objectList = await Model.aggregate(aggregateOptions).exec()
 
-    // log.d(mod, fun, `objectList: ${utils.beau`tify(objectList)}`)
+    // log.d(mod, fun, `objectList: ${utils.beautify(objectList)}`)
 
     //--- Reshaping
     let populateOptions = getPopulateOptions(objectType)
@@ -810,6 +814,7 @@ exports.countObjectList = async (objectType, unionField, options) => {
 
     //--- Aggregation
     let aggregateOptions = [
+      { $match: filter },
       { $unwind: `$${pivot}` },
       {
         $group: {
@@ -821,8 +826,9 @@ exports.countObjectList = async (objectType, unionField, options) => {
       { $limit: limit },
       { $skip: offset },
     ]
-    if (filter) aggregateOptions.unshift({ $match: filter }) // Place the filter in first position in aggregateOptions
+    log.d(mod, fun, `aggregateOptions: ${utils.beautify(aggregateOptions)}`)
     let objectList = await Model.aggregate(aggregateOptions).exec()
+    log.d(mod, fun, `objectList: ${utils.beautify(objectList)}`)
 
     //--- Reshaping
 
@@ -909,8 +915,24 @@ exports.getUnlinkdedObjects = async (objectType) => {
     throw new Error(errMsg)
   }
   const [Model, listMetadataFields] = this.getMetadataFieldsWithObjectType(objectType)
-  const idField = this.getObjectIdField(objectType)
+  // const idField = this.getObjectIdField(objectType)
 
+  // for (const field in listMetadataFields)
+  let aggregateOptions = [
+    { $unwind: `$${field}` },
+    {
+      $group: {
+        _id: `$${pivot}`,
+      },
+    },
+  ]
+  await Metadata.aggregate()
+
+  //unwindOpts.concat([{ $set: { $add: [] } }])
+  //aggregateOptions.unshift(unwindOpts)
+
+  let objectList = await Model.aggregate(aggregateOptions).exec()
+  return objectList
 }
 
 exports.deleteObject = async (objectType, rudiId) => {

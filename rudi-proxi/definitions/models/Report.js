@@ -24,7 +24,7 @@ const { beautify } = require('../../utils/jsUtils')
 // -----------------------------------------------------------------------------
 // Constants
 // -----------------------------------------------------------------------------
-exports.IntegrationStatus = {
+const IntegrationStatus = {
   OK: 'OK',
   KO: 'KO',
 }
@@ -126,4 +126,4 @@ ReportSchema.pre('save', async function (next) {
 // Models definition
 // -----------------------------------------------------------------------------
 const Report = mongoose.model('Report', ReportSchema)
-module.exports = Report
+module.exports = {Report, IntegrationStatus}

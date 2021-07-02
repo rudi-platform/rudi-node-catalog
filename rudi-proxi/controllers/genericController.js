@@ -10,7 +10,8 @@ const mod = 'genCtrl'
 // -----------------------------------------------------------------------------
 // External dependancies
 // -----------------------------------------------------------------------------
-const boom = require('@hapi/boom')
+const mongoose = require('mongoose')
+const {boomify} = require('@hapi/boom')
 const uuid = require('uuid')
 // const url = require('url')
 const { pick } = require('lodash')
@@ -231,8 +232,13 @@ async function parseQueryParameters(objectType, reqUrl) {
           })
         } catch (err) {
           const errMsg = `Couldn't parse: '${utils.beautify(value)}': ${err}}`
-          log.w(mod, fun, errMsg)
-          throw new Error(errMsg)
+          // log.w(mod, fun, errMsg)
+          returnedFilter[EXT_REFS].push({
+            [EXT_OBJ]: nestedField,
+            [EXT_OBJ_PROP]: nestedFieldProp,
+            [EXT_OBJ_VAL]: value,
+          })
+          // throw new Error(errMsg)
         }
       } else {
         log.w(mod, fun, `Key is unkown and ignored for ${objectType}: ${utils.beautify(key)}`)
@@ -261,17 +267,17 @@ async function parseQueryParameters(objectType, reqUrl) {
           // returnedFilter[QUERY_FILTER][extObj] = 0
           throw err
         }
+        log.d(mod, fun, `nestedFieldIds: ${utils.beautify(nestedFieldIds)}`)
         let queryFilter
 
-        const ids = []
-        await Promise.all(
+        const ids =     await Promise.all(
           nestedFieldIds.map(async (foundObj) => {
             log.d(mod, fun, `nestedFieldId: ${utils.beautify(foundObj[DB_ID])}`)
-            ids.push(foundObj[DB_ID])
+            return new mongoose.Types.ObjectId(foundObj[DB_ID])
           })
         )
 
-        returnedFilter[QUERY_FILTER][extObj] = { $in: [ids.join(',')] }
+        returnedFilter[QUERY_FILTER][extObj] = { $in: ids }
 
         log.d(mod, fun, `filterReturn: ${utils.beautify(returnedFilter)}`)
       })
@@ -376,7 +382,7 @@ exports.addSingleObject = async (req, reply) => {
     // reply.statusCode = 500
     // reply.message = err
     // reply.send()
-    throw boom.boomify(err)
+    throw boomify(err)
   }
 }
 
@@ -398,7 +404,7 @@ exports.getSingleObject = async (req, reply) => {
     return dbObject
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw boomify(err)
   }
 }
 
@@ -504,7 +510,7 @@ exports.getObjectListFiltered = async (req, reply) => {
     return await db.getObjectList(objectType, limit, offset, filter, fields)
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw boomify(err)
   }
 }
 
@@ -535,7 +541,7 @@ exports.updateSingleObject = async (req, reply) => {
     }
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw boomify(err)
   }
 }
 
@@ -564,7 +570,7 @@ exports.deleteSingleObject = async (req, reply) => {
     return await db.deleteObject(objectType, objectRudiId)
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw boomify(err)
   }
 }
 
@@ -598,7 +604,7 @@ exports.deleteObjectList = async (req, reply) => {
     log.e(mod, fun, `url: ${utils.beautify(req.url)}`)
     log.e(mod, fun, `params: ${utils.beautify(req.params)}`)
     log.e(mod, fun, `body: ${utils.beautify(req.body)}`)
-    throw boom.boomify(err)
+    throw boomify(err)
   }
 }
 
@@ -630,7 +636,7 @@ exports.deleteManyObjects = async (req, reply) => {
     return await db.deleteManyWithFilter(objectType, filter)
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw boomify(err)
   }
 }
 
@@ -644,7 +650,6 @@ exports.getUnlinkdedObjects = async (objectType) => {
   return await db.getUnlinkdedObjects(objectType)
 }
 
-
 /**
  * Generate an UUID v4
  */
@@ -655,6 +660,6 @@ exports.generateUUID = async (req, reply) => {
     return uuid.v4()
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw boomify(err)
   }
 }
