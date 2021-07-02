@@ -43,6 +43,7 @@ const {
   PARAM_ACTION_REPORT,
   PARAM_ACTION_DELETION,
   PARAM_ACTION_UUID_GEN,
+  PARAM_ACTION_UNLINKED,
 } = require('../config/confApi')
 
 // -----------------------------------------------------------------------------
@@ -183,6 +184,14 @@ exports.backOfficeRoutes = [
     url: `${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_DELETION}`,
     // preHandler: logRequest,
     handler: genericController.deleteObjectList,
+  },
+
+  // Access unlinked data
+  {
+    method: 'GET',
+    url: `${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_UNLINKED}`,
+    // preHandler: logRequest,
+    handler: genericController.getUnlinkdedObjects,
   },
 
   // -----------------------------------------------------------------------------

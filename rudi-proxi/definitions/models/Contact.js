@@ -76,4 +76,5 @@ ContactSchema.methods.toJSON = function () {
 // -----------------------------------------------------------------------------
 // Exports
 // -----------------------------------------------------------------------------
-module.exports = mongoose.model('Contact', ContactSchema)
+const Contact = mongoose.model('Contact', ContactSchema)
+module.exports = Contact

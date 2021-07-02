@@ -61,4 +61,5 @@ PortalTokenSchema.methods.toJSON = function () {
 // -----------------------------------------------------------------------------
 // Exports
 // -----------------------------------------------------------------------------
-module.exports = mongoose.model('PortalToken', PortalTokenSchema)
+const PortalToken = mongoose.model('PortalToken', PortalTokenSchema)
+module.exports = PortalToken

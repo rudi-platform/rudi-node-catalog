@@ -118,4 +118,5 @@ SkosSchemeSchema.methods.toJSON = function () {
 // -----------------------------------------------------------------------------
 // Exports
 // -----------------------------------------------------------------------------
-module.exports = mongoose.model('SkosScheme', SkosSchemeSchema)
+const SkosScheme = mongoose.model('SkosScheme', SkosSchemeSchema)
+module.exports = SkosScheme

@@ -66,4 +66,5 @@ OrganizationSchema.methods.toJSON = function () {
 // -----------------------------------------------------------------------------
 // Exports
 // -----------------------------------------------------------------------------
-module.exports = mongoose.model('Organization', OrganizationSchema)
+const Organization = mongoose.model('Organization', OrganizationSchema)
+module.exports = Organization

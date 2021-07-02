@@ -60,7 +60,7 @@ const { Report, IntegrationStatus } = require('../definitions/models/Report')
 // -----------------------------------------------------------------------------
 // Comformity functions
 // -----------------------------------------------------------------------------
-function toRudi(reportBody) {
+function fromPortalToRudiFormat(reportBody) {
   if (reportBody[API_REPORT_VERSION] === 'v1') {
     reportBody[API_REPORT_VERSION] = VERSION
   }
@@ -83,7 +83,7 @@ exports.addSingleReportForObject = async (req, reply) => {
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
     const urlObjectId = json.accessReqParam(req, PARAM_ID)
 
-    const reportBody = toRudi(req.body)
+    const reportBody = fromPortalToRudiFormat(req.body)
 
     // retrieve body parameters: object id, report id
     const reportId = json.accessProperty(reportBody, API_REPORT_ID)
@@ -146,7 +146,7 @@ exports.addOrEditSingleReport = async (objectType, req, reply) => {
     // retrieve url parameters: object type, object id
     const urlObjectId = json.accessReqParam(req, PARAM_ID)
 
-    const reportBody = toRudi(req.body)
+    const reportBody = fromPortalToRudiFormat(req.body)
     // log.v(mod, fun, `new report: ${utils.beautify(reportBody)}`)
 
     // retrieve body parameters: object id, report id

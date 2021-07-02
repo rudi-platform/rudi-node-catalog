@@ -414,7 +414,6 @@ exports.getObjectList = async (req, reply) => {
   return await this.getManyObjects(objectType, req, reply)
 }
 
-
 /**
  * Get several objects for an particular object type
  */
@@ -638,9 +637,20 @@ exports.deleteManyObjects = async (req, reply) => {
 /**
  * Generate an UUID v4
  */
+exports.getUnlinkdedObjects = async (objectType) => {
+  const fun = 'getUnlinkdedObjects'
+  log.d(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_UNLINKED}`)
+
+  return await db.getUnlinkdedObjects(objectType)
+}
+
+
+/**
+ * Generate an UUID v4
+ */
 exports.generateUUID = async (req, reply) => {
   const fun = 'generateUUID'
-  log.d(mod, fun, '')
+  log.d(mod, fun, ``)
   try {
     return uuid.v4()
   } catch (err) {
