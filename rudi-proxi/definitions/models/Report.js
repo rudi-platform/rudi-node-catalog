@@ -7,7 +7,7 @@ const mod = 'reportSch'
 // -----------------------------------------------------------------------------
 const mongoose = require('mongoose')
 const Int32 = require('mongoose-int32')
-const _ = require('lodash')
+const { omit } = require('lodash')
 
 // -----------------------------------------------------------------------------
 // Internal dependancies
@@ -110,7 +110,7 @@ const ReportSchema = new mongoose.Schema(
 
 // ----- toJSON cleanup
 ReportSchema.methods.toJSON = function () {
-  return _.omit(this.toObject(), FIELDS_TO_SKIP)
+  return omit(this.toObject(), FIELDS_TO_SKIP)
 }
 
 /* 

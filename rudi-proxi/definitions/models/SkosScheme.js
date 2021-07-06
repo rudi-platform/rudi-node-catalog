@@ -6,6 +6,7 @@
 // External dependancies
 // -----------------------------------------------------------------------------
 const mongoose = require('mongoose')
+const { omit } = require('lodash')
 
 // -----------------------------------------------------------------------------
 // Internal dependencies
@@ -18,6 +19,7 @@ const Validation = require('../schemaValidators')
 // -----------------------------------------------------------------------------
 const ids = require('../schemas/Identifiers')
 const DictionaryEntry = require('../schemas/DictionaryEntry')
+const { FIELDS_TO_SKIP } = require('../../db/dbFields')
 
 // -----------------------------------------------------------------------------
 // Constants
@@ -106,13 +108,7 @@ const SkosSchemeSchema = new mongoose.Schema(
 
 // ----- toJSON cleanup
 SkosSchemeSchema.methods.toJSON = function () {
-  const obj = this.toObject()
-  delete obj.id
-  delete obj._id
-  delete obj.__v
-  delete obj.createdAt
-  delete obj.updatedAt
-  return obj
+  return omit(this.toObject(), FIELDS_TO_SKIP)
 }
 
 // -----------------------------------------------------------------------------

@@ -30,7 +30,7 @@ const mongoose = require('mongoose')
 const fastify = require('fastify')({
   logger: {
     level: 'warn',
-    logger: logConf.initFFLogger('rudiProxi'),
+    logger: logConf.initFFLogger(sys.APP_NAME),
     // file: sys.OUT_LOG
   },
 })
@@ -44,10 +44,10 @@ fastify.addHook('onRequest', (req, res, next) => {
 // })
 
 // Import Swagger Options
-const swagger = require('./config/swagger')
+// const swagger = require('./config/swagger')
 
 // Register Swagger
-fastify.register(require('fastify-swagger'), swagger.options)
+// fastify.register(require('fastify-swagger'), swagger.options)
 
 // -----------------------------------------------------------------------------
 // DB connection
@@ -135,7 +135,7 @@ const start = async () => {
     await fastify
       .listen(sys.LISTENING_PORT, sys.LISTENING_ADDR)
       .catch((err) => log.e(mod, 'Fastify listen', `${err}`))
-    fastify.swagger()
+    // fastify.swagger()
     // fastify.log.info(`Listening on ${fastify.server.address().address}:${fastify.server.address().port}`)
   } catch (err) {
     // fastify.log.error(err)

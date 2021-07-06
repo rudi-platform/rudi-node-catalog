@@ -6,8 +6,8 @@ const mod = 'portalCtrl'
 // -----------------------------------------------------------------------------
 // External dependancies
 // -----------------------------------------------------------------------------
-const boom = require('@hapi/boom')
-const crypto = require('crypto')
+const { boomify } = require('@hapi/boom')
+const { createHmac } = require('crypto')
 
 // -----------------------------------------------------------------------------
 // Internal dependancies
@@ -16,10 +16,13 @@ const db = require('../db/dbQueries')
 const log = require('../utils/logging')
 const api = require('../config/confApi')
 const utils = require('../utils/jsUtils')
-const portal = require('../config/confPortal')
-const { httpGet, httpPost, directPost, directGet } = require('../utils/httpReq')
-const validate = require('../definitions/schemaValidators')
 const json = require('../utils/jsonAccess')
+
+const { httpGet, httpPost, directPost, directGet } = require('../utils/httpReq')
+
+const portal = require('../config/confPortal')
+
+const validate = require('../definitions/schemaValidators')
 
 const { Metadata } = require('../definitions/models/Metadata')
 
@@ -49,7 +52,7 @@ exports.exposedGetPortalToken = async (req, reply) => {
     return await this.getPortalToken()
   } catch (err) {
     log.w(mod, fun, err)
-    throw boom.boomify(err)
+    throw boomify(err)
   }
 }
 // -----------------------------------------------------------------------------
@@ -100,7 +103,7 @@ exports.checkStoredToken = async (req, reply) => {
     return await this.getTokenCheckedByPortal(token[portal.FIELD_TOKEN])
   } catch (err) {
     log.w(mod, fun, err)
-    throw boom.boomify(err)
+    throw boomify(err)
   }
 }
 
@@ -112,7 +115,7 @@ exports.checkInputToken = async (req, reply) => {
     return await this.getTokenCheckedByPortal(token[portal.FIELD_TOKEN])
   } catch (err) {
     log.w(mod, fun, err)
-    throw boom.boomify(err)
+    throw boomify(err)
   }
 }
 
@@ -127,7 +130,7 @@ exports.getMetadata = async (req, reply) => {
     return await this.getMetadataFromPortal(metadataId)
   } catch (err) {
     log.w(mod, fun, err)
-    throw boom.boomify(err)
+    throw boomify(err)
   }
 }
 exports.sendMetadata = async (req, reply) => {
@@ -141,7 +144,7 @@ exports.sendMetadata = async (req, reply) => {
     return await this.sendMetadataToPortal(metadataId)
   } catch (err) {
     log.w(mod, fun, err)
-    throw boom.boomify(err)
+    throw boomify(err)
   }
 }
 // -----------------------------------------------------------------------------
@@ -255,8 +258,7 @@ exports.verifyPortalToken = (accessToken) => {
     const jwtBodyEncoded = jwt[1]
     const jwtSignature = jwt[2]
 
-    const hash = crypto
-      .createHmac('sha256', portal.SECRET)
+    const hash = createHmac('sha256', portal.SECRET)
       .update(`${jwtHeaderEncoded}.${jwtBodyEncoded}`)
       .digest('base64url')
 
@@ -310,7 +312,7 @@ exports.sendMetadataToPortal = async (metadataId) => {
     }
     const metadataClean = utils.deepClone(metadata)
 
-    // delete metadataClean[API_GEOGRAPHY_PROPERTY][API_GEO_GEOJSON_PROPERTY] // 
+    // delete metadataClean[API_GEOGRAPHY_PROPERTY][API_GEO_GEOJSON_PROPERTY] //
     // metadataClean[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = 'v1'
 
     const token = await this.getPortalToken()

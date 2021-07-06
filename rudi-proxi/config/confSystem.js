@@ -106,6 +106,7 @@ exports.APP_NAME = getIniValue(LOG_SECTION, _appName)
 exports.LOG_DIR = getIniValue(LOG_SECTION, _logDir)
 exports.LOG_FILE = getIniValue(LOG_SECTION, _logFileName)
 exports.OUT_LOG = `${this.LOG_DIR}/${this.LOG_FILE}`
+exports.SYMLINK_NAME = `${this.APP_NAME}-current.log`
 exports.LOG_LVL = getIniValue(LOG_SECTION, _logLevel)
 
 const fun = 'export'

@@ -9,7 +9,7 @@ const mod = 'skosCtrl'
 // -----------------------------------------------------------------------------
 // External dependancies
 // -----------------------------------------------------------------------------
-const boom = require('@hapi/boom')
+const { boomify } = require('@hapi/boom')
 
 // -----------------------------------------------------------------------------
 // Internal dependancies
@@ -488,7 +488,7 @@ exports.getEveryThesaurus = async (req, reply) => {
     return listThesauri
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw boomify(err)
   }
 }
 
@@ -508,6 +508,6 @@ exports.getSingleThesaurus = async (req, reply) => {
     return thesaurus
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw boomify(err)
   }
 }

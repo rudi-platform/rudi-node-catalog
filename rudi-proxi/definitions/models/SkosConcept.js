@@ -5,7 +5,7 @@
 // External dependancies
 // -----------------------------------------------------------------------------
 const mongoose = require('mongoose')
-const _ = require('lodash')
+const { omit } = require('lodash')
 
 // -----------------------------------------------------------------------------
 // Internal dependencies
@@ -226,7 +226,7 @@ const SkosConceptSchema = new mongoose.Schema(
 
 // ----- toJSON cleanup
 SkosConceptSchema.methods.toJSON = function () {
-  return _.omit(this.toObject(), FIELDS_TO_SKIP)
+  return omit(this.toObject(), FIELDS_TO_SKIP)
 }
 
 // -----------------------------------------------------------------------------

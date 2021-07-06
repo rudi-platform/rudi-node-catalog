@@ -5,13 +5,13 @@ const mod = 'devCtrl'
 // -----------------------------------------------------------------------------
 // External dependancies
 // -----------------------------------------------------------------------------
-const db = require('../db/dbQueries')
+const { boomify } = require('@hapi/boom')
 
 // -----------------------------------------------------------------------------
 // Internal dependancies
 // -----------------------------------------------------------------------------
 const log = require('../utils/logging')
-const boom = require('@hapi/boom')
+const db = require('../db/dbQueries')
 
 // -----------------------------------------------------------------------------
 // tests
@@ -28,6 +28,6 @@ exports.test = async (req, reply) => {
     return await db.isReferencedInMetadata(objectType, rudiId)
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw boomify(err)
   }
 }

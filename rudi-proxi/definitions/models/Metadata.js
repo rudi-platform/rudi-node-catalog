@@ -5,7 +5,7 @@ const mod = 'metaSch'
 // External dependencies
 // -----------------------------------------------------------------------------
 const mongoose = require('mongoose')
-const _ = require('lodash')
+const { omit } = require('lodash')
 
 // eslint-disable-next-line no-unused-vars
 const GeoJSON = require('mongoose-geojson-schema')
@@ -679,7 +679,7 @@ function checkDates(datesObj, firstDateProp, secondDateProp, shouldInitialize) {
 
 // ----- toJSON cleanup
 MetadataSchema.methods.toJSON = function () {
-  return _.omit(this.toObject(), FIELDS_TO_SKIP)
+  return omit(this.toObject(), FIELDS_TO_SKIP)
 }
 
 // ----- Virtuals

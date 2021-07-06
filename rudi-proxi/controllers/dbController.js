@@ -9,21 +9,19 @@ const mod = 'dbCtrl'
 // -----------------------------------------------------------------------------
 // External dependancies
 // -----------------------------------------------------------------------------
-const boom = require('@hapi/boom')
-const _ = require('lodash')
+const { boomify } = require('@hapi/boom')
+const { map } = require('lodash')
 
 // -----------------------------------------------------------------------------
 // Internal dependancies
 // -----------------------------------------------------------------------------
 const log = require('../utils/logging')
-
 const db = require('../db/dbQueries')
 
 // -----------------------------------------------------------------------------
 // Constants
 // -----------------------------------------------------------------------------
-const { URL_PV_DB_ACCESS: URL_DB_ACCESS } = require('../config/confApi')
-
+const { URL_PV_DB_ACCESS } = require('../config/confApi')
 const { DB_NAME } = require('../config/confSystem')
 
 // -----------------------------------------------------------------------------
@@ -32,24 +30,24 @@ const { DB_NAME } = require('../config/confSystem')
 
 exports.getCollections = async (req, reply) => {
   const fun = 'getCollections'
-  log.d(mod, fun, `< GET ${URL_DB_ACCESS}`)
+  log.d(mod, fun, `< GET ${URL_PV_DB_ACCESS}`)
   try {
     const dbActionResult = await db.getCollections(DB_NAME)
-    return _.map(dbActionResult, 'name')
+    return map(dbActionResult, 'name')
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw boomify(err)
   }
 }
 
 exports.dropDB = async (req, reply) => {
   const fun = 'dropDB'
-  log.d(mod, fun, `< DELETE ${URL_DB_ACCESS}`)
+  log.d(mod, fun, `< DELETE ${URL_PV_DB_ACCESS}`)
   try {
     const dbActionResult = await db.dropDB(DB_NAME)
     return dbActionResult
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw boomify(err)
   }
 }

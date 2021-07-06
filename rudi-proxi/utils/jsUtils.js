@@ -7,7 +7,7 @@ const mod = 'utils'
 // External dependancies
 // -----------------------------------------------------------------------------
 const util = require('util')
-const _ = require('lodash')
+const { floor, pick } = require('lodash')
 
 // -----------------------------------------------------------------------------
 // String
@@ -31,7 +31,7 @@ exports.nowEpochMs = () => {
   return new Date().getTime()
 }
 exports.nowEpochS = () => {
-  return _.floor(this.nowEpochMs() / 1000)
+  return floor(this.nowEpochMs() / 1000)
 }
 exports.dateEpochSToIso = (utcSeconds) => {
   const fun = 'dateEpochSToIso'
@@ -131,7 +131,7 @@ exports.getPaths = async (root, parentKeyName) => {
 }
 
 exports.listPick = (objList, fieldList) => {
-  const reshapedList = objList.map((obj) => _.pick(obj, fieldList))
+  const reshapedList = objList.map((obj) => pick(obj, fieldList))
   return reshapedList
 }
 
@@ -212,13 +212,13 @@ exports.separateLogs = (insertStr) => {
 }
 
 exports.consoleLog = (mod, fun, msg) => {
-  const where = !mod ? fun : !fun ? mod : `${mod} • ${fun}`
+  const where = !mod ? fun : !fun ? mod : `${mod} . ${fun}`
   const what = !msg || msg === '' ? '<-' : msg
   console.log(this.nowLocaleFormatted(), '.debug.', `[ ${where} ]`, what)
 }
 
 exports.consoleErr = (mod, fun, msg) => {
-  const where = !mod ? fun : !fun ? mod : `${mod} • ${fun}`
+  const where = !mod ? fun : !fun ? mod : `${mod} . ${fun}`
   console.error(this.nowLocaleFormatted(), '.error.', `[ ${where} ]`, msg.err)
 }
 

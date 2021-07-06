@@ -3,8 +3,8 @@
 // -----------------------------------------------------------------------------
 // External dependancies
 // -----------------------------------------------------------------------------
-const _ = require('lodash')
 const mongoose = require('mongoose')
+const { omit } = require('lodash')
 
 // -----------------------------------------------------------------------------
 // Internal dependancies
@@ -70,7 +70,7 @@ const ContactSchema = new mongoose.Schema(
 
 // ----- toJSON cleanup
 ContactSchema.methods.toJSON = function () {
-  return _.omit(this.toObject(), FIELDS_TO_SKIP)
+  return omit(this.toObject(), FIELDS_TO_SKIP)
 }
 
 // -----------------------------------------------------------------------------

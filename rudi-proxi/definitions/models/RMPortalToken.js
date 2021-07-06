@@ -4,7 +4,7 @@
 // External dependancies
 // -----------------------------------------------------------------------------
 const { Schema, model, connect } = require('mongoose')
-const _ = require('lodash')
+const { omit } = require('lodash')
 
 const Int32 = require('mongoose-int32')
 
@@ -37,7 +37,7 @@ const RudiPortalTokenSchema = new Schema<RMToken>(
 )
 
 RudiPortalTokenSchema.methods.toJSON = function () {
-  return _.omit(this.toObject(), FIELDS_TO_SKIP)
+  return omit(this.toObject(), FIELDS_TO_SKIP)
 }
 
 // -----------------------------------------------------------------------------

@@ -191,7 +191,7 @@ exports.backOfficeRoutes = [
     method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_UNLINKED}`,
     // preHandler: logRequest,
-    handler: genericController.getUnlinkdedObjects,
+    handler: genericController.getOrphans,
   },
 
   // -----------------------------------------------------------------------------
@@ -385,7 +385,7 @@ exports.devRoutes = [
     method: 'GET',
     url: `${URL_PV_LOGS_ACCESS}`,
     // preHandler: logRequest,
-    handler: sysController.getLogs,
+    handler: sysController.getLastLogLines,
   },
   {
     method: 'GET',

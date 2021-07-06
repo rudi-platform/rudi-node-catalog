@@ -13,7 +13,7 @@ const prcs = require('child_process')
 const readLastLines = require('read-last-lines')
 
 const mongoose = require('mongoose')
-const boom = require('@hapi/boom')
+const {boomify} = require('@hapi/boom')
 
 // -----------------------------------------------------------------------------
 // Internal dependancies
@@ -28,6 +28,7 @@ const {
   URL_PV_GIT_HASH_ACCESS,
   URL_PV_NODE_VERSION_ACCESS,
   PARAM_LOGS_LINES,
+  QUERY_LIMIT,
 } = require('../config/confApi')
 
 // -----------------------------------------------------------------------------
@@ -52,7 +53,7 @@ exports.getGitHash = () => {
     return `${hashId}`.trim()
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw boomify(err)
   }
 }
 
@@ -64,7 +65,7 @@ exports.getAppHash = () => {
     return CURRENT_APP_HASH
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw boomify(err)
   }
 }
 
@@ -88,7 +89,7 @@ exports.getNodeVersion = async () => {
     return nVersions
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw boomify(err)
   }
 }
 
@@ -106,6 +107,7 @@ async function getMongDbVersion() {
 // -----------------------------------------------------------------------------
 // Logs
 // -----------------------------------------------------------------------------
+const LOG_FILE = `${sys.LOG_DIR}/${sys.SYMLINK_NAME}`
 
 exports.getLogs = async (req, reply) => {
   const fun = 'getLogs'
@@ -119,12 +121,12 @@ exports.getLogs = async (req, reply) => {
     const logs = fs.readFileSync(sys.OUT_LOG, readOptions)
     */
     const nbLines = req.params[PARAM_LOGS_LINES] || req.params[QUERY_LIMIT] || NB_LOG_LINES_DEFAULT
-    const logs = readLastLines.read(sys.OUT_LOG, nbLines)
+    const logs = readLastLines.read(LOG_FILE, nbLines)
     // const logs = readLastLines.read(sys.OUT_LOG, NB_LOG_LINES_DEFAULT)
     return logs
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw boomify(err)
   }
 }
 
@@ -132,11 +134,12 @@ exports.getLastLogLines = async (req, reply) => {
   const fun = 'getLastLogLines'
   try {
     log.d(mod, fun, `GET ${URL_PV_LOGS_ACCESS}/:${PARAM_LOGS_LINES}`)
+
     const nbLines = req.params[PARAM_LOGS_LINES] || req.params[QUERY_LIMIT] || NB_LOG_LINES_DEFAULT
-    const logs = readLastLines.read(sys.OUT_LOG, nbLines)
+    const logs = readLastLines.read(LOG_FILE, nbLines)
     return logs
   } catch (err) {
     log.e(mod, fun, err)
-    throw boom.boomify(err)
+    throw boomify(err)
   }
 }

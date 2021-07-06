@@ -546,6 +546,7 @@ exports.overwriteMetadata = async (incomingRudiMetadata) => {
 }
 
 // parameter incomingRudiMetadata can be partial metadata
+// (obsolete)
 exports.updateMetadata = async (incomingRudiMetadata) => {
   const fun = 'updateMetadata'
   log.d(mod, fun, ``)

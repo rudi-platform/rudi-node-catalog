@@ -627,7 +627,7 @@ exports.getObjectList = async (objectType, options) => {
         }
       })
     }
-    sortOptions._id = 1 // Default sort to get consistent offset/limit results
+    sortOptions[DB_ID] = 1 // Default sort to get consistent offset/limit results
 
     log.d(mod, fun, `sortOptions: ${utils.beautify(sortOptions)}`)
 
@@ -891,7 +891,7 @@ exports.overwriteObject = async (objectType, updateData) => {
     const { Model, idField } = this.getObjectAccesses(objectType)
     const rudiId = json.accessProperty(updateData, idField)
     const filter = { [idField]: rudiId }
-    const updateOpts = { new: true, overwrite: true }
+    const updateOpts = { new: true, overwrite: true, upsert: true }
 
     const populateOptions = getPopulateOptions(objectType)
     if (utils.isEmptyArray(populateOptions)) {
@@ -906,7 +906,12 @@ exports.overwriteObject = async (objectType, updateData) => {
   // log.d(mod, fun, `updatedObject: ${utils.beautify(updatedObject)}`)
 }
 
-exports.getUnlinkdedObjects = async (objectType) => {
+/**
+ * 
+ * @param {String} objectType Object type ('organizations', 'contacts' or 'media')
+ * @returns 
+ */
+exports.getOrphans = async (objectType) => {
   const fun = `getUnlinkdedObjects`
   log.d(mod, fun, ``)
   if (objectType === PARAM_OBJECT_METADATA) {
@@ -919,14 +924,10 @@ exports.getUnlinkdedObjects = async (objectType) => {
   //
   // for (const field in listMetadataFields)
   let aggregateOptions = [
-    { $unwind: `$${field}` },
-    {
-      $group: {
-        _id: `$${pivot}`,
-      },
-    },
+    // accumule Metadata.field1 et Metadata.field2 dans un set => tableau
+    // cherche les valeurs de Model._id qui ne sont pas dans le tableau
   ]
-  await Metadata.aggregate()
+  await Model.aggregate()
 
   //unwindOpts.concat([{ $set: { $add: [] } }])
   //aggregateOptions.unshift(unwindOpts)
@@ -1596,7 +1597,7 @@ exports.getLatestStoredPortalToken = async () => {
     const lastToken = await PortalToken.findOne()
       .sort({
         field: 'asc',
-        _id: -1,
+        [DB_ID]: -1,
       })
       .limit(1)
     // log.d(mod, fun, `lastToken: ${utils.beautify(lastToken)}`)

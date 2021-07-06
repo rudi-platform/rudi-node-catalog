@@ -71,14 +71,14 @@ const Colors = {
 // }
 
 // function displayLine(logLvl, mod, fun, msg) {
-//   display(logLvl, `• ${displayStr(mod, fun, msg)}`)
+//   display(logLvl, `. ${displayStr(mod, fun, msg)}`)
 // }
 
 function displayStr(mod, fun, msg) {
   if (mod === '') {
     return `[ ${fun} ] ${msg !== '' ? msg : '<-'}`
   } else {
-    return `[ ${mod} • ${fun} ] ${msg !== '' ? msg : '<-'}`
+    return `[ ${mod} . ${fun} ] ${msg !== '' ? msg : '<-'}`
   }
 }
 

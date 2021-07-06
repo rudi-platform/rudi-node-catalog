@@ -643,11 +643,11 @@ exports.deleteManyObjects = async (req, reply) => {
 /**
  * Generate an UUID v4
  */
-exports.getUnlinkdedObjects = async (objectType) => {
+exports.getOrphans = async (objectType) => {
   const fun = 'getUnlinkdedObjects'
   log.d(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_UNLINKED}`)
 
-  return await db.getUnlinkdedObjects(objectType)
+  return await db.getOrphans(objectType)
 }
 
 /**

@@ -2,7 +2,7 @@
 // External dependancies
 // -----------------------------------------------------------------------------
 const mongoose = require('mongoose')
-const _ = require('lodash')
+const { omit } = require('lodash')
 
 // -----------------------------------------------------------------------------
 // Schema definitions
@@ -81,13 +81,13 @@ const LicenceCustomSchema = new mongoose.Schema(
 
 // ----- toJSON cleanup
 LicenceSchema.methods.toJSON = function () {
-  return _.omit(this.toObject(), FIELDS_TO_SKIP)
+  return omit(this.toObject(), FIELDS_TO_SKIP)
 }
 LicenceStandardSchema.methods.toJSON = function () {
-  return _.omit(this.toObject(), FIELDS_TO_SKIP)
+  return omit(this.toObject(), FIELDS_TO_SKIP)
 }
 LicenceCustomSchema.methods.toJSON = function () {
-  return _.omit(this.toObject(), FIELDS_TO_SKIP)
+  return omit(this.toObject(), FIELDS_TO_SKIP)
 }
 
 /*

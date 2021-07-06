@@ -4,7 +4,7 @@
 // External dependancies
 // -----------------------------------------------------------------------------
 const mongoose = require('mongoose')
-const _ = require('lodash')
+const { omit } = require('lodash')
 
 // -----------------------------------------------------------------------------
 // Internal dependancies
@@ -60,7 +60,7 @@ const OrganizationSchema = new mongoose.Schema(
 
 // ----- toJSON cleanup
 OrganizationSchema.methods.toJSON = function () {
-  return _.omit(this.toObject(), FIELDS_TO_SKIP)
+  return omit(this.toObject(), FIELDS_TO_SKIP)
 }
 
 // -----------------------------------------------------------------------------
