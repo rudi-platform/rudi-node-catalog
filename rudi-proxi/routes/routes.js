@@ -55,6 +55,7 @@ const reportController = require('../controllers/reportController')
 
 const dbController = require('../controllers/dbController')
 const sysController = require('../controllers/sysController')
+const { getLastLogLines, getLogs } = require('../controllers/logController')
 const skosController = require('../controllers/skosController')
 const licenceController = require('../controllers/licenceController')
 
@@ -385,13 +386,13 @@ exports.devRoutes = [
     method: 'GET',
     url: `${URL_PV_LOGS_ACCESS}`,
     // preHandler: logRequest,
-    handler: sysController.getLastLogLines,
+    handler: getLogs,
   },
   {
     method: 'GET',
     url: `${URL_PV_LOGS_ACCESS}/:${PARAM_LOGS_LINES}`,
     // preHandler: logRequest,
-    handler: sysController.getLastLogLines,
+    handler: getLastLogLines,
   },
 
   // -----------------------------------------------------------------------------

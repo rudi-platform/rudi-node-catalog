@@ -1,0 +1,124 @@
+'use strict'
+
+// -----------------------------------------------------------------------------
+// External dependancies
+// -----------------------------------------------------------------------------
+const { Schema, model } = require('mongoose')
+const { omit } = require('lodash')
+const { format } = require('date-and-time')
+const { v4 } = require('uuid')
+
+// -----------------------------------------------------------------------------
+// Internal dependancies
+// -----------------------------------------------------------------------------
+const { beautify } = require('../../utils/jsUtils')
+
+const { LOG_EXP } = require('../../config/confSystem')
+const { LOG_DATE_FORMAT } = require('../../config/confLogs')
+const { UUIDv4 } = require('../schemas/Identifiers')
+const { VALID_UUID } = require('../schemaValidators')
+const { DB_ID, DB_V, DB_UPDATED_AT } = require('../../db/dbFields')
+
+// -----------------------------------------------------------------------------
+// Constants
+// -----------------------------------------------------------------------------
+const dayS = 60 * 60 * 24
+const logExpirationTime = 100 // 7 * dayS
+
+// -----------------------------------------------------------------------------
+// Custom schema definition
+// -----------------------------------------------------------------------------
+const LogEntrySchema = new Schema(
+  {
+    // Unique and permanent identifier for the log entry (required)
+    entry_id: {
+      type: String,
+      default: v4,
+      required: true,
+      unique: true,
+      index: true,
+      lowercase: true,
+      match: VALID_UUID,
+    },
+
+    // Log message
+    message: {
+      type: String,
+      required: true,
+    },
+
+    // log level
+    log_level: {
+      type: String,
+      required: true,
+    },
+
+    // Module/file where the log is coming from
+    location_module: {
+      type: String,
+    },
+
+    // Function where the log is coming from
+    location_function: {
+      type: String,
+    },
+
+    user_address: {
+      type: String,
+    },
+  },
+  {
+    // Adds mongoose fields 'updatedAt' and 'createdAt'
+    timestamps: true,
+    id: false,
+
+    // optimisticConcurrency: true,
+    // strict: true,
+    // runSettersOnQuery: true,
+    // toObject: {
+    //   getters: true,
+    //   setters: true,
+    //   virtuals: false
+    // },
+  }
+)
+LogEntrySchema.index({ updatedAt: 1 }, { expires: LOG_EXP })
+
+// -----------------------------------------------------------------------------
+// Schema refinements
+// -----------------------------------------------------------------------------
+
+// ----- toJSON cleanup
+LogEntrySchema.methods.toJSON = function () {
+  return omit(this.toObject(), [DB_ID, DB_V, DB_UPDATED_AT])
+}
+
+function logLineToString(logLine) {
+  const date = format(logLine.createdAt, LOG_DATE_FORMAT)
+  return (
+    `${date} ${logLine.log_level} [ ${logLine.location_module} ` +
+    `. ${logLine.location_function} ] ${logLine.message}`
+  )
+}
+
+// -----------------------------------------------------------------------------
+// Helper function
+// -----------------------------------------------------------------------------
+function makeLogInfo(logLvl, mod, fun, msg) {
+  if (!msg) msg = ''
+  return {
+    message: msg, // .replace(/\"/g, "'"),
+    log_level: logLvl,
+    location_module: mod,
+    location_function: fun,
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Exports
+// -----------------------------------------------------------------------------
+const LogEntry = model('LogEntry', LogEntrySchema)
+
+LogEntry.collection.dropIndex({ updatedAt: 1 })
+
+module.exports = { LogEntry, makeLogInfo, logLineToString }

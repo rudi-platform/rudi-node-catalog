@@ -1988,7 +1988,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?count_by=producer&limit=4",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?count_by=producer&limit=10",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -2003,7 +2003,7 @@
 								},
 								{
 									"key": "limit",
-									"value": "4"
+									"value": "10"
 								}
 							]
 						}
@@ -3676,14 +3676,19 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{logs}}/400",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{logs}}?lines=150",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{adminUrl}}",
-								"{{logs}}",
-								"400"
+								"{{logs}}"
+							],
+							"query": [
+								{
+									"key": "lines",
+									"value": "150"
+								}
 							]
 						}
 					},

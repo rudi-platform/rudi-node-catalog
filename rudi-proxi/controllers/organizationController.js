@@ -40,7 +40,7 @@ exports.newOrganization = async (orgJson) => {
         orgJson
       )} | Error: ${err}`
     )
-    log.e(mod, fun, err)
+    // log.e(mod, fun, err)
     throw err
   }
   try {
@@ -54,7 +54,7 @@ exports.newOrganization = async (orgJson) => {
         dbOrganization
       )} | Error: ${err}`
     )
-    log.e(mod, fun, err)
+    // log.e(mod, fun, err)
     throw err
   }
   return dbOrganization

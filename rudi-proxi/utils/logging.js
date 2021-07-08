@@ -4,7 +4,10 @@
 // -----------------------------------------------------------------------------
 // Internal dependencies
 // -----------------------------------------------------------------------------
-const logger = require('../config/confLogs').logger
+const { logger } = require('../config/confLogs')
+const { consoleErr } = require('./jsUtils')
+const { LogEntry } = require('../definitions/models/LogEntry')
+const { addLogEntry } = require('../db/dbQueries')
 
 // -----------------------------------------------------------------------------
 // Colors
@@ -117,6 +120,9 @@ exports.v = (mod, fun, msg) => {
 
 exports.d = (mod, fun, msg) => {
   logger.debug(displayStr(mod, fun, msg))
+  addLogEntry('debug', mod, fun, msg).catch((err) =>
+    consoleErr(mod, fun, `Logging failed: msg=${msg}, err: ${err}`)
+  )
   // if (LOG_LVL < levels.debug) return
   // displayFunc(DEBUG, fun, msg)
 }

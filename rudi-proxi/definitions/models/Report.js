@@ -126,4 +126,4 @@ ReportSchema.pre('save', async function (next) {
 // Models definition
 // -----------------------------------------------------------------------------
 const Report = mongoose.model('Report', ReportSchema)
-module.exports = {Report, IntegrationStatus}
+module.exports = { Report, IntegrationStatus }

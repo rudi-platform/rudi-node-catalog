@@ -11,7 +11,7 @@ const mod = 'genCtrl'
 // External dependancies
 // -----------------------------------------------------------------------------
 const mongoose = require('mongoose')
-const {boomify} = require('@hapi/boom')
+const { boomify } = require('@hapi/boom')
 const uuid = require('uuid')
 // const url = require('url')
 const { pick } = require('lodash')
@@ -83,10 +83,10 @@ const {
 
 const Organization = require('../definitions/models/Organization')
 const Contact = require('../definitions/models/Contact')
-const Report = require('../definitions/models/Report')
 const SkosConcept = require('../definitions/models/SkosConcept')
 const SkosScheme = require('../definitions/models/SkosScheme')
 
+const { Report } = require('../definitions/models/Report')
 const { Metadata } = require('../definitions/models/Metadata')
 const { Media, MediaFile, MediaSeries } = require('../definitions/models/Media')
 
@@ -270,7 +270,7 @@ async function parseQueryParameters(objectType, reqUrl) {
         log.d(mod, fun, `nestedFieldIds: ${utils.beautify(nestedFieldIds)}`)
         let queryFilter
 
-        const ids =     await Promise.all(
+        const ids = await Promise.all(
           nestedFieldIds.map(async (foundObj) => {
             log.d(mod, fun, `nestedFieldId: ${utils.beautify(foundObj[DB_ID])}`)
             return new mongoose.Types.ObjectId(foundObj[DB_ID])

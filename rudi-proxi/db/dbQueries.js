@@ -79,7 +79,9 @@ const Contact = require('../definitions/models/Contact')
 
 const { Media } = require('../definitions/models/Media')
 const { Metadata, METADATA_FIELDS_TO_POPULATE } = require('../definitions/models/Metadata')
+
 const { Report } = require('../definitions/models/Report')
+const { LogEntry, makeLogInfo } = require('../definitions/models/LogEntry')
 
 // -----------------------------------------------------------------------------
 // Properties with special treatments
@@ -907,9 +909,9 @@ exports.overwriteObject = async (objectType, updateData) => {
 }
 
 /**
- * 
+ *
  * @param {String} objectType Object type ('organizations', 'contacts' or 'media')
- * @returns 
+ * @returns
  */
 exports.getOrphans = async (objectType) => {
   const fun = `getUnlinkdedObjects`
@@ -1623,10 +1625,42 @@ exports.cleanStoredToken = (dbToken) => {
 exports.storePortalToken = async (token) => {
   const fun = 'storePortalToken'
   try {
-    const dbToken = await PortalToken(token)
+    const dbToken = await new PortalToken(token)
     return await dbToken.save()
   } catch (err) {
     log.w(mod, fun, err)
+    throw err
+  }
+}
+
+// ----------------------------------------
+// - Logs
+// ----------------------------------------
+// No log.d / log.e function here or you'll create a loopback
+exports.addLogEntry = async (logLvl, loc_module, loc_function, msg) => {
+  const fun = 'storeLog'
+  try {
+    if (!msg || msg === '') msg = '<-'
+    // utils.consoleLog(mod, fun, ``)
+    const logInfo = makeLogInfo(logLvl, loc_module, loc_function, msg)
+    const logEntry = await new LogEntry(logInfo)
+    return await logEntry.save()
+  } catch (err) {
+    throw err
+  }
+}
+
+exports.getLogEntries = async (nbLines) => {
+  const fun = 'getLogEntries'
+  try {
+    utils.consoleLog(mod, fun, ``)
+    return await LogEntry.aggregate([
+      { $sort: { createdAt: -1 } },
+      { $limit: nbLines },
+      { $sort: { createdAt: 1 } },
+    ])
+    // .find({}).sort({ createdAt: -1 }).limit(nbLines).sort({ createdAt: 1 })
+  } catch (err) {
     throw err
   }
 }

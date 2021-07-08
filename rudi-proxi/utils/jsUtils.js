@@ -8,6 +8,7 @@ const mod = 'utils'
 // -----------------------------------------------------------------------------
 const util = require('util')
 const { floor, pick } = require('lodash')
+const { format } = require('date-and-time')
 
 // -----------------------------------------------------------------------------
 // String
@@ -50,12 +51,15 @@ exports.dateEpochMsToIso = (utcMs) => {
   }
 }
 
-exports.nowLocaleFormatted = () => {
-  const [date, month, year] = new Date().toLocaleDateString('fr-FR').split('/')
-  const [h, m, s] = new Date().toLocaleTimeString('fr-FR').split(/:| /)
-  return `${year}/${month}/${date} ${h}:${m}:${s}`
-}
+const LOG_DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss'
 
+exports.nowLocaleFormatted = () => {
+  return format(new Date(), LOG_DATE_FORMAT)
+  // const [date, month, year] = new Date().toLocaleDateString('fr-FR').split('/')
+  // const [h, m, s] = new Date().toLocaleTimeString('fr-FR').split(/:| /)
+  // return `${year}/${month}/${date} ${h}:${m}:${s}`
+}
+  
 // -----------------------------------------------------------------------------
 // Arrays
 // -----------------------------------------------------------------------------
@@ -219,7 +223,7 @@ exports.consoleLog = (mod, fun, msg) => {
 
 exports.consoleErr = (mod, fun, msg) => {
   const where = !mod ? fun : !fun ? mod : `${mod} . ${fun}`
-  console.error(this.nowLocaleFormatted(), '.error.', `[ ${where} ]`, msg.err)
+  console.error(this.nowLocaleFormatted(), '.error.', `[ ${where} ]`, msg.err || msg)
 }
 
 // -----------------------------------------------------------------------------

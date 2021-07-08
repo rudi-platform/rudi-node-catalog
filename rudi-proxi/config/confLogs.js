@@ -31,8 +31,8 @@ const utils = require('../utils/jsUtils')
 const errorLogsFileName = 'rudiProxi-errors.log'
 const errorDBLogsFileName = 'ff-errors.log'
 
-const logsTimestamp = 'YYYY/MM/DD HH:mm:ss'
-const fileTimestamp = 'YYYY-MM-DD-HH'
+exports.LOG_DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss'
+const fileTimestamp = 'YYYY-MM-DD-HH'   
 // const fileDatestamp = 'YYYY-MM-DD'
 
 // -----------------------------------------------------------------------------
@@ -76,7 +76,7 @@ winston.addColors({
 })
 
 const FORMAT_TIMESTAMP = {}
-FORMAT_TIMESTAMP.format = logsTimestamp
+FORMAT_TIMESTAMP.format = this.LOG_DATE_FORMAT
 const COLORIZE_ALL = {}
 COLORIZE_ALL.all = true
 const FORMAT_PRINTF = (info) => `${info.timestamp} .${info.level}. ${info.message}`
