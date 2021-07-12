@@ -1,13 +1,12 @@
 /* eslint-disable no-console */
 'use strict'
 
-const mod = 'loggingô'
+const mod = 'logging'
 // -----------------------------------------------------------------------------
 // Internal dependencies
 // -----------------------------------------------------------------------------
 const { logger } = require('../config/confLogs')
 const { consoleErr, displayStr } = require('./jsUtils')
-const { LogEntry } = require('../definitions/models/LogEntry')
 const { addLogEntry } = require('../db/dbQueries')
 
 // -----------------------------------------------------------------------------

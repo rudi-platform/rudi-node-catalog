@@ -31,10 +31,6 @@ const utils = require('../utils/jsUtils')
 const errorLogsFileName = 'rudiProxi-errors.log'
 const errorDBLogsFileName = 'ff-errors.log'
 
-exports.LOG_DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss'
-const fileTimestamp = 'YYYY-MM-DD-HH'   
-// const fileDatestamp = 'YYYY-MM-DD'
-
 // -----------------------------------------------------------------------------
 // Creating local log dir
 // -----------------------------------------------------------------------------
@@ -75,10 +71,9 @@ winston.addColors({
   debug: 'cyan',
 })
 
-const FORMAT_TIMESTAMP = {}
-FORMAT_TIMESTAMP.format = this.LOG_DATE_FORMAT
-const COLORIZE_ALL = {}
-COLORIZE_ALL.all = true
+const FORMAT_TIMESTAMP = { format: utils.LOG_DATE_FORMAT }
+const COLORIZE_ALL = { all: true }
+
 const FORMAT_PRINTF = (info) => `${info.timestamp} .${info.level}. ${info.message}`
 
 const formatConsoleLogs = winston.format.combine(
@@ -109,7 +104,7 @@ const logOutputs = {
     name: 'datedLogs',
     dirname: sys.LOG_DIR,
     filename: `${sys.APP_NAME}-%DATE%`,
-    datePattern: `${fileTimestamp}`,
+    datePattern: 'YYYY-MM-DD-HH',
     createSymlink: true,
     symlinkName: sys.SYMLINK_NAME,
     maxSize: '75m',
@@ -150,7 +145,6 @@ const logOutputs = {
   }),
   // - Write to the web
   // new(winston.transports.Http)({host: 'localhost', port: 3000, path: '/logs'}),
-  
 }
 
 // Loggers creation

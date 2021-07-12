@@ -11,10 +11,9 @@ const { v4 } = require('uuid')
 // -----------------------------------------------------------------------------
 // Internal dependancies
 // -----------------------------------------------------------------------------
-const { beautify, nowEpochMs } = require('../../utils/jsUtils')
+const { beautify, nowEpochMs, LOG_DATE_FORMAT } = require('../../utils/jsUtils')
 
 const { LOG_EXP } = require('../../config/confSystem')
-const { LOG_DATE_FORMAT } = require('../../config/confLogs')
 const { UUIDv4 } = require('../schemas/Identifiers')
 const { VALID_UUID, VALID_EPOCH_MS } = require('../schemaValidators')
 const { DB_ID, DB_V, DB_UPDATED_AT } = require('../../db/dbFields')

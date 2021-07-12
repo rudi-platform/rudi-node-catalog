@@ -51,10 +51,10 @@ exports.dateEpochMsToIso = (utcMs) => {
   }
 }
 
-const LOG_DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss'
+exports.LOG_DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss SSS'
 
 exports.nowLocaleFormatted = () => {
-  return format(new Date(), LOG_DATE_FORMAT)
+  return format(new Date(), this.LOG_DATE_FORMAT)
   // const [date, month, year] = new Date().toLocaleDateString('fr-FR').split('/')
   // const [h, m, s] = new Date().toLocaleTimeString('fr-FR').split(/:| /)
   // return `${year}/${month}/${date} ${h}:${m}:${s}`
