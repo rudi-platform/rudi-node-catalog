@@ -261,7 +261,7 @@
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    const collectionList = _.map(responseJson, 'name');",
-									"    pm.expect(collectionList).to.be.empty;",
+									"    pm.expect(collectionList.length).to.lte(1);",
 									"});"
 								],
 								"type": "text/javascript"
