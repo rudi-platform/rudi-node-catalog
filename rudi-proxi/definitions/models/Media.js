@@ -45,14 +45,14 @@ const UpdateStatus = [
 ]
 
 const InterfaceContract = {
-  Dwnl: 'dwnl'
+  Dwnl: 'dwnl',
 }
 
 const commonSchemaOptions = {
   discriminatorKey: 'media_type',
   timestamps: true,
   id: false,
-} 
+}
 
 // -----------------------------------------------------------------------------
 // Media schema definition
@@ -96,7 +96,7 @@ const MediaSchema = new mongoose.Schema(
 
 MediaSchema.pre('save', function (next) {
   const fun = 'pre save hook'
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   if (
     this[API_MEDIA_TYPE_PROPERTY] === MediaTypes.File &&
     !isNotEmptyObject(this[API_MEDIA_CHECKSUM_PROPERTY])
@@ -170,7 +170,7 @@ const FileSchema = new mongoose.Schema(
 
 FileSchema.pre('save', function (next) {
   const fun = 'pre save hook'
-  log.d('FileSchema', fun, ``)
+  // log.d('FileSchema', fun, ``)
   if (!isNotEmptyObject(this[API_MEDIA_CHECKSUM_PROPERTY])) {
     next(new Error(missingField(API_MEDIA_CHECKSUM_PROPERTY)))
   } else {
@@ -253,5 +253,5 @@ module.exports = {
   MediaFile,
   MediaSeries,
   MediaTypes,
-  InterfaceContract
+  InterfaceContract,
 }

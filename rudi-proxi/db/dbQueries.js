@@ -607,6 +607,15 @@ function toMongoSortOptions(initialCriteria, sortByFields, conculsionCriteria) {
   return [{ ...initialCriteria, ...sortOptions, ...conculsionCriteria }, listOptions]
 }
  */
+
+function addToFilterUpdated(filter, key, dateVal) {
+  const fun = 'addToFilterUpdated'
+  // log.d(mod, fun, ``)
+  const date = new Date(dateVal)
+  if (!filter.updatedAt) filter.updatedAt = {}
+  filter.updatedAt[key] = date
+}
+
 exports.getObjectList = async (objectType, options) => {
   const fun = `getObjectList`
   log.d(mod, fun, ``)
@@ -629,12 +638,9 @@ exports.getObjectList = async (objectType, options) => {
     log.d(mod, fun, `options: ${utils.beautify(options)}`)
 
     // Adapt filter with 'updated after/before'
-    if (!!updatedAfter) {
-      filter.updatedAt = { $gte: new Date(updatedAfter) }
-    }
-    if (!!updatedBefore) {
-      filter.updatedAt = { $lte: new Date(updatedBefore) }
-    }
+    if (!!updatedAfter) addToFilterUpdated(filter, '$gte', updatedAfter)
+    if (!!updatedBefore) addToFilterUpdated(filter, '$lte', updatedBefore)
+
     log.d(mod, fun, `filter: ${utils.beautify(filter)}`)
 
     // const [sortOptions] = toMongoSortOptions({}, sortBy, { [idField]: 1 })
@@ -712,13 +718,8 @@ exports.groupObjectList = async (objectType, unionField, options) => {
     const updatedBefore = options[QUERY_UPDATED_BEFORE]
 
     // Adapt filter with 'updated after/before'
-    if (!!updatedAfter) {
-      filter.updatedAt = { $gte: new Date(updatedAfter) }
-    }
-    if (!!updatedBefore) {
-      filter.updatedAt = { $lte: new Date(updatedBefore) }
-    }
-    log.d(mod, fun, `filter: ${utils.beautify(filter)}`)
+    if (!!updatedAfter) addToFilterUpdated(filter, '$gte', updatedAfter)
+    if (!!updatedBefore) addToFilterUpdated(filter, '$lte', updatedBefore)
 
     // Prepare sortBy options for MongoDB
     const groupList = 'list'
@@ -843,14 +844,9 @@ exports.countObjectList = async (objectType, unionField, options) => {
     const updatedBefore = options[QUERY_UPDATED_BEFORE]
 
     // Adapt filter with 'updated after/before'
-    if (!!updatedAfter) {
-      filter.updatedAt = { $gte: new Date(updatedAfter) }
-    }
-    if (!!updatedBefore) {
-      filter.updatedAt = { $lte: new Date(updatedBefore) }
-    }
-    log.d(mod, fun, `filter: ${utils.beautify(filter)}`)
-    
+    if (!!updatedAfter) addToFilterUpdated(filter, '$gte', updatedAfter)
+    if (!!updatedBefore) addToFilterUpdated(filter, '$lte', updatedBefore)
+
     //--- Aggregation
     let aggregateOptions = [
       { $match: filter },

@@ -1780,19 +1780,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?limit=50",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{apiUrl}}",
 								"{{data}}"
-							],
-							"query": [
-								{
-									"key": "limit",
-									"value": "50"
-								}
 							]
 						}
 					},
@@ -3394,7 +3388,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{logs}}?log_level=info&limit=20&time={\"$gte\":1625757072442}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{logs}}?limit=20",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -3404,16 +3398,8 @@
 							],
 							"query": [
 								{
-									"key": "log_level",
-									"value": "info"
-								},
-								{
 									"key": "limit",
 									"value": "20"
-								},
-								{
-									"key": "time",
-									"value": "{\"$gte\":1625757072442}"
 								}
 							]
 						}

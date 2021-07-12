@@ -174,8 +174,6 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
         case QUERY_UPDATED_AFTER:
         case QUERY_UPDATED_BEFORE:
           const valueClean = value.replace(/[\'\"\`]/g, '')
-          log.d(mod, fun, `Key: '${key}', Value: '${valueClean}'`)
-
           if (valueClean.match(new RegExp(/^[0-9]{10}$/))) {
             returnedFilter[key] = new Date(parseInt(valueClean * 1000))
           } else if (valueClean.match(new RegExp(/^[0-9]{13}$/))) {

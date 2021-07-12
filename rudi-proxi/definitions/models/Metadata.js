@@ -716,21 +716,33 @@ MetadataSchema.pre('save', async function (next) {
     // If 'temporal_spread' is defined, the field 'start_date' should be defined
     json.requireSubProperty(metadata, API_PERIOD_PROPERTY, API_START_DATE_PROPERTY)
 
-    checkDates(metadata[API_PERIOD_PROPERTY], API_START_DATE_PROPERTY, API_END_DATE_PROPERTY)
-
-    checkDates(
-      metadata[API_DATA_DATES_PROPERTY],
-      API_DATES_CREATED_PROPERTY,
-      API_DATES_EDITED_PROPERTY,
-      true // If 'dataset_dates.updated' is not defined, it is initialized with 'dataset_dates.created'
-    )
-
-    checkDates(
-      metadata[API_DATA_DATES_PROPERTY],
-      API_DATES_CREATED_PROPERTY,
-      API_DATES_PUBLISHED_PROPERTY
-    )
-
+    try {
+      checkDates(metadata[API_PERIOD_PROPERTY], API_START_DATE_PROPERTY, API_END_DATE_PROPERTY)
+    } catch (err) {
+      metadata[API_PERIOD_PROPERTY][API_START_DATE_PROPERTY] =
+        metadata[API_PERIOD_PROPERTY][API_END_DATE_PROPERTY]
+    }
+    try {
+      checkDates(
+        metadata[API_DATA_DATES_PROPERTY],
+        API_DATES_CREATED_PROPERTY,
+        API_DATES_EDITED_PROPERTY,
+        true // If 'dataset_dates.updated' is not defined, it is initialized with 'dataset_dates.created'
+      )
+    } catch (err) {
+      metadata[API_DATA_DATES_PROPERTY][API_DATES_CREATED_PROPERTY] =
+        metadata[API_DATA_DATES_PROPERTY][API_DATES_EDITED_PROPERTY]
+    }
+    try {
+      checkDates(
+        metadata[API_DATA_DATES_PROPERTY],
+        API_DATES_CREATED_PROPERTY,
+        API_DATES_PUBLISHED_PROPERTY
+      )
+    } catch (err) {
+      metadata[API_DATA_DATES_PROPERTY][API_DATES_PUBLISHED_PROPERTY] =
+        metadata[API_DATA_DATES_PROPERTY][API_DATES_CREATED_PROPERTY]
+    }
     // Checking 'licence' field
     await checkLicence(metadata)
 
