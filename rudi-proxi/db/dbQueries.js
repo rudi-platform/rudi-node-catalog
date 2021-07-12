@@ -44,6 +44,8 @@ const {
   QUERY_SORT_BY,
   PARAM_LOGS_LINES,
   PARAM_OBJECT_LOGS,
+  QUERY_UPDATED_AFTER,
+  QUERY_UPDATED_BEFORE,
 } = require('../config/confApi')
 
 // Fields from the JSON as definied in the API
@@ -619,9 +621,21 @@ exports.getObjectList = async (objectType, options) => {
     const filter = options[QUERY_FILTER] || {}
     const fields = options[QUERY_FIELDS]
     const sortByFields = options[QUERY_SORT_BY]
+    const updatedAfter = options[QUERY_UPDATED_AFTER]
+    const updatedBefore = options[QUERY_UPDATED_BEFORE]
+
     const populateFields = getPopulateFields(objectType)
 
     log.d(mod, fun, `options: ${utils.beautify(options)}`)
+
+    // Adapt filter with 'updated after/before'
+    if (!!updatedAfter) {
+      filter.updatedAt = { $gte: new Date(updatedAfter) }
+    }
+    if (!!updatedBefore) {
+      filter.updatedAt = { $lte: new Date(updatedBefore) }
+    }
+    log.d(mod, fun, `filter: ${utils.beautify(filter)}`)
 
     // const [sortOptions] = toMongoSortOptions({}, sortBy, { [idField]: 1 })
     const sortOptions = {}
@@ -694,15 +708,22 @@ exports.groupObjectList = async (objectType, unionField, options) => {
     const filter = options[QUERY_FILTER] || {}
     const fieldsToKeep = options[QUERY_FIELDS]
     const sortByFields = options[QUERY_SORT_BY]
+    const updatedAfter = options[QUERY_UPDATED_AFTER]
+    const updatedBefore = options[QUERY_UPDATED_BEFORE]
+
+    // Adapt filter with 'updated after/before'
+    if (!!updatedAfter) {
+      filter.updatedAt = { $gte: new Date(updatedAfter) }
+    }
+    if (!!updatedBefore) {
+      filter.updatedAt = { $lte: new Date(updatedBefore) }
+    }
+    log.d(mod, fun, `filter: ${utils.beautify(filter)}`)
 
     // Prepare sortBy options for MongoDB
     const groupList = 'list'
     const genField = 'field'
     const objId = 'obj_id'
-
-    // const [sortOptions, listOptions] = toMongoSortOptions({ count: -1, _id: 1 }, sortByFields, {
-    //   id: 1,
-    // })
 
     const sortOptions = { count: -1, _id: 1 }
     const listOptions = { [objId]: '$_id' }
@@ -818,7 +839,18 @@ exports.countObjectList = async (objectType, unionField, options) => {
     const offset = options[QUERY_OFFSET] || DEFAULT_QUERY_OFFSET
     const filter = options[QUERY_FILTER] || {}
     const sortBy = options[QUERY_SORT_BY]
+    const updatedAfter = options[QUERY_UPDATED_AFTER]
+    const updatedBefore = options[QUERY_UPDATED_BEFORE]
 
+    // Adapt filter with 'updated after/before'
+    if (!!updatedAfter) {
+      filter.updatedAt = { $gte: new Date(updatedAfter) }
+    }
+    if (!!updatedBefore) {
+      filter.updatedAt = { $lte: new Date(updatedBefore) }
+    }
+    log.d(mod, fun, `filter: ${utils.beautify(filter)}`)
+    
     //--- Aggregation
     let aggregateOptions = [
       { $match: filter },

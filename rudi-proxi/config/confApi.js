@@ -53,6 +53,9 @@ exports.QUERY_COUNT_BY = 'count_by'
 exports.QUERY_GROUP_BY = 'group_by'
 exports.QUERY_GROUP_LIMIT = 'group_limit'
 exports.QUERY_GROUP_OFFSET = 'group_offset'
+exports.QUERY_UPDATED_AFTER = 'updated_after'
+exports.QUERY_UPDATED_BEFORE = 'updated_before'
+exports.QUERY_CONFIRM = 'confirm'
 exports.QUERY_CONFIRM = 'confirm'
 
 exports.DEFAULT_QUERY_LIMIT = 100

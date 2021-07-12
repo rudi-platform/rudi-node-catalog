@@ -63,6 +63,8 @@ const {
   URL_OBJECTS,
   QUERY_CONFIRM,
   URL_PV_OBJECT_GENERIC,
+  QUERY_UPDATED_AFTER,
+  QUERY_UPDATED_BEFORE,
 } = require('../config/confApi')
 
 const {
@@ -112,6 +114,8 @@ const QUERY_RESERVED_WORDS = [
   QUERY_GROUP_BY,
   QUERY_GROUP_LIMIT,
   QUERY_GROUP_OFFSET,
+  QUERY_UPDATED_AFTER,
+  QUERY_UPDATED_BEFORE,
   QUERY_CONFIRM,
 ]
 
@@ -166,6 +170,19 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
         case QUERY_GROUP_BY:
         case QUERY_COUNT_BY:
           returnedFilter[key] = value
+          break
+        case QUERY_UPDATED_AFTER:
+        case QUERY_UPDATED_BEFORE:
+          const valueClean = value.replace(/[\'\"\`]/g, '')
+          log.d(mod, fun, `Key: '${key}', Value: '${valueClean}'`)
+
+          if (valueClean.match(new RegExp(/^[0-9]{10}$/))) {
+            returnedFilter[key] = new Date(parseInt(valueClean * 1000))
+          } else if (valueClean.match(new RegExp(/^[0-9]{13}$/))) {
+            returnedFilter[key] = new Date(parseInt(valueClean))
+          } else {
+            returnedFilter[key] = new Date(valueClean)
+          }
           break
         case QUERY_CONFIRM:
           if (['false', '0', 'null', 'no'].includes(value)) break
@@ -448,6 +465,8 @@ exports.getManyObjects = async (objectType, req, reply) => {
         QUERY_SORT_BY,
         QUERY_FILTER,
         QUERY_FIELDS,
+        QUERY_UPDATED_AFTER,
+        QUERY_UPDATED_BEFORE,
       ])
       objectList = await db.getObjectList(objectType, options)
     } else if (groupBy) {
@@ -463,6 +482,8 @@ exports.getManyObjects = async (objectType, req, reply) => {
         QUERY_SORT_BY,
         QUERY_GROUP_LIMIT,
         QUERY_GROUP_OFFSET,
+        QUERY_UPDATED_AFTER,
+        QUERY_UPDATED_BEFORE,
       ])
       objectList = await db.groupObjectList(objectType, groupBy, options)
     } else {
@@ -472,6 +493,8 @@ exports.getManyObjects = async (objectType, req, reply) => {
         QUERY_OFFSET,
         QUERY_FILTER,
         QUERY_FIELDS,
+        QUERY_UPDATED_AFTER,
+        QUERY_UPDATED_BEFORE,
       ])
 
       objectList = await db.countObjectList(objectType, countBy, options)

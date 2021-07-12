@@ -166,7 +166,7 @@ exports.mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFound) 
 
         // log.d(mod, fun, `rudiMedia[API_MEDIA_TYPE_PROPERTY]: ${utils.beautify(rudiMedia[API_MEDIA_TYPE_PROPERTY])}`)
         const media = new Media(rudiMedia)
-        log.d(mod, fun, `new Media: ${utils.beautify(media)}`)
+        // log.d(mod, fun, `new Media: ${utils.beautify(media)}`)
 
         // log.d(mod, fun, media)
         const dbActionResult = await media.save()
@@ -413,26 +413,26 @@ exports.setGeography = (metadata) => {
   const geography = metadata[API_GEOGRAPHY_PROPERTY]
   if (utils.isNothing(geography)) {
     // No 'geography' property => exit
-    log.d(mod, fun, `No '${API_GEOGRAPHY_PROPERTY}' property was set`)
+    // log.d(mod, fun, `No '${API_GEOGRAPHY_PROPERTY}' property was set`)
     return
   }
 
   const bbox = geography[API_GEO_BBOX_PROPERTY]
   const geojson = geography[API_GEO_GEOJSON_PROPERTY]
-  log.d(mod, fun, `bbox: ${utils.beautify(bbox)}`)
-  log.d(mod, fun, `geojson: ${utils.beautify(geojson)}`)
+  // log.d(mod, fun, `bbox: ${utils.beautify(bbox)}`)
+  // log.d(mod, fun, `geojson: ${utils.beautify(geojson)}`)
 
   if (utils.isNothing(bbox)) {
     // No 'bounding_box' property
-    log.d(mod, fun, `No '${API_GEO_BBOX_PROPERTY}' property was set`)
+    // log.d(mod, fun, `No '${API_GEO_BBOX_PROPERTY}' property was set`)
     if (utils.isNothing(geojson)) {
       // No 'bounding_box' property nor GeoJSON => problem
-      log.d(mod, fun, `No '${API_GEO_GEOJSON_PROPERTY}' property was set`)
+      // log.d(mod, fun, `No '${API_GEO_GEOJSON_PROPERTY}' property was set`)
       // No geographic information
       // TODO: (If shouldBeStrict: error => bbox is mandatory if 'geography' is set!)
       return
     } else {
-      log.d(mod, fun, `'${API_GEO_GEOJSON_PROPERTY}' property already set`)
+      // log.d(mod, fun, `'${API_GEO_GEOJSON_PROPERTY}' property already set`)
       // No 'bounding_box' property but GeoJSON => extract bounding box from GeoJSON !
       // GeoJsonToBbox GeoJSON =
       //    1. extract 'geography.geographic_distribution.bbox'
@@ -447,16 +447,17 @@ exports.setGeography = (metadata) => {
       `Both '${API_GEO_BBOX_PROPERTY}' ` +
       `and '${API_GEO_GEOJSON_PROPERTY}' properties are already set`
 
-    log.d(mod, fun, msg)
-    log.d(mod, fun, `'${API_GEO_BBOX_PROPERTY}' = ${utils.beautify(bbox)}`)
-    log.d(mod, fun, `'${API_GEO_GEOJSON_PROPERTY}' = ${utils.beautify(geojson)}`)
+    // log.d(mod, fun, msg)
+    // log.d(mod, fun, `'${API_GEO_BBOX_PROPERTY}' = ${utils.beautify(bbox)}`)
+    // log.d(mod, fun, `'${API_GEO_GEOJSON_PROPERTY}' = ${utils.beautify(geojson)}`)
+
     // TODO: check that 'geographic_distribution' property is a valid GeoJSON
     // TODO: set bbox property if not set
     // TODO: check that bbox subproperty is coherent with 'geography.bounding_box' coordinates
     return
   }
 
-  log.d(mod, fun, `Extracting '${API_GEO_GEOJSON_PROPERTY}' from '${API_GEO_BBOX_PROPERTY}'`)
+  // log.d(mod, fun, `Extracting '${API_GEO_GEOJSON_PROPERTY}' from '${API_GEO_BBOX_PROPERTY}'`)
 
   // No GeoJSON but 'bounding_box' property is set => extract GeoJSON from bbox property
 

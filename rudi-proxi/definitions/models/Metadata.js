@@ -572,10 +572,10 @@ async function checkThesaurus(metadata) {
       throw new Error(msg.incorrectVal(API_THEME_PROPERTY, theme))
 
     const keywords = metadata[API_KEYWORDS_PROPERTY]
-    log.d(mod, fun, `keywords: ${utils.beautify(keywords)}`)
+    // log.d(mod, fun, `keywords: ${utils.beautify(keywords)}`)
     await Promise.all(
       keywords.map((keyword) => {
-        log.d(mod, fun, `keyword: ${keyword}`)
+        // log.d(mod, fun, `keyword: ${keyword}`)
         if (!Keywords.isValid(keyword, shouldInit))
           throw new Error(msg.incorrectVal('keywords', keyword))
         return true
