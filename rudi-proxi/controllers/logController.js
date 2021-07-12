@@ -15,9 +15,20 @@ const log = require('../utils/logging')
 const { consoleLog, consoleErr, beautify } = require('../utils/jsUtils')
 
 const { getLogEntries } = require('../db/dbQueries')
+const { parseQueryParameters } = require('./genericController')
 const { logLineToString } = require('../definitions/models/LogEntry')
 
-const { URL_PV_LOGS_ACCESS, PARAM_LOGS_LINES, QUERY_LIMIT } = require('../config/confApi')
+const {
+  URL_PV_LOGS_ACCESS,
+  PARAM_LOGS_LINES,
+  QUERY_LIMIT,
+  QUERY_OFFSET,
+  DEFAULT_QUERY_OFFSET,
+  PARAM_OBJECT_LOGS,
+  QUERY_FILTER,
+  QUERY_FIELDS,
+} = require('../config/confApi')
+const { pick } = require('lodash')
 
 // -----------------------------------------------------------------------------
 // Logs API access
@@ -25,20 +36,22 @@ const { URL_PV_LOGS_ACCESS, PARAM_LOGS_LINES, QUERY_LIMIT } = require('../config
 const NB_LOG_LINES_DEFAULT = 100
 const LOG_FILE = `${sys.LOG_DIR}/${sys.SYMLINK_NAME}`
 
+// obsolete
 exports.getLogs = async (req, reply) => {
   const fun = 'getLogs'
   try {
     log.d(mod, fun, `GET ${URL_PV_LOGS_ACCESS}`)
-    /*
-    const readOptions = {
-      encoding: 'utf8',
-      flag: 'r'
+    let parsedParameters
+    try {
+      parsedParameters = await parseQueryParameters(PARAM_OBJECT_LOGS, req.url)
+    } catch (err) {
+      log.w(mod, fun, err)
+      return []
     }
-    const logs = fs.readFileSync(sys.OUT_LOG, readOptions)
-    */
-    const nbLines = parseInt(req.query[PARAM_LOGS_LINES] || req.query[QUERY_LIMIT] || NB_LOG_LINES_DEFAULT)
-    const logLines = await getLogEntries(nbLines)
-    return logLines.map((logLine) => logLineToString(logLine))
+    const options = pick(parsedParameters, [QUERY_LIMIT, QUERY_OFFSET, QUERY_FILTER, QUERY_FIELDS])
+
+    const logLines = await getLogEntries(options)
+    return logLines //.map((logLine) => logLineToString(logLine))
   } catch (err) {
     consoleErr(mod, fun, err)
     throw boomify(err)

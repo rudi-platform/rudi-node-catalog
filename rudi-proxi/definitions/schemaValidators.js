@@ -19,11 +19,19 @@ exports.validateSchema = (schemaStr, regExPattern) => {
 }
 
 // -----------------------------------------------------------------------------
+// Epoch time
+// -----------------------------------------------------------------------------
+exports.EPOCH_MS = /^[0-9]{13}$/
+exports.VALID_EPOCH_MS = [this.EPOCH_MS, `'{VALUE}' is not a valid Epoch time in milliseconds`]
+
+exports.EPOCH_S = /^[0-9]{10}$/
+exports.VALID_EPOCH_S = [this.EPOCH_S, `'{VALUE}' is not a valid Epoch time in seconds`]
+
+// -----------------------------------------------------------------------------
 // UUID
 // -----------------------------------------------------------------------------
 
-exports.REGEX_UUID =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+exports.REGEX_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 exports.VALID_UUID = [this.REGEX_UUID, `'{VALUE}' is not a valid UUID v4`]
 
 exports.isUUID = (id) => {

@@ -427,12 +427,12 @@ exports.setGeography = (metadata) => {
     log.d(mod, fun, `No '${API_GEO_BBOX_PROPERTY}' property was set`)
     if (utils.isNothing(geojson)) {
       // No 'bounding_box' property nor GeoJSON => problem
-      log.d(mod, fun, `No '${  API_GEO_GEOJSON_PROPERTY}' property was set`)
+      log.d(mod, fun, `No '${API_GEO_GEOJSON_PROPERTY}' property was set`)
       // No geographic information
       // TODO: (If shouldBeStrict: error => bbox is mandatory if 'geography' is set!)
       return
     } else {
-      log.d(mod, fun, `'${  API_GEO_GEOJSON_PROPERTY}' property already set`)
+      log.d(mod, fun, `'${API_GEO_GEOJSON_PROPERTY}' property already set`)
       // No 'bounding_box' property but GeoJSON => extract bounding box from GeoJSON !
       // GeoJsonToBbox GeoJSON =
       //    1. extract 'geography.geographic_distribution.bbox'
@@ -445,11 +445,11 @@ exports.setGeography = (metadata) => {
     // Both GeoJSON and 'bounding_box' properties are set => exit
     const msg =
       `Both '${API_GEO_BBOX_PROPERTY}' ` +
-      `and '${  API_GEO_GEOJSON_PROPERTY}' properties are already set`
+      `and '${API_GEO_GEOJSON_PROPERTY}' properties are already set`
 
     log.d(mod, fun, msg)
     log.d(mod, fun, `'${API_GEO_BBOX_PROPERTY}' = ${utils.beautify(bbox)}`)
-    log.d(mod, fun, `'${  API_GEO_GEOJSON_PROPERTY}' = ${utils.beautify(geojson)}`)
+    log.d(mod, fun, `'${API_GEO_GEOJSON_PROPERTY}' = ${utils.beautify(geojson)}`)
     // TODO: check that 'geographic_distribution' property is a valid GeoJSON
     // TODO: set bbox property if not set
     // TODO: check that bbox subproperty is coherent with 'geography.bounding_box' coordinates
@@ -470,7 +470,7 @@ exports.setGeography = (metadata) => {
   const east = bbox[API_GEO_BBOX_EAST]
   const north = bbox[API_GEO_BBOX_NORTH]
 
-  metadata[API_GEOGRAPHY_PROPERTY][  API_GEO_GEOJSON_PROPERTY] = geo.bboxToGeoJsonPolygon(
+  metadata[API_GEOGRAPHY_PROPERTY][API_GEO_GEOJSON_PROPERTY] = geo.bboxToGeoJsonPolygon(
     west,
     south,
     east,
@@ -501,7 +501,7 @@ exports.newMetadata = async (rudiMetadata) => {
     log.w(
       mod,
       fun,
-      `New object '${PARAM_OBJECT_METADATA}': ${utils.beautify(dbReadyObject)} | Error: ${err}`
+      `New object '${PARAM_OBJECT_METADATA}': ${dbReadyObject[API_METADATA_ID]} | Error: ${err}`
     )
     throw err
   }
@@ -511,7 +511,7 @@ exports.newMetadata = async (rudiMetadata) => {
     log.w(
       mod,
       fun,
-      `Saving object '${PARAM_OBJECT_METADATA}': ${utils.beautify(dbMetadata)} | Error: ${err}`
+      `Saving object '${PARAM_OBJECT_METADATA}': ${dbMetadata[API_METADATA_ID]} | Error: ${err}`
     )
     throw err
   }
@@ -649,7 +649,6 @@ exports.getSingleMetadata = async (req, reply) => {
     const dbObject = await db.getEnsuredMetadataWithRudiId(objectId)
     // return the object
     return dbObject
-
   } catch (err) {
     log.e(mod, fun, err)
     throw boomify(err)
@@ -665,7 +664,6 @@ exports.getMetadataList = async (req, reply) => {
   log.v(mod, fun, `< GET ${URL_PUB_METADATA}`)
   try {
     return await genericController.getManyObjects(PARAM_OBJECT_METADATA, req, reply)
-
   } catch (err) {
     log.e(mod, fun, err)
     throw boomify(err)

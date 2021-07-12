@@ -59,7 +59,7 @@ exports.nowLocaleFormatted = () => {
   // const [h, m, s] = new Date().toLocaleTimeString('fr-FR').split(/:| /)
   // return `${year}/${month}/${date} ${h}:${m}:${s}`
 }
-  
+
 // -----------------------------------------------------------------------------
 // Arrays
 // -----------------------------------------------------------------------------
@@ -207,23 +207,27 @@ exports.deepClone = (jsonObject) => {
 // Basic logging
 // -----------------------------------------------------------------------------
 exports.separateLogs = (insertStr) => {
-  console.log(
-    this.nowLocaleFormatted(),
-    !insertStr
-      ? `--------------------------------------------------------------------------`
-      : `---------------------------------------------------------------[${insertStr}]--`
-  )
+  const logSeparator = !insertStr
+    ? `--------------------------------------------------------------------------`
+    : `---------------------------------------------------------------[${insertStr}]--`
+  console.log(this.nowLocaleFormatted(), logSeparator)
+  return logSeparator
 }
 
-exports.consoleLog = (mod, fun, msg) => {
-  const where = !mod ? fun : !fun ? mod : `${mod} . ${fun}`
-  const what = !msg || msg === '' ? '<-' : msg
-  console.log(this.nowLocaleFormatted(), '.debug.', `[ ${where} ]`, what)
+exports.logWhere = (loc_mod, loc_fun) => {
+  return !loc_mod ? loc_fun : !loc_fun ? loc_mod : `${loc_mod} . ${loc_fun}`
 }
 
-exports.consoleErr = (mod, fun, msg) => {
-  const where = !mod ? fun : !fun ? mod : `${mod} . ${fun}`
-  console.error(this.nowLocaleFormatted(), '.error.', `[ ${where} ]`, msg.err || msg)
+exports.displayStr = (loc_mod, loc_fun, msg) => {
+  return `[ ${this.logWhere(loc_mod, loc_fun)} ] ${msg !== '' ? msg : '<-'}`
+}
+exports.consoleLog = (loc_mod, loc_fun, msg) => {
+  console.log(this.nowLocaleFormatted(), '.debug.', this.displayStr(loc_mod, loc_fun, msg))
+}
+
+exports.consoleErr = (loc_mod, loc_fun, msg) => {
+  const errMsg = msg.err || msg
+  console.error(this.nowLocaleFormatted(), '.error.', this.displayStr(loc_mod, loc_fun, errMsg))
 }
 
 // -----------------------------------------------------------------------------

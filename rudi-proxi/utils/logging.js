@@ -1,11 +1,12 @@
 /* eslint-disable no-console */
 'use strict'
 
+const mod = 'loggingô'
 // -----------------------------------------------------------------------------
 // Internal dependencies
 // -----------------------------------------------------------------------------
 const { logger } = require('../config/confLogs')
-const { consoleErr } = require('./jsUtils')
+const { consoleErr, displayStr } = require('./jsUtils')
 const { LogEntry } = require('../definitions/models/LogEntry')
 const { addLogEntry } = require('../db/dbQueries')
 
@@ -77,13 +78,6 @@ const Colors = {
 //   display(logLvl, `. ${displayStr(mod, fun, msg)}`)
 // }
 
-function displayStr(mod, fun, msg) {
-  if (mod === '') {
-    return `[ ${fun} ] ${msg !== '' ? msg : '<-'}`
-  } else {
-    return `[ ${mod} . ${fun} ] ${msg !== '' ? msg : '<-'}`
-  }
-}
 
 // -----------------------------------------------------------------------------
 // Logging functions
@@ -97,6 +91,10 @@ function displayStr(mod, fun, msg) {
 exports.e = (mod, fun, msg) => {
   logger.error(displayStr(mod, fun, msg))
   // displayFunc(ERROR, fun, msg)
+  const logLevel = 'error'
+  addLogEntry(logLevel, mod, fun, msg).catch((err) =>
+    consoleErr(mod, fun, `${logLevel} logging failed: msg: ${msg}, err: ${err}`)
+  )
 }
 
 exports.w = (mod, fun, msg) => {
@@ -104,24 +102,37 @@ exports.w = (mod, fun, msg) => {
 
   // if (LOG_LVL < levels.warning) return
   // displayFunc(WARNING, fun, msg)
+  const logLevel = 'warn'
+  addLogEntry(logLevel, mod, fun, msg).catch((err) =>
+    consoleErr(mod, fun, `${logLevel} logging failed: msg: ${msg}, err: ${err}`)
+  )
 }
 
 exports.i = (mod, fun, msg) => {
   logger.info(displayStr(mod, fun, msg))
   // if (LOG_LVL < levels.info) return
   // displayFunc(INFO, fun, msg)
+  const logLevel = 'info'
+  addLogEntry(logLevel, mod, fun, msg).catch((err) =>
+    consoleErr(mod, fun, `${logLevel} logging failed: msg: ${msg}, err: ${err}`)
+  )
 }
 
 exports.v = (mod, fun, msg) => {
   logger.verbose(displayStr(mod, fun, msg))
   // if (LOG_LVL < levels.verbose) return
   // displayFunc(VERBOSE, fun, msg)
+  const logLevel = 'verbose'
+  addLogEntry(logLevel, mod, fun, msg).catch((err) =>
+    consoleErr(mod, fun, `${logLevel} logging failed: msg: ${msg}, err: ${err}`)
+  )
 }
 
 exports.d = (mod, fun, msg) => {
   logger.debug(displayStr(mod, fun, msg))
-  addLogEntry('debug', mod, fun, msg).catch((err) =>
-    consoleErr(mod, fun, `Logging failed: msg=${msg}, err: ${err}`)
+  const logLevel = 'debug'
+  addLogEntry(logLevel, mod, fun, msg).catch((err) =>
+    consoleErr(mod, fun, `${logLevel} logging failed: msg: ${msg}, err: ${err}`)
   )
   // if (LOG_LVL < levels.debug) return
   // displayFunc(DEBUG, fun, msg)
@@ -133,7 +144,7 @@ exports.d = (mod, fun, msg) => {
 
 exports.logRequest = (req, res) => {
   const fun = 'request'
-  this.i('', fun, `${req.method} ${req.url} <- ${req.ip} `)
+  this.i('http', fun, `${req.method} ${req.url} <- ${req.ip} `)
   // return
   // this.d(mod, fun, `method: ${utils.beautify(req.method)}`)
   // this.d(mod, fun, `url: ${utils.beautify(req.url)}`)

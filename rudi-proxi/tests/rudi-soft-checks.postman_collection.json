@@ -3382,6 +3382,8 @@
 								"exec": [
 									"pm.test(\"Accessing logs\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const response = pm.response.json()",
+									"    pm.expect(response.length).to.eq(20)",
 									"});"
 								],
 								"type": "text/javascript"
@@ -3392,14 +3394,27 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{logs}}/100",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{logs}}?log_level=info&limit=20&time={\"$gte\":1625757072442}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{adminUrl}}",
-								"{{logs}}",
-								"100"
+								"{{logs}}"
+							],
+							"query": [
+								{
+									"key": "log_level",
+									"value": "info"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "time",
+									"value": "{\"$gte\":1625757072442}"
+								}
 							]
 						}
 					},

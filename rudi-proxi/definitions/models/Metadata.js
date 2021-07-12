@@ -657,7 +657,7 @@ function checkDates(datesObj, firstDateProp, secondDateProp, shouldInitialize) {
         datesObj[secondDateProp] = datesObj[firstDateProp]
       return
     }
-  
+
     const date1 = toDate(datesObj[firstDateProp])
     const date2 = toDate(datesObj[secondDateProp])
 

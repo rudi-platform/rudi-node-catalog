@@ -42,6 +42,8 @@ const {
   QUERY_GROUP_LIMIT,
   QUERY_GROUP_OFFSET,
   QUERY_SORT_BY,
+  PARAM_LOGS_LINES,
+  PARAM_OBJECT_LOGS,
 } = require('../config/confApi')
 
 // Fields from the JSON as definied in the API
@@ -63,6 +65,7 @@ const {
   API_SKOS_CONCEPT_ROLE,
   FIELDS_TO_SKIP,
   API_MEDIA_PROPERTY,
+  LOG_ID,
 } = require('./dbFields')
 
 const { JWT_EXP } = require('../config/confPortal')
@@ -81,7 +84,7 @@ const { Media } = require('../definitions/models/Media')
 const { Metadata, METADATA_FIELDS_TO_POPULATE } = require('../definitions/models/Metadata')
 
 const { Report } = require('../definitions/models/Report')
-const { LogEntry, makeLogInfo } = require('../definitions/models/LogEntry')
+const { LogEntry, makeLogInfo, logLineToString } = require('../definitions/models/LogEntry')
 
 // -----------------------------------------------------------------------------
 // Properties with special treatments
@@ -101,6 +104,7 @@ const OBJ_MODEL = {
   [PARAM_OBJECT_SKOS_CONCEPT]: SkosConcept,
   [URL_SUFFIX_LICENCE]: SkosConcept,
   [PARAM_ACTION_REPORT]: Report,
+  [PARAM_OBJECT_LOGS]: LogEntry,
 }
 
 const ID_PROP = {
@@ -112,6 +116,7 @@ const ID_PROP = {
   [PARAM_OBJECT_SKOS_CONCEPT]: API_SKOS_CONCEPT_ID,
   [URL_SUFFIX_LICENCE]: API_SKOS_CONCEPT_ID,
   [PARAM_ACTION_REPORT]: API_REPORT_ID,
+  [PARAM_OBJECT_LOGS]: LOG_ID,
 }
 
 function assertIsString(fun, param) {
@@ -409,7 +414,7 @@ exports.doesObjectExistWithRudiId = async (objectType, rudiId) => {
 
 exports.doesObjectExistWithJson = async (objectType, rudiObject) => {
   const fun = `doesObjectExistWithJson`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   try {
     const dbObject = await this.getObjectWithJson(objectType, rudiObject)
     return !!dbObject
@@ -726,7 +731,7 @@ exports.groupObjectList = async (objectType, unionField, options) => {
     log.d(mod, fun, `sortOptions: ${utils.beautify(sortOptions)}`)
 
     //--- Aggregation
-    let aggregateOptions = [
+    const aggregateOptions = [
       { $match: filter },
       { $unwind: `$${pivot}` },
       {
@@ -1650,16 +1655,27 @@ exports.addLogEntry = async (logLvl, loc_module, loc_function, msg) => {
   }
 }
 
-exports.getLogEntries = async (nbLines) => {
+exports.getLogEntries = async (options) => {
   const fun = 'getLogEntries'
   try {
-    utils.consoleLog(mod, fun, ``)
-    return await LogEntry.aggregate([
-      { $sort: { createdAt: -1 } },
-      { $limit: nbLines },
-      { $sort: { createdAt: 1 } },
-    ])
-    // .find({}).sort({ createdAt: -1 }).limit(nbLines).sort({ createdAt: 1 })
+    log.d(mod, fun, `options: ${utils.beautify(options)}`)
+    // Extract options
+    const limit = options[QUERY_LIMIT] || DEFAULT_QUERY_LIMIT
+    const offset = options[QUERY_OFFSET] || DEFAULT_QUERY_OFFSET
+    const filter = options[QUERY_FILTER] || {}
+
+    const aggregateOptions = [
+      { $match: filter },
+      { $sort: { time: -1, _id: 1 } },
+      { $skip: offset },
+      { $limit: limit },
+      { $sort: { time: 1, _id: 1 } },
+    ]
+
+    log.d(mod, fun, `aggregateOptions: ${utils.beautify(aggregateOptions)}`)
+    const logLines = await LogEntry.aggregate(aggregateOptions).exec()
+
+    return logLines.map(logLineToString)
   } catch (err) {
     throw err
   }

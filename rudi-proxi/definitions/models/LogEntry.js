@@ -11,12 +11,12 @@ const { v4 } = require('uuid')
 // -----------------------------------------------------------------------------
 // Internal dependancies
 // -----------------------------------------------------------------------------
-const { beautify } = require('../../utils/jsUtils')
+const { beautify, nowEpochMs } = require('../../utils/jsUtils')
 
 const { LOG_EXP } = require('../../config/confSystem')
 const { LOG_DATE_FORMAT } = require('../../config/confLogs')
 const { UUIDv4 } = require('../schemas/Identifiers')
-const { VALID_UUID } = require('../schemaValidators')
+const { VALID_UUID, VALID_EPOCH_MS } = require('../schemaValidators')
 const { DB_ID, DB_V, DB_UPDATED_AT } = require('../../db/dbFields')
 
 // -----------------------------------------------------------------------------
@@ -39,6 +39,14 @@ const LogEntrySchema = new Schema(
       index: true,
       lowercase: true,
       match: VALID_UUID,
+    },
+
+    // Epoch time of the event in ms
+    time: {
+      type: Number,
+      default: Date.now,
+      match: VALID_EPOCH_MS,
+      index: true,
     },
 
     // Log message
@@ -75,14 +83,18 @@ const LogEntrySchema = new Schema(
     // optimisticConcurrency: true,
     // strict: true,
     // runSettersOnQuery: true,
-    // toObject: {
-    //   getters: true,
-    //   setters: true,
-    //   virtuals: false
-    // },
+    toObject: {
+      // getters: true,
+      // setters: true,
+      virtuals: true,
+    },
+    toJSON: {
+      virtuals: true,
+    },
   }
 )
 LogEntrySchema.index({ updatedAt: 1 }, { expires: LOG_EXP })
+// LogEntrySchema.virtual('time').get(() => this.createdAt.getTime())
 
 // -----------------------------------------------------------------------------
 // Schema refinements
@@ -90,15 +102,13 @@ LogEntrySchema.index({ updatedAt: 1 }, { expires: LOG_EXP })
 
 // ----- toJSON cleanup
 LogEntrySchema.methods.toJSON = function () {
-  return omit(this.toObject(), [DB_ID, DB_V, DB_UPDATED_AT])
+  return logLineToString(this)
+
+  // return omit(this.toObject(), [DB_ID, DB_V, DB_UPDATED_AT])
 }
 
-function logLineToString(logLine) {
-  const date = format(logLine.createdAt, LOG_DATE_FORMAT)
-  return (
-    `${date} ${logLine.log_level} [ ${logLine.location_module} ` +
-    `. ${logLine.location_function} ] ${logLine.message}`
-  )
+LogEntrySchema.methods.toString = function () {
+  return logLineToString(this)
 }
 
 // -----------------------------------------------------------------------------
@@ -114,11 +124,19 @@ function makeLogInfo(logLvl, mod, fun, msg) {
   }
 }
 
+function logLineToString(logLine) {
+  const dateStr = `${format(logLine.createdAt, LOG_DATE_FORMAT)} ${logLine.createdAt.getTime()}`
+  return (
+    `${format(logLine.createdAt, LOG_DATE_FORMAT)} ${logLine.time} ${logLine.log_level} [ ${
+      logLine.location_module
+    } ` + `. ${logLine.location_function} ] ${logLine.message}`
+  )
+}
+
 // -----------------------------------------------------------------------------
 // Exports
 // -----------------------------------------------------------------------------
 const LogEntry = model('LogEntry', LogEntrySchema)
-
 LogEntry.collection.dropIndex({ updatedAt: 1 })
 
 module.exports = { LogEntry, makeLogInfo, logLineToString }

@@ -9,10 +9,10 @@ const utils = require('./utils/jsUtils')
 const sys = require('./config/confSystem')
 const logConf = require('./config/confLogs')
 const log = require('./utils/logging')
-// const portal = require('./config/confPortal')
 
 const api = require('./config/confApi')
 const sysController = require('./controllers/sysController')
+const { addLogEntry } = require('./db/dbQueries')
 
 // -----------------------------------------------------------------------------
 // Prerequisites
@@ -69,8 +69,23 @@ const mongoConnectOptions = {
   useNewUrlParser: true,
 }
 
+const logSeparatorConf =
+  '---------------------------------------------------------------[Conf OK]--'
+console.log(utils.nowLocaleFormatted(), logSeparatorConf)
+addLogEntry('info', 'app', 'launching', logSeparatorConf).catch((err) =>
+  log.e(mod, 'addLogEntry', err)
+)
 log.i(mod, 'mongo', `Connecting to [${sys.DB_URL}]`)
 const mongoConnection = mongoose.connect(sys.DB_URL, mongoConnectOptions)
+
+mongoConnection
+  .then(() => {
+    log.i(mod, 'mongo', `MongoDB connected`)
+    log.i(mod, 'app', `Application version '${sysController.getAppHash()}' | API ${api.VERSION}`)
+    const logSeparatorEnd = utils.separateLogs('Init OK')
+    addLogEntry('info', 'app', 'launching', logSeparatorEnd)
+  })
+  .catch((err) => log.e(mod, 'mongoConnection', err))
 
 // -----------------------------------------------------------------------------
 // ROUTES
@@ -153,14 +168,6 @@ try {
 } catch (uncaught) {
   log.e(mod, 'server', `Uncaught error: ${uncaught}`)
 }
-
-mongoConnection
-  .then(() => {
-    log.i(mod, 'mongo', `MongoDB connected`)
-    log.i(mod, 'app', `Application version '${sysController.getAppHash()}' | API ${api.VERSION}`)
-    utils.separateLogs('Init OK')
-  })
-  .catch((err) => log.e(mod, 'mongoConnection', err))
 
 process.on('uncaughtException', (err) => {
   log.e(mod, 'process', `Uncaught error: ${err}`)

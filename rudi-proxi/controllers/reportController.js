@@ -50,6 +50,7 @@ const {
   VERSION,
   PARAM_OBJECT_METADATA,
   URL_PV_OBJECT_GENERIC,
+  DEFAULT_QUERY_LIMIT,
 } = require('../config/confApi')
 
 // -----------------------------------------------------------------------------
@@ -215,7 +216,7 @@ exports.getReportList = async (objectType, req, reply) => {
     const urlObjectId = json.accessReqParam(req, PARAM_ID)
 
     // retrieve query parameters: 'limit' and 'offset'
-    const limit = parseInt(req.query[QUERY_LIMIT]) || 0
+    const limit = parseInt(req.query[QUERY_LIMIT]) || DEFAULT_QUERY_LIMIT
     const offset = parseInt(req.query[QUERY_OFFSET]) || 0
 
     // ensure object exists

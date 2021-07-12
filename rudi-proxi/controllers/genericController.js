@@ -90,6 +90,8 @@ const { Report } = require('../definitions/models/Report')
 const { Metadata } = require('../definitions/models/Metadata')
 const { Media, MediaFile, MediaSeries } = require('../definitions/models/Media')
 
+const { LogEntry } = require('../definitions/models/LogEntry')
+
 // -----------------------------------------------------------------------------
 // Specific controllers
 // -----------------------------------------------------------------------------
@@ -118,7 +120,7 @@ const EXT_OBJ = 'refObj'
 const EXT_OBJ_PROP = 'refObjProp'
 const EXT_OBJ_VAL = 'refObjVal'
 
-async function parseQueryParameters(objectType, reqUrl) {
+exports.parseQueryParameters = async (objectType, reqUrl) => {
   const fun = 'parseQueryParameters'
 
   // identify object model
@@ -137,7 +139,7 @@ async function parseQueryParameters(objectType, reqUrl) {
 
   // extract request parameters
   if (reqUrl.indexOf('?') === -1) {
-    log.d(mod, fun, `No question mark was found in url: ${reqUrl}`)
+    log.d(mod, fun, `No question mark in url: ${reqUrl}`)
     return returnedFilter
   }
   const reqSearch = reqUrl.substring(reqUrl.indexOf('?'))
@@ -428,7 +430,7 @@ exports.getManyObjects = async (objectType, req, reply) => {
   try {
     let parsedParameters
     try {
-      parsedParameters = await parseQueryParameters(objectType, req.url)
+      parsedParameters = await this.parseQueryParameters(objectType, req.url)
     } catch (err) {
       log.w(mod, fun, err)
       return []
@@ -480,37 +482,6 @@ exports.getManyObjects = async (objectType, req, reply) => {
   } catch (err) {
     log.w(mod, fun, err)
     throw err
-  }
-}
-
-/**
- * Get several objects from a filter query
- * => GET /{object}
- */
-exports.getObjectListFiltered = async (req, reply) => {
-  const fun = 'getObjectListFiltered'
-  log.d(mod, fun, ``)
-  try {
-    // retrieve url parameter: object type
-    const objectType = json.accessReqParam(req, PARAM_OBJECT)
-
-    // retrieve url query parameters
-    let parsedParameters
-    try {
-      parsedParameters = await parseQueryParameters(objectType, req.url)
-    } catch (err) {
-      log.w(mod, fun, err)
-      return []
-    }
-    const limit = parsedParameters[QUERY_LIMIT]
-    const offset = parsedParameters[QUERY_OFFSET]
-    const filter = parsedParameters[QUERY_FILTER]
-    const fields = parsedParameters[QUERY_FIELDS]
-
-    return await db.getObjectList(objectType, limit, offset, filter, fields)
-  } catch (err) {
-    log.e(mod, fun, err)
-    throw boomify(err)
   }
 }
 
@@ -618,7 +589,7 @@ exports.deleteManyObjects = async (req, reply) => {
   try {
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
 
-    let parsedParameters = await parseQueryParameters(objectType, req.url)
+    let parsedParameters = await this.parseQueryParameters(objectType, req.url)
     log.d(mod, fun, `parsedParameters: ${utils.beautify(parsedParameters)}`)
     const filter = parsedParameters[QUERY_FILTER]
     const fields = parsedParameters[QUERY_FIELDS]

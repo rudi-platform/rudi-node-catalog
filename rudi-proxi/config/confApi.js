@@ -30,6 +30,7 @@ exports.PARAM_OBJECT_CONTACTS = 'contacts'
 exports.PARAM_OBJECT_MEDIA = 'media'
 exports.PARAM_OBJECT_SKOS_SCHEME = 'skos_schemes'
 exports.PARAM_OBJECT_SKOS_CONCEPT = 'skos_concepts'
+exports.PARAM_OBJECT_LOGS = 'logs'
 
 exports.URL_OBJECTS = [
   this.PARAM_OBJECT_METADATA,
@@ -39,6 +40,7 @@ exports.URL_OBJECTS = [
   this.PARAM_OBJECT_SKOS_CONCEPT,
   this.PARAM_OBJECT_SKOS_SCHEME,
   this.PARAM_ACTION_REPORT,
+  this.PARAM_OBJECT_LOGS,
 ]
 
 // --- "In query" parameters
@@ -78,7 +80,6 @@ exports.PARAM_ACTION_REPORT = 'report'
 exports.URL_PREFIX_PRIVATE = '/api/admin'
 
 const URL_SUFFIX_PORTAL = 'portal'
-const URL_SUFFIX_LOGS = 'logs'
 const URL_SUFFIX_DB = 'db'
 const URL_SUFFIX_THESAURUS = 'enum'
 const URL_SUFFIX_LICENCE_CODES = 'licence_codes'
@@ -97,7 +98,7 @@ exports.URL_PV_PORTAL_PREFIX = `${this.URL_PREFIX_PRIVATE}/${URL_SUFFIX_PORTAL}`
 exports.URL_PV_TOKEN_ACCESS = `${this.URL_PV_PORTAL_PREFIX}/${this.URL_SUFFIX_TOKEN_GET}`
 exports.URL_PV_TOKEN_CHECK_ACCESS = `${this.URL_PV_TOKEN_ACCESS}/${this.URL_SUFFIX_TOKEN_CHECK}`
 
-exports.URL_PV_LOGS_ACCESS = `${this.URL_PREFIX_PRIVATE}/${URL_SUFFIX_LOGS}`
+exports.URL_PV_LOGS_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.PARAM_OBJECT_LOGS}`
 exports.URL_PV_GIT_HASH_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_SUFFIX_GIT_HASH}`
 exports.URL_PV_APP_HASH_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_SUFFIX_APP_HASH}`
 exports.URL_PV_NODE_VERSION_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_SUFFIX_NODE_VERSION}`
