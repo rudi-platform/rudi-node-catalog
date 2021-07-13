@@ -701,7 +701,7 @@ MetadataSchema.virtual(
 
 MetadataSchema.pre('save', async function (next) {
   const fun = 'pre save hook'
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   const metadata = this
 
   try {

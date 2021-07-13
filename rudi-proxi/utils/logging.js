@@ -77,7 +77,6 @@ const Colors = {
 //   display(logLvl, `. ${displayStr(mod, fun, msg)}`)
 // }
 
-
 // -----------------------------------------------------------------------------
 // Logging functions
 // -----------------------------------------------------------------------------
@@ -91,9 +90,7 @@ exports.e = (mod, fun, msg) => {
   logger.error(displayStr(mod, fun, msg))
   // displayFunc(ERROR, fun, msg)
   const logLevel = 'error'
-  addLogEntry(logLevel, mod, fun, msg).catch((err) =>
-    consoleErr(mod, fun, `${logLevel} logging failed: msg: ${msg}, err: ${err}`)
-  )
+  addLogEntry(logLevel, mod, fun, msg)
 }
 
 exports.w = (mod, fun, msg) => {
@@ -102,9 +99,7 @@ exports.w = (mod, fun, msg) => {
   // if (LOG_LVL < levels.warning) return
   // displayFunc(WARNING, fun, msg)
   const logLevel = 'warn'
-  addLogEntry(logLevel, mod, fun, msg).catch((err) =>
-    consoleErr(mod, fun, `${logLevel} logging failed: msg: ${msg}, err: ${err}`)
-  )
+  addLogEntry(logLevel, mod, fun, msg)
 }
 
 exports.i = (mod, fun, msg) => {
@@ -112,9 +107,7 @@ exports.i = (mod, fun, msg) => {
   // if (LOG_LVL < levels.info) return
   // displayFunc(INFO, fun, msg)
   const logLevel = 'info'
-  addLogEntry(logLevel, mod, fun, msg).catch((err) =>
-    consoleErr(mod, fun, `${logLevel} logging failed: msg: ${msg}, err: ${err}`)
-  )
+  addLogEntry(logLevel, mod, fun, msg)
 }
 
 exports.v = (mod, fun, msg) => {
@@ -122,19 +115,13 @@ exports.v = (mod, fun, msg) => {
   // if (LOG_LVL < levels.verbose) return
   // displayFunc(VERBOSE, fun, msg)
   const logLevel = 'verbose'
-  addLogEntry(logLevel, mod, fun, msg).catch((err) =>
-    consoleErr(mod, fun, `${logLevel} logging failed: msg: ${msg}, err: ${err}`)
-  )
+  addLogEntry(logLevel, mod, fun, msg)
 }
 
 exports.d = (mod, fun, msg) => {
   logger.debug(displayStr(mod, fun, msg))
   const logLevel = 'debug'
-  addLogEntry(logLevel, mod, fun, msg).catch((err) =>
-    consoleErr(mod, fun, `${logLevel} logging failed: msg: ${msg}, err: ${err}`)
-  )
-  // if (LOG_LVL < levels.debug) return
-  // displayFunc(DEBUG, fun, msg)
+  addLogEntry(logLevel, mod, fun, msg)
 }
 
 // -----------------------------------------------------------------------------

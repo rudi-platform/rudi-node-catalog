@@ -148,7 +148,7 @@ exports.backOfficeRoutes = [
     method: 'PUT',
     url: URL_PV_OBJECT_GENERIC,
     // preHandler: logRequest,
-    handler: genericController.updateSingleObject,
+    handler: genericController.upsertSingleObject,
   },
   // Get all
   {

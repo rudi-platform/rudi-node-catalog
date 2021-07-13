@@ -131,7 +131,7 @@ function assertIsString(fun, param) {
 
 exports.getObjectModel = (objectType) => {
   const fun = 'getObjectModel'
-  // log.d(mod, fun, ``)
+  // // log.d(mod, fun, ``)
   assertIsString(fun, objectType)
   const Model = OBJ_MODEL[objectType]
   if (!Model) throw new Error(msg.objectTypeNotFound(objectType))
@@ -140,7 +140,7 @@ exports.getObjectModel = (objectType) => {
 
 exports.getObjectIdField = (objectType) => {
   const fun = 'getObjectIdField'
-  // log.d(mod, fun, ``)
+  // // log.d(mod, fun, ``)
   assertIsString(fun, objectType)
   const idField = ID_PROP[objectType]
   if (!idField) throw new Error(msg.objectTypeNotFound(objectType))
@@ -149,7 +149,7 @@ exports.getObjectIdField = (objectType) => {
 
 exports.getObjectAccesses = (objectType) => {
   // const fun = 'getObjectAccesses'
-  // log.d(mod, fun, ``)
+  // // log.d(mod, fun, ``)
   return {
     Model: this.getObjectModel(objectType),
     idField: this.getObjectIdField(objectType),
@@ -316,7 +316,7 @@ async function dropCollection(collectionName) {
 // -----------------------------------------------------------------------------
 exports.getObject = async (objectType, filter) => {
   const fun = `getObject`
-  // log.d(mod, fun, ``)
+  // // log.d(mod, fun, ``)
 
   try {
     const Model = this.getObjectModel(objectType)
@@ -339,7 +339,7 @@ exports.getObject = async (objectType, filter) => {
 
 exports.getObjectWithDbId = async (objectType, dbId) => {
   const fun = `getObjectWithDbId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
 
   const filter = { [DB_ID]: dbId }
 
@@ -348,7 +348,7 @@ exports.getObjectWithDbId = async (objectType, dbId) => {
 
 exports.getObjectWithRudiId = async (objectType, rudiId) => {
   const fun = `getObjectWithRudiId`
-  // log.d(mod, fun, ``)
+  // // log.d(mod, fun, ``)
   if (!rudiId) throw new Error(`${msg.parameterExpected(fun, PARAM_ID)}`)
 
   const idField = this.getObjectIdField(objectType)
@@ -359,7 +359,7 @@ exports.getObjectWithRudiId = async (objectType, rudiId) => {
 
 exports.getEnsuredObjectWithRudiId = async (objectType, rudiId) => {
   const fun = `getEnsuredObjectWithRudiId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   if (!rudiId) throw new Error(`${msg.parameterExpected(fun, PARAM_ID)}`)
   const dbObject = await this.getObjectWithRudiId(objectType, rudiId)
   if (!dbObject) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
@@ -368,7 +368,7 @@ exports.getEnsuredObjectWithRudiId = async (objectType, rudiId) => {
 
 exports.getObjectWithJson = async (objectType, rudiObject) => {
   // const fun = `getObjectWithJson`
-  // log.d(mod, fun, ``)
+  // // log.d(mod, fun, ``)
   const idField = this.getObjectIdField(objectType)
   const rudiId = json.accessProperty(rudiObject, idField)
   return await this.getObjectWithRudiId(objectType, rudiId)
@@ -376,7 +376,7 @@ exports.getObjectWithJson = async (objectType, rudiObject) => {
 
 exports.getEnsuredObjectWithJson = async (objectType, rudiObject) => {
   const fun = `getEnsuredObjectWithJson`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   try {
     const idField = this.getObjectIdField(objectType)
     const rudiId = json.accessProperty(rudiObject, idField)
@@ -391,7 +391,7 @@ exports.getEnsuredObjectWithJson = async (objectType, rudiObject) => {
 
 exports.getEnsuredObjectWithDbId = async (objectType, dbId) => {
   const fun = `getEnsuredObjectWithDbId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   try {
     const dbObject = await this.getObjectWithDbId(objectType, dbId)
     if (!dbObject) throw new Error(`${msg.objectNotFound(objectType, dbId)}`)
@@ -404,7 +404,7 @@ exports.getEnsuredObjectWithDbId = async (objectType, dbId) => {
 
 exports.doesObjectExistWithRudiId = async (objectType, rudiId) => {
   const fun = `doesObjectExistWithRudiId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   try {
     const dbObject = await this.getObjectWithRudiId(objectType, rudiId)
     return !!dbObject
@@ -416,7 +416,7 @@ exports.doesObjectExistWithRudiId = async (objectType, rudiId) => {
 
 exports.doesObjectExistWithJson = async (objectType, rudiObject) => {
   const fun = `doesObjectExistWithJson`
-  // log.d(mod, fun, ``)
+  // // log.d(mod, fun, ``)
   try {
     const dbObject = await this.getObjectWithJson(objectType, rudiObject)
     return !!dbObject
@@ -461,7 +461,7 @@ exports.getNestedObject = async (objectType, nestedObjectProperty, filter, field
 // -----------------------------------------------------------------------------
 exports.getObjectPropertiesWithDbId = async (objectType, dbId, propertyList) => {
   const fun = `getObjectPropertiesWithDbId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   try {
     const Model = this.getObjectModel(objectType)
     const populateFields = getPopulateFields(objectType)
@@ -501,7 +501,7 @@ exports.getObjectPropertiesWithRudiId = async (objectType, rudiId, propertyList)
 
 exports.getDbIdWithRudiId = async (objectType, rudiId) => {
   const fun = `getDbIdWithRudiId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   // log.d(mod, fun, `objectType: ${objectType}`)
   // log.d(mod, fun, `idField: ${idField}`)
   // log.d(mod, fun, `rudiId: ${rudiId}`)
@@ -515,7 +515,7 @@ exports.getDbIdWithRudiId = async (objectType, rudiId) => {
 
 exports.getEnsuredDbIdWithRudiId = async (objectType, rudiId) => {
   const fun = `getEnsuredDbIdWithRudiId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   try {
     const dbId = await this.getDbIdWithRudiId(objectType, rudiId)
     if (!dbId) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
@@ -528,7 +528,7 @@ exports.getEnsuredDbIdWithRudiId = async (objectType, rudiId) => {
 
 exports.getDbIdWithJson = async (objectType, rudiObject) => {
   const fun = `getDbIdWithJson`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   try {
     const idField = this.getObjectIdField(objectType)
     const rudiId = json.accessProperty(rudiObject, idField)
@@ -541,7 +541,7 @@ exports.getDbIdWithJson = async (objectType, rudiObject) => {
 
 exports.getEnsuredDbIdWithJson = async (objectType, rudiObject) => {
   const fun = `getEnsuredDbIdWithJson`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   // log.d(mod, fun, `objectType: ${objectType}`)
   // log.d(mod, fun, `idField: ${idField}`)
   // log.d(mod, fun, `jsonObject: ${utils.beautify(jsonObject)}`)
@@ -558,7 +558,7 @@ exports.getEnsuredDbIdWithJson = async (objectType, rudiObject) => {
 /*
 exports.getObjectWithField = async (Model, fieldName, fieldValue, populateFields) => {
   const fun = `getObjectWithField`
-  // log.d(mod, fun, ``)
+  // // log.d(mod, fun, ``)
   try {
     if (!fieldName) throw new Error(`${msg.parameterExpected(fun, 'field name')}`)
 
@@ -610,7 +610,7 @@ function toMongoSortOptions(initialCriteria, sortByFields, conculsionCriteria) {
 
 function addToFilterUpdated(filter, key, dateVal) {
   const fun = 'addToFilterUpdated'
-  // log.d(mod, fun, ``)
+  // // log.d(mod, fun, ``)
   const date = new Date(dateVal)
   if (!filter.updatedAt) filter.updatedAt = {}
   filter.updatedAt[key] = date
@@ -618,7 +618,7 @@ function addToFilterUpdated(filter, key, dateVal) {
 
 exports.getObjectList = async (objectType, options) => {
   const fun = `getObjectList`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   try {
     //--- Parameters
     // Identify object type characteristics
@@ -694,7 +694,7 @@ exports.getObjectList = async (objectType, options) => {
  */
 exports.groupObjectList = async (objectType, unionField, options) => {
   const fun = `groupObjectList`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   log.d(mod, fun, `options: ${options}`)
 
   try {
@@ -824,7 +824,7 @@ exports.groupObjectList = async (objectType, unionField, options) => {
 
 exports.countObjectList = async (objectType, unionField, options) => {
   const fun = `countObjectList`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
 
   try {
     //--- Parameters
@@ -891,7 +891,7 @@ exports.countObjectList = async (objectType, unionField, options) => {
 
 exports.updateObject = async (objectType, updateData) => {
   const fun = `updateObject`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   try {
     assertIsString(fun, objectType)
 
@@ -917,7 +917,7 @@ exports.updateObject = async (objectType, updateData) => {
 
 exports.overwriteObject = async (objectType, updateData) => {
   const fun = `updateObject`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   try {
     assertIsString(fun, objectType)
 
@@ -948,7 +948,7 @@ exports.overwriteObject = async (objectType, updateData) => {
  */
 exports.getOrphans = async (objectType) => {
   const fun = `getUnlinkdedObjects`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   if (objectType === PARAM_OBJECT_METADATA) {
     const errMsg = 'Not implemented'
     log.d(mod, fun, errMsg)
@@ -973,7 +973,7 @@ exports.getOrphans = async (objectType) => {
 
 exports.deleteObject = async (objectType, rudiId) => {
   const fun = `deleteObject`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   try {
     const { Model, idField } = this.getObjectAccesses(objectType)
     const filter = { [idField]: rudiId }
@@ -1081,31 +1081,31 @@ function changeConditionsIntoRegex(conditions) {
 // ----------------------------------------
 exports.getMetadataWithJson = async (metadataJson) => {
   const fun = `getMetadataFromJson`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getObjectWithJson(PARAM_OBJECT_METADATA, metadataJson)
 }
 
 exports.getEnsuredMetadataWithJson = async (metadataJson) => {
   const fun = `getEnsuredMetadataFromJson`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getEnsuredObjectWithJson(PARAM_OBJECT_METADATA, metadataJson)
 }
 
 exports.getMetadataWithRudiId = async (rudiId) => {
   const fun = `getMetadataWithRudiId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getObjectWithRudiId(PARAM_OBJECT_METADATA, rudiId)
 }
 
 exports.getEnsuredMetadataWithRudiId = async (rudiId) => {
   const fun = `getEnsuredMetadataWithRudiId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getEnsuredObjectWithRudiId(PARAM_OBJECT_METADATA, rudiId)
 }
 
 exports.updateMetadata = async (jsonMetadata) => {
   const fun = `updateMetadata`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
 
   // Checking incoming data for an id
   const id = jsonMetadata[API_METADATA_ID]
@@ -1127,7 +1127,7 @@ exports.updateMetadata = async (jsonMetadata) => {
 
 exports.deleteMetadata = async (metadataRudiId) => {
   const fun = `deleteOrganization`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
 
   // Checking the id parameter
   if (!metadataRudiId) {
@@ -1150,56 +1150,56 @@ exports.deleteMetadata = async (metadataRudiId) => {
 // ----------------------------------------
 exports.getOrganizationWithJson = async (organizationJson) => {
   const fun = `getOrganizationWithJson`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getObjectWithJson(PARAM_OBJECT_ORGANIZATIONS, organizationJson)
 }
 
 exports.getEnsuredOrganizationWithJson = async (organizationJson) => {
   const fun = `getEnsuredOrganizationWithJson`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   const rudiId = json.accessProperty(organizationJson, API_ORGANIZATION_ID)
   return await this.getEnsuredOrganizationWithRudiId(rudiId)
 }
 
 exports.getOrganizationWithRudiId = async (rudiId) => {
   const fun = `getOrganizationWithRudiId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getObjectWithRudiId(PARAM_OBJECT_ORGANIZATIONS, rudiId)
 }
 
 exports.getEnsuredOrganizationWithRudiId = async (rudiId) => {
   const fun = `getEnsuredOrganizationWithRudiId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getEnsuredObjectWithRudiId(PARAM_OBJECT_ORGANIZATIONS, rudiId)
 }
 
 exports.getOrganizationWithDbId = async (id) => {
   const fun = `getOrganizationWithDbId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getObjectWithDbId(PARAM_OBJECT_ORGANIZATIONS, id)
 }
 
 exports.getEnsuredOrganizationWithDbId = async (dbId) => {
   const fun = `getOrganizationWithDbId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getEnsuredObjectWithDbId(PARAM_OBJECT_ORGANIZATIONS, dbId)
 }
 
 exports.getEnsuredOrganizationDbIdWithJson = async (organizationJson) => {
   const fun = `getEnsuredOrganizationDbIdWithJson`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getEnsuredDbIdWithJson(PARAM_OBJECT_ORGANIZATIONS, organizationJson)
 }
 
 exports.getOrganizationDbIdWithJson = async (organizationJson) => {
   const fun = `getEnsuredOrganizationDbIdWithJson`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getDbIdWithJson(PARAM_OBJECT_ORGANIZATIONS, organizationJson)
 }
 
 exports.getAllOrganizations = async () => {
   const fun = `getAllOrganizations`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
 
   const organizationList = await Organization.find({})
   // log.d(mod, fun, `metadataList: ${metadataList}`)
@@ -1209,7 +1209,7 @@ exports.getAllOrganizations = async () => {
 
 exports.updateOrganization = async (jsonOrganization) => {
   const fun = `updateOrganization`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
 
   // Checking incoming data for an id
   const id = jsonOrganization[API_ORGANIZATION_ID]
@@ -1235,7 +1235,7 @@ exports.updateOrganization = async (jsonOrganization) => {
 
 exports.deleteOrganization = async (organizationRudiId) => {
   const fun = `deleteOrganization`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
 
   // Checking the id parameter
   if (!organizationRudiId) {
@@ -1261,61 +1261,61 @@ exports.deleteOrganization = async (organizationRudiId) => {
 
 exports.getContactWithRudiId = async (contactRudiId) => {
   const fun = `getContactWithRudiId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getObjectWithRudiId(PARAM_OBJECT_CONTACTS, contactRudiId)
 }
 
 exports.getEnsuredContactWithRudiId = async (contactRudiId) => {
   const fun = `getEnsuredContactWithRudiId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getEnsuredObjectWithRudiId(PARAM_OBJECT_CONTACTS, contactRudiId)
 }
 
 exports.getContactWithJson = async (contactJson) => {
   const fun = `getContactWithJson`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getObjectWithJson(PARAM_OBJECT_CONTACTS, contactJson)
 }
 
 exports.getEnsuredContactWithJson = async (contactJson) => {
   const fun = `getEnsuredContactWithJson`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getEnsuredObjectWithJson(PARAM_OBJECT_CONTACTS, contactJson)
 }
 
 exports.getContactWithDbId = async (contactDbId) => {
   const fun = `getContactWithDbId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getObjectWithDbId(PARAM_OBJECT_CONTACTS, contactDbId)
 }
 
 exports.getEnsuredContactWithDbId = async (contactDbId) => {
   const fun = `getEnsuredContactWithDbId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getEnsuredObjectWithDbId(PARAM_OBJECT_CONTACTS, contactDbId)
 }
 
 exports.getContactDbIdWithJson = async (contactJson) => {
   const fun = `getContactDbIdWithJson`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getDbIdWithJson(PARAM_OBJECT_CONTACTS, contactJson)
 }
 
 exports.getEnsuredContactDbIdWithJson = async (contactJson) => {
   const fun = `getEnsuredContactDbIdWithJson`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getEnsuredDbIdWithJson(PARAM_OBJECT_CONTACTS, contactJson)
 }
 
 exports.getAllContacts = async () => {
   const fun = `getAllContacts`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await Contact.find({})
 }
 
 exports.updateContact = async (jsonContact) => {
   const fun = `updateContact`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
 
   // Checking incoming data for an id
   const rudiId = json.accessProperty(jsonContact, API_CONTACT_ID)
@@ -1332,7 +1332,7 @@ exports.updateContact = async (jsonContact) => {
 
 exports.deleteContact = async (contactRudiId) => {
   const fun = `deleteContact`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
 
   // Checking the id parameter
   if (!contactRudiId) {
@@ -1354,7 +1354,7 @@ exports.deleteContact = async (contactRudiId) => {
 // ----------------------------------------
 exports.getMediaDbIdWithJson = async (mediaJson) => {
   const fun = `getMediaDbIdWithJson`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   // log.d(mod, fun, `URL_OBJECT_MEDIA: ${URL_OBJECT_MEDIA}`)
   // log.d(mod, fun, `API_MEDIA_ID: ${API_MEDIA_ID}`)
   // log.d(mod, fun, `mediaJson: ${utils.beautify(mediaJson)}`)
@@ -1364,7 +1364,7 @@ exports.getMediaDbIdWithJson = async (mediaJson) => {
 
 exports.getEnsuredMediaDbIdWithJson = async (mediaJson) => {
   const fun = `getEnsuredMediaDbIdWithJson`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   // log.d(mod, fun, `URL_OBJECT_MEDIA: ${URL_OBJECT_MEDIA}`)
   // log.d(mod, fun, `API_MEDIA_ID: ${API_MEDIA_ID}`)
   // log.d(mod, fun, `mediaJson: ${utils.beautify(mediaJson)}`)
@@ -1374,13 +1374,13 @@ exports.getEnsuredMediaDbIdWithJson = async (mediaJson) => {
 
 exports.getMediaWithDbId = async (mediaDbId) => {
   const fun = `getMediaWithDbId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getObjectWithDbId(PARAM_OBJECT_MEDIA, mediaDbId)
 }
 
 exports.getEnsuredMediaWithDbId = async (mediaDbId) => {
   const fun = `getEnsuredMediaWithDbId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getEnsuredObjectWithDbId(PARAM_OBJECT_MEDIA, mediaDbId)
 }
 
@@ -1389,25 +1389,25 @@ exports.getEnsuredMediaWithDbId = async (mediaDbId) => {
 // ----------------------------------------
 exports.getSchemeDbIdWithJson = async (schemeJson) => {
   const fun = `getSchemeDbIdWithJson`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getDbIdWithJson(PARAM_OBJECT_SKOS_SCHEME, schemeJson)
 }
 
 exports.getSchemeDbIdWithRudiId = async (schemeRudiId) => {
   const fun = `getSchemeDbIdWithRudiId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getDbIdWithRudiId(PARAM_OBJECT_SKOS_SCHEME, schemeRudiId)
 }
 
 exports.getEnsuredSchemeDbIdWithRudiId = async (schemeRudiId) => {
   const fun = `getEnsuredSchemeDbIdWithRudiId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getEnsuredDbIdWithRudiId(PARAM_OBJECT_SKOS_SCHEME, schemeRudiId)
 }
 
 exports.getSchemeRudiIdWithDbId = async (schemeDbId) => {
   const fun = `getEnsuredSchemeDbIdWithRudiId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getObjectPropertiesWithDbId(PARAM_OBJECT_SKOS_SCHEME, schemeDbId, [
     API_SKOS_SCHEME_ID,
   ])
@@ -1415,19 +1415,19 @@ exports.getSchemeRudiIdWithDbId = async (schemeDbId) => {
 
 exports.getSchemeWithDbId = async (schemeDbId) => {
   const fun = `getSchemeWithDbId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getObjectWithDbId(PARAM_OBJECT_SKOS_SCHEME, schemeDbId)
 }
 
 exports.getEnsuredSchemeWithDbId = async (schemeDbId) => {
   const fun = `getSchemeJsonIdWithDbId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getEnsuredObjectWithDbId(PARAM_OBJECT_SKOS_SCHEME, schemeDbId)
 }
 /*
 exports.getEnsuredSchemeWithCode = async (schemeCode) => {
   const fun = `getSchemeJsonIdWithDbId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return this.getEnsuredObjectWithRudiId(URL_OBJECT_SKOS_SCHEME, SkosScheme, schemeDbId)
 }
  */
@@ -1437,37 +1437,37 @@ exports.getEnsuredSchemeWithCode = async (schemeCode) => {
 
 exports.getConceptWithDbId = async (conceptDbId) => {
   const fun = `getConceptWithDbId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getObjectWithDbId(SkosConcept, conceptDbId)
 }
 
 exports.getConceptRudiIdWithDbId = async (conceptDbId) => {
   const fun = `getConceptRudiIdWithDbId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getObjectPropertiesWithDbId(PARAM_OBJECT_SKOS_CONCEPT, [API_SKOS_CONCEPT_ID])
 }
 
 exports.getConceptWithJson = async (conceptJson) => {
   // const fun = `getConceptWithJson`
-  // log.d(mod, fun, ``)
+  // // log.d(mod, fun, ``)
   return await this.getObjectWithJson(PARAM_OBJECT_SKOS_CONCEPT, conceptJson)
 }
 
 exports.getConceptDbIdWithJson = async (conceptJson) => {
   const fun = `getConceptDbIdWithJson`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getDbIdWithJson(PARAM_OBJECT_SKOS_CONCEPT, conceptJson)
 }
 
 exports.getConceptDbIdWithRudiId = async (conceptRudiId) => {
   const fun = `getConceptDbIdWithRudiId`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   return await this.getDbIdWithRudiId(PARAM_OBJECT_SKOS_CONCEPT, conceptRudiId)
 }
 
 exports.getAllConcepts = async () => {
   const fun = `getAllConcepts`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
 
   const conceptList = await SkosConcept.find({})
   return conceptList
@@ -1475,7 +1475,7 @@ exports.getAllConcepts = async () => {
 
 exports.getAllConceptsFromScheme = async (schemeCode) => {
   const fun = `getAllConceptsFromScheme`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
 
   const conceptList = await SkosConcept.find({
     [API_SKOS_SCHEME_CODE]: schemeCode,
@@ -1485,7 +1485,7 @@ exports.getAllConceptsFromScheme = async (schemeCode) => {
 
 exports.getAllConceptsWithRole = async (conceptRole) => {
   const fun = `getAllConceptsWithRole`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
 
   const conceptList = await SkosConcept.find({
     [API_SKOS_CONCEPT_ROLE]: conceptRole,
@@ -1498,7 +1498,7 @@ exports.getAllConceptsWithRole = async (conceptRole) => {
 // ----------------------------------------
 exports.findNotReferencedInMetadata = (objectType) => {
   const fun = `isReferencedInMetadata`
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
 }
 
 exports.isReferencedInMetadata = async (objectType, rudiId) => {
@@ -1671,7 +1671,7 @@ exports.storePortalToken = async (token) => {
 // ----------------------------------------
 // No log.d / log.e function here or you'll create a loopback
 exports.addLogEntry = async (logLvl, loc_module, loc_function, msg) => {
-  const fun = 'storeLog'
+  const fun = 'addLogEntry'
   try {
     if (!msg || msg === '') msg = '<-'
     // utils.consoleLog(mod, fun, ``)
@@ -1679,7 +1679,8 @@ exports.addLogEntry = async (logLvl, loc_module, loc_function, msg) => {
     const logEntry = await new LogEntry(logInfo)
     return await logEntry.save()
   } catch (err) {
-    throw err
+    utils.consoleErr(loc_module, `${loc_function} > ${fun}`, `${logLvl} logging failed! msg: ${msg}, err: ${err}`)
+    // throw err
   }
 }
 

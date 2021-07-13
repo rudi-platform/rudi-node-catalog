@@ -409,7 +409,7 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
  */
 exports.setGeography = (metadata) => {
   const fun = 'setGeography'
-  log.d(mod, fun, ``)
+  // log.d(mod, fun, ``)
   const geography = metadata[API_GEOGRAPHY_PROPERTY]
   if (utils.isNothing(geography)) {
     // No 'geography' property => exit

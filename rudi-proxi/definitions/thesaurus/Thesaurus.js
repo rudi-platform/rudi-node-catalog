@@ -156,7 +156,7 @@ module.exports = class Thesaurus {
 
   #storeEnum = async (typeThesaurus, listValues) => {
     const fun = 'storeEnum'
-    log.d(mod, fun, ``)
+    // log.d(mod, fun, ``)
 
     try {
       const dbEnum = await DynamicEnum.findOneAndUpdate(

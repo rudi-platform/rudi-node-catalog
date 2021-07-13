@@ -73,8 +73,7 @@ const logSeparatorConf =
   '---------------------------------------------------------------[Conf OK]--'
 console.log(utils.nowLocaleFormatted(), logSeparatorConf)
 addLogEntry('info', 'app', 'launching', logSeparatorConf)
-  .catch((err) => log.e(mod, 'addLogEntry', err))
-  .then()
+
 log.i(mod, 'mongo', `Connecting to [${sys.DB_URL}]`)
 const mongoConnection = mongoose.connect(sys.DB_URL, mongoConnectOptions)
 

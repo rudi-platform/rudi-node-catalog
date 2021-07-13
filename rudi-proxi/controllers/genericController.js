@@ -538,6 +538,40 @@ exports.updateSingleObject = async (req, reply) => {
 }
 
 /**
+ * Update an existing object or creates it if it doesn't exist
+ * => PUT /{object}
+ */
+exports.upsertSingleObject = async (req, reply) => {
+  const fun = 'upsertSingleObject'
+  log.v(mod, fun, `< PUT ${URL_PV_OBJECT_GENERIC}`)
+  try {
+    // retrieve url parameters: object type, object id
+    const objectType = json.accessReqParam(req, PARAM_OBJECT)
+    const idField = db.getObjectIdField(objectType)
+
+    const updateData = req.body
+
+    // retrieve url parameters: object type, object id
+    const rudiId = json.accessProperty(updateData, idField)
+
+    const existsObject = await db.doesObjectExistWithRudiId(objectType, rudiId)
+
+    if (!existsObject) {
+      return await newObject(objectType, updateData)
+    } else {
+      if (objectType === PARAM_OBJECT_METADATA) {
+        return await metadataController.overwriteMetadata(updateData)
+      } else {
+        return await db.overwriteObject(objectType, updateData)
+      }
+    }
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw boomify(err)
+  }
+}
+
+/**
  * Delete a single object
  * => DELETE /{object}/{id}
  */
