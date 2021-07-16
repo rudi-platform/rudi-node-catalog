@@ -7,7 +7,9 @@ const mod = 'portalCtrl'
 // External dependancies
 // -----------------------------------------------------------------------------
 const { boomify } = require('@hapi/boom')
-const { createHmac } = require('crypto')
+// const { createHmac, createVerify, verify } = require('crypto')
+const { parseKey } = require('sshpk')
+const { readFileSync } = require('fs')
 
 // -----------------------------------------------------------------------------
 // Internal dependancies
@@ -133,6 +135,7 @@ exports.getMetadata = async (req, reply) => {
     throw boomify(err)
   }
 }
+
 exports.sendMetadata = async (req, reply) => {
   const fun = 'sendMetadata'
   log.d(mod, fun, ``)
@@ -246,51 +249,100 @@ jwtBody = {
   scope: ['read']
 }
 */
+
+exports.checkSignatureWithSecret = (accessToken) => {
+  const fun = 'verifyPortalToken'
+  log.d(mod, fun, ``)
+
+  try {
+    const [jwtHeaderBase64, jwtPayloadBase64, jwtSignatureBase64] = accessToken.split('.')
+
+    const hash = createHmac('sha256', portal.SECRET)
+      .update(`${jwtHeaderBase64}.${jwtPayloadBase64}`)
+      .digest('base64url')
+
+    if (hash !== jwtSignatureBase64) {
+      const errMsg = `Forged token? Computed hash: ${hash} != jwt signature: ${jwtSignatureBase64}`
+      log.w(mod, fun, errMsg)
+    }
+    return hash === jwtSignatureBase64
+
+    // if (hash !== jwtSignatureBase64) {
+    //   const errMsg = `Forged token? Computed hash: ${hash} != jwt signature: ${jwtSignatureBase64}`
+    //   log.w(mod, fun, errMsg)
+    //   throw new Error(errMsg)
+    // }
+    // return true
+  } catch (err) {
+    const errMsg = `Invalid token: ${err}`
+    log.w(mod, fun, errMsg)
+    throw err
+  }
+}
+const RUDI_PK_NAME = 'rudiPortal'
+exports.checkSignatureWithPubKey = (accessToken) => {
+  const fun = 'checkSignatureWithPubKey'
+  log.d(mod, fun, ``)
+
+  try {
+    const [jwtHeaderBase64, jwtPayloadBase64, jwtSignatureBase64] = accessToken.split('.')
+
+    const dataToVerify = Buffer.from(`${jwtHeaderBase64}.${jwtPayloadBase64}`, 'base64')
+    const pubKey = readFileSync(`${portal.PUBLIC_KEY}`, 'utf-8')
+    const sslKey = parseKey(pubKey, 'pkcs8', RUDI_PK_NAME)
+    const keyName = sslKey.comment && sslKey.comment !== '(unnamed)' ? `'${sslKey.comment}' ` : ''
+    log.d(mod, fun, `${keyName}public key: ${sslKey.type} ${sslKey.size} bits`)
+
+    const signatureIsValid = sslKey
+      .createVerify('sha256')
+      .update(Buffer.from(`${jwtHeaderBase64}.${jwtPayloadBase64}`, 'base64'))
+      .verify(jwtSignatureBase64)
+
+    if (signatureIsValid) {
+      log.i(mod, fun, `signatureIsValid: ${signatureIsValid}`)
+    } else {
+      log.w(mod, fun, `signatureIsValid: ${signatureIsValid}`)
+    }
+    return signatureIsValid
+  } catch (err) {
+    const errMsg = `Invalid token: ${err}`
+    log.w(mod, fun, errMsg)
+    throw err
+  }
+}
+
 exports.verifyPortalToken = (accessToken) => {
   const fun = 'verifyPortalToken'
   log.d(mod, fun, ``)
 
   try {
-    const jwt = accessToken.split('.')
-
-    // Check JWT signature
-    const jwtHeaderEncoded = jwt[0]
-    const jwtBodyEncoded = jwt[1]
-    const jwtSignature = jwt[2]
-
-    const hash = createHmac('sha256', portal.SECRET)
-      .update(`${jwtHeaderEncoded}.${jwtBodyEncoded}`)
-      .digest('base64url')
-
-    if (hash !== jwtSignature) {
-      const errMsg = `Forged token? Computed hash: ${hash} != jwt signature: ${jwtSignature}`
-      log.w(mod, fun, errMsg)
-      throw new Error(errMsg)
-    }
-    // else {
-    //   log.v(mod, fun, `JWT correctly signed`)
-    // }
+    const [jwtHeaderBase64, jwtPayloadBase64, jwtSignatureBase64] = accessToken.split('.')
 
     // Check JWT header
-    const jwtHeader = JSON.parse(utils.decodeBase64(jwtHeaderEncoded))
-    // log.d(mod, fun, `jwtHeader :${utils.beautify(jwtHeader)}`)
+    const jwtHeader = JSON.parse(utils.decodeBase64(jwtHeaderBase64))
 
     if (jwtHeader[portal.JWT_TYP] !== 'JWT')
       throw new Error(`Received token is not a JWT: ${utils.beautify(jwtHeader)}`)
 
     // Check JWT body
-    const jwtBody = JSON.parse(utils.decodeBase64(jwtBodyEncoded))
+    const jwtPayload = JSON.parse(utils.decodeBase64(jwtPayloadBase64))
 
-    if (jwtBody[portal.JWT_USER] !== portal.LOGIN) throw new Error('Portal JWT: incorrect user')
-    if (jwtBody[portal.JWT_CLIENT] !== portal.LOGIN) throw new Error('Portal JWT: incorrect client')
-    if (jwtBody[portal.JWT_EXP] < utils.nowEpochS())
+    if (jwtPayload[portal.JWT_USER] !== portal.LOGIN) throw new Error('Portal JWT: incorrect user')
+    if (jwtPayload[portal.JWT_CLIENT] !== portal.LOGIN)
+      throw new Error('Portal JWT: incorrect client')
+    if (jwtPayload[portal.JWT_EXP] < utils.nowEpochS())
       throw new Error(
         `Portal JWT expired: ` +
-          `expire_date=${utils.dateEpochSToIso(jwtBody[portal.JWT_EXP])}` +
+          `expire_date=${utils.dateEpochSToIso(jwtPayload[portal.JWT_EXP])}` +
           ` < now=${utils.dateEpochSToIso(utils.nowEpochS())}`
       )
+    log.d(mod, fun, `jwtHeader: ${utils.beautify(jwtHeader)}`)
+    log.d(mod, fun, `jwtPayload: ${utils.beautify(jwtPayload)}`)
 
-    return [jwtHeader, jwtBody]
+    // Check JWT signature
+    this.checkSignatureWithPubKey(accessToken)
+
+    return [jwtHeader, jwtPayload]
   } catch (err) {
     const errMsg = `Invalid token: ${err}`
     log.w(mod, fun, errMsg)
@@ -339,8 +391,4 @@ exports.getMetadataFromPortal = async (metadataId) => {
     log.w(mod, fun, err)
     throw err
   }
-}
-
-exports.convertToPortalFormat = (metadata) => {
-  // metadata[]
 }

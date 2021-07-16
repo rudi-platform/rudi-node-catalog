@@ -6,7 +6,6 @@
 // Internal dependecies
 // -----------------------------------------------------------------------------
 const fa = require('../utils/fileActions')
-// const log = require('../utils/logging')
 const utils = require('../utils/jsUtils')
 
 // -----------------------------------------------------------------------------
@@ -29,6 +28,8 @@ const _authChk = 'auth_chk'
 const _login = 'login'
 const _passw = 'passw'
 const _secret = 'secret'
+const _publicKey = 'publicKey'
+const _publicKeyPath = 'publicKeyPath'
 
 // API section
 const _getUrl = 'get_url'
@@ -76,6 +77,8 @@ exports.getCheckAuthUrl = () => {
 exports.LOGIN = getIniValue(PORTAL_SECTION, _login)
 exports.PASSW = getIniValue(PORTAL_SECTION, _passw)
 exports.SECRET = getIniValue(PORTAL_SECTION, _secret)
+exports.PUBLIC_KEY = getIniValue(PORTAL_SECTION, _publicKey)
+exports.PUBLIC_KEY_PATH = getIniValue(PORTAL_SECTION, _publicKeyPath)
 
 // ----- API
 exports.API_GET_URL = getIniValue(PORTAL_SECTION, _getUrl)

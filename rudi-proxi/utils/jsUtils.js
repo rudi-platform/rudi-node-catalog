@@ -13,12 +13,11 @@ const { format } = require('date-and-time')
 // -----------------------------------------------------------------------------
 // String
 // -----------------------------------------------------------------------------
-exports.toBase64 = (str) => {
-  return Buffer.from(str, 'utf-8').toString('base64url')
-}
+exports.toBase64 = (str) => this.convertEncoding(str, 'utf-8', 'base64url')
+exports.decodeBase64 = (data) => this.convertEncoding(data, 'base64url', 'utf-8')
 
-exports.decodeBase64 = (data) => {
-  return Buffer.from(data, 'base64url').toString('utf-8')
+exports.convertEncoding = (data, fromEncoding, toEncoding) => {
+  return Buffer.from(data, fromEncoding).toString(toEncoding)
 }
 
 // -----------------------------------------------------------------------------

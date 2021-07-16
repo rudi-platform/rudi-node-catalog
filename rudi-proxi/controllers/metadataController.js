@@ -585,6 +585,7 @@ exports.sendToPortal = async (metadata) => {
     const collectionTag = metadata[API_COLLECTION_TAG]
     if (collectionTag || metadata.init) {
       log.d(mod, fun, `Not sending to portal: ${metadataId} (${collectionTag})`)
+      log.d(mod, fun, utils.beautify(metadata))
       return
     }
 
