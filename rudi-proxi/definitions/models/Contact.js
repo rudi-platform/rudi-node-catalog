@@ -23,23 +23,23 @@ const ContactSchema = new mongoose.Schema(
     // system (required)
     contact_id: ids.UUIDv4,
 
-    // Updated offical name of the contact's organization
+    /** Updated offical name of the contact's organization */
     organization_name: {
       type: String,
     },
 
-    // Updated name of the service, or possibly the person
+    /** Updated name of the service, or possibly the person */
     contact_name: {
       type: String,
       required: true,
     },
 
-    // Updated status of the contact person
+    /** Updated status of the contact person */
     role: {
       type: String,
     },
 
-    // Updated offical postal address of the organization
+    /** Updated offical postal address of the organization */
     email: {
       type: String,
       trim: true,
@@ -51,7 +51,12 @@ const ContactSchema = new mongoose.Schema(
       match: Validation.EMAIL,
     },
 
-    // Time when this contact was successfully published on RUDI portal
+    /** Tag for identifying a collection of resources */
+    collection_tag: {
+      type: String,
+    },
+
+    /** Time when this contact was successfully published on RUDI portal  */
     publishedAt: {
       type: Date,
     },

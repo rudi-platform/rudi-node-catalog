@@ -8,6 +8,7 @@ const mod = 'mediaSch'
 const mongoose = require('mongoose')
 const Int32 = require('mongoose-int32')
 const { omit } = require('lodash')
+const sanitize = require('sanitize-filename')
 
 // -----------------------------------------------------------------------------
 // Internal dependancies
@@ -24,6 +25,7 @@ const {
   FIELDS_TO_SKIP,
   API_MEDIA_TYPE_PROPERTY,
   API_MEDIA_CHECKSUM_PROPERTY,
+  API_MEDIA_NAME_PROPERTY,
 } = require('../../db/dbFields')
 const { isNotEmptyObject } = require('../../utils/jsUtils')
 const { missingObjectProperty, missingField } = require('../../utils/msg')
@@ -60,22 +62,26 @@ const commonSchemaOptions = {
 
 const MediaSchema = new mongoose.Schema(
   {
-    // Unique and permanent identifier for the organization in RUDI
-    // system (required)
+    /**
+     * Unique and permanent identifier for the organization in RUDI
+     * system (required)
+     */
     media_id: Ids.UUIDv4,
 
-    // Updated offical name of the organization
+    /** Updated offical name of the organization */
     media_type: {
       type: String,
       enum: Object.values(MediaTypes),
       required: true,
     },
 
+    /** Original name of the file */
     media_name: {
       type: String,
+      // required: true,
     },
 
-    // Updated name of the service, or possibly the person
+    /** Updated name of the service, or possibly the person */
     connector: {
       url: {
         type: String,
@@ -90,19 +96,40 @@ const MediaSchema = new mongoose.Schema(
         default: InterfaceContract.Dwnl,
       },
     },
+
+    /** Tag for identifying a collection of resources */
+    collection_tag: {
+      type: String,
+    },
   },
   commonSchemaOptions
 )
 
 MediaSchema.pre('save', function (next) {
+  const mod = 'MediaSchema'
   const fun = 'pre save hook'
   // log.d(mod, fun, ``)
-  if (
-    this[API_MEDIA_TYPE_PROPERTY] === MediaTypes.File &&
-    !isNotEmptyObject(this[API_MEDIA_CHECKSUM_PROPERTY])
-  ) {
-    next(new Error(missingField(API_MEDIA_CHECKSUM_PROPERTY)))
-  } else next()
+  try {
+    if (
+      this[API_MEDIA_TYPE_PROPERTY] === MediaTypes.File &&
+      !isNotEmptyObject(this[API_MEDIA_CHECKSUM_PROPERTY])
+    ) {
+      throw new Error(missingField(API_MEDIA_CHECKSUM_PROPERTY))
+    }
+
+    if (!!this[API_MEDIA_NAME_PROPERTY]) {
+      const nameBefore = this[API_MEDIA_NAME_PROPERTY]
+      const nameAfter = sanitize(this[API_MEDIA_NAME_PROPERTY])
+      if (nameBefore !== nameAfter) {
+        this[API_MEDIA_NAME_PROPERTY] = nameAfter
+        log.d(mod, fun, `sanitized: '${nameBefore}' -> '${nameAfter}'`)
+      }
+    }
+    next()
+  } catch (err) {
+    log.w(mod, fun, err)
+    next(err)
+  }
 })
 
 // -----------------------------------------------------------------------------
@@ -171,10 +198,14 @@ const FileSchema = new mongoose.Schema(
 FileSchema.pre('save', function (next) {
   const fun = 'pre save hook'
   // log.d('FileSchema', fun, ``)
-  if (!isNotEmptyObject(this[API_MEDIA_CHECKSUM_PROPERTY])) {
-    next(new Error(missingField(API_MEDIA_CHECKSUM_PROPERTY)))
-  } else {
+  try {
+    if (!isNotEmptyObject(this[API_MEDIA_CHECKSUM_PROPERTY])) {
+      throw new Error(missingField(API_MEDIA_CHECKSUM_PROPERTY))
+    }
     next()
+  } catch (err) {
+    log.w('FileSchema', fun, err)
+    next(err)
   }
 })
 

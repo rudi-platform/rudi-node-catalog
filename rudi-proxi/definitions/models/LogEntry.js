@@ -1,5 +1,6 @@
 'use strict'
 
+const mod = 'logDb'
 // -----------------------------------------------------------------------------
 // External dependancies
 // -----------------------------------------------------------------------------
@@ -11,12 +12,13 @@ const { v4 } = require('uuid')
 // -----------------------------------------------------------------------------
 // Internal dependancies
 // -----------------------------------------------------------------------------
-const { beautify, nowEpochMs, LOG_DATE_FORMAT } = require('../../utils/jsUtils')
+const { beautify, nowEpochMs, LOG_DATE_FORMAT, consoleErr, consoleLog } = require('../../utils/jsUtils')
 
 const { LOG_EXP } = require('../../config/confSystem')
 const { UUIDv4 } = require('../schemas/Identifiers')
 const { VALID_UUID, VALID_EPOCH_MS } = require('../schemaValidators')
 const { DB_ID, DB_V, DB_UPDATED_AT } = require('../../db/dbFields')
+const log = require('../../utils/logging')
 
 // -----------------------------------------------------------------------------
 // Constants
@@ -92,7 +94,9 @@ const LogEntrySchema = new Schema(
     },
   }
 )
+
 LogEntrySchema.index({ updatedAt: 1 }, { expires: LOG_EXP })
+
 // LogEntrySchema.virtual('time').get(() => this.createdAt.getTime())
 
 // -----------------------------------------------------------------------------
@@ -136,6 +140,8 @@ function logLineToString(logLine) {
 // Exports
 // -----------------------------------------------------------------------------
 const LogEntry = model('LogEntry', LogEntrySchema)
-LogEntry.collection.dropIndex({ updatedAt: 1 })
+LogEntry.collection
+  .dropIndex({ updatedAt: 1 })
+  .catch((err) => log.d(mod, 'LogEntry.dropIndex', err + ' (nevermind)'))
 
 module.exports = { LogEntry, makeLogInfo, logLineToString }

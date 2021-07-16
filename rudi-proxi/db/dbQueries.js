@@ -506,7 +506,8 @@ exports.getDbIdWithRudiId = async (objectType, rudiId) => {
   // log.d(mod, fun, `idField: ${idField}`)
   // log.d(mod, fun, `rudiId: ${rudiId}`)
   try {
-    return await this.getObjectPropertiesWithRudiId(objectType, rudiId, [DB_ID])
+    const partialDbObject = await this.getObjectPropertiesWithRudiId(objectType, rudiId, [DB_ID])
+    return partialDbObject ? partialDbObject[DB_ID] : null
   } catch (err) {
     log.w(mod, fun, err)
     throw err
@@ -635,13 +636,13 @@ exports.getObjectList = async (objectType, options) => {
 
     const populateFields = getPopulateFields(objectType)
 
-    log.d(mod, fun, `options: ${utils.beautify(options)}`)
+    // log.d(mod, fun, `options: ${utils.beautify(options)}`)
 
     // Adapt filter with 'updated after/before'
     if (!!updatedAfter) addToFilterUpdated(filter, '$gte', updatedAfter)
     if (!!updatedBefore) addToFilterUpdated(filter, '$lte', updatedBefore)
 
-    log.d(mod, fun, `filter: ${utils.beautify(filter)}`)
+    // log.d(mod, fun, `filter: ${utils.beautify(filter)}`)
 
     // const [sortOptions] = toMongoSortOptions({}, sortBy, { [idField]: 1 })
     const sortOptions = {}
@@ -656,7 +657,7 @@ exports.getObjectList = async (objectType, options) => {
     }
     sortOptions[DB_ID] = 1 // Default sort to get consistent offset/limit results
 
-    log.d(mod, fun, `sortOptions: ${utils.beautify(sortOptions)}`)
+    // log.d(mod, fun, `sortOptions: ${utils.beautify(sortOptions)}`)
 
     //--- Find
     if (utils.isEmptyArray(populateFields)) {
@@ -916,7 +917,7 @@ exports.updateObject = async (objectType, updateData) => {
 }
 
 exports.overwriteObject = async (objectType, updateData) => {
-  const fun = `updateObject`
+  const fun = `overwriteObject`
   // log.d(mod, fun, ``)
   try {
     assertIsString(fun, objectType)
@@ -928,12 +929,22 @@ exports.overwriteObject = async (objectType, updateData) => {
     const filter = { [idField]: rudiId }
     const updateOpts = { new: true, overwrite: true, upsert: true }
 
-    const populateOptions = getPopulateOptions(objectType)
-    if (utils.isEmptyArray(populateOptions)) {
-      return await Model.findOneAndUpdate(filter, updateData, updateOpts)
-    } else {
-      return await Model.findOneAndUpdate(filter, updateData, updateOpts).populate(populateOptions)
-    }
+    // const populateOptions = getPopulateOptions(objectType)
+    // let dbObject
+    // if (utils.isEmptyArray(populateOptions)) {
+    //   dbObject = await Model.findOneAndUpdate(filter, updateData, updateOpts)
+    // } else {
+    //   dbObject = await Model.findOneAndUpdate(filter, updateData, updateOpts).populate(
+    //     populateOptions
+    //   )
+    // }
+
+    const dbObject = await Model.findOneAndUpdate(filter, updateData, updateOpts)
+
+    // log.d(mod, fun, `dbObject: ${utils.beautify(dbObject)}`)
+    await dbObject.save()
+    // log.d(mod, fun, `dbObject: ${utils.beautify(dbObject)}`)
+    return dbObject
   } catch (err) {
     log.w(mod, fun, err)
     throw err
@@ -1511,9 +1522,7 @@ exports.isReferencedInMetadata = async (objectType, rudiId) => {
   // log.d(mod, fun, `truc: ${utils.beautify(truc2)}`)
   let dbId
   try {
-    dbId = await (await this.getObjectPropertiesWithRudiId(objectType, rudiId, [DB_ID])).toObject()[
-      DB_ID
-    ]
+    dbId = (await this.getObjectPropertiesWithRudiId(objectType, rudiId, [DB_ID]))[DB_ID]
   } catch (err) {
     const errMsg = msg.objectNotFound(objectType, rudiId)
     log.w(mod, fun, errMsg)
@@ -1679,7 +1688,11 @@ exports.addLogEntry = async (logLvl, loc_module, loc_function, msg) => {
     const logEntry = await new LogEntry(logInfo)
     return await logEntry.save()
   } catch (err) {
-    utils.consoleErr(loc_module, `${loc_function} > ${fun}`, `${logLvl} logging failed! msg: ${msg}, err: ${err}`)
+    utils.consoleErr(
+      loc_module,
+      `${loc_function} > ${fun}`,
+      `${logLvl} logging failed! msg: ${msg}, err: ${err}`
+    )
     // throw err
   }
 }

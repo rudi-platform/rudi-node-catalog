@@ -63,13 +63,14 @@ const themes = new Thesaurus(CODE, INIT_VALUES)
 
 const fun = `init ${CODE}`
 // log.d(mod, fun, ``)
-themes
-  .init()
-  .then(() => {
-    // log.d(mod, fun, `Themes: ${themes.get()}`)
-  })
-  .catch((err) => {
+
+;(async () => {
+  try {
+    await themes.init()
+    // log.d(mod, fun, `ok`)
+  } catch (e) {
     log.w(mod, fun, `Init failed: ${err}`)
-  })
+  }
+})()
 
 module.exports = themes

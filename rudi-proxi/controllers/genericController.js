@@ -12,7 +12,7 @@ const mod = 'genCtrl'
 // -----------------------------------------------------------------------------
 const mongoose = require('mongoose')
 const { boomify } = require('@hapi/boom')
-const uuid = require('uuid')
+const {v4: UUIDv4} = require('uuid')
 // const url = require('url')
 const { pick } = require('lodash')
 
@@ -23,11 +23,10 @@ const log = require('../utils/logging')
 const msg = require('../utils/msg')
 
 const sys = require('../config/confSystem')
-
 const db = require('../db/dbQueries')
-
 const json = require('../utils/jsonAccess')
-const utils = require('../utils/jsUtils')
+
+const { beautify, nowISO, isNotEmptyArray, isEmptyObject } = require('../utils/jsUtils')
 
 // -----------------------------------------------------------------------------
 // Constants
@@ -159,7 +158,7 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
 
   for (const [key, value] of urlSearchParams) {
     if (QUERY_RESERVED_WORDS.includes(key)) {
-      // log.d(mod, fun, `Key is a reserved word: ${utils.beautify(key)} => ${utils.beautify(queryParameters[key])}`)
+      // log.d(mod, fun, `Key is a reserved word: ${beautify(key)} => ${beautify(queryParameters[key])}`)
       switch (key) {
         case QUERY_LIMIT:
         case QUERY_OFFSET:
@@ -216,14 +215,14 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
           log.w(mod, fun, `Query keyword not recognized: '${key}'`)
       }
     } else if (modelProperties.includes(key)) {
-      // log.d(mod, fun, `Key is a ${objectType} property: ${utils.beautify(key)}`)
+      // log.d(mod, fun, `Key is a ${objectType} property: ${beautify(key)}`)
       const val = value
       try {
         const obj = JSON.parse(val)
-        // log.d(mod, fun, `parsed String: ${utils.beautify(obj)}`)
+        // log.d(mod, fun, `parsed String: ${beautify(obj)}`)
         returnedFilter[QUERY_FILTER][key] = obj
       } catch (err) {
-        const errMsg = `Error while parsing: '${utils.beautify(val)}': ${err}}`
+        const errMsg = `Error while parsing: '${beautify(val)}': ${err}}`
         // log.w(mod, fun, errMsg)
         returnedFilter[QUERY_FILTER][key] = val
         // throw new Error(errMsg)
@@ -248,7 +247,7 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
             [EXT_OBJ_VAL]: obj,
           })
         } catch (err) {
-          const errMsg = `Couldn't parse: '${utils.beautify(value)}': ${err}}`
+          const errMsg = `Couldn't parse: '${beautify(value)}': ${err}}`
           // log.w(mod, fun, errMsg)
           returnedFilter[EXT_REFS].push({
             [EXT_OBJ]: nestedField,
@@ -258,15 +257,15 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
           // throw new Error(errMsg)
         }
       } else {
-        log.w(mod, fun, `Key is unkown and ignored for ${objectType}: ${utils.beautify(key)}`)
-        // log.w(mod, fun, `Model properties: ${utils.beautify(modelProperties)}`)
+        log.w(mod, fun, `Key is unkown and ignored for ${objectType}: ${beautify(key)}`)
+        // log.w(mod, fun, `Model properties: ${beautify(modelProperties)}`)
       }
     }
   }
-  // log.d(mod, fun, `filterReturn: ${utils.beautify(filterReturn)}`)
+  // log.d(mod, fun, `filterReturn: ${beautify(filterReturn)}`)
 
   const extRefs = returnedFilter[EXT_REFS]
-  if (utils.isNotEmptyArray(extRefs)) {
+  if (isNotEmptyArray(extRefs)) {
     await Promise.all(
       extRefs.map(async (extRef) => {
         const extObj = extRef[EXT_OBJ]
@@ -275,7 +274,7 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
 
         const objFilter = { [extObjProp]: extObjVal }
 
-        log.d(mod, fun, `objFilter: ${utils.beautify(objFilter)}`)
+        log.d(mod, fun, `objFilter: ${beautify(objFilter)}`)
         let nestedFieldIds
         try {
           nestedFieldIds = await db.getNestedObject(objectType, extObj, objFilter, DB_ID)
@@ -284,19 +283,19 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
           // returnedFilter[QUERY_FILTER][extObj] = 0
           throw err
         }
-        log.d(mod, fun, `nestedFieldIds: ${utils.beautify(nestedFieldIds)}`)
+        log.d(mod, fun, `nestedFieldIds: ${beautify(nestedFieldIds)}`)
         let queryFilter
 
         const ids = await Promise.all(
           nestedFieldIds.map(async (foundObj) => {
-            log.d(mod, fun, `nestedFieldId: ${utils.beautify(foundObj[DB_ID])}`)
+            log.d(mod, fun, `nestedFieldId: ${beautify(foundObj[DB_ID])}`)
             return new mongoose.Types.ObjectId(foundObj[DB_ID])
           })
         )
 
         returnedFilter[QUERY_FILTER][extObj] = { $in: ids }
 
-        log.d(mod, fun, `filterReturn: ${utils.beautify(returnedFilter)}`)
+        log.d(mod, fun, `filterReturn: ${beautify(returnedFilter)}`)
       })
     )
   }
@@ -349,15 +348,20 @@ async function isObjectReferenced(objectType, rudiId) {
   }
 }
 
-exports.setPublishedFlag = async (dbObject) => {
+exports.setPublishedFlag = async (dbObject, rudiId) => {
   const fun = 'setPublishedFlag'
   log.d(mod, fun, '')
-  if (!dbObject[DB_PUBLISHED_AT]) {
-    dbObject[DB_PUBLISHED_AT] = utils.nowISO()
-    dbObject.save()
-    log.d(mod, fun, `dbObject published: ${utils.beautify(dbObject)}`)
-  } else {
-    log.w(mod, fun, `Data was already published on : ${dbObject[DB_PUBLISHED_AT]}`)
+  try {
+    if (!dbObject[DB_PUBLISHED_AT]) {
+      dbObject[DB_PUBLISHED_AT] = nowISO()
+      await dbObject.save()
+      log.d(mod, fun, `dbObject published: ${beautify(dbObject)}`)
+    } else {
+      log.w(mod, fun, `Data was already published for id '${rudiId}'`)
+    }
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
   }
 }
 
@@ -382,7 +386,7 @@ exports.addSingleObject = async (req, reply) => {
     const rudiObject = req.body
 
     // retrieving the id
-    // log.d(mod, fun, `objectType: '${objectType}', incomingData: '${utils.beautify(rudiObject)}' `)
+    // log.d(mod, fun, `objectType: '${objectType}', incomingData: '${beautify(rudiObject)}' `)
     const rudiId = json.accessProperty(rudiObject, idField)
 
     // First: we make sure object doesn't exist already
@@ -391,7 +395,7 @@ exports.addSingleObject = async (req, reply) => {
 
     // Creating new object + specific treatments
     const createdObject = await newObject(objectType, rudiObject)
-    // log.v(mod, fun, utils.beautify(createdObject, 2))
+    // log.v(mod, fun, beautify(createdObject, 2))
     log.i(mod, fun, `${msg.objectAdded(objectType, rudiId)}`)
     return createdObject
   } catch (err) {
@@ -441,7 +445,7 @@ exports.getObjectList = async (req, reply) => {
  * Get several objects for an particular object type
  */
 exports.getManyObjects = async (objectType, req, reply) => {
-  const fun = 'getObjectList'
+  const fun = 'getManyObjects'
   try {
     let parsedParameters
     try {
@@ -497,7 +501,7 @@ exports.getManyObjects = async (objectType, req, reply) => {
 
       objectList = await db.countObjectList(objectType, countBy, options)
     }
-    // log.d(mod, fun, `objectList: ${utils.beautify(objectList)}`)
+    // log.d(mod, fun, `objectList: ${beautify(objectList)}`)
 
     return objectList
   } catch (err) {
@@ -507,7 +511,7 @@ exports.getManyObjects = async (objectType, req, reply) => {
 }
 
 /**
- * Update an existing object
+ * Update an existing object (obsolete)
  * => PUT /{object}
  */
 exports.updateSingleObject = async (req, reply) => {
@@ -616,7 +620,7 @@ exports.deleteObjectList = async (req, reply) => {
 
     // retrieve incoming data
     const filter = req.body
-    log.d(mod, fun, utils.beautify(filter))
+    log.d(mod, fun, beautify(filter))
     let deletionResult
     if (Array.isArray(filter)) {
       deletionResult = await db.deleteManyWithRudiIds(objectType, filter)
@@ -626,10 +630,10 @@ exports.deleteObjectList = async (req, reply) => {
     return deletionResult
   } catch (err) {
     log.e(mod, fun, err)
-    log.e(mod, fun, `method: ${utils.beautify(req.method)}`)
-    log.e(mod, fun, `url: ${utils.beautify(req.url)}`)
-    log.e(mod, fun, `params: ${utils.beautify(req.params)}`)
-    log.e(mod, fun, `body: ${utils.beautify(req.body)}`)
+    log.e(mod, fun, `method: ${beautify(req.method)}`)
+    log.e(mod, fun, `url: ${beautify(req.url)}`)
+    log.e(mod, fun, `params: ${beautify(req.params)}`)
+    log.e(mod, fun, `body: ${beautify(req.body)}`)
     throw boomify(err)
   }
 }
@@ -645,12 +649,12 @@ exports.deleteManyObjects = async (req, reply) => {
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
 
     let parsedParameters = await this.parseQueryParameters(objectType, req.url)
-    log.d(mod, fun, `parsedParameters: ${utils.beautify(parsedParameters)}`)
+    log.d(mod, fun, `parsedParameters: ${beautify(parsedParameters)}`)
     const filter = parsedParameters[QUERY_FILTER]
     const fields = parsedParameters[QUERY_FIELDS]
     const confirmation = parsedParameters[QUERY_CONFIRM] || false
 
-    if (utils.isEmptyObject(filter)) {
+    if (isEmptyObject(filter)) {
       if (confirmation) return await db.deleteAll(objectType)
       else {
         const msg = `use confirm=true as a parameter to confirm the deletion of all ${objectType}`
@@ -683,7 +687,7 @@ exports.generateUUID = async (req, reply) => {
   const fun = 'generateUUID'
   log.d(mod, fun, ``)
   try {
-    return uuid.v4()
+    return UUIDv4()
   } catch (err) {
     log.e(mod, fun, err)
     throw boomify(err)

@@ -113,9 +113,10 @@ exports.addSingleReportForObject = async (req, reply) => {
     log.d(mod, fun, `save new integration report`)
     await dbReadyReport.save()
     log.i(mod, fun, `Report saved: ${utils.beautify(dbReadyReport)}`)
+    log.d(mod, fun, `dbObject: ${utils.beautify(dbObject)}`)
 
-    if (IntegrationStatus.OK === reportBody[API_REPORT_STATUS]) {
-      await genericController.setPublishedFlag(dbObject)
+    if (reportBody[API_REPORT_STATUS] === IntegrationStatus.OK) {
+      await genericController.setPublishedFlag(dbObject, urlObjectId)
     }
 
     return dbReadyReport

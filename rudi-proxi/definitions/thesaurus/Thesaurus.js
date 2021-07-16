@@ -54,7 +54,12 @@ module.exports = class Thesaurus {
       } catch (err) {
         log.d(mod, fun, 'No values found in DB')
         this.#currentValues = this.#initValues
-        await this.#storeCurrentValues()
+        try {
+          await this.#storeCurrentValues()
+          log.d(mod, fun, 'Current values stored in DB')
+        } catch (err) {
+          log.w(mod, fun, 'Failed to store current enum values')
+        }
       }
     }
     this.#isInit = true
@@ -115,7 +120,7 @@ module.exports = class Thesaurus {
   }
 
   #retrieveDbValues = async () => {
-    const fun = 'retrieveDbValues'
+    const fun = '#retrieveDbValues'
     try {
       const dbValues = await this.#getEnum(this.#code)
       if (dbValues) {
@@ -130,7 +135,7 @@ module.exports = class Thesaurus {
   }
 
   #storeCurrentValues = async () => {
-    const fun = 'storeCurrentValues'
+    const fun = '#storeCurrentValues'
     try {
       if (!this.#currentValues) throw new Error('Values not inititalized')
       await this.#storeEnum(this.#code, this.#currentValues)
@@ -141,7 +146,7 @@ module.exports = class Thesaurus {
   }
 
   #getEnum = async (typeThesaurus) => {
-    const fun = 'getEnum'
+    const fun = '#getEnum'
     // log.d(mod, fun, ``)
 
     try {
@@ -155,7 +160,7 @@ module.exports = class Thesaurus {
   }
 
   #storeEnum = async (typeThesaurus, listValues) => {
-    const fun = 'storeEnum'
+    const fun = '#storeEnum'
     // log.d(mod, fun, ``)
 
     try {

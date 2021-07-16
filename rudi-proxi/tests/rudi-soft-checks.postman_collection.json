@@ -583,7 +583,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"contact_id\": \"{{softContact1Id}}\",\n    \"contact_name\": \"{{softContact1Name}}\",\n    \"email\": \"{{softContact1Email}}\"\n}",
+							"raw": "{\n    \"contact_id\": \"{{softContact1Id}}\",\n    \"contact_name\": \"{{softContact1Name}}\",\n    \"email\": \"{{softContact1Email}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -640,7 +640,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"contact_id\": \"{{softContact2Id}}\",\n    \"contact_name\": \"{{softContact2Name}}\",\n    \"email\": \"{{softContact2Email}}\"\n}",
+							"raw": "{\n    \"contact_id\": \"{{softContact2Id}}\",\n    \"contact_name\": \"{{softContact2Name}}\",\n    \"email\": \"{{softContact2Email}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -697,7 +697,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"contact_id\": \"{{softContact3Id}}\",\n    \"contact_name\": \"{{softContact3Name}}\",\n    \"email\": \"{{softContact3Email}}\"\n}",
+							"raw": "{\n    \"contact_id\": \"{{softContact3Id}}\",\n    \"contact_name\": \"{{softContact3Name}}\",\n    \"email\": \"{{softContact3Email}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -793,7 +793,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"contact_id\": \"{{softContact1Id}}\",\n    \"contact_name\": \"{{softContact3Name}}\",\n    \"email\": \"{{softContact3Email}}\"\n}",
+							"raw": "{\n    \"contact_id\": \"{{softContact1Id}}\",\n    \"contact_name\": \"{{softContact3Name}}\",\n    \"email\": \"{{softContact3Email}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -889,7 +889,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"organization_id\": \"{{softOrg1Id}}\",\n    \"organization_name\": \"{{softOrg1Name}}\",\n    \"organization_address\": \"{{softOrg1Address}}\"\n}",
+							"raw": "{\n    \"organization_id\": \"{{softOrg1Id}}\",\n    \"organization_name\": \"{{softOrg1Name}}\",\n    \"organization_address\": \"{{softOrg1Address}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -945,7 +945,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"organization_id\": \"{{softOrg2Id}}\",\n    \"organization_name\": \"{{softOrg2Name}}\",\n    \"organization_address\": \"{{softOrg2Address}}\"\n}",
+							"raw": "{\n    \"organization_id\": \"{{softOrg2Id}}\",\n    \"organization_name\": \"{{softOrg2Name}}\",\n    \"organization_address\": \"{{softOrg2Address}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1037,7 +1037,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"organization_id\": \"{{softOrg2Id}}\",\n    \"organization_name\": \"{{softOrg2Name}}\",\n    \"organization_address\": \"{{softOrg2Address}}\"\n}",
+							"raw": "{\n    \"organization_id\": \"{{softOrg2Id}}\",\n    \"organization_name\": \"{{softOrg2Name}}\",\n    \"organization_address\": \"{{softOrg2Address}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2258,7 +2258,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"global_id\": \"{{softMeta1Id}}\",\n    \"resource_title\": \"Test de RUDI en local 44\",\n    \"summary\": [{\n        \"lang\": \"fr-FR\",\n        \"text\": \"Mon résumé chg 444\"\n    }],\n    \"producer\": {\n        \"organization_id\": \"{{softOrg1Id}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{softContact1Id}}\"\n        }\n    ],\n    \"metadata_info\": {\n        \"metadata_provider\": {\n            \"organization_id\": \"{{softOrg2Id}}\"\n        },\n        \"metadata_contacts\": [\n            {\n                \"contact_id\": \"{{softContact2Id}}\"\n            }\n        ],\n        \"metadata_dates\": {\n            \"created\": \"{{now}}\"\n        }\n    }\n}",
+							"raw": "{\n    \"global_id\": \"{{softMeta1Id}}\",\n    \"local_id\": \"testingID {{softMeta1Id}}\",\n    \"doi\": \"10.1007/s00223-003-0070-444/{{softMeta1Id}}\",\n    \"resource_title\": \"Test de RUDI en local {{softMeta1Id}}\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 4444\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 4\"\n        }\n    ],\n    \"collection_tag\": \"{{stamp}}\",\n    \"purpose\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{stamp}}\"\n        }\n    ],\n    \"theme\": \"oceans\",\n    \"keywords\": [\n        \"energy_consommation\",\n        \"electricity\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{softOrg1Id}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{softContact1Id}}\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_provider\": {\n            \"organization_id\": \"{{softOrg2Id}}\"\n        },\n        \"metadata_contacts\": [\n            {\n                \"contact_id\": \"{{softContact2Id}}\"\n            }\n        ]\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"licence_label\": \"{{softLicence}}\"\n        }\n    },\n    \"available_formats\": [\n        {\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{softMedia1Id}}\",\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.1.0\"\n            },\n            \"file_type\": \"application/json\",\n            \"file_size\": 59016,\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"4c9ee0f14e835927a1bbafde0eb89fb3\"\n            }\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"

@@ -592,7 +592,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"contact_id\": \"{{contId1}}\",\n    \"contact_name\": \"M. Fazo\",\n    \"email\": \"fazo@irisa.fr\"\n}",
+							"raw": "{\n    \"contact_id\": \"{{contId1}}\",\n    \"contact_name\": \"M. Fazo\",\n    \"email\": \"fazo@irisa.fr\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -636,7 +636,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n   \"contact_id\": \"{{contId2}}\",\n   \"contact_name\": \"Mme. Feya\",\n    \"email\": \"feya@irisa.fr\"\n}",
+							"raw": "{\n   \"contact_id\": \"{{contId2}}\",\n   \"contact_name\": \"Mme. Feya\",\n    \"email\": \"feya@irisa.fr\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -690,7 +690,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n   \"contact_id\": \"{{contId3}}\",\n   \"contact_name\": \"Mme. Areio\",\n    \"email\": \"areio@irisa.fr\"\n}",
+							"raw": "{\n   \"contact_id\": \"{{contId3}}\",\n   \"contact_name\": \"Mme. Areio\",\n    \"email\": \"areio@irisa.fr\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -771,7 +771,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"contact_id\": \"{{contId1}}\",\n    \"contact_name\": \"M. Fazo Gres\",\n    \"email\": \"fazo@univ-rennes1.fr\"\n}",
+							"raw": "{\n    \"contact_id\": \"{{contId1}}\",\n    \"contact_name\": \"M. Fazo Gres\",\n    \"email\": \"fazo@univ-rennes1.fr\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3678,7 +3678,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{logs}}?log_level=info&limit=20&time={\"$gte\":1625757072442}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{logs}}?limit=20&time={\"$gte\":1625757072442}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -3687,10 +3687,6 @@
 								"{{logs}}"
 							],
 							"query": [
-								{
-									"key": "log_level",
-									"value": "info"
-								},
 								{
 									"key": "limit",
 									"value": "20"

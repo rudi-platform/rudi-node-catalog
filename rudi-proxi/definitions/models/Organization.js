@@ -18,22 +18,29 @@ const { FIELDS_TO_SKIP } = require('../../db/dbFields')
 // -----------------------------------------------------------------------------
 const OrganizationSchema = new mongoose.Schema(
   {
-    // Unique and permanent identifier for the organization in RUDI
-    // system (required)
+    /**
+     * Unique and permanent identifier for the organization in RUDI
+     * system (required)
+     */
     organization_id: ids.UUIDv4,
 
-    // Updated offical name of the organization
+    /** Updated offical name of the organization */
     organization_name: {
       type: String,
       required: true,
     },
 
-    // Updated offical postal address of the organization
+    /** Updated offical postal address of the organization */
     organization_address: {
       type: String,
     },
 
-    // Time when this organization was succesfully published on RUDI portal
+    /** Tag for identifying a collection of resources */
+    collection_tag: {
+      type: String,
+    },
+
+    /** Time when this organization was succesfully published on RUDI portal */
     publishedAt: {
       type: Date,
     },

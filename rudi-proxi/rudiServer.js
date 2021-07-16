@@ -72,17 +72,20 @@ const mongoConnectOptions = {
 const logSeparatorConf =
   '---------------------------------------------------------------[Conf OK]--'
 console.log(utils.nowLocaleFormatted(), logSeparatorConf)
-addLogEntry('info', 'app', 'launching', logSeparatorConf)
+addLogEntry('info', 'app', 'logSeparatorConf', logSeparatorConf).catch((err) =>
+  utils.consoleErr('info', 'app', 'logSeparatorConf: ' + err)
+)
 
 log.i(mod, 'mongo', `Connecting to [${sys.DB_URL}]`)
-const mongoConnection = mongoose.connect(sys.DB_URL, mongoConnectOptions)
-
-mongoConnection
+mongoose
+  .connect(sys.DB_URL, mongoConnectOptions)
   .then(() => {
     log.i(mod, 'mongo', `MongoDB connected`)
     log.i(mod, 'app', `Application version '${sysController.getAppHash()}' | API ${api.VERSION}`)
     const logSeparatorEnd = utils.separateLogs('Init OK')
-    addLogEntry('info', 'app', 'launching', logSeparatorEnd)
+    addLogEntry('info', 'app', 'logSeparatorEnd', logSeparatorEnd).catch((err) =>
+      utils.consoleErr('info', 'app', 'logSeparatorEnd: ' + err)
+    )
   })
   .catch((err) => log.e(mod, 'mongoConnection', err))
 
@@ -133,12 +136,12 @@ publicRoutes.forEach((pubRoute, index) => {
 // Loop over each backoffice route
 backOfficeRoutes.forEach((boRoute, index) => {
   fastify.route(boRoute)
-  log.v(mod, 'routes', `Private route #${index} = ${boRoute.method} ${boRoute.url}`)
+  // log.v(mod, 'routes', `Private route #${index} = ${boRoute.method} ${boRoute.url}`)
 })
 
 devRoutes.forEach((devRoute, index) => {
   fastify.route(devRoute)
-  log.d(mod, 'routes', `Dev route #${index} = ${devRoute.method} ${devRoute.url}`)
+  // log.d(mod, 'routes', `Dev route #${index} = ${devRoute.method} ${devRoute.url}`)
 })
 
 // -----------------------------------------------------------------------------
@@ -176,6 +179,6 @@ process.on('uncaughtException', (err) => {
 
 process.on('unhandledRejection', (error, promise) => {
   const fun = 'catching promise rejection'
-  log.e(mod, fun, 'DAMN!!! Promise rejection not handled here: ', promise)
-  log.e(mod, fun, 'The error was: ', error)
+  log.e(mod, fun, 'DAMN!!! Promise rejection not handled here: ' + utils.beautify(promise))
+  log.e(mod, fun, 'The error was: ' + error)
 })

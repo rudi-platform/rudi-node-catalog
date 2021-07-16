@@ -568,17 +568,21 @@ async function checkThesaurus(metadata) {
 
   try {
     const theme = metadata[API_THEME_PROPERTY]
-    if (!Themes.isValid(theme, shouldInit))
+    if (!(await Themes.isValid(theme, shouldInit)))
       throw new Error(msg.incorrectVal(API_THEME_PROPERTY, theme))
 
     const keywords = metadata[API_KEYWORDS_PROPERTY]
     // log.d(mod, fun, `keywords: ${utils.beautify(keywords)}`)
+
     await Promise.all(
       keywords.map((keyword) => {
         // log.d(mod, fun, `keyword: ${keyword}`)
-        if (!Keywords.isValid(keyword, shouldInit))
-          throw new Error(msg.incorrectVal('keywords', keyword))
-        return true
+        Keywords.isValid(keyword, shouldInit)
+          .then((resolve) => {
+            if (resolve) return true
+            else throw new Error(msg.incorrectVal(API_KEYWORDS_PROPERTY, keyword))
+          })
+          .catch((err) => log.w(mod, fun, err))
       })
     )
 
@@ -762,6 +766,7 @@ MetadataSchema.post('save', async function (doc, next) {
 
   try {
     await this.populate(POPULATE_OPTS).execPopulate()
+    next()
   } catch (err) {
     next(err)
   }

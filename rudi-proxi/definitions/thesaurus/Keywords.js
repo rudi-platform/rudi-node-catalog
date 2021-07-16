@@ -45,13 +45,22 @@ const INIT_VALUES = [
 const keywords = new Thesaurus(CODE, INIT_VALUES)
 
 const fun = `init ${CODE}`
-keywords
-  .init()
-  .then(() => {
-    // log.d(mod, fun, `Keywords: ${keywords.get()}`)
-  })
-  .catch((err) => {
-    log.w(mod, fun, `Init failed: ${err}`)
-  })
+// keywords
+//   .init()
+//   .then(() => {
+//     // log.d(mod, fun, `Keywords: ${keywords.get()}`)
+//   })
+//   .catch((err) => {
+//     log.w(mod, fun, `Init failed: ${err}`)
+//   })
+
+  ;(async () => {
+    try {
+      await keywords.init()
+      // log.d(mod, fun, `ok`)
+    } catch (e) {
+      log.w(mod, fun, `Init failed: ${err}`)
+    }
+  })()
 
 module.exports = keywords

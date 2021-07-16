@@ -9,6 +9,7 @@ const mod = 'metaCtrl'
 // -----------------------------------------------------------------------------
 // External dependancies
 // -----------------------------------------------------------------------------
+const mongoose = require('mongoose')
 const { mergeWith } = require('lodash')
 const { boomify } = require('@hapi/boom')
 
@@ -17,7 +18,13 @@ const { boomify } = require('@hapi/boom')
 // -----------------------------------------------------------------------------
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
-const utils = require('../utils/jsUtils')
+const {
+  beautify,
+  deepClone,
+  isNotEmptyArray,
+  isEmptyArray,
+  isNothing,
+} = require('../utils/jsUtils')
 
 const db = require('../db/dbQueries')
 const json = require('../utils/jsonAccess')
@@ -102,6 +109,7 @@ exports.organizationRudiToDbFormat = async (rudiProducer, shouldCreateIfNotFound
   if (rudiProducer == null) throw new Error(`${msg.parameterExpected(fun, 'rudiProducer')}`)
 
   let organizationDbId = await db.getOrganizationDbIdWithJson(rudiProducer)
+  // log.d(mod, fun, `organizationDbId: -> ${organizationDbId} `)
 
   if (!organizationDbId) {
     if (!shouldCreateIfNotFound) {
@@ -110,12 +118,13 @@ exports.organizationRudiToDbFormat = async (rudiProducer, shouldCreateIfNotFound
       throw new Error(errMsg)
     }
     const newOrg = await organisationController.newOrganization(rudiProducer)
-    log.d(mod, fun, `new Organization: ${utils.beautify(rudiProducer)}`)
+    newOrg.save()
+    log.d(mod, fun, `new Organization: ${beautify(rudiProducer)}`)
 
     organizationDbId = newOrg[DB_ID]
   }
-  // log.d(mod, fun, `${utils.beautify(rudiProducer)} -> ${organizationDbId} `)
-  return organizationDbId
+  // log.d(mod, fun, `${beautify(rudiProducer)} -> ${organizationDbId} `)
+  return new mongoose.Types.ObjectId(organizationDbId)
 }
 
 exports.contactListRudiToDbFormat = async (rudiContactList, shouldCreateIfNotFound) => {
@@ -135,12 +144,13 @@ exports.contactListRudiToDbFormat = async (rudiContactList, shouldCreateIfNotFou
           )
 
         const dbContact = await contactController.newContact(rudiContact)
-        log.d(mod, fun, `new Contact: ${utils.beautify(rudiContact)}`)
+        dbContact.save()
+        log.d(mod, fun, `new Contact: ${beautify(rudiContact)}`)
 
         contactDbId = dbContact[DB_ID]
       }
-      contactDbIds.push(contactDbId)
-      // log.d(mod, fun, `${utils.beautify(rudiContact)} -> ${contactDbId}`)
+      contactDbIds.push(new mongoose.Types.ObjectId(contactDbId))
+      // log.d(mod, fun, `${beautify(rudiContact)} -> ${contactDbId}`)
     })
   )
   return contactDbIds
@@ -149,34 +159,33 @@ exports.contactListRudiToDbFormat = async (rudiContactList, shouldCreateIfNotFou
 exports.mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFound) => {
   const fun = 'mediaListRudiToDbFormat'
   log.d(mod, fun, ``)
-  // log.d(mod, fun, `rudiMediaList: ${utils.beautify(rudiMediaList)}`)
+  // log.d(mod, fun, `rudiMediaList: ${beautify(rudiMediaList)}`)
   if (rudiMediaList == null) throw new Error(`${msg.parameterExpected(fun, 'rudiMediaList')}`)
 
   const mediaDbIds = []
   await Promise.all(
     rudiMediaList.map(async (rudiMedia) => {
-      // log.d(mod, fun, `rudiMedia: ${utils.beautify(rudiMedia)}`)
+      // log.d(mod, fun, `rudiMedia: ${beautify(rudiMedia)}`)
 
-      let mediaDbId
-      mediaDbId = await db.getMediaDbIdWithJson(rudiMedia)
+      let mediaDbId = await db.getMediaDbIdWithJson(rudiMedia)
 
       if (!mediaDbId) {
         if (!shouldCreateIfNotFound)
           throw new Error(`${msg.objectNotFound(PARAM_OBJECT_MEDIA, rudiMedia[API_MEDIA_ID])}`)
 
-        // log.d(mod, fun, `rudiMedia[API_MEDIA_TYPE_PROPERTY]: ${utils.beautify(rudiMedia[API_MEDIA_TYPE_PROPERTY])}`)
+        // log.d(mod, fun, `rudiMedia[API_MEDIA_TYPE_PROPERTY]: ${beautify(rudiMedia[API_MEDIA_TYPE_PROPERTY])}`)
         const media = new Media(rudiMedia)
-        // log.d(mod, fun, `new Media: ${utils.beautify(media)}`)
+        // log.d(mod, fun, `new Media: ${beautify(media)}`)
 
         // log.d(mod, fun, media)
         const dbActionResult = await media.save()
-        // log.d(mod, fun, `dbActionResult: ${utils.beautify(dbActionResult)}`)
+        log.d(mod, fun, `dbActionResult: ${beautify(dbActionResult)}`)
 
         mediaDbId = media[DB_ID]
-        // log.d(mod, fun, `newly created mediaDbId: ${utils.beautify(mediaDbId)}`)
+        // log.d(mod, fun, `newly created mediaDbId: ${beautify(mediaDbId)}`)
       }
-      mediaDbIds.push(mediaDbId)
-      // log.d(mod, fun, `${utils.beautify(rudiMedia)} -> ${mediaDbId} `)
+      mediaDbIds.push(new mongoose.Types.ObjectId(mediaDbId))
+      // log.d(mod, fun, `${beautify(rudiMedia)} -> ${mediaDbId} `)
     })
   )
   return mediaDbIds
@@ -184,7 +193,7 @@ exports.mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFound) 
 
 function customMerger(value, srcValue, key, object, source) {
   const fun = 'customMerger'
-  log.v(mod, fun, `'${key}': ${utils.beautify(srcValue)} -> ${utils.beautify(value)}`)
+  log.v(mod, fun, `'${key}': ${beautify(srcValue)} -> ${beautify(value)}`)
   if (Array.isArray(srcValue)) return srcValue
   return undefined
   // switch(key){
@@ -198,7 +207,7 @@ function customMerger(value, srcValue, key, object, source) {
 async function metadataCustomMerge(dbMetadata, dbReadyModMetadata) {
   const fun = 'metadataCustomMerge'
   log.d(mod, fun, ``)
-  // log.d(mod, fun, `dbMetadata: ${utils.beautify(dbMetadata)}`)
+  // log.d(mod, fun, `dbMetadata: ${beautify(dbMetadata)}`)
 
   //   const dataDates = dbMetadata[API_DATA_DATES_PROPERTY]
   //   const metaDates = dbMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY]
@@ -215,7 +224,7 @@ async function metadataCustomMerge(dbMetadata, dbReadyModMetadata) {
   // dbMetadata[API_DATA_DATES_PROPERTY] = dataDates
   // dbMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY] = metaDates
 
-  // log.d(mod, fun, `dbMetadata updated: ${utils.beautify(dbMetadata)}`)
+  // log.d(mod, fun, `dbMetadata updated: ${beautify(dbMetadata)}`)
   return dbMetadata
 }
 
@@ -229,16 +238,16 @@ exports.organizationDbToRudiFormat = async (producerDbId) => {
   if (producerDbId == null) throw new Error(`${msg.parameterExpected(fun, 'producerDbId')}`)
 
   const dbOrganization = await db.getEnsuredOrganizationWithDbId(producerDbId)
-  log.d(mod, fun, `dbOrganization -> ${utils.beautify(dbOrganization)}`)
+  log.d(mod, fun, `dbOrganization -> ${beautify(dbOrganization)}`)
   // const cleanedOrganization = dbRwk.unmongoosify(dbOrganization)
-  // log.d(mod, fun, `${producerDbId} -> ${utils.beautify(cleanedOrganization)}`)
+  // log.d(mod, fun, `${producerDbId} -> ${beautify(cleanedOrganization)}`)
   return dbOrganization
 }
 
 exports.contactListDbToRudiFormat = async (contactsDbIds) => {
   const fun = 'contactListDbToRudiFormat'
   log.d(mod, fun, ``)
-  log.d(mod, fun, `contactsDbIds: ${utils.beautify(contactsDbIds)}`)
+  log.d(mod, fun, `contactsDbIds: ${beautify(contactsDbIds)}`)
   if (contactsDbIds == null) throw new Error(`${msg.parameterExpected(fun, 'contactsDbIds')}`)
 
   const contacts = []
@@ -248,7 +257,7 @@ exports.contactListDbToRudiFormat = async (contactsDbIds) => {
       const contact = await db.getEnsuredContactWithDbId(contactDbId)
       // contacts.push(dbRwk.unmongoosify(contact))
       contacts.push(contact)
-      log.d(mod, fun, `${contactDbId} -> ${utils.beautify(contact)}`)
+      log.d(mod, fun, `${contactDbId} -> ${beautify(contact)}`)
     })
   )
   return contacts
@@ -257,7 +266,7 @@ exports.contactListDbToRudiFormat = async (contactsDbIds) => {
 exports.mediaListDbToRudiFormat = async (mediaDbIds) => {
   const fun = 'mediaListDbToRudiFormat'
   log.d(mod, fun, ``)
-  log.d(mod, fun, `mediaDbIds: ${utils.beautify(mediaDbIds)}`)
+  log.d(mod, fun, `mediaDbIds: ${beautify(mediaDbIds)}`)
   if (!mediaDbIds) throw new Error(`${msg.parameterExpected(fun, 'mediaDbIds')}`)
 
   const mediaList = []
@@ -267,7 +276,7 @@ exports.mediaListDbToRudiFormat = async (mediaDbIds) => {
       const dbMedia = await db.getEnsuredMediaWithDbId(mediaDbId)
       // contacts.push(dbRwk.unmongoosify(contact))
       mediaList.push(dbMedia)
-      log.d(mod, fun, `${mediaDbId} -> ${utils.beautify(dbMedia)}`)
+      log.d(mod, fun, `${mediaDbId} -> ${beautify(dbMedia)}`)
     })
   )
   return mediaList
@@ -293,10 +302,10 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
 
   if (!rudiMetadata) throw new Error(msg.parameterExpected(fun, 'rudiMetadata'))
 
-  // let dbReadyMetadata = utils.deepClone(rudiMetadata)
+  // let dbReadyMetadata = deepClone(rudiMetadata)
   let dbReadyMetadata
   if (shouldClone) {
-    dbReadyMetadata = utils.deepClone(rudiMetadata)
+    dbReadyMetadata = deepClone(rudiMetadata)
   } else {
     dbReadyMetadata = rudiMetadata
   }
@@ -327,7 +336,7 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
     } else {
       contacts = dbReadyMetadata[API_DATA_CONTACTS_PROPERTY]
     }
-    if (utils.isNotEmptyArray(contacts)) {
+    if (isNotEmptyArray(contacts)) {
       dbReadyMetadata[API_DATA_CONTACTS_PROPERTY] = await this.contactListRudiToDbFormat(
         contacts,
         SHOULD_CREATE_IF_NOT_FOUND
@@ -343,14 +352,14 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
     } else {
       mediaList = dbReadyMetadata[API_MEDIA_PROPERTY]
     }
-    // log.d(mod, fun, `mediaList: ${utils.beautify(mediaList)}`)
-    if (utils.isNotEmptyArray(mediaList)) {
+    // log.d(mod, fun, `mediaList: ${beautify(mediaList)}`)
+    if (isNotEmptyArray(mediaList)) {
       dbReadyMetadata[API_MEDIA_PROPERTY] = await this.mediaListRudiToDbFormat(
         mediaList,
         SHOULD_CREATE_IF_NOT_FOUND
       )
     }
-    // log.d(mod, fun, `media list: ${utils.beautify(dbReadyMetadata[API_MEDIA_PROPERTY])}`)
+    // log.d(mod, fun, `media list: ${beautify(dbReadyMetadata[API_MEDIA_PROPERTY])}`)
 
     // ----- Updating metadataInfo.metadata_provider field (same as above producer organization) with db instead of incoming data
     // TODO[VALIDATE]: The organization info already in database is not updated with possible new data,
@@ -370,16 +379,16 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
       }
 
       const metaInfoContacts = metaInfo[API_METAINFO_CONTACTS_PROPERTY]
-      if (utils.isNotEmptyArray(metaInfoContacts)) {
+      if (isNotEmptyArray(metaInfoContacts)) {
         dbReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_CONTACTS_PROPERTY] =
           await this.contactListRudiToDbFormat(metaInfoContacts)
       }
     }
 
-    if (utils.isEmptyArray(dbReadyMetadata[API_PURPOSE])) {
+    if (isEmptyArray(dbReadyMetadata[API_PURPOSE])) {
       delete dbReadyMetadata[API_PURPOSE]
     }
-    const langStr = utils.beautify(dbReadyMetadata[API_LANGUAGES_PROPERTY])
+    const langStr = beautify(dbReadyMetadata[API_LANGUAGES_PROPERTY])
     // log.d(mod, fun, `langStr: ${langStr}`)
     if (langStr === '[]' || langStr === '[null]') {
       log.d(mod, fun, `removing lang field: ${langStr}`)
@@ -387,7 +396,7 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
     }
     this.setGeography(dbReadyMetadata)
 
-    // log.d(mod, fun, `dbReadyMetadata: ${utils.beautify(dbReadyMetadata, 2)}`)
+    // log.d(mod, fun, `dbReadyMetadata: ${beautify(dbReadyMetadata, 2)}`)
     return dbReadyMetadata
   } catch (err) {
     log.w(mod, fun, err)
@@ -411,7 +420,7 @@ exports.setGeography = (metadata) => {
   const fun = 'setGeography'
   // log.d(mod, fun, ``)
   const geography = metadata[API_GEOGRAPHY_PROPERTY]
-  if (utils.isNothing(geography)) {
+  if (isNothing(geography)) {
     // No 'geography' property => exit
     // log.d(mod, fun, `No '${API_GEOGRAPHY_PROPERTY}' property was set`)
     return
@@ -419,13 +428,13 @@ exports.setGeography = (metadata) => {
 
   const bbox = geography[API_GEO_BBOX_PROPERTY]
   const geojson = geography[API_GEO_GEOJSON_PROPERTY]
-  // log.d(mod, fun, `bbox: ${utils.beautify(bbox)}`)
-  // log.d(mod, fun, `geojson: ${utils.beautify(geojson)}`)
+  // log.d(mod, fun, `bbox: ${beautify(bbox)}`)
+  // log.d(mod, fun, `geojson: ${beautify(geojson)}`)
 
-  if (utils.isNothing(bbox)) {
+  if (isNothing(bbox)) {
     // No 'bounding_box' property
     // log.d(mod, fun, `No '${API_GEO_BBOX_PROPERTY}' property was set`)
-    if (utils.isNothing(geojson)) {
+    if (isNothing(geojson)) {
       // No 'bounding_box' property nor GeoJSON => problem
       // log.d(mod, fun, `No '${API_GEO_GEOJSON_PROPERTY}' property was set`)
       // No geographic information
@@ -441,15 +450,15 @@ exports.setGeography = (metadata) => {
       return
     }
   }
-  if (!utils.isNothing(geojson)) {
+  if (!isNothing(geojson)) {
     // Both GeoJSON and 'bounding_box' properties are set => exit
     const msg =
       `Both '${API_GEO_BBOX_PROPERTY}' ` +
       `and '${API_GEO_GEOJSON_PROPERTY}' properties are already set`
 
     // log.d(mod, fun, msg)
-    // log.d(mod, fun, `'${API_GEO_BBOX_PROPERTY}' = ${utils.beautify(bbox)}`)
-    // log.d(mod, fun, `'${API_GEO_GEOJSON_PROPERTY}' = ${utils.beautify(geojson)}`)
+    // log.d(mod, fun, `'${API_GEO_BBOX_PROPERTY}' = ${beautify(bbox)}`)
+    // log.d(mod, fun, `'${API_GEO_GEOJSON_PROPERTY}' = ${beautify(geojson)}`)
 
     // TODO: check that 'geographic_distribution' property is a valid GeoJSON
     // TODO: set bbox property if not set
@@ -486,12 +495,12 @@ exports.setGeography = (metadata) => {
 exports.newMetadata = async (rudiMetadata) => {
   const fun = 'newMetadata'
   log.d(mod, fun, ``)
-  // log.d(mod, fun, `incoming object: ${utils.beautify(rudiMetadata)}`)
+  // log.d(mod, fun, `incoming object: ${beautify(rudiMetadata)}`)
   if (!rudiMetadata) throw new Error(`${msg.parameterExpected(fun, 'rudiMetadata')}`)
 
   // Special treatment!
   const dbReadyObject = await this.rudiToDbFormat(rudiMetadata, true)
-  // log.d(mod, fun, `dbReadyObject: ${utils.beautify(dbReadyObject)}`)
+  // log.d(mod, fun, `dbReadyObject: ${beautify(dbReadyObject)}`)
 
   // Special update for metadataInfo.referenceDates: update 'createdDate'
 
@@ -516,7 +525,7 @@ exports.newMetadata = async (rudiMetadata) => {
     )
     throw err
   }
-  // log.d(mod, fun, `dbMetadata: ${utils.beautify(dbMetadata)}`)
+  // log.d(mod, fun, `dbMetadata: ${beautify(dbMetadata)}`)
 
   await this.sendToPortal(dbMetadata)
 
@@ -531,17 +540,21 @@ exports.overwriteMetadata = async (incomingRudiMetadata) => {
 
   if (incomingRudiMetadata == null)
     throw new Error(`${msg.parameterExpected(fun, 'incomingRudiMetadata')}`)
-  // log.d(mod, fun, `edited metadata: ${utils.beautify(incomingRudiMetadata)}\n`)
+  // log.d(mod, fun, `edited metadata: ${beautify(incomingRudiMetadata)}\n`)
 
   // ensure the metadata already exist
   const rudiId = json.accessProperty(incomingRudiMetadata, API_METADATA_ID)
+  // log.d(mod, fun, `incomingRudiMetadata: ${beautify(incomingRudiMetadata)}`)
 
-  const dbReadyEditedMetadata = await this.rudiToDbFormat(incomingRudiMetadata)
+  const dbReadyEditedMetadata = await this.rudiToDbFormat(incomingRudiMetadata, true)
+  // log.d(mod, fun, `dbReadyEditedMetadata: ${beautify(dbReadyEditedMetadata)}`)
   const dbMetadata = await db.overwriteObject(PARAM_OBJECT_METADATA, dbReadyEditedMetadata)
+  // log.d(mod, fun, `dbMetadata: ${beautify(dbMetadata)}`)
   // const reply = await dbMetadata.save()
-  // log.d(mod, fun, `metadata saved: ${utils.beautify(reply)}`)
+  // log.d(mod, fun, `reply: ${beautify(reply)}`)
+  // log.d(mod, fun, `reply: ${beautify(reply.contacts[0])}`)
 
-  this.sendToPortal(dbMetadata)
+  await this.sendToPortal(dbMetadata)
 
   return dbMetadata
 }
@@ -554,24 +567,24 @@ exports.updateMetadata = async (incomingRudiMetadata) => {
 
   if (incomingRudiMetadata == null)
     throw new Error(`${msg.parameterExpected(fun, 'incomingRudiMetadata')}`)
-  // log.d(mod, fun, `edited metadata: ${utils.beautify(incomingRudiMetadata)}\n`)
+  // log.d(mod, fun, `edited metadata: ${beautify(incomingRudiMetadata)}\n`)
 
   // ensure the metadata already exist
   const rudiId = json.accessProperty(incomingRudiMetadata, API_METADATA_ID)
   // // let dbMetadata = await db.getEnsuredMetadataWithRudiId(rudiId) // No => no populate please !
   const dbMetadata = await db.getEnsuredObjectWithRudiId(PARAM_OBJECT_METADATA, rudiId)
-  // log.v(mod, fun, `corresponding db object: ${utils.beautify(dbMetadata)}\n`)
+  // log.v(mod, fun, `corresponding db object: ${beautify(dbMetadata)}\n`)
 
   const dbReadyEditedMetadata = await this.rudiToDbFormat(incomingRudiMetadata)
-  // log.v(mod, fun, `dbReadyEditedMetadata: ${utils.beautify(dbReadyEditedMetadata)}\n`)
+  // log.v(mod, fun, `dbReadyEditedMetadata: ${beautify(dbReadyEditedMetadata)}\n`)
 
   // Backing up existing dates ('dataset_dates' and 'metadata_info.meadatada_dates' properties)
 
   await metadataCustomMerge(dbMetadata, dbReadyEditedMetadata)
-  // log.d(mod, fun, `modified metadata: ${utils.beautify(dbMetadata)}`)
+  // log.d(mod, fun, `modified metadata: ${beautify(dbMetadata)}`)
 
   const reply = await dbMetadata.save()
-  // log.d(mod, fun, `metadata saved: ${utils.beautify(reply)}`)
+  // log.d(mod, fun, `metadata saved: ${beautify(reply)}`)
 
   this.sendToPortal(dbMetadata)
 
@@ -585,7 +598,7 @@ exports.sendToPortal = async (metadata) => {
     const collectionTag = metadata[API_COLLECTION_TAG]
     if (collectionTag || metadata.init) {
       log.d(mod, fun, `Not sending to portal: ${metadataId} (${collectionTag})`)
-      log.d(mod, fun, utils.beautify(metadata))
+      // log.d(mod, fun, beautify(metadata))
       return
     }
 
@@ -625,7 +638,7 @@ exports.massInit = async (req, reply) => {
 
   Promise.all(
     initData.map(async (metadata) => {
-      log.d(mod, fun, utils.beautify(metadata))
+      log.d(mod, fun, beautify(metadata))
       await this.newMetadata(metadata)
       return true
     })

@@ -42,6 +42,7 @@ exports.API_DATA_DATES_PROPERTY = 'dataset_dates'
 // -----------------------------------------------------------------------------
 exports.API_MEDIA_PROPERTY = 'available_formats'
 exports.API_MEDIA_TYPE_PROPERTY = 'media_type'
+exports.API_MEDIA_NAME_PROPERTY = 'media_name'
 exports.API_MEDIA_CHECKSUM_PROPERTY = 'checksum'
 
 // -----------------------------------------------------------------------------
