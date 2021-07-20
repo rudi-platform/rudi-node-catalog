@@ -140,8 +140,10 @@ function logLineToString(logLine) {
 // Exports
 // -----------------------------------------------------------------------------
 const LogEntry = model('LogEntry', LogEntrySchema)
+
 LogEntry.collection
   .dropIndex({ updatedAt: 1 })
-  .catch((err) => log.d(mod, 'LogEntry.dropIndex', err + ' (nevermind)'))
+  .catch((err) => 'nevermind')
+  //log.d(mod, 'LogEntry.dropIndex', err + ' (nevermind)'))
 
 module.exports = { LogEntry, makeLogInfo, logLineToString }

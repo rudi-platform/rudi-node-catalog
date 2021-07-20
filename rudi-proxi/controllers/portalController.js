@@ -7,9 +7,9 @@ const mod = 'portalCtrl'
 // External dependancies
 // -----------------------------------------------------------------------------
 const { boomify } = require('@hapi/boom')
-// const { createHmac, createVerify, verify } = require('crypto')
-const { parseKey } = require('sshpk')
+
 const { readFileSync } = require('fs')
+const { parseKey } = require('sshpk')
 
 // -----------------------------------------------------------------------------
 // Internal dependancies
@@ -150,8 +150,23 @@ exports.sendMetadata = async (req, reply) => {
     throw boomify(err)
   }
 }
+
 // -----------------------------------------------------------------------------
-// Functions: Portal calls
+// Portal calls: GET public key
+// -----------------------------------------------------------------------------
+
+// ----- GET Portal public key
+exports.getPortalPublicKey = () => {
+  const fun = 'getPortalPublicKey'
+
+  const publicKeyObj = this.PUBLIC_KEY_URL ? httpGet(this.PUBLIC_KEY_URL) : null
+  const publicKey = publicKeyObj ? publicKeyObj.value : null
+
+  log.d(mod, fun, `publicKey: ${publicKey}`)
+}
+
+// -----------------------------------------------------------------------------
+// Portal calls: token
 // -----------------------------------------------------------------------------
 
 exports.getNewTokenFromPortal = async () => {
@@ -279,24 +294,24 @@ exports.checkSignatureWithSecret = (accessToken) => {
     throw err
   }
 }
+
 const RUDI_PK_NAME = 'rudiPortal'
 exports.checkSignatureWithPubKey = (accessToken) => {
   const fun = 'checkSignatureWithPubKey'
   log.d(mod, fun, ``)
 
   try {
-    const [jwtHeaderBase64, jwtPayloadBase64, jwtSignatureBase64] = accessToken.split('.')
+    const [jwtHeaderBase64url, jwtPayloadBase64url, jwtSignatureBase64url] = accessToken.split('.')
 
-    const dataToVerify = Buffer.from(`${jwtHeaderBase64}.${jwtPayloadBase64}`, 'base64')
-    const pubKey = readFileSync(`${portal.PUBLIC_KEY}`, 'utf-8')
-    const sslKey = parseKey(pubKey, 'pkcs8', RUDI_PK_NAME)
-    const keyName = sslKey.comment && sslKey.comment !== '(unnamed)' ? `'${sslKey.comment}' ` : ''
-    log.d(mod, fun, `${keyName}public key: ${sslKey.type} ${sslKey.size} bits`)
+    const pubKeyPem = readFileSync(`${portal.PUBLIC_KEY}`, 'ascii')
+    const sslKey = parseKey(pubKeyPem)
+    // log.d(mod, fun, `sslKey: ${utils.beautify(sslKey)}`)
+    // const keyName = sslKey.comment && sslKey.comment !== '(unnamed)' ? `'${sslKey.comment}' ` : ''
+    // log.d(mod, fun, `${keyName}public key: ${sslKey.type} ${sslKey.size} bits`)
 
-    const signatureIsValid = sslKey
-      .createVerify('sha256')
-      .update(Buffer.from(`${jwtHeaderBase64}.${jwtPayloadBase64}`, 'base64'))
-      .verify(jwtSignatureBase64)
+    const verifier = sslKey.createVerify('sha256')
+    verifier.update(`${jwtHeaderBase64url}.${jwtPayloadBase64url}`)
+    const signatureIsValid = verifier.verify(jwtSignatureBase64url, 'base64url')
 
     if (signatureIsValid) {
       log.i(mod, fun, `signatureIsValid: ${signatureIsValid}`)
@@ -349,6 +364,10 @@ exports.verifyPortalToken = (accessToken) => {
     throw err
   }
 }
+
+// -----------------------------------------------------------------------------
+// Portal calls: metadata
+// -----------------------------------------------------------------------------
 
 exports.sendMetadataToPortal = async (metadataId) => {
   const fun = 'sendMetadataToPortal'

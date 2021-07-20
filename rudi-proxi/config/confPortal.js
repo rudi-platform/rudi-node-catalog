@@ -29,7 +29,7 @@ const _login = 'login'
 const _passw = 'passw'
 const _secret = 'secret'
 const _publicKey = 'publicKey'
-const _publicKeyPath = 'publicKeyPath'
+const _publicKeyUrl = 'publicKeyUrl'
 
 // API section
 const _getUrl = 'get_url'
@@ -78,7 +78,7 @@ exports.LOGIN = getIniValue(PORTAL_SECTION, _login)
 exports.PASSW = getIniValue(PORTAL_SECTION, _passw)
 exports.SECRET = getIniValue(PORTAL_SECTION, _secret)
 exports.PUBLIC_KEY = getIniValue(PORTAL_SECTION, _publicKey)
-exports.PUBLIC_KEY_PATH = getIniValue(PORTAL_SECTION, _publicKeyPath)
+exports.PUBLIC_KEY_URL = getIniValue(PORTAL_SECTION, _publicKeyUrl)
 
 // ----- API
 exports.API_GET_URL = getIniValue(PORTAL_SECTION, _getUrl)

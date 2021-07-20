@@ -862,9 +862,9 @@ exports.countObjectList = async (objectType, unionField, options) => {
       { $limit: limit },
       { $skip: offset },
     ]
-    log.d(mod, fun, `aggregateOptions: ${utils.beautify(aggregateOptions)}`)
+    // log.d(mod, fun, `aggregateOptions: ${utils.beautify(aggregateOptions)}`)
     let objectList = await Model.aggregate(aggregateOptions).exec()
-    log.d(mod, fun, `objectList: ${utils.beautify(objectList)}`)
+    // log.d(mod, fun, `objectList: ${utils.beautify(objectList)}`)
 
     //--- Reshaping
 
