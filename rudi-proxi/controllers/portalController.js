@@ -355,7 +355,8 @@ exports.verifyPortalToken = (accessToken) => {
     log.d(mod, fun, `jwtPayload: ${utils.beautify(jwtPayload)}`)
 
     // Check JWT signature
-    this.checkSignatureWithPubKey(accessToken)
+    if (!this.checkSignatureWithPubKey(accessToken))
+      throw new Error('Portal JWT signature is not valid')
 
     return [jwtHeader, jwtPayload]
   } catch (err) {
