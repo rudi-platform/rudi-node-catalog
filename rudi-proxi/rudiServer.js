@@ -136,12 +136,12 @@ publicRoutes.forEach((pubRoute, index) => {
 // Loop over each backoffice route
 backOfficeRoutes.forEach((boRoute, index) => {
   fastify.route(boRoute)
-  // log.v(mod, 'routes', `Private route #${index} = ${boRoute.method} ${boRoute.url}`)
+  log.v(mod, 'routes', `Private route #${index} = ${boRoute.method} ${boRoute.url}`)
 })
 
 devRoutes.forEach((devRoute, index) => {
   fastify.route(devRoute)
-  // log.d(mod, 'routes', `Dev route #${index} = ${devRoute.method} ${devRoute.url}`)
+  log.d(mod, 'routes', `Dev route #${index} = ${devRoute.method} ${devRoute.url}`)
 })
 
 // -----------------------------------------------------------------------------

@@ -51,6 +51,7 @@ const {
   PARAM_OBJECT_METADATA,
   URL_PV_OBJECT_GENERIC,
   DEFAULT_QUERY_LIMIT,
+  QUERY_FILTER,
 } = require('../config/confApi')
 
 // -----------------------------------------------------------------------------
@@ -213,7 +214,7 @@ exports.getReportList = async (objectType, req, reply) => {
   const fun = 'getReportList'
   log.d(mod, fun, ``)
   try {
-    // retrieve url parameters: object type, object id
+    // retrieve url parameters: object id
     const urlObjectId = json.accessReqParam(req, PARAM_ID)
 
     // retrieve query parameters: 'limit' and 'offset'
@@ -225,10 +226,12 @@ exports.getReportList = async (objectType, req, reply) => {
     if (!existsObject) throw new Error(`${msg.objectNotFound(objectType, urlObjectId)}`)
 
     // get all reports for this object
-
-    const dbReportList = await db.getObjectList(PARAM_ACTION_REPORT, limit, offset, {
-      [API_REPORT_RESOURCE_ID]: urlObjectId,
-    })
+    const options = {
+      [QUERY_LIMIT]: limit,
+      [QUERY_OFFSET]: offset,
+      [QUERY_FILTER]: { [API_REPORT_RESOURCE_ID]: urlObjectId },
+    }
+    const dbReportList = await db.getObjectList(PARAM_ACTION_REPORT, options)
 
     return dbReportList
   } catch (err) {
@@ -256,8 +259,8 @@ exports.getSingleReportForObject = async (req, reply) => {
     fun,
     `< GET ${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}/:${PARAM_REPORT_ID}`
   )
-      // retrieve url parameters: object type
-const objectType = json.accessReqParam(req, PARAM_OBJECT)
+  // retrieve url parameters: object type
+  const objectType = json.accessReqParam(req, PARAM_OBJECT)
   return await this.getSingleReport(objectType, req, reply)
 }
 

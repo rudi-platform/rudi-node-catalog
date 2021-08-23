@@ -72,7 +72,7 @@ exports.URL_PUB_METADATA = `${this.URL_PREFIX_PUBLIC}/${this.PARAM_OBJECT_METADA
 exports.PARAM_ACTION_UUID_GEN = 'id_generation'
 exports.PARAM_ACTION_INIT = 'init'
 exports.PARAM_ACTION_DELETION = 'deletion'
-exports.PARAM_ACTION_UNLINKED = 'unliked'
+exports.PARAM_ACTION_UNLINKED = 'unlinked'
 exports.PARAM_ACTION_REPORT = 'report'
 
 

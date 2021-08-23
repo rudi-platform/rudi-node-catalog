@@ -17,7 +17,7 @@ const { transports } = winston
 //   printf
 // } = format
 
-const fs = require('fs')
+const {existsSync, mkdirSync} = require('fs')
 
 // -----------------------------------------------------------------------------
 // Internal dependencies
@@ -37,8 +37,8 @@ const errorDBLogsFileName = 'ff-errors.log'
 
 try {
   // first check if directory already exists
-  if (!fs.existsSync(sys.LOG_DIR)) {
-    fs.mkdirSync(sys.LOG_DIR)
+  if (!existsSync(sys.LOG_DIR)) {
+    mkdirSync(sys.LOG_DIR)
     utils.consoleLog(mod, '', 'Log directory has been created.')
   } else {
     utils.consoleLog(mod, '', 'Log directory exists.')

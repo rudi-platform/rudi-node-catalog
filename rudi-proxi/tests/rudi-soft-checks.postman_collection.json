@@ -237,6 +237,100 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Delete previous test metadata Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const stamp = pm.collectionVariables.get('stamp')",
+									"pm.test(`Delete metadata with '${stamp}' stamp`, () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    \"{{softMeta1Id}}\",\n    \"{{softMeta2Id}}\"\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}?collection_tag={{stamp}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{cont}}"
+							],
+							"query": [
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete previous test orgs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const stamp = pm.collectionVariables.get('stamp')",
+									"pm.test(`Delete metadata with '${stamp}' stamp`, () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    \"{{softMeta1Id}}\",\n    \"{{softMeta2Id}}\"\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}?collection_tag={{stamp}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{org}}"
+							],
+							"query": [
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -1780,13 +1874,19 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?sort_by=-createdAt",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{apiUrl}}",
 								"{{data}}"
+							],
+							"query": [
+								{
+									"key": "sort_by",
+									"value": "-createdAt"
+								}
 							]
 						}
 					},
@@ -2567,7 +2667,7 @@
 									"pm.test(\"2 integration reports created for metadata 1\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const reportList = pm.response.json();",
-									"    pm.expect(reportList.length).to.eq(3);",
+									"    pm.expect(reportList.length).to.eq(2);",
 									"});"
 								],
 								"type": "text/javascript"
