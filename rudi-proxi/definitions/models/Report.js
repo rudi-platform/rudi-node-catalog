@@ -35,48 +35,57 @@ const IntegrationStatus = {
 
 const ReportSchema = new mongoose.Schema(
   {
-    // Unique identifier of the integration report (required)
+    /** Unique identifier of the integration report (required) */
     report_id: ids.UUIDv4,
 
-    // Unique and permanent identifier for the resource in RUDI
-    // system (required)
+    /**
+     * Unique and permanent identifier for the resource in RUDI
+     * system (required)
+     */
     resource_id: ids.UUID,
 
+    /**
+     * Title of the resource
+     */
     resource_title: String,
 
-    // Date when the integration request was submitted by the Producer
+    /** Date when the integration request was submitted by the Producer */
     submission_date: Date,
 
-    // Date when the integration request was processed by the Portal
+    /** Date when the integration request was processed by the Portal */
     treatment_date: Date,
 
-    // Method used for the integration request by the Producer
+    /** Method used for the integration request by the Producer */
     method: {
       type: String,
       enum: Object.values(api.HttpMethods),
     },
 
-    // Version number of the integration contract used for the file
+    /** Version number of the integration contract used for the file */
     version: {
       type: String,
       required: true,
       // match: Validation.API_VERSION,
     },
 
-    // State of the integration of the resource in the Portal
+    /** State of the integration of the resource in the Portal */
     integration_status: {
       type: String,
       // enum: Object.values(this.IntegrationStatus),
     },
 
-    // Comment on the state of the integration of the resource in the
-    // Portal
+    /**
+     * Comment on the state of the integration of the resource in the
+     * Portal
+     */
     comment: {
       type: String,
     },
 
-    // List of all the errors that were encounntered during the
-    // integration of the resource.
+    /**
+     * List of all the errors that were encountered during the
+     * integration of the resource.
+     */ 
     integration_errors: {
       type: [
         {
@@ -100,6 +109,11 @@ const ReportSchema = new mongoose.Schema(
     report_treatment_error: {
       error_type: String,
       error_message: String,
+    },
+
+    /** Tag for identifying a collection of resources */
+    collection_tag: {
+      type: String,
     },
   },
   {

@@ -2136,7 +2136,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"report_id\": \"{{reportId1}}\",\n    \"resource_id\": \"{{metaId1}}\",\n    \"resource_title\": \"Test de RUDI en local 44\",\n    \"integration_status\": \"KO\", \n    \"comment\": \"metadata #1 integration KO\",\n    \"treatment_date\": \"{{now}}\",\n    \"version\": \"v1\"\n}",
+							"raw": "{\n    \"report_id\": \"{{reportId1}}\",\n    \"resource_id\": \"{{metaId1}}\",\n    \"resource_title\": \"Test de RUDI en local 44\",\n    \"integration_status\": \"KO\", \n    \"comment\": \"metadata #1 integration KO\",\n    \"treatment_date\": \"{{now}}\",\n    \"version\": \"v1\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2184,7 +2184,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"report_id\": \"{{reportId2}}\",\n    \"resource_id\": \"{{metaId1}}\",\n    \"resource_title\": \"Test de RUDI en local 44\",\n    \"integration_status\": \"OK\",\n    \"comment\": \"metadata #1 integration: OK\",\n    \"treatment_date\": \"{{now}}\",\n    \"version\": \"{{apiVersion}}\"\n}",
+							"raw": "{\n    \"report_id\": \"{{reportId2}}\",\n    \"resource_id\": \"{{metaId1}}\",\n    \"resource_title\": \"Test de RUDI en local 44\",\n    \"integration_status\": \"OK\",\n    \"comment\": \"metadata #1 integration: OK\",\n    \"treatment_date\": \"{{now}}\",\n    \"version\": \"{{apiVersion}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2281,7 +2281,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"report_id\": \"{{reportId2}}\",\n    \"resource_id\": \"{{metaId1}}\",\n    \"resource_title\": \"Test de RUDI en local 44\",\n    \"integration_status\": \"OK\",\n    \"treatment_date\": \"{{now}}\",\n    \"version\": \"{{apiVersion}}\",\n    \"comment\": \"edit\",\n    \"method\": \"POST\"\n}",
+							"raw": "{\n    \"report_id\": \"{{reportId2}}\",\n    \"resource_id\": \"{{metaId1}}\",\n    \"resource_title\": \"Test de RUDI en local 44\",\n    \"integration_status\": \"OK\",\n    \"treatment_date\": \"{{now}}\",\n    \"version\": \"{{apiVersion}}\",\n    \"comment\": \"edit\",\n    \"method\": \"POST\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
