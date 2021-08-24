@@ -142,7 +142,7 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
 
   // extract request parameters
   if (reqUrl.indexOf('?') === -1) {
-    log.d(mod, fun, `No question mark in url: ${reqUrl}`)
+    // log.d(mod, fun, `No question mark in url: ${reqUrl}`)
     return returnedFilter
   }
   const reqSearch = reqUrl.substring(reqUrl.indexOf('?'))
