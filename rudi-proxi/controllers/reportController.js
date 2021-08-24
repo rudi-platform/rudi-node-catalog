@@ -22,7 +22,7 @@ const db = require('../db/dbQueries')
 const utils = require('../utils/jsUtils')
 const json = require('../utils/jsonAccess')
 
-const genericController = require('../controllers/genericController')
+const {setPublishedFlag} = require('../controllers/genericController')
 
 // -----------------------------------------------------------------------------
 // Constants
@@ -117,7 +117,7 @@ exports.addSingleReportForObject = async (req, reply) => {
     log.d(mod, fun, `dbObject: ${utils.beautify(dbObject)}`)
 
     if (reportBody[API_REPORT_STATUS] === IntegrationStatus.OK) {
-      await genericController.setPublishedFlag(dbObject, urlObjectId)
+      await setPublishedFlag(dbObject, urlObjectId)
     }
 
     return dbReadyReport
@@ -186,6 +186,10 @@ exports.addOrEditSingleReport = async (objectType, req, reply) => {
       log.d(mod, fun, `Updating existing report`)
       dbReadyReport = await db.overwriteObject(PARAM_ACTION_REPORT, reportBody)
       log.i(mod, fun, `Report edited: ${utils.beautify(dbReadyReport)}`)
+    }
+
+    if (reportBody[API_REPORT_STATUS] === IntegrationStatus.OK) {
+      await setPublishedFlag(dbObject, urlObjectId)
     }
 
     return dbReadyReport

@@ -2899,51 +2899,6 @@
 					"response": []
 				},
 				{
-					"name": "Get all reports",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"2 integration reports created in total\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const reportList = pm.response.json();",
-									"    pm.expect(reportList.length).to.gte(2);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{reports}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{adminUrl}}",
-								"{{reports}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Get all test reports",
 					"event": [
 						{
@@ -2989,6 +2944,51 @@
 									"key": "collection_tag",
 									"value": "{{stamp}}"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all reports",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"2 integration reports created in total\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const reportList = pm.response.json();",
+									"    pm.expect(reportList.length).to.gte(2);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{reports}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{reports}}"
 							]
 						}
 					},
