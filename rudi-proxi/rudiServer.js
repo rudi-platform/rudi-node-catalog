@@ -33,6 +33,7 @@ const fastify = require('fastify')({
     logger: logConf.initFFLogger(sys.APP_NAME),
     // file: sys.OUT_LOG
   },
+  ignoreTrailingSlash: true,
 })
 fastify.addHook('onRequest', (req, res, next) => {
   log.logRequest(req)
@@ -116,12 +117,6 @@ fastify.get('/api', async (request, reply) => {
 // Declare a default route
 fastify.get(api.URL_PREFIX_PUBLIC, async (request, reply) => {
   log.i(mod, 'routes', `GET ${api.URL_PREFIX_PUBLIC}`)
-  return {
-    'API version': 'RUDI API v1',
-  }
-})
-fastify.get(`${api.URL_PREFIX_PUBLIC}/`, async (request, reply) => {
-  log.i(mod, 'routes', `GET ${api.URL_PREFIX_PUBLIC}/`)
   return {
     'API version': 'RUDI API v1',
   }
