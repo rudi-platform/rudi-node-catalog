@@ -4,7 +4,7 @@ exports.options = {
   swagger: {
     info: {
       title: 'RUDI Producer API',
-      description: 'API for the RUDI Proxi on the Producer node',
+      description: 'API for the RUDI Proxy on the Producer node',
       version: '1.0.3',
     },
     externalDocs: {

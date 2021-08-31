@@ -20,7 +20,7 @@ const api = require('../config/confApi')
 const utils = require('../utils/jsUtils')
 const json = require('../utils/jsonAccess')
 
-const { httpGet, httpPost, directPost, directGet } = require('../utils/httpReq')
+const { httpGet, httpPost, httpDelete, directPost, directGet } = require('../utils/httpReq')
 
 const portal = require('../config/confPortal')
 
@@ -144,13 +144,27 @@ exports.sendMetadata = async (req, reply) => {
     log.d(mod, fun, `metadataId: ${metadataId}`)
     if (metadataId && !validate.isUUID(metadataId)) metadataId = null
 
-    return await this.sendMetadataToPortal(metadataId)
+    return await this.postMetadataToPortal(metadataId)
   } catch (err) {
     log.w(mod, fun, err)
     throw boomify(err)
   }
 }
 
+exports.deleteMetadata = async (req, reply) => {
+  const fun = 'deleteMetadata'
+  log.d(mod, fun, ``)
+  try {
+    let metadataId = req.params[api.PARAM_ID]
+    log.d(mod, fun, `metadataId: ${metadataId}`)
+    if (metadataId && !validate.isUUID(metadataId)) metadataId = null
+
+    return await this.deletePortalMetadata(metadataId)
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw boomify(err)
+  }
+}
 // -----------------------------------------------------------------------------
 // Portal calls: GET public key
 // -----------------------------------------------------------------------------
@@ -239,7 +253,7 @@ exports.getTokenCheckedByPortal = async (token) => {
 }
 
 /* jwtHeader = {
-  alg: 'HS256',                     // RSA 512
+  alg: 'RS512',                     // RSA 512
   typ: 'JWT'
 }
 jwtBody = {
@@ -303,7 +317,8 @@ exports.checkSignatureWithPubKey = (accessToken) => {
   try {
     const [jwtHeaderBase64url, jwtPayloadBase64url, jwtSignatureBase64url] = accessToken.split('.')
 
-    const pubKeyPem = readFileSync(`${portal.PUBLIC_KEY}`, 'ascii')
+    // Retrieve the public key
+    const pubKeyPem = readFileSync(portal.PUBLIC_KEY, 'ascii')
     const sslKey = parseKey(pubKeyPem)
     // log.d(mod, fun, `sslKey: ${utils.beautify(sslKey)}`)
     // const keyName = sslKey.comment && sslKey.comment !== '(unnamed)' ? `'${sslKey.comment}' ` : ''
@@ -336,8 +351,8 @@ exports.verifyPortalToken = (accessToken) => {
     // Check JWT header
     const jwtHeader = JSON.parse(utils.decodeBase64(jwtHeaderBase64))
 
-    if (jwtHeader[portal.JWT_TYP] !== 'JWT')
-      throw new Error(`Received token is not a JWT: ${utils.beautify(jwtHeader)}`)
+    // if (jwtHeader[portal.JWT_TYP] !== 'JWT')
+    //   throw new Error(`Received token is not a JWT: ${utils.beautify(jwtHeader)}`)
 
     // Check JWT body
     const jwtPayload = JSON.parse(utils.decodeBase64(jwtPayloadBase64))
@@ -345,6 +360,7 @@ exports.verifyPortalToken = (accessToken) => {
     if (jwtPayload[portal.JWT_USER] !== portal.LOGIN) throw new Error('Portal JWT: incorrect user')
     if (jwtPayload[portal.JWT_CLIENT] !== portal.LOGIN)
       throw new Error('Portal JWT: incorrect client')
+
     if (jwtPayload[portal.JWT_EXP] < utils.nowEpochS())
       throw new Error(
         `Portal JWT expired: ` +
@@ -370,8 +386,8 @@ exports.verifyPortalToken = (accessToken) => {
 // Portal calls: metadata
 // -----------------------------------------------------------------------------
 
-exports.sendMetadataToPortal = async (metadataId) => {
-  const fun = 'sendMetadataToPortal'
+exports.postMetadataToPortal = async (metadataId) => {
+  const fun = 'postMetadataToPortal'
   log.d(mod, fun, ``)
   try {
     if (!metadataId) throw new Error('Not yet implemented')
@@ -405,6 +421,22 @@ exports.getMetadataFromPortal = async (metadataId) => {
 
     const token = await this.getPortalToken()
     const reply = await httpGet(portal.getPortalMetaUrl(metadataId), token)
+
+    return reply
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
+}
+
+exports.deletePortalMetadata = async (metadataId) => {
+  const fun = 'deletePortalMetadata'
+  log.d(mod, fun, ``)
+  try {
+    if (!metadataId) throw new Error('Metadata id required') // Can't get the resouces list yet.
+
+    const token = await this.getPortalToken()
+    const reply = await httpDelete(portal.getPortalMetaUrl(metadataId), token)
 
     return reply
   } catch (err) {

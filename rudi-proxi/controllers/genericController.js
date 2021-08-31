@@ -12,7 +12,7 @@ const mod = 'genCtrl'
 // -----------------------------------------------------------------------------
 const mongoose = require('mongoose')
 const { boomify } = require('@hapi/boom')
-const {v4: UUIDv4} = require('uuid')
+const { v4: UUIDv4 } = require('uuid')
 // const url = require('url')
 const { pick } = require('lodash')
 
@@ -335,14 +335,15 @@ async function newObject(objectType, objectData) {
 
 async function isObjectReferenced(objectType, rudiId) {
   const fun = 'isObjectReferenced'
-  log.d(mod, fun, `objectType: ${objectType}`)
   checkIsUrlObject(objectType)
 
   switch (objectType) {
     case PARAM_OBJECT_ORGANIZATIONS:
     case PARAM_OBJECT_CONTACTS:
-    case PARAM_OBJECT_MEDIA:
+    case PARAM_OBJECT_MEDIA: {
+      log.d(mod, fun, `objectType: ${objectType}, id: ${rudiId}`)
       return await db.isReferencedInMetadata(objectType, rudiId)
+    }
     default:
       return false
   }

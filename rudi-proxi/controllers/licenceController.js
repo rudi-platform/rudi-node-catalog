@@ -24,6 +24,7 @@ const {
   PARAM_OBJECT_SKOS_SCHEME,
   URL_PV_LICENCE_ACCESS,
   URL_PV_LICENCE_CODES_ACCESS,
+  PARAM_ACTION_INIT,
 } = require('../config/confApi')
 
 const { API_SKOS_CONCEPT_CODE } = require('../db/dbFields')
@@ -50,7 +51,7 @@ exports.getLicences = async () => {
     log.d(mod, fun, `Init LICENCE_LIST`)
     let dblicenceList = await db.getAllConceptsWithRole(this.LicenceConceptRole)
     if (utils.isEmptyArray(dblicenceList)) {
-      await this.initLicences()
+      await this.initializeLicences()
       dblicenceList = await db.getAllConceptsWithRole(this.LicenceConceptRole)
     }
     this.LICENCE_LIST = await skosController.dbConceptListToRudiRecursive(dblicenceList)
@@ -70,8 +71,8 @@ exports.getLicenceCodes = async () => {
   return this.LICENCE_CODE_LIST
 }
 
-exports.initLicences = async () => {
-  const fun = 'initlicences'
+exports.initializeLicences = async () => {
+  const fun = 'initializeLicences'
   // log.v(mod, fun, `${LICENCE_POST_ADDRESS}`)
   try {
     await db.cleanLicences()
@@ -117,8 +118,8 @@ exports.getAllLicenceCodes = async (req, reply) => {
   return await this.getLicenceCodes()
 }
 
-exports.init = async (req, reply) => {
-  const fun = `init`
-  log.v(mod, fun, ``)
-  return await this.initLicences()
+exports.initLicences = async (req, reply) => {
+  const fun = `initLicences`
+  log.v(mod, fun, `< POST ${URL_PV_LICENCE_ACCESS}/${PARAM_ACTION_INIT}`)
+  return await this.initializeLicences()
 }

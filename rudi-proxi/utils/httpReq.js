@@ -8,6 +8,7 @@ const mod = 'http'
 const https = require('https')
 const http = require('http')
 const { get, post } = require('axios')
+const axios = require('axios')
 
 // -----------------------------------------------------------------------------
 // Internal dependecies
@@ -71,7 +72,7 @@ function doHttpRequest(options, protocol, data) {
 }
 
 exports.httpGet = async (destUrl, authorizationToken) => {
-  const fun = 'getResquest'
+  const fun = 'httpGet'
   log.d(mod, fun, ``)
 
   const reqOpts = {
@@ -92,8 +93,30 @@ exports.httpGet = async (destUrl, authorizationToken) => {
   }
 }
 
+exports.httpDelete = async (destUrl, authorizationToken) => {
+  const fun = 'httpDelete'
+  log.d(mod, fun, ``)
+
+  const reqOpts = {
+    headers: {
+      'User-Agent': 'Rudi-Producer',
+      'Content-Type': 'application/json',
+    },
+  }
+  if (authorizationToken) reqOpts.headers.Authorization = `Bearer ${authorizationToken}`
+
+  try {
+    const answer = await axios.delete(destUrl, reqOpts)
+    log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
+    return answer.data
+  } catch (error) {
+    log.w(mod, fun, `GET: ${error}`)
+    throw error
+  }
+}
+
 exports.getWithOpts = async (options, authorizationToken) => {
-  const fun = 'getRequest'
+  const fun = 'getWithOpts'
   log.d(mod, fun, ``)
   try {
     const destUrl = `${options.protocol}://${options.hostname}/${options.path}`
@@ -125,7 +148,7 @@ exports.getWithOpts = async (options, authorizationToken) => {
 }
 
 exports.httpPost = async (destUrl, dataToSend, authorizationToken) => {
-  const fun = 'postRequest'
+  const fun = 'httpPost'
   log.d(mod, fun, ``)
   try {
     const reqOpts = {
@@ -193,8 +216,12 @@ exports.directGet = async (destUrl, reqOpts) => {
     const answer = await get(destUrl, reqOpts)
     return answer
   } catch (err) {
-    // log.w(mod, fun, err)
-    log.w(mod, fun, utils.beautify(err.response.data))
-    throw new Error(`${err.response.data.code}: ${err.response.data.label}`)
+    if (err.response && err.response.data)
+      throw new Error(`${err.response.data.code}: ${err.response.data.label}`)
+    if (err.message && err.code) throw new Error(`${err.code}: ${err.message}`)
+
+    log.w(mod, fun, `err: ${utils.beautify(err)}`)
+    log.w(mod, fun, `err.response: ${utils.beautify(err.response)}`)
+    log.w(mod, fun, `err.message: ${utils.beautify(err.message)}`)
   }
 }

@@ -6,9 +6,9 @@ const mod = 'utils'
 // -----------------------------------------------------------------------------
 // External dependancies
 // -----------------------------------------------------------------------------
-const util = require('util')
+const { inspect } = require('util')
 const { floor, pick } = require('lodash')
-const { format } = require('date-and-time')
+const datetime = require('date-and-time')
 
 // -----------------------------------------------------------------------------
 // String
@@ -17,7 +17,15 @@ exports.toBase64 = (str) => this.convertEncoding(str, 'utf-8', 'base64url')
 exports.decodeBase64 = (data) => this.convertEncoding(data, 'base64url', 'utf-8')
 
 exports.convertEncoding = (data, fromEncoding, toEncoding) => {
-  return Buffer.from(data, fromEncoding).toString(toEncoding)
+  const fun = 'convertEncoding'
+  try {
+    let dataStr = data
+    if (typeof data === 'object') dataStr = JSON.stringify(data)
+    return Buffer.from(dataStr, fromEncoding).toString(toEncoding)
+  } catch (err) {
+    this.consoleErr(mod, fun, err)
+    throw err
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -53,7 +61,7 @@ exports.dateEpochMsToIso = (utcMs) => {
 exports.LOG_DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss SSS'
 
 exports.nowLocaleFormatted = () => {
-  return format(new Date(), this.LOG_DATE_FORMAT)
+  return datetime.format(new Date(), this.LOG_DATE_FORMAT)
   // const [date, month, year] = new Date().toLocaleDateString('fr-FR').split('/')
   // const [h, m, s] = new Date().toLocaleTimeString('fr-FR').split(/:| /)
   // return `${year}/${month}/${date} ${h}:${m}:${s}`
@@ -188,7 +196,7 @@ exports.beautify = (jsonObject, option) => {
       option != null ? '\n' : ''
     }`
   } catch (err) {
-    return `${util.inspect(jsonObject)}`
+    return `${inspect(jsonObject)}`
   }
 }
 

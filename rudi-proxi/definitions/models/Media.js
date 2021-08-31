@@ -47,7 +47,7 @@ const UpdateStatus = [
 ]
 
 const InterfaceContract = {
-  Dwnl: 'dwnl',
+  DWNLD: 'dwnl',
 }
 
 const commonSchemaOptions = {
@@ -93,7 +93,7 @@ const MediaSchema = new mongoose.Schema(
       interface_contract: {
         type: String,
         required: true,
-        default: InterfaceContract.Dwnl,
+        default: InterfaceContract.DWNLD,
       },
     },
 

@@ -1,6 +1,6 @@
 'use strict'
 
-// const mod = 'routes'
+const mod = 'routes'
 
 // -----------------------------------------------------------------------------
 // External dependencies
@@ -9,6 +9,7 @@
 // -----------------------------------------------------------------------------
 // Internal dependencies
 // -----------------------------------------------------------------------------
+const log = require('../utils/logging')
 
 // -----------------------------------------------------------------------------
 // Swagger documentation
@@ -44,6 +45,7 @@ const {
   PARAM_ACTION_DELETION,
   PARAM_ACTION_UUID_GEN,
   PARAM_ACTION_UNLINKED,
+  PARAM_ACTION_SIGN,
 } = require('../config/confApi')
 
 // -----------------------------------------------------------------------------
@@ -61,18 +63,39 @@ const licenceController = require('../controllers/licenceController')
 
 const devController = require('../controllers/testController')
 const portalController = require('../controllers/portalController')
+const { forgeToken } = require('../controllers/tokenController')
 
 // -----------------------------------------------------------------------------
 // Helper functions
 // -----------------------------------------------------------------------------
-/* function logRequest(req, res) {
-  const fun = 'logRequest'
-  utils.consoleLog('', fun, `${req.ip}: ${req.method} ${req.url} `)
+
+async function onPublicRoute(req, res) {
+  const fun = 'onPublicRoute'
+  log.d(mod, fun, `${req.ip}: ${req.method} ${req.url} `)
+  return
 }
- */
+
+async function onPrivateRoute(req, res) {
+  const fun = 'onPrivateRoute'
+  log.d(mod, fun, `${req.ip}: ${req.method} ${req.url} `)
+  return
+}
+
+async function onDevRoute(req, res) {
+  const fun = 'onDevRoute'
+  log.d(mod, fun, `${req.ip}: ${req.method} ${req.url} `)
+  return
+}
+
 // -----------------------------------------------------------------------------
 // Public routes
 // -----------------------------------------------------------------------------
+const PUB_ROUTE_01 = 'get_all_metadata'
+const PUB_ROUTE_02 = 'get_one_metadata'
+const PUB_ROUTE_03 = 'upsert_one_report'
+const PUB_ROUTE_04 = 'get_all_obj_report'
+const PUB_ROUTE_05 = 'get_one_obj_report'
+
 exports.publicRoutes = [
   // Routes accessed by RUDI Portal:
   // /resources POST/PUT/GET
@@ -87,15 +110,17 @@ exports.publicRoutes = [
   {
     method: 'GET',
     url: URL_PUB_METADATA,
-    // preHandler: logRequest,
+    preHandler: onPublicRoute,
     handler: metadataController.getMetadataList,
+    config: { routeName: PUB_ROUTE_01 },
   },
   // Get 1
   {
     method: 'GET',
     url: `${URL_PUB_METADATA}/:${PARAM_ID}`,
-    // preHandler: logRequest,
+    preHandler: onPublicRoute,
     handler: metadataController.getSingleMetadata,
+    config: { routeName: PUB_ROUTE_02 },
   },
 
   // -----------------------------------------------------------------------------
@@ -106,29 +131,49 @@ exports.publicRoutes = [
   {
     method: 'PUT',
     url: `${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
-    // preHandler: logRequest,
+    preHandler: onPublicRoute,
     handler: reportController.addOrEditSingleReportForMetadata,
+    config: { routeName: PUB_ROUTE_03 },
   },
 
   // Get all reports for one object integration
   {
     method: 'GET',
     url: `${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
-    // preHandler: logRequest,
+    preHandler: onPublicRoute,
     handler: reportController.getReportListForMetadata,
+    config: { routeName: PUB_ROUTE_04 },
   },
   // Get 1 report for one object integration
   {
     method: 'GET',
     url: `${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}/:${PARAM_REPORT_ID}`,
-    // preHandler: logRequest,
+    preHandler: onPublicRoute,
     handler: reportController.getSingleReportForMetadata,
+    config: { routeName: PUB_ROUTE_05 },
   },
 ]
 
 // -----------------------------------------------------------------------------
 // Private routes
 // -----------------------------------------------------------------------------
+const PRV_ROUTE_01 = 'add_one'
+const PRV_ROUTE_02 = 'upsert_one'
+const PRV_ROUTE_03 = 'get_all'
+const PRV_ROUTE_04 = 'get_one'
+const PRV_ROUTE_05 = 'del_one'
+const PRV_ROUTE_06 = 'del_many'
+const PRV_ROUTE_07 = 'del_list'
+const PRV_ROUTE_08 = 'get_orphans'
+const PRV_ROUTE_09 = 'add_obj_report'
+const PRV_ROUTE_10 = 'upsert_obj_report'
+const PRV_ROUTE_11 = 'get_obj_report_list'
+const PRV_ROUTE_12 = 'get_one_obj_report'
+const PRV_ROUTE_13 = 'get_all_obj_report'
+const PRV_ROUTE_14 = 'del_obj_report'
+const PRV_ROUTE_15 = 'del_all_obj_report'
+const PRV_ROUTE_16 = 'del_list_obj_report'
+
 exports.backOfficeRoutes = [
   // -----------------------------------------------------------------------------
   // Generic routes for accessing any object
@@ -139,60 +184,68 @@ exports.backOfficeRoutes = [
   {
     method: 'POST',
     url: URL_PV_OBJECT_GENERIC,
-    // preHandler: logRequest,
+    preHandler: onPrivateRoute,
     handler: genericController.addSingleObject,
+    config: { routeName: PRV_ROUTE_01 },
     // schema: documentation.addMetadataSchema
   },
   // Edit 1
   {
     method: 'PUT',
     url: URL_PV_OBJECT_GENERIC,
-    // preHandler: logRequest,
+    preHandler: onPrivateRoute,
     handler: genericController.upsertSingleObject,
+    config: { routeName: PRV_ROUTE_02 },
   },
   // Get all
   {
     method: 'GET',
     url: URL_PV_OBJECT_GENERIC,
-    // preHandler: logRequest,
+    preHandler: onPrivateRoute,
     handler: genericController.getObjectList,
+    config: { routeName: PRV_ROUTE_03 },
   },
   // Get 1
   {
     method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`,
-    // preHandler: logRequest,
+    preHandler: onPrivateRoute,
     handler: genericController.getSingleObject,
+    config: { routeName: PRV_ROUTE_04 },
   },
 
   // Delete 1
   {
     method: 'DELETE',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`,
-    // preHandler: logRequest,
+    preHandler: onPrivateRoute,
     handler: genericController.deleteSingleObject,
+    config: { routeName: PRV_ROUTE_05 },
   },
   // Delete all
   {
     method: 'DELETE',
     url: URL_PV_OBJECT_GENERIC,
-    // preHandler: logRequest,
+    preHandler: onPrivateRoute,
     handler: genericController.deleteManyObjects,
+    config: { routeName: PRV_ROUTE_06 },
   },
   // Delete many
   {
     method: 'POST',
     url: `${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_DELETION}`,
-    // preHandler: logRequest,
+    preHandler: onPrivateRoute,
     handler: genericController.deleteObjectList,
+    config: { routeName: PRV_ROUTE_07 },
   },
 
   // Access unlinked data
   {
     method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_UNLINKED}`,
-    // preHandler: logRequest,
+    preHandler: onPrivateRoute,
     handler: genericController.getOrphans,
+    config: { routeName: PRV_ROUTE_08 },
   },
 
   // -----------------------------------------------------------------------------
@@ -203,62 +256,74 @@ exports.backOfficeRoutes = [
   {
     method: 'POST',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
-    // preHandler: logRequest,
+    preHandler: onPrivateRoute,
     handler: reportController.addSingleReportForObject,
+    config: { routeName: PRV_ROUTE_09 },
   },
 
   // Add/edit 1 integration report for an identified object
   {
     method: 'PUT',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
-    // preHandler: logRequest,
+    preHandler: onPrivateRoute,
     handler: reportController.addOrEditSingleReportForObject,
+    config: { routeName: PRV_ROUTE_10 },
   },
 
   // Get all integration reports for an identified object
   {
     method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
-    // preHandler: logRequest,
+    preHandler: onPrivateRoute,
     handler: reportController.getReportListForObject,
+    config: { routeName: PRV_ROUTE_11 },
   },
   // Get 1 report for one object integration
   {
     method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}/:${PARAM_REPORT_ID}`,
-    // preHandler: logRequest,
+    preHandler: onPrivateRoute,
     handler: reportController.getSingleReportForObject,
+    config: { routeName: PRV_ROUTE_12 },
   },
   // Get all integration reports for one object type
   {
     method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_REPORT}`,
-    // preHandler: logRequest,
+    preHandler: onPrivateRoute,
     handler: reportController.getReportListForObjectType,
+    config: { routeName: PRV_ROUTE_13 },
   },
 
   // Delete 1 identified integration report for one object
   {
     method: 'DELETE',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}/:${PARAM_REPORT_ID}`,
-    // preHandler: logRequest,
+    preHandler: onPrivateRoute,
     handler: reportController.deleteSingleReportForObject,
+    config: { routeName: PRV_ROUTE_14 },
   },
   // Delete all integration reports for one object
   {
     method: 'DELETE',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
-    // preHandler: logRequest,
+    preHandler: onPrivateRoute,
     handler: reportController.deleteEveryReportForObject,
+    config: { routeName: PRV_ROUTE_15 },
   },
   // Delete many integration reports for an identified object
   {
     method: 'POST',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}/${PARAM_ACTION_DELETION}`,
-    // preHandler: logRequest,
+    preHandler: onPrivateRoute,
     handler: reportController.deleteManyReportForObject,
+    config: { routeName: PRV_ROUTE_16 },
   },
 ]
+
+// -----------------------------------------------------------------------------
+// Ext. application routes
+// -----------------------------------------------------------------------------
 exports.devRoutes = [
   // -----------------------------------------------------------------------------
   // Accessing thesaurus
@@ -266,32 +331,37 @@ exports.devRoutes = [
   {
     method: 'GET',
     url: `${URL_PV_THESAURUS_ACCESS}`,
-    // preHandler: logRequest,
+    preHandler: onDevRoute,
     handler: skosController.getEveryThesaurus,
+    config: { routeName: 'getEveryThesaurus' },
   },
   {
     method: 'GET',
     url: `${URL_PV_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}`,
-    // preHandler: logRequest,
+    preHandler: onDevRoute,
     handler: skosController.getSingleThesaurus,
+    config: { routeName: 'getSingleThesaurus' },
   },
   {
     method: 'GET',
     url: `${URL_PV_LICENCE_ACCESS}`,
-    // preHandler: logRequest,
+    preHandler: onDevRoute,
     handler: licenceController.getAllLicences,
+    config: { routeName: 'getAllLicences' },
   },
   {
     method: 'GET',
     url: `${URL_PV_LICENCE_CODES_ACCESS}`,
-    // preHandler: logRequest,
+    preHandler: onDevRoute,
     handler: licenceController.getAllLicenceCodes,
+    config: { routeName: 'getAllLicenceCodes' },
   },
   {
     method: 'POST',
-    url: `${URL_PV_LICENCE_ACCESS}/init`,
-    // preHandler: logRequest,
-    handler: licenceController.init,
+    url: `${URL_PV_LICENCE_ACCESS}/${PARAM_ACTION_INIT}`,
+    preHandler: onDevRoute,
+    handler: licenceController.initLicences,
+    config: { routeName: 'initLicences' },
   },
 
   // -----------------------------------------------------------------------------
@@ -301,8 +371,9 @@ exports.devRoutes = [
   {
     method: 'POST',
     url: `${URL_PREFIX_PRIVATE}/${PARAM_OBJECT_METADATA}/${PARAM_ACTION_INIT}`,
-    // preHandler: logRequest,
-    handler: metadataController.massInit,
+    preHandler: onDevRoute,
+    handler: metadataController.initWithODR,
+    config: { routeName: 'initWithODR' },
   },
 
   // -----------------------------------------------------------------------------
@@ -311,8 +382,19 @@ exports.devRoutes = [
   {
     method: 'GET',
     url: `${URL_PREFIX_PRIVATE}/${PARAM_ACTION_UUID_GEN}`,
-    // preHandler: logRequest,
+    preHandler: onDevRoute,
     handler: genericController.generateUUID,
+    config: { routeName: 'generateUUID' },
+  },
+  // -----------------------------------------------------------------------------
+  // Local token generation
+  // -----------------------------------------------------------------------------
+  {
+    method: 'POST',
+    url: `${URL_PREFIX_PRIVATE}/${PARAM_ACTION_SIGN}`,
+    preHandler: onDevRoute,
+    handler: forgeToken,
+    config: { routeName: 'forgeToken' },
   },
   // -----------------------------------------------------------------------------
   // Portal token
@@ -321,15 +403,17 @@ exports.devRoutes = [
   {
     method: 'GET',
     url: `${URL_PV_PORTAL_PREFIX}/${URL_SUFFIX_TOKEN_GET}`,
-    // preHandler: logRequest,
+    preHandler: onDevRoute,
     handler: portalController.exposedGetPortalToken,
+    config: { routeName: 'exposedGetPortalToken' },
   },
   // Get a token checked by the Portal
   {
     method: 'GET',
     url: `${URL_PV_PORTAL_PREFIX}/${URL_SUFFIX_TOKEN_GET}/${URL_SUFFIX_TOKEN_CHECK}`,
-    // preHandler: logRequest,
+    preHandler: onDevRoute,
     handler: portalController.checkStoredToken,
+    config: { routeName: 'checkStoredToken' },
   },
 
   // -----------------------------------------------------------------------------
@@ -338,14 +422,23 @@ exports.devRoutes = [
   {
     method: 'GET',
     url: `${URL_PV_PORTAL_PREFIX}/${PARAM_OBJECT_METADATA}/:${PARAM_ID}`,
-    // preHandler: logRequest,
+    preHandler: onDevRoute,
     handler: portalController.getMetadata,
+    config: { routeName: 'getPortalMetadata' },
   },
   {
     method: 'POST',
     url: `${URL_PV_PORTAL_PREFIX}/${PARAM_OBJECT_METADATA}/:${PARAM_ID}`,
-    // preHandler: logRequest,
+    preHandler: onDevRoute,
     handler: portalController.sendMetadata,
+    config: { routeName: 'sendMetadataToPortal' },
+  },
+  {
+    method: 'DELETE',
+    url: `${URL_PV_PORTAL_PREFIX}/${PARAM_OBJECT_METADATA}/:${PARAM_ID}`,
+    preHandler: onDevRoute,
+    handler: portalController.deleteMetadata,
+    config: { routeName: 'deletePortalMetadata' },
   },
 
   // -----------------------------------------------------------------------------
@@ -357,8 +450,9 @@ exports.devRoutes = [
   {
     method: 'GET',
     url: `${URL_PV_GIT_HASH_ACCESS}`,
-    // preHandler: logRequest,
+    preHandler: onDevRoute,
     handler: sysController.getGitHash,
+    config: { routeName: 'getGitHash' },
   },
   /**
    * Get current git hash from the running application
@@ -366,8 +460,9 @@ exports.devRoutes = [
   {
     method: 'GET',
     url: `${URL_PV_APP_HASH_ACCESS}`,
-    // preHandler: logRequest,
+    preHandler: onDevRoute,
     handler: sysController.getAppHash,
+    config: { routeName: 'getAppHash' },
   },
   /**
    * Get node and npm versions
@@ -375,8 +470,9 @@ exports.devRoutes = [
   {
     method: 'GET',
     url: `${URL_PV_NODE_VERSION_ACCESS}`,
-    // preHandler: logRequest,
+    preHandler: onDevRoute,
     handler: sysController.getNodeVersion,
+    config: { routeName: 'getNodeVersion' },
   },
 
   // -----------------------------------------------------------------------------
@@ -385,14 +481,16 @@ exports.devRoutes = [
   {
     method: 'GET',
     url: `${URL_PV_LOGS_ACCESS}`,
-    // preHandler: logRequest,
+    preHandler: onDevRoute,
     handler: getLogs,
+    config: { routeName: 'getLogs' },
   },
   {
     method: 'GET',
     url: `${URL_PV_LOGS_ACCESS}/:${PARAM_LOGS_LINES}`,
-    // preHandler: logRequest,
+    preHandler: onDevRoute,
     handler: getLastLogLines,
+    config: { routeName: 'getLastLogLines' },
   },
 
   // -----------------------------------------------------------------------------
@@ -402,15 +500,17 @@ exports.devRoutes = [
   {
     method: 'GET',
     url: `${URL_PV_DB_ACCESS}`,
-    // preHandler: logRequest,
+    preHandler: onDevRoute,
     handler: dbController.getCollections,
+    config: { routeName: 'getCollections' },
   },
   // Drop DB
   {
     method: 'DELETE',
     url: `${URL_PV_DB_ACCESS}`,
-    // preHandler: logRequest,
+    preHandler: onDevRoute,
     handler: dbController.dropDB,
+    config: { routeName: 'dropDB' },
   },
   // -----------------------------------------------------------------------------
   // Tests entry
@@ -418,7 +518,8 @@ exports.devRoutes = [
   {
     method: 'GET',
     url: `${URL_PREFIX_PRIVATE}/test`,
-    // preHandler: logRequest,
+    preHandler: onDevRoute,
     handler: devController.test,
+    config: { routeName: 'test' },
   },
 ]

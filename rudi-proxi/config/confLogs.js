@@ -28,7 +28,7 @@ const utils = require('../utils/jsUtils')
 // -----------------------------------------------------------------------------
 // Constants
 // -----------------------------------------------------------------------------
-const errorLogsFileName = 'rudiProxi-errors.log'
+const errorLogsFileName = 'rudiProxy-errors.log'
 const errorDBLogsFileName = 'ff-errors.log'
 
 // -----------------------------------------------------------------------------
@@ -38,7 +38,7 @@ const errorDBLogsFileName = 'ff-errors.log'
 try {
   // first check if directory already exists
   if (!existsSync(sys.LOG_DIR)) {
-    mkdirSync(sys.LOG_DIR)
+    mkdirSync(sys.LOG_DIR, { recursive: true })
     utils.consoleLog(mod, '', 'Log directory has been created.')
   } else {
     utils.consoleLog(mod, '', 'Log directory exists.')

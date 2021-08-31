@@ -602,7 +602,7 @@ exports.sendToPortal = async (metadata) => {
       return
     }
 
-    await portalController.sendMetadataToPortal(metadataId)
+    await portalController.postMetadataToPortal(metadataId)
     log.v(mod, fun, `Sent to portal: ${metadataId}`)
   } catch (err) {
     log.w(mod, fun, err)
@@ -610,7 +610,7 @@ exports.sendToPortal = async (metadata) => {
   }
 }
 
-exports.massInit = async (req, reply) => {
+exports.initWithODR = async (req, reply) => {
   const fun = 'massInit'
   log.v(mod, fun, `> ${URL_PREFIX_PUBLIC}/${PARAM_OBJECT_METADATA}/${PARAM_ACTION_INIT}`)
 
@@ -620,7 +620,7 @@ exports.massInit = async (req, reply) => {
   const initCont = require(`../data/datarennes_cont.json`)
   const initData = require(`../data/datarennes_meta.json`)
 
-  await licenceController.init()
+  await licenceController.initLicences()
   // Themes.init('reset')
   // Keywords.init('reset')
 

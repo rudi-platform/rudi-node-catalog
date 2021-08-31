@@ -46,6 +46,12 @@ const _logFileName = 'log_file'
 const _logLevel = 'log_level'
 const _expires = 'expires'
 
+// Security section
+const SECURITY_SECTION = 'security'
+const _prod_jwt_ctrl = 'prod_jwt_ctrl'
+const _publicKeys = 'public_keys'
+const _privateKey = 'private_key'
+
 // -----------------------------------------------------------------------------
 // Constants: default configuration
 // -----------------------------------------------------------------------------
@@ -63,9 +69,9 @@ const DEFAULT_CONF = {
   },
   // Logs
   [LOG_SECTION]: {
-    [_appName]: 'rudiProxi',
+    [_appName]: 'rudiy',
     [_logDir]: './logs',
-    [_logFileName]: 'rudiProxi.log',
+    [_logFileName]: 'rudiProxy.log',
     [_logLevel]: 'debug',
     [_expires]: '1d',
   },
@@ -116,6 +122,11 @@ exports.OUT_LOG = `${this.LOG_DIR}/${this.LOG_FILE}`
 exports.SYMLINK_NAME = `${this.APP_NAME}-current.log`
 exports.LOG_LVL = getIniValue(LOG_SECTION, _logLevel)
 exports.LOG_EXP = getIniValue(LOG_SECTION, _expires)
+
+// Security
+exports.ARE_PROD_JWT_CONTROLLED = getIniValue(SECURITY_SECTION, _prod_jwt_ctrl)
+exports.PUB_KEYS = getIniValue(SECURITY_SECTION, _publicKeys)
+exports.PRIV_KEY = getIniValue(SECURITY_SECTION, _privateKey)
 
 const fun = 'export'
 // const now = utils.nowLocaleFormatted()

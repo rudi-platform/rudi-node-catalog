@@ -1700,7 +1700,7 @@ exports.addLogEntry = async (logLvl, loc_module, loc_function, msg) => {
 exports.getLogEntries = async (options) => {
   const fun = 'getLogEntries'
   try {
-    log.d(mod, fun, `options: ${utils.beautify(options)}`)
+    // log.d(mod, fun, `options: ${utils.beautify(options)}`)
     // Extract options
     const limit = options[QUERY_LIMIT] || DEFAULT_QUERY_LIMIT
     const offset = options[QUERY_OFFSET] || DEFAULT_QUERY_OFFSET
@@ -1711,13 +1711,14 @@ exports.getLogEntries = async (options) => {
       { $sort: { time: -1, _id: 1 } },
       { $skip: offset },
       { $limit: limit },
-      { $sort: { time: 1, _id: 1 } },
     ]
 
-    log.d(mod, fun, `aggregateOptions: ${utils.beautify(aggregateOptions)}`)
+    // log.d(mod, fun, `aggregateOptions: ${utils.beautify(aggregateOptions)}`)
     const logLines = await LogEntry.aggregate(aggregateOptions).exec()
+    const readableLogs = logLines.map(logLineToString)
+    // log.d(mod, fun, `logs: ${utils.beautify(readableLogs)}`)
 
-    return logLines.map(logLineToString)
+    return readableLogs
   } catch (err) {
     throw err
   }
