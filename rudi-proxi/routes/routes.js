@@ -17,6 +17,23 @@ const log = require('../utils/logging')
 // const documentation = require('./documentation/metadataApi')
 
 // -----------------------------------------------------------------------------
+// Controllers
+// -----------------------------------------------------------------------------
+const genericController = require('../controllers/genericController')
+const metadataController = require('../controllers/metadataController')
+const reportController = require('../controllers/reportController')
+
+const dbController = require('../controllers/dbController')
+const sysController = require('../controllers/sysController')
+const { getLastLogLines, getLogs } = require('../controllers/logController')
+const skosController = require('../controllers/skosController')
+const licenceController = require('../controllers/licenceController')
+
+const devController = require('../controllers/testController')
+const portalController = require('../controllers/portalController')
+const tokenController = require('../controllers/tokenController')
+
+// -----------------------------------------------------------------------------
 // API request constants
 // -----------------------------------------------------------------------------
 const {
@@ -47,55 +64,110 @@ const {
   PARAM_ACTION_UNLINKED,
   PARAM_ACTION_SIGN,
 } = require('../config/confApi')
+const { beautify } = require('../utils/jsUtils')
+const { SHOULD_CONTROL_PRIVATE_REQUESTS } = require('../config/confSystem')
+const { ForbiddenError } = require('../utils/errors')
 
 // -----------------------------------------------------------------------------
-// Controllers
+// Route names
 // -----------------------------------------------------------------------------
-const genericController = require('../controllers/genericController')
-const metadataController = require('../controllers/metadataController')
-const reportController = require('../controllers/reportController')
+const PUB_GET_ALL_METADATA = 'pub_get_all_metadata'
+const PUB_GET_ONE_METADATA = 'pub_get_one_metadata'
+const PUB_UPSERT_ONE_REPORT = 'pub_upsert_one_report'
+const PUB_GET_ALL_OBJ_REPORT = 'pub_get_all_obj_report'
+const PUB_GET_ONE_OBJ_REPORT = 'pub_get_one_obj_report'
 
-const dbController = require('../controllers/dbController')
-const sysController = require('../controllers/sysController')
-const { getLastLogLines, getLogs } = require('../controllers/logController')
-const skosController = require('../controllers/skosController')
-const licenceController = require('../controllers/licenceController')
+const PRV_ADD_ONE = 'prv_add_one'
+const PRV_UPSERT_ONE = 'prv_upsert_one'
+const PRV_GET_ALL = 'prv_get_all'
+const PRV_GET_ONE = 'prv_get_one'
+const PRV_DEL_ONE = 'prv_del_one'
+const PRV_DEL_MANY = 'prv_del_many'
+const PRV_DEL_LIST = 'prv_del_list'
+const PRV_GET_ORPHANS = 'prv_get_orphans'
+const PRV_ADD_OBJ_REPORT = 'prv_add_obj_report'
+const PRV_UPSERT_OBJ_REPORT = 'prv_upsert_obj_report'
+const PRV_GET_OBJ_REPORT_LIST = 'prv_get_obj_report_list'
+const PRV_GET_ONE_OBJ_REPORT = 'prv_get_one_obj_report'
+const PRV_GET_ALL_OBJ_REPORT = 'prv_get_all_obj_report'
+const PRV_DEL_OBJ_REPORT = 'prv_del_obj_report'
+const PRV_DEL_ALL_OBJ_REPORT = 'prv_del_all_obj_report'
+const PRV_DEL_LIST_OBJ_REPORT = 'prv_del_list_obj_report'
 
-const devController = require('../controllers/testController')
-const portalController = require('../controllers/portalController')
-const { forgeToken } = require('../controllers/tokenController')
+const DEV_GET_EVERY_THESAURUS = 'dev_get_every_thesaurus'
+const DEV_GET_SINGLE_THESAURUS = 'dev_get_single_thesaurus'
+const DEV_GET_ALL_LICENCES = 'dev_get_all_licences'
+const DEV_GET_ALL_LICENCE_CODES = 'dev_get_all_licence_codes'
+const DEV_INIT_LICENCES = 'dev_init_licences'
+const DEV_INIT_WITH_ODR = 'dev_init_with_odr'
+const DEV_GENERATE_UUID = 'dev_generate_uuid'
+const DEV_FORGE_TOKEN = 'dev_forge_token'
+const DEV_EXPOSED_GET_PORTAL_TOKEN = 'dev_exposed_get_portal_token'
+const DEV_CHECK_STORED_TOKEN = 'dev_check_stored_token'
+const DEV_GET_PORTAL_METADATA = 'dev_get_portal_metadata'
+const DEV_SEND_METADATA_TO_PORTAL = 'dev_send_metadata_to_portal'
+const DEV_DEL_PORTAL_METADATA = 'dev_del_portal_metadata'
+const DEV_GET_GIT_HASH = 'dev_get_git_hash'
+const DEV_GET_APP_HASH = 'dev_get_app_hash'
+const DEV_GET_NODE_VERSION = 'dev_get_node_version'
+const DEV_GET_LOGS = 'dev_get_logs'
+const DEV_GET_LAST_LOG_LINES = 'dev_get_last_log_lines'
+const DEV_GET_COLLECTIONS = 'dev_get_collections'
+const DEV_DROP_DB = 'dev_drop_db'
+const DEV_TEST = 'dev_test'
 
 // -----------------------------------------------------------------------------
 // Helper functions
 // -----------------------------------------------------------------------------
 
-async function onPublicRoute(req, res) {
+async function onPublicRoute(req, reply) {
   const fun = 'onPublicRoute'
-  log.d(mod, fun, `${req.ip}: ${req.method} ${req.url} `)
-  return
+  log.d(mod, fun, `${req.method} ${req.url} `)
+  try {
+    return
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
 }
 
-async function onPrivateRoute(req, res) {
+async function onPrivateRoute(req, reply) {
   const fun = 'onPrivateRoute'
-  log.d(mod, fun, `${req.ip}: ${req.method} ${req.url} `)
-  return
+  log.d(mod, fun, `${req.method} ${req.url} `)
+  try {
+    // log.w(mod, fun, `JWT are ${SHOULD_CONTROL_PRIVATE_REQUESTS ? '' : 'not '}controlled`)
+    if (!SHOULD_CONTROL_PRIVATE_REQUESTS) return true
+
+    const subject = await tokenController.checkRudiProdPermission(req, reply)
+    log.i(mod, fun, `subject: ${subject} -> route ${req.context.config.routeName}`)
+    return
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
 }
 
-async function onDevRoute(req, res) {
+async function onDevRoute(req, reply) {
   const fun = 'onDevRoute'
-  log.d(mod, fun, `${req.ip}: ${req.method} ${req.url} `)
-  return
+  log.d(mod, fun, `${req.method} ${req.url} `)
+  try {
+    log.w(mod, fun, `JWT are ${SHOULD_CONTROL_PRIVATE_REQUESTS ? '' : 'not '}controlled`)
+    if (!SHOULD_CONTROL_PRIVATE_REQUESTS) return true
+
+    // log.d(mod, fun, `${req.ip}: ${req.method} ${req.url} ${req.context.config.routeName}`)
+    const subject = await tokenController.checkRudiProdPermission(req, reply)
+    log.i(mod, fun, `subject: ${subject} -> route ${req.context.config.routeName}`)
+    return
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
+  // log.d(mod, fun, `${beautify(req)}`)
 }
 
 // -----------------------------------------------------------------------------
 // Public routes
 // -----------------------------------------------------------------------------
-const PUB_ROUTE_01 = 'get_all_metadata'
-const PUB_ROUTE_02 = 'get_one_metadata'
-const PUB_ROUTE_03 = 'upsert_one_report'
-const PUB_ROUTE_04 = 'get_all_obj_report'
-const PUB_ROUTE_05 = 'get_one_obj_report'
-
 exports.publicRoutes = [
   // Routes accessed by RUDI Portal:
   // /resources POST/PUT/GET
@@ -112,7 +184,7 @@ exports.publicRoutes = [
     url: URL_PUB_METADATA,
     preHandler: onPublicRoute,
     handler: metadataController.getMetadataList,
-    config: { routeName: PUB_ROUTE_01 },
+    config: { routeName: PUB_GET_ALL_METADATA },
   },
   // Get 1
   {
@@ -120,7 +192,7 @@ exports.publicRoutes = [
     url: `${URL_PUB_METADATA}/:${PARAM_ID}`,
     preHandler: onPublicRoute,
     handler: metadataController.getSingleMetadata,
-    config: { routeName: PUB_ROUTE_02 },
+    config: { routeName: PUB_GET_ONE_METADATA },
   },
 
   // -----------------------------------------------------------------------------
@@ -133,7 +205,7 @@ exports.publicRoutes = [
     url: `${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
     preHandler: onPublicRoute,
     handler: reportController.addOrEditSingleReportForMetadata,
-    config: { routeName: PUB_ROUTE_03 },
+    config: { routeName: PUB_UPSERT_ONE_REPORT },
   },
 
   // Get all reports for one object integration
@@ -142,7 +214,7 @@ exports.publicRoutes = [
     url: `${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
     preHandler: onPublicRoute,
     handler: reportController.getReportListForMetadata,
-    config: { routeName: PUB_ROUTE_04 },
+    config: { routeName: PUB_GET_ALL_OBJ_REPORT },
   },
   // Get 1 report for one object integration
   {
@@ -150,30 +222,13 @@ exports.publicRoutes = [
     url: `${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}/:${PARAM_REPORT_ID}`,
     preHandler: onPublicRoute,
     handler: reportController.getSingleReportForMetadata,
-    config: { routeName: PUB_ROUTE_05 },
+    config: { routeName: PUB_GET_ONE_OBJ_REPORT },
   },
 ]
 
 // -----------------------------------------------------------------------------
 // Private routes
 // -----------------------------------------------------------------------------
-const PRV_ROUTE_01 = 'add_one'
-const PRV_ROUTE_02 = 'upsert_one'
-const PRV_ROUTE_03 = 'get_all'
-const PRV_ROUTE_04 = 'get_one'
-const PRV_ROUTE_05 = 'del_one'
-const PRV_ROUTE_06 = 'del_many'
-const PRV_ROUTE_07 = 'del_list'
-const PRV_ROUTE_08 = 'get_orphans'
-const PRV_ROUTE_09 = 'add_obj_report'
-const PRV_ROUTE_10 = 'upsert_obj_report'
-const PRV_ROUTE_11 = 'get_obj_report_list'
-const PRV_ROUTE_12 = 'get_one_obj_report'
-const PRV_ROUTE_13 = 'get_all_obj_report'
-const PRV_ROUTE_14 = 'del_obj_report'
-const PRV_ROUTE_15 = 'del_all_obj_report'
-const PRV_ROUTE_16 = 'del_list_obj_report'
-
 exports.backOfficeRoutes = [
   // -----------------------------------------------------------------------------
   // Generic routes for accessing any object
@@ -186,7 +241,7 @@ exports.backOfficeRoutes = [
     url: URL_PV_OBJECT_GENERIC,
     preHandler: onPrivateRoute,
     handler: genericController.addSingleObject,
-    config: { routeName: PRV_ROUTE_01 },
+    config: { routeName: PRV_ADD_ONE },
     // schema: documentation.addMetadataSchema
   },
   // Edit 1
@@ -195,7 +250,7 @@ exports.backOfficeRoutes = [
     url: URL_PV_OBJECT_GENERIC,
     preHandler: onPrivateRoute,
     handler: genericController.upsertSingleObject,
-    config: { routeName: PRV_ROUTE_02 },
+    config: { routeName: PRV_UPSERT_ONE },
   },
   // Get all
   {
@@ -203,7 +258,7 @@ exports.backOfficeRoutes = [
     url: URL_PV_OBJECT_GENERIC,
     preHandler: onPrivateRoute,
     handler: genericController.getObjectList,
-    config: { routeName: PRV_ROUTE_03 },
+    config: { routeName: PRV_GET_ALL },
   },
   // Get 1
   {
@@ -211,7 +266,7 @@ exports.backOfficeRoutes = [
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`,
     preHandler: onPrivateRoute,
     handler: genericController.getSingleObject,
-    config: { routeName: PRV_ROUTE_04 },
+    config: { routeName: PRV_GET_ONE },
   },
 
   // Delete 1
@@ -220,7 +275,7 @@ exports.backOfficeRoutes = [
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`,
     preHandler: onPrivateRoute,
     handler: genericController.deleteSingleObject,
-    config: { routeName: PRV_ROUTE_05 },
+    config: { routeName: PRV_DEL_ONE },
   },
   // Delete all
   {
@@ -228,7 +283,7 @@ exports.backOfficeRoutes = [
     url: URL_PV_OBJECT_GENERIC,
     preHandler: onPrivateRoute,
     handler: genericController.deleteManyObjects,
-    config: { routeName: PRV_ROUTE_06 },
+    config: { routeName: PRV_DEL_MANY },
   },
   // Delete many
   {
@@ -236,7 +291,7 @@ exports.backOfficeRoutes = [
     url: `${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_DELETION}`,
     preHandler: onPrivateRoute,
     handler: genericController.deleteObjectList,
-    config: { routeName: PRV_ROUTE_07 },
+    config: { routeName: PRV_DEL_LIST },
   },
 
   // Access unlinked data
@@ -245,7 +300,7 @@ exports.backOfficeRoutes = [
     url: `${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_UNLINKED}`,
     preHandler: onPrivateRoute,
     handler: genericController.getOrphans,
-    config: { routeName: PRV_ROUTE_08 },
+    config: { routeName: PRV_GET_ORPHANS },
   },
 
   // -----------------------------------------------------------------------------
@@ -258,7 +313,7 @@ exports.backOfficeRoutes = [
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
     preHandler: onPrivateRoute,
     handler: reportController.addSingleReportForObject,
-    config: { routeName: PRV_ROUTE_09 },
+    config: { routeName: PRV_ADD_OBJ_REPORT },
   },
 
   // Add/edit 1 integration report for an identified object
@@ -267,7 +322,7 @@ exports.backOfficeRoutes = [
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
     preHandler: onPrivateRoute,
     handler: reportController.addOrEditSingleReportForObject,
-    config: { routeName: PRV_ROUTE_10 },
+    config: { routeName: PRV_UPSERT_OBJ_REPORT },
   },
 
   // Get all integration reports for an identified object
@@ -276,7 +331,7 @@ exports.backOfficeRoutes = [
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
     preHandler: onPrivateRoute,
     handler: reportController.getReportListForObject,
-    config: { routeName: PRV_ROUTE_11 },
+    config: { routeName: PRV_GET_OBJ_REPORT_LIST },
   },
   // Get 1 report for one object integration
   {
@@ -284,7 +339,7 @@ exports.backOfficeRoutes = [
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}/:${PARAM_REPORT_ID}`,
     preHandler: onPrivateRoute,
     handler: reportController.getSingleReportForObject,
-    config: { routeName: PRV_ROUTE_12 },
+    config: { routeName: PRV_GET_ONE_OBJ_REPORT },
   },
   // Get all integration reports for one object type
   {
@@ -292,7 +347,7 @@ exports.backOfficeRoutes = [
     url: `${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_REPORT}`,
     preHandler: onPrivateRoute,
     handler: reportController.getReportListForObjectType,
-    config: { routeName: PRV_ROUTE_13 },
+    config: { routeName: PRV_GET_ALL_OBJ_REPORT },
   },
 
   // Delete 1 identified integration report for one object
@@ -301,7 +356,7 @@ exports.backOfficeRoutes = [
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}/:${PARAM_REPORT_ID}`,
     preHandler: onPrivateRoute,
     handler: reportController.deleteSingleReportForObject,
-    config: { routeName: PRV_ROUTE_14 },
+    config: { routeName: PRV_DEL_OBJ_REPORT },
   },
   // Delete all integration reports for one object
   {
@@ -309,7 +364,7 @@ exports.backOfficeRoutes = [
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
     preHandler: onPrivateRoute,
     handler: reportController.deleteEveryReportForObject,
-    config: { routeName: PRV_ROUTE_15 },
+    config: { routeName: PRV_DEL_ALL_OBJ_REPORT },
   },
   // Delete many integration reports for an identified object
   {
@@ -317,12 +372,12 @@ exports.backOfficeRoutes = [
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}/${PARAM_ACTION_DELETION}`,
     preHandler: onPrivateRoute,
     handler: reportController.deleteManyReportForObject,
-    config: { routeName: PRV_ROUTE_16 },
+    config: { routeName: PRV_DEL_LIST_OBJ_REPORT },
   },
 ]
 
 // -----------------------------------------------------------------------------
-// Ext. application routes
+// External application/module routes
 // -----------------------------------------------------------------------------
 exports.devRoutes = [
   // -----------------------------------------------------------------------------
@@ -333,35 +388,35 @@ exports.devRoutes = [
     url: `${URL_PV_THESAURUS_ACCESS}`,
     preHandler: onDevRoute,
     handler: skosController.getEveryThesaurus,
-    config: { routeName: 'getEveryThesaurus' },
+    config: { routeName: DEV_GET_EVERY_THESAURUS },
   },
   {
     method: 'GET',
     url: `${URL_PV_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}`,
     preHandler: onDevRoute,
     handler: skosController.getSingleThesaurus,
-    config: { routeName: 'getSingleThesaurus' },
+    config: { routeName: DEV_GET_SINGLE_THESAURUS },
   },
   {
     method: 'GET',
     url: `${URL_PV_LICENCE_ACCESS}`,
     preHandler: onDevRoute,
     handler: licenceController.getAllLicences,
-    config: { routeName: 'getAllLicences' },
+    config: { routeName: DEV_GET_ALL_LICENCES },
   },
   {
     method: 'GET',
     url: `${URL_PV_LICENCE_CODES_ACCESS}`,
     preHandler: onDevRoute,
     handler: licenceController.getAllLicenceCodes,
-    config: { routeName: 'getAllLicenceCodes' },
+    config: { routeName: DEV_GET_ALL_LICENCE_CODES },
   },
   {
     method: 'POST',
     url: `${URL_PV_LICENCE_ACCESS}/${PARAM_ACTION_INIT}`,
     preHandler: onDevRoute,
     handler: licenceController.initLicences,
-    config: { routeName: 'initLicences' },
+    config: { routeName: DEV_INIT_LICENCES },
   },
 
   // -----------------------------------------------------------------------------
@@ -373,7 +428,7 @@ exports.devRoutes = [
     url: `${URL_PREFIX_PRIVATE}/${PARAM_OBJECT_METADATA}/${PARAM_ACTION_INIT}`,
     preHandler: onDevRoute,
     handler: metadataController.initWithODR,
-    config: { routeName: 'initWithODR' },
+    config: { routeName: DEV_INIT_WITH_ODR },
   },
 
   // -----------------------------------------------------------------------------
@@ -384,7 +439,7 @@ exports.devRoutes = [
     url: `${URL_PREFIX_PRIVATE}/${PARAM_ACTION_UUID_GEN}`,
     preHandler: onDevRoute,
     handler: genericController.generateUUID,
-    config: { routeName: 'generateUUID' },
+    config: { routeName: DEV_GENERATE_UUID },
   },
   // -----------------------------------------------------------------------------
   // Local token generation
@@ -393,8 +448,8 @@ exports.devRoutes = [
     method: 'POST',
     url: `${URL_PREFIX_PRIVATE}/${PARAM_ACTION_SIGN}`,
     preHandler: onDevRoute,
-    handler: forgeToken,
-    config: { routeName: 'forgeToken' },
+    handler: tokenController.forgeToken,
+    config: { routeName: DEV_FORGE_TOKEN },
   },
   // -----------------------------------------------------------------------------
   // Portal token
@@ -405,7 +460,7 @@ exports.devRoutes = [
     url: `${URL_PV_PORTAL_PREFIX}/${URL_SUFFIX_TOKEN_GET}`,
     preHandler: onDevRoute,
     handler: portalController.exposedGetPortalToken,
-    config: { routeName: 'exposedGetPortalToken' },
+    config: { routeName: DEV_EXPOSED_GET_PORTAL_TOKEN },
   },
   // Get a token checked by the Portal
   {
@@ -413,7 +468,7 @@ exports.devRoutes = [
     url: `${URL_PV_PORTAL_PREFIX}/${URL_SUFFIX_TOKEN_GET}/${URL_SUFFIX_TOKEN_CHECK}`,
     preHandler: onDevRoute,
     handler: portalController.checkStoredToken,
-    config: { routeName: 'checkStoredToken' },
+    config: { routeName: DEV_CHECK_STORED_TOKEN },
   },
 
   // -----------------------------------------------------------------------------
@@ -424,21 +479,21 @@ exports.devRoutes = [
     url: `${URL_PV_PORTAL_PREFIX}/${PARAM_OBJECT_METADATA}/:${PARAM_ID}`,
     preHandler: onDevRoute,
     handler: portalController.getMetadata,
-    config: { routeName: 'getPortalMetadata' },
+    config: { routeName: DEV_GET_PORTAL_METADATA },
   },
   {
     method: 'POST',
     url: `${URL_PV_PORTAL_PREFIX}/${PARAM_OBJECT_METADATA}/:${PARAM_ID}`,
     preHandler: onDevRoute,
     handler: portalController.sendMetadata,
-    config: { routeName: 'sendMetadataToPortal' },
+    config: { routeName: DEV_SEND_METADATA_TO_PORTAL },
   },
   {
     method: 'DELETE',
     url: `${URL_PV_PORTAL_PREFIX}/${PARAM_OBJECT_METADATA}/:${PARAM_ID}`,
     preHandler: onDevRoute,
     handler: portalController.deleteMetadata,
-    config: { routeName: 'deletePortalMetadata' },
+    config: { routeName: DEV_DEL_PORTAL_METADATA },
   },
 
   // -----------------------------------------------------------------------------
@@ -452,7 +507,7 @@ exports.devRoutes = [
     url: `${URL_PV_GIT_HASH_ACCESS}`,
     preHandler: onDevRoute,
     handler: sysController.getGitHash,
-    config: { routeName: 'getGitHash' },
+    config: { routeName: DEV_GET_GIT_HASH },
   },
   /**
    * Get current git hash from the running application
@@ -462,7 +517,7 @@ exports.devRoutes = [
     url: `${URL_PV_APP_HASH_ACCESS}`,
     preHandler: onDevRoute,
     handler: sysController.getAppHash,
-    config: { routeName: 'getAppHash' },
+    config: { routeName: DEV_GET_APP_HASH },
   },
   /**
    * Get node and npm versions
@@ -472,7 +527,7 @@ exports.devRoutes = [
     url: `${URL_PV_NODE_VERSION_ACCESS}`,
     preHandler: onDevRoute,
     handler: sysController.getNodeVersion,
-    config: { routeName: 'getNodeVersion' },
+    config: { routeName: DEV_GET_NODE_VERSION },
   },
 
   // -----------------------------------------------------------------------------
@@ -483,14 +538,14 @@ exports.devRoutes = [
     url: `${URL_PV_LOGS_ACCESS}`,
     preHandler: onDevRoute,
     handler: getLogs,
-    config: { routeName: 'getLogs' },
+    config: { routeName: DEV_GET_LOGS },
   },
   {
     method: 'GET',
     url: `${URL_PV_LOGS_ACCESS}/:${PARAM_LOGS_LINES}`,
     preHandler: onDevRoute,
     handler: getLastLogLines,
-    config: { routeName: 'getLastLogLines' },
+    config: { routeName: DEV_GET_LAST_LOG_LINES },
   },
 
   // -----------------------------------------------------------------------------
@@ -502,7 +557,7 @@ exports.devRoutes = [
     url: `${URL_PV_DB_ACCESS}`,
     preHandler: onDevRoute,
     handler: dbController.getCollections,
-    config: { routeName: 'getCollections' },
+    config: { routeName: DEV_GET_COLLECTIONS },
   },
   // Drop DB
   {
@@ -510,7 +565,7 @@ exports.devRoutes = [
     url: `${URL_PV_DB_ACCESS}`,
     preHandler: onDevRoute,
     handler: dbController.dropDB,
-    config: { routeName: 'dropDB' },
+    config: { routeName: DEV_DROP_DB },
   },
   // -----------------------------------------------------------------------------
   // Tests entry
@@ -520,6 +575,6 @@ exports.devRoutes = [
     url: `${URL_PREFIX_PRIVATE}/test`,
     preHandler: onDevRoute,
     handler: devController.test,
-    config: { routeName: 'test' },
+    config: { routeName: DEV_TEST },
   },
 ]

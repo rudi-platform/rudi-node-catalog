@@ -11,7 +11,6 @@ const mod = 'metaCtrl'
 // -----------------------------------------------------------------------------
 const mongoose = require('mongoose')
 const { mergeWith } = require('lodash')
-const { boomify } = require('@hapi/boom')
 
 // -----------------------------------------------------------------------------
 // Internal dependancies
@@ -98,6 +97,14 @@ const organisationController = require('./organizationController')
 const contactController = require('./contactController')
 const licenceController = require('./licenceController')
 const portalController = require('./portalController')
+const {
+  NotFoundError,
+  BadRequestError,
+  MethodNotAllowedError,
+  InternalServerError,
+  ParameterExpectedError,
+  ObjectNotFoundError,
+} = require('../utils/errors')
 
 // -----------------------------------------------------------------------------
 // Atomic treatments of properties: RUDI -> DB
@@ -106,7 +113,7 @@ const portalController = require('./portalController')
 exports.organizationRudiToDbFormat = async (rudiProducer, shouldCreateIfNotFound) => {
   const fun = 'organizationRudiToDbFormat'
   log.d(mod, fun, ``)
-  if (rudiProducer == null) throw new Error(`${msg.parameterExpected(fun, 'rudiProducer')}`)
+  if (rudiProducer == null) throw new ParameterExpectedError(fun, 'rudiProducer')
 
   let organizationDbId = await db.getOrganizationDbIdWithJson(rudiProducer)
   // log.d(mod, fun, `organizationDbId: -> ${organizationDbId} `)
@@ -114,8 +121,8 @@ exports.organizationRudiToDbFormat = async (rudiProducer, shouldCreateIfNotFound
   if (!organizationDbId) {
     if (!shouldCreateIfNotFound) {
       const errMsg = msg.organizationNotFound(rudiProducer[API_ORGANIZATION_ID])
-      log.e(mod, fun, errMsg)
-      throw new Error(errMsg)
+      log.w(mod, fun, errMsg)
+      throw new NotFoundError(errMsg)
     }
     const newOrg = await organisationController.newOrganization(rudiProducer)
     newOrg.save()
@@ -130,7 +137,7 @@ exports.organizationRudiToDbFormat = async (rudiProducer, shouldCreateIfNotFound
 exports.contactListRudiToDbFormat = async (rudiContactList, shouldCreateIfNotFound) => {
   const fun = 'contactListRudiToDbFormat'
   log.d(mod, fun, ``)
-  if (rudiContactList == null) throw new Error(`${msg.parameterExpected(fun, 'rudiContactList')}`)
+  if (rudiContactList == null) throw new ParameterExpectedError(fun, 'rudiContactList')
 
   const contactDbIds = []
   await Promise.all(
@@ -139,9 +146,7 @@ exports.contactListRudiToDbFormat = async (rudiContactList, shouldCreateIfNotFou
       contactDbId = await db.getContactDbIdWithJson(rudiContact)
       if (!contactDbId) {
         if (!shouldCreateIfNotFound)
-          throw new Error(
-            `${msg.objectNotFound(PARAM_OBJECT_CONTACTS, rudiContact[API_CONTACT_ID])}`
-          )
+          throw new ObjectNotFoundError(PARAM_OBJECT_CONTACTS, rudiContact[API_CONTACT_ID])
 
         const dbContact = await contactController.newContact(rudiContact)
         dbContact.save()
@@ -160,7 +165,7 @@ exports.mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFound) 
   const fun = 'mediaListRudiToDbFormat'
   log.d(mod, fun, ``)
   // log.d(mod, fun, `rudiMediaList: ${beautify(rudiMediaList)}`)
-  if (rudiMediaList == null) throw new Error(`${msg.parameterExpected(fun, 'rudiMediaList')}`)
+  if (rudiMediaList == null) throw new ParameterExpectedError(fun, 'rudiMediaList')
 
   const mediaDbIds = []
   await Promise.all(
@@ -171,7 +176,7 @@ exports.mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFound) 
 
       if (!mediaDbId) {
         if (!shouldCreateIfNotFound)
-          throw new Error(`${msg.objectNotFound(PARAM_OBJECT_MEDIA, rudiMedia[API_MEDIA_ID])}`)
+          throw new ObjectNotFoundError(PARAM_OBJECT_MEDIA, rudiMedia[API_MEDIA_ID])
 
         // log.d(mod, fun, `rudiMedia[API_MEDIA_TYPE_PROPERTY]: ${beautify(rudiMedia[API_MEDIA_TYPE_PROPERTY])}`)
         const media = new Media(rudiMedia)
@@ -235,7 +240,7 @@ async function metadataCustomMerge(dbMetadata, dbReadyModMetadata) {
 exports.organizationDbToRudiFormat = async (producerDbId) => {
   const fun = 'organizationDbToRudiFormat'
   log.d(mod, fun, ``)
-  if (producerDbId == null) throw new Error(`${msg.parameterExpected(fun, 'producerDbId')}`)
+  if (producerDbId == null) throw new ParameterExpectedError(fun, 'producerDbId')
 
   const dbOrganization = await db.getEnsuredOrganizationWithDbId(producerDbId)
   log.d(mod, fun, `dbOrganization -> ${beautify(dbOrganization)}`)
@@ -248,7 +253,7 @@ exports.contactListDbToRudiFormat = async (contactsDbIds) => {
   const fun = 'contactListDbToRudiFormat'
   log.d(mod, fun, ``)
   log.d(mod, fun, `contactsDbIds: ${beautify(contactsDbIds)}`)
-  if (contactsDbIds == null) throw new Error(`${msg.parameterExpected(fun, 'contactsDbIds')}`)
+  if (contactsDbIds == null) throw new ParameterExpectedError(fun, 'contactsDbIds')
 
   const contacts = []
   await Promise.all(
@@ -267,7 +272,7 @@ exports.mediaListDbToRudiFormat = async (mediaDbIds) => {
   const fun = 'mediaListDbToRudiFormat'
   log.d(mod, fun, ``)
   log.d(mod, fun, `mediaDbIds: ${beautify(mediaDbIds)}`)
-  if (!mediaDbIds) throw new Error(`${msg.parameterExpected(fun, 'mediaDbIds')}`)
+  if (!mediaDbIds) throw new ParameterExpectedError(fun, 'mediaDbIds')
 
   const mediaList = []
   await Promise.all(
@@ -300,7 +305,7 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
   const fun = 'rudiToDbFormat'
   log.d(mod, fun, ``)
 
-  if (!rudiMetadata) throw new Error(msg.parameterExpected(fun, 'rudiMetadata'))
+  if (!rudiMetadata) throw new InternalServerError(msg.parameterExpected(fun, 'rudiMetadata'))
 
   // let dbReadyMetadata = deepClone(rudiMetadata)
   let dbReadyMetadata
@@ -496,7 +501,7 @@ exports.newMetadata = async (rudiMetadata) => {
   const fun = 'newMetadata'
   log.d(mod, fun, ``)
   // log.d(mod, fun, `incoming object: ${beautify(rudiMetadata)}`)
-  if (!rudiMetadata) throw new Error(`${msg.parameterExpected(fun, 'rudiMetadata')}`)
+  if (!rudiMetadata) throw new ParameterExpectedError(fun, 'rudiMetadata')
 
   // Special treatment!
   const dbReadyObject = await this.rudiToDbFormat(rudiMetadata, true)
@@ -538,8 +543,7 @@ exports.overwriteMetadata = async (incomingRudiMetadata) => {
   const fun = 'overwriteMetadata'
   log.d(mod, fun, ``)
 
-  if (incomingRudiMetadata == null)
-    throw new Error(`${msg.parameterExpected(fun, 'incomingRudiMetadata')}`)
+  if (incomingRudiMetadata == null) throw new ParameterExpectedError(fun, 'incomingRudiMetadata')
   // log.d(mod, fun, `edited metadata: ${beautify(incomingRudiMetadata)}\n`)
 
   // ensure the metadata already exist
@@ -565,8 +569,7 @@ exports.updateMetadata = async (incomingRudiMetadata) => {
   const fun = 'updateMetadata'
   log.d(mod, fun, ``)
 
-  if (incomingRudiMetadata == null)
-    throw new Error(`${msg.parameterExpected(fun, 'incomingRudiMetadata')}`)
+  if (incomingRudiMetadata == null) throw new ParameterExpectedError(fun, 'incomingRudiMetadata')
   // log.d(mod, fun, `edited metadata: ${beautify(incomingRudiMetadata)}\n`)
 
   // ensure the metadata already exist
@@ -666,7 +669,8 @@ exports.getSingleMetadata = async (req, reply) => {
     return dbObject
   } catch (err) {
     log.e(mod, fun, err)
-    throw boomify(err)
+    if (err.name === 'MongoError') throw new BadRequestError(err)
+    throw new NotFoundError(err)
   }
 }
 
@@ -675,12 +679,13 @@ exports.getSingleMetadata = async (req, reply) => {
  * => GET /resources
  */
 exports.getMetadataList = async (req, reply) => {
-  const fun = 'getSingleMetadata'
+  const fun = 'getMetadataList'
   log.v(mod, fun, `< GET ${URL_PUB_METADATA}`)
   try {
     return await genericController.getManyObjects(PARAM_OBJECT_METADATA, req, reply)
   } catch (err) {
     log.e(mod, fun, err)
-    throw boomify(err)
+    if (err.name === 'MongoError') throw new BadRequestError(err)
+    throw new NotFoundError(err)
   }
 }

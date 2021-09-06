@@ -1,6 +1,7 @@
 'use strict'
 
 const mod = 'sysConf'
+const fun = 'export'
 // -----------------------------------------------------------------------------
 // External dependecies
 // -----------------------------------------------------------------------------
@@ -48,34 +49,8 @@ const _expires = 'expires'
 
 // Security section
 const SECURITY_SECTION = 'security'
-const _prod_jwt_ctrl = 'prod_jwt_ctrl'
-const _publicKeys = 'public_keys'
-const _privateKey = 'private_key'
-
-// -----------------------------------------------------------------------------
-// Constants: default configuration
-// -----------------------------------------------------------------------------
-const DEFAULT_CONF = {
-  // Node.js server
-  [SERVER_SECTION]: {
-    [_serverAddress]: '0.0.0.0',
-    [_serverPort]: 3003,
-  },
-  // DB
-  [DB_SECTION]: {
-    [_dbUrl]: 'mongodb://127.0.0.1/',
-    [_dbName]: 'rudi_prod',
-    [_dbPort]: 27017,
-  },
-  // Logs
-  [LOG_SECTION]: {
-    [_appName]: 'rudiy',
-    [_logDir]: './logs',
-    [_logFileName]: 'rudiProxy.log',
-    [_logLevel]: 'debug',
-    [_expires]: '1d',
-  },
-}
+const _profilesConfFile = 'profiles'
+const _should_control_private_requests = 'should_control_private_requests'
 
 // -----------------------------------------------------------------------------
 // Constants: user and local configuration
@@ -98,7 +73,9 @@ function getIniValue(section, field) {
   const userValue = utils.quietAccess(USER_CONF[section], field)
   const localValue = utils.quietAccess(LOCAL_CONF[section], field)
 
-  return userValue || localValue || DEFAULT_CONF[section][field]
+  if (userValue != utils.NOT_FOUND) return userValue
+  if (localValue != utils.NOT_FOUND) return localValue
+  return utils.NOT_FOUND
 }
 
 // -----------------------------------------------------------------------------
@@ -124,11 +101,16 @@ exports.LOG_LVL = getIniValue(LOG_SECTION, _logLevel)
 exports.LOG_EXP = getIniValue(LOG_SECTION, _expires)
 
 // Security
-exports.ARE_PROD_JWT_CONTROLLED = getIniValue(SECURITY_SECTION, _prod_jwt_ctrl)
-exports.PUB_KEYS = getIniValue(SECURITY_SECTION, _publicKeys)
-exports.PRIV_KEY = getIniValue(SECURITY_SECTION, _privateKey)
+const profilesConfFile = getIniValue(SECURITY_SECTION, _profilesConfFile)
+const PROFILES = fa.readIniFile(profilesConfFile)
+exports.SHOULD_CONTROL_PRIVATE_REQUESTS = getIniValue(
+  SECURITY_SECTION,
+  _should_control_private_requests
+)
+exports.getProfile = (subject) => {
+  return PROFILES[subject]
+}
 
-const fun = 'export'
 // const now = utils.nowLocaleFormatted()
 
 utils.consoleLog(mod, fun, `APP_NAME: ${this.APP_NAME}`)

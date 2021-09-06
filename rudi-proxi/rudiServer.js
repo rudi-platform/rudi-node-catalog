@@ -25,6 +25,13 @@ RegExp.prototype.toJSON = RegExp.prototype.toString
 // -----------------------------------------------------------------------------
 // Require external modules
 const mongoose = require('mongoose')
+const {
+  ForbiddenError,
+  finalErrorHandler,
+  UnauthorizedError,
+  RudiError,
+  createRudiHttpError,
+} = require('./utils/errors')
 
 // Require the fastify framework and instantiate it
 const fastify = require('fastify')({
@@ -35,14 +42,23 @@ const fastify = require('fastify')({
   },
   ignoreTrailingSlash: true,
 })
+
+fastify.setErrorHandler((error, request, reply) => {
+  const fun = 'finalErrorHandler'
+  try {
+    log.e(mod, fun, error)
+    const rudiHttpError = createRudiHttpError(error.statusCode, error.message)
+    reply.code(rudiHttpError.statusCode).send(rudiHttpError)
+  } catch (uncaughtErr) {
+    log.w(mod, fun, uncaughtErr)
+  }
+  log.d(mod, fun, 'done')
+})
+
 fastify.addHook('onRequest', (req, res, next) => {
   log.logRequest(req)
   next()
 })
-
-// fastify.setErrorHandler(function (error, request, reply) {
-//   log.e(mod, 'fastifyErrorHandler', error)
-// })
 
 // Import Swagger Options
 // const swagger = require('./config/swagger')

@@ -79,6 +79,7 @@ const {
   PARAM_THESAURUS_CODE,
   URL_SUFFIX_LICENCE: URL_LICENCE_SUFFIX,
 } = require('../config/confApi')
+const { InternalServerError, ParameterExpectedError } = require('../utils/errors')
 
 // -----------------------------------------------------------------------------
 // Controllers: Scheme
@@ -96,7 +97,7 @@ exports.newSkosScheme = async (rudiScheme) => {
   const fun = 'newScheme'
   log.d(mod, fun, ``)
 
-  if (!rudiScheme) throw new Error(`${msg.parameterExpected(fun, 'rudiScheme')}`)
+  if (!rudiScheme) throw new ParameterExpectedError(fun, 'rudiScheme')
 
   const topConcepts = await utils.deepClone(rudiScheme[API_SCHEME_TOPS_PROPERTY])
 
@@ -164,8 +165,8 @@ exports.createConceptHierarchy = async (listConcepts, schemeDbId, parentConcept)
   // log.d(mod, fun, ``)
 
   // Check input parameters
-  if (!listConcepts) throw new Error(`${msg.parameterExpected(fun, 'listConcepts')}`)
-  if (!schemeDbId) throw new Error(`${msg.parameterExpected(fun, 'schemeDbId')}`)
+  if (!listConcepts) throw new ParameterExpectedError(fun, 'listConcepts')
+  if (!schemeDbId) throw new ParameterExpectedError(fun, 'schemeDbId')
 
   // Create all concept in the list
   const conceptDbIds = []

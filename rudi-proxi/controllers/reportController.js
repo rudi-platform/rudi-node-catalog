@@ -22,7 +22,7 @@ const db = require('../db/dbQueries')
 const utils = require('../utils/jsUtils')
 const json = require('../utils/jsonAccess')
 
-const {setPublishedFlag} = require('../controllers/genericController')
+const { setPublishedFlag } = require('../controllers/genericController')
 
 // -----------------------------------------------------------------------------
 // Constants
@@ -58,6 +58,7 @@ const {
 // Data models
 // -----------------------------------------------------------------------------
 const { Report, IntegrationStatus } = require('../definitions/models/Report')
+const { BadRequestError, NotFoundError, ObjectNotFoundError } = require('../utils/errors')
 
 // -----------------------------------------------------------------------------
 // Comformity functions
@@ -93,7 +94,7 @@ exports.addSingleReportForObject = async (req, reply) => {
 
     // ensure url object id and body object id match
     if (urlObjectId !== bodyObjectId)
-      throw new Error(`${msg.parametersMismatch(urlObjectId, bodyObjectId)}`)
+      throw new BadRequestError(`${msg.parametersMismatch(urlObjectId, bodyObjectId)}`)
 
     // ensure object exists
     const dbObject = await db.getObjectWithRudiId(objectType, urlObjectId)
@@ -106,7 +107,8 @@ exports.addSingleReportForObject = async (req, reply) => {
 
     // ensure report doesn't exist
     const existsReport = await db.doesObjectExistWithRudiId(PARAM_ACTION_REPORT, reportId)
-    if (existsReport) throw new Error(`${msg.objectAlreadyExists(PARAM_ACTION_REPORT, reportId)}`)
+    if (existsReport)
+      throw new MethodNotAllowedError(`${msg.objectAlreadyExists(PARAM_ACTION_REPORT, reportId)}`)
 
     // add new integration report
     log.d(mod, fun, `add new integration report`)
@@ -168,7 +170,6 @@ exports.addOrEditSingleReport = async (objectType, req, reply) => {
         [LOCAL_REPORT_ERROR_MSG]: `The '${objectType}' object concerned by the report was not found`,
       }
     }
-    // if (!existsObject) throw new Error(`${msg.objectNotFound(objectType, urlObjectId)}`)
 
     // check if the report exists
     const dbReport = await db.getObjectWithRudiId(PARAM_ACTION_REPORT, reportId)
@@ -227,7 +228,7 @@ exports.getReportList = async (objectType, req, reply) => {
 
     // ensure object exists
     const existsObject = await db.doesObjectExistWithRudiId(objectType, urlObjectId)
-    if (!existsObject) throw new Error(`${msg.objectNotFound(objectType, urlObjectId)}`)
+    if (!existsObject) throw new ObjectNotFoundError(objectType, urlObjectId)
 
     // get all reports for this object
     const options = {

@@ -11,7 +11,6 @@ const mod = 'genCtrl'
 // External dependancies
 // -----------------------------------------------------------------------------
 const mongoose = require('mongoose')
-const { boomify } = require('@hapi/boom')
 const { v4: UUIDv4 } = require('uuid')
 // const url = require('url')
 const { pick } = require('lodash')
@@ -100,6 +99,14 @@ const metadataController = require('../controllers/metadataController')
 const organizationController = require('../controllers/organizationController')
 const contactController = require('../controllers/contactController')
 const skosController = require('./skosController')
+const { deletePortalMetadata } = require('./portalController')
+const {
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  MethodNotAllowedError,
+  ObjectNotFoundError,
+} = require('../utils/errors')
 
 // -----------------------------------------------------------------------------
 // Specific object type helper functions
@@ -303,7 +310,8 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
 }
 
 function checkIsUrlObject(objectType) {
-  if (URL_OBJECTS.indexOf(objectType) === -1) throw new Error(msg.objectTypeNotFound(objectType))
+  if (URL_OBJECTS.indexOf(objectType) === -1)
+    throw new NotFoundError(msg.objectTypeNotFound(objectType))
 }
 
 async function newObject(objectType, objectData) {
@@ -325,7 +333,7 @@ async function newObject(objectType, objectData) {
         // Custom creation to create the children scheme concepts
         return await skosController.newSkosScheme(objectData)
       default:
-        throw new Error(msg.objectTypeNotFound(objectType))
+        throw new NotFoundError(msg.objectTypeNotFound(objectType))
     }
   } catch (err) {
     log.w(mod, fun, err)
@@ -392,7 +400,7 @@ exports.addSingleObject = async (req, reply) => {
 
     // First: we make sure object doesn't exist already
     const existsObject = await db.doesObjectExistWithJson(objectType, rudiObject)
-    if (existsObject) throw new Error(`${msg.objectAlreadyExists(objectType, rudiId)}`)
+    if (existsObject) throw new ForbiddenError(`${msg.objectAlreadyExists(objectType, rudiId)}`)
 
     // Creating new object + specific treatments
     const createdObject = await newObject(objectType, rudiObject)
@@ -404,7 +412,7 @@ exports.addSingleObject = async (req, reply) => {
     // reply.statusCode = 500
     // reply.message = err
     // reply.send()
-    throw boomify(err)
+    throw err
   }
 }
 
@@ -426,7 +434,7 @@ exports.getSingleObject = async (req, reply) => {
     return dbObject
   } catch (err) {
     log.e(mod, fun, err)
-    throw boomify(err)
+    throw err
   }
 }
 
@@ -529,7 +537,7 @@ exports.updateSingleObject = async (req, reply) => {
     const rudiId = json.accessProperty(updateData, idField)
 
     const existsObject = await db.doesObjectExistWithRudiId(objectType, rudiId)
-    if (!existsObject) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
+    if (!existsObject) throw new ObjectNotFoundError(objectType, rudiId)
 
     if (objectType === PARAM_OBJECT_METADATA) {
       return await metadataController.overwriteMetadata(updateData)
@@ -538,7 +546,7 @@ exports.updateSingleObject = async (req, reply) => {
     }
   } catch (err) {
     log.e(mod, fun, err)
-    throw boomify(err)
+    throw err
   }
 }
 
@@ -572,7 +580,7 @@ exports.upsertSingleObject = async (req, reply) => {
     }
   } catch (err) {
     log.e(mod, fun, err)
-    throw boomify(err)
+    throw err
   }
 }
 
@@ -592,16 +600,17 @@ exports.deleteSingleObject = async (req, reply) => {
     const objectToDelete = await db.getEnsuredObjectWithRudiId(objectType, objectRudiId)
 
     if (await isObjectReferenced(objectType, objectRudiId)) {
-      const err = new Error(msg.objectNotDeletedBecauseUsed(objectType, objectRudiId))
-      err.statusCode = 403
+      const err = new ForbiddenError(msg.objectNotDeletedBecauseUsed(objectType, objectRudiId))
       throw err
     }
     // TODO: if SkosScheme: delete all SkosConcepts that reference it
     // TODO: if SkosConcept: update all other SkosConcepts that reference it (parents/children/siblings/relatives)
-    return await db.deleteObject(objectType, objectRudiId)
+    const reply = await db.deleteObject(objectType, objectRudiId)
+    if (objectType === PARAM_OBJECT_METADATA) await deletePortalMetadata(objectRudiId)
+    return reply
   } catch (err) {
     log.e(mod, fun, err)
-    throw boomify(err)
+    throw err
   }
 }
 
@@ -619,6 +628,9 @@ exports.deleteObjectList = async (req, reply) => {
     // identify object model
     const { Model, idField } = db.getObjectAccesses(objectType)
 
+    // TODO: retrieve the metadata ids, DELETE on portal side with
+    // deletePortalMetadata(id)
+
     // retrieve incoming data
     const filter = req.body
     log.d(mod, fun, beautify(filter))
@@ -635,7 +647,7 @@ exports.deleteObjectList = async (req, reply) => {
     log.e(mod, fun, `url: ${beautify(req.url)}`)
     log.e(mod, fun, `params: ${beautify(req.params)}`)
     log.e(mod, fun, `body: ${beautify(req.body)}`)
-    throw boomify(err)
+    throw err
   }
 }
 
@@ -663,11 +675,13 @@ exports.deleteManyObjects = async (req, reply) => {
         return msg
       }
     }
+    // TODO: retrieve the metadata ids, DELETE on portal side with
+    // deletePortalMetadata(id)
 
     return await db.deleteManyWithFilter(objectType, filter)
   } catch (err) {
     log.e(mod, fun, err)
-    throw boomify(err)
+    throw err
   }
 }
 
@@ -691,6 +705,6 @@ exports.generateUUID = async (req, reply) => {
     return UUIDv4()
   } catch (err) {
     log.e(mod, fun, err)
-    throw boomify(err)
+    throw err
   }
 }

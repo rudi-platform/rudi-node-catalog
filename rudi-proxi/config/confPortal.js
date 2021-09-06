@@ -35,6 +35,21 @@ const _publicKeyUrl = 'publicKeyUrl'
 const _getUrl = 'get_url'
 const _sendUrl = 'put_url'
 
+// Incoming requests control
+const _should_control_public_requests = 'should_control_public_requests'
+
+// -----------------------------------------------------------------------------
+// Constants: Portal JWT
+// -----------------------------------------------------------------------------
+exports.PARAM_TOKEN = 'token'
+
+exports.FIELD_TOKEN = 'access_token'
+
+exports.JWT_TYP = 'typ'
+exports.JWT_USER = 'user_name'
+exports.JWT_CLIENT = 'user_name'
+exports.JWT_EXP = 'exp'
+
 // -----------------------------------------------------------------------------
 // Extracting portal configuration
 // -----------------------------------------------------------------------------
@@ -53,7 +68,9 @@ function getIniValue(section, field) {
   const userValue = utils.quietAccess(USR_PORTAL_CONF[section], field)
   const localValue = utils.quietAccess(DEF_PORTAL_CONF[section], field)
 
-  return userValue || localValue
+  if (userValue != utils.NOT_FOUND) return userValue
+  if (localValue != utils.NOT_FOUND) return localValue
+  return utils.NOT_FOUND
 }
 
 // -----------------------------------------------------------------------------
@@ -80,12 +97,16 @@ exports.SECRET = getIniValue(PORTAL_SECTION, _secret)
 exports.PUBLIC_KEY = getIniValue(PORTAL_SECTION, _publicKey)
 exports.PUBLIC_KEY_URL = getIniValue(PORTAL_SECTION, _publicKeyUrl)
 
+exports.SHOULD_CONTROL_PUBLIC_REQUESTS = getIniValue(
+  PORTAL_SECTION,
+  _should_control_public_requests
+)
+
 // ----- API
 exports.API_GET_URL = getIniValue(PORTAL_SECTION, _getUrl)
 exports.API_SEND_URL = getIniValue(PORTAL_SECTION, _sendUrl)
 
 // ----- API: Get
-
 exports.getPortalMetaUrl = (id) => {
   return `${this.API_GET_URL.replace(/{{id}}/, id)}`
 }
@@ -124,12 +145,3 @@ exports.apiSendOptions = () => {
     path: this.API_SEND_PATH,
   }
 }
-
-exports.PARAM_TOKEN = 'token'
-
-exports.FIELD_TOKEN = 'access_token'
-
-exports.JWT_TYP = 'typ'
-exports.JWT_USER = 'user_name'
-exports.JWT_CLIENT = 'user_name'
-exports.JWT_EXP = 'exp'

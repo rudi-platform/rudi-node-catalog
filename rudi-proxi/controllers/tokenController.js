@@ -5,7 +5,7 @@ const mod = 'jwtCtrl'
 // -----------------------------------------------------------------------------
 // External dependancies
 // -----------------------------------------------------------------------------
-const { readFileSync } = require('fs')
+const { readFileSync, access } = require('fs')
 const { v4: uuidv4 } = require('uuid')
 const { parseKey, parsePrivateKey } = require('sshpk')
 
@@ -14,7 +14,6 @@ const { parseKey, parsePrivateKey } = require('sshpk')
 // -----------------------------------------------------------------------------
 const log = require('../utils/logging')
 
-const { PRIV_KEY, PUB_KEY } = require('../config/confSystem')
 const {
   beautify,
   isEmptyObject,
@@ -22,7 +21,17 @@ const {
   decodeBase64url,
   convertEncoding,
   nowEpochS,
+  nowISO,
+  dateEpochSToIso,
 } = require('../utils/jsUtils')
+const { getProfile } = require('../config/confSystem')
+const { accessProperty } = require('../utils/jsonAccess')
+const {
+  ForbiddenError,
+  UnauthorizedError,
+  RudiHttpError,
+  createRudiHttpError,
+} = require('../utils/errors')
 
 // -----------------------------------------------------------------------------
 // Constants
@@ -31,11 +40,20 @@ const {
 // norm : https://www.iana.org/assignments/jwt/jwt.xhtml
 const JWT_ID = 'jti' // https://www.rfc-editor.org/rfc/rfc7519.html#section-4.1.7
 const JWT_EXP = 'exp' // Expiration Time https://www.rfc-editor.org/rfc/rfc7519.html#section-4.1.4
+const JWT_SUB = 'sub' // Subject https://www.rfc-editor.org/rfc/rfc7519.html#section-4.1.2
+
 const JWT_IAT = 'iat' // Issued At https://www.rfc-editor.org/rfc/rfc7519.html#section-4.1.6
-const JWT_APP = 'client_id' // https://www.rfc-editor.org/rfc/rfc6749.html#section-2.2
-const JWT_USR = 'sub' // Subject https://www.rfc-editor.org/rfc/rfc7519.html#section-4.1.2
+const JWT_CLIENT = 'client_id' // https://www.rfc-editor.org/rfc/rfc6749.html#section-2.2
+
+const REQ_MTD = 'req_mtd'
+const REQ_URL = 'req_url'
 
 const DEFAULT_EXP = 600
+
+const PUB_KEY = 'pub_key'
+const SUB_ACL = 'routes'
+const REQ_ROUTE_ALL = 'all'
+
 // -----------------------------------------------------------------------------
 // Controllers
 // -----------------------------------------------------------------------------
@@ -47,7 +65,7 @@ const DEFAULT_EXP = 600
  *
  * Note: 'ed25519' (EdDSA) is STRONGLY recommended
  * https://crypto.stackexchange.com/a/60390/94576
- * 
+ *
  * @param {String} algo
  * @returns
  */
@@ -126,8 +144,8 @@ exports.forgeToken = async (req, reply) => {
       throw new Error(`Incoming JSON should not be null`)
 
     // Identifying the client / app
-    const moduleId = jwtPayload[JWT_APP]
-    if (!moduleId) throw new Error(`No ID was found for the app (property ${JWT_APP})`)
+    const moduleId = jwtPayload[JWT_CLIENT]
+    if (!moduleId) throw new Error(`No ID was found for the app (property ${JWT_CLIENT})`)
 
     // Identifying the (public) key type
     const pubKeyPem = readFileSync(PUB_KEY, 'ascii')
@@ -177,19 +195,27 @@ exports.forgeToken = async (req, reply) => {
   }
 }
 
-exports.checkToken = async (req, reply) => {
-  const fun = 'checkToken'
+exports.checkRudiProdPermission = async (req, reply) => {
+  const fun = 'checkRudiProdPermission'
   log.d(mod, fun, ``)
   try {
     const header = req.headers
     // log.d(mod, fun, `${beautify(header)}`)
     const auth = header.authorization
+
     if (!auth)
-      throw new Error('Headers should include a JWT in the form "Authorization": Bearer <JWT>"')
+      throw new UnauthorizedError(
+        'Headers should include a JWT in the form "Authorization": Bearer <JWT>"'
+      )
     const token = auth.substring(7)
-    // log.d(mod, fun, token)
-    const signIsValid = await this.verifyToken(token)
-    return `JWT is ${signIsValid ? '' : 'in'}valid`
+    // log.d(mod, fun, `token: ${token}`)
+    const subject = await this.verifyRudiProdToken(token, req.method, req.url)
+
+    // Check the ACL (= does the subject have permission to enter this route?)
+    log.d(mod, fun, `req: ${beautify(req.context.config.routeName)}`)
+    const reqRouteName = accessProperty(req.context.config, 'routeName')
+    checkSubjPermission(subject, reqRouteName)
+    return subject
     // return 'ok'
   } catch (err) {
     log.w(mod, fun, err)
@@ -197,41 +223,88 @@ exports.checkToken = async (req, reply) => {
   }
 }
 
-exports.verifyToken = async (token) => {
-  const fun = 'checkToken'
+function checkSubjPermission(subject, reqRouteName) {
+  const fun = 'checkSubjPermission'
+  log.d(mod, fun, ``)
+
+  const subjProfile = getProfile(subject)
+  const subjAcl = accessProperty(subjProfile, SUB_ACL)
+  if (!subjAcl.includes(reqRouteName) && !subjAcl.includes(REQ_ROUTE_ALL))
+    throw new ForbiddenError(
+      `Current subject '${subject}' cannot access this route (${reqRouteName})`
+    )
+  return true
+}
+
+exports.verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
+  const fun = 'verifyRudiProdToken'
   log.d(mod, fun, `token: ${token}`)
 
   try {
     const [jwtHeaderBase64url, jwtPayloadBase64url, jwtSignatureBase64url] = token.split('.')
 
-    // Retrieve the public key
-    const pubKeyPem = readFileSync(PUB_KEY, 'ascii')
-    const sslKey = parseKey(pubKeyPem)
-
     // Identify the signature hash algorithm from the JWT header alg property
     const jwtHeader = JSON.parse(decodeBase64url(jwtHeaderBase64url))
-    log.d(mod, fun, `JWT algo: ${jwtHeader.alg}`)
+    // log.d(mod, fun, `JWT algo: ${jwtHeader.alg}`)
     const hashAlgo = this.getHashAlgo(jwtHeader.alg)
-    log.d(mod, fun, `hash algo: ${hashAlgo}`)
+    // log.d(mod, fun, `hash algo: ${hashAlgo}`)
 
     // Check if the token is still valid
+
     const jwtPayload = JSON.parse(decodeBase64url(jwtPayloadBase64url))
-    const jwtIat = jwtPayload[JWT_IAT]
-    if (!jwtIat) throw new Error(`JWT payload requires the property '${JWT_IAT}'`)
-    const jwtExp = jwtPayload[JWT_EXP]
-    if (!jwtExp) throw new Error(`JWT payload requires the property '${JWT_EXP}'`)
-    if (nowEpochS() > jwtIat + jwtExp)
-      throw new Error(
-        `JWT expired: JWT issued at ${jwtIat}, expires after ${jwtExp}s, now is ${nowEpochS()}`
+    const jwtExp = accessProperty(jwtPayload, JWT_EXP)
+
+    if (nowEpochS() > jwtExp)
+      throw new ForbiddenError(
+        `JWT expired: JWT expires after ${dateEpochSToIso(jwtExp)},now is ${nowISO()}`
       )
+
+    // Check the current route
+    const jwtMtd = accessProperty(jwtPayload, REQ_MTD)
+    if (jwtMtd !== reqMethod && jwtMtd !== REQ_ROUTE_ALL)
+      throw new ForbiddenError(
+        `The http request method '${reqMethod}' doesn't match what has been declared in the JWT: '${jwtMtd}'`
+      )
+    const jwtUrl = accessProperty(jwtPayload, REQ_URL)
+    if (jwtUrl !== reqUrl && jwtUrl !== REQ_ROUTE_ALL)
+      throw new ForbiddenError(
+        `The request URL '${reqUrl}' doesn't match what has been declared in the JWT: '${jwtUrl}'`
+      )
+
+    // Identify the subject (= caller/requester)
+    const subject = accessProperty(jwtPayload, JWT_SUB)
+    // log.d(mod, fun, `subject: ${subject}`)
+
+    // Retrieve the public key
+    const subjProfile = getProfile(subject)
+    if (!subjProfile)
+      throw new ForbiddenError(`No profile was found for this subject: '${subject}'`)
+
+    let keyFile
+    try {
+      keyFile = accessProperty(subjProfile, PUB_KEY)
+    } catch (err) {
+      throw createRudiHttpError(
+        0,
+        `Wrong configuration, public key path not found for '${subject}'`
+      )
+    }
+
+    const pubKeyPem = readFileSync(keyFile, 'ascii')
+    const sslKey = parseKey(pubKeyPem)
+    // log.d(mod, fun, `sslKey: ${beautify(sslKey)}`)
 
     // Check the signature
     const verifier = sslKey.createVerify(hashAlgo)
     verifier.update(`${jwtHeaderBase64url}.${jwtPayloadBase64url}`)
     const signatureIsValid = verifier.verify(jwtSignatureBase64url, 'base64url')
-    return signatureIsValid
+    if (!signatureIsValid) throw new ForbiddenError('Signature is not valid')
+    // Check the ACL (= does the subject have permission to enter this route?)
+    // const subjAcl = accessProperty(subjProfile, SUB_ACL)
+
+    return subject
   } catch (err) {
     log.w(mod, fun, err)
-    throw err
+    throw new ForbiddenError(`JWT invalid: ${err.message}`)
   }
 }

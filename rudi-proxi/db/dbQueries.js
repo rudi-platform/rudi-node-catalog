@@ -87,6 +87,7 @@ const { Metadata, METADATA_FIELDS_TO_POPULATE } = require('../definitions/models
 
 const { Report } = require('../definitions/models/Report')
 const { LogEntry, makeLogInfo, logLineToString } = require('../definitions/models/LogEntry')
+const { InternalServerError, ParameterExpectedError } = require('../utils/errors')
 
 // -----------------------------------------------------------------------------
 // Properties with special treatments
@@ -349,7 +350,7 @@ exports.getObjectWithDbId = async (objectType, dbId) => {
 exports.getObjectWithRudiId = async (objectType, rudiId) => {
   const fun = `getObjectWithRudiId`
   // // log.d(mod, fun, ``)
-  if (!rudiId) throw new Error(`${msg.parameterExpected(fun, PARAM_ID)}`)
+  if (!rudiId) throw new ParameterExpectedError(fun, PARAM_ID)
 
   const idField = this.getObjectIdField(objectType)
   const filter = { [idField]: rudiId }
@@ -360,7 +361,7 @@ exports.getObjectWithRudiId = async (objectType, rudiId) => {
 exports.getEnsuredObjectWithRudiId = async (objectType, rudiId) => {
   const fun = `getEnsuredObjectWithRudiId`
   // log.d(mod, fun, ``)
-  if (!rudiId) throw new Error(`${msg.parameterExpected(fun, PARAM_ID)}`)
+  if (!rudiId) throw new ParameterExpectedError(fun, PARAM_ID)
   const dbObject = await this.getObjectWithRudiId(objectType, rudiId)
   if (!dbObject) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
   return dbObject
@@ -561,7 +562,7 @@ exports.getObjectWithField = async (Model, fieldName, fieldValue, populateFields
   const fun = `getObjectWithField`
   // // log.d(mod, fun, ``)
   try {
-    if (!fieldName) throw new Error(`${msg.parameterExpected(fun, 'field name')}`)
+    if (!fieldName) throw new ParameterExpectedError(fun, 'field name')
 
     const filter = {
       [fieldName]: fieldValue
@@ -1142,7 +1143,7 @@ exports.deleteMetadata = async (metadataRudiId) => {
 
   // Checking the id parameter
   if (!metadataRudiId) {
-    throw new Error(`${msg.parameterExpected(fun, API_METADATA_ID)}`)
+    throw new ParameterExpectedError(fun, API_METADATA_ID)
   }
 
   // Checking that the metadata already exists
@@ -1250,7 +1251,7 @@ exports.deleteOrganization = async (organizationRudiId) => {
 
   // Checking the id parameter
   if (!organizationRudiId) {
-    throw new Error(`${msg.parameterExpected(fun, API_ORGANIZATION_ID)}`)
+    throw new ParameterExpectedError(fun, API_ORGANIZATION_ID)
   }
 
   // Checking that the organization already exists
@@ -1347,7 +1348,7 @@ exports.deleteContact = async (contactRudiId) => {
 
   // Checking the id parameter
   if (!contactRudiId) {
-    throw new Error(`${msg.parameterExpected(fun, API_CONTACT_ID)}`)
+    throw new ParameterExpectedError(fun, API_CONTACT_ID)
   }
 
   // Checking that the contact already exists

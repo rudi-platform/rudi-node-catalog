@@ -7,7 +7,6 @@ const mod = 'http'
 // -----------------------------------------------------------------------------
 const https = require('https')
 const http = require('http')
-const { get, post } = require('axios')
 const axios = require('axios')
 
 // -----------------------------------------------------------------------------
@@ -15,6 +14,7 @@ const axios = require('axios')
 // -----------------------------------------------------------------------------
 const log = require('./logging')
 const utils = require('./jsUtils')
+const { InternalServerError, createRudiHttpError } = require('./errors')
 
 // -----------------------------------------------------------------------------
 // Http protocols
@@ -73,7 +73,7 @@ function doHttpRequest(options, protocol, data) {
 
 exports.httpGet = async (destUrl, authorizationToken) => {
   const fun = 'httpGet'
-  log.d(mod, fun, ``)
+  log.d(mod, fun, `destUrl: ${destUrl}`)
 
   const reqOpts = {
     headers: {
@@ -84,7 +84,7 @@ exports.httpGet = async (destUrl, authorizationToken) => {
   if (authorizationToken) reqOpts.headers.Authorization = `Bearer ${authorizationToken}`
 
   try {
-    const answer = await get(destUrl, reqOpts)
+    const answer = await axios.get(destUrl, reqOpts)
     log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
     return answer.data
   } catch (error) {
@@ -111,7 +111,10 @@ exports.httpDelete = async (destUrl, authorizationToken) => {
     return answer.data
   } catch (error) {
     log.w(mod, fun, `GET: ${error}`)
-    throw error
+    log.w(mod, fun, `details: ${utils.beautify(error.response.data)}`)
+    if (error.response && error.response.data && error.response.data.label && error.response.data.code)
+      throw createRudiHttpError(error.response.data.code, error.response.data.label)
+    else throw error
   }
 }
 
@@ -188,9 +191,9 @@ exports.httpPost = async (destUrl, dataToSend, authorizationToken) => {
 
 exports.directPost = async (destUrl, dataToSend, reqOpts) => {
   const fun = 'directPost'
-  log.d(mod, fun, ``)
+  log.d(mod, fun, `destUrl: ${destUrl}`)
   try {
-    const answer = await post(destUrl, dataToSend, reqOpts)
+    const answer = await axios.post(destUrl, dataToSend, reqOpts)
     return answer
   } catch (err) {
     // log.w(mod, fun, err)

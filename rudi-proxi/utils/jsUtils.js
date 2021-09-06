@@ -13,8 +13,10 @@ const datetime = require('date-and-time')
 // -----------------------------------------------------------------------------
 // String
 // -----------------------------------------------------------------------------
-exports.toBase64 = (str) => this.convertEncoding(str, 'utf-8', 'base64url')
-exports.decodeBase64 = (data) => this.convertEncoding(data, 'base64url', 'utf-8')
+exports.toBase64 = (str) => this.convertEncoding(str, 'utf-8', 'base64')
+exports.toBase64Url = (str) => this.convertEncoding(str, 'utf-8', 'base64url')
+exports.decodeBase64 = (data) => this.convertEncoding(data, 'base64', 'utf-8')
+exports.decodeBase64url = (data) => this.convertEncoding(data, 'base64url', 'utf-8')
 
 exports.convertEncoding = (data, fromEncoding, toEncoding) => {
   const fun = 'convertEncoding'
@@ -104,11 +106,12 @@ exports.isNotEmptyObject = (obj) => {
   return obj && Object.keys(obj).length > 0
 }
 
+exports.NOT_FOUND = '!_not_found_!'
 exports.quietAccess = (obj, prop) => {
   try {
     return obj[prop]
   } catch {
-    return {}
+    return this.NOT_FOUND
   }
 }
 

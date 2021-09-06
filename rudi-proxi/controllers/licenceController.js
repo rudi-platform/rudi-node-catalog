@@ -16,6 +16,7 @@ const sys = require('../config/confSystem')
 const log = require('../utils/logging')
 const utils = require('../utils/jsUtils')
 const json = require('../utils/jsonAccess')
+const { InternalServerError } = require('../utils/errors')
 
 const db = require('../db/dbQueries')
 const { httpPost, directPost } = require('../utils/httpReq')
@@ -85,13 +86,17 @@ exports.initializeLicences = async () => {
       })
     )
     // log.d(mod, fun, licenceData)
+    const reply = await skosController.newSkosScheme(licenceData)
+    if(!reply)      throw new InternalServerError(`Licence integration failed`)
+    return await this.getLicenceCodes()
+/* 
     const res = await directPost(LICENCE_POST_ADDRESS, licenceData)
     if (res.status === 200) {
       log.d(mod, fun, `Integration done`)
       return await this.getLicenceCodes()
     } else {
-      throw new Error(`Licence integration failed`)
-    }
+      throw new InternalServerError(`Licence integration failed`)
+    } */
     // log.d(mod, fun, `Body: ${utils.beautify(res.data)}`)
   } catch (err) {
     log.w(mod, fun, err)

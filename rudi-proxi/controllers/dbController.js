@@ -23,6 +23,7 @@ const db = require('../db/dbQueries')
 // -----------------------------------------------------------------------------
 const { URL_PV_DB_ACCESS } = require('../config/confApi')
 const { DB_NAME } = require('../config/confSystem')
+const { NotFoundError, BadRequestError } = require('../utils/errors')
 
 // -----------------------------------------------------------------------------
 // Controllers
@@ -36,7 +37,8 @@ exports.getCollections = async (req, reply) => {
     return map(dbActionResult, 'name')
   } catch (err) {
     log.e(mod, fun, err)
-    throw boomify(err)
+    if (err.name === 'MongoError') throw new BadRequestError(err)
+    throw new NotFoundError(err)
   }
 }
 
@@ -48,6 +50,7 @@ exports.dropDB = async (req, reply) => {
     return dbActionResult
   } catch (err) {
     log.e(mod, fun, err)
-    throw boomify(err)
+    if (err.name === 'MongoError') throw new BadRequestError(err)
+    throw new NotFoundError(err)
   }
 }

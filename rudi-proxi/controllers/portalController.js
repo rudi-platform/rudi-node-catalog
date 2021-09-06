@@ -6,7 +6,7 @@ const mod = 'portalCtrl'
 // -----------------------------------------------------------------------------
 // External dependancies
 // -----------------------------------------------------------------------------
-const { boomify } = require('@hapi/boom')
+const { boomify, notImplemented } = require('@hapi/boom')
 
 const { readFileSync } = require('fs')
 const { parseKey } = require('sshpk')
@@ -27,6 +27,12 @@ const portal = require('../config/confPortal')
 const validate = require('../definitions/schemaValidators')
 
 const { Metadata } = require('../definitions/models/Metadata')
+const {
+  NotFoundError,
+  InternalServerError,
+  NotImplementedError,
+  BadRequestError,
+} = require('../utils/errors')
 
 // -----------------------------------------------------------------------------
 // Token manager
@@ -71,7 +77,7 @@ exports.getPortalToken = async () => {
   try {
     const rmToken = await db.getLatestStoredPortalToken()
     if (!rmToken) {
-      throw new Error('No token in cache')
+      throw new InternalServerError('No token in cache')
     }
     token = json.accessProperty(rmToken, portal.FIELD_TOKEN)
     // log.d(mod, fun, `token: ${utils.beautify(token)}`)
@@ -87,7 +93,7 @@ exports.getPortalToken = async () => {
       token = json.accessProperty(rmToken, portal.FIELD_TOKEN)
     } catch (err) {
       log.w(mod, fun, err)
-      throw new Error(`Failed to get a new token from the portal: ${err}`)
+      throw new InternalServerError(`Failed to get a new token from the portal: ${err}`)
     }
   }
   return token
@@ -192,7 +198,7 @@ exports.getNewTokenFromPortal = async () => {
     const portalUrl = portal.getAuthUrl()
     const body = `grant_type=password&scope=read&client_id=${usr}&username=${usr}&password=${pwd}`
 
-    const basicAuth = utils.toBase64(`${usr}:${pwd}`)
+    const basicAuth = utils.toBase64Url(`${usr}:${pwd}`)
 
     const opts = {
       headers: {
@@ -219,7 +225,7 @@ exports.getNewTokenFromPortal = async () => {
 
       return portalToken
     } else {
-      throw new Error(utils.beautify(answer))
+      throw new InternalServerError(utils.beautify(answer))
     }
   } catch (err) {
     const errMsg = `Portal couldn't deliver a token: ${err}`
@@ -244,7 +250,7 @@ exports.getTokenCheckedByPortal = async (token) => {
     } else {
       const errMsg = `Portal invalidated the token: ${portalResponse.data}`
       log.w(mod, fun, errMsg)
-      throw new Error(errMsg)
+      throw new InternalServerError(errMsg)
     }
   } catch (err) {
     log.w(mod, fun, err)
@@ -349,20 +355,18 @@ exports.verifyPortalToken = (accessToken) => {
     const [jwtHeaderBase64, jwtPayloadBase64, jwtSignatureBase64] = accessToken.split('.')
 
     // Check JWT header
-    const jwtHeader = JSON.parse(utils.decodeBase64(jwtHeaderBase64))
-
-    // if (jwtHeader[portal.JWT_TYP] !== 'JWT')
-    //   throw new Error(`Received token is not a JWT: ${utils.beautify(jwtHeader)}`)
+    const jwtHeader = JSON.parse(utils.decodeBase64url(jwtHeaderBase64))
 
     // Check JWT body
-    const jwtPayload = JSON.parse(utils.decodeBase64(jwtPayloadBase64))
+    const jwtPayload = JSON.parse(utils.decodeBase64url(jwtPayloadBase64))
 
-    if (jwtPayload[portal.JWT_USER] !== portal.LOGIN) throw new Error('Portal JWT: incorrect user')
+    if (jwtPayload[portal.JWT_USER] !== portal.LOGIN)
+      throw new InternalServerError('Portal JWT: incorrect user')
     if (jwtPayload[portal.JWT_CLIENT] !== portal.LOGIN)
-      throw new Error('Portal JWT: incorrect client')
+      throw new InternalServerError('Portal JWT: incorrect client')
 
     if (jwtPayload[portal.JWT_EXP] < utils.nowEpochS())
-      throw new Error(
+      throw new InternalServerError(
         `Portal JWT expired: ` +
           `expire_date=${utils.dateEpochSToIso(jwtPayload[portal.JWT_EXP])}` +
           ` < now=${utils.dateEpochSToIso(utils.nowEpochS())}`
@@ -372,7 +376,7 @@ exports.verifyPortalToken = (accessToken) => {
 
     // Check JWT signature
     if (!this.checkSignatureWithPubKey(accessToken))
-      throw new Error('Portal JWT signature is not valid')
+      throw new InternalServerError('Portal JWT signature is not valid')
 
     return [jwtHeader, jwtPayload]
   } catch (err) {
@@ -390,13 +394,13 @@ exports.postMetadataToPortal = async (metadataId) => {
   const fun = 'postMetadataToPortal'
   log.d(mod, fun, ``)
   try {
-    if (!metadataId) throw new Error('Not yet implemented')
+    if (!metadataId) throw new NotImplementedError('Not yet implemented')
 
     const metadata = await db.getEnsuredObjectWithRudiId(api.PARAM_OBJECT_METADATA, metadataId)
     if (!metadata) {
       const errMsg = `No data found locally for id '${metadataId}'`
       log.w(mod, fun, errMsg)
-      throw new Error(errMsg)
+      throw new NotFoundError(errMsg)
     }
     const metadataClean = utils.deepClone(metadata)
 
@@ -417,7 +421,7 @@ exports.getMetadataFromPortal = async (metadataId) => {
   const fun = 'getMetadataFromPortal'
   log.d(mod, fun, ``)
   try {
-    if (!metadataId) throw new Error('Not yet implemented on Portal side') // Can't get the resouces list yet.
+    if (!metadataId) throw new NotImplementedError('Not yet implemented on Portal side') // Can't get the resouces list yet.
 
     const token = await this.getPortalToken()
     const reply = await httpGet(portal.getPortalMetaUrl(metadataId), token)
@@ -433,14 +437,14 @@ exports.deletePortalMetadata = async (metadataId) => {
   const fun = 'deletePortalMetadata'
   log.d(mod, fun, ``)
   try {
-    if (!metadataId) throw new Error('Metadata id required') // Can't get the resouces list yet.
+    if (!metadataId) throw new BadRequestError('Metadata id required') // Can't get the resouces list yet.
 
     const token = await this.getPortalToken()
     const reply = await httpDelete(portal.getPortalMetaUrl(metadataId), token)
 
     return reply
   } catch (err) {
-    log.w(mod, fun, err)
-    throw err
+    log.e(mod, fun, `Couldn't delete on Portal side: ${err}`)
+    return false
   }
 }
