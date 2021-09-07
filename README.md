@@ -45,6 +45,17 @@ Configuration files can be found in the **"0-ini" directory**.
 **"0-ini/conf_default.ini"**: default configuration and use examples
 **"0-ini/conf_custom.ini"**: user configuration, to be created.
 
+**Security profiles**
+In the configuration file it is possible to activate the flag **"security.should_control_private_requests"**.
+When this flag is true, JWT from incoming requests are controlled 
+
+In the configuration file, the parameter **"security.profiles"** indicates the path where is located the security file.
+
+The security "profiles" are defined each by a section whose **name** reflects the **"sub"** payload field in the JWT
+In this section, 
+- **pub_key** indicates the path where is stored the public key associated with the subject
+- **routes[]** indicates the name of a route that is allowed for the user (see "0-ini/profiles.ini" file for a list of route names)
+
 #### Security
 **Required header fields for RUDI JWT**
 - **alg**: the JWT algorithm (preferably "EdDSA"). It must correspond to the algorithm used to create the private key used to generate this token signature (preferably ed25519).
@@ -58,17 +69,6 @@ Configuration files can be found in the **"0-ini" directory**.
 - **jti** (jwt identifier): a UUIDv4 identifying this JSON web token
 - **iat** (issued at): date of the generation of the token in Epoch seconds
 - **client_id**: an identifier for the logged user requesting the resource
-
-**Security profiles**
-In the configuration file it is possible to activate the flag **"security.should_control_private_requests"**.
-When this flag is true, JWT from incoming requests are controlled 
-
-In the configuration file, the parameter **"security.profiles"** indicates the path where is located the security file.
-
-The security "profiles" are defined each by a section whose **name** reflects the **"sub"** payload field in the JWT
-In this section, 
-- **pub_key** indicates the path where is stored the public key associated with the subject
-- **routes[]** indicates the name of a route that is allowed for the user (see "0-ini/profiles.ini" file for a list of route names)
 
 **Test files**
 In **"tests/env-rudi-*.postman_environment.json** the value for the key **"cryptoJwtUrl"** should be replaced with the valid address of the client/crypto module
