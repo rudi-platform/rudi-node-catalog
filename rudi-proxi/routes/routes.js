@@ -101,7 +101,6 @@ const DEV_GET_ALL_LICENCE_CODES = 'dev_get_all_licence_codes'
 const DEV_INIT_LICENCES = 'dev_init_licences'
 const DEV_INIT_WITH_ODR = 'dev_init_with_odr'
 const DEV_GENERATE_UUID = 'dev_generate_uuid'
-const DEV_FORGE_TOKEN = 'dev_forge_token'
 const DEV_EXPOSED_GET_PORTAL_TOKEN = 'dev_exposed_get_portal_token'
 const DEV_CHECK_STORED_TOKEN = 'dev_check_stored_token'
 const DEV_GET_PORTAL_METADATA = 'dev_get_portal_metadata'
@@ -440,16 +439,6 @@ exports.devRoutes = [
     preHandler: onDevRoute,
     handler: genericController.generateUUID,
     config: { routeName: DEV_GENERATE_UUID },
-  },
-  // -----------------------------------------------------------------------------
-  // Local token generation
-  // -----------------------------------------------------------------------------
-  {
-    method: 'POST',
-    url: `${URL_PREFIX_PRIVATE}/${PARAM_ACTION_SIGN}`,
-    preHandler: onDevRoute,
-    handler: tokenController.forgeToken,
-    config: { routeName: DEV_FORGE_TOKEN },
   },
   // -----------------------------------------------------------------------------
   // Portal token
