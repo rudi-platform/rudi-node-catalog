@@ -28,14 +28,14 @@ The Media driver provides :
 - **GET /api/v1/resources/:id/report**
 - **GET /api/v1/resources/:id/report/:irid**
 
-optional parameters: 
-- **limit** (default = 100, max = 500),
-- **offset** (default = 0),
-- **fields**, 
-- **sort_by**, 
-- **count_by**, 
-- **group_by**, 
-- **updated_after**, 
+Optional parameters: 
+- **limit** (default = 100, max = 500): the maximum number of  metadata in the result set    
+- **offset** (default = 0): the number of metadata to skip before starting to collect the result set 
+- **fields**: Comma-separated properties that are kept for displaying the elements of the result set
+- **sort_by**: comma-separated properties used to order the metadata in the result set, ordered by decreasing priority. A minus sign before the field name means metadata will be sorted by decreasing values over this particular field
+- **count_by**: the number of metadata to skip before starting to collect the result set  
+- **group_by**: the one property to be used for grouping and counting the metadata
+- **updated_after**: 
 - **updated_before**
     - use:
         GET /api/v1/resources?limit=30&offset=3
