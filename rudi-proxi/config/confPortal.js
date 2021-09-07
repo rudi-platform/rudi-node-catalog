@@ -7,17 +7,11 @@
 // -----------------------------------------------------------------------------
 const fa = require('../utils/fileActions')
 const utils = require('../utils/jsUtils')
-const { CONF_USER, CONF_DEFAULT } = require('./confSystem')
+const { USER_CONF_FILE, DEFAULT_CONF_FILE, USER_CONF, LOCAL_CONF, getIniValue } = require('./confSystem')
 
 // -----------------------------------------------------------------------------
 // Constants: local ini file configuration settings
 // -----------------------------------------------------------------------------
-
-// Conf file name
-// - user conf
-const usrPortalConfFile = CONF_USER
-// - default conf
-const defPortalConfFile = CONF_DEFAULT
 
 const PORTAL_SECTION = 'portal'
 // Auth section
@@ -52,27 +46,8 @@ exports.JWT_CLIENT = 'user_name'
 exports.JWT_EXP = 'exp'
 
 // -----------------------------------------------------------------------------
-// Extracting portal configuration
-// -----------------------------------------------------------------------------
-const DEF_PORTAL_CONF = fa.readIniFile(defPortalConfFile)
-const USR_PORTAL_CONF = fa.readIniFile(usrPortalConfFile)
-
-// -----------------------------------------------------------------------------
 // Helper functions
 // -----------------------------------------------------------------------------
-
-// Get values from global constants
-// -> gets user conf file value
-//    if null get local conf file value
-//    if null get default value
-function getIniValue(section, field) {
-  const userValue = utils.quietAccess(USR_PORTAL_CONF[section], field)
-  const localValue = utils.quietAccess(DEF_PORTAL_CONF[section], field)
-
-  if (userValue != utils.NOT_FOUND) return userValue
-  if (localValue != utils.NOT_FOUND) return localValue
-  return utils.NOT_FOUND
-}
 
 // -----------------------------------------------------------------------------
 // Extracting and exporting sys configuration

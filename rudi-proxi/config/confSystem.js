@@ -24,9 +24,9 @@ utils.separateLogs()
 // - directory
 const iniDir = './0-ini'
 // - user conf path
-exports.CONF_USER = `${iniDir}/conf_custom.ini`
+const userConfFile = `${iniDir}/conf_custom.ini`
 // - default conf path
-exports.CONF_DEFAULT = `${iniDir}/conf_default.ini`
+const defaultConfFile = `${iniDir}/conf_default.ini`
 
 // Node Server section
 const SERVER_SECTION = 'server'
@@ -60,8 +60,8 @@ const _should_control_private_requests = 'should_control_private_requests'
 // Getting user conf file value
 // if null, local conf file value
 // if null , default value
-const USER_CONF = fa.readIniFile(this.CONF_USER)
-const LOCAL_CONF = fa.readIniFile(this.CONF_DEFAULT)
+exports.USER_CONF = fa.readIniFile(userConfFile)
+exports.LOCAL_CONF = fa.readIniFile(defaultConfFile)
 
 // -----------------------------------------------------------------------------
 // Helper functions
@@ -71,9 +71,9 @@ const LOCAL_CONF = fa.readIniFile(this.CONF_DEFAULT)
 // -> gets user conf file value
 //    if null get local conf file value
 //    if null get default value
-function getIniValue(section, field) {
-  const userValue = utils.quietAccess(USER_CONF[section], field)
-  const localValue = utils.quietAccess(LOCAL_CONF[section], field)
+exports.getIniValue = (section, field) => {
+  const userValue = utils.quietAccess(this.USER_CONF[section], field)
+  const localValue = utils.quietAccess(this.LOCAL_CONF[section], field)
 
   if (userValue != utils.NOT_FOUND) return userValue
   if (localValue != utils.NOT_FOUND) return localValue
@@ -85,30 +85,31 @@ function getIniValue(section, field) {
 // -----------------------------------------------------------------------------
 
 // Server
-exports.LISTENING_ADDR = getIniValue(SERVER_SECTION, _serverAddress)
-exports.LISTENING_PORT = getIniValue(SERVER_SECTION, _serverPort)
+exports.LISTENING_ADDR = this.getIniValue(SERVER_SECTION, _serverAddress)
+exports.LISTENING_PORT = this.getIniValue(SERVER_SECTION, _serverPort)
 
 // DB
-exports.DB_NAME = getIniValue(DB_SECTION, _dbName)
-const DB_URL_PREFIX = getIniValue(DB_SECTION, _dbUrl)
+exports.DB_NAME = this.getIniValue(DB_SECTION, _dbName)
+const DB_URL_PREFIX = this.getIniValue(DB_SECTION, _dbUrl)
 exports.DB_URL = `${DB_URL_PREFIX}${this.DB_NAME}`
 
 // Logs
-exports.APP_NAME = getIniValue(LOG_SECTION, _appName)
-exports.LOG_DIR = getIniValue(LOG_SECTION, _logDir)
-exports.LOG_FILE = getIniValue(LOG_SECTION, _logFileName)
+exports.APP_NAME = this.getIniValue(LOG_SECTION, _appName)
+exports.LOG_DIR = this.getIniValue(LOG_SECTION, _logDir)
+exports.LOG_FILE = this.getIniValue(LOG_SECTION, _logFileName)
 exports.OUT_LOG = `${this.LOG_DIR}/${this.LOG_FILE}`
 exports.SYMLINK_NAME = `${this.APP_NAME}-current.log`
-exports.LOG_LVL = getIniValue(LOG_SECTION, _logLevel)
-exports.LOG_EXP = getIniValue(LOG_SECTION, _expires)
+exports.LOG_LVL = this.getIniValue(LOG_SECTION, _logLevel)
+exports.LOG_EXP = this.getIniValue(LOG_SECTION, _expires)
 
 // Security
-const profilesConfFile = getIniValue(SECURITY_SECTION, _profilesConfFile)
+const profilesConfFile = this.getIniValue(SECURITY_SECTION, _profilesConfFile)
 const PROFILES = fa.readIniFile(profilesConfFile)
-exports.SHOULD_CONTROL_PRIVATE_REQUESTS = getIniValue(
+exports.SHOULD_CONTROL_PRIVATE_REQUESTS = this.getIniValue(
   SECURITY_SECTION,
   _should_control_private_requests
 )
+
 exports.getProfile = (subject) => {
   return PROFILES[subject]
 }
