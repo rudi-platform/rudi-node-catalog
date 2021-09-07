@@ -43,7 +43,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"exp\": {{exp}},\n    \"jti\": \"{{$randomUUID}}\",\n    \"sub\": \"rudi_api_pm\",\n    \"client_id\": \"pm\",\n    \"req_mtd\": \"all\",\n    \"req_url\": \"all\"\n}",
+							"raw": "{\n    \"exp\": {{exp}},\n    \"jti\": \"{{$randomUUID}}\",\n    \"sub\": \"{{pm_client_name}}\",\n    \"client_id\": \"pm\",\n    \"req_mtd\": \"all\",\n    \"req_url\": \"all\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3926,7 +3926,6 @@
 					"    },",
 					"",
 					"    initVal: function (field) {",
-					"        console.log(field)",
 					"        const val = pm.collectionVariables.get(field);",
 					"        if(val) return val;",
 					"        const randVal = rand.get('{{$randomUUID}}');",

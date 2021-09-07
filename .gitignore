@@ -1,7 +1,7 @@
 # Config
-**/rudi_proxi_custom.ini
-**/rudi_portal_custom.ini
-**/profiles.ini
+**/custom.ini
+**/*custom.ini
+**/profiles_custom.ini
 
 # Libs
 **/node_modules
