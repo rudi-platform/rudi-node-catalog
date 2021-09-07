@@ -26,17 +26,18 @@ The Media driver provides :
 - **GET /api/v1/resources/:id/report**
 - **GET /api/v1/resources/:id/report/:irid**
 
-Optional parameters: 
-- **limit** (default = 100, max = 500): the maximum number of  metadata in the result set    
+**Optional parameters: 
+**- **limit** (default = 100, max = 500): the maximum number of  metadata in the result set    
 - **offset** (default = 0): the number of metadata to skip before starting to collect the result set 
 - **fields**: Comma-separated properties that are kept for displaying the elements of the result set
 - **sort_by**: comma-separated properties used to order the metadata in the result set, ordered by decreasing priority. A minus sign before the field name means metadata will be sorted by decreasing values over this particular field
 - **count_by**: the number of metadata to skip before starting to collect the result set  
 - **group_by**: the one property to be used for grouping and counting the metadata
-- **updated_after**: 
-- **updated_before**
-    - use:
-        GET /api/v1/resources?limit=30&offset=3
+- **updated_after**: Shortcut to list the metadata updated after a given date
+- **updated_before**: Shortcut to list the metadata updated before a given date
+
+**Use example:**
+GET https://data-rudi.aqmo.org/api/v1/resources?limit=10&fields=global_id,resource_title,updatedAt&updated_after=2021-07-02&updated_before=2021-07-14T13:25:32.758Z
 
 #### Configuration
 Configuration files can be found in the **"0-ini" directory**.

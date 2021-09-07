@@ -49,6 +49,15 @@ const _logFileName = 'log_file'
 const _logLevel = 'log_level'
 const _expires = 'expires'
 
+// Logs section
+const SYSLOG_SECTION = 'syslog'
+
+const _syslogHost = 'syslog_host'
+const _syslogPort = 'syslog_port'
+const _syslogPath = 'syslog_path'
+const _syslogLevel = 'syslog_lvl'
+const _syslogType = 'syslog_type'
+
 // Security section
 const SECURITY_SECTION = 'security'
 const _profilesConfFile = 'profiles'
@@ -101,6 +110,13 @@ exports.OUT_LOG = `${this.LOG_DIR}/${this.LOG_FILE}`
 exports.SYMLINK_NAME = `${this.APP_NAME}-current.log`
 exports.LOG_LVL = this.getIniValue(LOG_SECTION, _logLevel)
 exports.LOG_EXP = this.getIniValue(LOG_SECTION, _expires)
+
+// Syslog
+exports.SYSLOG_HOST = this.getIniValue(SYSLOG_SECTION, _syslogHost)
+exports.SYSLOG_PORT = this.getIniValue(SYSLOG_SECTION, _syslogPort)
+exports.SYSLOG_PATH = this.getIniValue(SYSLOG_SECTION, _syslogPath)
+exports.SYSLOG_LEVEL = this.getIniValue(SYSLOG_SECTION, _syslogLevel)
+exports.SYSLOG_TYPE = this.getIniValue(SYSLOG_SECTION, _syslogType)
 
 // Security
 const profilesConfFile = this.getIniValue(SECURITY_SECTION, _profilesConfFile)

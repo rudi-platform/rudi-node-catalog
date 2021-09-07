@@ -5,7 +5,7 @@ const mod = 'logging'
 // -----------------------------------------------------------------------------
 // Internal dependencies
 // -----------------------------------------------------------------------------
-const { logger } = require('../config/confLogs')
+const { logger, sysLogger } = require('../config/confLogs')
 const { consoleErr, displayStr } = require('./jsUtils')
 const { addLogEntry } = require('../db/dbQueries')
 
@@ -88,6 +88,7 @@ const Colors = {
 
 exports.e = (mod, fun, msg) => {
   logger.error(displayStr(mod, fun, msg))
+  sysLogger.error(displayStr(mod, fun, msg))
   // displayFunc(ERROR, fun, msg)
   const logLevel = 'error'
   addLogEntry(logLevel, mod, fun, msg)
@@ -104,6 +105,7 @@ exports.w = (mod, fun, msg) => {
 
 exports.i = (mod, fun, msg) => {
   logger.info(displayStr(mod, fun, msg))
+  
   // if (LOG_LVL < levels.info) return
   // displayFunc(INFO, fun, msg)
   const logLevel = 'info'

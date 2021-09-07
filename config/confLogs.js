@@ -8,6 +8,7 @@ const mod = 'logger'
 // -----------------------------------------------------------------------------
 const winston = require('winston')
 require('winston-daily-rotate-file')
+require('winston-syslog').Syslog
 
 const { transports } = winston
 // const {
@@ -17,7 +18,7 @@ const { transports } = winston
 //   printf
 // } = format
 
-const {existsSync, mkdirSync} = require('fs')
+const { existsSync, mkdirSync } = require('fs')
 
 // -----------------------------------------------------------------------------
 // Internal dependencies
@@ -157,6 +158,18 @@ exports.logger = winston.createLogger({
   transports: [logOutputs.console, logOutputs.datedFile, logOutputs.combined],
 })
 
+const syslogOptions = {
+  levels: winston.config.syslog.levels,
+  transports: [new winston.transports.Syslog()],
+  host: sys.SYSLOG_HOST,
+  port: sys.SYSLOG_PORT,
+  path: sys.SYSLOG_PATH,
+  level: sys.SYSLOG_LEVEL,
+  type: sys.SYSLOG_TYPE
+}
+
+exports.sysLogger = winston.createLogger(syslogOptions)
+  
 function extractErrorFromFastifyMsg(msg) {
   try {
     return msg.split('err: ')[1].split('\n')
