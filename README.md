@@ -1,12 +1,8 @@
-RUDI producer proxy API module
+RUDI producer proxy API module: the interface module between RUDI Portal and internal Rudi Producer node services
 ==============================
-The interface module between RUDI Portal and internal Rudi Producer node services
 
-
-* * * 
-
-This module offers a RESTful interface to access RUDI metadata publically exposed on the RUDI Producer node.
-It also makes it possible to upload metadata from another module such as the Producer node manager (https://gitlab.aqmo.org/rudidev/rudi-console-proxy)
+*This module offers a RESTful interface to access RUDI metadata publically exposed on the RUDI Producer node.
+It also makes it possible to upload metadata from another module such as the Producer node manager (https://gitlab.aqmo.org/rudidev/rudi-console-proxy)*
 
 * * *
 
