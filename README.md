@@ -21,10 +21,22 @@ The Media driver provides :
 - **release**: environment used to ensure the compatibility with Rennes Métropole's RUDI Portal. This version is the one to be deployed.
 
 #### Public API
-- **GET /api/v1/resources**
+
+- **GET /api/v1/resources**: returns a list of all the public resources on the Producer node
 - **GET /api/v1/resources/:id**
 - **PUT /api/v1/resources/:id/report**
 - **GET /api/v1/resources/:id/report**
 - **GET /api/v1/resources/:id/report/:irid**
 
+optional parameters: 
+- **limit** (default = 100, max = 500),
+- **offset** (default = 0),
+- **fields**, 
+- **sort_by**, 
+- **count_by**, 
+- **group_by**, 
+- **updated_after**, 
+- **updated_before**
+    - use:
+        GET /api/v1/resources?limit=30&offset=3
 
