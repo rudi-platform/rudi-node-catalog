@@ -61,6 +61,8 @@ exports.QUERY_CONFIRM = 'confirm'
 exports.DEFAULT_QUERY_LIMIT = 100
 exports.DEFAULT_QUERY_OFFSET = 0
 
+exports.MAX_QUERY_LIMIT = 500
+
 // -----------------------------------------------------------------------------
 // REQ URL
 // -----------------------------------------------------------------------------

@@ -1,6 +1,7 @@
 'use strict'
 const mod = 'json'
 
+const { BadRequestError } = require('./errors')
 // -----------------------------------------------------------------------------
 // Internal dependancies
 // -----------------------------------------------------------------------------
@@ -21,7 +22,7 @@ const msg = require('./msg')
  */
 exports.accessReqParam = (req, param) => {
   const value = req.params[param]
-  if (!value) throw new Error(`${msg.missingRequestParameter(req, param)}`)
+  if (!value) throw new BadRequestError(`${msg.missingRequestParameter(req, param)}`)
   return value
 }
 
@@ -37,7 +38,7 @@ exports.accessProperty = (jsonObject, jsonProperty) => {
   const value = jsonObject[jsonProperty]
   // log.d(mod, fun, `=> value = ${utils.beautify(value)}`)
   if (!value)
-    throw new Error(`${msg.missingObjectProperty(jsonObject, jsonProperty)}`)
+    throw new BadRequestError(`${msg.missingObjectProperty(jsonObject, jsonProperty)}`)
   // log.d(mod, fun, `=> ${jsonProperty} = ${utils.beautify(value)}`)
   return value
 }
@@ -70,7 +71,7 @@ exports.requireSubProperty = (obj, prop, subProp, enumProp, enumVal) => {
     if (utils.isNothing(objProp[subProp])) {
       const errMsg = msg.subPropNeededWhenPropSet(prop, subProp)
       // log.e(mod, fun, errMsg)
-      throw new Error(errMsg)
+      throw new BadRequestError(errMsg)
     }
     // log.d(mod, fun, `${objProp[subProp]}`)
     return objProp[subProp]
@@ -86,7 +87,7 @@ exports.requireSubProperty = (obj, prop, subProp, enumProp, enumVal) => {
           enumVal
         )
         // log.e(mod, fun, errMsg)
-        throw new Error(errMsg)
+        throw new BadRequestError(errMsg)
       } else {
         return objProp[subProp]
       }

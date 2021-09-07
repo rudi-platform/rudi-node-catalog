@@ -105,6 +105,7 @@ const {
   API_MEDIA_TYPE_PROPERTY,
   API_END_DATE_PROPERTY,
 } = require('../../db/dbFields')
+const { NotFoundError, BadRequestError } = require('../../utils/errors')
 
 // -----------------------------------------------------------------------------
 // Fields with specific treatments
@@ -525,7 +526,7 @@ async function checkLicence(metadata) {
       const listLicenceCode = await licenceController.getLicenceCodes()
       // log.d(mod, fun, `licence list: ${utils.beautify(listLicenceCode)}`)
       if (listLicenceCode.indexOf(licenceLabel) === -1) {
-        throw new Error(
+        throw new NotFoundError(
           `Licence label '${licenceLabel}' was not found in licence list '${listLicenceCode}'`
         )
       } else {
@@ -556,7 +557,7 @@ async function checkLicence(metadata) {
         licenceType
       )
       log.e(mod, fun, errMsg)
-      throw new Error(errMsg)
+      throw new BadRequestError(errMsg)
     }
   }
 }
@@ -569,7 +570,7 @@ async function checkThesaurus(metadata) {
   try {
     const theme = metadata[API_THEME_PROPERTY]
     if (!(await Themes.isValid(theme, shouldInit)))
-      throw new Error(msg.incorrectVal(API_THEME_PROPERTY, theme))
+      throw new BadRequestError(msg.incorrectVal(API_THEME_PROPERTY, theme))
 
     const keywords = metadata[API_KEYWORDS_PROPERTY]
     // log.d(mod, fun, `keywords: ${utils.beautify(keywords)}`)
@@ -580,7 +581,7 @@ async function checkThesaurus(metadata) {
         Keywords.isValid(keyword, shouldInit)
           .then((resolve) => {
             if (resolve) return true
-            else throw new Error(msg.incorrectVal(API_KEYWORDS_PROPERTY, keyword))
+            else throw new BadRequestError(msg.incorrectVal(API_KEYWORDS_PROPERTY, keyword))
           })
           .catch((err) => log.w(mod, fun, err))
       })
@@ -595,7 +596,7 @@ async function checkThesaurus(metadata) {
         await Promise.all(
           languages.map((lang) => {
             if (!Languages.isValid(lang, shouldInit))
-              throw new Error(msg.incorrectVal(API_LANGUAGES_PROPERTY, lang))
+              throw new BadRequestError(msg.incorrectVal(API_LANGUAGES_PROPERTY, lang))
             return true
           })
         )
@@ -607,14 +608,14 @@ async function checkThesaurus(metadata) {
       const projection = geography[API_GEO_PROJECTION_PROPERTY]
       if (projection) {
         if (!Projections.isValid(projection, shouldInit))
-          throw new Error(
+          throw new BadRequestError(
             msg.incorrectVal(`${API_GEOGRAPHY_PROPERTY}.${API_GEO_PROJECTION_PROPERTY}`, projection)
           )
       }
     }
 
     if (!StorageStatus.isValid(metadata.storage_status, shouldInit)) {
-      throw new Error(msg.incorrectVal('storage_status', metadata.storage_status))
+      throw new BadRequestError(msg.incorrectVal('storage_status', metadata.storage_status))
     }
   } catch (err) {
     log.w(mod, fun, err)
@@ -627,10 +628,10 @@ function checkMedia(metadata) {
   log.d(mod, fun, `metadata: ${utils.beautify(metadata)}`)
   try {
     const media = metadata[API_MEDIA_PROPERTY]
-    if (!media) throw new Error(msg.missingField(API_MEDIA_PROPERTY))
+    if (!media) throw new BadRequestError(msg.missingField(API_MEDIA_PROPERTY))
     if (media[API_MEDIA_TYPE_PROPERTY] === MediaTypes.File) {
       if (!utils.isNotEmptyObject(media[API_MEDIA_CHECKSUM_PROPERTY])) {
-        throw new Error(msg.missingObjectProperty(this, API_MEDIA_CHECKSUM_PROPERTY))
+        throw new BadRequestError(msg.missingObjectProperty(this, API_MEDIA_CHECKSUM_PROPERTY))
       }
     } else {
       log.d(mod, fun, `media: ${utils.beautify(metadata[API_MEDIA_PROPERTY])}`)
@@ -646,7 +647,7 @@ function toDate(dateStr) {
   try {
     return new Date(dateStr)
   } catch (err) {
-    throw new Error(`This is not a date: '${dateStr}'`)
+    throw new BadRequestError(`This is not a date: '${dateStr}'`)
   }
 }
 
@@ -667,7 +668,7 @@ function checkDates(datesObj, firstDateProp, secondDateProp, shouldInitialize) {
 
     if (date1 <= date2) return true
 
-    throw new Error(
+    throw new BadRequestError(
       `Date '${secondDateProp}' = '${date2.toISOString()}' should be subsequent ` +
         `to '${firstDateProp}' = '${date1.toISOString()}' `
     )

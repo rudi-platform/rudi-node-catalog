@@ -29,6 +29,7 @@ const {
 } = require('../../db/dbFields')
 const { isNotEmptyObject } = require('../../utils/jsUtils')
 const { missingObjectProperty, missingField } = require('../../utils/msg')
+const { BadRequestError } = require('../../utils/errors')
 
 // -----------------------------------------------------------------------------
 // Constants
@@ -114,7 +115,7 @@ MediaSchema.pre('save', function (next) {
       this[API_MEDIA_TYPE_PROPERTY] === MediaTypes.File &&
       !isNotEmptyObject(this[API_MEDIA_CHECKSUM_PROPERTY])
     ) {
-      throw new Error(missingField(API_MEDIA_CHECKSUM_PROPERTY))
+      throw new BadRequestError(missingField(API_MEDIA_CHECKSUM_PROPERTY))
     }
 
     if (!!this[API_MEDIA_NAME_PROPERTY]) {
@@ -200,7 +201,7 @@ FileSchema.pre('save', function (next) {
   // log.d('FileSchema', fun, ``)
   try {
     if (!isNotEmptyObject(this[API_MEDIA_CHECKSUM_PROPERTY])) {
-      throw new Error(missingField(API_MEDIA_CHECKSUM_PROPERTY))
+      throw new BadRequestError(missingField(API_MEDIA_CHECKSUM_PROPERTY))
     }
     next()
   } catch (err) {

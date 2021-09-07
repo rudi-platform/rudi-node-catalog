@@ -1,4 +1,5 @@
 import { v4 } from 'uuid'
+import { BadRequestError } from '../../utils/errors'
 
 export class UUIDv4 {
   protected str: string
@@ -11,7 +12,7 @@ export class UUIDv4 {
       if (UUIDv4.isValid(str)) {
         this.str = str
       } else {
-        throw new Error('Error: invalid UUID !')
+        throw new BadRequestError('Error: invalid UUID !')
       }
     }
   }

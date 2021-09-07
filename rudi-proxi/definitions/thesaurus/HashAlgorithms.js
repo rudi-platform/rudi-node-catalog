@@ -34,7 +34,7 @@ exports.set = (newValue) => {
     if (!newValue) {
       const errMsg = parameterExpected(fun, 'newValue')
       log.w(mod, fun, errMsg)
-      throw new Error(errMsg)
+      throw new BadRequestError(errMsg)
     }
     newValue = `${newValue}`.trim()
     if (Thesaurus.indexOf(newValue) === -1) Thesaurus.push(newValue)

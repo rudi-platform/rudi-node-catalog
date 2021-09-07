@@ -10,6 +10,7 @@ const { beautify } = require('../../utils/jsUtils')
 const { parameterExpected } = require('../../utils/msg')
 
 const DynamicEnum = require('../models/DynamicEnum')
+const { MethodNotAllowedError, BadRequestError, NotFoundError } = require('../../utils/errors')
 
 // -----------------------------------------------------------------------------
 // Thesaurus class
@@ -43,7 +44,7 @@ module.exports = class Thesaurus {
   init = async (shouldReset) => {
     const fun = 'init'
     // log.d(mod, fun, `Thesaurus: ${this.#code}`)
-    if (this.#isInit) throw new Error('Init should be called only once.')
+    if (this.#isInit) throw new MethodNotAllowedError('Init should be called only once.')
 
     if (shouldReset) {
       this.#currentValues = []
@@ -73,18 +74,18 @@ module.exports = class Thesaurus {
     } else {
       const errMsg = 'Init first'
       log.w(mod, fun, errMsg)
-      throw new Error(errMsg)
+      throw new MethodNotAllowedError(errMsg)
     }
   }
 
   addSingleValue = async (newValue) => {
     const fun = 'addSingleValue'
     try {
-      if (!this.#isInit) throw new Error('Init first')
+      if (!this.#isInit) throw new MethodNotAllowedError('Init first')
       if (!newValue) {
         const errMsg = parameterExpected(fun, 'newValue')
         log.w(mod, fun, errMsg)
-        throw new Error(errMsg)
+        throw new BadRequestError(errMsg)
       }
 
       newValue = `${newValue}`.trim()
@@ -101,7 +102,7 @@ module.exports = class Thesaurus {
   isValid = async (val, shouldInit) => {
     const fun = 'isValid'
     try {
-      if (!this.#isInit) throw new Error('Init first')
+      if (!this.#isInit) throw new MethodNotAllowedError('Init first')
 
       if (!val) {
         log.w(mod, fun, parameterExpected(fun, 'value'))
@@ -126,7 +127,7 @@ module.exports = class Thesaurus {
       if (dbValues) {
         this.#currentValues = dbValues
       } else {
-        throw new Error(`No values found for thesaurus '${this.#code}'`)
+        throw new NotFoundError(`No values found for thesaurus '${this.#code}'`)
       }
     } catch (err) {
       log.d(mod, fun, err)
@@ -137,7 +138,7 @@ module.exports = class Thesaurus {
   #storeCurrentValues = async () => {
     const fun = '#storeCurrentValues'
     try {
-      if (!this.#currentValues) throw new Error('Values not inititalized')
+      if (!this.#currentValues) throw new MethodNotAllowedError('Values not inititalized')
       await this.#storeEnum(this.#code, this.#currentValues)
     } catch (err) {
       log.w(mod, fun, err)
@@ -152,7 +153,7 @@ module.exports = class Thesaurus {
     try {
       const dbEnum = await DynamicEnum.findOne({ code: typeThesaurus })
       if (dbEnum) return dbEnum.values
-      else throw new Error(`Enum '${typeThesaurus}' was not found`)
+      else throw new NotFoundError(`Enum '${typeThesaurus}' was not found`)
     } catch (err) {
       log.d(mod, fun, err)
       throw err

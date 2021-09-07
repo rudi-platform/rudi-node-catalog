@@ -232,7 +232,6 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
         const errMsg = `Error while parsing: '${beautify(val)}': ${err}}`
         // log.w(mod, fun, errMsg)
         returnedFilter[QUERY_FILTER][key] = val
-        // throw new Error(errMsg)
       }
     } else {
       const indexSeparator = key.indexOf('.')
@@ -261,7 +260,6 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
             [EXT_OBJ_PROP]: nestedFieldProp,
             [EXT_OBJ_VAL]: value,
           })
-          // throw new Error(errMsg)
         }
       } else {
         log.w(mod, fun, `Key is unkown and ignored for ${objectType}: ${beautify(key)}`)

@@ -1,6 +1,7 @@
 'use strict'
 
 const mod = 'geo'
+const { BadRequestError } = require('./errors')
 /**
  * Library for treating geography related properties
  */
@@ -29,7 +30,7 @@ exports.bboxToGeoJsonPolygon = (western, southern, eastern, northern) => {
   if (southern > northern) {
     const errMsg = `Southern coordinate must be lower than northern coordinate`
     log.w(mod, fun, errMsg)
-    throw new Error(errMsg)
+    throw new BadRequestError(errMsg)
   }
 
   if(western === eastern && southern === northern)

@@ -15,7 +15,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.collectionVariables.set('exp', pm.globals.get('nowEpochS') + 10000)"
+									"pm.collectionVariables.set('exp', pm.collectionVariables.get('nowEpochS') + 10000)"
 								],
 								"type": "text/javascript"
 							}
@@ -74,6 +74,18 @@
 									"",
 									"",
 									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									" pm.test(\"Checking current JWT\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    pm.expect(pm.response.stream.toString('utf8')).to.eq('JWT is valid')",
+									" })"
 								],
 								"type": "text/javascript"
 							}
@@ -327,7 +339,7 @@
 									"].map(idLabel => {",
 									"    const newUUID = uuid.v4()",
 									"    //console.log(`${idLabel}: ${newUUID}`)",
-									"    pm.environment.set(idLabel, newUUID)",
+									"    pm.collectionVariables.set(idLabel, newUUID)",
 									"});",
 									""
 								],
@@ -686,6 +698,16 @@
 								],
 								"type": "text/javascript"
 							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const randVal = rand.initVal('contId1')",
+									""
+								],
+								"type": "text/javascript"
+							}
 						}
 					],
 					"request": {
@@ -727,6 +749,16 @@
 									"    const contId = pm.variables.get('contId2');",
 									"    pm.expect(responseJson.contact_id).to.eq(contId);",
 									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"rand.initVal('contId2')",
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -779,8 +811,8 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"const contactId = pm.variables.replaceIn('{{$randomUUID}}')",
-									"pm.collectionVariables.set('contact3', contactId)"
+									"rand.initVal('contId3')",
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -862,6 +894,16 @@
 									"    pm.expect(responseJson.contact_name).to.eq(\"M. Fazo Gres\");",
 									"    pm.expect(responseJson.email).to.eq(\"fazo@univ-rennes1.fr\");",
 									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"rand.initVal('contId1')",
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -996,6 +1038,16 @@
 								],
 								"type": "text/javascript"
 							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"rand.initVal('orgId2')",
+									""
+								],
+								"type": "text/javascript"
+							}
 						}
 					],
 					"request": {
@@ -1072,6 +1124,16 @@
 									"    pm.expect(responseJson.organization_name).to.eq(\"UR1\");",
 									"    pm.expect(responseJson.organization_address).to.eq(\"2 rue du Thabor - CS 46510, 35065 Rennes CEDEX\");",
 									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"rand.initVal('orgId2')",
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -1166,6 +1228,19 @@
 								],
 								"type": "text/javascript"
 							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"rand.initVal('metaId1')",
+									"rand.initVal('orgId1')",
+									"rand.initVal('contId1')",
+									"rand.initVal('contId2')",
+									""
+								],
+								"type": "text/javascript"
+							}
 						}
 					],
 					"request": {
@@ -1201,7 +1276,7 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Metadata 2 creation: missing property 'geography.bounding_box'\", () => {",
-									"    pm.expect(pm.response.code).to.eql(500);",
+									"    pm.expect(pm.response.code).to.gte(400);",
 									"    const responseJson = pm.response.json();",
 									"    // //console.log(responseJson.message);",
 									"    pm.expect(responseJson.message).to.eql(\"La propriété 'geography.bounding_box' est requise lorsque la propriété parente 'geography' est renseignée\");",
@@ -1244,7 +1319,7 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Metadata 2 creation: missingy property 'temporal_spread.start_date'\", () => {",
-									"    pm.expect(pm.response.code).to.eql(500);",
+									"    pm.expect(pm.response.code).to.gte(400);",
 									"    const responseJson = pm.response.json();",
 									"    // //console.log(responseJson.message);",
 									"    pm.expect(responseJson.message).to.eql(\"La propriété 'temporal_spread.start_date' est requise lorsque la propriété parente 'temporal_spread' est renseignée\");",
@@ -1287,7 +1362,7 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Metadata 2 creation: missingy property 'access_condition'\", () => {",
-									"    pm.expect(pm.response.code).to.eql(500);",
+									"    pm.expect(pm.response.code).to.gte(400);",
 									"    const responseJson = pm.response.json();",
 									"    // //console.log(responseJson.message);",
 									"    pm.expect(responseJson.message).to.eql(\"Metadata validation failed: access_condition: Path `access_condition` is required.\");",
@@ -1330,7 +1405,7 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Metadata 2 creation: missingy property 'access_condition.licence'\", () => {",
-									"    pm.expect(pm.response.code).to.eql(500);",
+									"    pm.expect(pm.response.code).to.gte(400);",
 									"    const responseJson = pm.response.json();",
 									"    pm.expect(responseJson.message).to.eql(\"La propriété 'access_condition.licence' est requise lorsque la propriété parente 'access_condition' est renseignée\");",
 									"});"
@@ -1372,7 +1447,7 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Metadata 2 creation: 'licence_label' not recognized\", () => {",
-									"    pm.expect(pm.response.code).to.eql(500);",
+									"    pm.expect(pm.response.code).to.gte(400);",
 									"    const requestBody = JSON.parse(pm.request.body);",
 									"    const licenceLabel = requestBody.access_condition.licence.licence_label;",
 									"    const expectedResponse = `Licence label '${licenceLabel}' was not found in licence list `",
@@ -1418,7 +1493,7 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Metadata 2 creation: missing 'licence_type'\", () => {",
-									"    pm.expect(pm.response.code).to.eql(500);",
+									"    pm.expect(pm.response.code).to.gte(400);",
 									"    const requestBody = JSON.parse(pm.request.body);",
 									"    // const licenceLabel = requestBody.access_condition.licence.licence_label;",
 									"    const expectedResponse = `La propriété 'licence.licence_type' est requise lorsque la propriété parente 'licence' est renseignée`",
@@ -1464,7 +1539,7 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Metadata 2 creation: missing 'licence_label'\", () => {",
-									"    pm.expect(pm.response.code).to.eql(500);",
+									"    pm.expect(pm.response.code).to.gte(400);",
 									"    const requestBody = JSON.parse(pm.request.body);",
 									"    // const licenceLabel = requestBody.access_condition.licence.licence_label;",
 									"    const expectedResponse = `La propriété 'licence.licence_label' est requise lorsque la propriété 'licence.licence_type' vaut 'STANDARD'`",
@@ -1510,7 +1585,7 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Metadata 2 creation: missing 'custom_licence_label'\", () => {",
-									"    pm.expect(pm.response.code).to.eql(500);",
+									"    pm.expect(pm.response.code).to.gte(400);",
 									"    const requestBody = JSON.parse(pm.request.body);",
 									"    // const licenceLabel = requestBody.access_condition.licence.licence_label;",
 									"    const expectedResponse = `La propriété 'licence.custom_licence_label' est requise lorsque la propriété 'licence.licence_type' vaut 'CUSTOM'`",
@@ -1556,7 +1631,7 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Metadata 2 creation: missing 'custom_licence_uri'\", () => {",
-									"    pm.expect(pm.response.code).to.eql(500);",
+									"    pm.expect(pm.response.code).to.gte(400);",
 									"    const requestBody = JSON.parse(pm.request.body);",
 									"    // const licenceLabel = requestBody.access_condition.licence.licence_label;",
 									"    const expectedResponse = `La propriété 'licence.custom_licence_uri' est requise lorsque la propriété 'licence.licence_type' vaut 'CUSTOM'`",
@@ -3820,9 +3895,9 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
-					"pm.globals.set(\"now\", new Date().toISOString());",
-					"pm.globals.set(\"timezone\", new Date().getTimezoneOffset());",
-					"",
+					"pm.collectionVariables.set(\"now\", new Date().toISOString());",
+					"pm.collectionVariables.set(\"timezone\", new Date().getTimezoneOffset());",
+					"pm.collectionVariables.set(\"nowEpochS\", _.floor(new Date().getTime() / 1000));",
 					"",
 					"utils = {",
 					"    getContactEmail: function (contactName) {",
@@ -3841,7 +3916,23 @@
 					"    ",
 					"    randomPick: function (listName) {",
 					"        return this.randomPickInList(pm.collectionVariables.get(listName));",
-					"    }",
+					"    },",
+					"",
+					" };",
+					"",
+					"rand = {",
+					"    get: function (randName) {",
+					"        return pm.variables.replaceIn(randName);",
+					"    },",
+					"",
+					"    initVal: function (field) {",
+					"        console.log(field)",
+					"        const val = pm.collectionVariables.get(field);",
+					"        if(val) return val;",
+					"        const randVal = rand.get('{{$randomUUID}}');",
+					"        pm.collectionVariables.set(field, randVal);",
+					"        return randVal;",
+					"    },",
 					"};"
 				]
 			}
@@ -3895,6 +3986,62 @@
 		},
 		{
 			"key": "pm_jwt",
+			"value": ""
+		},
+		{
+			"key": "now",
+			"value": ""
+		},
+		{
+			"key": "timezone",
+			"value": ""
+		},
+		{
+			"key": "nowEpochS",
+			"value": ""
+		},
+		{
+			"key": "metaId1",
+			"value": ""
+		},
+		{
+			"key": "metaId2",
+			"value": ""
+		},
+		{
+			"key": "orgId1",
+			"value": ""
+		},
+		{
+			"key": "orgId2",
+			"value": ""
+		},
+		{
+			"key": "contId1",
+			"value": ""
+		},
+		{
+			"key": "contId2",
+			"value": ""
+		},
+		{
+			"key": "contId3",
+			"value": ""
+		},
+		{
+			"key": "reportId1",
+			"value": ""
+		},
+		{
+			"key": "reportId2",
+			"value": ""
+		},
+		{
+			"key": "mediaId1",
+			"value": ""
+		},
+		{
+			"key": "mediaId2",
 			"value": ""
 		}
 	]

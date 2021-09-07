@@ -31,6 +31,8 @@ const {
   UnauthorizedError,
   RudiHttpError,
   createRudiHttpError,
+  BadRequestError,
+  NotFoundError,
 } = require('../utils/errors')
 
 // -----------------------------------------------------------------------------
@@ -141,11 +143,11 @@ exports.forgeToken = async (req, reply) => {
     const jwtPayload = req.body
 
     if (!jwtPayload || isEmptyObject(jwtPayload))
-      throw new Error(`Incoming JSON should not be null`)
+      throw new BadRequestError(`Incoming JSON should not be null`)
 
     // Identifying the client / app
     const moduleId = jwtPayload[JWT_CLIENT]
-    if (!moduleId) throw new Error(`No ID was found for the app (property ${JWT_CLIENT})`)
+    if (!moduleId) throw new NotFoundError(`No ID was found for the app (property ${JWT_CLIENT})`)
 
     // Identifying the (public) key type
     const pubKeyPem = readFileSync(PUB_KEY, 'ascii')

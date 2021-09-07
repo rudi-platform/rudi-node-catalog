@@ -79,7 +79,7 @@ const {
   PARAM_THESAURUS_CODE,
   URL_SUFFIX_LICENCE: URL_LICENCE_SUFFIX,
 } = require('../config/confApi')
-const { InternalServerError, ParameterExpectedError } = require('../utils/errors')
+const { InternalServerError, ParameterExpectedError, NotFoundError } = require('../utils/errors')
 
 // -----------------------------------------------------------------------------
 // Controllers: Scheme
@@ -503,7 +503,7 @@ exports.getSingleThesaurus = async (req, reply) => {
 
     const thesaurus = await this.getThesaurus(thesaurusCode)
     if (!thesaurus)
-      throw new Error(
+      throw new NotFoundError(
         `Thesaurus not found for such required code: ${utils.beautify(thesaurusCode)}`
       )
     return thesaurus

@@ -160,7 +160,7 @@ exports.addOrEditSingleReport = async (objectType, req, reply) => {
 
     // ensure url object id and body object id match
     if (urlObjectId !== bodyObjectId)
-      throw new Error(`${msg.parametersMismatch(urlObjectId, bodyObjectId)}`)
+      throw new BadRequestError(`${msg.parametersMismatch(urlObjectId, bodyObjectId)}`)
 
     // ensure object exists
     const dbObject = await db.getObjectWithRudiId(objectType, urlObjectId)
@@ -280,7 +280,7 @@ exports.getSingleReport = async (objectType, req, reply) => {
 
     // ensure object exists
     const existsObject = await db.doesObjectExistWithRudiId(objectType, urlObjectId)
-    if (!existsObject) throw new Error(`${msg.objectNotFound(objectType, urlObjectId)}`)
+    if (!existsObject) throw new ObjectNotFoundError(objectType, urlObjectId)
 
     // ensure report doesn't exist
     const dbReport = await db.getEnsuredObjectWithRudiId(PARAM_ACTION_REPORT, reportId)
@@ -288,7 +288,7 @@ exports.getSingleReport = async (objectType, req, reply) => {
     // ensure report is for the object
     const resourceId = json.accessProperty(dbReport, API_REPORT_RESOURCE_ID)
     if (resourceId !== urlObjectId)
-      throw new Error(`${msg.objectNotFound(objectType, urlObjectId)}`)
+      throw new ObjectNotFoundError(objectType, urlObjectId)
 
     return dbReport
   } catch (err) {

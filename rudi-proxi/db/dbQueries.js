@@ -46,6 +46,7 @@ const {
   PARAM_OBJECT_LOGS,
   QUERY_UPDATED_AFTER,
   QUERY_UPDATED_BEFORE,
+  MAX_QUERY_LIMIT,
 } = require('../config/confApi')
 
 // Fields from the JSON as definied in the API
@@ -87,7 +88,7 @@ const { Metadata, METADATA_FIELDS_TO_POPULATE } = require('../definitions/models
 
 const { Report } = require('../definitions/models/Report')
 const { LogEntry, makeLogInfo, logLineToString } = require('../definitions/models/LogEntry')
-const { InternalServerError, ParameterExpectedError } = require('../utils/errors')
+const { InternalServerError, ParameterExpectedError, NotFoundError, ObjectNotFoundError, NotImplementedError, BadRequestError } = require('../utils/errors')
 
 // -----------------------------------------------------------------------------
 // Properties with special treatments
@@ -126,7 +127,7 @@ function assertIsString(fun, param) {
   if (typeof param !== 'string') {
     const errMsg = msg.parameterTypeExpected(fun, 'string', param)
     log.w(mod, fun, errMsg)
-    throw new Error(errMsg)
+    throw new BadRequestError(errMsg)
   }
 }
 
@@ -135,7 +136,7 @@ exports.getObjectModel = (objectType) => {
   // // log.d(mod, fun, ``)
   assertIsString(fun, objectType)
   const Model = OBJ_MODEL[objectType]
-  if (!Model) throw new Error(msg.objectTypeNotFound(objectType))
+  if (!Model) throw new NotFoundError(msg.objectTypeNotFound(objectType))
   return Model
 }
 
@@ -144,7 +145,7 @@ exports.getObjectIdField = (objectType) => {
   // // log.d(mod, fun, ``)
   assertIsString(fun, objectType)
   const idField = ID_PROP[objectType]
-  if (!idField) throw new Error(msg.objectTypeNotFound(objectType))
+  if (!idField) throw new NotFoundError(msg.objectTypeNotFound(objectType))
   return idField
 }
 
@@ -363,7 +364,7 @@ exports.getEnsuredObjectWithRudiId = async (objectType, rudiId) => {
   // log.d(mod, fun, ``)
   if (!rudiId) throw new ParameterExpectedError(fun, PARAM_ID)
   const dbObject = await this.getObjectWithRudiId(objectType, rudiId)
-  if (!dbObject) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
+  if (!dbObject) throw new ObjectNotFoundError(objectType, rudiId)
   return dbObject
 }
 
@@ -382,7 +383,7 @@ exports.getEnsuredObjectWithJson = async (objectType, rudiObject) => {
     const idField = this.getObjectIdField(objectType)
     const rudiId = json.accessProperty(rudiObject, idField)
     const dbObject = await this.getObjectWithRudiId(objectType, rudiId)
-    if (!dbObject) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
+    if (!dbObject) throw new ObjectNotFoundError(objectType, rudiId)
     return dbObject
   } catch (err) {
     log.w(mod, fun, err)
@@ -395,7 +396,7 @@ exports.getEnsuredObjectWithDbId = async (objectType, dbId) => {
   // log.d(mod, fun, ``)
   try {
     const dbObject = await this.getObjectWithDbId(objectType, dbId)
-    if (!dbObject) throw new Error(`${msg.objectNotFound(objectType, dbId)}`)
+    if (!dbObject) throw new ObjectNotFoundError(objectType, dbId)
     return dbObject
   } catch (err) {
     log.w(mod, fun, err)
@@ -445,7 +446,7 @@ exports.getNestedObject = async (objectType, nestedObjectProperty, filter, field
       const dbObjects = await FieldModel.find(filter, fieldSelection)
       log.d(mod, fun, `dbObjects: ${dbObjects}`)
       if (utils.isEmptyArray(dbObjects))
-        throw new Error(
+        throw new NotFoundError(
           `Object not found! Type: '${nestedObjectProperty}', filter: ${utils.beautify(filter)}`
         )
 
@@ -520,7 +521,7 @@ exports.getEnsuredDbIdWithRudiId = async (objectType, rudiId) => {
   // log.d(mod, fun, ``)
   try {
     const dbId = await this.getDbIdWithRudiId(objectType, rudiId)
-    if (!dbId) throw new Error(`${msg.objectNotFound(objectType, rudiId)}`)
+    if (!dbId) throw new ObjectNotFoundError(objectType, rudiId)
     return dbId
   } catch (err) {
     log.w(mod, fun, err)
@@ -618,6 +619,13 @@ function addToFilterUpdated(filter, key, dateVal) {
   filter.updatedAt[key] = date
 }
 
+function getParamValue(options, param, defaultVal, maxVal) {
+  const val = options ? options[param] : null
+  if (!val) return defaultVal
+  if (!maxVal || val < maxVal) return val
+  return maxVal
+}
+
 exports.getObjectList = async (objectType, options) => {
   const fun = `getObjectList`
   // log.d(mod, fun, ``)
@@ -627,13 +635,13 @@ exports.getObjectList = async (objectType, options) => {
     const { Model, idField } = this.getObjectAccesses(objectType)
 
     // Extract options
-    const limit = options[QUERY_LIMIT] || DEFAULT_QUERY_LIMIT
-    const offset = options[QUERY_OFFSET] || DEFAULT_QUERY_OFFSET
-    const filter = options[QUERY_FILTER] || {}
-    const fields = options[QUERY_FIELDS]
-    const sortByFields = options[QUERY_SORT_BY]
-    const updatedAfter = options[QUERY_UPDATED_AFTER]
-    const updatedBefore = options[QUERY_UPDATED_BEFORE]
+    const limit = getParamValue(options, QUERY_LIMIT, DEFAULT_QUERY_LIMIT, MAX_QUERY_LIMIT)
+    const offset = getParamValue(options, QUERY_OFFSET, DEFAULT_QUERY_OFFSET)
+    const filter = getParamValue(options, QUERY_FILTER)
+    const fields = getParamValue(options, QUERY_FIELDS)
+    const sortByFields = getParamValue(options, QUERY_SORT_BY)
+    const updatedAfter = getParamValue(options, QUERY_UPDATED_AFTER)
+    const updatedBefore = getParamValue(options, QUERY_UPDATED_BEFORE)
 
     const populateFields = getPopulateFields(objectType)
 
@@ -709,15 +717,20 @@ exports.groupObjectList = async (objectType, unionField, options) => {
     const pivot = !FieldModel ? unionField : rootProp
 
     // Extract options
-    const limit = options[QUERY_LIMIT] || DEFAULT_QUERY_LIMIT // Limits the number of results in the final list
-    const offset = options[QUERY_OFFSET] || DEFAULT_QUERY_OFFSET
-    const groupLimit = options[QUERY_GROUP_LIMIT] || DEFAULT_QUERY_LIMIT // For each result, limit the number of objects
-    const groupOffset = options[QUERY_GROUP_OFFSET] || DEFAULT_QUERY_OFFSET
-    const filter = options[QUERY_FILTER] || {}
-    const fieldsToKeep = options[QUERY_FIELDS]
-    const sortByFields = options[QUERY_SORT_BY]
-    const updatedAfter = options[QUERY_UPDATED_AFTER]
-    const updatedBefore = options[QUERY_UPDATED_BEFORE]
+    const limit = getParamValue(options, QUERY_LIMIT, DEFAULT_QUERY_LIMIT, MAX_QUERY_LIMIT)
+    const offset = getParamValue(options, QUERY_OFFSET, DEFAULT_QUERY_OFFSET)
+    const groupLimit = getParamValue(
+      options,
+      QUERY_GROUP_LIMIT,
+      DEFAULT_QUERY_LIMIT,
+      MAX_QUERY_LIMIT
+    )
+    const groupOffset = getParamValue(options, QUERY_GROUP_OFFSET, DEFAULT_QUERY_OFFSET)
+    const filter = getParamValue(options, QUERY_FILTER, {})
+    const fieldsToKeep = getParamValue(options, QUERY_FIELDS)
+    const sortByFields = getParamValue(options, QUERY_SORT_BY)
+    const updatedAfter = getParamValue(options, QUERY_UPDATED_AFTER)
+    const updatedBefore = getParamValue(options, QUERY_UPDATED_BEFORE)
 
     // Adapt filter with 'updated after/before'
     if (!!updatedAfter) addToFilterUpdated(filter, '$gte', updatedAfter)
@@ -838,12 +851,12 @@ exports.countObjectList = async (objectType, unionField, options) => {
     const pivot = !FieldModel ? unionField : rootProp
 
     // Extract options
-    const limit = options[QUERY_LIMIT] || DEFAULT_QUERY_LIMIT // Limits the number of results in the final list
-    const offset = options[QUERY_OFFSET] || DEFAULT_QUERY_OFFSET
-    const filter = options[QUERY_FILTER] || {}
-    const sortBy = options[QUERY_SORT_BY]
-    const updatedAfter = options[QUERY_UPDATED_AFTER]
-    const updatedBefore = options[QUERY_UPDATED_BEFORE]
+    const limit = getParamValue(options, QUERY_LIMIT, DEFAULT_QUERY_LIMIT, MAX_QUERY_LIMIT)
+    const offset = getParamValue(options, QUERY_OFFSET, DEFAULT_QUERY_OFFSET)
+    const filter = getParamValue(options, QUERY_FILTER)
+    const sortByFields = getParamValue(options, QUERY_SORT_BY)
+    const updatedAfter = getParamValue(options, QUERY_UPDATED_AFTER)
+    const updatedBefore = getParamValue(options, QUERY_UPDATED_BEFORE)
 
     // Adapt filter with 'updated after/before'
     if (!!updatedAfter) addToFilterUpdated(filter, '$gte', updatedAfter)
@@ -964,7 +977,7 @@ exports.getOrphans = async (objectType) => {
   if (objectType === PARAM_OBJECT_METADATA) {
     const errMsg = 'Not implemented'
     log.d(mod, fun, errMsg)
-    throw new Error(errMsg)
+    throw new NotImplementedError(errMsg)
   }
   const [Model, listMetadataFields] = this.getMetadataFieldsWithObjectType(objectType)
   // const idField = this.getObjectIdField(objectType)
@@ -1122,13 +1135,13 @@ exports.updateMetadata = async (jsonMetadata) => {
   // Checking incoming data for an id
   const id = jsonMetadata[API_METADATA_ID]
   if (!id) {
-    throw new Error(`${msg.missingObjectProperty(jsonMetadata, API_METADATA_ID)}`)
+    throw new BadRequestError(`${msg.missingObjectProperty(jsonMetadata, API_METADATA_ID)}`)
   }
 
   // Checking that the metadata already exists
   const existingMetadata = await this.getMetadataWithRudiId(id)
   if (!existingMetadata) {
-    throw new Error(`${msg.metadataNotFound(id)}`)
+    throw new NotFoundError(`${msg.metadataNotFound(id)}`)
   }
 
   // Updating the ùetadata
@@ -1148,7 +1161,7 @@ exports.deleteMetadata = async (metadataRudiId) => {
 
   // Checking that the metadata already exists
   if (!(await this.doesObjectExistWithRudiId(PARAM_OBJECT_METADATA, metadataRudiId))) {
-    throw new Error(`${msg.metadataNotFound(metadataRudiId)}`)
+    throw new NotFoundError(`${msg.metadataNotFound(metadataRudiId)}`)
   }
 
   // Deleting the metadata
@@ -1226,13 +1239,13 @@ exports.updateOrganization = async (jsonOrganization) => {
   // Checking incoming data for an id
   const id = jsonOrganization[API_ORGANIZATION_ID]
   if (!id) {
-    throw new Error(`${msg.missingObjectProperty(jsonOrganization, API_ORGANIZATION_ID)}`)
+    throw new BadRequestError(`${msg.missingObjectProperty(jsonOrganization, API_ORGANIZATION_ID)}`)
   }
 
   // Checking that the organization already exists
   const existingOrganization = await this.getOrganizationWithRudiId(id)
   if (!existingOrganization) {
-    throw new Error(`${msg.organizationNotFound(id)}`)
+    throw new NotFoundError(`${msg.organizationNotFound(id)}`)
   }
 
   // Updating the organization
@@ -1525,9 +1538,8 @@ exports.isReferencedInMetadata = async (objectType, rudiId) => {
   try {
     dbId = (await this.getObjectPropertiesWithRudiId(objectType, rudiId, [DB_ID]))[DB_ID]
   } catch (err) {
-    const errMsg = msg.objectNotFound(objectType, rudiId)
-    log.w(mod, fun, errMsg)
-    throw new Error(errMsg)
+    log.w(mod, fun, msg.objectNotFound(objectType, rudiId))
+    throw new ObjectNotFoundError(objectType, rudiId)
   }
 
   log.d(mod, fun, `dbId: ${utils.beautify(dbId)}`)
@@ -1560,7 +1572,7 @@ exports.isReferencedInMetadata = async (objectType, rudiId) => {
       }
       break
     default:
-      throw new Error(msg.objectTypeNotFound(objectType))
+      throw new NotFoundError(msg.objectTypeNotFound(objectType))
   }
   const res = await Metadata.findOne(metadataFilter, API_METADATA_ID)
   log.d(mod, fun, `res: ${utils.beautify(res)}`)

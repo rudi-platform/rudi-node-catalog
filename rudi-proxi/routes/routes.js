@@ -151,7 +151,7 @@ async function onDevRoute(req, reply) {
   const fun = 'onDevRoute'
   log.d(mod, fun, `${req.method} ${req.url} `)
   try {
-    log.w(mod, fun, `JWT are ${SHOULD_CONTROL_PRIVATE_REQUESTS ? '' : 'not '}controlled`)
+    // log.w(mod, fun, `JWT are ${SHOULD_CONTROL_PRIVATE_REQUESTS ? '' : 'not '}controlled`)
     if (!SHOULD_CONTROL_PRIVATE_REQUESTS) return true
 
     // log.d(mod, fun, `${req.ip}: ${req.method} ${req.url} ${req.context.config.routeName}`)
