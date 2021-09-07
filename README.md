@@ -1,8 +1,7 @@
-
-RUDI producer node: API module - The interface module between RUDI Portal and internal Rudi producer node services
+RUDI producer node: API module - The interface module between RUDI Portal and internal Rudi Producer node services
 ==================================================================================================================
 
-This module offers a RESTful interface to access RUDI metadata publically exposed on the RUDI producer node.
+This module offers a RESTful interface to access RUDI metadata publically exposed on the RUDI Producer node.
 It also makes it possible to upload metadata from another module such as the Producer node manager (https://gitlab.aqmo.org/rudidev/rudi-console-proxy)
 
 * * *
@@ -17,11 +16,15 @@ The Media driver provides :
 * A private API for creating, accessing, updating and deleting metadata.
 
 ### Current deployment
-- *test*: environment 
-- *shared*:
-- *release*:
+- *test*: environment used to test that the current code can be executed on a distant node
+- *shared*: environment used to ensure the compatibility with the other modules of the RUDI Producer node
+- *release*: environment used to ensure the compatibility with Rennes Métropole's RUDI Portal. This version is the one to be deployed.
 
-
-#### File Access
+#### Public API
+**GET /api/v1/resources**
+**GET /api/v1/resources/:id**
+**PUT /api/v1/resources/:id/report**
+**GET /api/v1/resources/:id/report**
+**GET /api/v1/resources/:id/report/:irid**
 
 
