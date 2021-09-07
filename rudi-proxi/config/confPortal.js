@@ -7,6 +7,7 @@
 // -----------------------------------------------------------------------------
 const fa = require('../utils/fileActions')
 const utils = require('../utils/jsUtils')
+const { CONF_USER, CONF_DEFAULT } = require('./confSystem')
 
 // -----------------------------------------------------------------------------
 // Constants: local ini file configuration settings
@@ -14,9 +15,9 @@ const utils = require('../utils/jsUtils')
 
 // Conf file name
 // - user conf
-const usrPortalConfFile = 'rudi_proxi_custom.ini'
+const usrPortalConfFile = CONF_USER
 // - default conf
-const defPortalConfFile = 'rudi_proxi_default.ini'
+const defPortalConfFile = CONF_DEFAULT
 
 const PORTAL_SECTION = 'portal'
 // Auth section

@@ -21,10 +21,12 @@ utils.separateLogs()
 // -----------------------------------------------------------------------------
 
 // Conf files name
-// - user conf
-const userConfFile = 'rudi_proxi_custom.ini'
-// - default conf
-const defConfFile = 'rudi_proxi_default.ini'
+// - directory
+const iniDir = './0-ini'
+// - user conf path
+exports.CONF_USER = `${iniDir}/conf_custom.ini`
+// - default conf path
+exports.CONF_DEFAULT = `${iniDir}/conf_default.ini`
 
 // Node Server section
 const SERVER_SECTION = 'server'
@@ -58,8 +60,8 @@ const _should_control_private_requests = 'should_control_private_requests'
 // Getting user conf file value
 // if null, local conf file value
 // if null , default value
-const USER_CONF = fa.readIniFile(userConfFile)
-const LOCAL_CONF = fa.readIniFile(defConfFile)
+const USER_CONF = fa.readIniFile(this.CONF_USER)
+const LOCAL_CONF = fa.readIniFile(this.CONF_DEFAULT)
 
 // -----------------------------------------------------------------------------
 // Helper functions
