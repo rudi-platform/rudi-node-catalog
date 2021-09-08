@@ -172,7 +172,7 @@ function checkSubjPermission(subject, reqRouteName) {
 
 exports.verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
   const fun = 'verifyRudiProdToken'
-  log.d(mod, fun, `token: ${token}`)
+  // log.d(mod, fun, `token: ${token}`)
 
   try {
     const [jwtHeaderBase64url, jwtPayloadBase64url, jwtSignatureBase64url] = token.split('.')

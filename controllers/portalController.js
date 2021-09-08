@@ -33,6 +33,7 @@ const {
   NotImplementedError,
   BadRequestError,
   ForbiddenError,
+  createRudiHttpError,
 } = require('../utils/errors')
 
 // -----------------------------------------------------------------------------
@@ -227,12 +228,14 @@ exports.getNewTokenFromPortal = async () => {
 
       return portalToken
     } else {
-      throw new InternalServerError(utils.beautify(answer))
+      const errMsg = `Couldn't get a token from the portal: ${utils.beautify(answer)}`
+      log.w(mod, fun, errMsg)
+      throw createRudiHttpError(answer.status, errMsg)
     }
   } catch (err) {
-    const errMsg = `Portal couldn't deliver a token: ${err}`
+    const errMsg = `Portal couldn't deliver a token: ${utils.beautify(err)}`
     log.w(mod, fun, errMsg)
-    throw err
+    throw new ForbiddenError(errMsg)
   }
 }
 
