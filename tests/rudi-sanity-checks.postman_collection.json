@@ -27,7 +27,6 @@
 									" pm.test(\"Receiving a JWT\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const token = pm.response.stream.toString('utf8');",
-									"    // console.log(token)",
 									"    pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
 									"    pm.collectionVariables.set('pm_jwt', token);",
 									"    // console.log('token stored')",
