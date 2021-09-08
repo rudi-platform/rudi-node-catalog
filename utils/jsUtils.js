@@ -231,6 +231,7 @@ exports.logWhere = (loc_mod, loc_fun) => {
 exports.displayStr = (loc_mod, loc_fun, msg) => {
   return `[ ${this.logWhere(loc_mod, loc_fun)} ] ${msg !== '' ? msg : '<-'}`
 }
+
 exports.consoleLog = (loc_mod, loc_fun, msg) => {
   console.log(this.nowLocaleFormatted(), '.debug.', this.displayStr(loc_mod, loc_fun, msg))
 }

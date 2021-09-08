@@ -6,7 +6,7 @@ const mod = 'logging'
 // Internal dependencies
 // -----------------------------------------------------------------------------
 const { logger, sysLogger } = require('../config/confLogs')
-const { consoleErr, displayStr } = require('./jsUtils')
+const { consoleErr, displayStr, logWhere } = require('./jsUtils')
 const { addLogEntry } = require('../db/dbQueries')
 
 // -----------------------------------------------------------------------------
@@ -45,23 +45,15 @@ const Colors = {
 // const FgErrorColor = Colors.FgRed
 // const BgErrorDebug = ''
 // const BgErrorColor = Colors.BgWhite
-// -----------------------------------------------------------------------------
-// Constants
-// -----------------------------------------------------------------------------
-// const levels = {
-//   error: 0,
-//   warning: 1,
-//   info: 2,
-//   http: 3,
-//   verbose: 4,
-//   debug: 5,
-//   silly: 6
-// }
-// const LOG_LVL = levels.debug
 
 // -----------------------------------------------------------------------------
 // Display functions
 // -----------------------------------------------------------------------------
+exports.displaySyslog = (loc_mod, loc_fun, msg) => {
+  return `[ ${logWhere(loc_mod, loc_fun)} ] ${msg !== '' ? msg : '<-'}`
+}
+
+
 // function displayColor(fgColor, bgColor, msg) {
 //   console.log(fgColor, bgColor, msg, Colors.Reset)
 // }
@@ -80,42 +72,28 @@ const Colors = {
 // -----------------------------------------------------------------------------
 // Logging functions
 // -----------------------------------------------------------------------------
-// const ERROR = 'ERROR'
-// const WARNING = 'WARNING'
-// const INFO = 'INFO'
-// const VERBOSE = 'VERBOSE'
-// const DEBUG = 'DEBUG'
 
 exports.e = (mod, fun, msg) => {
+  const logLevel = 'error'
   logger.error(displayStr(mod, fun, msg))
   sysLogger.error(displayStr(mod, fun, msg))
-  // displayFunc(ERROR, fun, msg)
-  const logLevel = 'error'
   addLogEntry(logLevel, mod, fun, msg)
 }
 
 exports.w = (mod, fun, msg) => {
-  logger.warn(displayStr(mod, fun, msg))
-
-  // if (LOG_LVL < levels.warning) return
-  // displayFunc(WARNING, fun, msg)
   const logLevel = 'warn'
+  logger.warn(displayStr(mod, fun, msg))
   addLogEntry(logLevel, mod, fun, msg)
 }
 
 exports.i = (mod, fun, msg) => {
-  logger.info(displayStr(mod, fun, msg))
-  
-  // if (LOG_LVL < levels.info) return
-  // displayFunc(INFO, fun, msg)
   const logLevel = 'info'
+  logger.info(displayStr(mod, fun, msg))
   addLogEntry(logLevel, mod, fun, msg)
 }
 
 exports.v = (mod, fun, msg) => {
   logger.verbose(displayStr(mod, fun, msg))
-  // if (LOG_LVL < levels.verbose) return
-  // displayFunc(VERBOSE, fun, msg)
   const logLevel = 'verbose'
   addLogEntry(logLevel, mod, fun, msg)
 }

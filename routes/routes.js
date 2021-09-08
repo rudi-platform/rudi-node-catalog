@@ -119,6 +119,17 @@ const DEV_TEST = 'dev_test'
 // Helper functions
 // -----------------------------------------------------------------------------
 
+async function onFreeRoute(req, reply) {
+  const fun = 'onPublicRoute'
+  log.d(mod, fun, `${req.method} ${req.url} `)
+  try {
+    return
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
+}
+
 async function onPublicRoute(req, reply) {
   const fun = 'onPublicRoute'
   log.d(mod, fun, `${req.method} ${req.url} `)
@@ -494,7 +505,7 @@ exports.devRoutes = [
   {
     method: 'GET',
     url: `${URL_PV_GIT_HASH_ACCESS}`,
-    preHandler: onDevRoute,
+    preHandler: onFreeRoute,
     handler: sysController.getGitHash,
     config: { routeName: DEV_GET_GIT_HASH },
   },
@@ -504,7 +515,7 @@ exports.devRoutes = [
   {
     method: 'GET',
     url: `${URL_PV_APP_HASH_ACCESS}`,
-    preHandler: onDevRoute,
+    preHandler: onFreeRoute,
     handler: sysController.getAppHash,
     config: { routeName: DEV_GET_APP_HASH },
   },
