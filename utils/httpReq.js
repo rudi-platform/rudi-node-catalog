@@ -73,18 +73,17 @@ function doHttpRequest(options, protocol, data) {
 
 exports.httpGet = async (destUrl, authorizationToken) => {
   const fun = 'httpGet'
-  log.d(mod, fun, `destUrl: ${destUrl}`)
-
-  const reqOpts = {
-    headers: {
-      'User-Agent': 'Rudi-Producer',
-      'Content-Type': 'application/json',
-    },
-  }
-  if (authorizationToken) reqOpts.headers.Authorization = `Bearer ${authorizationToken}`
-
+  log.d(mod, fun, ``)
   try {
-    const answer = await axios.get(destUrl, reqOpts)
+    const reqOpts = {
+      headers: {
+        'User-Agent': 'Rudi-Producer',
+        'Content-Type': 'application/json',
+      },
+    }
+    if (authorizationToken) reqOpts.headers.Authorization = `Bearer ${authorizationToken}`
+
+    const answer = await this.directGet(destUrl, reqOpts)
     log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
     return answer.data
   } catch (error) {
@@ -110,7 +109,7 @@ exports.httpDelete = async (destUrl, authorizationToken) => {
     log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
     return answer.data
   } catch (error) {
-    log.w(mod, fun, `GET: ${error}`)
+    log.w(mod, fun, `DELETE: ${error}`)
     log.w(mod, fun, `details: ${utils.beautify(error.response.data)}`)
     if (
       error.response &&
@@ -166,8 +165,7 @@ exports.httpPost = async (destUrl, dataToSend, authorizationToken) => {
       },
     }
     if (authorizationToken) reqOpts.headers.Authorization = `Bearer ${authorizationToken}`
-    // log.d(mod, fun, `reqOpts: ${utils.beautify(reqOpts)}`)
-    // log.d(mod, fun, `authorizationToken: ${utils.beautify(authorizationToken)}`)
+
     const answer = await this.directPost(destUrl, dataToSend, reqOpts)
 
     log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
@@ -196,7 +194,8 @@ exports.httpPost = async (destUrl, dataToSend, authorizationToken) => {
 
 exports.directPost = async (destUrl, dataToSend, reqOpts) => {
   const fun = 'directPost'
-  log.d(mod, fun, `destUrl: ${destUrl}`)
+  log.d(mod, fun, ``)
+  // log.d(mod, fun, `destUrl: ${destUrl}`)
   try {
     const answer = await axios.post(destUrl, dataToSend, reqOpts)
     return answer
@@ -220,6 +219,7 @@ exports.directPost = async (destUrl, dataToSend, reqOpts) => {
 exports.directGet = async (destUrl, reqOpts) => {
   const fun = 'directGet'
   log.d(mod, fun, ``)
+  // log.d(mod, fun, `destUrl: ${destUrl}`)
   try {
     const answer = await axios.get(destUrl, reqOpts)
     return answer

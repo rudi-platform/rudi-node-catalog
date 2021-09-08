@@ -354,7 +354,7 @@ exports.verifyPortalToken = (accessToken) => {
   log.d(mod, fun, ``)
 
   try {
-    if(!accessToken) throw new ForbiddenError('No token was received from the Portal!')
+    if (!accessToken) throw new ForbiddenError('No token was received from the Portal!')
     const [jwtHeaderBase64, jwtPayloadBase64, jwtSignatureBase64] = accessToken.split('.')
 
     // Check JWT header
@@ -443,7 +443,9 @@ exports.deletePortalMetadata = async (metadataId) => {
     if (!metadataId) throw new BadRequestError('Metadata id required') // Can't get the resouces list yet.
 
     const token = await this.getPortalToken()
-    const reply = await httpDelete(portal.getPortalMetaUrl(metadataId), token)
+    const portalDeleteUrl = portal.API_SEND_URL + '/' + metadataId
+    const reply = await httpDelete(portalDeleteUrl, token)
+    // const reply = await httpDelete(portal.getPortalMetaUrl(metadataId), token)
 
     return reply
   } catch (err) {
