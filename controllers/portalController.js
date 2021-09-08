@@ -34,6 +34,7 @@ const {
   BadRequestError,
   ForbiddenError,
   createRudiHttpError,
+  ParameterExpectedError,
 } = require('../utils/errors')
 
 // -----------------------------------------------------------------------------
@@ -245,6 +246,7 @@ exports.getTokenCheckedByPortal = async (token) => {
   const fun = 'getTokenCheckedByPortal'
   log.d(mod, fun, ``)
   try {
+    if (!token) throw new BadRequestError('No token to check!')
     const portalUrl = portal.getCheckAuthUrl()
 
     const requestUrl = `${portalUrl}?${portal.PARAM_TOKEN}=${token}`
@@ -297,6 +299,7 @@ exports.checkSignatureWithSecret = (accessToken) => {
   log.d(mod, fun, ``)
 
   try {
+    if (!accessToken) throw new BadRequestError('No token = no signature to verify!')
     const [jwtHeaderBase64, jwtPayloadBase64, jwtSignatureBase64] = accessToken.split('.')
 
     const hash = createHmac('sha256', portal.SECRET)
@@ -328,6 +331,7 @@ exports.checkSignatureWithPubKey = (accessToken) => {
   log.d(mod, fun, ``)
 
   try {
+    if (!accessToken) throw new BadRequestError('No token = no signature to check!')
     const [jwtHeaderBase64url, jwtPayloadBase64url, jwtSignatureBase64url] = accessToken.split('.')
 
     // Retrieve the public key
@@ -342,9 +346,9 @@ exports.checkSignatureWithPubKey = (accessToken) => {
     const signatureIsValid = verifier.verify(jwtSignatureBase64url, 'base64url')
 
     if (signatureIsValid) {
-      log.i(mod, fun, `signatureIsValid: ${signatureIsValid}`)
+      log.i(mod, fun, `signature is valid`)
     } else {
-      log.w(mod, fun, `signatureIsValid: ${signatureIsValid}`)
+      log.w(mod, fun, `signature is not valid`)
     }
     return signatureIsValid
   } catch (err) {
