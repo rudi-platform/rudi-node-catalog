@@ -99,7 +99,7 @@ mongoose
   .then(() => {
     log.i(mod, 'mongo', `MongoDB connected`)
     log.i(mod, 'app', `Application version '${sysController.getAppHash()}' | API ${api.VERSION}`)
-    const logSeparatorEnd = utils.separateLogs('Init OK')
+    const logSeparatorEnd = utils.separateLogs('logSeparatorEnd')
     addLogEntry('info', 'app', 'logSeparatorEnd', logSeparatorEnd).catch((err) =>
       utils.consoleErr('info', 'app', 'logSeparatorEnd: ' + err)
     )
