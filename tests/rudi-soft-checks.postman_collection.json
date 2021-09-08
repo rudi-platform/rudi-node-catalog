@@ -27,10 +27,10 @@
 									" pm.test(\"Receiving a JWT\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const token = pm.response.stream.toString('utf8');",
-									"    console.log(token)",
+									"    //console.log(token)",
 									"    pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
 									"    pm.collectionVariables.set('pm_jwt', token);",
-									"    console.log('token stored')",
+									"    //console.log('token stored')",
 									"});",
 									""
 								],
@@ -70,7 +70,7 @@
 							"script": {
 								"exec": [
 									"const token = pm.collectionVariables.get('pm_jwt');",
-									"console.log(token)",
+									"//console.log(token)",
 									"",
 									"",
 									""
@@ -1398,7 +1398,7 @@
 									"    pm.collectionVariables.get('softContact1Id'), ",
 									"    pm.collectionVariables.get('softContact2Id'), ",
 									"    pm.collectionVariables.get('softContact3Id')];",
-									"console.log(`contacts: ${contacts}`)",
+									"//console.log(`contacts: ${contacts}`)",
 									"",
 									"",
 									"const randomContId1 = utils.randomPickInList(contacts)",
