@@ -112,7 +112,12 @@ exports.httpDelete = async (destUrl, authorizationToken) => {
   } catch (error) {
     log.w(mod, fun, `GET: ${error}`)
     log.w(mod, fun, `details: ${utils.beautify(error.response.data)}`)
-    if (error.response && error.response.data && error.response.data.label && error.response.data.code)
+    if (
+      error.response &&
+      error.response.data &&
+      error.response.data.label &&
+      error.response.data.code
+    )
       throw createRudiHttpError(error.response.data.code, error.response.data.label)
     else throw error
   }
@@ -216,7 +221,7 @@ exports.directGet = async (destUrl, reqOpts) => {
   const fun = 'directGet'
   log.d(mod, fun, ``)
   try {
-    const answer = await get(destUrl, reqOpts)
+    const answer = await axios.get(destUrl, reqOpts)
     return answer
   } catch (err) {
     if (err.response && err.response.data)
@@ -224,7 +229,7 @@ exports.directGet = async (destUrl, reqOpts) => {
     if (err.message && err.code) throw new Error(`${err.code}: ${err.message}`)
 
     log.w(mod, fun, `err: ${utils.beautify(err)}`)
-    log.w(mod, fun, `err.response: ${utils.beautify(err.response)}`)
+    if (err.response) log.w(mod, fun, `err.response: ${utils.beautify(err.response)}`)
     log.w(mod, fun, `err.message: ${utils.beautify(err.message)}`)
   }
 }

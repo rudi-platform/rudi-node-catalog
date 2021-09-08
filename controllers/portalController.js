@@ -32,6 +32,7 @@ const {
   InternalServerError,
   NotImplementedError,
   BadRequestError,
+  ForbiddenError,
 } = require('../utils/errors')
 
 // -----------------------------------------------------------------------------
@@ -213,6 +214,7 @@ exports.getNewTokenFromPortal = async () => {
 
     if (answer.status === 200) {
       const portalToken = answer.data
+      log.d(mod, fun, utils.beautify(portalToken))
       const jwToken = portalToken[portal.FIELD_TOKEN]
       const jwtBody = this.verifyPortalToken(jwToken)[1]
       portalToken[portal.JWT_EXP] = jwtBody[portal.JWT_EXP]
@@ -352,6 +354,7 @@ exports.verifyPortalToken = (accessToken) => {
   log.d(mod, fun, ``)
 
   try {
+    if(!accessToken) throw new ForbiddenError('No token was received from the Portal!')
     const [jwtHeaderBase64, jwtPayloadBase64, jwtSignatureBase64] = accessToken.split('.')
 
     // Check JWT header
