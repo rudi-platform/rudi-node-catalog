@@ -79,7 +79,7 @@ exports.getPortalToken = async () => {
   try {
     const rmToken = await db.getLatestStoredPortalToken()
     if (!rmToken) {
-      throw new InternalServerError('No token in cache')
+      throw new Error('No token in cache')
     }
     token = json.accessProperty(rmToken, portal.FIELD_TOKEN)
     // log.d(mod, fun, `token: ${utils.beautify(token)}`)
@@ -214,9 +214,11 @@ exports.getNewTokenFromPortal = async () => {
     // log.d(mod, fun, `answer.status: ${answer.status}`)
 
     if (answer.status === 200) {
+      log.d(mod, fun, `config: ${utils.beautify(answer.config)}`)
+      log.d(mod, fun, `data: ${utils.beautify(answer.data)}`)
       const portalToken = answer.data
-      log.d(mod, fun, utils.beautify(portalToken))
-      const jwToken = portalToken[portal.FIELD_TOKEN]
+      log.d(mod, fun, `portalToken: ${utils.beautify(portalToken)}`)
+      const jwToken = json.accessProperty(portalToken, portal.FIELD_TOKEN)
       const jwtBody = this.verifyPortalToken(jwToken)[1]
       portalToken[portal.JWT_EXP] = jwtBody[portal.JWT_EXP]
       log.d(
@@ -357,7 +359,7 @@ exports.verifyPortalToken = (accessToken) => {
   log.d(mod, fun, ``)
 
   try {
-    if (!accessToken) throw new ForbiddenError('No token was received from the Portal!')
+    if (!accessToken) throw new BadRequestError('No token to verify!')
     const [jwtHeaderBase64, jwtPayloadBase64, jwtSignatureBase64] = accessToken.split('.')
 
     // Check JWT header
