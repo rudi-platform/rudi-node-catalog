@@ -245,6 +245,6 @@ exports.verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
     return subject
   } catch (err) {
     log.w(mod, fun, err)
-    throw new ForbiddenError(`JWT invalid: ${err.message}`)
+    throw new ForbiddenError(`JWT not accepted: ${err.message}`)
   }
 }
