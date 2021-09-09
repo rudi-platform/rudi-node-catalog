@@ -1,8 +1,11 @@
 'use strict'
 
-const { objectNotFound } = require("./msg")
-
 const mod = 'errors'
+
+// -----------------------------------------------------------------------------
+// Http errors
+// -----------------------------------------------------------------------------
+const { objectNotFound, parameterExpected } = require("./msg")
 
 // -----------------------------------------------------------------------------
 // Http errors
@@ -90,7 +93,8 @@ class InternalServerError extends RudiHttpError {
 
 class ParameterExpectedError extends InternalServerError {
   constructor(fun, param) {
-    super(`${msg.parameterExpected(fun, param)}`)
+    super(`${parameterExpected(fun, param)}`)
+
   }
 }
 

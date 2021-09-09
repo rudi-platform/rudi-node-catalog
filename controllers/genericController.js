@@ -106,6 +106,8 @@ const {
   ForbiddenError,
   MethodNotAllowedError,
   ObjectNotFoundError,
+  BadRequestError,
+  ParameterExpectedError,
 } = require('../utils/errors')
 
 // -----------------------------------------------------------------------------
@@ -359,6 +361,7 @@ exports.setPublishedFlag = async (dbObject, rudiId) => {
   const fun = 'setPublishedFlag'
   log.d(mod, fun, '')
   try {
+    if(!dbObject) throw new ParameterExpectedError(fun,'dbObject')
     if (!dbObject[DB_PUBLISHED_AT]) {
       dbObject[DB_PUBLISHED_AT] = nowISO()
       await dbObject.save()

@@ -218,14 +218,20 @@ exports.verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
     try {
       keyFile = accessProperty(subjProfile, PUB_KEY)
     } catch (err) {
-      throw createRudiHttpError(
-        0,
-        `Wrong configuration, public key path not found for '${subject}'`
-      )
+      throw new Error(`Wrong configuration, public key path not found for '${subject}': ${err}`)
     }
-
-    const pubKeyPem = readFileSync(keyFile, 'ascii')
-    const sslKey = parseKey(pubKeyPem)
+    let pubKeyPem
+    try {
+      pubKeyPem = readFileSync(keyFile, 'ascii')
+    } catch (err) {
+      throw new Error(`Wrong configuration, public key cannot be read at '${keyFile}': ${err}`)
+    }
+    let sslKey
+    try {
+      sslKey = parseKey(pubKeyPem)
+    } catch (err) {
+      throw new Error(`Wrong configuration, public key cannot be parsed from '${keyFile}': ${err}`)
+    }
     // log.d(mod, fun, `sslKey: ${beautify(sslKey)}`)
 
     // Check the signature

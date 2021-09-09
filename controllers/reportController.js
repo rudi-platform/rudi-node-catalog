@@ -78,11 +78,25 @@ function fromPortalToRudiFormat(reportBody) {
   return reportBody
 }
 
-function dateArrayToDate(dateArray){
-  if (!Array.isArray(dateArray) || dateArray.length !== 7) return dateArray
-  return `${dateArray[0]}-${dateArray[1]}-${dateArray[2]}T${dateArray[3]}:${dateArray[4]}:${dateArray[5]}.${dateArray[6]}Z`
+function dateArrayToDate(dateArray) {
+  const fun = 'dateArrayToDate'
+  try {
+    if (!Array.isArray(dateArray) || dateArray.length !== 7) return dateArray
+    log.d(mod, fun, `Date is an array: ${dateArray}`)
+    return
+      `${dateArray[0]}-${pad(dateArray[1])}-${pad(dateArray[2])}T` +
+      `${pad(dateArray[3])}:${pad(dateArray[4])}:${pad(dateArray[5])}.${dateArray[6]}Z`
+    // log.d(mod, fun, `Date: ${date}`)
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
 }
-
+function pad(number, nbZeros) {
+  const fun = 'pad'
+  if (!nbZeros) nbZeros = 2
+  return String(number).padStart(nbZeros, '0')
+}
 // -----------------------------------------------------------------------------
 // Controllers: integration report for any object
 // -----------------------------------------------------------------------------
