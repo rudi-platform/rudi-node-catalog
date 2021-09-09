@@ -216,15 +216,15 @@ exports.getNewTokenFromPortal = async () => {
     // log.d(mod, fun, `answer.status: ${answer.status}`)
 
     if (answer.status === 200) {
-      log.d(mod, fun, `config: ${utils.beautify(answer.config)}`)
-      log.d(mod, fun, `data: ${utils.beautify(answer.data)}`)
+      // log.d(mod, fun, `config: ${utils.beautify(answer.config)}`)
+      // log.d(mod, fun, `data: ${utils.beautify(answer.data)}`)
       const portalToken = answer.data
 
       const jwToken = portalToken[portal.FIELD_TOKEN]
       if (typeof portalToken !== 'object' || !portalToken[portal.FIELD_TOKEN])
         throw new NotAcceptableError(`The portal delivered an incorrect reply: ${portalToken}`)
 
-      log.d(mod, fun, `portalToken: ${utils.beautify(portalToken)}`)
+      // log.d(mod, fun, `portalToken: ${utils.beautify(portalToken)}`)
 
       const jwtBody = this.verifyPortalToken(jwToken)[1]
       portalToken[portal.JWT_EXP] = jwtBody[portal.JWT_EXP]

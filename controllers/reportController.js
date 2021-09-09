@@ -179,9 +179,17 @@ exports.addOrEditSingleReport = async (objectType, req, reply) => {
       // adding new report
       log.d(mod, fun, `Adding new report`)
       // add new integration report
-      dbReadyReport = await new Report(reportBody)
-      await dbReadyReport.save()
-      log.i(mod, fun, `Report created: ${utils.beautify(dbReadyReport)}`)
+      try {
+        dbReadyReport = await new Report(reportBody)
+        await dbReadyReport.save()
+        log.i(mod, fun, `Report created: ${utils.beautify(dbReadyReport)}`)
+      } catch (er) {
+        const errMsg = `Couldn't create a new report with incoming data: ${utils.beautify(
+          reportBody
+        )}. Cause: ${er}`
+        log.w(mod, fun, errMsg)
+        throw new BadRequestError(errMsg)
+      }
     } else {
       // updating existing report
       log.d(mod, fun, `Updating existing report`)
@@ -287,8 +295,7 @@ exports.getSingleReport = async (objectType, req, reply) => {
 
     // ensure report is for the object
     const resourceId = json.accessProperty(dbReport, API_REPORT_RESOURCE_ID)
-    if (resourceId !== urlObjectId)
-      throw new ObjectNotFoundError(objectType, urlObjectId)
+    if (resourceId !== urlObjectId) throw new ObjectNotFoundError(objectType, urlObjectId)
 
     return dbReport
   } catch (err) {
