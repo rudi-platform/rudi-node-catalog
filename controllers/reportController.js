@@ -36,6 +36,8 @@ const {
   LOCAL_REPORT_ERROR_MSG,
   API_REPORT_VERSION,
   API_REPORT_ERRORS,
+  API_REPORT_SUBMISSION_DATE,
+  API_REPORT_TREATMENT_DATE,
 } = require('../db/dbFields')
 
 const {
@@ -70,7 +72,15 @@ function fromPortalToRudiFormat(reportBody) {
   if (!reportBody[API_REPORT_ERRORS] && !!reportBody.errors) {
     reportBody[API_REPORT_ERRORS] = reportBody.errors
   }
+  reportBody[API_REPORT_SUBMISSION_DATE] = dateArrayToDate(reportBody[API_REPORT_SUBMISSION_DATE])
+  reportBody[API_REPORT_TREATMENT_DATE] = dateArrayToDate(reportBody[API_REPORT_TREATMENT_DATE])
+
   return reportBody
+}
+
+function dateArrayToDate(dateArray){
+  if (!Array.isArray(dateArray) || dateArray.length !== 7) return dateArray
+  return `${dateArray[0]}-${dateArray[1]}-${dateArray[2]}T${dateArray[3]}:${dateArray[4]}:${dateArray[5]}.${dateArray[6]}Z`
 }
 
 // -----------------------------------------------------------------------------
