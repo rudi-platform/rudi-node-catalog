@@ -84,7 +84,7 @@ function dateArrayToDate(dateArray) {
     if (!Array.isArray(dateArray) || dateArray.length !== 7) return dateArray
     log.d(mod, fun, `Date is an array: ${dateArray}`)
     return
-      `${dateArray[0]}-${pad(dateArray[1])}-${pad(dateArray[2])}T` +
+    ;`${dateArray[0]}-${pad(dateArray[1])}-${pad(dateArray[2])}T` +
       `${pad(dateArray[3])}:${pad(dateArray[4])}:${pad(dateArray[5])}.${dateArray[6]}Z`
     // log.d(mod, fun, `Date: ${date}`)
   } catch (err) {
@@ -123,6 +123,7 @@ exports.addSingleReportForObject = async (req, reply) => {
     // ensure object exists
     const dbObject = await db.getObjectWithRudiId(objectType, urlObjectId)
     if (!dbObject) {
+      log.w(mod, fun, `Object 'objectType' not found for id: ${urlObjectId}`)
       reportBody[LOCAL_REPORT_ERROR] = {
         [LOCAL_REPORT_ERROR_TYPE]: 'Object not found',
         [LOCAL_REPORT_ERROR_MSG]: `The '${objectType}' object concerned by the report was not found`,
@@ -142,7 +143,7 @@ exports.addSingleReportForObject = async (req, reply) => {
     log.i(mod, fun, `Report saved: ${utils.beautify(dbReadyReport)}`)
     log.d(mod, fun, `dbObject: ${utils.beautify(dbObject)}`)
 
-    if (reportBody[API_REPORT_STATUS] === IntegrationStatus.OK) {
+    if (dbObject && reportBody[API_REPORT_STATUS] === IntegrationStatus.OK) {
       await setPublishedFlag(dbObject, urlObjectId)
     }
 
@@ -189,6 +190,7 @@ exports.addOrEditSingleReport = async (objectType, req, reply) => {
     // ensure object exists
     const dbObject = await db.getObjectWithRudiId(objectType, urlObjectId)
     if (!dbObject) {
+      log.w(mod, fun, `Object 'objectType' not found for id: ${urlObjectId}`)
       reportBody[LOCAL_REPORT_ERROR] = {
         [LOCAL_REPORT_ERROR_TYPE]: 'Object not found',
         [LOCAL_REPORT_ERROR_MSG]: `The '${objectType}' object concerned by the report was not found`,
@@ -221,7 +223,7 @@ exports.addOrEditSingleReport = async (objectType, req, reply) => {
       log.i(mod, fun, `Report edited: ${utils.beautify(dbReadyReport)}`)
     }
 
-    if (reportBody[API_REPORT_STATUS] === IntegrationStatus.OK) {
+    if (dbObject && reportBody[API_REPORT_STATUS] === IntegrationStatus.OK) {
       await setPublishedFlag(dbObject, urlObjectId)
     }
 
