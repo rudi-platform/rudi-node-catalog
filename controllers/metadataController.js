@@ -496,7 +496,23 @@ exports.setGeography = (metadata) => {
 // -----------------------------------------------------------------------------
 // High level actions
 // -----------------------------------------------------------------------------
+exports.upsertMetadata = async (rudiMetadata) => {
+  const fun = 'upsertMetadata'
+  log.d(mod, fun, ``)
+  try {
+    const rudiId = json.accessProperty(rudiMetadata, idField)
+    const existsMetadata = await db.doesObjectExistWithRudiId(objectType, rudiId)
 
+    if (!existsMetadata) {
+      return await this.newMetadata(rudiMetadata)
+    } else {
+      return await this.overwriteMetadata(rudiMetadata)
+    }
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
+}
 exports.newMetadata = async (rudiMetadata) => {
   const fun = 'newMetadata'
   log.d(mod, fun, ``)
@@ -642,7 +658,7 @@ exports.initWithODR = async (req, reply) => {
   Promise.all(
     initData.map(async (metadata) => {
       log.d(mod, fun, beautify(metadata))
-      await this.newMetadata(metadata)
+      await this.upsertMetadata(metadata)
       return true
     })
   )
