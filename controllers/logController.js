@@ -5,7 +5,6 @@ const mod = 'logCtrl'
 // External dependencies
 // -----------------------------------------------------------------------------
 const readLastLines = require('read-last-lines')
-const { boomify } = require('@hapi/boom')
 
 // -----------------------------------------------------------------------------
 // Internal dependencies
@@ -54,7 +53,7 @@ exports.getLogs = async (req, reply) => {
     return logLines //.map((logLine) => logLineToString(logLine))
   } catch (err) {
     consoleErr(mod, fun, err)
-    throw boomify(err)
+    throw err
   }
 }
 
@@ -68,6 +67,6 @@ exports.getLastLogLines = async (req, reply) => {
     return logs
   } catch (err) {
     log.e(mod, fun, err)
-    throw boomify(err)
+    throw err
   }
 }

@@ -12,7 +12,6 @@ const mod = 'sysCtrl'
 const prcs = require('child_process')
 
 const mongoose = require('mongoose')
-const {boomify} = require('@hapi/boom')
 
 // -----------------------------------------------------------------------------
 // Internal dependancies
@@ -51,7 +50,7 @@ exports.getGitHash = () => {
     return `${hashId}`.trim()
   } catch (err) {
     log.e(mod, fun, err)
-    throw boomify(err)
+    throw err
   }
 }
 
@@ -63,7 +62,7 @@ exports.getAppHash = () => {
     return CURRENT_APP_HASH
   } catch (err) {
     log.e(mod, fun, err)
-    throw boomify(err)
+    throw err
   }
 }
 
@@ -87,7 +86,7 @@ exports.getNodeVersion = async () => {
     return nVersions
   } catch (err) {
     log.e(mod, fun, err)
-    throw boomify(err)
+    throw err
   }
 }
 

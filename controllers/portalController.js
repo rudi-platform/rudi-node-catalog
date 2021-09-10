@@ -6,8 +6,6 @@ const mod = 'portalCtrl'
 // -----------------------------------------------------------------------------
 // External dependancies
 // -----------------------------------------------------------------------------
-const { boomify, notImplemented } = require('@hapi/boom')
-
 const { readFileSync } = require('fs')
 const { parseKey } = require('sshpk')
 
@@ -64,7 +62,7 @@ exports.exposedGetPortalToken = async (req, reply) => {
     return await this.getPortalToken()
   } catch (err) {
     log.w(mod, fun, err)
-    throw boomify(err)
+    throw err
   }
 }
 // -----------------------------------------------------------------------------
@@ -115,7 +113,7 @@ exports.checkStoredToken = async (req, reply) => {
     return await this.getTokenCheckedByPortal(token[portal.FIELD_TOKEN])
   } catch (err) {
     log.w(mod, fun, err)
-    throw boomify(err)
+    throw err
   }
 }
 
@@ -127,7 +125,7 @@ exports.checkInputToken = async (req, reply) => {
     return await this.getTokenCheckedByPortal(token[portal.FIELD_TOKEN])
   } catch (err) {
     log.w(mod, fun, err)
-    throw boomify(err)
+    throw err
   }
 }
 
@@ -142,7 +140,7 @@ exports.getMetadata = async (req, reply) => {
     return await this.getMetadataFromPortal(metadataId)
   } catch (err) {
     log.w(mod, fun, err)
-    throw boomify(err)
+    throw err
   }
 }
 
@@ -157,7 +155,7 @@ exports.sendMetadata = async (req, reply) => {
     return await this.postMetadataToPortal(metadataId)
   } catch (err) {
     log.w(mod, fun, err)
-    throw boomify(err)
+    throw err
   }
 }
 
@@ -172,7 +170,7 @@ exports.deleteMetadata = async (req, reply) => {
     return await this.deletePortalMetadata(metadataId)
   } catch (err) {
     log.w(mod, fun, err)
-    throw boomify(err)
+    throw err
   }
 }
 // -----------------------------------------------------------------------------

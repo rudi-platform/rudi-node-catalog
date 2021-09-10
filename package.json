@@ -21,7 +21,6 @@
   "homepage": "https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER",
   "license": "GPL-3.0",
   "dependencies": {
-    "@hapi/boom": "^9.1.1",
     "axios": "^0.21.1",
     "cli-color": "^2.0.0",
     "date-and-time": "^2.0.0",

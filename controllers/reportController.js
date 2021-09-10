@@ -10,7 +10,6 @@ const mod = 'repCtrl'
 // -----------------------------------------------------------------------------
 // External dependancies
 // -----------------------------------------------------------------------------
-const { boomify } = require('@hapi/boom')
 
 // -----------------------------------------------------------------------------
 // Internal dependancies
@@ -151,7 +150,7 @@ exports.addSingleReportForObject = async (req, reply) => {
     return dbReadyReport
   } catch (err) {
     log.e(mod, fun, err)
-    throw boomify(err)
+    throw err
   }
 }
 
@@ -353,7 +352,7 @@ exports.deleteSingleReportForObject = async (req, reply) => {
     return `Function '${fun}' still needs to be implemented in module ${mod}`
   } catch (err) {
     log.e(mod, fun, err)
-    throw boomify(err)
+    throw err
   }
 }
 
@@ -370,7 +369,7 @@ exports.deleteEveryReportForObject = async (req, reply) => {
     return `Function '${fun}' still needs to be implemented in module ${mod}`
   } catch (err) {
     log.e(mod, fun, err)
-    throw boomify(err)
+    throw err
   }
 }
 
@@ -391,7 +390,7 @@ exports.deleteManyReportForObject = async (req, reply) => {
     return `Function '${fun}' still needs to be implemented in module ${mod}`
   } catch (err) {
     log.e(mod, fun, err)
-    throw boomify(err)
+    throw err
   }
 }
 
@@ -404,6 +403,6 @@ exports.getReportListForObjectType = async (req, reply) => {
     return `Function '${fun}' still needs to be implemented in module ${mod}`
   } catch (err) {
     log.e(mod, fun, err)
-    throw boomify(err)
+    throw err
   }
 }

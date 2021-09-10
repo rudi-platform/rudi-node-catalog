@@ -633,7 +633,7 @@ exports.initWithODR = async (req, reply) => {
   const fun = 'massInit'
   log.v(mod, fun, `> ${URL_PREFIX_PUBLIC}/${PARAM_OBJECT_METADATA}/${PARAM_ACTION_INIT}`)
 
-  await db.dropDB()
+  // await db.dropDB()
 
   const initProd = require(`../data/datarennes_prod.json`)
   const initCont = require(`../data/datarennes_cont.json`)
