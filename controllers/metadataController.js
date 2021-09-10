@@ -500,8 +500,8 @@ exports.upsertMetadata = async (rudiMetadata) => {
   const fun = 'upsertMetadata'
   log.d(mod, fun, ``)
   try {
-    const rudiId = json.accessProperty(rudiMetadata, idField)
-    const existsMetadata = await db.doesObjectExistWithRudiId(objectType, rudiId)
+    const rudiId = json.accessProperty(rudiMetadata, API_METADATA_ID)
+    const existsMetadata = await db.doesObjectExistWithRudiId(PARAM_OBJECT_METADATA, rudiId)
 
     if (!existsMetadata) {
       return await this.newMetadata(rudiMetadata)

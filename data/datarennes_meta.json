@@ -43,7 +43,7 @@
                 "media_name": "bp-2018-ville-de-rennes-subventions-aux-associations",
                 "media_id": "39efa487-ddf2-4390-a255-83d896f7591c",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/39efa487-ddf2-4390-a255-83d896f7591c"
+                    "url": "https://data-rudi.aqmo.org/media/download/39efa487-ddf2-4390-a255-83d896f7591c"
                 },
                 "file_type": "application/json",
                 "file_size": "343687",
@@ -109,7 +109,7 @@
                 "media_name": "artistes_concerts_transmusicales",
                 "media_id": "de59f4c7-bd47-4cbf-9c60-ecd2f3d78030",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/de59f4c7-bd47-4cbf-9c60-ecd2f3d78030"
+                    "url": "https://data-rudi.aqmo.org/media/download/de59f4c7-bd47-4cbf-9c60-ecd2f3d78030"
                 },
                 "file_type": "application/json",
                 "file_size": "1502776",
@@ -177,7 +177,7 @@
                 "media_name": "ca-2013-subventions-aux-associations",
                 "media_id": "ac6e5d5a-2d57-409f-a054-2ec6056d27c2",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/ac6e5d5a-2d57-409f-a054-2ec6056d27c2"
+                    "url": "https://data-rudi.aqmo.org/media/download/ac6e5d5a-2d57-409f-a054-2ec6056d27c2"
                 },
                 "file_type": "application/json",
                 "file_size": "13266",
@@ -245,7 +245,7 @@
                 "media_name": "ca-2009-budget-principal",
                 "media_id": "6ccbd350-c780-41e8-be51-cef47401fb4a",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/6ccbd350-c780-41e8-be51-cef47401fb4a"
+                    "url": "https://data-rudi.aqmo.org/media/download/6ccbd350-c780-41e8-be51-cef47401fb4a"
                 },
                 "file_type": "application/json",
                 "file_size": "202502",
@@ -312,7 +312,7 @@
                 "media_name": "opendataagenceorefrapirecords1",
                 "media_id": "d001d279-6953-4558-a7d5-fc139413d2a3",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/d001d279-6953-4558-a7d5-fc139413d2a3"
+                    "url": "https://data-rudi.aqmo.org/media/download/d001d279-6953-4558-a7d5-fc139413d2a3"
                 },
                 "file_type": "application/json",
                 "file_size": "807912",
@@ -378,7 +378,7 @@
                 "media_name": "resultats-des-elections-cantonales-a-rennes-de-2004-a-20111",
                 "media_id": "cc16ebb5-2c2e-461a-92fd-62a9f58bd6bd",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/cc16ebb5-2c2e-461a-92fd-62a9f58bd6bd"
+                    "url": "https://data-rudi.aqmo.org/media/download/cc16ebb5-2c2e-461a-92fd-62a9f58bd6bd"
                 },
                 "file_type": "application/json",
                 "file_size": "108397",
@@ -446,7 +446,7 @@
                 "media_name": "ca-2009-budgets-annexes",
                 "media_id": "6180a1ab-d088-47e5-a472-b83b932858a0",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/6180a1ab-d088-47e5-a472-b83b932858a0"
+                    "url": "https://data-rudi.aqmo.org/media/download/6180a1ab-d088-47e5-a472-b83b932858a0"
                 },
                 "file_type": "application/json",
                 "file_size": "20851",
@@ -514,7 +514,7 @@
                 "media_name": "ca-2012-budget-principal",
                 "media_id": "4563d6fe-626f-4f73-9ac1-7c9b398a212b",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/4563d6fe-626f-4f73-9ac1-7c9b398a212b"
+                    "url": "https://data-rudi.aqmo.org/media/download/4563d6fe-626f-4f73-9ac1-7c9b398a212b"
                 },
                 "file_type": "application/json",
                 "file_size": "214318",
@@ -580,7 +580,7 @@
                 "media_name": "noyal-od-subvention-2017-v3",
                 "media_id": "04c23142-f5f4-4e73-a519-839f8663795b",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/04c23142-f5f4-4e73-a519-839f8663795b"
+                    "url": "https://data-rudi.aqmo.org/media/download/04c23142-f5f4-4e73-a519-839f8663795b"
                 },
                 "file_type": "application/json",
                 "file_size": "20094",
@@ -646,7 +646,7 @@
                 "media_name": "massifs-de-rosiers-du-jardin-du-thabor",
                 "media_id": "944e66db-8496-4772-9b1a-ae9e2e1f0ae8",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/944e66db-8496-4772-9b1a-ae9e2e1f0ae8"
+                    "url": "https://data-rudi.aqmo.org/media/download/944e66db-8496-4772-9b1a-ae9e2e1f0ae8"
                 },
                 "file_type": "application/json",
                 "file_size": "45661",
@@ -712,7 +712,7 @@
                 "media_name": "diagnostic_luminosite_mesure_photometrique",
                 "media_id": "fc866a90-99a4-4c9e-aa99-db0c6101b803",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/fc866a90-99a4-4c9e-aa99-db0c6101b803"
+                    "url": "https://data-rudi.aqmo.org/media/download/fc866a90-99a4-4c9e-aa99-db0c6101b803"
                 },
                 "file_type": "application/json",
                 "file_size": "27450830",
@@ -780,7 +780,7 @@
                 "media_name": "ca-2012-subventions-aux-associations",
                 "media_id": "d04124f3-c5c5-426a-9a46-951f57b71116",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/d04124f3-c5c5-426a-9a46-951f57b71116"
+                    "url": "https://data-rudi.aqmo.org/media/download/d04124f3-c5c5-426a-9a46-951f57b71116"
                 },
                 "file_type": "application/json",
                 "file_size": "10695",
@@ -848,7 +848,7 @@
                 "media_name": "rva-bal",
                 "media_id": "51720893-0925-407a-b1cc-59833bee4b7f",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/51720893-0925-407a-b1cc-59833bee4b7f"
+                    "url": "https://data-rudi.aqmo.org/media/download/51720893-0925-407a-b1cc-59833bee4b7f"
                 },
                 "file_type": "application/json",
                 "file_size": "4645057",
@@ -914,7 +914,7 @@
                 "media_name": "lignes-de-bus-du-reseau-star",
                 "media_id": "3d4cfa5b-e146-4046-b8a2-c94159b7a007",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/3d4cfa5b-e146-4046-b8a2-c94159b7a007"
+                    "url": "https://data-rudi.aqmo.org/media/download/3d4cfa5b-e146-4046-b8a2-c94159b7a007"
                 },
                 "file_type": "application/json",
                 "file_size": "81769",
@@ -980,7 +980,7 @@
                 "media_name": "statistiques-de-prets-de-la-bibliotheque-des-champs-libres-en-2009",
                 "media_id": "fe5933a5-3dab-4b70-91b5-cc1933e54659",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/fe5933a5-3dab-4b70-91b5-cc1933e54659"
+                    "url": "https://data-rudi.aqmo.org/media/download/fe5933a5-3dab-4b70-91b5-cc1933e54659"
                 },
                 "file_type": "application/json",
                 "file_size": "12529",
@@ -1046,7 +1046,7 @@
                 "media_name": "resultats-des-elections-europeennes-a-rennes-de-2004-a-2014",
                 "media_id": "3d0be536-59f7-4d8a-b425-585c6ba1520b",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/3d0be536-59f7-4d8a-b425-585c6ba1520b"
+                    "url": "https://data-rudi.aqmo.org/media/download/3d0be536-59f7-4d8a-b425-585c6ba1520b"
                 },
                 "file_type": "application/json",
                 "file_size": "4719633",
@@ -1113,7 +1113,7 @@
                 "media_name": "mobilites-professionnelles-deplacements-domicile-lieu-de-travail-en-2010",
                 "media_id": "2d9e658c-7b9d-4a9b-a200-93de365edb20",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/2d9e658c-7b9d-4a9b-a200-93de365edb20"
+                    "url": "https://data-rudi.aqmo.org/media/download/2d9e658c-7b9d-4a9b-a200-93de365edb20"
                 },
                 "file_type": "application/json",
                 "file_size": "995860",
@@ -1181,7 +1181,7 @@
                 "media_name": "ca-2008-budgets-annexes",
                 "media_id": "70062be3-f394-480b-ae29-93414d5c6209",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/70062be3-f394-480b-ae29-93414d5c6209"
+                    "url": "https://data-rudi.aqmo.org/media/download/70062be3-f394-480b-ae29-93414d5c6209"
                 },
                 "file_type": "application/json",
                 "file_size": "22653",
@@ -1248,7 +1248,7 @@
                 "media_name": "lignes-de-metro-du-reseau-star",
                 "media_id": "b0193b69-7db4-4e21-abc1-d6c5392aef20",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/b0193b69-7db4-4e21-abc1-d6c5392aef20"
+                    "url": "https://data-rudi.aqmo.org/media/download/b0193b69-7db4-4e21-abc1-d6c5392aef20"
                 },
                 "file_type": "application/json",
                 "file_size": "614",
@@ -1316,7 +1316,7 @@
                 "media_name": "ca-2012-subventions-aux-associations1",
                 "media_id": "38d6e899-b38d-422e-902c-1dcfeffa604d",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/38d6e899-b38d-422e-902c-1dcfeffa604d"
+                    "url": "https://data-rudi.aqmo.org/media/download/38d6e899-b38d-422e-902c-1dcfeffa604d"
                 },
                 "file_type": "application/json",
                 "file_size": "2751",
@@ -1384,7 +1384,7 @@
                 "media_name": "ca-2016-ville-de-rennes-budgets-annexes",
                 "media_id": "a7398d41-4ada-409e-a08d-b45a9532dadd",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/a7398d41-4ada-409e-a08d-b45a9532dadd"
+                    "url": "https://data-rudi.aqmo.org/media/download/a7398d41-4ada-409e-a08d-b45a9532dadd"
                 },
                 "file_type": "application/json",
                 "file_size": "160937",
@@ -1450,7 +1450,7 @@
                 "media_name": "rennes-2030-reponses-par-theme",
                 "media_id": "f281e08a-cdd7-49db-ba9b-17f229d5b8e4",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/f281e08a-cdd7-49db-ba9b-17f229d5b8e4"
+                    "url": "https://data-rudi.aqmo.org/media/download/f281e08a-cdd7-49db-ba9b-17f229d5b8e4"
                 },
                 "file_type": "application/json",
                 "file_size": "497955",
@@ -1516,7 +1516,7 @@
                 "media_name": "bp-2014-subventions-aux-associations1",
                 "media_id": "65dabd48-4a8d-4c25-98bc-18c93bafc2e5",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/65dabd48-4a8d-4c25-98bc-18c93bafc2e5"
+                    "url": "https://data-rudi.aqmo.org/media/download/65dabd48-4a8d-4c25-98bc-18c93bafc2e5"
                 },
                 "file_type": "application/json",
                 "file_size": "117716",
@@ -1583,7 +1583,7 @@
                 "media_name": "resultats-des-elections-legislatives-2017-2eme-tour-thorigne-fouillard",
                 "media_id": "2e068563-02ab-4bae-8012-bb5c5b163832",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/2e068563-02ab-4bae-8012-bb5c5b163832"
+                    "url": "https://data-rudi.aqmo.org/media/download/2e068563-02ab-4bae-8012-bb5c5b163832"
                 },
                 "file_type": "application/json",
                 "file_size": "10113",
@@ -1649,7 +1649,7 @@
                 "media_name": "bp-2012-budgets-annexes",
                 "media_id": "c6e48374-7154-4f75-bdd1-327cedd245bc",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/c6e48374-7154-4f75-bdd1-327cedd245bc"
+                    "url": "https://data-rudi.aqmo.org/media/download/c6e48374-7154-4f75-bdd1-327cedd245bc"
                 },
                 "file_type": "application/json",
                 "file_size": "19717",
@@ -1715,7 +1715,7 @@
                 "media_name": "bp-2013-budget-principal",
                 "media_id": "794fa0f5-17a2-421c-9e10-3006fed1610d",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/794fa0f5-17a2-421c-9e10-3006fed1610d"
+                    "url": "https://data-rudi.aqmo.org/media/download/794fa0f5-17a2-421c-9e10-3006fed1610d"
                 },
                 "file_type": "application/json",
                 "file_size": "198770",
@@ -1782,7 +1782,7 @@
                 "media_name": "prenoms-cesson-sevigne",
                 "media_id": "350fbcac-e1e0-4fb1-9995-ebc6b43371b8",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/350fbcac-e1e0-4fb1-9995-ebc6b43371b8"
+                    "url": "https://data-rudi.aqmo.org/media/download/350fbcac-e1e0-4fb1-9995-ebc6b43371b8"
                 },
                 "file_type": "application/json",
                 "file_size": "249565",
@@ -1903,7 +1903,7 @@
                 "media_name": "matieres-collectees-en-decheteries-et-plateformes-de-vegetaux-a-rennes-metropole",
                 "media_id": "f3a1dbab-9e7b-4f36-9fed-1cd77ceb32b5",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/f3a1dbab-9e7b-4f36-9fed-1cd77ceb32b5"
+                    "url": "https://data-rudi.aqmo.org/media/download/f3a1dbab-9e7b-4f36-9fed-1cd77ceb32b5"
                 },
                 "file_type": "application/json",
                 "file_size": "657766",
@@ -1976,7 +1976,7 @@
                 "media_name": "set-de-donnees-graphiques-des-modes-de-transport",
                 "media_id": "1f935d5d-bfec-4afe-bcb3-d41bc4942466",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/1f935d5d-bfec-4afe-bcb3-d41bc4942466"
+                    "url": "https://data-rudi.aqmo.org/media/download/1f935d5d-bfec-4afe-bcb3-d41bc4942466"
                 },
                 "file_type": "application/json",
                 "file_size": "160",
@@ -2043,7 +2043,7 @@
                 "media_name": "points-de-vente-partenaires-agrees-par-le-reseau-star",
                 "media_id": "c3d4a386-69d2-4d02-9516-80632be93408",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/c3d4a386-69d2-4d02-9516-80632be93408"
+                    "url": "https://data-rudi.aqmo.org/media/download/c3d4a386-69d2-4d02-9516-80632be93408"
                 },
                 "file_type": "application/json",
                 "file_size": "114622",
@@ -2162,7 +2162,7 @@
                 "media_name": "consommation-annuelle-par-iris-2012-a-2017",
                 "media_id": "35f5001c-bbee-4da6-8a22-d7e44e5efbb6",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/35f5001c-bbee-4da6-8a22-d7e44e5efbb6"
+                    "url": "https://data-rudi.aqmo.org/media/download/35f5001c-bbee-4da6-8a22-d7e44e5efbb6"
                 },
                 "file_type": "application/json",
                 "file_size": "154",
@@ -2230,7 +2230,7 @@
                 "media_name": "ca-2014-subventions-aux-associations",
                 "media_id": "5bd45166-2378-4a5b-8740-c6341354e6be",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/5bd45166-2378-4a5b-8740-c6341354e6be"
+                    "url": "https://data-rudi.aqmo.org/media/download/5bd45166-2378-4a5b-8740-c6341354e6be"
                 },
                 "file_type": "application/json",
                 "file_size": "2878",
@@ -2296,7 +2296,7 @@
                 "media_name": "bp-2016-open-data-subventions",
                 "media_id": "9725f710-2005-4f01-8c58-16b93d6efb12",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/9725f710-2005-4f01-8c58-16b93d6efb12"
+                    "url": "https://data-rudi.aqmo.org/media/download/9725f710-2005-4f01-8c58-16b93d6efb12"
                 },
                 "file_type": "application/json",
                 "file_size": "312613",
@@ -2362,7 +2362,7 @@
                 "media_name": "resultats_m20_dataviz",
                 "media_id": "88fe2608-2005-4fdf-867d-608ae21291c5",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/88fe2608-2005-4fdf-867d-608ae21291c5"
+                    "url": "https://data-rudi.aqmo.org/media/download/88fe2608-2005-4fdf-867d-608ae21291c5"
                 },
                 "file_type": "application/json",
                 "file_size": "1252618",
@@ -2429,7 +2429,7 @@
                 "media_name": "rames-de-metro-utilisees-sur-le-reseau-star",
                 "media_id": "4fa0cf1d-7f9a-49ce-80c6-e6c40b16fb40",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/4fa0cf1d-7f9a-49ce-80c6-e6c40b16fb40"
+                    "url": "https://data-rudi.aqmo.org/media/download/4fa0cf1d-7f9a-49ce-80c6-e6c40b16fb40"
                 },
                 "file_type": "application/json",
                 "file_size": "12781",
@@ -2495,7 +2495,7 @@
                 "media_name": "mariages-noyal-chatillon-sur-seiche",
                 "media_id": "a81ab9c8-eb82-4c79-b7b9-75165113f3e3",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/a81ab9c8-eb82-4c79-b7b9-75165113f3e3"
+                    "url": "https://data-rudi.aqmo.org/media/download/a81ab9c8-eb82-4c79-b7b9-75165113f3e3"
                 },
                 "file_type": "application/json",
                 "file_size": "3439",
@@ -2561,7 +2561,7 @@
                 "media_name": "resultats_e19",
                 "media_id": "e1960bf6-20be-4e11-9ab7-2495607e6e51",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/e1960bf6-20be-4e11-9ab7-2495607e6e51"
+                    "url": "https://data-rudi.aqmo.org/media/download/e1960bf6-20be-4e11-9ab7-2495607e6e51"
                 },
                 "file_type": "application/json",
                 "file_size": "490623",
@@ -2629,7 +2629,7 @@
                 "media_name": "prevision-meteo-rennes-arome",
                 "media_id": "aa6a8fe6-3f8c-4558-9dc7-b4362b3ef1d9",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/aa6a8fe6-3f8c-4558-9dc7-b4362b3ef1d9"
+                    "url": "https://data-rudi.aqmo.org/media/download/aa6a8fe6-3f8c-4558-9dc7-b4362b3ef1d9"
                 },
                 "file_type": "application/json",
                 "file_size": "2827269",
@@ -2697,7 +2697,7 @@
                 "media_name": "ca-2018-ville-de-rennes-subventions-aux-associations",
                 "media_id": "6ca11500-34c2-4af1-903f-5a5ea23a53eb",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/6ca11500-34c2-4af1-903f-5a5ea23a53eb"
+                    "url": "https://data-rudi.aqmo.org/media/download/6ca11500-34c2-4af1-903f-5a5ea23a53eb"
                 },
                 "file_type": "application/json",
                 "file_size": "362434",
@@ -2765,7 +2765,7 @@
                 "media_name": "catalogue-des-donnees-disponibles",
                 "media_id": "f8142e34-22df-40bf-9993-e1091f02e2a9",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/f8142e34-22df-40bf-9993-e1091f02e2a9"
+                    "url": "https://data-rudi.aqmo.org/media/download/f8142e34-22df-40bf-9993-e1091f02e2a9"
                 },
                 "file_type": "application/json",
                 "file_size": "519894",
@@ -2831,7 +2831,7 @@
                 "media_name": "bp-2016-ville-de-rennes-budget-principal",
                 "media_id": "f3d93d4a-bc9b-4d91-8d48-e750ea008619",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/f3d93d4a-bc9b-4d91-8d48-e750ea008619"
+                    "url": "https://data-rudi.aqmo.org/media/download/f3d93d4a-bc9b-4d91-8d48-e750ea008619"
                 },
                 "file_type": "application/json",
                 "file_size": "4077620",
@@ -2899,7 +2899,7 @@
                 "media_name": "api-parkings-rennes-metropole",
                 "media_id": "6a44595a-f873-4042-8e99-cd4c7f3ec447",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/6a44595a-f873-4042-8e99-cd4c7f3ec447"
+                    "url": "https://data-rudi.aqmo.org/media/download/6a44595a-f873-4042-8e99-cd4c7f3ec447"
                 },
                 "file_type": "application/json",
                 "file_size": "139",
@@ -2968,7 +2968,7 @@
                 "media_name": "set-de-donnees-graphiques-dillustration-de-points",
                 "media_id": "db5a86f3-5cf4-4c43-a1a8-b8382856c2ab",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/db5a86f3-5cf4-4c43-a1a8-b8382856c2ab"
+                    "url": "https://data-rudi.aqmo.org/media/download/db5a86f3-5cf4-4c43-a1a8-b8382856c2ab"
                 },
                 "file_type": "application/json",
                 "file_size": "161",
@@ -3036,7 +3036,7 @@
                 "media_name": "ca-2014-budgets-annexes",
                 "media_id": "d35c4c16-9271-44c8-9d68-c825625bc378",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/d35c4c16-9271-44c8-9d68-c825625bc378"
+                    "url": "https://data-rudi.aqmo.org/media/download/d35c4c16-9271-44c8-9d68-c825625bc378"
                 },
                 "file_type": "application/json",
                 "file_size": "19836",
@@ -3102,7 +3102,7 @@
                 "media_name": "bp-2013-subventions-aux-associations1",
                 "media_id": "aa5dc8a0-ff35-4338-b618-63e3d2de17da",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/aa5dc8a0-ff35-4338-b618-63e3d2de17da"
+                    "url": "https://data-rudi.aqmo.org/media/download/aa5dc8a0-ff35-4338-b618-63e3d2de17da"
                 },
                 "file_type": "application/json",
                 "file_size": "12945",
@@ -3168,7 +3168,7 @@
                 "media_name": "bp-2012-subventions-aux-associations1",
                 "media_id": "90f2e216-387a-4d32-810f-bb05458f9a24",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/90f2e216-387a-4d32-810f-bb05458f9a24"
+                    "url": "https://data-rudi.aqmo.org/media/download/90f2e216-387a-4d32-810f-bb05458f9a24"
                 },
                 "file_type": "application/json",
                 "file_size": "126092",
@@ -3234,7 +3234,7 @@
                 "media_name": "statistiques-de-prets-de-la-bibliotheque-des-champs-libres-en-2012",
                 "media_id": "100864b7-f118-4638-b088-e2a1a817889b",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/100864b7-f118-4638-b088-e2a1a817889b"
+                    "url": "https://data-rudi.aqmo.org/media/download/100864b7-f118-4638-b088-e2a1a817889b"
                 },
                 "file_type": "application/json",
                 "file_size": "20350",
@@ -3404,7 +3404,7 @@
                 "media_name": "immeubles-proteges-au-titre-des-monuments-historiques",
                 "media_id": "7920d7df-aa37-482e-8e5f-2c44b6eb1016",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/7920d7df-aa37-482e-8e5f-2c44b6eb1016"
+                    "url": "https://data-rudi.aqmo.org/media/download/7920d7df-aa37-482e-8e5f-2c44b6eb1016"
                 },
                 "file_type": "application/json",
                 "file_size": "207557",
@@ -3470,7 +3470,7 @@
                 "media_name": "api-rva-rennes-metropole",
                 "media_id": "d31b72d0-60f2-4847-baf8-97bc7c421d5a",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/d31b72d0-60f2-4847-baf8-97bc7c421d5a"
+                    "url": "https://data-rudi.aqmo.org/media/download/d31b72d0-60f2-4847-baf8-97bc7c421d5a"
                 },
                 "file_type": "application/json",
                 "file_size": "134",
@@ -3536,7 +3536,7 @@
                 "media_name": "etat-des-equipements-des-stations-de-metro-du-reseau-star-en-temps-reel",
                 "media_id": "ef647471-0a8c-419f-99a8-096f4ec9e572",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/ef647471-0a8c-419f-99a8-096f4ec9e572"
+                    "url": "https://data-rudi.aqmo.org/media/download/ef647471-0a8c-419f-99a8-096f4ec9e572"
                 },
                 "file_type": "application/json",
                 "file_size": "55487",
@@ -3604,7 +3604,7 @@
                 "media_name": "ca-2012-budgets-annexes",
                 "media_id": "735a468d-f2b9-491b-8fcf-2e5a29a48ff9",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/735a468d-f2b9-491b-8fcf-2e5a29a48ff9"
+                    "url": "https://data-rudi.aqmo.org/media/download/735a468d-f2b9-491b-8fcf-2e5a29a48ff9"
                 },
                 "file_type": "application/json",
                 "file_size": "18269",
@@ -3670,7 +3670,7 @@
                 "media_name": "bp-2017-rennes-metropole",
                 "media_id": "e4951999-0647-4d8f-85c8-48a2e7294bda",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/e4951999-0647-4d8f-85c8-48a2e7294bda"
+                    "url": "https://data-rudi.aqmo.org/media/download/e4951999-0647-4d8f-85c8-48a2e7294bda"
                 },
                 "file_type": "application/json",
                 "file_size": "1730032",
@@ -3736,7 +3736,7 @@
                 "media_name": "resultats_c11",
                 "media_id": "25978b5f-cd3e-4a10-a2a4-a93c03d9eaa0",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/25978b5f-cd3e-4a10-a2a4-a93c03d9eaa0"
+                    "url": "https://data-rudi.aqmo.org/media/download/25978b5f-cd3e-4a10-a2a4-a93c03d9eaa0"
                 },
                 "file_type": "application/json",
                 "file_size": "171677",
@@ -3808,7 +3808,7 @@
                 "media_name": "consommation-electrique-par-secteur-dactivite",
                 "media_id": "62d6fbf4-a2ef-4fb4-9c8f-e33ef151ed99",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/62d6fbf4-a2ef-4fb4-9c8f-e33ef151ed99"
+                    "url": "https://data-rudi.aqmo.org/media/download/62d6fbf4-a2ef-4fb4-9c8f-e33ef151ed99"
                 },
                 "file_type": "application/json",
                 "file_size": "7403700",
@@ -3932,7 +3932,7 @@
                 "media_name": "bp-2015-subventions-aux-associations0",
                 "media_id": "331a2d19-5cf3-4029-98b7-b5940f0fa23f",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/331a2d19-5cf3-4029-98b7-b5940f0fa23f"
+                    "url": "https://data-rudi.aqmo.org/media/download/331a2d19-5cf3-4029-98b7-b5940f0fa23f"
                 },
                 "file_type": "application/json",
                 "file_size": "768",
@@ -4000,7 +4000,7 @@
                 "media_name": "ca-2014-budget-principal",
                 "media_id": "9098859c-6016-4097-9505-34b519d1e668",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/9098859c-6016-4097-9505-34b519d1e668"
+                    "url": "https://data-rudi.aqmo.org/media/download/9098859c-6016-4097-9505-34b519d1e668"
                 },
                 "file_type": "application/json",
                 "file_size": "2481039",
@@ -4066,7 +4066,7 @@
                 "media_name": "pictogrammes-des-lignes-de-metro-du-reseau-star",
                 "media_id": "6563d14a-2304-44b3-a88e-f8b654e44c95",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/6563d14a-2304-44b3-a88e-f8b654e44c95"
+                    "url": "https://data-rudi.aqmo.org/media/download/6563d14a-2304-44b3-a88e-f8b654e44c95"
                 },
                 "file_type": "application/json",
                 "file_size": "4585",
@@ -4132,7 +4132,7 @@
                 "media_name": "bp-2013-subventions-aux-associations0",
                 "media_id": "050c5bd6-f24c-484a-8154-ab377d146c2c",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/050c5bd6-f24c-484a-8154-ab377d146c2c"
+                    "url": "https://data-rudi.aqmo.org/media/download/050c5bd6-f24c-484a-8154-ab377d146c2c"
                 },
                 "file_type": "application/json",
                 "file_size": "2008",
@@ -4199,7 +4199,7 @@
                 "media_name": "liste-des-fournisseurs-des-cantines-a-rennes",
                 "media_id": "49d52c19-b132-4342-8b24-d634258c3c52",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/49d52c19-b132-4342-8b24-d634258c3c52"
+                    "url": "https://data-rudi.aqmo.org/media/download/49d52c19-b132-4342-8b24-d634258c3c52"
                 },
                 "file_type": "application/json",
                 "file_size": "29213",
@@ -4265,7 +4265,7 @@
                 "media_name": "resultats-des-elections-municipales-a-rennes-2014",
                 "media_id": "db9dad80-7eda-4b46-b1e5-0b6a2afe73f1",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/db9dad80-7eda-4b46-b1e5-0b6a2afe73f1"
+                    "url": "https://data-rudi.aqmo.org/media/download/db9dad80-7eda-4b46-b1e5-0b6a2afe73f1"
                 },
                 "file_type": "application/json",
                 "file_size": "644397",
@@ -4331,7 +4331,7 @@
                 "media_name": "perimetres_cantons_2014",
                 "media_id": "4bd53756-d6b8-4c8f-9f87-c8c519259ceb",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/4bd53756-d6b8-4c8f-9f87-c8c519259ceb"
+                    "url": "https://data-rudi.aqmo.org/media/download/4bd53756-d6b8-4c8f-9f87-c8c519259ceb"
                 },
                 "file_type": "application/json",
                 "file_size": "263871",
@@ -4397,7 +4397,7 @@
                 "media_name": "base-sirene",
                 "media_id": "a3ded34d-148d-40c5-bd63-5e2c3602bccc",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/a3ded34d-148d-40c5-bd63-5e2c3602bccc"
+                    "url": "https://data-rudi.aqmo.org/media/download/a3ded34d-148d-40c5-bd63-5e2c3602bccc"
                 },
                 "file_type": "application/json",
                 "file_size": "26682137",
@@ -4463,7 +4463,7 @@
                 "media_name": "mariages-a-rennes",
                 "media_id": "ecdebedf-c1ea-4c97-8491-46626fb80998",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/ecdebedf-c1ea-4c97-8491-46626fb80998"
+                    "url": "https://data-rudi.aqmo.org/media/download/ecdebedf-c1ea-4c97-8491-46626fb80998"
                 },
                 "file_type": "application/json",
                 "file_size": "14041",
@@ -4527,7 +4527,7 @@
                 "media_name": "bp_2015_open_data_budget_principal_par_sousfonctioncsv",
                 "media_id": "6bb9f1a9-5252-413f-80e0-9ebdf552120b",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/6bb9f1a9-5252-413f-80e0-9ebdf552120b"
+                    "url": "https://data-rudi.aqmo.org/media/download/6bb9f1a9-5252-413f-80e0-9ebdf552120b"
                 },
                 "file_type": "application/json",
                 "file_size": "216957",
@@ -4597,7 +4597,7 @@
                 "media_name": "ca-2018-subvention-aux-associations-ville-de-thorigne-fouillard",
                 "media_id": "a9e2806a-4d90-420d-8c95-e6cf39d49957",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/a9e2806a-4d90-420d-8c95-e6cf39d49957"
+                    "url": "https://data-rudi.aqmo.org/media/download/a9e2806a-4d90-420d-8c95-e6cf39d49957"
                 },
                 "file_type": "application/json",
                 "file_size": "27384",
@@ -4670,7 +4670,7 @@
                 "media_name": "production-electrique-annuelle-par-filiere-a-la-maille-commune",
                 "media_id": "a49dc1a0-872d-4e93-aa0c-c1ed9e38bcf9",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/a49dc1a0-872d-4e93-aa0c-c1ed9e38bcf9"
+                    "url": "https://data-rudi.aqmo.org/media/download/a49dc1a0-872d-4e93-aa0c-c1ed9e38bcf9"
                 },
                 "file_type": "application/json",
                 "file_size": "762714",
@@ -4738,7 +4738,7 @@
                 "media_name": "ca-2010-budgets-annexes",
                 "media_id": "e14aee06-c6fe-49fa-a8f3-6de19ca7b170",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/e14aee06-c6fe-49fa-a8f3-6de19ca7b170"
+                    "url": "https://data-rudi.aqmo.org/media/download/e14aee06-c6fe-49fa-a8f3-6de19ca7b170"
                 },
                 "file_type": "application/json",
                 "file_size": "22307",
@@ -4804,7 +4804,7 @@
                 "media_name": "bp-2013-budget-annexes",
                 "media_id": "a1af03c6-28b2-41d6-8434-d834f8e3020e",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/a1af03c6-28b2-41d6-8434-d834f8e3020e"
+                    "url": "https://data-rudi.aqmo.org/media/download/a1af03c6-28b2-41d6-8434-d834f8e3020e"
                 },
                 "file_type": "application/json",
                 "file_size": "20750",
@@ -4871,7 +4871,7 @@
                 "media_name": "budget-participatif-ville-de-rennes-saison-2-projets",
                 "media_id": "1534ca71-f166-4c72-95ed-85bd57d6c6d3",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/1534ca71-f166-4c72-95ed-85bd57d6c6d3"
+                    "url": "https://data-rudi.aqmo.org/media/download/1534ca71-f166-4c72-95ed-85bd57d6c6d3"
                 },
                 "file_type": "application/json",
                 "file_size": "1824154",
@@ -4939,7 +4939,7 @@
                 "media_name": "garages-partenaires-du-reseau-star",
                 "media_id": "2221fb43-505c-4b0d-b438-013be21838b9",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/2221fb43-505c-4b0d-b438-013be21838b9"
+                    "url": "https://data-rudi.aqmo.org/media/download/2221fb43-505c-4b0d-b438-013be21838b9"
                 },
                 "file_type": "application/json",
                 "file_size": "19448",
@@ -5007,7 +5007,7 @@
                 "media_name": "ca-2015-ville-de-rennes-budget-principal",
                 "media_id": "17d2c5ef-ca08-48de-ba97-ec0a678d9c7c",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/17d2c5ef-ca08-48de-ba97-ec0a678d9c7c"
+                    "url": "https://data-rudi.aqmo.org/media/download/17d2c5ef-ca08-48de-ba97-ec0a678d9c7c"
                 },
                 "file_type": "application/json",
                 "file_size": "4623307",
@@ -5073,7 +5073,7 @@
                 "media_name": "deces-noyal-chatillon-sur-seiche",
                 "media_id": "93498828-900c-471f-b6b0-d8c53b8a82c5",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/93498828-900c-471f-b6b0-d8c53b8a82c5"
+                    "url": "https://data-rudi.aqmo.org/media/download/93498828-900c-471f-b6b0-d8c53b8a82c5"
                 },
                 "file_type": "application/json",
                 "file_size": "2801",
@@ -5139,7 +5139,7 @@
                 "media_name": "resultats-elections-europeennes-2019-thorigne-fouillard-dataviz",
                 "media_id": "088f8360-a6d9-4788-975e-07ffdf25eb42",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/088f8360-a6d9-4788-975e-07ffdf25eb42"
+                    "url": "https://data-rudi.aqmo.org/media/download/088f8360-a6d9-4788-975e-07ffdf25eb42"
                 },
                 "file_type": "application/json",
                 "file_size": "274768",
@@ -5207,7 +5207,7 @@
                 "media_name": "ca-2017-rennes-metropole",
                 "media_id": "ca735140-b416-448a-80b2-03a7f66209eb",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/ca735140-b416-448a-80b2-03a7f66209eb"
+                    "url": "https://data-rudi.aqmo.org/media/download/ca735140-b416-448a-80b2-03a7f66209eb"
                 },
                 "file_type": "application/json",
                 "file_size": "2508463",
@@ -5275,7 +5275,7 @@
                 "media_name": "datamix-europe-transmusicales",
                 "media_id": "84eb2996-03f8-4360-a3c1-dff48b14d18f",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/84eb2996-03f8-4360-a3c1-dff48b14d18f"
+                    "url": "https://data-rudi.aqmo.org/media/download/84eb2996-03f8-4360-a3c1-dff48b14d18f"
                 },
                 "file_type": "application/json",
                 "file_size": "9309460",
@@ -5342,7 +5342,7 @@
                 "media_name": "budget-participatif-ville-de-rennes-saison-1-votes",
                 "media_id": "d663fcda-3946-46e0-b851-1f9784495836",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/d663fcda-3946-46e0-b851-1f9784495836"
+                    "url": "https://data-rudi.aqmo.org/media/download/d663fcda-3946-46e0-b851-1f9784495836"
                 },
                 "file_type": "application/json",
                 "file_size": "3880137",
@@ -5410,7 +5410,7 @@
                 "media_name": "ca-2014-subventions-aux-associations0",
                 "media_id": "2fcf5a9f-b7b7-4a48-8da2-c9bec465a98e",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/2fcf5a9f-b7b7-4a48-8da2-c9bec465a98e"
+                    "url": "https://data-rudi.aqmo.org/media/download/2fcf5a9f-b7b7-4a48-8da2-c9bec465a98e"
                 },
                 "file_type": "application/json",
                 "file_size": "132881",
@@ -5477,7 +5477,7 @@
                 "media_name": "frequentation-des-expositions-musee-de-bretagne-et-les-champs-libres",
                 "media_id": "7e02e8bc-47a7-405d-8e31-86e3910558da",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/7e02e8bc-47a7-405d-8e31-86e3910558da"
+                    "url": "https://data-rudi.aqmo.org/media/download/7e02e8bc-47a7-405d-8e31-86e3910558da"
                 },
                 "file_type": "application/json",
                 "file_size": "22709",
@@ -5543,7 +5543,7 @@
                 "media_name": "bp-2014-subventions-aux-associations",
                 "media_id": "b7b3752d-7006-4194-a70d-e42cc1b863e0",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/b7b3752d-7006-4194-a70d-e42cc1b863e0"
+                    "url": "https://data-rudi.aqmo.org/media/download/b7b3752d-7006-4194-a70d-e42cc1b863e0"
                 },
                 "file_type": "application/json",
                 "file_size": "13665",
@@ -5609,7 +5609,7 @@
                 "media_name": "ca-2017-ville-de-st-jacques-de-la-lande-subvention-aux-associations",
                 "media_id": "19711772-f782-4860-b862-134a31c12f31",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/19711772-f782-4860-b862-134a31c12f31"
+                    "url": "https://data-rudi.aqmo.org/media/download/19711772-f782-4860-b862-134a31c12f31"
                 },
                 "file_type": "application/json",
                 "file_size": "27123",
@@ -5675,7 +5675,7 @@
                 "media_name": "bp-2014-budget-principal0",
                 "media_id": "8d784a62-5e20-4412-a3be-48ef85c073ec",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/8d784a62-5e20-4412-a3be-48ef85c073ec"
+                    "url": "https://data-rudi.aqmo.org/media/download/8d784a62-5e20-4412-a3be-48ef85c073ec"
                 },
                 "file_type": "application/json",
                 "file_size": "212371",
@@ -5741,7 +5741,7 @@
                 "media_name": "base_elus_rennes",
                 "media_id": "37df63aa-1aae-4279-be3b-b07076d36130",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/37df63aa-1aae-4279-be3b-b07076d36130"
+                    "url": "https://data-rudi.aqmo.org/media/download/37df63aa-1aae-4279-be3b-b07076d36130"
                 },
                 "file_type": "application/json",
                 "file_size": "62891",
@@ -5808,7 +5808,7 @@
                 "media_name": "bus-utilises-sur-le-reseau-star",
                 "media_id": "a8a15a14-94eb-49e6-97a0-47902c3c20f6",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/a8a15a14-94eb-49e6-97a0-47902c3c20f6"
+                    "url": "https://data-rudi.aqmo.org/media/download/a8a15a14-94eb-49e6-97a0-47902c3c20f6"
                 },
                 "file_type": "application/json",
                 "file_size": "404190",
@@ -5875,7 +5875,7 @@
                 "media_name": "agences-commerciales-du-reseau-star",
                 "media_id": "23fdc65e-92d0-469f-bf55-938381073781",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/23fdc65e-92d0-469f-bf55-938381073781"
+                    "url": "https://data-rudi.aqmo.org/media/download/23fdc65e-92d0-469f-bf55-938381073781"
                 },
                 "file_type": "application/json",
                 "file_size": "5337",
@@ -5943,7 +5943,7 @@
                 "media_name": "ca-2013-subventions-aux-associations1",
                 "media_id": "5223558c-afbe-4d57-b8d4-1081e3d7a093",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/5223558c-afbe-4d57-b8d4-1081e3d7a093"
+                    "url": "https://data-rudi.aqmo.org/media/download/5223558c-afbe-4d57-b8d4-1081e3d7a093"
                 },
                 "file_type": "application/json",
                 "file_size": "3636",
@@ -6011,7 +6011,7 @@
                 "media_name": "indicateurs-financiers-budget-annexe-dechets-rennes-metropole",
                 "media_id": "6c8395a2-1147-48d9-adb8-d2ef9e7ac348",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/6c8395a2-1147-48d9-adb8-d2ef9e7ac348"
+                    "url": "https://data-rudi.aqmo.org/media/download/6c8395a2-1147-48d9-adb8-d2ef9e7ac348"
                 },
                 "file_type": "application/json",
                 "file_size": "22891",
@@ -6078,7 +6078,7 @@
                 "media_name": "statistiques-de-frequentation-du-site-de-la-fabrique-citoyenne",
                 "media_id": "3f870e4b-0834-4651-93db-26b6beedce09",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/3f870e4b-0834-4651-93db-26b6beedce09"
+                    "url": "https://data-rudi.aqmo.org/media/download/3f870e4b-0834-4651-93db-26b6beedce09"
                 },
                 "file_type": "application/json",
                 "file_size": "233954",
@@ -6144,7 +6144,7 @@
                 "media_name": "bp-2012-budget-principal",
                 "media_id": "92321a23-7516-4cad-ad91-e1ed227f721b",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/92321a23-7516-4cad-ad91-e1ed227f721b"
+                    "url": "https://data-rudi.aqmo.org/media/download/92321a23-7516-4cad-ad91-e1ed227f721b"
                 },
                 "file_type": "application/json",
                 "file_size": "198833",
@@ -6212,7 +6212,7 @@
                 "media_name": "statistiques-de-frequentation-des-expositions-du-musee-des-beaux-arts-de-rennes",
                 "media_id": "82fa5591-ff83-4966-b08d-530792e97e96",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/82fa5591-ff83-4966-b08d-530792e97e96"
+                    "url": "https://data-rudi.aqmo.org/media/download/82fa5591-ff83-4966-b08d-530792e97e96"
                 },
                 "file_type": "application/json",
                 "file_size": "20640",
@@ -6334,7 +6334,7 @@
                 "media_name": "ca-2017-ville-de-rennes-budgets-annexes",
                 "media_id": "165cf0a1-6ea7-4cec-a7d9-1d72bdf8a56a",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/165cf0a1-6ea7-4cec-a7d9-1d72bdf8a56a"
+                    "url": "https://data-rudi.aqmo.org/media/download/165cf0a1-6ea7-4cec-a7d9-1d72bdf8a56a"
                 },
                 "file_type": "application/json",
                 "file_size": "163492",
@@ -6400,7 +6400,7 @@
                 "media_name": "bp-2015-budgets-annexes",
                 "media_id": "2bae3164-4399-4776-a519-4f7ccd69e20a",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/2bae3164-4399-4776-a519-4f7ccd69e20a"
+                    "url": "https://data-rudi.aqmo.org/media/download/2bae3164-4399-4776-a519-4f7ccd69e20a"
                 },
                 "file_type": "application/json",
                 "file_size": "23228",
@@ -6467,7 +6467,7 @@
                 "media_name": "resultats-elections-europeennes-2019-thorigne-fouillard",
                 "media_id": "8f7d3132-7034-456d-933b-54e5ee298ed6",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/8f7d3132-7034-456d-933b-54e5ee298ed6"
+                    "url": "https://data-rudi.aqmo.org/media/download/8f7d3132-7034-456d-933b-54e5ee298ed6"
                 },
                 "file_type": "application/json",
                 "file_size": "40636",
@@ -6535,7 +6535,7 @@
                 "media_name": "prets-doeuvres-du-musee-des-beaux-arts-de-rennes",
                 "media_id": "f633ff13-9cfd-40ed-8c26-f0c2b4cd6486",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/f633ff13-9cfd-40ed-8c26-f0c2b4cd6486"
+                    "url": "https://data-rudi.aqmo.org/media/download/f633ff13-9cfd-40ed-8c26-f0c2b4cd6486"
                 },
                 "file_type": "application/json",
                 "file_size": "258940",
@@ -6601,7 +6601,7 @@
                 "media_name": "statistiques-de-prets-de-la-bibliotheque-des-champs-libres-en-2007",
                 "media_id": "d07f7d9c-aa56-41f0-889d-e5a7073de0d5",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/d07f7d9c-aa56-41f0-889d-e5a7073de0d5"
+                    "url": "https://data-rudi.aqmo.org/media/download/d07f7d9c-aa56-41f0-889d-e5a7073de0d5"
                 },
                 "file_type": "application/json",
                 "file_size": "12518",
@@ -6668,7 +6668,7 @@
                 "media_name": "equipements-des-stations-de-metro-du-reseau-star",
                 "media_id": "4d6dfd5a-a5d6-4cc6-8fcb-cf58be7b0715",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/4d6dfd5a-a5d6-4cc6-8fcb-cf58be7b0715"
+                    "url": "https://data-rudi.aqmo.org/media/download/4d6dfd5a-a5d6-4cc6-8fcb-cf58be7b0715"
                 },
                 "file_type": "application/json",
                 "file_size": "59384",
@@ -6736,7 +6736,7 @@
                 "media_name": "ca-2015-ville-de-rennes-subventions-aux-associations",
                 "media_id": "9124db2d-ba4e-4d32-8b61-dbb18b21a22c",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/9124db2d-ba4e-4d32-8b61-dbb18b21a22c"
+                    "url": "https://data-rudi.aqmo.org/media/download/9124db2d-ba4e-4d32-8b61-dbb18b21a22c"
                 },
                 "file_type": "application/json",
                 "file_size": "368027",
@@ -6803,7 +6803,7 @@
                 "media_name": "budget-participatif-ville-de-rennes-saison-1-projets",
                 "media_id": "c42db269-bca8-447e-833a-0c2ac9a0dbdf",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/c42db269-bca8-447e-833a-0c2ac9a0dbdf"
+                    "url": "https://data-rudi.aqmo.org/media/download/c42db269-bca8-447e-833a-0c2ac9a0dbdf"
                 },
                 "file_type": "application/json",
                 "file_size": "1980245",
@@ -6871,7 +6871,7 @@
                 "media_name": "ca-2013-subventions-aux-associations0",
                 "media_id": "eff9d406-a7e8-472d-ae93-58931f55e09e",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/eff9d406-a7e8-472d-ae93-58931f55e09e"
+                    "url": "https://data-rudi.aqmo.org/media/download/eff9d406-a7e8-472d-ae93-58931f55e09e"
                 },
                 "file_type": "application/json",
                 "file_size": "141862",
@@ -6937,7 +6937,7 @@
                 "media_name": "resultats-m20-acigne-dataviz",
                 "media_id": "c3fa4f52-4722-456e-95e0-73f7873f08ce",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/c3fa4f52-4722-456e-95e0-73f7873f08ce"
+                    "url": "https://data-rudi.aqmo.org/media/download/c3fa4f52-4722-456e-95e0-73f7873f08ce"
                 },
                 "file_type": "application/json",
                 "file_size": "13741",
@@ -7008,7 +7008,7 @@
                 "media_name": "topologie-des-stations-le-velo-star0",
                 "media_id": "8c3201f2-8e29-4cff-a93d-238680cdb3e0",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/8c3201f2-8e29-4cff-a93d-238680cdb3e0"
+                    "url": "https://data-rudi.aqmo.org/media/download/8c3201f2-8e29-4cff-a93d-238680cdb3e0"
                 },
                 "file_type": "application/json",
                 "file_size": "32810",
@@ -7074,7 +7074,7 @@
                 "media_name": "statistiques-de-frequentation-du-site-rennes-metropole-en-acces-libre",
                 "media_id": "58b167c2-7412-4390-8e68-e2504b8e56f9",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/58b167c2-7412-4390-8e68-e2504b8e56f9"
+                    "url": "https://data-rudi.aqmo.org/media/download/58b167c2-7412-4390-8e68-e2504b8e56f9"
                 },
                 "file_type": "application/json",
                 "file_size": "239290",
@@ -7140,7 +7140,7 @@
                 "media_name": "bp-2015-subventions-aux-associations1",
                 "media_id": "256efa1c-4766-41f3-862a-7705b74b2f27",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/256efa1c-4766-41f3-862a-7705b74b2f27"
+                    "url": "https://data-rudi.aqmo.org/media/download/256efa1c-4766-41f3-862a-7705b74b2f27"
                 },
                 "file_type": "application/json",
                 "file_size": "115153",
@@ -7209,7 +7209,7 @@
                 "media_name": "effectifs-scolaires-cesson-sevigne",
                 "media_id": "89179193-2c60-4512-b5cb-ec6ea87a4b75",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/89179193-2c60-4512-b5cb-ec6ea87a4b75"
+                    "url": "https://data-rudi.aqmo.org/media/download/89179193-2c60-4512-b5cb-ec6ea87a4b75"
                 },
                 "file_type": "application/json",
                 "file_size": "4389",
@@ -7276,7 +7276,7 @@
                 "media_name": "adresses_labfab",
                 "media_id": "13ccf562-3327-481f-abbe-1350ce9d89d4",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/13ccf562-3327-481f-abbe-1350ce9d89d4"
+                    "url": "https://data-rudi.aqmo.org/media/download/13ccf562-3327-481f-abbe-1350ce9d89d4"
                 },
                 "file_type": "application/json",
                 "file_size": "5327",
@@ -7342,7 +7342,7 @@
                 "media_name": "orthophotographie-2004",
                 "media_id": "9d2d3053-0524-4321-911d-94acc2165098",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/9d2d3053-0524-4321-911d-94acc2165098"
+                    "url": "https://data-rudi.aqmo.org/media/download/9d2d3053-0524-4321-911d-94acc2165098"
                 },
                 "file_type": "application/json",
                 "file_size": "666332",
@@ -7466,7 +7466,7 @@
                 "media_name": "titres-et-tarifs-du-reseau-star",
                 "media_id": "e6fb372b-39a5-445c-a439-434f348d2c80",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/e6fb372b-39a5-445c-a439-434f348d2c80"
+                    "url": "https://data-rudi.aqmo.org/media/download/e6fb372b-39a5-445c-a439-434f348d2c80"
                 },
                 "file_type": "application/json",
                 "file_size": "106599",
@@ -7534,7 +7534,7 @@
                 "media_name": "ca-2015-ville-de-rennes-budgets-annexes",
                 "media_id": "d89bd528-7a54-4ea8-b031-d9a1c40227d6",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/d89bd528-7a54-4ea8-b031-d9a1c40227d6"
+                    "url": "https://data-rudi.aqmo.org/media/download/d89bd528-7a54-4ea8-b031-d9a1c40227d6"
                 },
                 "file_type": "application/json",
                 "file_size": "171551",
@@ -7602,7 +7602,7 @@
                 "media_name": "ca-2013-budget-principal",
                 "media_id": "c97aec56-c79d-4d60-9c36-3d849519ab31",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/c97aec56-c79d-4d60-9c36-3d849519ab31"
+                    "url": "https://data-rudi.aqmo.org/media/download/c97aec56-c79d-4d60-9c36-3d849519ab31"
                 },
                 "file_type": "application/json",
                 "file_size": "2359940",
@@ -7668,7 +7668,7 @@
                 "media_name": "bp-2016-rennes-metropole",
                 "media_id": "77adb693-f30b-489a-a472-1794ed47488d",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/77adb693-f30b-489a-a472-1794ed47488d"
+                    "url": "https://data-rudi.aqmo.org/media/download/77adb693-f30b-489a-a472-1794ed47488d"
                 },
                 "file_type": "application/json",
                 "file_size": "1841699",
@@ -7735,7 +7735,7 @@
                 "media_name": "population-legale-cesson-sevigne",
                 "media_id": "4d445158-bf40-46d4-8a76-35d6258c6e1c",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/4d445158-bf40-46d4-8a76-35d6258c6e1c"
+                    "url": "https://data-rudi.aqmo.org/media/download/4d445158-bf40-46d4-8a76-35d6258c6e1c"
                 },
                 "file_type": "application/json",
                 "file_size": "4035",
@@ -7801,7 +7801,7 @@
                 "media_name": "emplacement-de-spanneaux-daffichage-libre",
                 "media_id": "76a5e8dc-60d5-4d04-8aba-ac96ad8e0de7",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/76a5e8dc-60d5-4d04-8aba-ac96ad8e0de7"
+                    "url": "https://data-rudi.aqmo.org/media/download/76a5e8dc-60d5-4d04-8aba-ac96ad8e0de7"
                 },
                 "file_type": "application/json",
                 "file_size": "1438",
@@ -7867,7 +7867,7 @@
                 "media_name": "resultats-des-elections-legislatives-2017-2eme-tour-saint-jacques-de-la-lande",
                 "media_id": "e2697466-1243-44ad-abd5-747df0b373fc",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/e2697466-1243-44ad-abd5-747df0b373fc"
+                    "url": "https://data-rudi.aqmo.org/media/download/e2697466-1243-44ad-abd5-747df0b373fc"
                 },
                 "file_type": "application/json",
                 "file_size": "9288",
@@ -7933,7 +7933,7 @@
                 "media_name": "resultats-des-elections-municipales-rennes-metropole-2014",
                 "media_id": "c3b3ed11-9d5d-4d50-b83d-b50d984e5a6f",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/c3b3ed11-9d5d-4d50-b83d-b50d984e5a6f"
+                    "url": "https://data-rudi.aqmo.org/media/download/c3b3ed11-9d5d-4d50-b83d-b50d984e5a6f"
                 },
                 "file_type": "application/json",
                 "file_size": "140201",
@@ -8000,7 +8000,7 @@
                 "media_name": "api-travaux-rennes-metropole",
                 "media_id": "60309868-bad4-4e73-b87c-7617975facc9",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/60309868-bad4-4e73-b87c-7617975facc9"
+                    "url": "https://data-rudi.aqmo.org/media/download/60309868-bad4-4e73-b87c-7617975facc9"
                 },
                 "file_type": "application/json",
                 "file_size": "138",
@@ -8067,7 +8067,7 @@
                 "media_name": "topologie-des-points-darret-de-metro-du-reseau-star",
                 "media_id": "8ed2afd7-acef-426d-9370-9635d499ef4d",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/8ed2afd7-acef-426d-9370-9635d499ef4d"
+                    "url": "https://data-rudi.aqmo.org/media/download/8ed2afd7-acef-426d-9370-9635d499ef4d"
                 },
                 "file_type": "application/json",
                 "file_size": "15152",
@@ -8133,7 +8133,7 @@
                 "media_name": "deces",
                 "media_id": "d3423a1d-b3a9-4613-b69c-546d5b5dbc52",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/d3423a1d-b3a9-4613-b69c-546d5b5dbc52"
+                    "url": "https://data-rudi.aqmo.org/media/download/d3423a1d-b3a9-4613-b69c-546d5b5dbc52"
                 },
                 "file_type": "application/json",
                 "file_size": "14541",
@@ -8201,7 +8201,7 @@
                 "media_name": "couverture-2g-3g-4g-en-france-par-operateur-juillet-2015",
                 "media_id": "3a613ee2-034c-416f-a732-e1f5b07147a3",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/3a613ee2-034c-416f-a732-e1f5b07147a3"
+                    "url": "https://data-rudi.aqmo.org/media/download/3a613ee2-034c-416f-a732-e1f5b07147a3"
                 },
                 "file_type": "application/json",
                 "file_size": "21759",
@@ -8269,7 +8269,7 @@
                 "media_name": "ca-2012-budget-principal0",
                 "media_id": "07f15477-5aa7-482f-914e-d3df1802bbcb",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/07f15477-5aa7-482f-914e-d3df1802bbcb"
+                    "url": "https://data-rudi.aqmo.org/media/download/07f15477-5aa7-482f-914e-d3df1802bbcb"
                 },
                 "file_type": "application/json",
                 "file_size": "2377614",
@@ -8335,7 +8335,7 @@
                 "media_name": "photographies-fonds-de-la-guerre-14-18",
                 "media_id": "9568989e-4d59-4704-b00c-d5a9432f2c81",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/9568989e-4d59-4704-b00c-d5a9432f2c81"
+                    "url": "https://data-rudi.aqmo.org/media/download/9568989e-4d59-4704-b00c-d5a9432f2c81"
                 },
                 "file_type": "application/json",
                 "file_size": "71891",
@@ -8401,7 +8401,7 @@
                 "media_name": "resultats_l17_2",
                 "media_id": "27af0bda-3016-46b3-9541-89b6c084f325",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/27af0bda-3016-46b3-9541-89b6c084f325"
+                    "url": "https://data-rudi.aqmo.org/media/download/27af0bda-3016-46b3-9541-89b6c084f325"
                 },
                 "file_type": "application/json",
                 "file_size": "170546",
@@ -8471,7 +8471,7 @@
                 "media_name": "tco-bus-topologie-dessertes-td",
                 "media_id": "9f7ffee1-6518-4764-9bc3-0ffb69da91e3",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/9f7ffee1-6518-4764-9bc3-0ffb69da91e3"
+                    "url": "https://data-rudi.aqmo.org/media/download/9f7ffee1-6518-4764-9bc3-0ffb69da91e3"
                 },
                 "file_type": "application/json",
                 "file_size": "2846558",
@@ -8538,7 +8538,7 @@
                 "media_name": "versions-des-horaires-theoriques-des-lignes-du-reseau-star-au-format-gtfs",
                 "media_id": "5c6442ac-6c01-43e5-92d7-833d7e889a2f",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/5c6442ac-6c01-43e5-92d7-833d7e889a2f"
+                    "url": "https://data-rudi.aqmo.org/media/download/5c6442ac-6c01-43e5-92d7-833d7e889a2f"
                 },
                 "file_type": "application/json",
                 "file_size": "1779",
@@ -8606,7 +8606,7 @@
                 "media_name": "documents-actes-durbanisme-delivres-cesson-sevigne",
                 "media_id": "a1b189cc-14d1-4e3c-adf1-473655f16496",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/a1b189cc-14d1-4e3c-adf1-473655f16496"
+                    "url": "https://data-rudi.aqmo.org/media/download/a1b189cc-14d1-4e3c-adf1-473655f16496"
                 },
                 "file_type": "application/json",
                 "file_size": "2209",
@@ -8674,7 +8674,7 @@
                 "media_name": "ca-2011-subventions-aux-associations",
                 "media_id": "5745fb70-dc77-469b-b6c9-6dce988264b1",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/5745fb70-dc77-469b-b6c9-6dce988264b1"
+                    "url": "https://data-rudi.aqmo.org/media/download/5745fb70-dc77-469b-b6c9-6dce988264b1"
                 },
                 "file_type": "application/json",
                 "file_size": "128112",
@@ -8740,7 +8740,7 @@
                 "media_name": "bp-2018-ville-de-rennes-budget-principal",
                 "media_id": "b15c0c85-7883-4bed-a088-f2e26ff58261",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/b15c0c85-7883-4bed-a088-f2e26ff58261"
+                    "url": "https://data-rudi.aqmo.org/media/download/b15c0c85-7883-4bed-a088-f2e26ff58261"
                 },
                 "file_type": "application/json",
                 "file_size": "3855831",
@@ -8806,7 +8806,7 @@
                 "media_name": "resultats_e19_dataviz",
                 "media_id": "212a7311-8c9c-43d7-abfe-529a03ae4da0",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/212a7311-8c9c-43d7-abfe-529a03ae4da0"
+                    "url": "https://data-rudi.aqmo.org/media/download/212a7311-8c9c-43d7-abfe-529a03ae4da0"
                 },
                 "file_type": "application/json",
                 "file_size": "3699820",
@@ -8872,7 +8872,7 @@
                 "media_name": "bp-2012-subventions-aux-associations0",
                 "media_id": "d7aec6ff-f904-4fb1-a687-e683d81f91b9",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/d7aec6ff-f904-4fb1-a687-e683d81f91b9"
+                    "url": "https://data-rudi.aqmo.org/media/download/d7aec6ff-f904-4fb1-a687-e683d81f91b9"
                 },
                 "file_type": "application/json",
                 "file_size": "12395",
@@ -8990,7 +8990,7 @@
                 "media_name": "horodateurs-sur-la-ville-de-rennes",
                 "media_id": "100ce404-1f57-41d7-8a02-f9399d9ce860",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/100ce404-1f57-41d7-8a02-f9399d9ce860"
+                    "url": "https://data-rudi.aqmo.org/media/download/100ce404-1f57-41d7-8a02-f9399d9ce860"
                 },
                 "file_type": "application/json",
                 "file_size": "264282",
@@ -9058,7 +9058,7 @@
                 "media_name": "population-par-sexe-age-et-nationalite-par-commune-2014",
                 "media_id": "46e2d633-7691-4c3d-92a4-174bc912bdf4",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/46e2d633-7691-4c3d-92a4-174bc912bdf4"
+                    "url": "https://data-rudi.aqmo.org/media/download/46e2d633-7691-4c3d-92a4-174bc912bdf4"
                 },
                 "file_type": "application/json",
                 "file_size": "373978",
@@ -9130,7 +9130,7 @@
                 "media_name": "base-sirene8",
                 "media_id": "ec33f04d-4429-437c-b589-4983f39f4b35",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/ec33f04d-4429-437c-b589-4983f39f4b35"
+                    "url": "https://data-rudi.aqmo.org/media/download/ec33f04d-4429-437c-b589-4983f39f4b35"
                 },
                 "file_type": "application/json",
                 "file_size": "4812947",
@@ -9197,7 +9197,7 @@
                 "media_name": "dessertes-des-parcours-de-metro-du-reseau-star",
                 "media_id": "a28f36d7-0c0e-4bc0-b7d9-790bae98cf80",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/a28f36d7-0c0e-4bc0-b7d9-790bae98cf80"
+                    "url": "https://data-rudi.aqmo.org/media/download/a28f36d7-0c0e-4bc0-b7d9-790bae98cf80"
                 },
                 "file_type": "application/json",
                 "file_size": "12459",
@@ -9315,7 +9315,7 @@
                 "media_name": "statistiques-etat-civil-noyal-chatillon-sur-seiche",
                 "media_id": "90ea5fab-d63e-4332-ba55-ee603390c2d7",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/90ea5fab-d63e-4332-ba55-ee603390c2d7"
+                    "url": "https://data-rudi.aqmo.org/media/download/90ea5fab-d63e-4332-ba55-ee603390c2d7"
                 },
                 "file_type": "application/json",
                 "file_size": "2833",
@@ -9383,7 +9383,7 @@
                 "media_name": "delinquance-2014-en-france",
                 "media_id": "74282ca4-c046-4a61-98b8-f70e499042c3",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/74282ca4-c046-4a61-98b8-f70e499042c3"
+                    "url": "https://data-rudi.aqmo.org/media/download/74282ca4-c046-4a61-98b8-f70e499042c3"
                 },
                 "file_type": "application/json",
                 "file_size": "131144",
@@ -9450,7 +9450,7 @@
                 "media_name": "emprise-de-rennes-metropole",
                 "media_id": "9f5d2185-febf-41cf-9d1e-eef580a62dfc",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/9f5d2185-febf-41cf-9d1e-eef580a62dfc"
+                    "url": "https://data-rudi.aqmo.org/media/download/9f5d2185-febf-41cf-9d1e-eef580a62dfc"
                 },
                 "file_type": "application/json",
                 "file_size": "851270",
@@ -9523,7 +9523,7 @@
                 "media_name": "limites-communales-referentielles-de-rennes-metropole-polylignes",
                 "media_id": "46f0690a-caf1-4ad5-b228-7a5c17f03d59",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/46f0690a-caf1-4ad5-b228-7a5c17f03d59"
+                    "url": "https://data-rudi.aqmo.org/media/download/46f0690a-caf1-4ad5-b228-7a5c17f03d59"
                 },
                 "file_type": "application/json",
                 "file_size": "1941398",
@@ -9595,7 +9595,7 @@
                 "media_name": "comites-de-secteur-de-rennes-metropole",
                 "media_id": "9348e5a7-07a1-4b0a-b5bd-38606572702f",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/9348e5a7-07a1-4b0a-b5bd-38606572702f"
+                    "url": "https://data-rudi.aqmo.org/media/download/9348e5a7-07a1-4b0a-b5bd-38606572702f"
                 },
                 "file_type": "application/json",
                 "file_size": "1629906",
@@ -9667,7 +9667,7 @@
                 "media_name": "perimetres-des-6-directions-de-quartier-de-la-ville-de-rennes",
                 "media_id": "0fe4d67e-a871-457a-bf82-b7edcbea9b0d",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/0fe4d67e-a871-457a-bf82-b7edcbea9b0d"
+                    "url": "https://data-rudi.aqmo.org/media/download/0fe4d67e-a871-457a-bf82-b7edcbea9b0d"
                 },
                 "file_type": "application/json",
                 "file_size": "265874",
@@ -9739,7 +9739,7 @@
                 "media_name": "perimetres-des-45-sous-quartiers-de-la-ville-de-rennes",
                 "media_id": "38b67797-0de1-43c1-93a0-f613636bab14",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/38b67797-0de1-43c1-93a0-f613636bab14"
+                    "url": "https://data-rudi.aqmo.org/media/download/38b67797-0de1-43c1-93a0-f613636bab14"
                 },
                 "file_type": "application/json",
                 "file_size": "443500",
@@ -9812,7 +9812,7 @@
                 "media_name": "murs-dexpression-libre-street-art-et-graffitis",
                 "media_id": "04802b57-2b7a-40ac-bc89-51fc85732cb4",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/04802b57-2b7a-40ac-bc89-51fc85732cb4"
+                    "url": "https://data-rudi.aqmo.org/media/download/04802b57-2b7a-40ac-bc89-51fc85732cb4"
                 },
                 "file_type": "application/json",
                 "file_size": "46340",
@@ -9884,7 +9884,7 @@
                 "media_name": "aires-de-jeux-des-espaces-verts-rennes",
                 "media_id": "b358b385-d665-495c-9bfa-6d5c8fda51de",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/b358b385-d665-495c-9bfa-6d5c8fda51de"
+                    "url": "https://data-rudi.aqmo.org/media/download/b358b385-d665-495c-9bfa-6d5c8fda51de"
                 },
                 "file_type": "application/json",
                 "file_size": "630315",
@@ -9953,7 +9953,7 @@
                 "media_name": "points-apport-volontaire",
                 "media_id": "377c6755-3032-4f10-90b5-f19031c859c6",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/377c6755-3032-4f10-90b5-f19031c859c6"
+                    "url": "https://data-rudi.aqmo.org/media/download/377c6755-3032-4f10-90b5-f19031c859c6"
                 },
                 "file_type": "application/json",
                 "file_size": "1115926",
@@ -10028,7 +10028,7 @@
                 "media_name": "points-presentation-bacs-roulants",
                 "media_id": "21c93118-7ed9-40fb-a124-9a0738f7ed67",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/21c93118-7ed9-40fb-a124-9a0738f7ed67"
+                    "url": "https://data-rudi.aqmo.org/media/download/21c93118-7ed9-40fb-a124-9a0738f7ed67"
                 },
                 "file_type": "application/json",
                 "file_size": "1645507",
@@ -10094,7 +10094,7 @@
                 "media_name": "zac_participations",
                 "media_id": "287561b8-1ccc-4439-b53b-f2fab7ad98cf",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/287561b8-1ccc-4439-b53b-f2fab7ad98cf"
+                    "url": "https://data-rudi.aqmo.org/media/download/287561b8-1ccc-4439-b53b-f2fab7ad98cf"
                 },
                 "file_type": "application/json",
                 "file_size": "1175406",
@@ -10160,7 +10160,7 @@
                 "media_name": "zones_amenagement_concerte",
                 "media_id": "22a36b01-d738-41d6-bc28-5c83ba9bd600",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/22a36b01-d738-41d6-bc28-5c83ba9bd600"
+                    "url": "https://data-rudi.aqmo.org/media/download/22a36b01-d738-41d6-bc28-5c83ba9bd600"
                 },
                 "file_type": "application/json",
                 "file_size": "1238737",
@@ -10229,7 +10229,7 @@
                 "media_name": "perimetre-marches",
                 "media_id": "821acc22-8e88-4476-b438-bd45e8c8772f",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/821acc22-8e88-4476-b438-bd45e8c8772f"
+                    "url": "https://data-rudi.aqmo.org/media/download/821acc22-8e88-4476-b438-bd45e8c8772f"
                 },
                 "file_type": "application/json",
                 "file_size": "54381",
@@ -10297,7 +10297,7 @@
                 "media_name": "carte_scolaire_primaire_rennes",
                 "media_id": "9e9bc021-3f57-4920-a760-9d55a7df676e",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/9e9bc021-3f57-4920-a760-9d55a7df676e"
+                    "url": "https://data-rudi.aqmo.org/media/download/9e9bc021-3f57-4920-a760-9d55a7df676e"
                 },
                 "file_type": "application/json",
                 "file_size": "7151061",
@@ -10366,7 +10366,7 @@
                 "media_name": "decheteries_plateformes_vegetaux",
                 "media_id": "9f28f336-49b5-4876-a1e2-d4595777bb24",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/9f28f336-49b5-4876-a1e2-d4595777bb24"
+                    "url": "https://data-rudi.aqmo.org/media/download/9f28f336-49b5-4876-a1e2-d4595777bb24"
                 },
                 "file_type": "application/json",
                 "file_size": "46533",
@@ -10433,7 +10433,7 @@
                 "media_name": "stations_vls",
                 "media_id": "5c707db9-de42-4643-9a56-8b40656fe217",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/5c707db9-de42-4643-9a56-8b40656fe217"
+                    "url": "https://data-rudi.aqmo.org/media/download/5c707db9-de42-4643-9a56-8b40656fe217"
                 },
                 "file_type": "application/json",
                 "file_size": "65880",
@@ -10608,7 +10608,7 @@
                 "media_name": "panneaux_entree_sortie_agglomeration",
                 "media_id": "9c5413d9-9e1f-4100-98fc-2ca6a48bd392",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/9c5413d9-9e1f-4100-98fc-2ca6a48bd392"
+                    "url": "https://data-rudi.aqmo.org/media/download/9c5413d9-9e1f-4100-98fc-2ca6a48bd392"
                 },
                 "file_type": "application/json",
                 "file_size": "632166",
@@ -10995,7 +10995,7 @@
                 "media_name": "route_grande_circulation",
                 "media_id": "5952db2a-3f49-4aad-ae0f-50ebc9eab40a",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/5952db2a-3f49-4aad-ae0f-50ebc9eab40a"
+                    "url": "https://data-rudi.aqmo.org/media/download/5952db2a-3f49-4aad-ae0f-50ebc9eab40a"
                 },
                 "file_type": "application/json",
                 "file_size": "1407215",
@@ -11219,7 +11219,7 @@
                 "media_name": "topologie-des-points-darret-de-bus-du-reseau-star",
                 "media_id": "2f49847a-37da-43df-8b94-6381ce78b6a9",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/2f49847a-37da-43df-8b94-6381ce78b6a9"
+                    "url": "https://data-rudi.aqmo.org/media/download/2f49847a-37da-43df-8b94-6381ce78b6a9"
                 },
                 "file_type": "application/json",
                 "file_size": "795447",
@@ -11285,7 +11285,7 @@
                 "media_name": "codes-insee-et-postaux-des-communes-de-rennes-metropole-geolocalisees",
                 "media_id": "1b5e98dd-1cf5-48e3-a46b-83589637aa33",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/1b5e98dd-1cf5-48e3-a46b-83589637aa33"
+                    "url": "https://data-rudi.aqmo.org/media/download/1b5e98dd-1cf5-48e3-a46b-83589637aa33"
                 },
                 "file_type": "application/json",
                 "file_size": "21323",
@@ -11351,7 +11351,7 @@
                 "media_name": "adresses-du-referentiel-voies-et-adresses-de-rennes-metropole",
                 "media_id": "dda2e822-55a7-4a71-812b-ab421b02a8ee",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/dda2e822-55a7-4a71-812b-ab421b02a8ee"
+                    "url": "https://data-rudi.aqmo.org/media/download/dda2e822-55a7-4a71-812b-ab421b02a8ee"
                 },
                 "file_type": "application/json",
                 "file_size": "10819502",
@@ -11418,7 +11418,7 @@
                 "media_name": "prochains-passages-des-lignes-de-bus-du-reseau-star-en-temps-reel",
                 "media_id": "6df68998-6b1d-4b43-a686-44bf8107e553",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/6df68998-6b1d-4b43-a686-44bf8107e553"
+                    "url": "https://data-rudi.aqmo.org/media/download/6df68998-6b1d-4b43-a686-44bf8107e553"
                 },
                 "file_type": "application/json",
                 "file_size": "6762478",
@@ -11539,7 +11539,7 @@
                 "media_name": "collecte-des-archives-municipales",
                 "media_id": "7a84f2e3-e3ca-49f8-b7e5-93814d126a9b",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/7a84f2e3-e3ca-49f8-b7e5-93814d126a9b"
+                    "url": "https://data-rudi.aqmo.org/media/download/7a84f2e3-e3ca-49f8-b7e5-93814d126a9b"
                 },
                 "file_type": "application/json",
                 "file_size": "152690",
@@ -11606,7 +11606,7 @@
                 "media_name": "limites-communales-referentielles-de-rennes-metropole-polygones",
                 "media_id": "c4e01bf1-2d83-4911-bdae-93e46e0ab951",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/c4e01bf1-2d83-4911-bdae-93e46e0ab951"
+                    "url": "https://data-rudi.aqmo.org/media/download/c4e01bf1-2d83-4911-bdae-93e46e0ab951"
                 },
                 "file_type": "application/json",
                 "file_size": "2886500",
@@ -11678,7 +11678,7 @@
                 "media_name": "bp-2019-ville-de-rennes-budgets-annexes",
                 "media_id": "0d2007da-1f85-4c5c-a419-05fb75aa338b",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/0d2007da-1f85-4c5c-a419-05fb75aa338b"
+                    "url": "https://data-rudi.aqmo.org/media/download/0d2007da-1f85-4c5c-a419-05fb75aa338b"
                 },
                 "file_type": "application/json",
                 "file_size": "168914",
@@ -11759,7 +11759,7 @@
                 "media_name": "consommation-electrique-annuelle-a-la-maille-commune",
                 "media_id": "f64caa60-05e2-4411-b895-b1bab7e8e855",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/f64caa60-05e2-4411-b895-b1bab7e8e855"
+                    "url": "https://data-rudi.aqmo.org/media/download/f64caa60-05e2-4411-b895-b1bab7e8e855"
                 },
                 "file_type": "application/json",
                 "file_size": "1903981",
@@ -11825,7 +11825,7 @@
                 "media_name": "emplacement-des-bureaux-de-vote-saint-jacques-de-la-lande",
                 "media_id": "d1334197-10fa-43b3-9d4c-ddaad22bf215",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/d1334197-10fa-43b3-9d4c-ddaad22bf215"
+                    "url": "https://data-rudi.aqmo.org/media/download/d1334197-10fa-43b3-9d4c-ddaad22bf215"
                 },
                 "file_type": "application/json",
                 "file_size": "3806",
@@ -11891,7 +11891,7 @@
                 "media_name": "stats-collecte-dechets",
                 "media_id": "3beae9cc-8177-4b17-90f3-7b1b146953ed",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/3beae9cc-8177-4b17-90f3-7b1b146953ed"
+                    "url": "https://data-rudi.aqmo.org/media/download/3beae9cc-8177-4b17-90f3-7b1b146953ed"
                 },
                 "file_type": "application/json",
                 "file_size": "33853",
@@ -11957,7 +11957,7 @@
                 "media_name": "topologie-des-stations-le-velo-star",
                 "media_id": "cdaa3201-4f1d-40e4-b08c-b7a14a792fa2",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/cdaa3201-4f1d-40e4-b08c-b7a14a792fa2"
+                    "url": "https://data-rudi.aqmo.org/media/download/cdaa3201-4f1d-40e4-b08c-b7a14a792fa2"
                 },
                 "file_type": "application/json",
                 "file_size": "32754",
@@ -12088,7 +12088,7 @@
                 "media_name": "etat-des-stations-le-velo-star-en-temps-reel",
                 "media_id": "61f1a5a3-e034-42bd-a7f3-0ff93df03aec",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/61f1a5a3-e034-42bd-a7f3-0ff93df03aec"
+                    "url": "https://data-rudi.aqmo.org/media/download/61f1a5a3-e034-42bd-a7f3-0ff93df03aec"
                 },
                 "file_type": "application/json",
                 "file_size": "27950",
@@ -12156,7 +12156,7 @@
                 "media_name": "toilettes_publiques_vdr",
                 "media_id": "2271113e-21e8-4e36-8b3b-3044a3d5c50f",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/2271113e-21e8-4e36-8b3b-3044a3d5c50f"
+                    "url": "https://data-rudi.aqmo.org/media/download/2271113e-21e8-4e36-8b3b-3044a3d5c50f"
                 },
                 "file_type": "application/json",
                 "file_size": "51713",
@@ -12222,7 +12222,7 @@
                 "media_name": "lst_agent_elus",
                 "media_id": "e0695022-4ed6-4944-8186-20d91c750e28",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/e0695022-4ed6-4944-8186-20d91c750e28"
+                    "url": "https://data-rudi.aqmo.org/media/download/e0695022-4ed6-4944-8186-20d91c750e28"
                 },
                 "file_type": "application/json",
                 "file_size": "127734",
@@ -12288,7 +12288,7 @@
                 "media_name": "stations-du-canevas-geodesique-de-rennes-metropole",
                 "media_id": "f6af1d3b-9dea-4316-8b49-3f9f7f9f510a",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/f6af1d3b-9dea-4316-8b49-3f9f7f9f510a"
+                    "url": "https://data-rudi.aqmo.org/media/download/f6af1d3b-9dea-4316-8b49-3f9f7f9f510a"
                 },
                 "file_type": "application/json",
                 "file_size": "6991611",
@@ -12361,7 +12361,7 @@
                 "media_name": "position-des-bus-en-circulation-sur-le-reseau-star-en-temps-reel",
                 "media_id": "aad0fb7c-1b19-4a04-a4d7-609e7046e2cd",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/aad0fb7c-1b19-4a04-a4d7-609e7046e2cd"
+                    "url": "https://data-rudi.aqmo.org/media/download/aad0fb7c-1b19-4a04-a4d7-609e7046e2cd"
                 },
                 "file_type": "application/json",
                 "file_size": "177935",
@@ -12429,7 +12429,7 @@
                 "media_name": "alertes-trafic-en-temps-reel-sur-les-lignes-du-reseau-star",
                 "media_id": "9ca802c5-f639-421c-914a-97d4bb4cded0",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/9ca802c5-f639-421c-914a-97d4bb4cded0"
+                    "url": "https://data-rudi.aqmo.org/media/download/9ca802c5-f639-421c-914a-97d4bb4cded0"
                 },
                 "file_type": "application/json",
                 "file_size": "50351",
@@ -12495,7 +12495,7 @@
                 "media_name": "menus-cantines",
                 "media_id": "ff4a4061-fbbc-468a-9e89-75e72ffd52f3",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/ff4a4061-fbbc-468a-9e89-75e72ffd52f3"
+                    "url": "https://data-rudi.aqmo.org/media/download/ff4a4061-fbbc-468a-9e89-75e72ffd52f3"
                 },
                 "file_type": "application/json",
                 "file_size": "1406058",
@@ -12615,7 +12615,7 @@
                 "media_name": "bornes-de-recharge-dediees-aux-vehicules-electriques-sur-le-territoire-de-rennes",
                 "media_id": "f5d9ef45-cd12-4d67-ab24-490cc3038c1a",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/f5d9ef45-cd12-4d67-ab24-490cc3038c1a"
+                    "url": "https://data-rudi.aqmo.org/media/download/f5d9ef45-cd12-4d67-ab24-490cc3038c1a"
                 },
                 "file_type": "application/json",
                 "file_size": "32186",
@@ -12687,7 +12687,7 @@
                 "media_name": "troncon_rva_support_trafic",
                 "media_id": "ec541c5e-9ec0-4895-bd48-0aa995b707dd",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/ec541c5e-9ec0-4895-bd48-0aa995b707dd"
+                    "url": "https://data-rudi.aqmo.org/media/download/ec541c5e-9ec0-4895-bd48-0aa995b707dd"
                 },
                 "file_type": "application/json",
                 "file_size": "1698810",
@@ -12753,7 +12753,7 @@
                 "media_name": "prenoms-a-rennes",
                 "media_id": "b6b03c79-2377-4b1e-9933-f2d475f48cb3",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/b6b03c79-2377-4b1e-9933-f2d475f48cb3"
+                    "url": "https://data-rudi.aqmo.org/media/download/b6b03c79-2377-4b1e-9933-f2d475f48cb3"
                 },
                 "file_type": "application/json",
                 "file_size": "2662436",
@@ -12829,7 +12829,7 @@
                 "media_name": "sondages-pour-diagnostic-de-la-presence-damiante-dans-les-enrobes-de-voirie-sur-",
                 "media_id": "8cdb1071-e36a-4caf-ae01-f258cd4087ee",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/8cdb1071-e36a-4caf-ae01-f258cd4087ee"
+                    "url": "https://data-rudi.aqmo.org/media/download/8cdb1071-e36a-4caf-ae01-f258cd4087ee"
                 },
                 "file_type": "application/json",
                 "file_size": "7728680",
@@ -12895,7 +12895,7 @@
                 "media_name": "stations-reparation-velo",
                 "media_id": "019e8585-68f7-4d0b-aaca-5305f620005e",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/019e8585-68f7-4d0b-aaca-5305f620005e"
+                    "url": "https://data-rudi.aqmo.org/media/download/019e8585-68f7-4d0b-aaca-5305f620005e"
                 },
                 "file_type": "application/json",
                 "file_size": "10318",
@@ -12964,7 +12964,7 @@
                 "media_name": "amenagements-velo-et-zones-de-circulation-apaisee",
                 "media_id": "08f4ecb1-2f6e-4a32-8748-93db907cffb8",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/08f4ecb1-2f6e-4a32-8748-93db907cffb8"
+                    "url": "https://data-rudi.aqmo.org/media/download/08f4ecb1-2f6e-4a32-8748-93db907cffb8"
                 },
                 "file_type": "application/json",
                 "file_size": "4210031",
@@ -13033,7 +13033,7 @@
                 "media_name": "points-regroupement-bacs-roulants",
                 "media_id": "6de12530-aab8-4023-841b-ff62b8a6089c",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/6de12530-aab8-4023-841b-ff62b8a6089c"
+                    "url": "https://data-rudi.aqmo.org/media/download/6de12530-aab8-4023-841b-ff62b8a6089c"
                 },
                 "file_type": "application/json",
                 "file_size": "271279",
@@ -13100,7 +13100,7 @@
                 "media_name": "base-orga-var",
                 "media_id": "5504c800-7106-4913-a793-83e8f92716d5",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/5504c800-7106-4913-a793-83e8f92716d5"
+                    "url": "https://data-rudi.aqmo.org/media/download/5504c800-7106-4913-a793-83e8f92716d5"
                 },
                 "file_type": "application/json",
                 "file_size": "5819777",
@@ -13166,7 +13166,7 @@
                 "media_name": "parcours-pedestres-sur-la-ville-de-rennes",
                 "media_id": "2384cb0f-d82b-41b5-8398-da0e79bfe691",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/2384cb0f-d82b-41b5-8398-da0e79bfe691"
+                    "url": "https://data-rudi.aqmo.org/media/download/2384cb0f-d82b-41b5-8398-da0e79bfe691"
                 },
                 "file_type": "application/json",
                 "file_size": "285228",
@@ -13232,7 +13232,7 @@
                 "media_name": "troncons-de-voies-du-referentiel-voies-et-adresses-de-rennes-metropole",
                 "media_id": "2c97d475-57ef-48a3-aebb-cac94a544a64",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/2c97d475-57ef-48a3-aebb-cac94a544a64"
+                    "url": "https://data-rudi.aqmo.org/media/download/2c97d475-57ef-48a3-aebb-cac94a544a64"
                 },
                 "file_type": "application/json",
                 "file_size": "10158966",
@@ -13298,7 +13298,7 @@
                 "media_name": "perimetres-bureaux-de-vote",
                 "media_id": "015cbe4c-be8f-4fef-9db6-cb1c58018506",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/015cbe4c-be8f-4fef-9db6-cb1c58018506"
+                    "url": "https://data-rudi.aqmo.org/media/download/015cbe4c-be8f-4fef-9db6-cb1c58018506"
                 },
                 "file_type": "application/json",
                 "file_size": "590088",
@@ -13477,7 +13477,7 @@
                 "media_name": "conditions-de-circulation-hivernales",
                 "media_id": "8297168c-e435-4f86-89d7-9c34261b6967",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/8297168c-e435-4f86-89d7-9c34261b6967"
+                    "url": "https://data-rudi.aqmo.org/media/download/8297168c-e435-4f86-89d7-9c34261b6967"
                 },
                 "file_type": "application/json",
                 "file_size": "39911",
@@ -13550,7 +13550,7 @@
                 "media_name": "export-api-parking-citedia",
                 "media_id": "21a0dbaf-6840-46b4-ae21-a72063143c24",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/21a0dbaf-6840-46b4-ae21-a72063143c24"
+                    "url": "https://data-rudi.aqmo.org/media/download/21a0dbaf-6840-46b4-ae21-a72063143c24"
                 },
                 "file_type": "application/json",
                 "file_size": "7226",
@@ -13616,7 +13616,7 @@
                 "media_name": "resultats-du-referendum-a-rennes-de-2005",
                 "media_id": "9180d6a6-9523-4aa0-9b0d-20fa87ec3a2e",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/9180d6a6-9523-4aa0-9b0d-20fa87ec3a2e"
+                    "url": "https://data-rudi.aqmo.org/media/download/9180d6a6-9523-4aa0-9b0d-20fa87ec3a2e"
                 },
                 "file_type": "application/json",
                 "file_size": "112815",
@@ -13684,7 +13684,7 @@
                 "media_name": "ca-2011-budget-principal",
                 "media_id": "cc749b4f-7deb-4a0b-91c8-2e70dc1b367c",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/cc749b4f-7deb-4a0b-91c8-2e70dc1b367c"
+                    "url": "https://data-rudi.aqmo.org/media/download/cc749b4f-7deb-4a0b-91c8-2e70dc1b367c"
                 },
                 "file_type": "application/json",
                 "file_size": "209020",
@@ -13750,7 +13750,7 @@
                 "media_name": "resultats_p17_2",
                 "media_id": "615bb2de-22a9-4e80-88e9-94ed2b93946f",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/615bb2de-22a9-4e80-88e9-94ed2b93946f"
+                    "url": "https://data-rudi.aqmo.org/media/download/615bb2de-22a9-4e80-88e9-94ed2b93946f"
                 },
                 "file_type": "application/json",
                 "file_size": "135773",
@@ -13816,7 +13816,7 @@
                 "media_name": "etat-des-agences-commerciales-du-reseau-star-en-temps-reel",
                 "media_id": "c6a53162-a4dc-4c0d-ae04-f4219ea36da7",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/c6a53162-a4dc-4c0d-ae04-f4219ea36da7"
+                    "url": "https://data-rudi.aqmo.org/media/download/c6a53162-a4dc-4c0d-ae04-f4219ea36da7"
                 },
                 "file_type": "application/json",
                 "file_size": "791",
@@ -13882,7 +13882,7 @@
                 "media_name": "bp-2014-subventions-aux-associations0",
                 "media_id": "ea64cd3d-5613-40f7-a5c6-9c2a284fdafa",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/ea64cd3d-5613-40f7-a5c6-9c2a284fdafa"
+                    "url": "https://data-rudi.aqmo.org/media/download/ea64cd3d-5613-40f7-a5c6-9c2a284fdafa"
                 },
                 "file_type": "application/json",
                 "file_size": "1379",
@@ -13949,7 +13949,7 @@
                 "media_name": "reseau_fibre_metropolitain",
                 "media_id": "5e8a4de8-9658-448f-98d2-d984e9cd48bd",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/5e8a4de8-9658-448f-98d2-d984e9cd48bd"
+                    "url": "https://data-rudi.aqmo.org/media/download/5e8a4de8-9658-448f-98d2-d984e9cd48bd"
                 },
                 "file_type": "application/json",
                 "file_size": "1782789",
@@ -14017,7 +14017,7 @@
                 "media_name": "ca-2009-subventions-aux-associations0",
                 "media_id": "e8e1da83-a6f3-4530-b00b-a7c339811e4f",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/e8e1da83-a6f3-4530-b00b-a7c339811e4f"
+                    "url": "https://data-rudi.aqmo.org/media/download/e8e1da83-a6f3-4530-b00b-a7c339811e4f"
                 },
                 "file_type": "application/json",
                 "file_size": "12076",
@@ -14083,7 +14083,7 @@
                 "media_name": "bp-2016-budgets-annexes",
                 "media_id": "a6db9f83-4e11-4685-b51d-27165848f1e6",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/a6db9f83-4e11-4685-b51d-27165848f1e6"
+                    "url": "https://data-rudi.aqmo.org/media/download/a6db9f83-4e11-4685-b51d-27165848f1e6"
                 },
                 "file_type": "application/json",
                 "file_size": "142474",
@@ -14149,7 +14149,7 @@
                 "media_name": "electtest-transpose_l17",
                 "media_id": "e3c94b6b-5313-4300-b0b2-27a9712583f5",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/e3c94b6b-5313-4300-b0b2-27a9712583f5"
+                    "url": "https://data-rudi.aqmo.org/media/download/e3c94b6b-5313-4300-b0b2-27a9712583f5"
                 },
                 "file_type": "application/json",
                 "file_size": "1774705",
@@ -14215,7 +14215,7 @@
                 "media_name": "perimetres_bureaux_vote_2014",
                 "media_id": "932350f3-2ba0-4ae7-8604-6022576ac35a",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/932350f3-2ba0-4ae7-8604-6022576ac35a"
+                    "url": "https://data-rudi.aqmo.org/media/download/932350f3-2ba0-4ae7-8604-6022576ac35a"
                 },
                 "file_type": "application/json",
                 "file_size": "479921",
@@ -14281,7 +14281,7 @@
                 "media_name": "localisation_centres_vote_2014",
                 "media_id": "4fa50bf8-7c1c-4535-abf3-cf3522e99649",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/4fa50bf8-7c1c-4535-abf3-cf3522e99649"
+                    "url": "https://data-rudi.aqmo.org/media/download/4fa50bf8-7c1c-4535-abf3-cf3522e99649"
                 },
                 "file_type": "application/json",
                 "file_size": "15944",
@@ -14347,7 +14347,7 @@
                 "media_name": "resultats-des-elections-presidentielles-a-rennes-depuis-2007",
                 "media_id": "9a54d344-5d7d-4e21-b84a-e46c4f9865ef",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/9a54d344-5d7d-4e21-b84a-e46c4f9865ef"
+                    "url": "https://data-rudi.aqmo.org/media/download/9a54d344-5d7d-4e21-b84a-e46c4f9865ef"
                 },
                 "file_type": "application/json",
                 "file_size": "5669405",
@@ -14415,7 +14415,7 @@
                 "media_name": "ca-2010-subventions-aux-associations",
                 "media_id": "89e5db92-b50f-43da-8141-d93cb11524fb",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/89e5db92-b50f-43da-8141-d93cb11524fb"
+                    "url": "https://data-rudi.aqmo.org/media/download/89e5db92-b50f-43da-8141-d93cb11524fb"
                 },
                 "file_type": "application/json",
                 "file_size": "43881",
@@ -14481,7 +14481,7 @@
                 "media_name": "bp-2018-rennes-metropole",
                 "media_id": "91121abd-5838-4581-9fbd-81f4eefbe1d1",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/91121abd-5838-4581-9fbd-81f4eefbe1d1"
+                    "url": "https://data-rudi.aqmo.org/media/download/91121abd-5838-4581-9fbd-81f4eefbe1d1"
                 },
                 "file_type": "application/json",
                 "file_size": "1329228",
@@ -14547,7 +14547,7 @@
                 "media_name": "perimetres_centres_vote_2014",
                 "media_id": "5d1f7f0f-c776-45db-a4c8-c8f613c3c034",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/5d1f7f0f-c776-45db-a4c8-c8f613c3c034"
+                    "url": "https://data-rudi.aqmo.org/media/download/5d1f7f0f-c776-45db-a4c8-c8f613c3c034"
                 },
                 "file_type": "application/json",
                 "file_size": "314128",
@@ -14613,7 +14613,7 @@
                 "media_name": "surfaces-minerales-du-jardin-du-thabor",
                 "media_id": "dccf3cf7-e6d2-4220-85ee-887ca5fc55c1",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/dccf3cf7-e6d2-4220-85ee-887ca5fc55c1"
+                    "url": "https://data-rudi.aqmo.org/media/download/dccf3cf7-e6d2-4220-85ee-887ca5fc55c1"
                 },
                 "file_type": "application/json",
                 "file_size": "895662",
@@ -14785,7 +14785,7 @@
                 "media_name": "liste-des-equipements-et-organismes-culturels-de-rennes-metropole",
                 "media_id": "521495e4-c66b-4044-a0ce-0a84e296692a",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/521495e4-c66b-4044-a0ce-0a84e296692a"
+                    "url": "https://data-rudi.aqmo.org/media/download/521495e4-c66b-4044-a0ce-0a84e296692a"
                 },
                 "file_type": "application/json",
                 "file_size": "523612",
@@ -14853,7 +14853,7 @@
                 "media_name": "ca-2018-ville-de-rennes-budget-principal",
                 "media_id": "1067863c-06ad-4571-b8d0-75e37475dbf9",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/1067863c-06ad-4571-b8d0-75e37475dbf9"
+                    "url": "https://data-rudi.aqmo.org/media/download/1067863c-06ad-4571-b8d0-75e37475dbf9"
                 },
                 "file_type": "application/json",
                 "file_size": "3752349",
@@ -14919,7 +14919,7 @@
                 "media_name": "statistiques-de-frequentation-du-site-de-rennes-ville-et-metropole",
                 "media_id": "d147b40d-82c0-4981-81f4-4d3391f52f57",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/d147b40d-82c0-4981-81f4-4d3391f52f57"
+                    "url": "https://data-rudi.aqmo.org/media/download/d147b40d-82c0-4981-81f4-4d3391f52f57"
                 },
                 "file_type": "application/json",
                 "file_size": "327086",
@@ -14985,7 +14985,7 @@
                 "media_name": "frequentation_parheure",
                 "media_id": "bd715901-fdb3-4b28-a24a-929c775c80cf",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/bd715901-fdb3-4b28-a24a-929c775c80cf"
+                    "url": "https://data-rudi.aqmo.org/media/download/bd715901-fdb3-4b28-a24a-929c775c80cf"
                 },
                 "file_type": "application/json",
                 "file_size": "4332388",
@@ -15053,7 +15053,7 @@
                 "media_name": "ca-2012-subventions-aux-associations0",
                 "media_id": "16dfbe9c-7ae1-485a-bcad-f664757cae1e",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/16dfbe9c-7ae1-485a-bcad-f664757cae1e"
+                    "url": "https://data-rudi.aqmo.org/media/download/16dfbe9c-7ae1-485a-bcad-f664757cae1e"
                 },
                 "file_type": "application/json",
                 "file_size": "133277",
@@ -15119,7 +15119,7 @@
                 "media_name": "menus-des-cantines-de-st-jacques",
                 "media_id": "34b66ed2-aa9c-469e-a588-810c978ad1b6",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/34b66ed2-aa9c-469e-a588-810c978ad1b6"
+                    "url": "https://data-rudi.aqmo.org/media/download/34b66ed2-aa9c-469e-a588-810c978ad1b6"
                 },
                 "file_type": "application/json",
                 "file_size": "146682",
@@ -15185,7 +15185,7 @@
                 "media_name": "acigne_resultats_e19_dataviz",
                 "media_id": "1e5f74df-5500-4f15-8977-e5e16a639a65",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/1e5f74df-5500-4f15-8977-e5e16a639a65"
+                    "url": "https://data-rudi.aqmo.org/media/download/1e5f74df-5500-4f15-8977-e5e16a639a65"
                 },
                 "file_type": "application/json",
                 "file_size": "228587",
@@ -15251,7 +15251,7 @@
                 "media_name": "bp-2017-ville-de-rennes-budget-principal",
                 "media_id": "8a4b5764-0998-4c2c-aa53-39648970f41c",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/8a4b5764-0998-4c2c-aa53-39648970f41c"
+                    "url": "https://data-rudi.aqmo.org/media/download/8a4b5764-0998-4c2c-aa53-39648970f41c"
                 },
                 "file_type": "application/json",
                 "file_size": "3921652",
@@ -15381,7 +15381,7 @@
                 "media_name": "effectifs-detudiants-inscrits-dans-les-etablissements-et-les-formations-de-lense",
                 "media_id": "eb8d4867-5d72-4887-850d-c7751e4ab192",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/eb8d4867-5d72-4887-850d-c7751e4ab192"
+                    "url": "https://data-rudi.aqmo.org/media/download/eb8d4867-5d72-4887-850d-c7751e4ab192"
                 },
                 "file_type": "application/json",
                 "file_size": "1732659",
@@ -15448,7 +15448,7 @@
                 "media_name": "parcours-des-lignes-de-metro-du-reseau-star",
                 "media_id": "d64d3e33-8d5a-4770-b93f-cd20c1205abb",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/d64d3e33-8d5a-4770-b93f-cd20c1205abb"
+                    "url": "https://data-rudi.aqmo.org/media/download/d64d3e33-8d5a-4770-b93f-cd20c1205abb"
                 },
                 "file_type": "application/json",
                 "file_size": "14518",
@@ -15514,7 +15514,7 @@
                 "media_name": "bp-2018-ville-de-rennes-budgets-annexes",
                 "media_id": "569d0249-44f0-4026-8265-c28cd003332d",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/569d0249-44f0-4026-8265-c28cd003332d"
+                    "url": "https://data-rudi.aqmo.org/media/download/569d0249-44f0-4026-8265-c28cd003332d"
                 },
                 "file_type": "application/json",
                 "file_size": "168914",
@@ -15580,7 +15580,7 @@
                 "media_name": "electtest-transpose_2",
                 "media_id": "ce639f31-46a2-40ff-9eb3-b72c7e7c632d",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/ce639f31-46a2-40ff-9eb3-b72c7e7c632d"
+                    "url": "https://data-rudi.aqmo.org/media/download/ce639f31-46a2-40ff-9eb3-b72c7e7c632d"
                 },
                 "file_type": "application/json",
                 "file_size": "203185",
@@ -15648,7 +15648,7 @@
                 "media_name": "ca-2008-budget-principal",
                 "media_id": "dab4f1d2-9152-4829-b8ac-68891b0a8d0c",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/dab4f1d2-9152-4829-b8ac-68891b0a8d0c"
+                    "url": "https://data-rudi.aqmo.org/media/download/dab4f1d2-9152-4829-b8ac-68891b0a8d0c"
                 },
                 "file_type": "application/json",
                 "file_size": "211992",
@@ -15715,7 +15715,7 @@
                 "media_name": "emplacement-des-panneaux-daffichage-libre-a-cesson-sevigne",
                 "media_id": "0c983fec-dc85-42b4-ade0-b217a8b9b30b",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/0c983fec-dc85-42b4-ade0-b217a8b9b30b"
+                    "url": "https://data-rudi.aqmo.org/media/download/0c983fec-dc85-42b4-ade0-b217a8b9b30b"
                 },
                 "file_type": "application/json",
                 "file_size": "1173",
@@ -15781,7 +15781,7 @@
                 "media_name": "acigne_resultats_e19",
                 "media_id": "1eb1e073-5759-44c4-aea2-fba9dc4aa374",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/1eb1e073-5759-44c4-aea2-fba9dc4aa374"
+                    "url": "https://data-rudi.aqmo.org/media/download/1eb1e073-5759-44c4-aea2-fba9dc4aa374"
                 },
                 "file_type": "application/json",
                 "file_size": "30695",
@@ -15899,7 +15899,7 @@
                 "media_name": "subventions-versees-en-2017-aux-associations-noyal-chatillon-sur-seiche",
                 "media_id": "5ff78334-e820-495e-a256-9f0b193e78c3",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/5ff78334-e820-495e-a256-9f0b193e78c3"
+                    "url": "https://data-rudi.aqmo.org/media/download/5ff78334-e820-495e-a256-9f0b193e78c3"
                 },
                 "file_type": "application/json",
                 "file_size": "22602",
@@ -15965,7 +15965,7 @@
                 "media_name": "massifs-arbustifs-du-jardin-du-thabor",
                 "media_id": "09428d87-266c-46b0-8976-5cf16284b2ba",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/09428d87-266c-46b0-8976-5cf16284b2ba"
+                    "url": "https://data-rudi.aqmo.org/media/download/09428d87-266c-46b0-8976-5cf16284b2ba"
                 },
                 "file_type": "application/json",
                 "file_size": "289577",
@@ -16031,7 +16031,7 @@
                 "media_name": "resultats-des-elections-departementales-depuis-2008-a-rennes",
                 "media_id": "e35f4c27-8088-4403-b0a9-e91826b07bce",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/e35f4c27-8088-4403-b0a9-e91826b07bce"
+                    "url": "https://data-rudi.aqmo.org/media/download/e35f4c27-8088-4403-b0a9-e91826b07bce"
                 },
                 "file_type": "application/json",
                 "file_size": "3695795",
@@ -16103,7 +16103,7 @@
                 "media_name": "base-sirene10",
                 "media_id": "5d930861-93ec-4f62-965d-d42985592431",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/5d930861-93ec-4f62-965d-d42985592431"
+                    "url": "https://data-rudi.aqmo.org/media/download/5d930861-93ec-4f62-965d-d42985592431"
                 },
                 "file_type": "application/json",
                 "file_size": "11910754",
@@ -16169,7 +16169,7 @@
                 "media_name": "ca-2008-subventions-aux-associations0",
                 "media_id": "6c9b1081-5c5c-4d79-a38a-387de4ba1769",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/6c9b1081-5c5c-4d79-a38a-387de4ba1769"
+                    "url": "https://data-rudi.aqmo.org/media/download/6c9b1081-5c5c-4d79-a38a-387de4ba1769"
                 },
                 "file_type": "application/json",
                 "file_size": "17300",
@@ -16235,7 +16235,7 @@
                 "media_name": "resultats-des-elections-presidentielles-de-2017-1er-tour-saint-jacques-de-la-lan",
                 "media_id": "c21cd81f-3223-4a8b-904d-b1ed4aba2ed5",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/c21cd81f-3223-4a8b-904d-b1ed4aba2ed5"
+                    "url": "https://data-rudi.aqmo.org/media/download/c21cd81f-3223-4a8b-904d-b1ed4aba2ed5"
                 },
                 "file_type": "application/json",
                 "file_size": "13893",
@@ -16303,7 +16303,7 @@
                 "media_name": "ca-2016-ville-de-rennes-subventions-aux-associations",
                 "media_id": "8e97545d-7bac-400d-9fe0-610aa299698f",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/8e97545d-7bac-400d-9fe0-610aa299698f"
+                    "url": "https://data-rudi.aqmo.org/media/download/8e97545d-7bac-400d-9fe0-610aa299698f"
                 },
                 "file_type": "application/json",
                 "file_size": "92691",
@@ -16369,7 +16369,7 @@
                 "media_name": "statistiques-de-prets-de-la-bibliotheque-des-champs-libres-en-2008",
                 "media_id": "bb8195af-f154-4ff5-beb3-5c508edae5c1",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/bb8195af-f154-4ff5-beb3-5c508edae5c1"
+                    "url": "https://data-rudi.aqmo.org/media/download/bb8195af-f154-4ff5-beb3-5c508edae5c1"
                 },
                 "file_type": "application/json",
                 "file_size": "12521",
@@ -16439,7 +16439,7 @@
                 "media_name": "bp-2018-ville-thorigne-fouillard",
                 "media_id": "219231c7-4835-4231-ab29-a7f2accbe304",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/219231c7-4835-4231-ab29-a7f2accbe304"
+                    "url": "https://data-rudi.aqmo.org/media/download/219231c7-4835-4231-ab29-a7f2accbe304"
                 },
                 "file_type": "application/json",
                 "file_size": "235669",
@@ -16505,7 +16505,7 @@
                 "media_name": "frequentation-du-musee-des-beaux-arts",
                 "media_id": "8d7f5179-4ddd-4ca8-9dd8-70d7feda2e15",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/8d7f5179-4ddd-4ca8-9dd8-70d7feda2e15"
+                    "url": "https://data-rudi.aqmo.org/media/download/8d7f5179-4ddd-4ca8-9dd8-70d7feda2e15"
                 },
                 "file_type": "application/json",
                 "file_size": "11534",
@@ -16573,7 +16573,7 @@
                 "media_name": "ca-2013-budgets-annexes",
                 "media_id": "e8d5702d-77c2-4c2d-b68f-81e580ed31a5",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/e8d5702d-77c2-4c2d-b68f-81e580ed31a5"
+                    "url": "https://data-rudi.aqmo.org/media/download/e8d5702d-77c2-4c2d-b68f-81e580ed31a5"
                 },
                 "file_type": "application/json",
                 "file_size": "19825",
@@ -16639,7 +16639,7 @@
                 "media_name": "bp-2019-ville-de-rennes-budget-principal",
                 "media_id": "f0784444-35e1-4e2c-9fc1-e9ff2f42a646",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/f0784444-35e1-4e2c-9fc1-e9ff2f42a646"
+                    "url": "https://data-rudi.aqmo.org/media/download/f0784444-35e1-4e2c-9fc1-e9ff2f42a646"
                 },
                 "file_type": "application/json",
                 "file_size": "3855831",
@@ -16705,7 +16705,7 @@
                 "media_name": "naissances-noyal-chatillon-sur-seiche",
                 "media_id": "5f15a226-0b7f-4f17-83f0-0a2d36d52bb4",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/5f15a226-0b7f-4f17-83f0-0a2d36d52bb4"
+                    "url": "https://data-rudi.aqmo.org/media/download/5f15a226-0b7f-4f17-83f0-0a2d36d52bb4"
                 },
                 "file_type": "application/json",
                 "file_size": "2961",
@@ -16829,7 +16829,7 @@
                 "media_name": "ca-2014-budget-principal0",
                 "media_id": "89d8cd2e-9d30-4d26-b69a-3e5a01a83736",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/89d8cd2e-9d30-4d26-b69a-3e5a01a83736"
+                    "url": "https://data-rudi.aqmo.org/media/download/89d8cd2e-9d30-4d26-b69a-3e5a01a83736"
                 },
                 "file_type": "application/json",
                 "file_size": "233998",
@@ -16896,7 +16896,7 @@
                 "media_name": "donnees-de-la-cartographie-generale-au-2000",
                 "media_id": "74ff4b69-f3cf-4ffa-9465-9e49659966b5",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/74ff4b69-f3cf-4ffa-9465-9e49659966b5"
+                    "url": "https://data-rudi.aqmo.org/media/download/74ff4b69-f3cf-4ffa-9465-9e49659966b5"
                 },
                 "file_type": "application/json",
                 "file_size": "153",
@@ -16962,7 +16962,7 @@
                 "media_name": "za-raccordees-au-reseau-for",
                 "media_id": "8e759510-a2eb-4fce-b1ad-ff77065cc8dd",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/8e759510-a2eb-4fce-b1ad-ff77065cc8dd"
+                    "url": "https://data-rudi.aqmo.org/media/download/8e759510-a2eb-4fce-b1ad-ff77065cc8dd"
                 },
                 "file_type": "application/json",
                 "file_size": "22240",
@@ -17028,7 +17028,7 @@
                 "media_name": "toilettes-publiques-cesson-sevigne",
                 "media_id": "19b86de0-4dba-4cad-a18b-68368d5c9bd5",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/19b86de0-4dba-4cad-a18b-68368d5c9bd5"
+                    "url": "https://data-rudi.aqmo.org/media/download/19b86de0-4dba-4cad-a18b-68368d5c9bd5"
                 },
                 "file_type": "application/json",
                 "file_size": "1795",
@@ -17094,7 +17094,7 @@
                 "media_name": "elections-st-jacques",
                 "media_id": "3305496c-3e1e-4e4d-8b22-cce546b1da31",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/3305496c-3e1e-4e4d-8b22-cce546b1da31"
+                    "url": "https://data-rudi.aqmo.org/media/download/3305496c-3e1e-4e4d-8b22-cce546b1da31"
                 },
                 "file_type": "application/json",
                 "file_size": "20330",
@@ -17165,7 +17165,7 @@
                 "media_name": "structure-population-francaise-2016-rectangle-1-km",
                 "media_id": "6937e583-7f67-4afa-8618-aa53c8f24f43",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/6937e583-7f67-4afa-8618-aa53c8f24f43"
+                    "url": "https://data-rudi.aqmo.org/media/download/6937e583-7f67-4afa-8618-aa53c8f24f43"
                 },
                 "file_type": "application/json",
                 "file_size": "3465737",
@@ -17232,7 +17232,7 @@
                 "media_name": "budget-participatif-rennes",
                 "media_id": "694c91a3-7eed-49dc-937b-e76e60953350",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/694c91a3-7eed-49dc-937b-e76e60953350"
+                    "url": "https://data-rudi.aqmo.org/media/download/694c91a3-7eed-49dc-937b-e76e60953350"
                 },
                 "file_type": "application/json",
                 "file_size": "3830823",
@@ -17300,7 +17300,7 @@
                 "media_name": "qualite-de-service-selon-operateurs-et-axe-de-transport-2g-3g-4g",
                 "media_id": "13722645-e36f-4e3f-b0bb-dc5cbeb0e383",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/13722645-e36f-4e3f-b0bb-dc5cbeb0e383"
+                    "url": "https://data-rudi.aqmo.org/media/download/13722645-e36f-4e3f-b0bb-dc5cbeb0e383"
                 },
                 "file_type": "application/json",
                 "file_size": "1507344",
@@ -17368,7 +17368,7 @@
                 "media_name": "ca-2010-budget-principal",
                 "media_id": "4c37893d-9247-434f-88e4-c595ea00515f",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/4c37893d-9247-434f-88e4-c595ea00515f"
+                    "url": "https://data-rudi.aqmo.org/media/download/4c37893d-9247-434f-88e4-c595ea00515f"
                 },
                 "file_type": "application/json",
                 "file_size": "205051",
@@ -17434,7 +17434,7 @@
                 "media_name": "logement-anciennete",
                 "media_id": "af7da447-5985-4d72-9827-238f54a5aa70",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/af7da447-5985-4d72-9827-238f54a5aa70"
+                    "url": "https://data-rudi.aqmo.org/media/download/af7da447-5985-4d72-9827-238f54a5aa70"
                 },
                 "file_type": "application/json",
                 "file_size": "201848",
@@ -17508,7 +17508,7 @@
                 "media_name": "statistiques-de-prets-de-dvd-en-2017-cesson-sevigne",
                 "media_id": "9f5a1035-96bd-4a1d-8437-9282ecde8188",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/9f5a1035-96bd-4a1d-8437-9282ecde8188"
+                    "url": "https://data-rudi.aqmo.org/media/download/9f5a1035-96bd-4a1d-8437-9282ecde8188"
                 },
                 "file_type": "application/json",
                 "file_size": "291459",
@@ -17632,7 +17632,7 @@
                 "media_name": "principaux-etablissements-denseignement-superieur",
                 "media_id": "30d367e3-91f2-43b6-be2d-7e1cfeff5a29",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/30d367e3-91f2-43b6-be2d-7e1cfeff5a29"
+                    "url": "https://data-rudi.aqmo.org/media/download/30d367e3-91f2-43b6-be2d-7e1cfeff5a29"
                 },
                 "file_type": "application/json",
                 "file_size": "24294",
@@ -17700,7 +17700,7 @@
                 "media_name": "budget-participatif-4",
                 "media_id": "710fcbac-2e7a-4aa7-813a-080325d26eb1",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/710fcbac-2e7a-4aa7-813a-080325d26eb1"
+                    "url": "https://data-rudi.aqmo.org/media/download/710fcbac-2e7a-4aa7-813a-080325d26eb1"
                 },
                 "file_type": "application/json",
                 "file_size": "1245989",
@@ -17766,7 +17766,7 @@
                 "media_name": "ca-2010-subventions-aux-associations1",
                 "media_id": "3349d1b4-fe7e-4040-9d72-7d20a77f53d4",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/3349d1b4-fe7e-4040-9d72-7d20a77f53d4"
+                    "url": "https://data-rudi.aqmo.org/media/download/3349d1b4-fe7e-4040-9d72-7d20a77f53d4"
                 },
                 "file_type": "application/json",
                 "file_size": "9853",
@@ -17832,7 +17832,7 @@
                 "media_name": "electtest-transpose_l17_2",
                 "media_id": "a727a87f-9093-434d-9f92-191693c5cebb",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/a727a87f-9093-434d-9f92-191693c5cebb"
+                    "url": "https://data-rudi.aqmo.org/media/download/a727a87f-9093-434d-9f92-191693c5cebb"
                 },
                 "file_type": "application/json",
                 "file_size": "200508",
@@ -17901,7 +17901,7 @@
                 "media_name": "budget-primitif-2019-commune-de-thorigne-fouillard",
                 "media_id": "09fde02e-65fa-48ab-b2af-290c7f8fc0e9",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/09fde02e-65fa-48ab-b2af-290c7f8fc0e9"
+                    "url": "https://data-rudi.aqmo.org/media/download/09fde02e-65fa-48ab-b2af-290c7f8fc0e9"
                 },
                 "file_type": "application/json",
                 "file_size": "241671",
@@ -17968,7 +17968,7 @@
                 "media_name": "defibrillateurs-saint-jacques-de-la-lande",
                 "media_id": "6167b5a0-f94b-46f2-8329-a6338859479b",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/6167b5a0-f94b-46f2-8329-a6338859479b"
+                    "url": "https://data-rudi.aqmo.org/media/download/6167b5a0-f94b-46f2-8329-a6338859479b"
                 },
                 "file_type": "application/json",
                 "file_size": "4152",
@@ -18034,7 +18034,7 @@
                 "media_name": "bp-2014-budget-principal",
                 "media_id": "b2ed31fb-298a-45a5-950e-23a153030f52",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/b2ed31fb-298a-45a5-950e-23a153030f52"
+                    "url": "https://data-rudi.aqmo.org/media/download/b2ed31fb-298a-45a5-950e-23a153030f52"
                 },
                 "file_type": "application/json",
                 "file_size": "1226167",
@@ -18100,7 +18100,7 @@
                 "media_name": "base-sirene9",
                 "media_id": "2b850025-1cf5-424d-b7e6-47dff810c4d4",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/2b850025-1cf5-424d-b7e6-47dff810c4d4"
+                    "url": "https://data-rudi.aqmo.org/media/download/2b850025-1cf5-424d-b7e6-47dff810c4d4"
                 },
                 "file_type": "application/json",
                 "file_size": "2487824",
@@ -18167,7 +18167,7 @@
                 "media_name": "topologie-des-stations-de-metro-du-reseau-star",
                 "media_id": "a08bb35b-32c8-4771-8660-af41c91652de",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/a08bb35b-32c8-4771-8660-af41c91652de"
+                    "url": "https://data-rudi.aqmo.org/media/download/a08bb35b-32c8-4771-8660-af41c91652de"
                 },
                 "file_type": "application/json",
                 "file_size": "6876",
@@ -18233,7 +18233,7 @@
                 "media_name": "bp-2019-rennes-metropole",
                 "media_id": "cf4cfe73-0aff-433e-a32d-b83d17a657da",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/cf4cfe73-0aff-433e-a32d-b83d17a657da"
+                    "url": "https://data-rudi.aqmo.org/media/download/cf4cfe73-0aff-433e-a32d-b83d17a657da"
                 },
                 "file_type": "application/json",
                 "file_size": "1382107",
@@ -18301,7 +18301,7 @@
                 "media_name": "ca-2011-subventions-aux-associations1",
                 "media_id": "07389561-5332-4d28-82cf-167782b7306a",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/07389561-5332-4d28-82cf-167782b7306a"
+                    "url": "https://data-rudi.aqmo.org/media/download/07389561-5332-4d28-82cf-167782b7306a"
                 },
                 "file_type": "application/json",
                 "file_size": "3365",
@@ -18368,7 +18368,7 @@
                 "media_name": "rennes-immo",
                 "media_id": "3b24d724-e5d8-420e-bf9b-ead6dadf7d27",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/3b24d724-e5d8-420e-bf9b-ead6dadf7d27"
+                    "url": "https://data-rudi.aqmo.org/media/download/3b24d724-e5d8-420e-bf9b-ead6dadf7d27"
                 },
                 "file_type": "application/json",
                 "file_size": "356303",
@@ -18434,7 +18434,7 @@
                 "media_name": "frequentation-detaillee-du-musee-des-beaux-arts",
                 "media_id": "b8a15b09-07c9-4331-9156-b0b71886bfaf",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/b8a15b09-07c9-4331-9156-b0b71886bfaf"
+                    "url": "https://data-rudi.aqmo.org/media/download/b8a15b09-07c9-4331-9156-b0b71886bfaf"
                 },
                 "file_type": "application/json",
                 "file_size": "3330",
@@ -18500,7 +18500,7 @@
                 "media_name": "ca-2009-subventions-aux-associations1",
                 "media_id": "7d72316f-9c63-4fba-a368-2f8e2ccdb20e",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/7d72316f-9c63-4fba-a368-2f8e2ccdb20e"
+                    "url": "https://data-rudi.aqmo.org/media/download/7d72316f-9c63-4fba-a368-2f8e2ccdb20e"
                 },
                 "file_type": "application/json",
                 "file_size": "50930",
@@ -18569,7 +18569,7 @@
                 "media_name": "consommation-annuelle-de-gaz-agregee-a-la-maille-iris",
                 "media_id": "0998b107-7554-4ae1-bd92-845f1e17de80",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/0998b107-7554-4ae1-bd92-845f1e17de80"
+                    "url": "https://data-rudi.aqmo.org/media/download/0998b107-7554-4ae1-bd92-845f1e17de80"
                 },
                 "file_type": "application/json",
                 "file_size": "5421280",
@@ -18635,7 +18635,7 @@
                 "media_name": "effectif-des-ecoles-de-st-jacques-de-la-lande",
                 "media_id": "98760385-54a6-4fcf-af4d-24b7560c97fa",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/98760385-54a6-4fcf-af4d-24b7560c97fa"
+                    "url": "https://data-rudi.aqmo.org/media/download/98760385-54a6-4fcf-af4d-24b7560c97fa"
                 },
                 "file_type": "application/json",
                 "file_size": "63252",
@@ -18701,7 +18701,7 @@
                 "media_name": "bp-2012-subventions-aux-associations",
                 "media_id": "1ecb381a-360e-4980-845e-2407977ca25e",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/1ecb381a-360e-4980-845e-2407977ca25e"
+                    "url": "https://data-rudi.aqmo.org/media/download/1ecb381a-360e-4980-845e-2407977ca25e"
                 },
                 "file_type": "application/json",
                 "file_size": "1692",
@@ -18770,7 +18770,7 @@
                 "media_name": "resultats_m20",
                 "media_id": "80d9100b-acfa-47ab-8d4b-814780cbc571",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/80d9100b-acfa-47ab-8d4b-814780cbc571"
+                    "url": "https://data-rudi.aqmo.org/media/download/80d9100b-acfa-47ab-8d4b-814780cbc571"
                 },
                 "file_type": "application/json",
                 "file_size": "213791",
@@ -18842,7 +18842,7 @@
                 "media_name": "defibrillateurs-cesson-sevigne",
                 "media_id": "69e06f9f-a92c-4124-9bf7-54711b529a12",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/69e06f9f-a92c-4124-9bf7-54711b529a12"
+                    "url": "https://data-rudi.aqmo.org/media/download/69e06f9f-a92c-4124-9bf7-54711b529a12"
                 },
                 "file_type": "application/json",
                 "file_size": "3925",
@@ -18908,7 +18908,7 @@
                 "media_name": "resultats_l17",
                 "media_id": "ae39dbe9-1b1c-400f-898f-3fdf66ffd7cc",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/ae39dbe9-1b1c-400f-898f-3fdf66ffd7cc"
+                    "url": "https://data-rudi.aqmo.org/media/download/ae39dbe9-1b1c-400f-898f-3fdf66ffd7cc"
                 },
                 "file_type": "application/json",
                 "file_size": "301270",
@@ -18974,7 +18974,7 @@
                 "media_name": "resultats-des-elections-legislatives-a-rennes-de-2007-a-2012",
                 "media_id": "b82a8f2f-72f8-4963-a135-c0c9bdd85793",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/b82a8f2f-72f8-4963-a135-c0c9bdd85793"
+                    "url": "https://data-rudi.aqmo.org/media/download/b82a8f2f-72f8-4963-a135-c0c9bdd85793"
                 },
                 "file_type": "application/json",
                 "file_size": "5893910",
@@ -19042,7 +19042,7 @@
                 "media_name": "ca-2010-subventions-aux-associations0",
                 "media_id": "3574e376-3f59-46e9-83bb-271f3eb6ecf1",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/3574e376-3f59-46e9-83bb-271f3eb6ecf1"
+                    "url": "https://data-rudi.aqmo.org/media/download/3574e376-3f59-46e9-83bb-271f3eb6ecf1"
                 },
                 "file_type": "application/json",
                 "file_size": "565351",
@@ -19108,7 +19108,7 @@
                 "media_name": "pictogrammes-des-lignes-de-bus-du-reseau-star",
                 "media_id": "aa356bd4-e46b-491a-9a8f-174169e2752f",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/aa356bd4-e46b-491a-9a8f-174169e2752f"
+                    "url": "https://data-rudi.aqmo.org/media/download/aa356bd4-e46b-491a-9a8f-174169e2752f"
                 },
                 "file_type": "application/json",
                 "file_size": "378874",
@@ -19174,7 +19174,7 @@
                 "media_name": "aires-de-jeux-cesson-sevigne",
                 "media_id": "d0d57f5b-ac57-441c-9989-feefa7c6318a",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/d0d57f5b-ac57-441c-9989-feefa7c6318a"
+                    "url": "https://data-rudi.aqmo.org/media/download/d0d57f5b-ac57-441c-9989-feefa7c6318a"
                 },
                 "file_type": "application/json",
                 "file_size": "8098",
@@ -19240,7 +19240,7 @@
                 "media_name": "massifs-floraux-du-jardin-du-thabor",
                 "media_id": "194ba53d-d453-4d93-8129-b19cdbf60275",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/194ba53d-d453-4d93-8129-b19cdbf60275"
+                    "url": "https://data-rudi.aqmo.org/media/download/194ba53d-d453-4d93-8129-b19cdbf60275"
                 },
                 "file_type": "application/json",
                 "file_size": "273892",
@@ -19308,7 +19308,7 @@
                 "media_name": "frequentation-du-service-educatif-des-archives-de-rennes",
                 "media_id": "752b36a1-22ad-44a3-9d97-ce4d23be84c2",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/752b36a1-22ad-44a3-9d97-ce4d23be84c2"
+                    "url": "https://data-rudi.aqmo.org/media/download/752b36a1-22ad-44a3-9d97-ce4d23be84c2"
                 },
                 "file_type": "application/json",
                 "file_size": "145105",
@@ -19374,7 +19374,7 @@
                 "media_name": "menus-du-restaurant-municipal-denfants-dacigne",
                 "media_id": "cfff507a-5a83-41a4-932a-b5e2f0098664",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/cfff507a-5a83-41a4-932a-b5e2f0098664"
+                    "url": "https://data-rudi.aqmo.org/media/download/cfff507a-5a83-41a4-932a-b5e2f0098664"
                 },
                 "file_type": "application/json",
                 "file_size": "156709",
@@ -19441,7 +19441,7 @@
                 "media_name": "statistiques-de-frequentation-du-site-rennes-2030",
                 "media_id": "dc7f5e83-faff-46fc-ac7a-3e6e777c5145",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/dc7f5e83-faff-46fc-ac7a-3e6e777c5145"
+                    "url": "https://data-rudi.aqmo.org/media/download/dc7f5e83-faff-46fc-ac7a-3e6e777c5145"
                 },
                 "file_type": "application/json",
                 "file_size": "220198",
@@ -19509,7 +19509,7 @@
                 "media_name": "ca-2014-subventions-aux-associations1",
                 "media_id": "95b78f35-d38c-4329-9755-4f774e04d3a4",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/95b78f35-d38c-4329-9755-4f774e04d3a4"
+                    "url": "https://data-rudi.aqmo.org/media/download/95b78f35-d38c-4329-9755-4f774e04d3a4"
                 },
                 "file_type": "application/json",
                 "file_size": "13039",
@@ -19575,7 +19575,7 @@
                 "media_name": "bp-2014-budgets-annexes",
                 "media_id": "8f4fdf09-e8b9-4620-8581-ac37c9bb477c",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/8f4fdf09-e8b9-4620-8581-ac37c9bb477c"
+                    "url": "https://data-rudi.aqmo.org/media/download/8f4fdf09-e8b9-4620-8581-ac37c9bb477c"
                 },
                 "file_type": "application/json",
                 "file_size": "23333",
@@ -19694,7 +19694,7 @@
                 "media_name": "aire-de-camping-car-cesson-sevigne",
                 "media_id": "c72f11d0-e277-4cb6-9a26-800132d4eb54",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/c72f11d0-e277-4cb6-9a26-800132d4eb54"
+                    "url": "https://data-rudi.aqmo.org/media/download/c72f11d0-e277-4cb6-9a26-800132d4eb54"
                 },
                 "file_type": "application/json",
                 "file_size": "653",
@@ -19812,7 +19812,7 @@
                 "media_name": "naissances-a-rennes",
                 "media_id": "5e7a6f80-ed46-4aa9-8101-00fcd9a58603",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/5e7a6f80-ed46-4aa9-8101-00fcd9a58603"
+                    "url": "https://data-rudi.aqmo.org/media/download/5e7a6f80-ed46-4aa9-8101-00fcd9a58603"
                 },
                 "file_type": "application/json",
                 "file_size": "25497",
@@ -19878,7 +19878,7 @@
                 "media_name": "bp-2017-ville-de-rennes-budgets-annexes",
                 "media_id": "50f215c6-492a-4837-8bfe-ec9a8671c864",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/50f215c6-492a-4837-8bfe-ec9a8671c864"
+                    "url": "https://data-rudi.aqmo.org/media/download/50f215c6-492a-4837-8bfe-ec9a8671c864"
                 },
                 "file_type": "application/json",
                 "file_size": "164676",
@@ -19949,7 +19949,7 @@
                 "media_name": "etat-des-stations-de-metro-du-reseau-star-en-temps-reel",
                 "media_id": "c365a946-dbd9-4f87-87f3-9dde6bb78fa0",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/c365a946-dbd9-4f87-87f3-9dde6bb78fa0"
+                    "url": "https://data-rudi.aqmo.org/media/download/c365a946-dbd9-4f87-87f3-9dde6bb78fa0"
                 },
                 "file_type": "application/json",
                 "file_size": "6521",
@@ -20017,7 +20017,7 @@
                 "media_name": "ca-2016-ville-de-rennes-budget-principal",
                 "media_id": "930f92bb-77b3-443a-973f-66bf16e8ea29",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/930f92bb-77b3-443a-973f-66bf16e8ea29"
+                    "url": "https://data-rudi.aqmo.org/media/download/930f92bb-77b3-443a-973f-66bf16e8ea29"
                 },
                 "file_type": "application/json",
                 "file_size": "4470881",
@@ -20083,7 +20083,7 @@
                 "media_name": "statistiques-de-prets-de-la-bibliotheque-des-champs-libres-en-2010",
                 "media_id": "46e8d5fd-ba05-4765-834a-5e1bcb9a70dc",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/46e8d5fd-ba05-4765-834a-5e1bcb9a70dc"
+                    "url": "https://data-rudi.aqmo.org/media/download/46e8d5fd-ba05-4765-834a-5e1bcb9a70dc"
                 },
                 "file_type": "application/json",
                 "file_size": "12504",
@@ -20149,7 +20149,7 @@
                 "media_name": "statistiques-de-prets-de-la-bibliotheque-des-champs-libres-en-2011",
                 "media_id": "ebadea1f-921a-4002-bce4-da57dcb13109",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/ebadea1f-921a-4002-bce4-da57dcb13109"
+                    "url": "https://data-rudi.aqmo.org/media/download/ebadea1f-921a-4002-bce4-da57dcb13109"
                 },
                 "file_type": "application/json",
                 "file_size": "12478",
@@ -20217,7 +20217,7 @@
                 "media_name": "ca-2017-ville-de-rennes-subventions-aux-associations",
                 "media_id": "659877ed-d7e8-46de-9248-6c78f69aeb31",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/659877ed-d7e8-46de-9248-6c78f69aeb31"
+                    "url": "https://data-rudi.aqmo.org/media/download/659877ed-d7e8-46de-9248-6c78f69aeb31"
                 },
                 "file_type": "application/json",
                 "file_size": "364879",
@@ -20286,7 +20286,7 @@
                 "media_name": "resultats-des-elections-municipales-2020-a-acigne",
                 "media_id": "fa1b3f06-c51a-41eb-b7a8-43c3ab8886bd",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/fa1b3f06-c51a-41eb-b7a8-43c3ab8886bd"
+                    "url": "https://data-rudi.aqmo.org/media/download/fa1b3f06-c51a-41eb-b7a8-43c3ab8886bd"
                 },
                 "file_type": "application/json",
                 "file_size": "8651",
@@ -20352,7 +20352,7 @@
                 "media_name": "bp-2015-budget-principal",
                 "media_id": "1e995253-adc7-42ec-8e45-845b429baf4b",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/1e995253-adc7-42ec-8e45-845b429baf4b"
+                    "url": "https://data-rudi.aqmo.org/media/download/1e995253-adc7-42ec-8e45-845b429baf4b"
                 },
                 "file_type": "application/json",
                 "file_size": "1494187",
@@ -20418,7 +20418,7 @@
                 "media_name": "eco-counter-sites",
                 "media_id": "6b8c9bf6-09ff-466a-9193-c69b818ee636",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/6b8c9bf6-09ff-466a-9193-c69b818ee636"
+                    "url": "https://data-rudi.aqmo.org/media/download/6b8c9bf6-09ff-466a-9193-c69b818ee636"
                 },
                 "file_type": "application/json",
                 "file_size": "6626",
@@ -20486,7 +20486,7 @@
                 "media_name": "ca-2011-subventions-aux-associations0",
                 "media_id": "00bada22-2bf4-457a-aaba-2a2f04ea5863",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/00bada22-2bf4-457a-aaba-2a2f04ea5863"
+                    "url": "https://data-rudi.aqmo.org/media/download/00bada22-2bf4-457a-aaba-2a2f04ea5863"
                 },
                 "file_type": "application/json",
                 "file_size": "11649",
@@ -20552,7 +20552,7 @@
                 "media_name": "bp-2017-ville-de-rennes-subventions-aux-associations",
                 "media_id": "ae6892bf-837b-4849-890a-4e613062f027",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/ae6892bf-837b-4849-890a-4e613062f027"
+                    "url": "https://data-rudi.aqmo.org/media/download/ae6892bf-837b-4849-890a-4e613062f027"
                 },
                 "file_type": "application/json",
                 "file_size": "388058",
@@ -20620,7 +20620,7 @@
                 "media_name": "ca-2011-budgets-annexes",
                 "media_id": "d3b5f507-ddf1-4840-a7ad-7f48e2c3bde1",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/d3b5f507-ddf1-4840-a7ad-7f48e2c3bde1"
+                    "url": "https://data-rudi.aqmo.org/media/download/d3b5f507-ddf1-4840-a7ad-7f48e2c3bde1"
                 },
                 "file_type": "application/json",
                 "file_size": "17775",
@@ -20686,7 +20686,7 @@
                 "media_name": "etat-des-lignes-de-metro-du-reseau-star-en-temps-reel",
                 "media_id": "229a3b07-4bae-48fe-9b4d-0e747d9654b1",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/229a3b07-4bae-48fe-9b4d-0e747d9654b1"
+                    "url": "https://data-rudi.aqmo.org/media/download/229a3b07-4bae-48fe-9b4d-0e747d9654b1"
                 },
                 "file_type": "application/json",
                 "file_size": "445",
@@ -20752,7 +20752,7 @@
                 "media_name": "orthophotographie-2011",
                 "media_id": "d128db42-b2aa-4f25-b517-8260f07d34f8",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/d128db42-b2aa-4f25-b517-8260f07d34f8"
+                    "url": "https://data-rudi.aqmo.org/media/download/d128db42-b2aa-4f25-b517-8260f07d34f8"
                 },
                 "file_type": "application/json",
                 "file_size": "762128",
@@ -20820,7 +20820,7 @@
                 "media_name": "ca-2008-subventions-aux-associations1",
                 "media_id": "6be4a1a6-5c23-4c53-9910-a2ba83ce8fad",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/6be4a1a6-5c23-4c53-9910-a2ba83ce8fad"
+                    "url": "https://data-rudi.aqmo.org/media/download/6be4a1a6-5c23-4c53-9910-a2ba83ce8fad"
                 },
                 "file_type": "application/json",
                 "file_size": "81309",
@@ -20888,7 +20888,7 @@
                 "media_name": "ca-2009-subventions-aux-associations",
                 "media_id": "38e3e102-f87e-4ec0-9edf-6ea7cf855143",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/38e3e102-f87e-4ec0-9edf-6ea7cf855143"
+                    "url": "https://data-rudi.aqmo.org/media/download/38e3e102-f87e-4ec0-9edf-6ea7cf855143"
                 },
                 "file_type": "application/json",
                 "file_size": "578464",
@@ -20954,7 +20954,7 @@
                 "media_name": "bp-2019-ville-de-rennes-subventions-aux-associations",
                 "media_id": "a7a8c61f-e865-4cf1-889f-fcb140dec70f",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/a7a8c61f-e865-4cf1-889f-fcb140dec70f"
+                    "url": "https://data-rudi.aqmo.org/media/download/a7a8c61f-e865-4cf1-889f-fcb140dec70f"
                 },
                 "file_type": "application/json",
                 "file_size": "343687",
@@ -21020,7 +21020,7 @@
                 "media_name": "resultats-des-elections-regionales-a-rennes-depuis-2004",
                 "media_id": "f6a1d329-213b-480e-9e8b-f19f815a9887",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/f6a1d329-213b-480e-9e8b-f19f815a9887"
+                    "url": "https://data-rudi.aqmo.org/media/download/f6a1d329-213b-480e-9e8b-f19f815a9887"
                 },
                 "file_type": "application/json",
                 "file_size": "4481709",
@@ -21086,7 +21086,7 @@
                 "media_name": "bp-2013-subventions-aux-associations",
                 "media_id": "f0ff482f-2c6e-4b56-b105-47f685e50c57",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/f0ff482f-2c6e-4b56-b105-47f685e50c57"
+                    "url": "https://data-rudi.aqmo.org/media/download/f0ff482f-2c6e-4b56-b105-47f685e50c57"
                 },
                 "file_type": "application/json",
                 "file_size": "122725",
@@ -21154,7 +21154,7 @@
                 "media_name": "ca-2018-rennes-metropole",
                 "media_id": "e1452e94-89c6-4a71-8a28-5989b1d9b709",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/e1452e94-89c6-4a71-8a28-5989b1d9b709"
+                    "url": "https://data-rudi.aqmo.org/media/download/e1452e94-89c6-4a71-8a28-5989b1d9b709"
                 },
                 "file_type": "application/json",
                 "file_size": "2503562",
@@ -21222,7 +21222,7 @@
                 "media_name": "effectifs-pour-rennes-metropole-2014-2015",
                 "media_id": "dbce5291-74ec-455b-bdbe-70fa557ef8c6",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/dbce5291-74ec-455b-bdbe-70fa557ef8c6"
+                    "url": "https://data-rudi.aqmo.org/media/download/dbce5291-74ec-455b-bdbe-70fa557ef8c6"
                 },
                 "file_type": "application/json",
                 "file_size": "175318",
@@ -21290,7 +21290,7 @@
                 "media_name": "ca-2008-subventions-aux-associations",
                 "media_id": "859f5f31-f4cd-4cc6-abf7-c862e0fe28aa",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/859f5f31-f4cd-4cc6-abf7-c862e0fe28aa"
+                    "url": "https://data-rudi.aqmo.org/media/download/859f5f31-f4cd-4cc6-abf7-c862e0fe28aa"
                 },
                 "file_type": "application/json",
                 "file_size": "730037",
@@ -21358,7 +21358,7 @@
                 "media_name": "ca-2018-ville-de-rennes-budgets-annexes",
                 "media_id": "431376aa-b507-4e11-a1ba-e85a951784c0",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/431376aa-b507-4e11-a1ba-e85a951784c0"
+                    "url": "https://data-rudi.aqmo.org/media/download/431376aa-b507-4e11-a1ba-e85a951784c0"
                 },
                 "file_type": "application/json",
                 "file_size": "147857",
@@ -21426,7 +21426,7 @@
                 "media_name": "ca-2017-ville-de-rennes-budget-principal",
                 "media_id": "74a2c3d4-5e06-4348-be7a-4c4792cd5356",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/74a2c3d4-5e06-4348-be7a-4c4792cd5356"
+                    "url": "https://data-rudi.aqmo.org/media/download/74a2c3d4-5e06-4348-be7a-4c4792cd5356"
                 },
                 "file_type": "application/json",
                 "file_size": "3965724",
@@ -21492,7 +21492,7 @@
                 "media_name": "statistiques-de-prets-de-la-bibliotheque-des-champs-libres-en-2006",
                 "media_id": "71481123-3d41-4419-aa67-013d3147ef97",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/71481123-3d41-4419-aa67-013d3147ef97"
+                    "url": "https://data-rudi.aqmo.org/media/download/71481123-3d41-4419-aa67-013d3147ef97"
                 },
                 "file_type": "application/json",
                 "file_size": "11223",
@@ -21558,7 +21558,7 @@
                 "media_name": "electtest-transpose",
                 "media_id": "17164b28-9542-415a-88f5-c84c0ff21f3a",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/17164b28-9542-415a-88f5-c84c0ff21f3a"
+                    "url": "https://data-rudi.aqmo.org/media/download/17164b28-9542-415a-88f5-c84c0ff21f3a"
                 },
                 "file_type": "application/json",
                 "file_size": "1071091",
@@ -21624,7 +21624,7 @@
                 "media_name": "resultats_p17",
                 "media_id": "18917080-7fd3-4f08-831c-288d50cb27e3",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/18917080-7fd3-4f08-831c-288d50cb27e3"
+                    "url": "https://data-rudi.aqmo.org/media/download/18917080-7fd3-4f08-831c-288d50cb27e3"
                 },
                 "file_type": "application/json",
                 "file_size": "954243",
@@ -21690,7 +21690,7 @@
                 "media_name": "orthophotographie-2014",
                 "media_id": "15d3f577-b032-4cd5-a97a-8d972f126ef5",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/15d3f577-b032-4cd5-a97a-8d972f126ef5"
+                    "url": "https://data-rudi.aqmo.org/media/download/15d3f577-b032-4cd5-a97a-8d972f126ef5"
                 },
                 "file_type": "application/json",
                 "file_size": "793958",
@@ -21756,7 +21756,7 @@
                 "media_name": "resultats-des-elections-presidentielles-2eme-tour-saint-jacques-de-la-lande",
                 "media_id": "6dba6e5c-bb9f-453d-8be3-21758bae1cf2",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/6dba6e5c-bb9f-453d-8be3-21758bae1cf2"
+                    "url": "https://data-rudi.aqmo.org/media/download/6dba6e5c-bb9f-453d-8be3-21758bae1cf2"
                 },
                 "file_type": "application/json",
                 "file_size": "7897",
@@ -21822,7 +21822,7 @@
                 "media_name": "bp-2015-subventions-aux-associations",
                 "media_id": "9623aa4c-596f-41d0-a96d-756c99fa7471",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/9623aa4c-596f-41d0-a96d-756c99fa7471"
+                    "url": "https://data-rudi.aqmo.org/media/download/9623aa4c-596f-41d0-a96d-756c99fa7471"
                 },
                 "file_type": "application/json",
                 "file_size": "12205",
@@ -21888,7 +21888,7 @@
                 "media_name": "prenoms-a-saint-jacques-de-la-lande",
                 "media_id": "7c599f7b-1a72-4001-8d0f-f8df12c17685",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/7c599f7b-1a72-4001-8d0f-f8df12c17685"
+                    "url": "https://data-rudi.aqmo.org/media/download/7c599f7b-1a72-4001-8d0f-f8df12c17685"
                 },
                 "file_type": "application/json",
                 "file_size": "397370",
@@ -21954,7 +21954,7 @@
                 "media_name": "parcours-des-lignes-de-bus-du-reseau-star",
                 "media_id": "a9d8a1af-654e-4cdb-bd86-b148506a4add",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/a9d8a1af-654e-4cdb-bd86-b148506a4add"
+                    "url": "https://data-rudi.aqmo.org/media/download/a9d8a1af-654e-4cdb-bd86-b148506a4add"
                 },
                 "file_type": "application/json",
                 "file_size": "5539512",
@@ -22020,7 +22020,7 @@
                 "media_name": "perimetres-des-12-quartiers-de-la-ville-de-rennes",
                 "media_id": "2cd7d1cd-b964-44db-87f4-50fe1cae5b11",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/2cd7d1cd-b964-44db-87f4-50fe1cae5b11"
+                    "url": "https://data-rudi.aqmo.org/media/download/2cd7d1cd-b964-44db-87f4-50fe1cae5b11"
                 },
                 "file_type": "application/json",
                 "file_size": "315078",
@@ -22099,7 +22099,7 @@
                 "media_name": "inventaire-2014-des-commerces-du-pays-de-rennes-cellules-commerciales",
                 "media_id": "556b263a-4139-4d1b-8eb3-2a0ab9a5a530",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/556b263a-4139-4d1b-8eb3-2a0ab9a5a530"
+                    "url": "https://data-rudi.aqmo.org/media/download/556b263a-4139-4d1b-8eb3-2a0ab9a5a530"
                 },
                 "file_type": "application/json",
                 "file_size": "5710826",
@@ -22165,7 +22165,7 @@
                 "media_name": "parcs-velos-securises-geres-par-rennes-metropole",
                 "media_id": "32512d90-0aaf-43d1-a4be-eb6468738f68",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/32512d90-0aaf-43d1-a4be-eb6468738f68"
+                    "url": "https://data-rudi.aqmo.org/media/download/32512d90-0aaf-43d1-a4be-eb6468738f68"
                 },
                 "file_type": "application/json",
                 "file_size": "54415",
@@ -22243,7 +22243,7 @@
                 "media_name": "equipement-accessibilite-arrets-bus",
                 "media_id": "051c184d-1419-4027-ae3f-fd178169e012",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/051c184d-1419-4027-ae3f-fd178169e012"
+                    "url": "https://data-rudi.aqmo.org/media/download/051c184d-1419-4027-ae3f-fd178169e012"
                 },
                 "file_type": "application/json",
                 "file_size": "815938",
@@ -22321,7 +22321,7 @@
                 "media_name": "donnees-geographiques-du-reseau-star-arrets-logiques",
                 "media_id": "b39fd1d5-eca3-4b0b-89d0-06ecff029208",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/b39fd1d5-eca3-4b0b-89d0-06ecff029208"
+                    "url": "https://data-rudi.aqmo.org/media/download/b39fd1d5-eca3-4b0b-89d0-06ecff029208"
                 },
                 "file_type": "application/json",
                 "file_size": "520144",
@@ -22395,7 +22395,7 @@
                 "media_name": "arbres-d-alignement-rennes",
                 "media_id": "c84832bd-93b6-414e-aa19-fa64590f9414",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/c84832bd-93b6-414e-aa19-fa64590f9414"
+                    "url": "https://data-rudi.aqmo.org/media/download/c84832bd-93b6-414e-aa19-fa64590f9414"
                 },
                 "file_type": "application/json",
                 "file_size": "6629019",
@@ -22522,7 +22522,7 @@
                 "media_name": "sites_organismes_sites",
                 "media_id": "a9b02d7d-647f-4542-809c-1824920d15d7",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/a9b02d7d-647f-4542-809c-1824920d15d7"
+                    "url": "https://data-rudi.aqmo.org/media/download/a9b02d7d-647f-4542-809c-1824920d15d7"
                 },
                 "file_type": "application/json",
                 "file_size": "3582303",
@@ -22588,7 +22588,7 @@
                 "media_name": "lotissements",
                 "media_id": "2c4bfd41-2807-4724-ba1b-b1d78aa813e8",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/2c4bfd41-2807-4724-ba1b-b1d78aa813e8"
+                    "url": "https://data-rudi.aqmo.org/media/download/2c4bfd41-2807-4724-ba1b-b1d78aa813e8"
                 },
                 "file_type": "application/json",
                 "file_size": "988304",
@@ -22659,7 +22659,7 @@
                 "media_name": "sites_organismes_organismes",
                 "media_id": "d4ad54fb-eafa-4ebb-9baf-e50567f32305",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/d4ad54fb-eafa-4ebb-9baf-e50567f32305"
+                    "url": "https://data-rudi.aqmo.org/media/download/d4ad54fb-eafa-4ebb-9baf-e50567f32305"
                 },
                 "file_type": "application/json",
                 "file_size": "8247616",
@@ -22725,7 +22725,7 @@
                 "media_name": "supports-velos",
                 "media_id": "1d60d1b9-aefe-4cb6-8001-929e423bf1bc",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/1d60d1b9-aefe-4cb6-8001-929e423bf1bc"
+                    "url": "https://data-rudi.aqmo.org/media/download/1d60d1b9-aefe-4cb6-8001-929e423bf1bc"
                 },
                 "file_type": "application/json",
                 "file_size": "879629",
@@ -22791,7 +22791,7 @@
                 "media_name": "panneaux_associatifs",
                 "media_id": "f6a40098-f5cd-4103-8095-664023d238d0",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/f6a40098-f5cd-4103-8095-664023d238d0"
+                    "url": "https://data-rudi.aqmo.org/media/download/f6a40098-f5cd-4103-8095-664023d238d0"
                 },
                 "file_type": "application/json",
                 "file_size": "91987",
@@ -23558,7 +23558,7 @@
                 "media_name": "voirie_domaine_gestionnaire",
                 "media_id": "7487157d-0b7f-442e-85ce-97d0d78e5805",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/7487157d-0b7f-442e-85ce-97d0d78e5805"
+                    "url": "https://data-rudi.aqmo.org/media/download/7487157d-0b7f-442e-85ce-97d0d78e5805"
                 },
                 "file_type": "application/json",
                 "file_size": "8335647",
@@ -23909,7 +23909,7 @@
                 "media_name": "horaires-et-plans-du-reseau-star-au-format-pdf",
                 "media_id": "275a18b4-d05f-47e3-8263-80d4d00c3301",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/275a18b4-d05f-47e3-8263-80d4d00c3301"
+                    "url": "https://data-rudi.aqmo.org/media/download/275a18b4-d05f-47e3-8263-80d4d00c3301"
                 },
                 "file_type": "application/json",
                 "file_size": "511176",
@@ -23975,7 +23975,7 @@
                 "media_name": "emplacement-des-bureaux-de-vote-cesson-sevigne",
                 "media_id": "86491f12-4943-4569-b8ab-fe9dc4cdc344",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/86491f12-4943-4569-b8ab-fe9dc4cdc344"
+                    "url": "https://data-rudi.aqmo.org/media/download/86491f12-4943-4569-b8ab-fe9dc4cdc344"
                 },
                 "file_type": "application/json",
                 "file_size": "1700",
@@ -24041,7 +24041,7 @@
                 "media_name": "resultats-des-elections-departementales-a-rennes-20150",
                 "media_id": "c0d46085-75a3-4c41-af3d-c769f17c9ed6",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/c0d46085-75a3-4c41-af3d-c769f17c9ed6"
+                    "url": "https://data-rudi.aqmo.org/media/download/c0d46085-75a3-4c41-af3d-c769f17c9ed6"
                 },
                 "file_type": "application/json",
                 "file_size": "320898",
@@ -24107,7 +24107,7 @@
                 "media_name": "cantons-dille-et-vilaine-version-rennes-metropole",
                 "media_id": "98b2c059-fbcc-45a7-9984-f64c9daddbf1",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/98b2c059-fbcc-45a7-9984-f64c9daddbf1"
+                    "url": "https://data-rudi.aqmo.org/media/download/98b2c059-fbcc-45a7-9984-f64c9daddbf1"
                 },
                 "file_type": "application/json",
                 "file_size": "4888229",
@@ -24179,7 +24179,7 @@
                 "media_name": "menus-des-cantines-des-creches",
                 "media_id": "74232e63-b22a-493a-b778-3fc938464e67",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/74232e63-b22a-493a-b778-3fc938464e67"
+                    "url": "https://data-rudi.aqmo.org/media/download/74232e63-b22a-493a-b778-3fc938464e67"
                 },
                 "file_type": "application/json",
                 "file_size": "1029606",
@@ -24246,7 +24246,7 @@
                 "media_name": "topologie-des-parcs-relais-du-reseau-star",
                 "media_id": "df1195a9-e1b3-4111-abd2-92e2975b985f",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/df1195a9-e1b3-4111-abd2-92e2975b985f"
+                    "url": "https://data-rudi.aqmo.org/media/download/df1195a9-e1b3-4111-abd2-92e2975b985f"
                 },
                 "file_type": "application/json",
                 "file_size": "2899",
@@ -24312,7 +24312,7 @@
                 "media_name": "actes-detat-civil",
                 "media_id": "a7759141-89e2-43f7-a060-b337ba1f0136",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/a7759141-89e2-43f7-a060-b337ba1f0136"
+                    "url": "https://data-rudi.aqmo.org/media/download/a7759141-89e2-43f7-a060-b337ba1f0136"
                 },
                 "file_type": "application/json",
                 "file_size": "18854",
@@ -24378,7 +24378,7 @@
                 "media_name": "centres-de-vote",
                 "media_id": "03c1f490-a115-4d6d-9f07-3fa3bca9877d",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/03c1f490-a115-4d6d-9f07-3fa3bca9877d"
+                    "url": "https://data-rudi.aqmo.org/media/download/03c1f490-a115-4d6d-9f07-3fa3bca9877d"
                 },
                 "file_type": "application/json",
                 "file_size": "84448",
@@ -24506,7 +24506,7 @@
                 "media_name": "metro-du-reseau-star-localisation-des-stations",
                 "media_id": "0695a503-0e6e-4d23-888b-9e089ec93006",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/0695a503-0e6e-4d23-888b-9e089ec93006"
+                    "url": "https://data-rudi.aqmo.org/media/download/0695a503-0e6e-4d23-888b-9e089ec93006"
                 },
                 "file_type": "application/json",
                 "file_size": "14286",
@@ -24577,7 +24577,7 @@
                 "media_name": "base-sirene-v3-ss",
                 "media_id": "7e5a5cf7-9722-42e0-b4f1-8e9966e099d0",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/7e5a5cf7-9722-42e0-b4f1-8e9966e099d0"
+                    "url": "https://data-rudi.aqmo.org/media/download/7e5a5cf7-9722-42e0-b4f1-8e9966e099d0"
                 },
                 "file_type": "application/json",
                 "file_size": "30171893",
@@ -24645,7 +24645,7 @@
                 "media_name": "2018-02-12_budget-participatif-3_depot-des-projets-2",
                 "media_id": "14c6c8c5-7e05-4742-a5a3-13660766404d",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/14c6c8c5-7e05-4742-a5a3-13660766404d"
+                    "url": "https://data-rudi.aqmo.org/media/download/14c6c8c5-7e05-4742-a5a3-13660766404d"
                 },
                 "file_type": "application/json",
                 "file_size": "1105592",
@@ -24711,7 +24711,7 @@
                 "media_name": "prochains-passages-des-lignes-de-metro-du-reseau-star-en-temps-reel",
                 "media_id": "5ca31a90-95c9-448f-ba61-9f2be37ac546",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/5ca31a90-95c9-448f-ba61-9f2be37ac546"
+                    "url": "https://data-rudi.aqmo.org/media/download/5ca31a90-95c9-448f-ba61-9f2be37ac546"
                 },
                 "file_type": "application/json",
                 "file_size": "1593058",
@@ -24933,7 +24933,7 @@
                 "media_name": "eco-counter-data",
                 "media_id": "946df16d-b057-45e9-a641-f28e6c4ce4a8",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/946df16d-b057-45e9-a641-f28e6c4ce4a8"
+                    "url": "https://data-rudi.aqmo.org/media/download/946df16d-b057-45e9-a641-f28e6c4ce4a8"
                 },
                 "file_type": "application/json",
                 "file_size": "3923772",
@@ -25000,7 +25000,7 @@
                 "media_name": "metro-du-reseau-star-traces-de-laxe-des-lignes",
                 "media_id": "a43863ca-4261-47f4-b375-c5ed4eeb1314",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/a43863ca-4261-47f4-b375-c5ed4eeb1314"
+                    "url": "https://data-rudi.aqmo.org/media/download/a43863ca-4261-47f4-b375-c5ed4eeb1314"
                 },
                 "file_type": "application/json",
                 "file_size": "241565",
@@ -25066,7 +25066,7 @@
                 "media_name": "ecoles-rennes",
                 "media_id": "8514c9f6-2535-4c37-8929-8fe82887fffb",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/8514c9f6-2535-4c37-8929-8fe82887fffb"
+                    "url": "https://data-rudi.aqmo.org/media/download/8514c9f6-2535-4c37-8929-8fe82887fffb"
                 },
                 "file_type": "application/json",
                 "file_size": "53209",
@@ -25139,7 +25139,7 @@
                 "media_name": "etat-des-parcs-relais-du-reseau-star-en-temps-reel",
                 "media_id": "c0926614-6ac0-40d5-bea0-812b100bb888",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/c0926614-6ac0-40d5-bea0-812b100bb888"
+                    "url": "https://data-rudi.aqmo.org/media/download/c0926614-6ac0-40d5-bea0-812b100bb888"
                 },
                 "file_type": "application/json",
                 "file_size": "3096",
@@ -25205,7 +25205,7 @@
                 "media_name": "localisation-et-etat-des-projets-du-budget-participatif",
                 "media_id": "cf0a576c-aee7-42ca-be2f-23566f0f9d6e",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/cf0a576c-aee7-42ca-be2f-23566f0f9d6e"
+                    "url": "https://data-rudi.aqmo.org/media/download/cf0a576c-aee7-42ca-be2f-23566f0f9d6e"
                 },
                 "file_type": "application/json",
                 "file_size": "234771",
@@ -25271,7 +25271,7 @@
                 "media_name": "portions-de-voies-en-stationnement-payant-sur-la-ville-de-rennes",
                 "media_id": "3e53360a-2081-471f-8f3b-53dccf789df6",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/3e53360a-2081-471f-8f3b-53dccf789df6"
+                    "url": "https://data-rudi.aqmo.org/media/download/3e53360a-2081-471f-8f3b-53dccf789df6"
                 },
                 "file_type": "application/json",
                 "file_size": "510272",
@@ -25340,7 +25340,7 @@
                 "media_name": "etat-du-trafic-en-temps-reel",
                 "media_id": "1e1a7751-9cdc-48f0-9925-82ffe9bdd91f",
                 "connector": {
-                    "url": "https://data-rudi.aqmo.org/media/downlad/1e1a7751-9cdc-48f0-9925-82ffe9bdd91f"
+                    "url": "https://data-rudi.aqmo.org/media/download/1e1a7751-9cdc-48f0-9925-82ffe9bdd91f"
                 },
                 "file_type": "application/json",
                 "file_size": "1923687",
