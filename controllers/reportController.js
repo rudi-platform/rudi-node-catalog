@@ -38,6 +38,7 @@ const {
   API_REPORT_ERRORS,
   API_REPORT_SUBMISSION_DATE,
   API_REPORT_TREATMENT_DATE,
+  API_REPORT_METHOD,
 } = require('../db/dbFields')
 
 const {
@@ -123,7 +124,7 @@ exports.addSingleReportForObject = async (req, reply) => {
     // ensure object exists
     const dbObject = await db.getObjectWithRudiId(objectType, urlObjectId)
     if (!dbObject) {
-      log.w(mod, fun, `Object 'objectType' not found for id: ${urlObjectId}`)
+      log.w(mod, fun, `Object '${objectType}' not found for id: ${urlObjectId}`)
       reportBody[LOCAL_REPORT_ERROR] = {
         [LOCAL_REPORT_ERROR_TYPE]: 'Object not found',
         [LOCAL_REPORT_ERROR_MSG]: `The '${objectType}' object concerned by the report was not found`,
@@ -188,12 +189,15 @@ exports.addOrEditSingleReport = async (objectType, req, reply) => {
       throw new BadRequestError(`${msg.parametersMismatch(urlObjectId, bodyObjectId)}`)
 
     // ensure object exists
+    const method = reportBody[API_REPORT_METHOD]
     const dbObject = await db.getObjectWithRudiId(objectType, urlObjectId)
     if (!dbObject) {
-      log.w(mod, fun, `Object 'objectType' not found for id: ${urlObjectId}`)
-      reportBody[LOCAL_REPORT_ERROR] = {
-        [LOCAL_REPORT_ERROR_TYPE]: 'Object not found',
-        [LOCAL_REPORT_ERROR_MSG]: `The '${objectType}' object concerned by the report was not found`,
+      log.w(mod, fun, `Object '${objectType}' not found for id: ${urlObjectId}`)
+      if (!method || method.toUpperCase() !== 'DELETE') {
+        reportBody[LOCAL_REPORT_ERROR] = {
+          [LOCAL_REPORT_ERROR_TYPE]: 'Object not found',
+          [LOCAL_REPORT_ERROR_MSG]: `The '${objectType}' object concerned by the report was not found`,
+        }
       }
     }
 
