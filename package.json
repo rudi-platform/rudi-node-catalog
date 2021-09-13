@@ -35,7 +35,7 @@
     "mongoose-long": "^0.3.2",
     "mongoose-validator": "^2.1.0",
     "nodemon": "^2.0.12",
-    "npm": "^7.5.4",
+    "npm": "^7.23.0",
     "read-last-lines": "^1.8.0",
     "sanitize-filename": "^1.6.3",
     "sshpk": "^1.16.1",

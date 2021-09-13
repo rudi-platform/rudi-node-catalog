@@ -63,6 +63,7 @@ const {
   PARAM_ACTION_UUID_GEN,
   PARAM_ACTION_UNLINKED,
   PARAM_ACTION_SIGN,
+  URL_PV_APP_ENV_ACCESS,
 } = require('../config/confApi')
 const { beautify } = require('../utils/jsUtils')
 const { SHOULD_CONTROL_PRIVATE_REQUESTS } = require('../config/confSystem')
@@ -109,6 +110,7 @@ const DEV_DEL_PORTAL_METADATA = 'dev_del_portal_metadata'
 const DEV_GET_GIT_HASH = 'dev_get_git_hash'
 const DEV_GET_APP_HASH = 'dev_get_app_hash'
 const DEV_GET_NODE_VERSION = 'dev_get_node_version'
+const DEV_GET_APP_ENV = 'dev_get_app_env'
 const DEV_GET_LOGS = 'dev_get_logs'
 const DEV_GET_LAST_LOG_LINES = 'dev_get_last_log_lines'
 const DEV_GET_COLLECTIONS = 'dev_get_collections'
@@ -528,6 +530,17 @@ exports.devRoutes = [
     preHandler: onDevRoute,
     handler: sysController.getNodeVersion,
     config: { routeName: DEV_GET_NODE_VERSION },
+  },
+
+ /**
+   * Get this module environment
+   */
+  {
+    method: 'GET',
+    url: `${URL_PV_APP_ENV_ACCESS}`,
+    preHandler: onDevRoute,
+    handler: sysController.getEnvironment,
+    config: { routeName: DEV_GET_APP_ENV },
   },
 
   // -----------------------------------------------------------------------------

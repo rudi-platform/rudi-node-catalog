@@ -80,7 +80,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									" pm.test(\"Checking current JWT\", () => {",
+									"pm.test(\"Checking current JWT\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    pm.expect(pm.response.stream.toString('utf8')).to.eq('JWT is valid')",
 									" })"
@@ -120,7 +120,41 @@
 			"name": "00. Check app online",
 			"item": [
 				{
-					"name": "Get git hash",
+					"name": "Get app env",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Git hash : 7 alphanumerical characters\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const env = pm.variables.get('env')",
+									"    const responseStr = pm.response.stream.toString('utf8');",
+									"    pm.expect(responseStr).to.eq(env)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/env",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"env"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get git hash Copy",
 					"event": [
 						{
 							"listen": "test",

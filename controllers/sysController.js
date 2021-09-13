@@ -44,7 +44,13 @@ exports.getGitHash = () => {
   // log.d(mod, fun, ``)
   try {
     // log.d(mod, fun, ` GET ${URL_PV_GIT_HASH_ACCESS}`)
-    const hashId = require('child_process').execSync('git rev-parse --short HEAD')
+    let hashId
+    try {
+      hashId = require('child_process').execSync('git rev-parse --short HEAD')
+      // log.d(mod, fun, utils.beautify(process.env))
+    } catch (err) {
+      hashId = process.env.RUDI_API_GIT_REV
+    }
     // log.d(mod, fun, `${hashId}`.trim())
 
     return `${hashId}`.trim()
@@ -60,6 +66,18 @@ exports.getAppHash = () => {
   try {
     if (!CURRENT_APP_HASH) CURRENT_APP_HASH = this.getGitHash()
     return CURRENT_APP_HASH
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw err
+  }
+}
+
+/** Returns the current environment for this module */
+exports.getEnvironment = () => {
+  const fun = 'getEnvironment'
+  try {
+    // log.d(mod, fun, utils.beautify(process.env))
+    return process.env.RUDI_API_ENV
   } catch (err) {
     log.e(mod, fun, err)
     throw err
