@@ -538,7 +538,7 @@ exports.devRoutes = [
   {
     method: 'GET',
     url: `${URL_PV_APP_ENV_ACCESS}`,
-    preHandler: onDevRoute,
+    preHandler: onFreeRoute,
     handler: sysController.getEnvironment,
     config: { routeName: DEV_GET_APP_ENV },
   },
