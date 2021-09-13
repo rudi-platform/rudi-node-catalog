@@ -97,7 +97,13 @@ exports.getNodeVersion = async () => {
     // log.d(mod, fun, ` GET ${URL_PV_NODE_VERSION_ACCESS}`)
     const nodeVersion = prcs.execSync('node -v')
     const npmVersion = prcs.execSync('npm -v')
-    const mongooseVersion = prcs.execSync('npm view mongoose version')
+    let mongooseVersion
+    try {
+       mongooseVersion = prcs.execSync('npm view mongoose version')
+    } catch (err) {
+      log.w(mod, fun, `Command 'npm view mongoose version' failed: ${err}`)
+    }
+    
     const mongoDbVersion = await getMongDbVersion()
     const nVersions = {
       node: `${nodeVersion}`.trim(),
@@ -122,6 +128,6 @@ async function getMongDbVersion() {
     // log.d(mod, fun, `Mongo : ${mongoInfo.version}`)
     return mongoInfo.version
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
   }
 }
