@@ -361,7 +361,7 @@ exports.setPublishedFlag = async (dbObject, rudiId) => {
   const fun = 'setPublishedFlag'
   log.d(mod, fun, '')
   try {
-    if(!dbObject) throw new ParameterExpectedError(fun,'dbObject')
+    if (!dbObject) throw new ParameterExpectedError(fun, 'dbObject')
     if (!dbObject[DB_PUBLISHED_AT]) {
       dbObject[DB_PUBLISHED_AT] = nowISO()
       await dbObject.save()
@@ -607,7 +607,17 @@ exports.deleteSingleObject = async (req, reply) => {
     // TODO: if SkosScheme: delete all SkosConcepts that reference it
     // TODO: if SkosConcept: update all other SkosConcepts that reference it (parents/children/siblings/relatives)
     const reply = await db.deleteObject(objectType, objectRudiId)
-    if (objectType === PARAM_OBJECT_METADATA) await deletePortalMetadata(objectRudiId)
+    try {
+      if (objectType === PARAM_OBJECT_METADATA) await deletePortalMetadata(objectRudiId)
+    } catch (err) {
+      log.w(
+        mod,
+        fun,
+        `Erreur on the Portal side: ` +
+          ` metadata couldn't be deleted for id ${objectRudiId}.` +
+          ` Cause: ${err}`
+      )
+    }
     return reply
   } catch (err) {
     log.e(mod, fun, err)
