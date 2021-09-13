@@ -12,6 +12,11 @@
     "devstart": "./node_modules/nodemon/bin/nodemon.js ./rudiServer.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "nodemonConfig": {
+    "execMap": {
+      "js": "export RUDI_API_GIT_REV=\"tot$o(git rev-parse HEAD)\"; node "
+    }
+  },
   "keywords": [
     "rudi",
     "metadata",

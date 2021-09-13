@@ -45,13 +45,15 @@ exports.getGitHash = () => {
   try {
     // log.d(mod, fun, ` GET ${URL_PV_GIT_HASH_ACCESS}`)
     let hashId
-    try {
-      hashId = require('child_process').execSync('git rev-parse --short HEAD')
-      // log.d(mod, fun, utils.beautify(process.env))
-    } catch (err) {
-      hashId = process.env.RUDI_API_GIT_REV
-    }
-    // log.d(mod, fun, `${hashId}`.trim())
+    hashId = process.env.RUDI_API_GIT_REV
+
+    if (!hashId)
+      try {
+        hashId = require('child_process').execSync('git rev-parse --short HEAD')
+        // log.d(mod, fun, utils.beautify(process.env))
+      } catch (err) {
+        new Error(mod, fun, `No git hash: ${err}`)
+      }
 
     return `${hashId}`.trim()
   } catch (err) {
@@ -71,6 +73,10 @@ exports.getAppHash = () => {
     throw err
   }
 }
+exports.ENV_DEV = 'local'
+exports.ENV_TEST = 'test'
+exports.ENV_SHARED = 'shared'
+exports.ENV_RELEASE = 'release'
 
 /** Returns the current environment for this module */
 exports.getEnvironment = () => {
