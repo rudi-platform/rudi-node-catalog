@@ -14,7 +14,7 @@
   },
   "nodemonConfig": {
     "execMap": {
-      "js": "export RUDI_API_GIT_REV=\"$(git rev-parse HEAD)\"; node "
+      "js": "export RUDI_API_GIT_REV=\"$(git rev-parse --short HEAD)\"; node "
     }
   },
   "keywords": [
