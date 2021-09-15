@@ -446,9 +446,14 @@ exports.getSingleObject = async (req, reply) => {
 exports.getObjectList = async (req, reply) => {
   const fun = 'getObjectList'
   log.v(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}`)
-  // retrieve url parameter: object type
-  const objectType = json.accessReqParam(req, PARAM_OBJECT)
-  return await this.getManyObjects(objectType, req, reply)
+  try {
+    // retrieve url parameter: object type
+    const objectType = json.accessReqParam(req, PARAM_OBJECT)
+    return await this.getManyObjects(objectType, req, reply)
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
 }
 
 /**

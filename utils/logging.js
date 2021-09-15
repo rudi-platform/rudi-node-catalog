@@ -6,7 +6,7 @@ const mod = 'logging'
 // Internal dependencies
 // -----------------------------------------------------------------------------
 const { logger, sysLogger } = require('../config/confLogs')
-const { consoleErr, displayStr, logWhere, beautify } = require('./jsUtils')
+const { consoleErr, displayStr, logWhere, beautify, displayRedirections } = require('./jsUtils')
 const { addLogEntry } = require('../db/dbQueries')
 
 // -----------------------------------------------------------------------------
@@ -108,9 +108,8 @@ exports.d = (mod, fun, msg) => {
 // -----------------------------------------------------------------------------
 
 exports.logRequest = (req, res) => {
-  const fun = 'request'
-  // this.d(mod, fun, beautify(req))
-  this.i('http', fun, `${req.method} ${req.url} <- ${req.ip} `)
+  const fun = 'apiCall'
+  this.i('http', fun, `${req.method} ${req.url} <- ${req.ip} ` + displayRedirections(req.headers))
   // return
   // this.d(mod, fun, `method: ${utils.beautify(req.method)}`)
   // this.d(mod, fun, `url: ${utils.beautify(req.url)}`)

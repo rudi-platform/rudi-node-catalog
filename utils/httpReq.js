@@ -25,6 +25,14 @@ const PROTOCOL = {
 }
 
 // -----------------------------------------------------------------------------
+// Functions: header treatments
+// -----------------------------------------------------------------------------
+exports.getHeaderRedirectUrls = (req) => {
+  if (!req.headers) return
+  return req.headers['x-forwarded-for'] || req.headers['X-Forwarded-For']
+}
+
+// -----------------------------------------------------------------------------
 // Functions: http requests
 // -----------------------------------------------------------------------------
 function doHttpRequest(options, protocol, data) {

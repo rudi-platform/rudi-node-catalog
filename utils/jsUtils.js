@@ -242,5 +242,13 @@ exports.consoleErr = (loc_mod, loc_fun, msg) => {
 }
 
 // -----------------------------------------------------------------------------
+// IP Redirections display
+// -----------------------------------------------------------------------------
+exports.displayRedirections = (headers) => {
+  if(!headers) return ''
+  const redirections = headers['x-forwarded-for'] || headers['X-Forwarded-For']
+  return redirections ? `<- ${redirections} ` : ''
+}
+// -----------------------------------------------------------------------------
 // Crypto
 // -----------------------------------------------------------------------------

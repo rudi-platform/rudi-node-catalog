@@ -54,12 +54,33 @@ fastify.setErrorHandler((error, request, reply) => {
   }
   log.d(mod, fun, 'done')
 })
+fastify.decorate('notFound', (req, reply) => {
+  const fun = 'notFound'
+  const ip = req.ip
+
+  const response = {
+    message: `Route ${req.method}:${req.url} not found`,
+    error: 'Not Found',
+    statusCode: 404,
+  }
+
+  log.w(mod, fun, `${response.message} <- ${req.ip}` + utils.displayRedirections(req.headers))
+
+  // log.d(mod, fun, utils.beautify(req))
+  reply.code(404).send(response)
+})
+
+fastify.setNotFoundHandler(fastify.notFound)
 
 fastify.addHook('onRequest', (req, res, next) => {
   log.logRequest(req)
   next()
 })
-
+fastify.addHook('onError', (request, reply, error, done) => {
+  const fun = 'onError'
+  log.e(mod, fun, error)
+  done()
+})
 // Import Swagger Options
 // const swagger = require('./config/swagger')
 

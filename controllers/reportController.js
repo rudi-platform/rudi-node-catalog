@@ -175,7 +175,7 @@ exports.addOrEditSingleReport = async (objectType, req, reply) => {
   try {
     // retrieve url parameters: object type, object id
     const urlObjectId = json.accessReqParam(req, PARAM_ID)
-
+    log.d(mod, fun, `Incoming Portal report: ${utils.beautify(req.body)}`)
     const reportBody = fromPortalToRudiFormat(req.body)
     // log.v(mod, fun, `new report: ${utils.beautify(reportBody)}`)
 
