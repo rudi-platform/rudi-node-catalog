@@ -343,7 +343,7 @@ exports.checkSignatureWithPubKey = (accessToken) => {
     try {
       pubKeyPem = readFileSync(portal.PUBLIC_KEY, 'ascii')
     } catch (err) {
-      throw new (`The file with the Portal public key can't be accessed: ${err}`)
+      throw new `The file with the Portal public key can't be accessed: ${err}`()
     }
     let sslKey
     try {
@@ -354,10 +354,11 @@ exports.checkSignatureWithPubKey = (accessToken) => {
     // log.d(mod, fun, `sslKey: ${utils.beautify(sslKey)}`)
     // const keyName = sslKey.comment && sslKey.comment !== '(unnamed)' ? `'${sslKey.comment}' ` : ''
     // log.d(mod, fun, `${keyName}public key: ${sslKey.type} ${sslKey.size} bits`)
+    let signatureIsValid
     try {
       const verifier = sslKey.createVerify('sha256')
       verifier.update(`${jwtHeaderBase64url}.${jwtPayloadBase64url}`)
-      const signatureIsValid = verifier.verify(jwtSignatureBase64url, 'base64url')
+      signatureIsValid = verifier.verify(jwtSignatureBase64url, 'base64url')
     } catch (err) {
       throw new Error(`Error while verifying the Portal token signature: ${err}`)
     }
