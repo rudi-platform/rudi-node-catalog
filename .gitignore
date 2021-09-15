@@ -18,3 +18,7 @@
 # Keys
 **/*.pub
 **/*.prv
+
+# Idz
+features
+notes

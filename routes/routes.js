@@ -72,6 +72,10 @@ const { ForbiddenError } = require('../utils/errors')
 // -----------------------------------------------------------------------------
 // Route names
 // -----------------------------------------------------------------------------
+const REDIRECT_GET_DATA = 'pub_redirect_metadata'
+const REDIRECT_GET_PLUS = 'pub_redirect_metadata'
+const REDIRECT_PUT_PLUS = 'pub_redirect_metadata'
+
 const PUB_GET_ALL_METADATA = 'pub_get_all_metadata'
 const PUB_GET_ONE_METADATA = 'pub_get_one_metadata'
 const PUB_UPSERT_ONE_REPORT = 'pub_upsert_one_report'
@@ -125,6 +129,7 @@ async function onFreeRoute(req, reply) {
   const fun = 'onPublicRoute'
   log.d(mod, fun, `${req.method} ${req.url} `)
   try {
+    // TODO : ajouter X-Forwarded-For à l'IP !!
     return
   } catch (err) {
     log.w(mod, fun, err)
@@ -136,6 +141,7 @@ async function onPublicRoute(req, reply) {
   const fun = 'onPublicRoute'
   log.d(mod, fun, `${req.method} ${req.url} `)
   try {
+    // TODO : ajouter X-Forwarded-For à l'IP !!
     return
   } catch (err) {
     log.w(mod, fun, err)
@@ -149,6 +155,8 @@ async function onPrivateRoute(req, reply) {
   try {
     // log.w(mod, fun, `JWT are ${SHOULD_CONTROL_PRIVATE_REQUESTS ? '' : 'not '}controlled`)
     if (!SHOULD_CONTROL_PRIVATE_REQUESTS) return true
+
+    // TODO : ajouter X-Forwarded-For à l'IP !!
 
     const subject = await tokenController.checkRudiProdPermission(req, reply)
     log.i(mod, fun, `subject: ${subject} -> route ${req.context.config.routeName}`)
@@ -165,6 +173,7 @@ async function onDevRoute(req, reply) {
   try {
     // log.w(mod, fun, `JWT are ${SHOULD_CONTROL_PRIVATE_REQUESTS ? '' : 'not '}controlled`)
     if (!SHOULD_CONTROL_PRIVATE_REQUESTS) return true
+    // TODO : ajouter X-Forwarded-For à l'IP !!
 
     // log.d(mod, fun, `${req.ip}: ${req.method} ${req.url} ${req.context.config.routeName}`)
     const subject = await tokenController.checkRudiProdPermission(req, reply)
@@ -176,7 +185,71 @@ async function onDevRoute(req, reply) {
   }
   // log.d(mod, fun, `${beautify(req)}`)
 }
-
+exports.redirectRoutes = [
+  {
+    method: 'GET',
+    url: `/`,
+    preHandler: onPublicRoute,
+    config: { routeName: REDIRECT_GET_DATA },
+    handler: function (req, reply) {
+      reply.redirect(URL_PUB_METADATA)
+    },
+  },
+  {
+    method: 'GET',
+    url: `/api`,
+    preHandler: onPublicRoute,
+    config: { routeName: REDIRECT_GET_DATA },
+    handler: function (req, reply) {
+      reply.redirect(URL_PUB_METADATA)
+    },
+  },
+  {
+    method: 'GET',
+    url: URL_PREFIX_PUBLIC,
+    preHandler: onPublicRoute,
+    config: { routeName: REDIRECT_GET_DATA },
+    handler: function (req, reply) {
+      reply.redirect(URL_PUB_METADATA)
+    },
+  },
+  {
+    method: 'GET',
+    url: `/${PARAM_OBJECT_METADATA}`,
+    preHandler: onPublicRoute,
+    config: { routeName: REDIRECT_GET_DATA },
+    handler: function (req, reply) {
+      const fun = `redirectRoutes handler`
+      const newRoute = `${URL_PREFIX_PUBLIC}${req.url}`
+      log.d(mod, fun, newRoute)
+      reply.redirect(newRoute)
+    },
+  },
+  {
+    method: 'GET',
+    url: `/${PARAM_OBJECT_METADATA}/*`,
+    preHandler: onPublicRoute,
+    config: { routeName: REDIRECT_GET_PLUS },
+    handler: function (req, reply) {
+      const fun = `redirectRoutes handler`
+      const newRoute = `${URL_PREFIX_PUBLIC}${req.url}`
+      log.d(mod, fun, newRoute)
+      reply.redirect(newRoute)
+    },
+  },
+  {
+    method: 'PUT',
+    url: `/${PARAM_OBJECT_METADATA}/*`,
+    preHandler: onPublicRoute,
+    config: { routeName: REDIRECT_PUT_PLUS },
+    handler: function (req, reply) {
+      const fun = `redirectRoutes handler`
+      const newRoute = `${URL_PREFIX_PUBLIC}${req.url}`
+      log.d(mod, fun, newRoute)
+      reply.redirect(newRoute)
+    },
+  },
+]
 // -----------------------------------------------------------------------------
 // Public routes
 // -----------------------------------------------------------------------------
@@ -532,7 +605,7 @@ exports.devRoutes = [
     config: { routeName: DEV_GET_NODE_VERSION },
   },
 
- /**
+  /**
    * Get this module environment
    */
   {

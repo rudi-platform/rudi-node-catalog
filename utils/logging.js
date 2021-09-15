@@ -6,7 +6,7 @@ const mod = 'logging'
 // Internal dependencies
 // -----------------------------------------------------------------------------
 const { logger, sysLogger } = require('../config/confLogs')
-const { consoleErr, displayStr, logWhere } = require('./jsUtils')
+const { consoleErr, displayStr, logWhere, beautify } = require('./jsUtils')
 const { addLogEntry } = require('../db/dbQueries')
 
 // -----------------------------------------------------------------------------
@@ -52,7 +52,6 @@ const Colors = {
 exports.displaySyslog = (loc_mod, loc_fun, msg) => {
   return `[ ${logWhere(loc_mod, loc_fun)} ] ${msg !== '' ? msg : '<-'}`
 }
-
 
 // function displayColor(fgColor, bgColor, msg) {
 //   console.log(fgColor, bgColor, msg, Colors.Reset)
@@ -110,6 +109,7 @@ exports.d = (mod, fun, msg) => {
 
 exports.logRequest = (req, res) => {
   const fun = 'request'
+  // this.d(mod, fun, beautify(req))
   this.i('http', fun, `${req.method} ${req.url} <- ${req.ip} `)
   // return
   // this.d(mod, fun, `method: ${utils.beautify(req.method)}`)

@@ -111,33 +111,13 @@ mongoose
 // -----------------------------------------------------------------------------
 
 // Import Routes
-const { publicRoutes, backOfficeRoutes, devRoutes } = require('./routes/routes')
+const { publicRoutes, backOfficeRoutes, devRoutes, redirectRoutes } = require('./routes/routes')
 
-// Declare a default route
-fastify.get('/', async (request, reply) => {
-  log.i(mod, 'routes', 'GET /')
-  return {
-    server: 'RUDI',
-  }
+// Loop over each public route
+redirectRoutes.forEach((pubRoute, index) => {
+  fastify.route(pubRoute)
+  log.v(mod, 'routes', `Redirect route #${index} = ${pubRoute.method} ${pubRoute.url}`)
 })
-
-// Declare a default route
-fastify.get('/api', async (request, reply) => {
-  // request.log.info(`GET /api`)
-  log.i(mod, 'routes', 'GET /api')
-  return {
-    API: 'RUDI API',
-  }
-})
-
-// Declare a default route
-fastify.get(api.URL_PREFIX_PUBLIC, async (request, reply) => {
-  log.i(mod, 'routes', `GET ${api.URL_PREFIX_PUBLIC}`)
-  return {
-    'API version': 'RUDI API v1',
-  }
-})
-
 // Loop over each public route
 publicRoutes.forEach((pubRoute, index) => {
   fastify.route(pubRoute)

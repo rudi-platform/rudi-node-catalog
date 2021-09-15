@@ -171,7 +171,7 @@ exports.addOrEditSingleReportForObject = async (req, reply) => {
 
 exports.addOrEditSingleReport = async (objectType, req, reply) => {
   const fun = 'addOrEditSingleReport'
-  // log.d(mod, fun, ``)
+  log.d(mod, fun, ``)
   try {
     // retrieve url parameters: object type, object id
     const urlObjectId = json.accessReqParam(req, PARAM_ID)

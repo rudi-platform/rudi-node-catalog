@@ -116,7 +116,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Git hash : 7 alphanumerical characters\", () => {",
+									"pm.test(`Env: ${pm.variables.get('env')}`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const env = pm.variables.get('env')",
 									"    const responseStr = pm.response.stream.toString('utf8');",

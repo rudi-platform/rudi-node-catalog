@@ -83,7 +83,8 @@ exports.getEnvironment = () => {
   const fun = 'getEnvironment'
   try {
     // log.d(mod, fun, utils.beautify(process.env))
-    return process.env.RUDI_API_ENV
+    const env = process.env.RUDI_API_ENV?process.env.RUDI_API_ENV:utils.NOT_FOUND
+    return env
   } catch (err) {
     log.e(mod, fun, err)
     throw err

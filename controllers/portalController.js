@@ -339,16 +339,28 @@ exports.checkSignatureWithPubKey = (accessToken) => {
     const [jwtHeaderBase64url, jwtPayloadBase64url, jwtSignatureBase64url] = accessToken.split('.')
 
     // Retrieve the public key
-    const pubKeyPem = readFileSync(portal.PUBLIC_KEY, 'ascii')
-    const sslKey = parseKey(pubKeyPem)
+    let pubKeyPem
+    try {
+      pubKeyPem = readFileSync(portal.PUBLIC_KEY, 'ascii')
+    } catch (err) {
+      throw new (`The file with the Portal public key can't be accessed: ${err}`)
+    }
+    let sslKey
+    try {
+      sslKey = parseKey(pubKeyPem)
+    } catch (err) {
+      throw new Error(`The Portal public key is incorrect, please check the content: ${err}`)
+    }
     // log.d(mod, fun, `sslKey: ${utils.beautify(sslKey)}`)
     // const keyName = sslKey.comment && sslKey.comment !== '(unnamed)' ? `'${sslKey.comment}' ` : ''
     // log.d(mod, fun, `${keyName}public key: ${sslKey.type} ${sslKey.size} bits`)
-
-    const verifier = sslKey.createVerify('sha256')
-    verifier.update(`${jwtHeaderBase64url}.${jwtPayloadBase64url}`)
-    const signatureIsValid = verifier.verify(jwtSignatureBase64url, 'base64url')
-
+    try {
+      const verifier = sslKey.createVerify('sha256')
+      verifier.update(`${jwtHeaderBase64url}.${jwtPayloadBase64url}`)
+      const signatureIsValid = verifier.verify(jwtSignatureBase64url, 'base64url')
+    } catch (err) {
+      throw new Error(`Error while verifying the Portal token signature: ${err}`)
+    }
     if (signatureIsValid) {
       log.i(mod, fun, `signature is valid`)
     } else {
@@ -356,8 +368,8 @@ exports.checkSignatureWithPubKey = (accessToken) => {
     }
     return signatureIsValid
   } catch (err) {
-    const errMsg = `Invalid token: ${err}`
-    log.w(mod, fun, errMsg)
+    // const errMsg = `Invalid token: ${err}`
+    log.w(mod, fun, err)
     throw err
   }
 }
