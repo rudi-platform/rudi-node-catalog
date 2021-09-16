@@ -163,7 +163,7 @@
 									"pm.test(\"Git hash : 7 alphanumerical characters\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseStr = pm.response.stream.toString('utf8');",
-									"    pm.expect(responseStr).to.match(/^[0-9a-z]{7}$/)",
+									"    pm.expect(responseStr).to.match(/^[0-9a-z]{7}|[0-9a-z]{40}$/)",
 									"",
 									"    pm.collectionVariables.set('gitHash', responseStr)",
 									"});"
@@ -203,7 +203,7 @@
 									"pm.test(\"Current app hash = git hash\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseStr = pm.response.stream.toString('utf8');",
-									"    pm.expect(responseStr).to.match(/^[0-9a-z]{7}$/)",
+									"    pm.expect(responseStr).to.match(/^[0-9a-z]{7}|[0-9a-z]{40}$/)",
 									"    pm.expect(responseStr).to.eq(gitHash)",
 									"});"
 								],
