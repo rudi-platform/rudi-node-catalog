@@ -192,6 +192,7 @@ exports.redirectRoutes = [
     preHandler: onPublicRoute,
     config: { routeName: REDIRECT_GET_DATA },
     handler: function (req, reply) {
+      log.d(mod, `redirect`, `${req.method} ${URL_PUB_METADATA}`)
       reply.redirect(URL_PUB_METADATA)
     },
   },
@@ -201,6 +202,7 @@ exports.redirectRoutes = [
     preHandler: onPublicRoute,
     config: { routeName: REDIRECT_GET_DATA },
     handler: function (req, reply) {
+      log.d(mod, `redirect`, `${req.method} ${URL_PUB_METADATA}`)
       reply.redirect(URL_PUB_METADATA)
     },
   },
@@ -210,6 +212,7 @@ exports.redirectRoutes = [
     preHandler: onPublicRoute,
     config: { routeName: REDIRECT_GET_DATA },
     handler: function (req, reply) {
+      log.d(mod, `redirect`, `${req.method} ${URL_PUB_METADATA}`)
       reply.redirect(URL_PUB_METADATA)
     },
   },
@@ -219,9 +222,8 @@ exports.redirectRoutes = [
     preHandler: onPublicRoute,
     config: { routeName: REDIRECT_GET_DATA },
     handler: function (req, reply) {
-      const fun = `redirectRoutes handler`
       const newRoute = `${URL_PREFIX_PUBLIC}${req.url}`
-      log.d(mod, fun, newRoute)
+      log.d(mod, `redirect`, `${req.method} ${newRoute}`)
       reply.redirect(308, newRoute)
     },
   },
@@ -231,9 +233,8 @@ exports.redirectRoutes = [
     preHandler: onPublicRoute,
     config: { routeName: REDIRECT_GET_PLUS },
     handler: function (req, reply) {
-      const fun = `redirectRoutes handler`
       const newRoute = `${URL_PREFIX_PUBLIC}${req.url}`
-      log.d(mod, fun, newRoute)
+      log.d(mod, `redirect`, `${req.method} ${newRoute}`)
       reply.redirect(308, newRoute)
     },
   },
@@ -243,9 +244,8 @@ exports.redirectRoutes = [
     preHandler: onPublicRoute,
     config: { routeName: REDIRECT_PUT_PLUS },
     handler: function (req, reply) {
-      const fun = `redirectRoutes handler`
       const newRoute = `${URL_PREFIX_PUBLIC}${req.url}`
-      log.d(mod, fun, newRoute)
+      log.d(mod, `redirect`, `${req.method} ${newRoute}`)
       reply.redirect(308, newRoute)
     },
   },
@@ -283,6 +283,15 @@ exports.publicRoutes = [
   // -----------------------------------------------------------------------------
   // Integration reports for one particular object
   // -----------------------------------------------------------------------------
+
+  // Add/edit 1 report for one object integration
+  {
+    method: 'PUT',
+    url: `/${PARAM_OBJECT_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
+    preHandler: onPublicRoute,
+    handler: reportController.addOrEditSingleReportForMetadata,
+    config: { routeName: PUB_UPSERT_ONE_REPORT },
+  },
 
   // Add/edit 1 report for one object integration
   {
