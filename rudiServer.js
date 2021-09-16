@@ -54,6 +54,7 @@ fastify.setErrorHandler((error, request, reply) => {
   }
   log.d(mod, fun, 'done')
 })
+
 fastify.decorate('notFound', (req, reply) => {
   const fun = 'notFound'
   const ip = req.ip

@@ -222,7 +222,7 @@ exports.redirectRoutes = [
       const fun = `redirectRoutes handler`
       const newRoute = `${URL_PREFIX_PUBLIC}${req.url}`
       log.d(mod, fun, newRoute)
-      reply.redirect(newRoute)
+      reply.redirect(308, newRoute)
     },
   },
   {
@@ -234,7 +234,7 @@ exports.redirectRoutes = [
       const fun = `redirectRoutes handler`
       const newRoute = `${URL_PREFIX_PUBLIC}${req.url}`
       log.d(mod, fun, newRoute)
-      reply.redirect(newRoute)
+      reply.redirect(308, newRoute)
     },
   },
   {
@@ -246,7 +246,7 @@ exports.redirectRoutes = [
       const fun = `redirectRoutes handler`
       const newRoute = `${URL_PREFIX_PUBLIC}${req.url}`
       log.d(mod, fun, newRoute)
-      reply.redirect(newRoute)
+      reply.redirect(308, newRoute)
     },
   },
 ]
