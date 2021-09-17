@@ -4,6 +4,7 @@ These routes are accessible from the internet, and especially the Portal:
 
 - `GET /api/v1/resources`
     - returns a list of all the public resources on the Producer node
+    - use of the optional parameters bellow can refine such request
 - `GET /api/v1/resources/:id`
     - returns the metadata for the identified resource
 - `PUT /api/v1/resources/:id/report` 
