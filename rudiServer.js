@@ -162,7 +162,7 @@ devRoutes.forEach((devRoute, index) => {
 // -----------------------------------------------------------------------------
 const start = async () => {
   try {
-    process.title = 'rudi-proxy-apiô'
+    process.title = 'rudi-proxy-api'
     await fastify
       .listen(sys.LISTENING_PORT, sys.LISTENING_ADDR)
       .catch((err) => log.e(mod, 'Fastify listen', `${err}`))

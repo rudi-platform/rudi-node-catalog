@@ -621,7 +621,7 @@ exports.sendToPortal = async (metadata) => {
       return
     }
 
-    await portalController.postMetadataToPortal(metadataId)
+    portalController.postMetadataToPortal(metadataId)
     log.v(mod, fun, `Sent to portal: ${metadataId}`)
   } catch (err) {
     log.w(mod, fun, err)

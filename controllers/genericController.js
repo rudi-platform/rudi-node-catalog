@@ -613,7 +613,7 @@ exports.deleteSingleObject = async (req, reply) => {
     // TODO: if SkosConcept: update all other SkosConcepts that reference it (parents/children/siblings/relatives)
     const reply = await db.deleteObject(objectType, objectRudiId)
     try {
-      if (objectType === PARAM_OBJECT_METADATA) await deletePortalMetadata(objectRudiId)
+      if (objectType === PARAM_OBJECT_METADATA) deletePortalMetadata(objectRudiId)
     } catch (err) {
       log.w(
         mod,

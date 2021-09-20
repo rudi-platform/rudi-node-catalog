@@ -113,12 +113,7 @@
 						}
 					},
 					"response": []
-				}
-			]
-		},
-		{
-			"name": "00. Check app online",
-			"item": [
+				},
 				{
 					"name": "Get app env",
 					"event": [
@@ -131,7 +126,10 @@
 									"    const env = pm.variables.get('env')",
 									"    const currentEnv = pm.response.stream.toString('utf8');",
 									"    if (!['dev', 'local', 'test'].includes(currentEnv))",
-									"        pm.collectionVariables.set('pm_jwt', 'environment not suited');",
+									"        {",
+									"            pm.collectionVariables.set('pm_jwt', 'environment not suited');",
+									"            throw new Error(`Environment '${currentEnv}' not suited for sanity tests`)",
+									"        }",
 									"    pm.expect(currentEnv).to.eq(env)",
 									"});"
 								],
@@ -154,7 +152,12 @@
 						}
 					},
 					"response": []
-				},
+				}
+			]
+		},
+		{
+			"name": "00. Check app online",
+			"item": [
 				{
 					"name": "Get git hash Copy",
 					"event": [
