@@ -198,7 +198,7 @@ exports.getNewTokenFromPortal = async () => {
     const pwd = portal.PASSW
 
     const portalUrl = portal.getAuthUrl()
-    const body = `grant_type=password&scope=read&client_id=${usr}&username=${usr}&password=${pwd}`
+    const body = `grant_type=password&scope=read&username=${usr}&password=${pwd}`
 
     const basicAuth = utils.toBase64Url(`${usr}:${pwd}`)
 
