@@ -574,7 +574,9 @@ exports.overwriteMetadata = async (incomingRudiMetadata) => {
   // log.d(mod, fun, `reply: ${beautify(reply)}`)
   // log.d(mod, fun, `reply: ${beautify(reply.contacts[0])}`)
 
-  await this.sendToPortal(dbMetadata)
+  this.sendToPortal(dbMetadata).catch((err) => {
+    log.w(mod, fun, `Failed to send the data to portal: ${err}`)
+  })
 
   return dbMetadata
 }

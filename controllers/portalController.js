@@ -180,6 +180,7 @@ exports.deleteMetadata = async (req, reply) => {
 // ----- GET Portal public key
 exports.getPortalPublicKey = () => {
   const fun = 'getPortalPublicKey'
+  log.d(mod, fun, ``)
 
   const publicKeyObj = this.PUBLIC_KEY_URL ? httpGet(this.PUBLIC_KEY_URL) : null
   const publicKey = publicKeyObj ? publicKeyObj.value : null
@@ -193,6 +194,7 @@ exports.getPortalPublicKey = () => {
 
 exports.getNewTokenFromPortal = async () => {
   const fun = 'getNewTokenFromPortal'
+  log.d(mod, fun, ``)
   try {
     const usr = portal.LOGIN
     const pwd = portal.PASSW
@@ -209,8 +211,14 @@ exports.getNewTokenFromPortal = async () => {
         Authorization: `Basic ${basicAuth}`,
       },
     }
-
-    const answer = await directPost(portalUrl, body, opts)
+    let answer
+    try {
+      answer = await directPost(portalUrl, body, opts)
+    } catch (err) {
+      const errMsg = `Post to portal failed: ${err}`
+      log.w(mod, fun, errMsg)
+      throw errMsg
+    }
     // log.d(mod, fun, `answer.status: ${answer.status}`)
 
     if (answer.status === 200) {
