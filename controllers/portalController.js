@@ -256,7 +256,7 @@ exports.getNewTokenFromPortal = async () => {
 
 exports.getTokenCheckedByPortal = async (token) => {
   const fun = 'getTokenCheckedByPortal'
-  log.d(mod, fun, `token: ${token}`)
+  log.d(mod, fun, ``)
   try {
     if (!token) throw new BadRequestError('No token to check!')
     const portalUrl = portal.getCheckAuthUrl()
