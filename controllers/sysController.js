@@ -98,14 +98,15 @@ exports.getNodeVersion = async () => {
     // log.d(mod, fun, ` GET ${URL_PV_NODE_VERSION_ACCESS}`)
     const nodeVersion = prcs.execSync('node -v')
     const npmVersion = prcs.execSync('npm -v')
-    let mongooseVersion
+
+    let mongooseVersion = 'n/a'
     try {
       mongooseVersion = prcs.execSync('npm view mongoose version')
     } catch (err) {
       log.w(mod, fun, `Command 'npm view mongoose version' failed: ${err}`)
     }
 
-    let mongoDbVersion
+    let mongoDbVersion = 'n/a'
     try {
       mongoDbVersion = await getMongDbVersion()
     } catch (err) {

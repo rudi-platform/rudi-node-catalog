@@ -193,7 +193,8 @@ exports.redirectRoutes = [
     config: { routeName: REDIRECT_GET_DATA },
     handler: function (req, reply) {
       log.d(mod, `redirect`, `${req.method} ${URL_PUB_METADATA}`)
-      reply.redirect(URL_PUB_METADATA)
+      return "RUDI producer node"
+      //reply.redirect(URL_PUB_METADATA)
     },
   },
   {
