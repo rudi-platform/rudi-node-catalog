@@ -61,6 +61,7 @@ const {
 // -----------------------------------------------------------------------------
 const { Report, IntegrationStatus } = require('../definitions/models/Report')
 const { BadRequestError, NotFoundError, ObjectNotFoundError, ForbiddenError } = require('../utils/errors')
+const { getTokenCheckedByPortal } = require('./portalController')
 
 // -----------------------------------------------------------------------------
 // Comformity functions
@@ -176,12 +177,12 @@ exports.addOrEditSingleReport = async (objectType, req, reply) => {
     // retrieve url parameters: object type, object id
     const urlObjectId = json.accessReqParam(req, PARAM_ID)
     log.d(mod, fun, `Incoming Portal report: ${utils.beautify(req.body)}`)
-    const reportBody = fromPortalToRudiFormat(req.body)
+    const reportBody = fromPortalToRudiFormat(req.body) 
     // log.v(mod, fun, `new report: ${utils.beautify(reportBody)}`)
     const header = json.accessProperty(req, 'headers')
     try {
       const portalToken = json.accessProperty(header, 'authorization')
-      const tokenChecked = await getTokenCheckedByPortal(portalToken)
+      const tokenChecked = await getTokenCheckedByPortal(portalToken) // TODO: check ourselves
     } catch (err) {
       const errMsg = `Incoming integration report from Portal should be presented with a JWT identified request. Error: ${err}`
       log.e(mod, fun, errMsg)
