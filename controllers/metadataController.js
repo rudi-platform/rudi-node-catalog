@@ -524,7 +524,7 @@ exports.newMetadata = async (rudiMetadata) => {
   // log.d(mod, fun, `dbReadyObject: ${beautify(dbReadyObject)}`)
 
   // Special update for metadataInfo.referenceDates: update 'createdDate'
-
+  const rudiId = dbReadyObject[API_METADATA_ID]
   let dbMetadata
   try {
     dbMetadata = await new Metadata(dbReadyObject)
@@ -532,7 +532,7 @@ exports.newMetadata = async (rudiMetadata) => {
     log.w(
       mod,
       fun,
-      `New object '${PARAM_OBJECT_METADATA}': ${dbReadyObject[API_METADATA_ID]} | Error: ${err}`
+      `New object '${PARAM_OBJECT_METADATA}': ${rudiId} | Error: ${err}`
     )
     throw err
   }
@@ -542,7 +542,7 @@ exports.newMetadata = async (rudiMetadata) => {
     log.w(
       mod,
       fun,
-      `Saving object '${PARAM_OBJECT_METADATA}': ${dbMetadata[API_METADATA_ID]} | Error: ${err}`
+      `Saving object '${PARAM_OBJECT_METADATA}': ${rudiId} | Error: ${err}`
     )
     throw err
   }

@@ -615,8 +615,8 @@ exports.deleteSingleObject = async (req, reply) => {
 
     if (objectType === PARAM_OBJECT_METADATA) {
       deletePortalMetadata(objectRudiId)
-        .catch((err) => log.e(mod, fun, `Portal couldn't delete metadata '${rudiId}': ${err}`))
-        .then((result) => log.i(mod, fun, `Portal successfully deleted metadata '${rudiId}'`))
+        .catch((err) => log.e(mod, fun, `Portal couldn't delete metadata '${objectRudiId}': ${err}`))
+        .then((result) => log.i(mod, fun, `Portal successfully deleted metadata '${objectRudiId}'`))
     }
 
     return reply
