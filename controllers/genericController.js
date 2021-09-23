@@ -612,17 +612,23 @@ exports.deleteSingleObject = async (req, reply) => {
     // TODO: if SkosScheme: delete all SkosConcepts that reference it
     // TODO: if SkosConcept: update all other SkosConcepts that reference it (parents/children/siblings/relatives)
     const reply = await db.deleteObject(objectType, objectRudiId)
-    try {
-      if (objectType === PARAM_OBJECT_METADATA) deletePortalMetadata(objectRudiId)
-    } catch (err) {
-      log.w(
-        mod,
-        fun,
-        `Erreur on the Portal side: ` +
-          ` metadata couldn't be deleted for id ${objectRudiId}.` +
-          ` Cause: ${err}`
-      )
+
+    if (objectType === PARAM_OBJECT_METADATA) {
+      const subFun = 'deletePortalMetadata'
+      deletePortalMetadata(objectRudiId)
+        .catch((err) => {
+          const errMsg =
+            `Erreur on the Portal side: ` +
+            ` metadata couldn't be deleted for id ${objectRudiId}.` +
+            ` Cause: ${err}`
+
+          log.w(mod, subFun, errMsg)
+        })
+        .then((portalAnswer) =>
+          log.w(mod, subFun, `Metadata deleted on the Portal side: ${portalAnswer}`)
+        )
     }
+
     return reply
   } catch (err) {
     log.e(mod, fun, err)
