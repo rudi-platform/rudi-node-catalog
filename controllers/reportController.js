@@ -178,8 +178,9 @@ exports.addOrEditSingleReport = async (objectType, req, reply) => {
     log.d(mod, fun, `Incoming Portal report: ${utils.beautify(req.body)}`)
     const reportBody = fromPortalToRudiFormat(req.body)
     // log.v(mod, fun, `new report: ${utils.beautify(reportBody)}`)
-    log.d(mod, fun, `Incoming Portal report header: ${utils.beautify(req.headers)}`)
-
+    const header = json.accessReqParam(req, 'headers')
+    const portalToken = json.accessReqParam(header, 'authorization')
+    const tokenChecked = await getTokenCheckedByPortal(portalToken)
 
     // retrieve body parameters: object id, report id
     const reportId = json.accessProperty(reportBody, API_REPORT_ID)

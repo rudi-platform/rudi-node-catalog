@@ -608,7 +608,6 @@ exports.updateMetadata = async (incomingRudiMetadata) => {
 
   const reply = await dbMetadata.save()
   // log.d(mod, fun, `metadata saved: ${beautify(reply)}`)
-
   this.sendToPortal(dbMetadata)
     .catch((err) => log.e(mod, fun, `Sending to portal failed for metadata '${rudiId}': ${err}`))
     .then((result) => log.i(mod, fun, `Sending to portal successful for metadata '${rudiId}'`))

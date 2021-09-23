@@ -271,7 +271,7 @@ exports.getTokenCheckedByPortal = async (token) => {
     } else {
       const errMsg = `Portal invalidated the token: ${portalResponse.data}`
       log.w(mod, fun, errMsg)
-      throw new InternalServerError(errMsg)
+      throw new ForbiddenError(errMsg)
     }
   } catch (err) {
     log.w(mod, fun, err)
