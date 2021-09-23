@@ -614,19 +614,9 @@ exports.deleteSingleObject = async (req, reply) => {
     const reply = await db.deleteObject(objectType, objectRudiId)
 
     if (objectType === PARAM_OBJECT_METADATA) {
-      const subFun = 'deletePortalMetadata'
       deletePortalMetadata(objectRudiId)
-        .catch((err) => {
-          const errMsg =
-            `Erreur on the Portal side: ` +
-            ` metadata couldn't be deleted for id ${objectRudiId}.` +
-            ` Cause: ${err}`
-
-          log.w(mod, subFun, errMsg)
-        })
-        .then((portalAnswer) =>
-          log.w(mod, subFun, `Metadata deleted on the Portal side: ${portalAnswer}`)
-        )
+        .catch((err) => log.e(mod, fun, `Portal couldn't delete metadata '${rudiId}': ${err}`))
+        .then((result) => log.i(mod, fun, `Portal successfully deleted metadata '${rudiId}'`))
     }
 
     return reply

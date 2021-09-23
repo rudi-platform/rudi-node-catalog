@@ -548,7 +548,9 @@ exports.newMetadata = async (rudiMetadata) => {
   }
   // log.d(mod, fun, `dbMetadata: ${beautify(dbMetadata)}`)
 
-  await this.sendToPortal(dbMetadata)
+  this.sendToPortal(dbMetadata)
+    .catch((err) => log.e(mod, fun, `Sending to portal failed for metadata '${rudiId}': ${err}`))
+    .then((result) => log.i(mod, fun, `Sending to portal successful for metadata '${rudiId}'`))
 
   return dbMetadata
   // return this.dbMetadataToRudi(dbMetadata)
@@ -574,9 +576,9 @@ exports.overwriteMetadata = async (incomingRudiMetadata) => {
   // log.d(mod, fun, `reply: ${beautify(reply)}`)
   // log.d(mod, fun, `reply: ${beautify(reply.contacts[0])}`)
 
-  this.sendToPortal(dbMetadata).catch((err) => {
-    log.w(mod, fun, `Failed to send the data to portal: ${err}`)
-  })
+  this.sendToPortal(dbMetadata)
+    .catch((err) => log.e(mod, fun, `Sending to portal failed for metadata '${rudiId}': ${err}`))
+    .then((result) => log.i(mod, fun, `Sending to portal successful for metadata '${rudiId}'`))
 
   return dbMetadata
 }
@@ -608,6 +610,8 @@ exports.updateMetadata = async (incomingRudiMetadata) => {
   // log.d(mod, fun, `metadata saved: ${beautify(reply)}`)
 
   this.sendToPortal(dbMetadata)
+    .catch((err) => log.e(mod, fun, `Sending to portal failed for metadata '${rudiId}': ${err}`))
+    .then((result) => log.i(mod, fun, `Sending to portal successful for metadata '${rudiId}'`))
 
   return reply
 }
@@ -623,7 +627,7 @@ exports.sendToPortal = async (metadata) => {
       return
     }
 
-    portalController.postMetadataToPortal(metadataId)
+    await portalController.postMetadataToPortal(metadataId)
     log.v(mod, fun, `Sent to portal: ${metadataId}`)
   } catch (err) {
     log.w(mod, fun, err)
