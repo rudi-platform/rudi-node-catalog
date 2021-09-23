@@ -83,7 +83,7 @@ exports.getEnvironment = () => {
   const fun = 'getEnvironment'
   try {
     // log.d(mod, fun, utils.beautify(process.env))
-    const env = process.env.RUDI_API_ENV?process.env.RUDI_API_ENV:utils.NOT_FOUND
+    const env = process.env.RUDI_API_ENV ? process.env.RUDI_API_ENV : utils.NOT_FOUND
     return env
   } catch (err) {
     log.e(mod, fun, err)
@@ -100,12 +100,18 @@ exports.getNodeVersion = async () => {
     const npmVersion = prcs.execSync('npm -v')
     let mongooseVersion
     try {
-       mongooseVersion = prcs.execSync('npm view mongoose version')
+      mongooseVersion = prcs.execSync('npm view mongoose version')
     } catch (err) {
       log.w(mod, fun, `Command 'npm view mongoose version' failed: ${err}`)
     }
-    
-    const mongoDbVersion = await getMongDbVersion()
+
+    let mongoDbVersion
+    try {
+      mongoDbVersion = await getMongDbVersion()
+    } catch (err) {
+      log.w(mod, fun, `Couldn't get MongoDB version: ${err}`)
+    }
+
     const nVersions = {
       node: `${nodeVersion}`.trim(),
       npm: `${npmVersion}`.trim(),
@@ -130,5 +136,6 @@ async function getMongDbVersion() {
     return mongoInfo.version
   } catch (err) {
     log.w(mod, fun, err)
+    throw err
   }
 }
