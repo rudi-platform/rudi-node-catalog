@@ -179,9 +179,10 @@ exports.addOrEditSingleReport = async (objectType, req, reply) => {
     log.d(mod, fun, `Incoming Portal report: ${utils.beautify(req.body)}`)
     const reportBody = fromPortalToRudiFormat(req.body) 
     // log.v(mod, fun, `new report: ${utils.beautify(reportBody)}`)
-    const header = json.accessProperty(req, 'headers')
     try {
-      const portalToken = json.accessProperty(header, 'authorization')
+      const header = json.accessProperty(req, 'headers')
+      const auth = json.accessProperty(header, 'authorization')
+      const portalToken = auth.substring(7)
       const tokenChecked = await getTokenCheckedByPortal(portalToken) // TODO: check ourselves
     } catch (err) {
       const errMsg = `Incoming integration report from Portal should be presented with a JWT identified request. Error: ${err}`
