@@ -605,17 +605,18 @@ exports.deleteSingleObject = async (req, reply) => {
     // ensure the object exists
     const objectToDelete = await db.getEnsuredObjectWithRudiId(objectType, objectRudiId)
 
-    if (await isObjectReferenced(objectType, objectRudiId)) {
-      const err = new ForbiddenError(msg.objectNotDeletedBecauseUsed(objectType, objectRudiId))
-      throw err
-    }
+    if (await isObjectReferenced(objectType, objectRudiId))
+      throw new ForbiddenError(msg.objectNotDeletedBecauseUsed(objectType, objectRudiId))
+
     // TODO: if SkosScheme: delete all SkosConcepts that reference it
     // TODO: if SkosConcept: update all other SkosConcepts that reference it (parents/children/siblings/relatives)
     const reply = await db.deleteObject(objectType, objectRudiId)
 
     if (objectType === PARAM_OBJECT_METADATA) {
       deletePortalMetadata(objectRudiId)
-        .catch((err) => log.e(mod, fun, `Portal couldn't delete metadata '${objectRudiId}': ${err}`))
+        .catch((err) =>
+          log.e(mod, fun, `Portal couldn't delete metadata '${objectRudiId}': ${err}`)
+        )
         .then((result) => log.i(mod, fun, `Portal successfully deleted metadata '${objectRudiId}'`))
     }
 

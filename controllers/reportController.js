@@ -60,7 +60,7 @@ const {
 // Data models
 // -----------------------------------------------------------------------------
 const { Report, IntegrationStatus } = require('../definitions/models/Report')
-const { BadRequestError, NotFoundError, ObjectNotFoundError } = require('../utils/errors')
+const { BadRequestError, NotFoundError, ObjectNotFoundError, ForbiddenError } = require('../utils/errors')
 
 // -----------------------------------------------------------------------------
 // Comformity functions
@@ -178,9 +178,15 @@ exports.addOrEditSingleReport = async (objectType, req, reply) => {
     log.d(mod, fun, `Incoming Portal report: ${utils.beautify(req.body)}`)
     const reportBody = fromPortalToRudiFormat(req.body)
     // log.v(mod, fun, `new report: ${utils.beautify(reportBody)}`)
-    const header = json.accessReqParam(req, 'headers')
-    const portalToken = json.accessReqParam(header, 'authorization')
-    const tokenChecked = await getTokenCheckedByPortal(portalToken)
+    const header = json.accessProperty(req, 'headers')
+    try {
+      const portalToken = json.accessProperty(header, 'authorization')
+      const tokenChecked = await getTokenCheckedByPortal(portalToken)
+    } catch (err) {
+      const errMsg = `Incoming integration report from Portal should be presented with a JWT identified request. Error: ${err}`
+      log.e(mod, fun, errMsg)
+      throw new ForbiddenError(errMsg)
+    }
 
     // retrieve body parameters: object id, report id
     const reportId = json.accessProperty(reportBody, API_REPORT_ID)
