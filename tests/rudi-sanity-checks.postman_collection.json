@@ -758,7 +758,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"contact_id\": \"{{contId1}}\",\n    \"contact_name\": \"M. Fazo\",\n    \"email\": \"fazo@irisa.fr\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"raw": "{\n    \"contact_id\": \"{{contId1}}\",\n    \"contact_name\": \"M. Fazo\",\n    \"email\": \"sfazo@irisa.fr\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -812,7 +812,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n   \"contact_id\": \"{{contId2}}\",\n   \"contact_name\": \"Mme. Feya\",\n    \"email\": \"feya@irisa.fr\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"raw": "{\n   \"contact_id\": \"{{contId2}}\",\n   \"contact_name\": \"Mme. Feya\",\n    \"email\": \"sfeya@irisa.fr\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -866,7 +866,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n   \"contact_id\": \"{{contId3}}\",\n   \"contact_name\": \"Mme. Areio\",\n    \"email\": \"areio@irisa.fr\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"raw": "{\n   \"contact_id\": \"{{contId3}}\",\n   \"contact_name\": \"Mme. Areio\",\n    \"email\": \"sareio@irisa.fr\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1807,8 +1807,9 @@
 								"exec": [
 									"pm.test(\"2 metadata created\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const metadataList = pm.response.json();",
-									"    pm.expect(metadataList.length).to.eq(2);",
+									"    const publicMetadataList = pm.response.json();",
+									"    pm.expect(publicMetadataList.total).to.eq(2);",
+									"    pm.expect(publicMetadataList.items.length).to.eq(2);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2001,10 +2002,11 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"2 metadata created\", () => {",
+									"pm.test(\"Filtering the metadata\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const metadataList = pm.response.json();",
-									"    pm.expect(metadataList.length).to.eq(1)",
+									"    const publicMetadataList = pm.response.json();",
+									"    pm.expect(publicMetadataList.total).to.eq(1);",
+									"    pm.expect(publicMetadataList.items.length).to.eq(1);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2050,7 +2052,7 @@
 					"response": []
 				},
 				{
-					"name": "[PUB] Count metadata (api_version)",
+					"name": "Count metadata (api_version)",
 					"event": [
 						{
 							"listen": "test",
@@ -2072,12 +2074,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?count_by=metadata_info.api_version",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?count_by=metadata_info.api_version",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							],
 							"query": [
@@ -2091,7 +2093,7 @@
 					"response": []
 				},
 				{
-					"name": "[PUB] Count all metadata (producer)",
+					"name": "Count all metadata (producer)",
 					"event": [
 						{
 							"listen": "test",
@@ -2114,12 +2116,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?count_by=producer",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?count_by=producer",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							],
 							"query": [
@@ -2133,7 +2135,7 @@
 					"response": []
 				},
 				{
-					"name": "[PUB] Group by api_version",
+					"name": "Group by api_version",
 					"event": [
 						{
 							"listen": "test",
@@ -2156,12 +2158,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?group_by=metadata_info.api_version&limit=3",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?group_by=metadata_info.api_version&limit=3",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							],
 							"query": [
@@ -2179,7 +2181,7 @@
 					"response": []
 				},
 				{
-					"name": "[PUB] Count by producer",
+					"name": "Count by producer",
 					"event": [
 						{
 							"listen": "test",
@@ -2207,12 +2209,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?count_by=producer&limit=10",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?count_by=producer&limit=10",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							],
 							"query": [
@@ -2230,7 +2232,7 @@
 					"response": []
 				},
 				{
-					"name": "[PUB] Group by producer",
+					"name": "Group by producer",
 					"event": [
 						{
 							"listen": "test",
@@ -2244,9 +2246,9 @@
 									"    const orgId = pm.variables.get('orgId1')",
 									"    const thisCountResult = result.find(aCountResult => aCountResult.producer.organization_id === orgId)",
 									" ",
-									"    pm.expect(thisCountResult.count).to.be.gte(2)",
+									"    pm.expect(thisCountResult.count).to.eq(2)",
 									"    pm.expect(thisCountResult.producer.organization_name).to.eq(\"IRISA\");",
-									"    pm.expect(thisCountResult.list.length).to.gte(2);",
+									"    pm.expect(thisCountResult.list.length).to.eq(2);",
 									"",
 									"});"
 								],
@@ -2258,12 +2260,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?group_by=producer&limit=4",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?group_by=producer&limit=4&collection_tag={{stamp}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							],
 							"query": [
@@ -2274,6 +2276,10 @@
 								{
 									"key": "limit",
 									"value": "4"
+								},
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
 								}
 							]
 						}
@@ -2281,7 +2287,7 @@
 					"response": []
 				},
 				{
-					"name": "[PUB] Filter by producer",
+					"name": "Filter by producer",
 					"event": [
 						{
 							"listen": "test",
@@ -2306,7 +2312,54 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?producer.organization_id=\"{{orgId1}}\"",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?producer.organization_id={{orgId1}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{data}}"
+							],
+							"query": [
+								{
+									"key": "producer.organization_id",
+									"value": "{{orgId1}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[PUB] Filter by producer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Filter by producer\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json()",
+									"",
+									"    const orgId = pm.variables.get('orgId1')",
+									"    const countWithOrg1 = pm.collectionVariables.get('countWithOrg1')",
+									"",
+									"        const publicMetadataList = pm.response.json();",
+									"",
+									"    // console.log(`should have: ${countWithOrg1} / found: ${responseJson.length}`)",
+									"    pm.expect(countWithOrg1).to.eq(publicMetadataList.total)",
+									"    pm.expect(publicMetadataList.items[0].producer.organization_id).to.eq(orgId)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?producer.organization_id={{orgId1}}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -2317,7 +2370,7 @@
 							"query": [
 								{
 									"key": "producer.organization_id",
-									"value": "\"{{orgId1}}\""
+									"value": "{{orgId1}}"
 								}
 							]
 						}

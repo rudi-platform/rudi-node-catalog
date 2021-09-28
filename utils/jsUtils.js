@@ -94,6 +94,10 @@ exports.isEmptyArray = (anArray) => {
 // -----------------------------------------------------------------------------
 // Objects
 // -----------------------------------------------------------------------------
+exports.isObject = (obj) => {
+  return Object.keys(obj).length > 0
+}
+
 exports.isEmptyObject = (obj) => {
   const fun = 'isEmptyObject'
   // this.consoleLog(mod, fun, `isString: ${this.isString(obj)}`)
@@ -245,7 +249,7 @@ exports.consoleErr = (loc_mod, loc_fun, msg) => {
 // IP Redirections display
 // -----------------------------------------------------------------------------
 exports.displayRedirections = (headers) => {
-  if(!headers) return ''
+  if (!headers) return ''
   const redirections = headers['x-forwarded-for'] || headers['X-Forwarded-For']
   return redirections ? `<- ${redirections} ` : ''
 }

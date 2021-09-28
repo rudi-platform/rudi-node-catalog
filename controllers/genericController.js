@@ -13,7 +13,7 @@ const mod = 'genCtrl'
 const mongoose = require('mongoose')
 const { v4: UUIDv4 } = require('uuid')
 // const url = require('url')
-const { pick } = require('lodash')
+const { pick, isObject } = require('lodash')
 
 // -----------------------------------------------------------------------------
 // Internal dependancies
@@ -25,7 +25,13 @@ const sys = require('../config/confSystem')
 const db = require('../db/dbQueries')
 const json = require('../utils/jsonAccess')
 
-const { beautify, nowISO, isNotEmptyArray, isEmptyObject } = require('../utils/jsUtils')
+const {
+  beautify,
+  nowISO,
+  isNotEmptyArray,
+  isEmptyObject,
+  isEmptyArray,
+} = require('../utils/jsUtils')
 
 // -----------------------------------------------------------------------------
 // Constants
@@ -74,7 +80,13 @@ const {
   API_DATES_EDITED_PROPERTY,
   DB_UPDATED_AT,
   API_DATES_PUBLISHED_PROPERTY,
-  DB_CREATE_AT,
+  DB_CREATED_AT,
+  API_DATA_DATES_PROPERTY,
+  API_DATES_VALIDATED_PROPERTY,
+  API_DATES_DELETED_PROPERTY,
+  API_PERIOD_PROPERTY,
+  API_END_DATE_PROPERTY,
+  API_START_DATE_PROPERTY,
 } = require('../db/dbFields')
 
 // -----------------------------------------------------------------------------
@@ -132,181 +144,264 @@ const EXT_OBJ = 'refObj'
 const EXT_OBJ_PROP = 'refObjProp'
 const EXT_OBJ_VAL = 'refObjVal'
 
+function cleanDate(inputDate) {
+  const fun = 'cleanDate'
+  const cleanValue = inputDate.replace(/[\'\"\`]/g, '')
+  if (cleanValue.match(new RegExp(/^[0-9]{10}$/))) return new Date(parseInt(cleanValue * 1000))
+  if (cleanValue.match(new RegExp(/^[0-9]{13}$/))) return new Date(parseInt(cleanValue))
+  try {
+    const cleanDate = new Date(cleanValue)
+    if (cleanDate == 'Invalid Date') throw new BadRequestError(`Invalid date: '${cleanValue}'`)
+    log.d(mod, fun, `cleanDate: ${cleanDate}`)
+    return cleanDate
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
+}
+
+function cleanDateOperations(inputDateOperations) {
+  const fun = 'cleanDateOperation'
+  log.d(mod, fun, `inputDateOperations: ${beautify(inputDateOperations)}`)
+
+  const operations = {}
+  for (const [operator, value] of Object.entries(inputDateOperations)) {
+    // if (isObject(value)) { // case with
+    //   for (const [op, val] of Object.entries(value)) {
+    //     if (op == '$and' || op == '$or') {
+    //       operations[op] = val.map(expr => )
+    //     } else {
+    //       log.w(mod, fun, `Operator '${op}' not recognized for dates comparisons`)
+    //     }
+    //   }
+    // } else {
+    operations[operator] = cleanDate(value)
+    // }
+  }
+  return operations
+}
+const DATA_DATES = `${API_DATA_DATES_PROPERTY}.`
+const META_DATES = `${API_METAINFO_PROPERTY}.${API_METAINFO_DATES_PROPERTY}.`
+
 exports.parseQueryParameters = async (objectType, reqUrl) => {
   const fun = 'parseQueryParameters'
+  try {
+    // identify object model
+    const Model = db.getObjectModel(objectType)
+    const modelProperties = db.getModelPropertyNames(Model)
 
-  // identify object model
-  const Model = db.getObjectModel(objectType)
-  const modelProperties = db.getModelPropertyNames(Model)
+    const returnedFilter = {
+      [QUERY_LIMIT]: DEFAULT_QUERY_LIMIT,
+      [QUERY_GROUP_LIMIT]: DEFAULT_QUERY_LIMIT,
+      [QUERY_OFFSET]: DEFAULT_QUERY_OFFSET,
+      [QUERY_GROUP_OFFSET]: DEFAULT_QUERY_OFFSET,
+      [QUERY_FILTER]: {},
+      [QUERY_CONFIRM]: false,
+      [EXT_REFS]: [],
+    }
+    const filters = []
 
-  const returnedFilter = {
-    [QUERY_LIMIT]: DEFAULT_QUERY_LIMIT,
-    [QUERY_GROUP_LIMIT]: DEFAULT_QUERY_LIMIT,
-    [QUERY_OFFSET]: DEFAULT_QUERY_OFFSET,
-    [QUERY_GROUP_OFFSET]: DEFAULT_QUERY_OFFSET,
-    [QUERY_FILTER]: {},
-    [QUERY_CONFIRM]: false,
-    [EXT_REFS]: [],
-  }
+    // extract request parameters
+    if (reqUrl.indexOf('?') === -1) {
+      // log.d(mod, fun, `No question mark in url: ${reqUrl}`)
+      return returnedFilter
+    }
+    const reqSearch = reqUrl.substring(reqUrl.indexOf('?'))
+    // log.d(mod, fun, `reqSearch: ${reqSearch}`)
+    const urlSearchParams = new URLSearchParams(reqSearch)
 
-  // extract request parameters
-  if (reqUrl.indexOf('?') === -1) {
-    // log.d(mod, fun, `No question mark in url: ${reqUrl}`)
-    return returnedFilter
-  }
-  const reqSearch = reqUrl.substring(reqUrl.indexOf('?'))
-  // log.d(mod, fun, `reqSearch: ${reqSearch}`)
-  const urlSearchParams = new URLSearchParams(reqSearch)
+    // Check if parameters were actually found by URLSearchParams
+    if (urlSearchParams.keys().length < 1) {
+      log.d(mod, fun, `No parameters found after the question mark: ${urlSearchParams}`)
+      return returnedFilter
+    }
+    //  log.d(mod, fun, `urlSearchParams: ${urlSearchParams}`)
 
-  // Check if parameters were actually found by URLSearchParams
-  if (urlSearchParams.keys().length < 1) {
-    log.d(mod, fun, `No parameters found after the question mark: ${urlSearchParams}`)
-    return returnedFilter
-  }
-  //  log.d(mod, fun, `urlSearchParams: ${urlSearchParams}`)
-
-  for (const [key, value] of urlSearchParams) {
-    if (QUERY_RESERVED_WORDS.includes(key)) {
-      // log.d(mod, fun, `Key is a reserved word: ${beautify(key)} => ${beautify(queryParameters[key])}`)
-      switch (key) {
-        case QUERY_LIMIT:
-        case QUERY_OFFSET:
-        case QUERY_GROUP_LIMIT:
-        case QUERY_GROUP_OFFSET:
-          returnedFilter[key] = parseInt(value)
-          break
-        case QUERY_GROUP_BY:
-        case QUERY_COUNT_BY:
-          returnedFilter[key] = value
-          break
-        case QUERY_UPDATED_AFTER:
-        case QUERY_UPDATED_BEFORE:
-          const valueClean = value.replace(/[\'\"\`]/g, '')
-          if (valueClean.match(new RegExp(/^[0-9]{10}$/))) {
-            returnedFilter[key] = new Date(parseInt(valueClean * 1000))
-          } else if (valueClean.match(new RegExp(/^[0-9]{13}$/))) {
-            returnedFilter[key] = new Date(parseInt(valueClean))
-          } else {
-            returnedFilter[key] = new Date(valueClean)
-          }
-          break
-        case QUERY_CONFIRM:
-          if (['false', '0', 'null', 'no'].includes(value)) break
-          returnedFilter[key] = !!value
-          break
-        case QUERY_FIELDS:
-          returnedFilter[key] = value.split(',').map((field) => field.trim())
-          break
-        case QUERY_SORT_BY:
-          returnedFilter[key] = value.split(',').map((field) => {
-            let trimmedField = field.trim()
-            let minus = ''
-            let absoluteField = trimmedField
-            if (trimmedField[0] === '-') {
-              minus = '-'
-              absoluteField = trimmedField.substring(1)
-            }
-            // Dealing with virtual fields
-            const metaDates = `${API_METAINFO_PROPERTY}.${API_METAINFO_DATES_PROPERTY}.`
-            switch (absoluteField) {
-              case `${metaDates}${API_DATES_CREATED_PROPERTY}`:
-                return `${minus}${DB_CREATE_AT}`
-              case `${metaDates}${API_DATES_EDITED_PROPERTY}`:
-                return `${minus}${DB_UPDATED_AT}`
-              case `${metaDates}${API_DATES_PUBLISHED_PROPERTY}`:
-                return `${minus}${DB_PUBLISHED_AT}`
-              default:
-                return trimmedField
-            }
-          })
-          break
-        default:
-          log.w(mod, fun, `Query keyword not recognized: '${key}'`)
-      }
-    } else if (modelProperties.includes(key)) {
-      // log.d(mod, fun, `Key is a ${objectType} property: ${beautify(key)}`)
-      const val = value
-      try {
-        const obj = JSON.parse(val)
-        // log.d(mod, fun, `parsed String: ${beautify(obj)}`)
-        returnedFilter[QUERY_FILTER][key] = obj
-      } catch (err) {
-        const errMsg = `Error while parsing: '${beautify(val)}': ${err}}`
-        // log.w(mod, fun, errMsg)
-        returnedFilter[QUERY_FILTER][key] = val
-      }
-    } else {
-      const indexSeparator = key.indexOf('.')
-      const nestedField = key.substring(0, indexSeparator)
-      const nestedFieldProp = key.substring(indexSeparator + 1)
-
-      if (modelProperties.includes(nestedField)) {
+    for (const [key, value] of urlSearchParams) {
+      if (QUERY_RESERVED_WORDS.includes(key)) {
+        // log.d(mod, fun, `Key is a reserved word: ${beautify(key)} => ${beautify(queryParameters[key])}`)
+        switch (key) {
+          case QUERY_LIMIT:
+          case QUERY_OFFSET:
+          case QUERY_GROUP_LIMIT:
+          case QUERY_GROUP_OFFSET:
+            returnedFilter[key] = parseInt(value)
+            break
+          case QUERY_GROUP_BY:
+          case QUERY_COUNT_BY:
+            returnedFilter[key] = value
+            break
+          case QUERY_UPDATED_AFTER:
+            filters.push({ [DB_UPDATED_AT]: { $gte: cleanDate(value) } })
+            break
+          case QUERY_UPDATED_BEFORE:
+            filters.push({ [DB_UPDATED_AT]: { $lte: cleanDate(value) } })
+            break
+          case QUERY_CONFIRM:
+            if (['false', '0', 'null', 'no'].includes(value)) break
+            returnedFilter[key] = !!value
+            break
+          case QUERY_FIELDS:
+            returnedFilter[key] = value.split(',').map((field) => field.trim())
+            break
+          case QUERY_SORT_BY:
+            returnedFilter[key] = value.split(',').map((field) => {
+              let trimmedField = field.trim()
+              let minus = ''
+              let absoluteField = trimmedField
+              if (trimmedField[0] === '-') {
+                minus = '-'
+                absoluteField = trimmedField.substring(1)
+              }
+              // Dealing with virtual fields
+              switch (absoluteField) {
+                case `${META_DATES}${API_DATES_CREATED_PROPERTY}`:
+                  return `${minus}${DB_CREATED_AT}`
+                case `${META_DATES}${API_DATES_EDITED_PROPERTY}`:
+                  return `${minus}${DB_UPDATED_AT}`
+                case `${META_DATES}${API_DATES_PUBLISHED_PROPERTY}`:
+                  return `${minus}${DB_PUBLISHED_AT}`
+                default:
+                  return trimmedField
+              }
+            })
+            break
+          default:
+            log.w(mod, fun, `Query keyword not recognized: '${key}'`)
+        }
+      } else if (modelProperties.includes(key)) {
+        // log.d(mod, fun, `Key is a ${objectType} property: ${beautify(key)}`)
+        const val = value
         try {
-          const obj = JSON.parse(value)
-          log.d(
-            mod,
-            fun,
-            `nestedField: ${nestedField} / nestedFieldProp: ${nestedFieldProp} / value: ${obj}`
-          )
+          const obj = JSON.parse(val)
+          log.d(mod, fun, `parsed String: ${beautify(obj)}`)
 
-          returnedFilter[EXT_REFS].push({
-            [EXT_OBJ]: nestedField,
-            [EXT_OBJ_PROP]: nestedFieldProp,
-            [EXT_OBJ_VAL]: obj,
-          })
+          switch (key) {
+            case `${DB_CREATED_AT}`:
+            case `${DB_UPDATED_AT}`:
+            case `${DB_PUBLISHED_AT}`:
+
+            case `${DATA_DATES}${API_DATES_CREATED_PROPERTY}`:
+            case `${DATA_DATES}${API_DATES_EDITED_PROPERTY}`:
+            case `${DATA_DATES}${API_DATES_PUBLISHED_PROPERTY}`:
+            case `${DATA_DATES}${API_DATES_VALIDATED_PROPERTY}`:
+            case `${DATA_DATES}${API_DATES_DELETED_PROPERTY}`:
+
+            case `${META_DATES}${API_DATES_CREATED_PROPERTY}`:
+            case `${META_DATES}${API_DATES_EDITED_PROPERTY}`:
+            case `${META_DATES}${API_DATES_PUBLISHED_PROPERTY}`:
+            case `${META_DATES}${API_DATES_VALIDATED_PROPERTY}`:
+            case `${META_DATES}${API_DATES_DELETED_PROPERTY}`:
+
+            case `${API_PERIOD_PROPERTY}.${API_START_DATE_PROPERTY}`:
+            case `${API_PERIOD_PROPERTY}.${API_END_DATE_PROPERTY}`:
+              filters.push({ [key]: cleanDateOperations(obj) })
+              break
+            default:
+              filters.push({ [key]: obj })
+          }
         } catch (err) {
-          const errMsg = `Couldn't parse: '${beautify(value)}': ${err}}`
-          // log.w(mod, fun, errMsg)
-          returnedFilter[EXT_REFS].push({
-            [EXT_OBJ]: nestedField,
-            [EXT_OBJ_PROP]: nestedFieldProp,
-            [EXT_OBJ_VAL]: value,
-          })
+          // log.d(mod, fun, `Error while parsing: '${beautify(val)}': ${err}}`)
+          switch (key) {
+            case `${DB_CREATED_AT}`:
+            case `${DB_UPDATED_AT}`:
+            case `${DB_PUBLISHED_AT}`:
+
+            case `${DATA_DATES}${API_DATES_CREATED_PROPERTY}`:
+            case `${DATA_DATES}${API_DATES_EDITED_PROPERTY}`:
+            case `${DATA_DATES}${API_DATES_PUBLISHED_PROPERTY}`:
+            case `${DATA_DATES}${API_DATES_VALIDATED_PROPERTY}`:
+            case `${DATA_DATES}${API_DATES_DELETED_PROPERTY}`:
+
+            case `${META_DATES}${API_DATES_CREATED_PROPERTY}`:
+            case `${META_DATES}${API_DATES_EDITED_PROPERTY}`:
+            case `${META_DATES}${API_DATES_PUBLISHED_PROPERTY}`:
+            case `${META_DATES}${API_DATES_VALIDATED_PROPERTY}`:
+            case `${META_DATES}${API_DATES_DELETED_PROPERTY}`:
+
+            case `${API_PERIOD_PROPERTY}.${API_START_DATE_PROPERTY}`:
+            case `${API_PERIOD_PROPERTY}.${API_END_DATE_PROPERTY}`:
+              filters.push({ [key]: cleanDate(val) })
+              break
+            default:
+              filters.push({ [key]: val })
+          }
         }
       } else {
-        log.w(mod, fun, `Key is unkown and ignored for ${objectType}: ${beautify(key)}`)
-        // log.w(mod, fun, `Model properties: ${beautify(modelProperties)}`)
+        const indexSeparator = key.indexOf('.')
+        const nestedField = key.substring(0, indexSeparator)
+        const nestedFieldProp = key.substring(indexSeparator + 1)
+
+        if (modelProperties.includes(nestedField)) {
+          try {
+            const obj = JSON.parse(value)
+            const msg = `nestedField: ${nestedField} / nestedFieldProp: ${nestedFieldProp} / value: ${obj}`
+            log.d(mod, fun, msg)
+
+            returnedFilter[EXT_REFS].push({
+              [EXT_OBJ]: nestedField,
+              [EXT_OBJ_PROP]: nestedFieldProp,
+              [EXT_OBJ_VAL]: obj,
+            })
+          } catch (err) {
+            const errMsg = `Couldn't parse: '${beautify(value)}': ${err}}`
+            // log.w(mod, fun, errMsg)
+            returnedFilter[EXT_REFS].push({
+              [EXT_OBJ]: nestedField,
+              [EXT_OBJ_PROP]: nestedFieldProp,
+              [EXT_OBJ_VAL]: value,
+            })
+          }
+        } else {
+          log.w(mod, fun, `Key is unkown and ignored for ${objectType}: ${beautify(key)}`)
+          // log.w(mod, fun, `Model properties: ${beautify(modelProperties)}`)
+        }
       }
     }
+    // log.d(mod, fun, `filterReturn: ${beautify(filterReturn)}`)
+
+    const extRefs = returnedFilter[EXT_REFS]
+    if (isNotEmptyArray(extRefs)) {
+      await Promise.all(
+        extRefs.map(async (extRef) => {
+          const extObj = extRef[EXT_OBJ]
+          const extObjProp = extRef[EXT_OBJ_PROP]
+          const extObjVal = extRef[EXT_OBJ_VAL]
+
+          const objFilter = { [extObjProp]: extObjVal }
+
+          // log.d(mod, fun, `objFilter: ${beautify(objFilter)}`)
+          let nestedFieldIds
+          try {
+            nestedFieldIds = await db.getNestedObject(objectType, extObj, objFilter, DB_ID)
+          } catch (err) {
+            log.w(mod, fun, err)
+            // returnedFilter[QUERY_FILTER][extObj] = 0
+            throw err
+          }
+          // log.d(mod, fun, `nestedFieldIds: ${beautify(nestedFieldIds)}`)
+          let queryFilter
+
+          const ids = await Promise.all(
+            nestedFieldIds.map(async (foundObj) => {
+              // log.d(mod, fun, `nestedFieldId: ${beautify(foundObj[DB_ID])}`)
+              return new mongoose.Types.ObjectId(foundObj[DB_ID])
+            })
+          )
+
+          filters.push({ [extObj]: { $in: ids } })
+
+          // log.d(mod, fun, `filterReturn: ${beautify(returnedFilter)}`)
+        })
+      )
+    }
+    if (isNotEmptyArray(filters)) returnedFilter[QUERY_FILTER] = { $and: filters }
+    // log.d(mod, fun, `filter: ${beautify(returnedFilter[QUERY_FILTER])}`)
+    return returnedFilter
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
   }
-  // log.d(mod, fun, `filterReturn: ${beautify(filterReturn)}`)
-
-  const extRefs = returnedFilter[EXT_REFS]
-  if (isNotEmptyArray(extRefs)) {
-    await Promise.all(
-      extRefs.map(async (extRef) => {
-        const extObj = extRef[EXT_OBJ]
-        const extObjProp = extRef[EXT_OBJ_PROP]
-        const extObjVal = extRef[EXT_OBJ_VAL]
-
-        const objFilter = { [extObjProp]: extObjVal }
-
-        log.d(mod, fun, `objFilter: ${beautify(objFilter)}`)
-        let nestedFieldIds
-        try {
-          nestedFieldIds = await db.getNestedObject(objectType, extObj, objFilter, DB_ID)
-        } catch (err) {
-          log.w(mod, fun, err)
-          // returnedFilter[QUERY_FILTER][extObj] = 0
-          throw err
-        }
-        log.d(mod, fun, `nestedFieldIds: ${beautify(nestedFieldIds)}`)
-        let queryFilter
-
-        const ids = await Promise.all(
-          nestedFieldIds.map(async (foundObj) => {
-            log.d(mod, fun, `nestedFieldId: ${beautify(foundObj[DB_ID])}`)
-            return new mongoose.Types.ObjectId(foundObj[DB_ID])
-          })
-        )
-
-        returnedFilter[QUERY_FILTER][extObj] = { $in: ids }
-
-        log.d(mod, fun, `filterReturn: ${beautify(returnedFilter)}`)
-      })
-    )
-  }
-  return returnedFilter
 }
 
 function checkIsUrlObject(objectType) {
@@ -457,7 +552,7 @@ exports.getObjectList = async (req, reply) => {
 }
 
 /**
- * Get several objects for an particular object type
+ * Get several objects for a particular object type
  */
 exports.getManyObjects = async (objectType, req, reply) => {
   const fun = 'getManyObjects'
@@ -469,6 +564,7 @@ exports.getManyObjects = async (objectType, req, reply) => {
       log.w(mod, fun, err)
       return []
     }
+    // log.d(mod, fun, beautify(parsedParameters))
 
     const countBy = parsedParameters[QUERY_COUNT_BY]
     const groupBy = parsedParameters[QUERY_GROUP_BY]
@@ -499,8 +595,6 @@ exports.getManyObjects = async (objectType, req, reply) => {
         QUERY_SORT_BY,
         QUERY_GROUP_LIMIT,
         QUERY_GROUP_OFFSET,
-        QUERY_UPDATED_AFTER,
-        QUERY_UPDATED_BEFORE,
       ])
       objectList = await db.groupObjectList(objectType, groupBy, options)
     } else {
@@ -510,8 +604,6 @@ exports.getManyObjects = async (objectType, req, reply) => {
         QUERY_OFFSET,
         QUERY_FILTER,
         QUERY_FIELDS,
-        QUERY_UPDATED_AFTER,
-        QUERY_UPDATED_BEFORE,
       ])
 
       objectList = await db.countObjectList(objectType, countBy, options)
@@ -522,6 +614,41 @@ exports.getManyObjects = async (objectType, req, reply) => {
   } catch (err) {
     log.w(mod, fun, err)
     throw err
+  }
+}
+
+/**
+ * Get many metadata and a count of all that match the filter
+ * @param {*} req
+ * @param {*} reply
+ * @returns
+ */
+exports.getMetadataListAndCount = async (req, reply) => {
+  const fun = 'getMetadataListAndCount'
+  try {
+    log.v(mod, fun, `< GET ${URL_PUB_METADATA}`)
+
+    let parsedParameters
+    try {
+      parsedParameters = await this.parseQueryParameters(PARAM_OBJECT_METADATA, req.url)
+    } catch (err) {
+      log.w(mod, fun, err)
+      return []
+    }
+    let objectList
+    const options = pick(parsedParameters, [
+      QUERY_LIMIT,
+      QUERY_OFFSET,
+      QUERY_SORT_BY,
+      QUERY_FILTER,
+      QUERY_FIELDS,
+    ])
+    objectList = await db.getMetadataListAndCount(options)
+    return objectList
+  } catch (err) {
+    log.e(mod, fun, err)
+    if (err.name === 'MongoError') throw new BadRequestError(err)
+    throw new NotFoundError(err)
   }
 }
 
@@ -617,7 +744,9 @@ exports.deleteSingleObject = async (req, reply) => {
         .catch((err) =>
           log.e(mod, fun, `Portal couldn't delete metadata '${objectRudiId}': ${err}`)
         )
-        .then((result) => log.i(mod, fun, `Portal accepted the deletion request for metadata '${objectRudiId}'`))
+        .then((result) =>
+          log.i(mod, fun, `Portal accepted the deletion request for metadata '${objectRudiId}'`)
+        )
     }
 
     return reply

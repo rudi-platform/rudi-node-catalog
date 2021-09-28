@@ -10,14 +10,14 @@
 // -----------------------------------------------------------------------------
 exports.DB_ID = '_id'
 exports.DB_V = '__v'
-exports.DB_CREATE_AT = 'createdAt'
+exports.DB_CREATED_AT = 'createdAt'
 exports.DB_UPDATED_AT = 'updatedAt'
 exports.DB_PUBLISHED_AT = 'publishedAt'
 
 exports.FIELDS_TO_SKIP = [
   this.DB_ID,
   this.DB_V,
-  this.DB_CREATE_AT,
+  this.DB_CREATED_AT,
   this.DB_UPDATED_AT,
   this.DB_PUBLISHED_AT,
 ]
@@ -87,6 +87,8 @@ exports.API_LICENCE_CUSTOM_URI = 'custom_licence_uri'
 exports.API_DATES_CREATED_PROPERTY = 'created'
 exports.API_DATES_EDITED_PROPERTY = 'updated'
 exports.API_DATES_PUBLISHED_PROPERTY = 'published'
+exports.API_DATES_VALIDATED_PROPERTY = 'validated'
+exports.API_DATES_DELETED_PROPERTY = 'deleted'
 
 // -----------------------------------------------------------------------------
 // Producer Specific fields

@@ -9,7 +9,7 @@ const mod = 'db'
 // External dependancies
 // -----------------------------------------------------------------------------
 const mongoose = require('mongoose')
-const { pick, orderBy } = require('lodash')
+const { omit, orderBy, pick } = require('lodash')
 
 // -----------------------------------------------------------------------------
 // Internal dependencies
@@ -44,8 +44,6 @@ const {
   QUERY_SORT_BY,
   PARAM_LOGS_LINES,
   PARAM_OBJECT_LOGS,
-  QUERY_UPDATED_AFTER,
-  QUERY_UPDATED_BEFORE,
   MAX_QUERY_LIMIT,
 } = require('../config/confApi')
 
@@ -88,7 +86,14 @@ const { Metadata, METADATA_FIELDS_TO_POPULATE } = require('../definitions/models
 
 const { Report } = require('../definitions/models/Report')
 const { LogEntry, makeLogInfo, logLineToString } = require('../definitions/models/LogEntry')
-const { InternalServerError, ParameterExpectedError, NotFoundError, ObjectNotFoundError, NotImplementedError, BadRequestError } = require('../utils/errors')
+const {
+  InternalServerError,
+  ParameterExpectedError,
+  NotFoundError,
+  ObjectNotFoundError,
+  NotImplementedError,
+  BadRequestError,
+} = require('../utils/errors')
 
 // -----------------------------------------------------------------------------
 // Properties with special treatments
@@ -444,7 +449,7 @@ exports.getNestedObject = async (objectType, nestedObjectProperty, filter, field
       return await FieldModel.find(filter)
     } else {
       const dbObjects = await FieldModel.find(filter, fieldSelection)
-      log.d(mod, fun, `dbObjects: ${dbObjects}`)
+      // log.d(mod, fun, `dbObjects: ${dbObjects}`)
       if (utils.isEmptyArray(dbObjects))
         throw new NotFoundError(
           `Object not found! Type: '${nestedObjectProperty}', filter: ${utils.beautify(filter)}`
@@ -615,8 +620,7 @@ function addToFilterUpdated(filter, key, dateVal) {
   const fun = 'addToFilterUpdated'
   // // log.d(mod, fun, ``)
   const date = new Date(dateVal)
-  if (!filter.updatedAt) filter.updatedAt = {}
-  filter.updatedAt[key] = date
+  if (!filter.updatedAt) filter.updatedAt = { [key]: date }
 }
 
 function getParamValue(options, param, defaultVal, maxVal) {
@@ -640,16 +644,10 @@ exports.getObjectList = async (objectType, options) => {
     const filter = getParamValue(options, QUERY_FILTER)
     const fields = getParamValue(options, QUERY_FIELDS)
     const sortByFields = getParamValue(options, QUERY_SORT_BY)
-    const updatedAfter = getParamValue(options, QUERY_UPDATED_AFTER)
-    const updatedBefore = getParamValue(options, QUERY_UPDATED_BEFORE)
 
     const populateFields = getPopulateFields(objectType)
 
     // log.d(mod, fun, `options: ${utils.beautify(options)}`)
-
-    // Adapt filter with 'updated after/before'
-    if (!!updatedAfter) addToFilterUpdated(filter, '$gte', updatedAfter)
-    if (!!updatedBefore) addToFilterUpdated(filter, '$lte', updatedBefore)
 
     // log.d(mod, fun, `filter: ${utils.beautify(filter)}`)
 
@@ -684,6 +682,159 @@ exports.getObjectList = async (objectType, options) => {
 
       return utils.listPick(objectList, fields)
     }
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
+}
+exports.getObjectListAndCount = async (objectType, options) => {
+  const fun = `getObjectList`
+  // log.d(mod, fun, ``)
+  try {
+    //--- Parameters
+    // Identify object type characteristics
+    const { Model, idField } = this.getObjectAccesses(objectType)
+
+    // Extract options
+    const limit = getParamValue(options, QUERY_LIMIT, DEFAULT_QUERY_LIMIT, MAX_QUERY_LIMIT)
+    const offset = getParamValue(options, QUERY_OFFSET, DEFAULT_QUERY_OFFSET)
+    const filter = getParamValue(options, QUERY_FILTER)
+    const fields = getParamValue(options, QUERY_FIELDS)
+    const sortByFields = getParamValue(options, QUERY_SORT_BY)
+
+    const populateFields = getPopulateFields(objectType)
+
+    // log.d(mod, fun, `options: ${utils.beautify(options)}`)
+
+    // log.d(mod, fun, `filter: ${utils.beautify(filter)}`)
+
+    // const [sortOptions] = toMongoSortOptions({}, sortBy, { [idField]: 1 })
+    const sortOptions = {}
+    if (sortByFields) {
+      sortByFields.map((field) => {
+        if (field[0] === '-') {
+          sortOptions[field.substring(1)] = -1
+        } else {
+          sortOptions[field] = 1
+        }
+      })
+    }
+    sortOptions[DB_ID] = 1 // Default sort to get consistent offset/limit results
+
+    // log.d(mod, fun, `sortOptions: ${utils.beautify(sortOptions)}`)
+
+    //--- Find
+    if (utils.isEmptyArray(populateFields)) {
+      const fieldsToKeep = fields ? fields.join(' ') : ``
+      return await Model.find(filter, fieldsToKeep).sort(sortOptions).limit(limit).skip(offset)
+    } else {
+      // Populate
+      const objectListFiltered = await Model.find(filter).sort(sortOptions)
+      const objectListCount = objectListFiltered.length
+      const objectList = objectListFiltered
+        .limit(limit)
+        .skip(offset)
+        .populate(getPopulateOptions(objectType))
+
+      let objectListFinal
+      if (!fields) objectListFinal = objectList
+      else objectListFinal = utils.listPick(objectList, fields)
+
+      return {
+        total: objectListCount,
+        items: objectListFinal,
+      }
+    }
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
+}
+
+/**
+ * Request to access objects and return both the filtered list and the global count
+ * @param {String} objectType
+ * @param {JSON} options
+ * @returns
+ */
+exports.getMetadataListAndCount = async (options) => {
+  const fun = `getMetadataListAndCount`
+  // log.d(mod, fun, ``)
+  try {
+    //--- Parameters
+
+    // Extract options
+    const limit = getParamValue(options, QUERY_LIMIT, DEFAULT_QUERY_LIMIT, MAX_QUERY_LIMIT)
+    const offset = getParamValue(options, QUERY_OFFSET, DEFAULT_QUERY_OFFSET)
+    const filter = getParamValue(options, QUERY_FILTER)
+    const fieldsToKeep = getParamValue(options, QUERY_FIELDS)
+    const sortByFields = getParamValue(options, QUERY_SORT_BY)
+
+    const populateFields = getPopulateFields(PARAM_OBJECT_METADATA)
+
+    // log.d(mod, fun, `options: ${utils.beautify(options)}`)
+
+    // log.d(mod, fun, `filter: ${utils.beautify(filter)}`)
+
+    const sortOptions = {}
+    if (sortByFields) {
+      sortByFields.map((field) => {
+        if (field[0] === '-') {
+          sortOptions[field.substring(1)] = -1
+        } else {
+          sortOptions[field] = 1
+        }
+      })
+    }
+    sortOptions[DB_ID] = 1 // Default sort to get consistent offset/limit results
+
+    //--- Aggregation
+    const COUNT_LABEL = 'total'
+    const LIST_LABEL = 'items'
+
+    let aggregateOptions = [
+      { $match: filter },
+      {
+        $facet: {
+          [COUNT_LABEL]: [{ $group: { _id: null, count: { $sum: 1 } } }],
+          [LIST_LABEL]: [{ $sort: sortOptions }, { $limit: limit }, { $skip: offset }],
+        },
+      },
+    ]
+
+    log.d(mod, fun, `aggregateOptions: ${utils.beautify(aggregateOptions)}`)
+    log.d(mod, fun, `sortOptions: ${utils.beautify(sortOptions)}`)
+
+    const result = await Metadata.aggregate(aggregateOptions).exec()
+    // log.d(mod, fun, `result: ${utils.beautify(result)}`)
+
+    const globalCount = result[0][COUNT_LABEL][0] ? result[0][COUNT_LABEL][0].count : 0
+    const objectList = result[0][LIST_LABEL]
+
+    log.d(mod, fun, `total: ${globalCount}`)
+    // log.d(mod, fun, `items: ${utils.beautify(objectList)}`)
+    // log.d(mod, fun, `objectList: ${utils.beautify(objectList)}`)
+    // return objectList
+
+    //--- Reshaping
+    let populateOptions = getPopulateOptions(PARAM_OBJECT_METADATA)
+
+    const objListPopulated = await Metadata.populate(objectList, populateOptions)
+
+    // Reshaping: selecting fields
+    let finalObjList
+    if (!fieldsToKeep) {
+      finalObjList = objListPopulated.map((obj) => omit(obj, FIELDS_TO_SKIP))
+    } else {
+      finalObjList = objListPopulated.map((obj) => pick(obj, fieldsToKeep))
+    }
+
+    const reshapedResult = {
+      [COUNT_LABEL]: globalCount,
+      [LIST_LABEL]: finalObjList,
+    }
+    // log.d(mod, fun, `reshapedResult: ${utils.beautify(reshapedResult)}`)
+    return reshapedResult
   } catch (err) {
     log.w(mod, fun, err)
     throw err
@@ -729,12 +880,6 @@ exports.groupObjectList = async (objectType, unionField, options) => {
     const filter = getParamValue(options, QUERY_FILTER, {})
     const fieldsToKeep = getParamValue(options, QUERY_FIELDS)
     const sortByFields = getParamValue(options, QUERY_SORT_BY)
-    const updatedAfter = getParamValue(options, QUERY_UPDATED_AFTER)
-    const updatedBefore = getParamValue(options, QUERY_UPDATED_BEFORE)
-
-    // Adapt filter with 'updated after/before'
-    if (!!updatedAfter) addToFilterUpdated(filter, '$gte', updatedAfter)
-    if (!!updatedBefore) addToFilterUpdated(filter, '$lte', updatedBefore)
 
     // Prepare sortBy options for MongoDB
     const groupList = 'list'
@@ -855,12 +1000,6 @@ exports.countObjectList = async (objectType, unionField, options) => {
     const offset = getParamValue(options, QUERY_OFFSET, DEFAULT_QUERY_OFFSET)
     const filter = getParamValue(options, QUERY_FILTER)
     const sortByFields = getParamValue(options, QUERY_SORT_BY)
-    const updatedAfter = getParamValue(options, QUERY_UPDATED_AFTER)
-    const updatedBefore = getParamValue(options, QUERY_UPDATED_BEFORE)
-
-    // Adapt filter with 'updated after/before'
-    if (!!updatedAfter) addToFilterUpdated(filter, '$gte', updatedAfter)
-    if (!!updatedBefore) addToFilterUpdated(filter, '$lte', updatedBefore)
 
     //--- Aggregation
     let aggregateOptions = [

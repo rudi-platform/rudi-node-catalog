@@ -269,7 +269,7 @@ exports.publicRoutes = [
     method: 'GET',
     url: URL_PUB_METADATA,
     preHandler: onPublicRoute,
-    handler: metadataController.getMetadataList,
+    handler: genericController.getMetadataListAndCount,
     config: { routeName: PUB_GET_ALL_METADATA },
   },
   // Get 1

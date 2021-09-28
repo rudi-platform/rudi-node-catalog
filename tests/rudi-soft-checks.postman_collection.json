@@ -2051,8 +2051,8 @@
 									"pm.test(\"2 metadata created\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const metadataList = pm.response.json();",
-									"    // console.log(metadataList.length)",
-									"    pm.expect(metadataList.length).to.gte(2);",
+									"    const publicMetadataList = pm.response.json();",
+									"    pm.expect(publicMetadataList.total).to.eq(2);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2063,7 +2063,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?sort_by=-createdAt",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?sort_by=-createdAt&collection_tag={{stamp}}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -2075,6 +2075,10 @@
 								{
 									"key": "sort_by",
 									"value": "-createdAt"
+								},
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
 								}
 							]
 						}
@@ -2088,11 +2092,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"2 metadata created\", () => {",
+									"pm.test(\"Testing URL with slashes\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const metadataList = pm.response.json();",
 									"    // console.log(metadataList.length)",
-									"    pm.expect(metadataList.length).to.gte(2);",
+									"    const publicMetadataList = pm.response.json();",
+									"    pm.expect(publicMetadataList.total).to.eq(2);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2103,7 +2108,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/?sort_by=-createdAt",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/?sort_by=-createdAt&collection_tag={{stamp}}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -2116,6 +2121,10 @@
 								{
 									"key": "sort_by",
 									"value": "-createdAt"
+								},
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
 								}
 							]
 						}
@@ -2131,9 +2140,9 @@
 								"exec": [
 									"pm.test(\"2 metadata created\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const metadataList = pm.response.json();",
-									"    // console.log(metadataList.length)",
-									"    pm.expect(metadataList.length).to.gte(2);",
+									"",
+									"    const publicMetadataList = pm.response.json();",
+									"    pm.expect(publicMetadataList.total).to.eq(2);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2144,7 +2153,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?limit=50&sort_by=-createdAt&fields=resource_title,global_id,createdAt",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?limit=50&sort_by=-createdAt&fields=resource_title,global_id,createdAt,collection_tag&collection_tag={{stamp}}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -2163,7 +2172,11 @@
 								},
 								{
 									"key": "fields",
-									"value": "resource_title,global_id,createdAt"
+									"value": "resource_title,global_id,createdAt,collection_tag"
+								},
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
 								}
 							]
 						}
@@ -2180,7 +2193,7 @@
 									"pm.test(\"2 metadata created\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const metadataList = pm.response.json();",
-									"    // console.log(metadataList.length);",
+									"    pm.expect(metadataList.length).to.eq(1);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2191,7 +2204,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?limit=10&keywords={\"$in\":[\"population\",\"plu\"]}&temporal_spread.start_date={\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2021-05-28T23:24:51.000Z\"}&perlin=2346&resource_languages=fr",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?limit=10&keywords={\"$in\":[\"population\",\"plu\"]}&temporal_spread.start_date={\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2021-05-28T23:24:51.000Z\"}&perlin=2346&resource_languages=fr&collection_tag={{stamp}}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -2219,6 +2232,10 @@
 								{
 									"key": "resource_languages",
 									"value": "fr"
+								},
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
 								}
 							]
 						}
@@ -2226,7 +2243,7 @@
 					"response": []
 				},
 				{
-					"name": "[PUB] Count metadata (api_version)",
+					"name": "Count metadata (api_version)",
 					"event": [
 						{
 							"listen": "test",
@@ -2246,12 +2263,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?count_by=metadata_info.api_version",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?count_by=metadata_info.api_version",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							],
 							"query": [
@@ -2265,7 +2282,7 @@
 					"response": []
 				},
 				{
-					"name": "[PUB] Group metadata (api_version)",
+					"name": "Group metadata (api_version)",
 					"event": [
 						{
 							"listen": "test",
@@ -2285,12 +2302,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?group_by=metadata_info.api_version&limit=3",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?group_by=metadata_info.api_version&limit=3",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							],
 							"query": [
@@ -2308,7 +2325,7 @@
 					"response": []
 				},
 				{
-					"name": "[PUB] Count metadata (metadata_provider)",
+					"name": "Count metadata (metadata_provider)",
 					"event": [
 						{
 							"listen": "test",
@@ -2326,12 +2343,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?count_by=metadata_info.metadata_provider",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?count_by=metadata_info.metadata_provider",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							],
 							"query": [
@@ -2345,7 +2362,7 @@
 					"response": []
 				},
 				{
-					"name": "[PUB] Count metadata (metadata_contacts)",
+					"name": "Count metadata (metadata_contacts)",
 					"event": [
 						{
 							"listen": "test",
@@ -2363,12 +2380,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?count_by=metadata_info.metadata_contacts",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?count_by=metadata_info.metadata_contacts",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							],
 							"query": [
@@ -2382,7 +2399,7 @@
 					"response": []
 				},
 				{
-					"name": "[PUB] Count metadata (producer)",
+					"name": "Count metadata (producer)",
 					"event": [
 						{
 							"listen": "test",
@@ -2411,12 +2428,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?count_by=producer",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?count_by=producer",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							],
 							"query": [
@@ -2438,11 +2455,12 @@
 								"exec": [
 									"pm.test(\"Filter by producer\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json()",
-									"",
+									"    ",
 									"    const countWithOrg1 = pm.collectionVariables.get('countWithOrg1')",
-									"    pm.expect(countWithOrg1).to.eq(responseJson.length)",
-									"    // console.log(responseJson.length)",
+									"",
+									"    const publicMetadataList = pm.response.json();",
+									"    pm.expect(publicMetadataList.total).to.eq(countWithOrg1);",
+									"    pm.expect(publicMetadataList.items.length).to.eq(countWithOrg1);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2453,7 +2471,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?producer.organization_id=\"{{softOrg1Id}}\"&fields=global_id,resource_title",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?producer.organization_id=\"{{softOrg1Id}}\"&fields=global_id,resource_title&collection_tag={{stamp}}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -2469,6 +2487,10 @@
 								{
 									"key": "fields",
 									"value": "global_id,resource_title"
+								},
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
 								}
 							]
 						}
@@ -2476,7 +2498,7 @@
 					"response": []
 				},
 				{
-					"name": "[PUB] Group metadata (producer)",
+					"name": "Group metadata (producer)",
 					"event": [
 						{
 							"listen": "test",
@@ -2491,13 +2513,17 @@
 									"    const countWithOrg1 = pm.collectionVariables.get('countWithOrg1')",
 									"    // console.log(`orgId: ${orgId}`)",
 									"",
+									"    let tested = false",
 									"    responseJson.map((res) => {",
 									"        // console.log(`res.producer.organization_id: ${res.producer.organization_id}`)",
-									"        if(res.producer.organization_id == orgId) {",
+									"        if(!tested && res.producer.organization_id == orgId) {",
 									"            // console.log(res.count)",
 									"            pm.expect(res.count).to.eq(countWithOrg1)",
+									"            tested = true",
 									"        }",
 									"    })",
+									"    pm.expect(tested).to.eq(true)",
+									"",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2508,12 +2534,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?group_by=producer&limit=3&group_limit=4&keywords=CA&fields=keywords,global_id,createdAt,updatedAt&sort_by=createdAt,-global_id",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?group_by=producer&collection_tag={{stamp}}&limit=3&group_limit=4",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							],
 							"query": [
@@ -2522,24 +2548,16 @@
 									"value": "producer"
 								},
 								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
+								},
+								{
 									"key": "limit",
 									"value": "3"
 								},
 								{
 									"key": "group_limit",
 									"value": "4"
-								},
-								{
-									"key": "keywords",
-									"value": "CA"
-								},
-								{
-									"key": "fields",
-									"value": "keywords,global_id,createdAt,updatedAt"
-								},
-								{
-									"key": "sort_by",
-									"value": "createdAt,-global_id"
 								}
 							]
 						}
@@ -3484,8 +3502,8 @@
 									"const stamp = pm.collectionVariables.get('stamp')",
 									"pm.test(`No metadata left with '${stamp}' stamp'`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const metadataList = pm.response.json();",
-									"    pm.expect(metadataList.length).to.eq(0)",
+									"    const publicMetadataList = pm.response.json();",
+									"    pm.expect(publicMetadataList.total).to.eq(0);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -3983,6 +4001,7 @@
 									"pm.test(\"Accessing logs\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const response = pm.response.json()",
+									"    //const pm.response.header",
 									"    pm.expect(response.length).to.eq(20)",
 									"});"
 								],
@@ -3994,7 +4013,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{logs}}?limit=20",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{logs}}?limit=20&sort_by=-updatedAt",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -4006,6 +4025,10 @@
 								{
 									"key": "limit",
 									"value": "20"
+								},
+								{
+									"key": "sort_by",
+									"value": "-updatedAt"
 								}
 							]
 						}

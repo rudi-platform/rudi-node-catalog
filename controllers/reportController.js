@@ -22,6 +22,7 @@ const utils = require('../utils/jsUtils')
 const json = require('../utils/jsonAccess')
 
 const { setPublishedFlag } = require('../controllers/genericController')
+const { checkRudiProdPermission } = require('../controllers/tokenController')
 
 // -----------------------------------------------------------------------------
 // Constants
@@ -60,7 +61,12 @@ const {
 // Data models
 // -----------------------------------------------------------------------------
 const { Report, IntegrationStatus } = require('../definitions/models/Report')
-const { BadRequestError, NotFoundError, ObjectNotFoundError, ForbiddenError } = require('../utils/errors')
+const {
+  BadRequestError,
+  NotFoundError,
+  ObjectNotFoundError,
+  ForbiddenError,
+} = require('../utils/errors')
 const { getTokenCheckedByPortal } = require('./portalController')
 
 // -----------------------------------------------------------------------------
@@ -177,16 +183,27 @@ exports.addOrEditSingleReport = async (objectType, req, reply) => {
     // retrieve url parameters: object type, object id
     const urlObjectId = json.accessReqParam(req, PARAM_ID)
     log.d(mod, fun, `Incoming Portal report: ${utils.beautify(req.body)}`)
-    const reportBody = fromPortalToRudiFormat(req.body) 
+    const reportBody = fromPortalToRudiFormat(req.body)
     // log.v(mod, fun, `new report: ${utils.beautify(reportBody)}`)
     try {
       const header = json.accessProperty(req, 'headers')
       const auth = json.accessProperty(header, 'authorization')
       const portalToken = auth.substring(7)
-      const tokenChecked = await getTokenCheckedByPortal(portalToken) // TODO: check ourselves
-    } catch (err) {
-      const errMsg = `Incoming integration report from Portal should be presented with a JWT identified request. Error: ${err}`
-      log.e(mod, fun, errMsg)
+      try {
+        await checkRudiProdPermission(req, reply)
+        log.i(mod, fun, `Report accepted with test access`)
+      } catch (eee) {
+        try {
+          await getTokenCheckedByPortal(portalToken) // TODO: check ourselves
+          log.i(mod, fun, `JWT issued from RUDI Portal`)
+        } catch (er) {
+          log.e(mod, fun, err)
+          throw new ForbiddenError(err)
+        }
+      }
+    } catch (error) {
+      const errMsg = `Incoming integration report from Portal should be presented with a JWT identified request. Error: ${error}`
+      log.w(mod, fun, errMsg)
       throw new ForbiddenError(errMsg)
     }
 

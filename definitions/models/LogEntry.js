@@ -23,7 +23,7 @@ const {
 const { LOG_EXP } = require('../../config/confSystem')
 const { UUIDv4 } = require('../schemas/Identifiers')
 const { VALID_UUID, VALID_EPOCH_MS } = require('../schemaValidators')
-const { DB_ID, DB_V, DB_UPDATED_AT, DB_CREATE_AT } = require('../../db/dbFields')
+const { DB_ID, DB_V, DB_UPDATED_AT, DB_CREATED_AT } = require('../../db/dbFields')
 const log = require('../../utils/logging')
 
 // -----------------------------------------------------------------------------
@@ -136,12 +136,13 @@ function makeLogInfo(logLvl, mod, fun, msg) {
 function logLineToString(logLine) {
   const fun = 'logLineToString'
   // log.d(mod, fun , `logLine: ${beautify(logLine)}`)
-  // const dateStr = `${format(logLine[DB_CREATE_AT], LOG_DATE_FORMAT)} ${logLine[
-  //   DB_CREATE_AT
+  // const dateStr = `${format(logLine[DB_CREATED_AT], LOG_DATE_FORMAT)} ${logLine[
+  //   DB_CREATED_AT
   // ].getTime()}`
   return (
-    `${datetime.format(logLine[DB_CREATE_AT], LOG_DATE_FORMAT)} ${logLine.time} ${logLine.log_level} ` +
-    `[ ${logLine.location_module} . ${logLine.location_function} ] ${logLine.message}`
+    `${datetime.format(logLine[DB_CREATED_AT], LOG_DATE_FORMAT)} ${logLine.time} ${
+      logLine.log_level
+    } ` + `[ ${logLine.location_module} . ${logLine.location_function} ] ${logLine.message}`
   )
 }
 
