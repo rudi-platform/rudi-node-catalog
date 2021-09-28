@@ -152,7 +152,7 @@ function cleanDate(inputDate) {
   try {
     const cleanDate = new Date(cleanValue)
     if (cleanDate == 'Invalid Date') throw new BadRequestError(`Invalid date: '${cleanValue}'`)
-    log.d(mod, fun, `cleanDate: ${cleanDate}`)
+    log.d(mod, fun, `cl eanDate: ${cleanDate.toISOString()}`)
     return cleanDate
   } catch (err) {
     log.w(mod, fun, err)

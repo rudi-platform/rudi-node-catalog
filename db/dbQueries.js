@@ -674,8 +674,8 @@ exports.getObjectList = async (objectType, options) => {
       // Populate
       const objectList = await Model.find(filter)
         .sort(sortOptions)
-        .limit(limit)
         .skip(offset)
+        .limit(limit)
         .populate(getPopulateOptions(objectType))
 
       if (!fields) return objectList
@@ -732,8 +732,8 @@ exports.getObjectListAndCount = async (objectType, options) => {
       const objectListFiltered = await Model.find(filter).sort(sortOptions)
       const objectListCount = objectListFiltered.length
       const objectList = objectListFiltered
-        .limit(limit)
         .skip(offset)
+        .limit(limit)
         .populate(getPopulateOptions(objectType))
 
       let objectListFinal
@@ -797,7 +797,7 @@ exports.getMetadataListAndCount = async (options) => {
       {
         $facet: {
           [COUNT_LABEL]: [{ $group: { _id: null, count: { $sum: 1 } } }],
-          [LIST_LABEL]: [{ $sort: sortOptions }, { $limit: limit }, { $skip: offset }],
+          [LIST_LABEL]: [{ $sort: sortOptions }, { $skip: offset }, { $limit: limit }],
         },
       },
     ]
@@ -933,8 +933,8 @@ exports.groupObjectList = async (objectType, unionField, options) => {
         },
       },
       { $sort: { count: -1, _id: 1 } },
-      { $limit: limit },
       { $skip: offset },
+      { $limit: limit },
     ]
     log.d(mod, fun, `aggregateOptions: ${utils.beautify(aggregateOptions)}`)
 
@@ -1012,8 +1012,8 @@ exports.countObjectList = async (objectType, unionField, options) => {
         },
       },
       { $sort: { count: -1, _id: 1 } },
-      { $limit: limit },
       { $skip: offset },
+      { $limit: limit },
     ]
     // log.d(mod, fun, `aggregateOptions: ${utils.beautify(aggregateOptions)}`)
     let objectList = await Model.aggregate(aggregateOptions).exec()
