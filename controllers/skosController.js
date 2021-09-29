@@ -77,8 +77,9 @@ const {
   URL_PV_THESAURUS_ACCESS: URL_THESAURUS_ACCESS,
   PARAM_THESAURUS_CODE,
   URL_SUFFIX_LICENCE: URL_LICENCE_SUFFIX,
+  PARAM_THESAURUS_LANG,
 } = require('../config/confApi')
-const { InternalServerError, ParameterExpectedError, NotFoundError } = require('../utils/errors')
+const { InternalServerError, ParameterExpectedError, NotFoundError, NotImplementedError } = require('../utils/errors')
 
 // -----------------------------------------------------------------------------
 // Controllers: Scheme
@@ -475,6 +476,30 @@ exports.getThesaurus = async (thesaurusCode) => {
   }
 }
 
+exports.getThesaurusLabel = async (thesaurusCode, lang) => {
+  const code = thesaurusCode.toLowerCase()
+
+  if (code === 'themes') return await Themes.getLabels(lang)
+  
+  if (code === 'keywords') return await Keywords.get()
+  if (code === 'licences') return await licenceController.getAllLicenceCodes()
+
+  switch (code) {
+    case 'encodings':
+      return Encodings.get()
+    case 'filetypes':
+      return FileTypes.get()
+    case 'fileextensions':
+      return FileTypes.getExtensions()
+    case 'hashalgorithms':
+      return HashAlgorithms.get()
+    case 'languages':
+      return Languages.get()
+    case 'projections':
+      return Projections.get()
+  }
+}
+
 // -----------------------------------------------------------------------------
 // API functions
 // -----------------------------------------------------------------------------
@@ -501,6 +526,27 @@ exports.getSingleThesaurus = async (req, reply) => {
     log.d(mod, fun, `thesaurusCode: ${thesaurusCode}`)
 
     const thesaurus = await this.getThesaurus(thesaurusCode)
+    if (!thesaurus)
+      throw new NotFoundError(
+        `Thesaurus not found for such required code: ${utils.beautify(thesaurusCode)}`
+      )
+    return thesaurus
+  } catch (err) {
+    log.e(mod, fun, err)
+    throw err
+  }
+}
+
+exports.getSingleThesaurusLabels = async (req, reply) => {
+  const fun = 'getThesaurusLabels'
+  try {
+    log.v(mod, fun, `< GET ${URL_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}/:${PARAM_THESAURUS_LANG}`)
+
+    const thesaurusCode = json.accessReqParam(req, PARAM_THESAURUS_CODE)
+    const thesaurusLang = json.accessReqParam(req, PARAM_THESAURUS_LANG)
+    log.d(mod, fun, `thesaurusCode: ${thesaurusCode}`)
+
+    const thesaurus = await this.getThesaurusLabel(thesaurusCode, thesaurusLang)
     if (!thesaurus)
       throw new NotFoundError(
         `Thesaurus not found for such required code: ${utils.beautify(thesaurusCode)}`

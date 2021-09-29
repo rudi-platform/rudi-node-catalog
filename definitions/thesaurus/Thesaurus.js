@@ -19,6 +19,7 @@ module.exports = class Thesaurus {
   #isInit
   #code
   #initValues
+  #initLabels
   #currentValues
 
   /**
@@ -26,13 +27,14 @@ module.exports = class Thesaurus {
    * @param {string} code Identifier for this enum
    * @param {string[]} initValues Default values to be used when none are provided
    */
-  constructor(code, initValues) {
+  constructor(code, initValues, initLabels) {
     const fun = 'constructor'
     // log.d(mod, fun, `${code}`)
 
     this.#isInit = false
     this.#code = code
     this.#initValues = initValues
+    this.#initLabels = initLabels
   }
 
   /**
@@ -69,13 +71,35 @@ module.exports = class Thesaurus {
 
   get() {
     const fun = 'get'
-    if (this.#isInit) {
-      return this.#currentValues
-    } else {
+    if (!this.#isInit) {
       const errMsg = 'Init first'
       log.w(mod, fun, errMsg)
       throw new MethodNotAllowedError(errMsg)
     }
+    return this.#currentValues
+  }
+
+  getLabels(lang) {
+    const fun = 'getLabels'
+    log.d(mod, fun, ``)
+
+    if (!this.#isInit) {
+      const errMsg = 'Init first'
+      log.w(mod, fun, errMsg)
+      throw new MethodNotAllowedError(errMsg)
+    }
+
+    if (!this.#initLabels) return this.#currentValues
+
+    if (!lang) return this.#initLabels
+    const labels = {}
+     Object.keys(this.#initLabels).map((key) => {
+      const val = this.#initLabels[key][lang]
+      const label = val ? val : key
+      // log.d(mod, fun, `${beautify(key)}: ${val}`)
+      labels[key] = label
+    })
+    return labels
   }
 
   addSingleValue = async (newValue) => {
@@ -147,6 +171,20 @@ module.exports = class Thesaurus {
   }
 
   #getEnum = async (typeThesaurus) => {
+    const fun = '#getEnum'
+    // log.d(mod, fun, ``)
+
+    try {
+      const dbEnum = await DynamicEnum.findOne({ code: typeThesaurus })
+      if (dbEnum) return dbEnum.values
+      else throw new NotFoundError(`Enum '${typeThesaurus}' was not found`)
+    } catch (err) {
+      log.d(mod, fun, err)
+      throw err
+    }
+  }
+
+  #getLabels = async (typeThesaurus) => {
     const fun = '#getEnum'
     // log.d(mod, fun, ``)
 

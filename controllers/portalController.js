@@ -196,10 +196,9 @@ exports.getNewTokenFromPortal = async () => {
   const fun = 'getNewTokenFromPortal'
   log.d(mod, fun, ``)
   try {
-    const usr = portal.LOGIN
-    const pwd = portal.PASSW
+    const [usr, pwd] = portal.getCredentials()
+    const portalAuthUrl = portal.getAuthUrl()
 
-    const portalUrl = portal.getAuthUrl()
     const body = `grant_type=password&scope=read&username=${usr}&password=${pwd}`
 
     const basicAuth = utils.toBase64Url(`${usr}:${pwd}`)
@@ -213,7 +212,7 @@ exports.getNewTokenFromPortal = async () => {
     }
     let answer
     try {
-      answer = await directPost(portalUrl, body, opts)
+      answer = await directPost(portalAuthUrl, body, opts)
     } catch (err) {
       const errMsg = `Post to portal failed: ${err}`
       log.w(mod, fun, errMsg)
@@ -314,7 +313,7 @@ exports.checkSignatureWithSecret = (accessToken) => {
     if (!accessToken) throw new BadRequestError('No token = no signature to verify!')
     const [jwtHeaderBase64, jwtPayloadBase64, jwtSignatureBase64] = accessToken.split('.')
 
-    const hash = createHmac('sha256', portal.SECRET)
+    const hash = createHmac('sha256', portal.getSecret())
       .update(`${jwtHeaderBase64}.${jwtPayloadBase64}`)
       .digest('base64url')
 
@@ -349,7 +348,7 @@ exports.checkSignatureWithPubKey = (accessToken) => {
     // Retrieve the public key
     let pubKeyPem
     try {
-      pubKeyPem = readFileSync(portal.PUBLIC_KEY, 'ascii')
+      pubKeyPem = readFileSync(portal.getAuthPub(), 'ascii')
     } catch (err) {
       throw new `The file with the Portal public key can't be accessed: ${err}`()
     }

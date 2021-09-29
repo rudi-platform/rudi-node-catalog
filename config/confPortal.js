@@ -1,13 +1,19 @@
 'use strict'
 
-// const mod = 'sysPortal'
+const mod = 'sysPortal'
 
 // -----------------------------------------------------------------------------
 // Internal dependecies
 // -----------------------------------------------------------------------------
 const fa = require('../utils/fileActions')
 const utils = require('../utils/jsUtils')
-const { USER_CONF_FILE, DEFAULT_CONF_FILE, USER_CONF, LOCAL_CONF, getIniValue } = require('./confSystem')
+const {
+  USER_CONF_FILE,
+  DEFAULT_CONF_FILE,
+  USER_CONF,
+  LOCAL_CONF,
+  getIniValue,
+} = require('./confSystem')
 
 // -----------------------------------------------------------------------------
 // Constants: local ini file configuration settings
@@ -18,13 +24,13 @@ const PORTAL_SECTION = 'portal'
 const _authUrl = 'auth_url'
 const _authGet = 'auth_get'
 const _authChk = 'auth_chk'
+const _authPub = 'auth_key'
 
 // Creds section
 const _login = 'login'
 const _passw = 'passw'
 const _secret = 'secret'
-const _publicKey = 'publicKey'
-const _publicKeyUrl = 'publicKeyUrl'
+const _portalPub = 'portal_pub'
 
 // API section
 const _getUrl = 'get_url'
@@ -57,30 +63,46 @@ exports.JWT_EXP = 'exp'
 const AUTH_URL = getIniValue(PORTAL_SECTION, _authUrl)
 const AUTH_GET = getIniValue(PORTAL_SECTION, _authGet)
 const AUTH_CHK = getIniValue(PORTAL_SECTION, _authChk)
+const PUB_KEY_URL = getIniValue(PORTAL_SECTION, _authPub)
+const PUB_KEY_FILE = getIniValue(PORTAL_SECTION, _portalPub)
 
-exports.getAuthUrl = () => {
-  return `${AUTH_URL}/${AUTH_GET}`
-}
+exports.getAuthUrl = () =>   {return `${AUTH_URL}/${AUTH_GET}`}
+
 
 exports.getCheckAuthUrl = () => {
+  // utils.consoleLog(mod, 'getCheckAuthUrl', `${AUTH_URL}/${AUTH_CHK}`)
   return `${AUTH_URL}/${AUTH_CHK}`
 }
 
-// ----- Creds
-exports.LOGIN = getIniValue(PORTAL_SECTION, _login)
-exports.PASSW = getIniValue(PORTAL_SECTION, _passw)
-exports.SECRET = getIniValue(PORTAL_SECTION, _secret)
-exports.PUBLIC_KEY = getIniValue(PORTAL_SECTION, _publicKey)
-exports.PUBLIC_KEY_URL = getIniValue(PORTAL_SECTION, _publicKeyUrl)
+exports.getAuthPub = () => {
+  return `${AUTH_URL}/${PUB_KEY_URL}`
+}
 
-exports.SHOULD_CONTROL_PUBLIC_REQUESTS = getIniValue(
-  PORTAL_SECTION,
-  _should_control_public_requests
-)
+exports.getPubKeyFile = () => {
+  return PUB_KEY_FILE
+}
+
+// ----- Creds
+const LOGIN = getIniValue(PORTAL_SECTION, _login)
+const PASSW = getIniValue(PORTAL_SECTION, _passw)
+const SHOULD_CONTROL_EXT_REQUESTS = getIniValue(PORTAL_SECTION, _should_control_public_requests)
+
+exports.getCredentials = () => {
+  return [LOGIN, PASSW]
+}
+
+// const SECRET = getIniValue(PORTAL_SECTION, _secret)
+exports.getSecret = () => {
+  return null
+}
+
+exports.shouldControlExtRequest = () => {
+  return SHOULD_CONTROL_EXT_REQUESTS
+}
 
 // ----- API
 exports.API_GET_URL = getIniValue(PORTAL_SECTION, _getUrl)
-exports.API_SEND_URL = getIniValue(PORTAL_SECTION, _sendUrl)
+const API_SEND_URL = getIniValue(PORTAL_SECTION, _sendUrl)
 
 // ----- API: Get
 exports.getPortalMetaUrl = (id) => {
@@ -88,36 +110,36 @@ exports.getPortalMetaUrl = (id) => {
 }
 
 const apiGetUrlElements = this.API_GET_URL.split('/')
-exports.API_GET_PROTOCOL = apiGetUrlElements[0].replace(/:/, '')
-exports.API_GET_PORT = this.API_GET_PROTOCOL === 'https' ? 443 : 80
-exports.API_GET_HOST = apiGetUrlElements[2]
-exports.API_GET_PATH = apiGetUrlElements.splice(3).join('/')
+const API_GET_PROTOCOL = apiGetUrlElements[0].replace(/:/, '')
+const API_GET_PORT = this.API_GET_PROTOCOL === 'https' ? 443 : 80
+const API_GET_HOST = apiGetUrlElements[2]
+const API_GET_PATH = apiGetUrlElements.splice(3).join('/')
 
 exports.apiGetOptions = (id) => {
   return {
-    protocol: this.API_GET_PROTOCOL,
-    hostname: this.API_GET_HOST,
-    port: this.API_GET_PORT,
-    path: this.API_GET_PATH.replace(/{{id}}/, id),
+    protocol: API_GET_PROTOCOL,
+    hostname: API_GET_HOST,
+    port: API_GET_PORT,
+    path: API_GET_PATH.replace(/{{id}}/, id),
   }
 }
 
 // ----- API: Send
 
 exports.postPortalMetaUrl = () => {
-  return `${this.API_SEND_URL}`
+  return `${API_SEND_URL}`
 }
-const apiSendUrlElements = this.API_SEND_URL.split('/')
-exports.API_SEND_PROTOCOL = apiSendUrlElements[0].replace(/:/, '')
-exports.API_SEND_PORT = this.API_SEND_PROTOCOL === 'https' ? 443 : 80
-exports.API_SEND_HOST = apiSendUrlElements[2]
-exports.API_SEND_PATH = apiSendUrlElements.splice(3).join('/')
+const apiSendUrlElements = API_SEND_URL.split('/')
+const API_SEND_PROTOCOL = apiSendUrlElements[0].replace(/:/, '')
+const API_SEND_PORT = API_SEND_PROTOCOL === 'https' ? 443 : 80
+const API_SEND_HOST = apiSendUrlElements[2]
+const API_SEND_PATH = apiSendUrlElements.splice(3).join('/')
 
 exports.apiSendOptions = () => {
   return {
-    protocol: this.API_SEND_PROTOCOL,
-    hostname: this.API_SEND_HOST,
-    port: this.API_SEND_PORT,
-    path: this.API_SEND_PATH,
+    protocol: API_SEND_PROTOCOL,
+    hostname: API_SEND_HOST,
+    port: API_SEND_PORT,
+    path: API_SEND_PATH,
   }
 }

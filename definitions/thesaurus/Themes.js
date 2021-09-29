@@ -37,7 +37,7 @@ const Thesaurus = require('./Thesaurus')
 */
 
 const CODE = 'themes'
-const INIT_VALUES = [
+/* const INIT_VALUES = [
   'farming',
   'biota',
   'boundaries',
@@ -57,9 +57,26 @@ const INIT_VALUES = [
   'structure',
   'transportation',
   'utilitiesCommunication',
-]
+] */
 
-const themes = new Thesaurus(CODE, INIT_VALUES)
+const INIT_VALUES = {
+  economy: { fr: 'Economie', en: 'Economy' },
+  citizenship: { fr: 'Citoyenneté', en: 'Citizenship' },
+  energyNetworks: { fr: 'Réseaux, Energie', en: 'Networks, Energy' },
+  culture: { fr: 'Culture, Sports, Loisirs', en: 'Culture, Sports, Leisure' },
+  transportation: { fr: 'Mobilité, Transport', en: 'Transportation' },
+  children: { fr: 'Enfance', en: 'Children' },
+  environment: { fr: 'Environnement', en: 'Environment' },
+  townPlanning: { fr: 'Urbanisme', en: 'Town planning' },
+  location: { fr: 'Référentiels géographiques', en: 'Location' },
+  education: { fr: 'Education', en: 'Eduction' },
+  publicSpace: { fr: 'Espace public', en: 'Public space' },
+  health: { fr: 'Santé, Sécurité', en: 'Health, security' },
+  housing: { fr: 'Logement', en: 'Housing' },
+  society: { fr: 'Social', en: 'Society' },
+}
+
+const themes = new Thesaurus(CODE, Object.keys(INIT_VALUES), INIT_VALUES)
 
 const fun = `init ${CODE}`
 // log.d(mod, fun, ``)
