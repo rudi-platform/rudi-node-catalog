@@ -200,10 +200,15 @@ exports.httpPost = async (destUrl, dataToSend, authorizationToken) => {
     */
 }
 
+const sslAgent = new https.Agent({  
+  rejectUnauthorized: false
+});
+
 exports.directPost = async (destUrl, dataToSend, reqOpts) => {
   const fun = 'directPost'
   log.d(mod, fun, ``)
   // log.d(mod, fun, `destUrl: ${destUrl}`)
+  reqOpts.httpsAgent = sslAgent
   try {
     const answer = await axios.post(destUrl, dataToSend, reqOpts)
     return answer
@@ -228,6 +233,7 @@ exports.directGet = async (destUrl, reqOpts) => {
   const fun = 'directGet'
   log.d(mod, fun, ``)
   // log.d(mod, fun, `destUrl: ${destUrl}`)
+  reqOpts.httpsAgent = sslAgent
   try {
     const answer = await axios.get(destUrl, reqOpts)
     return answer
