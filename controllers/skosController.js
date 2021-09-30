@@ -433,20 +433,21 @@ exports.dbConceptListToRudiRecursive = async (dbConceptList) => {
 // Thesaurus
 // -----------------------------------------------------------------------------
 
-exports.getThesaurusList = async (code) => {
-  const keywords = await Keywords.get()
-  const themes = await Themes.get()
+exports.getThesaurusList = async (lang) => {
+  
+  const keywords = await Keywords.get(lang)
+  const themes = await Themes.get(lang)
   const licences = await await licenceController.getAllLicenceCodes()
 
   const thesauri = {
-    encodings: Encodings.get(),
-    filetypes: FileTypes.get(),
+    encodings: Encodings.get(lang),
+    filetypes: FileTypes.get(lang),
     fileextensions: FileTypes.getExtensions(),
-    hashalgorithms: HashAlgorithms.get(),
+    hashalgorithms: HashAlgorithms.get(lang),
     keywords: keywords,
-    languages: Languages.get(),
+    languages: Languages.get(lang),
     licences: licences,
-    projections: Projections.get(),
+    projections: Projections.get(lang),
     themes: themes,
   }
 
@@ -508,7 +509,11 @@ exports.getEveryThesaurus = async (req, reply) => {
   try {
     log.v(mod, fun, `< GET ${URL_THESAURUS_ACCESS}`)
     log.d(mod, fun, ``)
-    const listThesauri = await this.getThesaurusList()
+
+    const lang = req.query[PARAM_THESAURUS_LANG]
+    log.d(mod, fun, `lang: ${lang}`)
+
+    const listThesauri = await this.getThesaurusList(lang)
 
     return listThesauri
   } catch (err) {

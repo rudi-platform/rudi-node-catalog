@@ -69,13 +69,14 @@ module.exports = class Thesaurus {
     // log.d(mod, fun, `Thesaurus initialized: ${this.#code}`)
   }
 
-  get() {
+  get(lang) {
     const fun = 'get'
     if (!this.#isInit) {
       const errMsg = 'Init first'
       log.w(mod, fun, errMsg)
       throw new MethodNotAllowedError(errMsg)
     }
+    if (lang) return this.getLabels(lang)
     return this.#currentValues
   }
 
@@ -93,7 +94,7 @@ module.exports = class Thesaurus {
 
     if (!lang) return this.#initLabels
     const labels = {}
-     Object.keys(this.#initLabels).map((key) => {
+    Object.keys(this.#initLabels).map((key) => {
       const val = this.#initLabels[key][lang]
       const label = val ? val : key
       // log.d(mod, fun, `${beautify(key)}: ${val}`)

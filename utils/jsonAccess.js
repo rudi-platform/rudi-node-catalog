@@ -21,7 +21,7 @@ const msg = require('./msg')
  * @throws request parameter is missing
  */
 exports.accessReqParam = (req, param) => {
-  const value = req.params[param]
+    const value = req.params[param]
   if (!value) throw new BadRequestError(`${msg.missingRequestParameter(req, param)}`)
   return value
 }

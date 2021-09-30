@@ -200,15 +200,16 @@ exports.httpPost = async (destUrl, dataToSend, authorizationToken) => {
     */
 }
 
-const sslAgent = new https.Agent({  
-  rejectUnauthorized: false
-});
+const sslAgent = new https.Agent({
+  rejectUnauthorized: false,
+})
 
 exports.directPost = async (destUrl, dataToSend, reqOpts) => {
   const fun = 'directPost'
   log.d(mod, fun, ``)
-  // log.d(mod, fun, `destUrl: ${destUrl}`)
-  reqOpts.httpsAgent = sslAgent
+  // log.d(mod, fun, `${destUrl}`)
+  if (reqOpts) reqOpts.httpsAgent = sslAgent
+  else reqOpts = { httpsAgent: sslAgent }
   try {
     const answer = await axios.post(destUrl, dataToSend, reqOpts)
     return answer
@@ -217,14 +218,17 @@ exports.directPost = async (destUrl, dataToSend, reqOpts) => {
     if (err.response && err.response.data) {
       log.w(mod, fun, utils.beautify(err.response.data))
       if (err.response.data.code && err.response.data.label) {
-        const postErr = new Error(`${err.response.data.code}: ${err.response.data.label}`)
+        const postErr = new InternalServerError(
+          `${err.response.data.code}: ${err.response.data.label}`
+        )
         postErr.status = err.status
-        throw new Error(`${err.response.data.code}: ${err.response.data.label}`)
+        throw new InternalServerError(`${err.response.data.code}: ${err.response.data.label}`)
       } else {
-        throw new Error(`${err.response.data}`)
+        throw new InternalServerError(`${utils.beautify(err.response.data)}`)
       }
     } else {
-      throw err
+      log.w(mod, fun, utils.beautify(err))
+      throw InternalServerError(utils.beautify(err))
     }
   }
 }
@@ -233,7 +237,8 @@ exports.directGet = async (destUrl, reqOpts) => {
   const fun = 'directGet'
   log.d(mod, fun, ``)
   // log.d(mod, fun, `destUrl: ${destUrl}`)
-  reqOpts.httpsAgent = sslAgent
+  if (reqOpts) reqOpts.httpsAgent = sslAgent
+  else reqOpts = { httpsAgent: sslAgent }
   try {
     const answer = await axios.get(destUrl, reqOpts)
     return answer

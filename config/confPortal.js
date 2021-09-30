@@ -41,7 +41,7 @@ const PORTAL_SECTION = 'portal'
 const AUTH_URL = getIniValue(PORTAL_SECTION, 'auth_url')
 const AUTH_GET = getIniValue(PORTAL_SECTION, 'auth_get')
 const AUTH_CHK = getIniValue(PORTAL_SECTION, 'auth_chk')
-const PUB_KEY_URL = getIniValue(PORTAL_SECTION, 'auth_key')
+const PUB_KEY_URL = getIniValue(PORTAL_SECTION, 'auth_pub')
 const PUB_KEY_FILE = getIniValue(PORTAL_SECTION, 'portal_pub')
 
 exports.getAuthUrl = () => {
