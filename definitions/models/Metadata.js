@@ -106,6 +106,7 @@ const {
   API_END_DATE_PROPERTY,
 } = require('../../db/dbFields')
 const { NotFoundError, BadRequestError } = require('../../utils/errors')
+const { DEFAULT_LANG } = require('../../config/confApi')
 
 // -----------------------------------------------------------------------------
 // Fields with specific treatments
@@ -568,9 +569,25 @@ async function checkThesaurus(metadata) {
   const shouldInit = metadata[API_COLLECTION_TAG] == 'init'
 
   try {
-    const theme = metadata[API_THEME_PROPERTY]
-    if (!(await Themes.isValid(theme, shouldInit)))
-      throw new BadRequestError(`${msg.incorrectVal(API_THEME_PROPERTY, theme)}. Allowed: ${utils.beautify(Themes.get())}`)
+    const dataTheme = metadata[API_THEME_PROPERTY]
+
+    const themes = Themes.get()
+    const themeLabels = Themes.getLabels(DEFAULT_LANG)
+    
+    const themeKeyIndex = Object.keys(themeLabels).indexOf(dataTheme)
+    if (themeKeyIndex === -1) {
+      const themeValIndex = Object.values(themeLabels).indexOf(dataTheme)
+      if (themeValIndex > -1) {
+        const allowedDataTheme = Object.keys(themeLabels)[themeValIndex]
+        log.d(mod, fun, `Changing Theme value: ${dataTheme} -> ${allowedDataTheme}`)
+        metadata[API_THEME_PROPERTY] = allowedDataTheme
+      } else if (!(await Themes.isValid(dataTheme, shouldInit))) {
+        throw new BadRequestError(
+          `${msg.incorrectVal(API_THEME_PROPERTY, dataTheme)}. ` +
+            `Allowed: ${utils.beautify(Themes.get())}`
+        )
+      }
+    }
     /* 
     const keywords = metadata[API_KEYWORDS_PROPERTY]
     // log.d(mod, fun, `keywords: ${utils.beautify(keywords)}`)
