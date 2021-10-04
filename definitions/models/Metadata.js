@@ -570,8 +570,8 @@ async function checkThesaurus(metadata) {
   try {
     const theme = metadata[API_THEME_PROPERTY]
     if (!(await Themes.isValid(theme, shouldInit)))
-      throw new BadRequestError(msg.incorrectVal(API_THEME_PROPERTY, theme))
-
+      throw new BadRequestError(`${msg.incorrectVal(API_THEME_PROPERTY, theme)}. Allowed: ${utils.beautify(Themes.get())}`)
+    /* 
     const keywords = metadata[API_KEYWORDS_PROPERTY]
     // log.d(mod, fun, `keywords: ${utils.beautify(keywords)}`)
 
@@ -586,7 +586,7 @@ async function checkThesaurus(metadata) {
           .catch((err) => log.w(mod, fun, err))
       })
     )
-
+    */
     const languages = metadata[API_LANGUAGES_PROPERTY]
     if (languages) {
       const langStr = utils.beautify(languages)

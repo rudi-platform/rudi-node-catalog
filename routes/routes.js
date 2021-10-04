@@ -64,6 +64,7 @@ const {
   PARAM_ACTION_UNLINKED,
   PARAM_ACTION_SIGN,
   URL_PV_APP_ENV_ACCESS,
+  PARAM_THESAURUS_LANG,
 } = require('../config/confApi')
 const { beautify } = require('../utils/jsUtils')
 const { SHOULD_CONTROL_PRIVATE_REQUESTS } = require('../config/confSystem')
@@ -193,7 +194,7 @@ exports.redirectRoutes = [
     config: { routeName: REDIRECT_GET_DATA },
     handler: function (req, reply) {
       log.d(mod, `redirect`, `${req.method} ${URL_PUB_METADATA}`)
-      return "RUDI producer node"
+      return 'RUDI producer node'
       //reply.redirect(URL_PUB_METADATA)
     },
   },
@@ -490,6 +491,13 @@ exports.devRoutes = [
     url: `${URL_PV_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}`,
     preHandler: onDevRoute,
     handler: skosController.getSingleThesaurus,
+    config: { routeName: DEV_GET_SINGLE_THESAURUS },
+  },
+  {
+    method: 'GET',
+    url: `${URL_PV_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}/:${PARAM_THESAURUS_LANG}`,
+    preHandler: onDevRoute,
+    handler: skosController.getSingleThesaurusLabels,
     config: { routeName: DEV_GET_SINGLE_THESAURUS },
   },
   {
