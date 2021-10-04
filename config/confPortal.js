@@ -15,7 +15,6 @@ const {
   getIniValue,
 } = require('./confSystem')
 
-
 // -----------------------------------------------------------------------------
 // Constants: Portal JWT
 // -----------------------------------------------------------------------------
@@ -80,25 +79,30 @@ exports.shouldControlExtRequest = () => {
 }
 
 // ----- API
+const API_PORTAL_URL = getIniValue(PORTAL_SECTION, 'portal_url')
 const API_GET_URL = getIniValue(PORTAL_SECTION, 'get_url')
 const API_SEND_URL = getIniValue(PORTAL_SECTION, 'put_url')
 
-const apiGetUrlElements = API_GET_URL.split('/')
+exports.getPortalMetaUrl = (id) => {
+  if (id) return `${API_PORTAL_URL}/${API_GET_URL.replace(/{{id}}/, id)}`
+  return `${API_PORTAL_URL}/${API_GET_URL}`
+}
+exports.postPortalMetaUrl = () => {
+  return `${API_PORTAL_URL}/${API_SEND_URL}`
+}
+const apiGetUrlElements = this.getPortalMetaUrl().split('/')
 const API_GET_PROTOCOL = apiGetUrlElements[0].replace(/:/, '')
 const API_GET_PORT = this.API_GET_PROTOCOL === 'https' ? 443 : 80
 const API_GET_HOST = apiGetUrlElements[2]
 const API_GET_PATH = apiGetUrlElements.splice(3).join('/')
 
-const apiSendUrlElements = API_SEND_URL.split('/')
+const apiSendUrlElements = this.postPortalMetaUrl().split('/')
 const API_SEND_PROTOCOL = apiSendUrlElements[0].replace(/:/, '')
 const API_SEND_PORT = API_SEND_PROTOCOL === 'https' ? 443 : 80
 const API_SEND_HOST = apiSendUrlElements[2]
 const API_SEND_PATH = apiSendUrlElements.splice(3).join('/')
 
 // ----- API: Get
-exports.getPortalMetaUrl = (id) => {
-  return `${API_GET_URL.replace(/{{id}}/, id)}`
-}
 
 exports.apiGetOptions = (id) => {
   return {
@@ -110,9 +114,7 @@ exports.apiGetOptions = (id) => {
 }
 
 // ----- API: Send
-exports.postPortalMetaUrl = () => {
-  return `${API_SEND_URL}`
-}
+
 exports.apiSendOptions = () => {
   return {
     protocol: API_SEND_PROTOCOL,
