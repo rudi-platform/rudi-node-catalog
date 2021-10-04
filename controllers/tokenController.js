@@ -91,7 +91,7 @@ exports.getJwtAlgo = (algo) => {
       case 'PS512':
         return algo
       default:
-        throw Error(`Algo not recognized: '${algo}'`)
+        throw new Error(`Algo not recognized: '${algo}'`)
     }
   } catch (err) {
     log.w(mod, fun, err)
@@ -121,7 +121,7 @@ exports.getHashAlgo = (algo) => {
       case 'EdDSA':
         return 'sha512'
       default:
-        throw Error(`Algo not recognized: '${algo}'`)
+        throw new Error(`Algo not recognized: '${algo}'`)
     }
   } catch (err) {
     log.w(mod, fun, err)
