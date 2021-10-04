@@ -99,6 +99,7 @@ exports.URL_SUFFIX_NODE_VERSION = 'nv'
 exports.URL_SUFFIX_LICENCE = 'licences'
 
 exports.PARAM_THESAURUS_CODE = `code`
+exports.PARAM_THESAURUS_LANG = `lang`
 exports.PARAM_LOGS_LINES = `lines`
 
 exports.URL_PV_PORTAL_PREFIX = `${this.URL_PREFIX_PRIVATE}/${URL_SUFFIX_PORTAL}`
