@@ -87,7 +87,6 @@ const { Metadata, METADATA_FIELDS_TO_POPULATE } = require('../definitions/models
 const { Report } = require('../definitions/models/Report')
 const { LogEntry, makeLogInfo, logLineToString } = require('../definitions/models/LogEntry')
 const {
-  InternalServerError,
   ParameterExpectedError,
   NotFoundError,
   ObjectNotFoundError,

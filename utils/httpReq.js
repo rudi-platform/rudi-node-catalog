@@ -228,7 +228,7 @@ exports.directPost = async (destUrl, dataToSend, reqOpts) => {
       }
     } else {
       log.w(mod, fun, utils.beautify(err))
-      throw InternalServerError(utils.beautify(err))
+      throw new InternalServerError(utils.beautify(err))
     }
   }
 }
