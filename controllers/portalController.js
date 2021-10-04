@@ -59,6 +59,7 @@ exports.exposedGetPortalToken = async (req, reply) => {
   const fun = 'exposedGetPortalToken'
   log.d(mod, fun, `< GET new portal token`)
   try {
+    log.d(mod, fun, portal.getAuthUrl())
     return await this.getPortalToken()
   } catch (err) {
     log.w(mod, fun, err)
@@ -95,7 +96,8 @@ exports.getPortalToken = async () => {
       token = json.accessProperty(rmToken, portal.FIELD_TOKEN)
     } catch (err) {
       log.w(mod, fun, err)
-      throw new InternalServerError(`Failed to get a new token from the portal: ${err}`)
+      throw err
+      //  new InternalServerError(`Failed to get a new token from the portal: ${err}`)
     }
   }
   return token
@@ -196,11 +198,20 @@ exports.getNewTokenFromPortal = async () => {
   const fun = 'getNewTokenFromPortal'
   log.d(mod, fun, ``)
   try {
-    const usr = portal.LOGIN
-    const pwd = portal.PASSW
+    const [usr, pwd] = portal.getCredentials()
+    const portalAuthUrl = portal.getAuthUrl()
+    log.d(mod, fun, portalAuthUrl)
 
-    const portalUrl = portal.getAuthUrl()
-    const body = `grant_type=password&scope=read&username=${usr}&password=${pwd}`
+    // const body = {
+    //   grant_type: 'password',
+    //   scope: 'read',
+    //   username: usr,
+    //   password: pwd,
+    // }
+    const body =
+      `grant_type=password&scope=read&username=${encodeURIComponent(usr)}&` +
+      `password=${encodeURIComponent(pwd)}`
+    log.d(mod, fun, `body: ${utils.beautify(body)}`)
 
     const basicAuth = utils.toBase64Url(`${usr}:${pwd}`)
 
@@ -211,9 +222,10 @@ exports.getNewTokenFromPortal = async () => {
         Authorization: `Basic ${basicAuth}`,
       },
     }
+    log.d(mod, fun, utils.beautify(opts))
     let answer
     try {
-      answer = await directPost(portalUrl, body, opts)
+      answer = await directPost(portalAuthUrl, body, opts)
     } catch (err) {
       const errMsg = `Post to portal failed: ${err}`
       log.w(mod, fun, errMsg)
@@ -314,7 +326,7 @@ exports.checkSignatureWithSecret = (accessToken) => {
     if (!accessToken) throw new BadRequestError('No token = no signature to verify!')
     const [jwtHeaderBase64, jwtPayloadBase64, jwtSignatureBase64] = accessToken.split('.')
 
-    const hash = createHmac('sha256', portal.SECRET)
+    const hash = createHmac('sha256', portal.getSecret())
       .update(`${jwtHeaderBase64}.${jwtPayloadBase64}`)
       .digest('base64url')
 
@@ -349,16 +361,20 @@ exports.checkSignatureWithPubKey = (accessToken) => {
     // Retrieve the public key
     let pubKeyPem
     try {
-      pubKeyPem = readFileSync(portal.PUBLIC_KEY, 'ascii')
+      pubKeyPem = readFileSync(portal.getPubKeyFile(), 'ascii')
     } catch (err) {
-      throw new `The file with the Portal public key can't be accessed: ${err}`()
+      throw new InternalServerError(`The file with the Portal public key can't be accessed: ${err}`)
     }
+
     let sslKey
     try {
       sslKey = parseKey(pubKeyPem)
     } catch (err) {
-      throw new Error(`The Portal public key is incorrect, please check the content: ${err}`)
+      throw new InternalServerError(
+        `The Portal public key is incorrect, please check the content: ${err}`
+      )
     }
+
     // log.d(mod, fun, `sslKey: ${utils.beautify(sslKey)}`)
     // const keyName = sslKey.comment && sslKey.comment !== '(unnamed)' ? `'${sslKey.comment}' ` : ''
     // log.d(mod, fun, `${keyName}public key: ${sslKey.type} ${sslKey.size} bits`)
@@ -368,7 +384,7 @@ exports.checkSignatureWithPubKey = (accessToken) => {
       verifier.update(`${jwtHeaderBase64url}.${jwtPayloadBase64url}`)
       signatureIsValid = verifier.verify(jwtSignatureBase64url, 'base64url')
     } catch (err) {
-      throw new Error(`Error while verifying the Portal token signature: ${err}`)
+      throw new ForbiddenError(`Error while verifying the Portal token signature: ${err}`)
     }
     if (signatureIsValid) {
       log.i(mod, fun, `signature is valid`)
@@ -397,13 +413,16 @@ exports.verifyPortalToken = (accessToken) => {
     // Check JWT body
     const jwtPayload = JSON.parse(utils.decodeBase64url(jwtPayloadBase64))
 
-    if (jwtPayload[portal.JWT_USER] !== portal.LOGIN)
-      throw new InternalServerError('Portal JWT: incorrect user')
-    if (jwtPayload[portal.JWT_CLIENT] !== portal.LOGIN)
-      throw new InternalServerError('Portal JWT: incorrect client')
+    const login = portal.getCredentials()[0]
+    if (jwtPayload[portal.JWT_USER] !== login) {
+      log.w(mod, fun, `Portal JWT: incorrect user: : ${jwtPayload[portal.JWT_USER]}`)
+      throw new ForbiddenError(`Portal JWT: incorrect user`)
+    }
+    // if (jwtPayload[portal.JWT_CLIENT] !== login)
+    //   throw new ForbiddenError('Portal JWT: incorrect client')
 
     if (jwtPayload[portal.JWT_EXP] < utils.nowEpochS())
-      throw new InternalServerError(
+      throw new ForbiddenError(
         `Portal JWT expired: ` +
           `expire_date=${utils.dateEpochSToIso(jwtPayload[portal.JWT_EXP])}` +
           ` < now=${utils.dateEpochSToIso(utils.nowEpochS())}`
@@ -413,7 +432,7 @@ exports.verifyPortalToken = (accessToken) => {
 
     // Check JWT signature
     if (!this.checkSignatureWithPubKey(accessToken))
-      throw new InternalServerError('Portal JWT signature is not valid')
+      throw new ForbiddenError('Portal JWT signature is not valid')
 
     return [jwtHeader, jwtPayload]
   } catch (err) {
