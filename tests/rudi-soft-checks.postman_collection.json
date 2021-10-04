@@ -560,6 +560,45 @@
 					"response": []
 				},
 				{
+					"name": "Get enum labels",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Themes received\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    pm.collectionVariables.set('themes', responseJson);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/enum?lang=fr",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"enum"
+							],
+							"query": [
+								{
+									"key": "lang",
+									"value": "fr"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get themes",
 					"event": [
 						{
@@ -588,6 +627,41 @@
 								"{{adminUrl}}",
 								"enum",
 								"Themes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get theme labels",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Themes received\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    pm.collectionVariables.set('themes', responseJson);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/enum/Themes/fr",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"enum",
+								"Themes",
+								"fr"
 							]
 						}
 					},
@@ -2625,7 +2699,7 @@
 							"query": [
 								{
 									"key": "global_id",
-									"value": null,
+									"value": "",
 									"disabled": true
 								}
 							]

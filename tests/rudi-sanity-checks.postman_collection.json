@@ -1973,7 +1973,7 @@
 							"query": [
 								{
 									"key": "global_id",
-									"value": null,
+									"value": "",
 									"disabled": true
 								}
 							]
