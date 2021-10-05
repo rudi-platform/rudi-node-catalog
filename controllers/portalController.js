@@ -208,9 +208,7 @@ exports.getNewTokenFromPortal = async () => {
     //   username: usr,
     //   password: pwd,
     // }
-    const body =
-      `grant_type=password&scope=read&username=${encodeURIComponent(usr)}&` +
-      `password=${encodeURIComponent(pwd)}`
+    const body = `grant_type=password&scope=read&username=${usr}&` + `password=${pwd}`
     log.d(mod, fun, `body: ${utils.beautify(body)}`)
 
     const basicAuth = utils.toBase64Url(`${usr}:${pwd}`)
