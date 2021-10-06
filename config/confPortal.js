@@ -61,10 +61,10 @@ exports.getPubKeyFile = () => {
 }
 
 // ----- Creds
-const isPwdEncoded = getIniValue(PORTAL_SECTION, 'is_encoded')
+const isPwdClear = getIniValue(PORTAL_SECTION, 'is_pwd_clear')
 const LOGIN = getIniValue(PORTAL_SECTION, 'login')
 const READ_PASSW = getIniValue(PORTAL_SECTION, 'passw')
-const PASSW_B64 = isPwdEncoded ? READ_PASSW : utils.toBase64(READ_PASSW)
+const PASSW_B64 = isPwdClear ? utils.toBase64(READ_PASSW) : READ_PASSW
 const SHOULD_CONTROL_EXT_REQUESTS = getIniValue(PORTAL_SECTION, 'should_control_public_requests')
 
 exports.getCredentials = () => {
