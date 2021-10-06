@@ -801,8 +801,8 @@ exports.getMetadataListAndCount = async (options) => {
       },
     ]
 
-    log.d(mod, fun, `aggregateOptions: ${utils.beautify(aggregateOptions)}`)
-    log.d(mod, fun, `sortOptions: ${utils.beautify(sortOptions)}`)
+    // log.d(mod, fun, `aggregateOptions: ${utils.beautify(aggregateOptions)}`)
+    // log.d(mod, fun, `sortOptions: ${utils.beautify(sortOptions)}`)
 
     const result = await Metadata.aggregate(aggregateOptions).exec()
     // log.d(mod, fun, `result: ${utils.beautify(result)}`)
@@ -935,7 +935,7 @@ exports.groupObjectList = async (objectType, unionField, options) => {
       { $skip: offset },
       { $limit: limit },
     ]
-    log.d(mod, fun, `aggregateOptions: ${utils.beautify(aggregateOptions)}`)
+    // log.d(mod, fun, `aggregateOptions: ${utils.beautify(aggregateOptions)}`)
 
     let objectList = await Model.aggregate(aggregateOptions).exec()
 
