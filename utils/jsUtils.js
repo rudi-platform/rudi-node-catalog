@@ -17,6 +17,7 @@ exports.toBase64 = (str) => this.convertEncoding(str, 'utf-8', 'base64')
 exports.toBase64Url = (str) => this.convertEncoding(str, 'utf-8', 'base64url')
 exports.decodeBase64 = (data) => this.convertEncoding(data, 'base64', 'utf-8')
 exports.decodeBase64url = (data) => this.convertEncoding(data, 'base64url', 'utf-8')
+exports.padWithEqualSignBase4 = (str) => this.pad(str, 4, '=')
 
 exports.convertEncoding = (data, fromEncoding, toEncoding) => {
   const fun = 'convertEncoding'
@@ -47,7 +48,6 @@ exports.pad = (str, base, padSign) => {
     throw err
   }
 }
-exports.padWithEqualSignBase4 = (str) => this.pad(str, 4, '=')
 
 // -----------------------------------------------------------------------------
 // Dates

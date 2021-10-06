@@ -201,9 +201,11 @@ exports.getNewTokenFromPortal = async () => {
     const [usr, pwdb64] = portal.getCredentials()
     const portalAuthUrl = portal.getAuthUrl()
     log.d(mod, fun, `portal URL: ${portalAuthUrl}`)
-
+    
     // LM -- the password is now provided in base64
     const pwd = utils.decodeBase64(pwdb64)
+    log.d(mod, fun, `pwdb64: ${pwdb64}`)
+    log.d(mod, fun, `pwd: ${pwd}`)
     // const body = {
     //   grant_type: 'password',
     //   scope: 'read',
