@@ -204,8 +204,8 @@ exports.getNewTokenFromPortal = async () => {
     
     // LM -- the password is now provided in base64
     const pwd = utils.decodeBase64(pwdb64)
-    log.d(mod, fun, `pwdb64: ${pwdb64}`)
-    log.d(mod, fun, `pwd: ${pwd}`)
+    // log.d(mod, fun, `pwdb64: ${pwdb64}`)
+    // log.d(mod, fun, `pwd: ${pwd}`)
     // const body = {
     //   grant_type: 'password',
     //   scope: 'read',
@@ -216,10 +216,10 @@ exports.getNewTokenFromPortal = async () => {
     const body =
       `grant_type=password&scope=read&username=${encodeURIComponent(usr)}&` +
       `password=${encodeURIComponent(pwd)}`
-    log.d(mod, fun, `body: ${body}`)
+    // log.d(mod, fun, `body: ${body}`)
 
     const basicAuth = utils.padWithEqualSignBase4(utils.toBase64Url(`${usr}:${pwd}`))
-    log.d(mod, fun, `basicAuth: ${basicAuth}`)
+    // log.d(mod, fun, `basicAuth: ${basicAuth}`)
 
     const opts = {
       headers: {
@@ -228,7 +228,7 @@ exports.getNewTokenFromPortal = async () => {
         Authorization: `Basic ${basicAuth}`,
       },
     }
-    log.d(mod, fun, utils.beautify(opts))
+    // log.d(mod, fun, utils.beautify(opts))
     let answer
     try {
       answer = await directPost(portalAuthUrl, body, opts)
@@ -433,8 +433,8 @@ exports.verifyPortalToken = (accessToken) => {
           `expire_date=${utils.dateEpochSToIso(jwtPayload[portal.JWT_EXP])}` +
           ` < now=${utils.dateEpochSToIso(utils.nowEpochS())}`
       )
-    log.d(mod, fun, `jwtHeader: ${utils.beautify(jwtHeader)}`)
-    log.d(mod, fun, `jwtPayload: ${utils.beautify(jwtPayload)}`)
+    // log.d(mod, fun, `jwtHeader: ${utils.beautify(jwtHeader)}`)
+    // log.d(mod, fun, `jwtPayload: ${utils.beautify(jwtPayload)}`)
 
     // Check JWT signature
     if (!this.checkSignatureWithPubKey(accessToken))

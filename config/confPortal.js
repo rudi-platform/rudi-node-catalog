@@ -64,10 +64,9 @@ exports.getPubKeyFile = () => {
 const isPwdClear = getIniValue(PORTAL_SECTION, 'is_pwd_clear')
 const LOGIN = getIniValue(PORTAL_SECTION, 'login')
 const READ_PASSW = getIniValue(PORTAL_SECTION, 'passw')
-const fun = 'readPortalConf'
-utils.consoleLog(mod, fun,`READ_PASSW: ${READ_PASSW}` )
+// utils.consoleLog(mod, 'readPortalConf',`READ_PASSW: ${READ_PASSW}` )
 const PASSW_B64 = isPwdClear ? utils.toBase64(READ_PASSW) : READ_PASSW
-utils.consoleLog(mod, fun,`PASSW_B64: ${PASSW_B64}` )
+// utils.consoleLog(mod, 'readPortalConf',`PASSW_B64: ${PASSW_B64}` )
 const SHOULD_CONTROL_EXT_REQUESTS = getIniValue(PORTAL_SECTION, 'should_control_public_requests')
 
 exports.getCredentials = () => {
