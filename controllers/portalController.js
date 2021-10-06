@@ -34,6 +34,7 @@ const {
   createRudiHttpError,
   ParameterExpectedError,
   NotAcceptableError,
+  ObjectNotFoundError,
 } = require('../utils/errors')
 
 // -----------------------------------------------------------------------------
@@ -112,6 +113,7 @@ exports.checkStoredToken = async (req, reply) => {
   // log.d(mod, fun, `< GET portal check token`)
   try {
     const token = await db.getLatestStoredPortalToken()
+    if(!token) throw new NotFoundError('No Portal token is actually stored')
     return await this.getTokenCheckedByPortal(token[portal.FIELD_TOKEN])
   } catch (err) {
     log.w(mod, fun, err)
@@ -218,7 +220,7 @@ exports.getNewTokenFromPortal = async () => {
       `password=${encodeURIComponent(pwd)}`
     // log.d(mod, fun, `body: ${body}`)
 
-    const basicAuth = utils.padWithEqualSignBase4(utils.toBase64Url(`${usr}:${pwd}`))
+    const basicAuth = utils.padWithEqualSignBase4(utils.toBase64(`${usr}:${pwd}`))
     // log.d(mod, fun, `basicAuth: ${basicAuth}`)
 
     const opts = {
