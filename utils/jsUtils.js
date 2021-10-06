@@ -29,6 +29,25 @@ exports.convertEncoding = (data, fromEncoding, toEncoding) => {
     throw err
   }
 }
+exports.pad = (str, base, padSign) => {
+  const fun = 'pad'
+  // this.consoleLog(mod, fun, `base = ${base}, sign = '${padSign}'`)
+  try {
+    if (padSign.length > 1) padSign = padSign[0]
+    const modulo = str.length % base
+    // this.consoleLog(`modulo = ${modulo}`)
+    let paddedStr = str
+    for (let i = modulo; i > 0; i--) {
+      paddedStr = paddedStr + padSign
+    }
+    // this.consoleLog(mod, fun, paddedStr)
+    return paddedStr
+  } catch (err) {
+    this.consoleErr(mod, fun, err)
+    throw err
+  }
+}
+exports.padWithEqualSignBase4 = (str) => this.pad(str, 4, '=')
 
 // -----------------------------------------------------------------------------
 // Dates

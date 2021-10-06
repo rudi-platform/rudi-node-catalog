@@ -200,23 +200,24 @@ exports.getNewTokenFromPortal = async () => {
   try {
     const [usr, pwdb64] = portal.getCredentials()
     const portalAuthUrl = portal.getAuthUrl()
-    log.d(mod, fun, portalAuthUrl)
+    log.d(mod, fun, `portal URL: ${portalAuthUrl}`)
 
     // LM -- the password is now provided in base64
-    const pwd = utils.decodeBase64(pwdb64);
+    const pwd = utils.decodeBase64(pwdb64)
     // const body = {
     //   grant_type: 'password',
     //   scope: 'read',
     //   username: usr,
     //   password: pwd,
     // }
-    const body =                                                             
-      `grant_type=password&scope=read&username=${encodeURIComponent(usr)}&` + 
+    // const body = `grant_type=password&scope=read&username=${usr}&password=${pwd}`
+    const body =
+      `grant_type=password&scope=read&username=${encodeURIComponent(usr)}&` +
       `password=${encodeURIComponent(pwd)}`
-    // LM -- const body = `grant_type=password&scope=read&username=${usr}&` + `password=${pwd}`
-    log.d(mod, fun, `body: ${utils.beautify(body)}`)
+    log.d(mod, fun, `body: ${body}`)
 
-    const basicAuth = utils.toBase64Url(`${usr}:${pwd}`)
+    const basicAuth = utils.padWithEqualSignBase4(utils.toBase64Url(`${usr}:${pwd}`))
+    log.d(mod, fun, `basicAuth: ${basicAuth}`)
 
     const opts = {
       headers: {
@@ -258,12 +259,12 @@ exports.getNewTokenFromPortal = async () => {
 
       return portalToken
     } else {
-      const errMsg = `Couldn't get a token from the portal: ${utils.beautify(answer)}`
-      log.w(mod, fun, errMsg)
+      const errMsg = `${utils.beautify(answer)}`
+      // log.w(mod, fun, ôerrMsg)
       throw createRudiHttpError(answer.status, errMsg)
     }
   } catch (err) {
-    const errMsg = `Portal couldn't deliver a token: ${utils.beautify(err)}`
+    const errMsg = `Failed to get a token from Portal: ${utils.beautify(err)}`
     log.w(mod, fun, errMsg)
     throw new ForbiddenError(errMsg)
   }
