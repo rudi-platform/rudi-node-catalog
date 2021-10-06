@@ -60,7 +60,7 @@ exports.exposedGetPortalToken = async (req, reply) => {
   log.d(mod, fun, `< GET new portal token`)
   try {
     log.d(mod, fun, portal.getAuthUrl())
-    return await this.getPortalToken()
+    return await this.getNewTokenFromPortal()
   } catch (err) {
     log.w(mod, fun, err)
     throw err
