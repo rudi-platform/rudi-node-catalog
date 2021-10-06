@@ -237,8 +237,8 @@ exports.directGet = async (destUrl, reqOpts) => {
   const fun = 'directGet'
   log.d(mod, fun, ``)
   // log.d(mod, fun, `destUrl: ${destUrl}`)
-  //if (reqOpts) reqOpts.httpsAgent = sslAgent
-  //else reqOpts = { httpsAgent: sslAgent }
+  if (reqOpts) reqOpts.httpsAgent = sslAgent
+  else reqOpts = { httpsAgent: sslAgent }
   try {
     const answer = await axios.get(destUrl, reqOpts)
     return answer

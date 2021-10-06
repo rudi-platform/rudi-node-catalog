@@ -257,6 +257,7 @@ exports.getNewTokenFromPortal = async () => {
         fun,
         `We got a new token, that expires on ${utils.dateEpochSToIso(jwtBody[portal.JWT_EXP])}`
       )
+      await this.getTokenCheckedByPortal(portalToken[portal.FIELD_TOKEN])
       await db.storePortalToken(portalToken)
 
       return portalToken
