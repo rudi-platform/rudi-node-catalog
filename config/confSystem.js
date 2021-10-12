@@ -1,7 +1,6 @@
 'use strict'
 
 const mod = 'sysConf'
-const fun = 'export'
 // -----------------------------------------------------------------------------
 // External dependecies
 // -----------------------------------------------------------------------------
@@ -131,6 +130,7 @@ exports.getProfile = (subject) => {
 }
 
 // const now = utils.nowLocaleFormatted()
+const fun = 'feedback'
 
 utils.consoleLog(mod, fun, `APP_NAME: ${this.APP_NAME}`)
 utils.consoleLog(mod, fun, `LISTENING_ADDR: ${this.LISTENING_ADDR}`)

@@ -118,7 +118,10 @@ exports.httpDelete = async (destUrl, authorizationToken) => {
     return answer.data
   } catch (error) {
     log.w(mod, fun, `DELETE: ${error}`)
-    log.w(mod, fun, `details: ${utils.beautify(error.response.data)}`)
+    if (error.response && error.response.data)
+      log.w(mod, fun, `details: ${utils.beautify(error.response.data)}`)
+    else log.w(mod, fun, `details: ${utils.beautify(error.response)}`)
+
     if (
       error.response &&
       error.response.data &&
@@ -200,18 +203,19 @@ exports.httpPost = async (destUrl, dataToSend, authorizationToken) => {
     */
 }
 
-const sslAgent = new https.Agent({
-  rejectUnauthorized: false,
-})
+// const sslAgent = new https.Agent({
+//   rejectUnauthorized: false,
+// })
 
 exports.directPost = async (destUrl, dataToSend, reqOpts) => {
   const fun = 'directPost'
   log.d(mod, fun, ``)
   // log.d(mod, fun, `${destUrl}`)
-  if (reqOpts) reqOpts.httpsAgent = sslAgent
-  else reqOpts = { httpsAgent: sslAgent }
+  // if (reqOpts) reqOpts.httpsAgent = sslAgent
+  // else reqOpts = { httpsAgent: sslAgent }
   try {
     const answer = await axios.post(destUrl, dataToSend, reqOpts)
+    log.logHttpAnswer(mod, fun, answer)
     return answer
   } catch (err) {
     // log.w(mod, fun, err)
@@ -237,10 +241,11 @@ exports.directGet = async (destUrl, reqOpts) => {
   const fun = 'directGet'
   log.d(mod, fun, ``)
   // log.d(mod, fun, `destUrl: ${destUrl}`)
-  if (reqOpts) reqOpts.httpsAgent = sslAgent
-  else reqOpts = { httpsAgent: sslAgent }
+  // if (reqOpts) reqOpts.httpsAgent = sslAgent
+  // else reqOpts = { httpsAgent: sslAgent }
   try {
     const answer = await axios.get(destUrl, reqOpts)
+    log.logHttpAnswer(mod, fun, answer)
     return answer
   } catch (err) {
     if (err.response && err.response.data)

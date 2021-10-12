@@ -120,7 +120,7 @@ mongoose
   .connect(sys.DB_URL, mongoConnectOptions)
   .then(() => {
     log.i(mod, 'mongo', `MongoDB connected`)
-    log.i(mod, 'app', `Application version '${sysController.getAppHash()}' | API ${api.VERSION}`)
+    log.i(mod, 'app', `API v${api.VERSION} | App version: '${sysController.getAppHash()}' | '${sysController.getEnvironment()}' env`)
     const logSeparatorEnd = utils.separateLogs('Init OK')
     addLogEntry('info', 'app', 'logSeparatorEnd', logSeparatorEnd).catch((err) =>
       utils.consoleErr('info', 'app', 'logSeparatorEnd: ' + err)

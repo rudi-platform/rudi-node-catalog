@@ -259,7 +259,7 @@ exports.getCollections = async () => {
     const collections = await mongoose.connection.db.listCollections().toArray()
 
     collections.map((collection) => {
-      log.v(mod, fun, `${utils.beautify(collection.name)}`)
+      log.d(mod, fun, `${utils.beautify(collection.name)}`)
       return collection.name
     })
     return collections
@@ -1136,7 +1136,7 @@ exports.getOrphans = async (objectType) => {
 
 exports.deleteObject = async (objectType, rudiId) => {
   const fun = `deleteObject`
-  // log.d(mod, fun, ``)
+  log.d(mod, fun, ``)
   try {
     const { Model, idField } = this.getObjectAccesses(objectType)
     const filter = { [idField]: rudiId }
@@ -1197,7 +1197,7 @@ exports.deleteManyWithRudiIds = async (objectType, rudiIdList) => {
 
 exports.deleteManyWithFilter = async (objectType, conditions) => {
   const fun = `deleteManyWithFilter`
-  log.d(mod, fun, `conditions: ${conditions}`)
+  log.d(mod, fun, `conditions: ${utils.beautify(conditions)}`)
   const Model = this.getObjectModel(objectType)
 
   // const regexConditions = {
@@ -1660,63 +1660,67 @@ exports.getAllConceptsWithRole = async (conceptRole) => {
 // - Filters
 // ----------------------------------------
 exports.findNotReferencedInMetadata = (objectType) => {
-  const fun = `isReferencedInMetadata`
+  const fun = `findNotReferencedInMetadata`
   // log.d(mod, fun, ``)
 }
 
 exports.isReferencedInMetadata = async (objectType, rudiId) => {
   const fun = `isReferencedInMetadata`
   log.d(mod, fun, `${objectType}: ${rudiId}`)
-
-  // const truc1 = await (await Contact.findOne({[API_CONTACT_ID]: rudiId}, '_id')).toObject()
-  // const truc = await Contact.findOne({[API_CONTACT_ID]: rudiId}, '_id')
-  // const truc2 = await truc.toObject()
-  // log.d(mod, fun, `truc: ${utils.beautify(truc2)}`)
-  let dbId
   try {
-    dbId = (await this.getObjectPropertiesWithRudiId(objectType, rudiId, [DB_ID]))[DB_ID]
+    // const truc1 = await (await Contact.findOne({[API_CONTACT_ID]: rudiId}, '_id')).toObject()
+    // const truc = await Contact.findOne({[API_CONTACT_ID]: rudiId}, '_id')
+    // const truc2 = await truc.toObject()
+    // log.d(mod, fun, `truc: ${utils.beautify(truc2)}`)
+    let dbId
+    try {
+      dbId = (await this.getObjectPropertiesWithRudiId(objectType, rudiId, [DB_ID]))[DB_ID]
+    } catch (err) {
+      log.w(mod, fun, msg.objectNotFound(objectType, rudiId))
+      throw new ObjectNotFoundError(objectType, rudiId)
+    }
+
+    // log.d(mod, fun, `dbId: ${utils.beautify(dbId)}`)
+
+    let metadataFilter
+    switch (objectType) {
+      case PARAM_OBJECT_ORGANIZATIONS:
+        metadataFilter = {
+          $or: [
+            { [API_DATA_PRODUCER_PROPERTY]: dbId },
+            {
+              [`${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`]: dbId,
+            },
+          ],
+        }
+        break
+      case PARAM_OBJECT_CONTACTS:
+        metadataFilter = {
+          $or: [
+            { [API_DATA_CONTACTS_PROPERTY]: dbId },
+            {
+              [`${API_METAINFO_PROPERTY}.${API_METAINFO_CONTACTS_PROPERTY}`]: dbId,
+            },
+          ],
+        }
+        break
+      case PARAM_OBJECT_MEDIA:
+        metadataFilter = {
+          [`${API_MEDIA_PROPERTY}`]: dbId,
+        }
+        break
+      default:
+        throw new NotFoundError(msg.objectTypeNotFound(objectType))
+    }
+    const res = await Metadata.findOne(metadataFilter, API_METADATA_ID)
+    log.d(mod, fun, `res: ${log.logMetadata(res)}`)
+    return !!res
+    // res = await Metadata.find(metadataFilter, API_METADATA_ID)
+    // return !!utils.isEmptyArray(res)
   } catch (err) {
-    log.w(mod, fun, msg.objectNotFound(objectType, rudiId))
-    throw new ObjectNotFoundError(objectType, rudiId)
+    log.w(mod, fun, err)
+    throw err
   }
-
-  log.d(mod, fun, `dbId: ${utils.beautify(dbId)}`)
-
-  let metadataFilter
-  switch (objectType) {
-    case PARAM_OBJECT_ORGANIZATIONS:
-      metadataFilter = {
-        $or: [
-          { [API_DATA_PRODUCER_PROPERTY]: dbId },
-          {
-            [`${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`]: dbId,
-          },
-        ],
-      }
-      break
-    case PARAM_OBJECT_CONTACTS:
-      metadataFilter = {
-        $or: [
-          { [API_DATA_CONTACTS_PROPERTY]: dbId },
-          {
-            [`${API_METAINFO_PROPERTY}.${API_METAINFO_CONTACTS_PROPERTY}`]: dbId,
-          },
-        ],
-      }
-      break
-    case PARAM_OBJECT_MEDIA:
-      metadataFilter = {
-        [`${API_MEDIA_PROPERTY}`]: dbId,
-      }
-      break
-    default:
-      throw new NotFoundError(msg.objectTypeNotFound(objectType))
-  }
-  const res = await Metadata.findOne(metadataFilter, API_METADATA_ID)
-  log.d(mod, fun, `res: ${utils.beautify(res)}`)
-  return !!res
-  // res = await Metadata.find(metadataFilter, API_METADATA_ID)
-  // return !!utils.isEmptyArray(res)
 }
 // ensure the organization is not in metadata.producer
 // ensure the organization is not in metadata.metainfo.provider

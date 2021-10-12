@@ -77,11 +77,12 @@ exports.exposedGetPortalToken = async (req, reply) => {
 exports.getPortalToken = async () => {
   const fun = 'getPortalToken'
   log.d(mod, fun, ``)
-  let token
+  let token, rmToken
   try {
-    const rmToken = await db.getLatestStoredPortalToken()
+    rmToken = await db.getLatestStoredPortalToken()
     if (!rmToken) {
-      throw new Error('No token in cache')
+      log.w(mod, fun, 'No token in cache')
+      rmToken = await this.getNewTokenFromPortal()
     }
     token = json.accessProperty(rmToken, portal.FIELD_TOKEN)
     // log.d(mod, fun, `token: ${utils.beautify(token)}`)
@@ -89,19 +90,13 @@ exports.getPortalToken = async () => {
     log.d(mod, fun, 'Stored token seems OK')
 
     await this.getTokenCheckedByPortal(token)
+    return token
     // log.d(mod, fun, 'Stored token was validated by the Portal')
   } catch (err) {
     log.w(mod, fun, err)
-    try {
-      const rmToken = await this.getNewTokenFromPortal()
-      token = json.accessProperty(rmToken, portal.FIELD_TOKEN)
-    } catch (err) {
-      log.w(mod, fun, err)
-      throw err
-      //  new InternalServerError(`Failed to get a new token from the portal: ${err}`)
-    }
+    throw err
+    //  new InternalServerError(`Failed to get a new token from the portal: ${err}`)
   }
-  return token
 }
 
 /**
@@ -113,7 +108,7 @@ exports.checkStoredToken = async (req, reply) => {
   // log.d(mod, fun, `< GET portal check token`)
   try {
     const token = await db.getLatestStoredPortalToken()
-    if(!token) throw new NotFoundError('No Portal token is actually stored')
+    if (!token) throw new NotFoundError('No Portal token is actually stored')
     return await this.getTokenCheckedByPortal(token[portal.FIELD_TOKEN])
   } catch (err) {
     log.w(mod, fun, err)
@@ -203,7 +198,7 @@ exports.getNewTokenFromPortal = async () => {
     const [usr, pwdb64] = portal.getCredentials()
     const portalAuthUrl = portal.getAuthUrl()
     log.d(mod, fun, `portal URL: ${portalAuthUrl}`)
-    
+
     // LM -- the password is now provided in base64
     const pwd = utils.decodeBase64(pwdb64)
     // log.d(mod, fun, `pwdb64: ${pwdb64}`)

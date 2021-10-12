@@ -511,7 +511,7 @@ exports.getEveryThesaurus = async (req, reply) => {
     log.d(mod, fun, ``)
 
     const lang = req.query[PARAM_THESAURUS_LANG]
-    log.d(mod, fun, `lang: ${lang}`)
+    // log.d(mod, fun, `lang: ${lang}`)
 
     const listThesauri = await this.getThesaurusList(lang)
 

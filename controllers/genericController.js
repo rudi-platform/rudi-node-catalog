@@ -460,7 +460,7 @@ exports.setPublishedFlag = async (dbObject, rudiId) => {
     if (!dbObject[DB_PUBLISHED_AT]) {
       dbObject[DB_PUBLISHED_AT] = nowISO()
       await dbObject.save()
-      log.d(mod, fun, `dbObject published: ${beautify(dbObject)}`)
+      log.d(mod, fun, `dbObject published: ${log.logMetadata(dbObject)}`)
     } else {
       log.w(mod, fun, `Data was already published for id '${rudiId}'`)
     }
@@ -737,7 +737,7 @@ exports.deleteSingleObject = async (req, reply) => {
 
     // TODO: if SkosScheme: delete all SkosConcepts that reference it
     // TODO: if SkosConcept: update all other SkosConcepts that reference it (parents/children/siblings/relatives)
-    const reply = await db.deleteObject(objectType, objectRudiId)
+    const answer = await db.deleteObject(objectType, objectRudiId)
 
     if (objectType === PARAM_OBJECT_METADATA) {
       deletePortalMetadata(objectRudiId)
@@ -749,7 +749,7 @@ exports.deleteSingleObject = async (req, reply) => {
         )
     }
 
-    return reply
+    return answer
   } catch (err) {
     log.e(mod, fun, err)
     throw err

@@ -674,11 +674,11 @@ exports.devRoutes = [
   // -----------------------------------------------------------------------------
   // Tests entry
   // -----------------------------------------------------------------------------
-  {
+ /*  {
     method: 'GET',
     url: `${URL_PREFIX_PRIVATE}/test`,
     preHandler: onDevRoute,
     handler: devController.test,
     config: { routeName: DEV_TEST },
-  },
+  }, */
 ]

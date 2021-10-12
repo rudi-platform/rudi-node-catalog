@@ -33,6 +33,7 @@ exports.API_MEDIA_ID = 'media_id'
 // -----------------------------------------------------------------------------
 // Metadata properties
 // -----------------------------------------------------------------------------
+exports.API_DATA_NAME_PROPERTY = 'resource_title'
 exports.API_DATA_PRODUCER_PROPERTY = 'producer'
 exports.API_DATA_CONTACTS_PROPERTY = 'contacts'
 exports.API_DATA_DATES_PROPERTY = 'dataset_dates'

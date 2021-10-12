@@ -3,11 +3,16 @@
 
 const mod = 'logging'
 // -----------------------------------------------------------------------------
+// External dependencies
+// -----------------------------------------------------------------------------
+const { pick } = require('lodash')
+// -----------------------------------------------------------------------------
 // Internal dependencies
 // -----------------------------------------------------------------------------
 const { logger, sysLogger } = require('../config/confLogs')
 const { consoleErr, displayStr, logWhere, beautify, displayRedirections } = require('./jsUtils')
 const { addLogEntry } = require('../db/dbQueries')
+const { API_METADATA_ID, API_DATA_NAME_PROPERTY } = require('../db/dbFields')
 
 // -----------------------------------------------------------------------------
 // Colors
@@ -101,6 +106,28 @@ exports.d = (mod, fun, msg) => {
   logger.debug(displayStr(mod, fun, msg))
   const logLevel = 'debug'
   addLogEntry(logLevel, mod, fun, msg)
+}
+
+// -----------------------------------------------------------------------------
+// Http
+// -----------------------------------------------------------------------------
+
+exports.logHttpAnswer = (loggedMod, loggedFun, httpAnswer) => {
+  try {
+    const respExtract = pick(httpAnswer.config, ['method', 'headers', 'url'])
+    respExtract.url = respExtract.url.length>50?respExtract.url.substring(0,50):respExtract.url
+    this.d(loggedMod, loggedFun, `HTTP answer: ${beautify(respExtract)}`)
+  } catch (err) {
+    this.w(mod, 'showHttpAnswer', err)
+    throw err
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Metadata
+// -----------------------------------------------------------------------------
+exports.logMetadata = (metadata) => {
+  return `${beautify(pick(metadata, [API_METADATA_ID, API_DATA_NAME_PROPERTY]))}`
 }
 
 // -----------------------------------------------------------------------------

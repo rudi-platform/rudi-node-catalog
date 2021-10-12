@@ -127,3 +127,9 @@ exports.apiSendOptions = () => {
     path: API_SEND_PATH,
   }
 }
+
+// ----- Feedback
+const fun = 'feedback'
+
+utils.consoleLog(mod, fun, `Portal - Data: '${API_PORTAL_URL}'`)
+utils.consoleLog(mod, fun, `Portal - Auth: '${AUTH_URL}'`)
