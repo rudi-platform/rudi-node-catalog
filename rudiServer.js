@@ -65,7 +65,7 @@ fastify.decorate('notFound', (req, reply) => {
     statusCode: 404,
   }
 
-  log.w(mod, fun, `${response.message} <- ${req.ip}` + utils.displayRedirections(req.headers))
+  log.w(mod, fun, `${response.message} <- ${utils.displayIps(req)}`)
 
   // log.d(mod, fun, utils.beautify(req))
   reply.code(404).send(response)
@@ -120,7 +120,13 @@ mongoose
   .connect(sys.DB_URL, mongoConnectOptions)
   .then(() => {
     log.i(mod, 'mongo', `MongoDB connected`)
-    log.i(mod, 'app', `API v${api.VERSION} | App version: '${sysController.getAppHash()}' | '${sysController.getEnvironment()}' env`)
+    log.i(
+      mod,
+      'app',
+      `API v${
+        api.VERSION
+      } | App version: '${sysController.getAppHash()}' | '${sysController.getEnvironment()}' env`
+    )
     const logSeparatorEnd = utils.separateLogs('Init OK')
     addLogEntry('info', 'app', 'logSeparatorEnd', logSeparatorEnd).catch((err) =>
       utils.consoleErr('info', 'app', 'logSeparatorEnd: ' + err)

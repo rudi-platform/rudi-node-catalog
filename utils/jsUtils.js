@@ -270,8 +270,16 @@ exports.consoleErr = (loc_mod, loc_fun, msg) => {
 exports.displayRedirections = (headers) => {
   if (!headers) return ''
   const redirections = headers['x-forwarded-for'] || headers['X-Forwarded-For']
-  return redirections ? `<- ${redirections} ` : ''
+  return redirections ? ` <- ${redirections} ` : ''
 }
-// -----------------------------------------------------------------------------
-// Crypto
-// -----------------------------------------------------------------------------
+exports.displayIps = (req) => {
+  const ip = req.ip
+  const headers = req.headers
+  return `${ip}${this.displayRedirections(headers)}`
+}
+exports.logApiCall = (req, subject) => {
+  return (
+    `${req.method} ${req.url} (${req.context.config.routeName})` +
+    ` <- ${subject} @ ${this.displayIps(req)}`
+  )
+}

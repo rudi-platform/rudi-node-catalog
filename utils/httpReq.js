@@ -120,7 +120,7 @@ exports.httpDelete = async (destUrl, authorizationToken) => {
     log.w(mod, fun, `DELETE: ${error}`)
     if (error.response && error.response.data)
       log.w(mod, fun, `details: ${utils.beautify(error.response.data)}`)
-    else log.w(mod, fun, `details: ${utils.beautify(error.response)}`)
+    else if (error.response) log.w(mod, fun, `details: ${utils.beautify(error.response)}`)
 
     if (
       error.response &&

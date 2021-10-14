@@ -37,6 +37,8 @@ const {
   ObjectNotFoundError,
 } = require('../utils/errors')
 
+const { extractJwt } = require('../utils/crypto')
+
 // -----------------------------------------------------------------------------
 // Token manager
 // -----------------------------------------------------------------------------
@@ -60,13 +62,26 @@ exports.exposedGetPortalToken = async (req, reply) => {
   const fun = 'exposedGetPortalToken'
   log.d(mod, fun, `< GET new portal token`)
   try {
-    log.d(mod, fun, portal.getAuthUrl())
+    // log.d(mod, fun, portal.getAuthUrl())
     return await this.getNewTokenFromPortal()
   } catch (err) {
     log.w(mod, fun, err)
     throw err
   }
 }
+
+exports.checkPortalTokenInHeader = async (req, reply) => {
+  const fun = 'checkPortalTokenInHeader'
+  log.d(mod, fun, ``)
+  try {
+    const token = extractJwt(req)
+    return await this.getTokenCheckedByPortal(token)
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
+}
+
 // -----------------------------------------------------------------------------
 // Controllers
 // -----------------------------------------------------------------------------
@@ -500,13 +515,11 @@ exports.deletePortalMetadata = async (metadataId) => {
     if (!metadataId) throw new BadRequestError('Metadata id required') // Can't get the resouces list yet.
 
     const token = await this.getPortalToken()
-    const portalDeleteUrl = portal.API_SEND_URL + '/' + metadataId
-    const reply = await httpDelete(portalDeleteUrl, token)
-    // const reply = await httpDelete(portal.getPortalMetaUrl(metadataId), token)
+    const reply = await httpDelete(portal.postPortalMetaUrl(metadataId), token)
 
     return reply
   } catch (err) {
-    log.e(mod, fun, `Couldn't delete on Portal side: ${err}`)
-    return false
+    log.w(mod, fun, `Couldn't delete on Portal side: ${err}`)
+    throw err
   }
 }

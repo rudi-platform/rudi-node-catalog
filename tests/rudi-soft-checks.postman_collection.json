@@ -103,6 +103,126 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Request new portal token",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const encodedPwd = encodeURI(pm.globals.get('pwd'))",
+									"pm.collectionVariables.set('encodedPwd',encodedPwd)"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(`Token received`, () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const answer = pm.response.json();",
+									"    //const answer = pm.response.stream.toString('utf8');",
+									"    const accessToken = answer.access_token",
+									"    // console.log(accessToken)",
+									"    pm.collectionVariables.set('accessToken', answer.access_token);",
+									"    pm.collectionVariables.set('jti', answer.jti);",
+									"    //console.log('authToken:' + pm.environment.get('authToken'))",
+									"",
+									"    const secondsBeforeExpiration = answer.expires_in",
+									"    const headerTime = new Date(pm.response.headers.get('Date')).getTime()",
+									"    const expirationDate  = new Date(headerTime + secondsBeforeExpiration * 1000).toISOString()",
+									"    ",
+									"",
+									"    const jwt = accessToken.split('.')",
+									"    const jwtHeaderEncoded = jwt[0]",
+									"    const jwtBodyEncoded = jwt[1]",
+									"    const jwtSignature = jwt[2]",
+									"",
+									"    //const jwtHeader = JSON.parse(codec.fromBase64Url(jwtHeaderEncoded))",
+									"    // console.log(jwtHeader)",
+									"    //const jwtBody = JSON.parse(codec.fromBase64Url(jwtBodyEncoded))",
+									"    // console.log(jwtBody)",
+									"",
+									"    //const jwtSign = JSON.parse(codec.fromBase64Url(jwtSignature))",
+									"    // console.log(jwtSign)",
+									"",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{pwd}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{usr}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "scope",
+									"value": "read",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "{{pwd}}",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "{{usr}}",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{portalBaseUrl}}/oauth/token",
+							"host": [
+								"{{portalBaseUrl}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -1455,16 +1575,16 @@
 									"",
 									"",
 									"//————— Thesauri",
-									"pm.collectionVariables.set('randomTheme', utils.randomPick('themes'));",
-									"pm.collectionVariables.set('randomKeyword1', utils.randomPick('keywords'));",
-									"pm.collectionVariables.set('randomKeyword2', utils.randomPick('keywords'));",
-									"pm.collectionVariables.set('randomLicence', utils.randomPick('licences'));",
+									"pm.collectionVariables.set('randomTheme', rand.pick('themes'));",
+									"pm.collectionVariables.set('randomKeyword1', rand.pick('keywords'));",
+									"pm.collectionVariables.set('randomKeyword2', rand.pick('keywords'));",
+									"pm.collectionVariables.set('randomLicence', rand.pick('licences'));",
 									"",
 									"//————— Producer",
 									"const orgs = [",
 									"    pm.collectionVariables.get('softOrg1Id'), ",
 									"    pm.collectionVariables.get('softOrg2Id')]",
-									"const randomOrgId = utils.randomPickInList(orgs)",
+									"const randomOrgId = rand.pickInList(orgs)",
 									"//console.log(`randomOrgId: ${randomOrgId}`)",
 									"pm.collectionVariables.set('randomOrgId', randomOrgId);",
 									"",
@@ -1476,7 +1596,7 @@
 									"//console.log(`contacts: ${contacts}`)",
 									"",
 									"",
-									"const randomContId1 = utils.randomPickInList(contacts)",
+									"const randomContId1 = rand.pickInList(contacts)",
 									"//console.log(`randomContId1: ${randomContId1}`)",
 									"",
 									"pm.collectionVariables.set('randomContact1', randomContId1);",
@@ -1485,7 +1605,7 @@
 									"const contactsLeft = contacts",
 									"    .filter(function(value, index, arr){ return value != randomContId1 });",
 									"",
-									"const randomContId2 = utils.randomPickInList(contactsLeft)",
+									"const randomContId2 = rand.pickInList(contactsLeft)",
 									"//console.log(`randomContId2: ${randomContId2}`)",
 									"",
 									"pm.collectionVariables.set('randomContact2', randomContId2);",
@@ -1601,7 +1721,6 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.collectionVariables.set('softMeta2Id', rand.get('{{$randomUUID}}'));",
 									""
 								],
 								"type": "text/javascript"
@@ -1654,7 +1773,6 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.collectionVariables.set('softMeta2Id', rand.get('{{$randomUUID}}'));",
 									""
 								],
 								"type": "text/javascript"
@@ -1707,7 +1825,6 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.collectionVariables.set('softMeta2Id', rand.get('{{$randomUUID}}'));",
 									""
 								],
 								"type": "text/javascript"
@@ -1764,7 +1881,6 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.collectionVariables.set('softMeta2Id', rand.get('{{$randomUUID}}'));",
 									""
 								],
 								"type": "text/javascript"
@@ -1821,7 +1937,6 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.collectionVariables.set('softMeta2Id', rand.get('{{$randomUUID}}'));",
 									""
 								],
 								"type": "text/javascript"
@@ -1878,7 +1993,6 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.collectionVariables.set('softMeta2Id', rand.get('{{$randomUUID}}'));",
 									""
 								],
 								"type": "text/javascript"
@@ -1935,7 +2049,6 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.collectionVariables.set('softMeta2Id', rand.get('{{$randomUUID}}'));",
 									""
 								],
 								"type": "text/javascript"
@@ -1992,7 +2105,6 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.collectionVariables.set('softMeta2Id', rand.get('{{$randomUUID}}'));",
 									""
 								],
 								"type": "text/javascript"
@@ -2101,6 +2213,16 @@
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -2146,6 +2268,16 @@
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -2191,6 +2323,16 @@
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -2509,6 +2651,16 @@
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -2703,6 +2855,16 @@
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -2800,6 +2962,16 @@
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "PUT",
 						"header": [],
 						"body": {
@@ -2826,7 +2998,7 @@
 					"response": []
 				},
 				{
-					"name": "Add report 2 (meta 1)",
+					"name": "[PUB] Add report 2 (meta 1)",
 					"event": [
 						{
 							"listen": "test",
@@ -2858,6 +3030,16 @@
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "PUT",
 						"header": [],
 						"body": {
@@ -2918,6 +3100,16 @@
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "PUT",
 						"header": [],
 						"body": {
@@ -2964,6 +3156,16 @@
 						"disableBodyPruning": true
 					},
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -3069,6 +3271,16 @@
 						"disableBodyPruning": true
 					},
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
@@ -3399,6 +3611,148 @@
 					"response": []
 				},
 				{
+					"name": "[PUB] No metadata left",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const stamp = pm.collectionVariables.get('stamp')",
+									"pm.test(`No metadata left with '${stamp}' stamp'`, () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const publicMetadataList = pm.response.json();",
+									"    pm.expect(publicMetadataList.total).to.eq(0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?collection_tag={{stamp}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}"
+							],
+							"query": [
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add meta 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Metadata 1 created\", () => {",
+									"    try {",
+									"        pm.expect(pm.response.code).to.eql(200);",
+									"    } catch(err) {",
+									"        // console.log(pm.response)",
+									"    }",
+									"    const responseJson = pm.response.json();",
+									"    // console.log(responseJson);",
+									"    const metaId = pm.collectionVariables.get('softMeta1Id');",
+									"    pm.expect(responseJson.global_id).to.eq(metaId);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"global_id\": \"{{softMeta1Id}}\",\n    \"local_id\": \"testingID {{softMeta1Id}}\",\n    \"doi\": \"10.1007/s00223-003-0070-444/{{softMeta1Id}}\",\n    \"resource_title\": \"Test de RUDI en local {{softMeta1Id}}\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 4444\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 4\"\n        }\n    ],\n    \"collection_tag\": \"{{stamp}}\",\n    \"purpose\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{stamp}}\"\n        }\n    ],\n    \"theme\": \"energyNetworks\",\n    \"keywords\": [\n        \"energy_consommation\",\n        \"electricity\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{softOrg1Id}}\",\n        \"organization_name\": \"{{softOrg1Name}}\",\n        \"organization_address\": \"{{softOrg1Address}}\",\n        \"collection_tag\": \"{{stamp}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{softContact1Id}}\",\n            \"contact_name\": \"M. Fazo\",\n            \"email\": \"gpizj@pzorjeg.gt\",\n            \"collection_tag\": \"{{stamp}}\"\n        },\n        {\n            \"contact_id\": \"{{softContact2Id}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\",\n            \"collection_tag\": \"{{stamp}}\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_provider\": {\n            \"organization_id\": \"{{softOrg1Id}}\"\n        },\n        \"metadata_contacts\": [\n            {\n                \"contact_id\": \"{{softContact2Id}}\"\n            }\n        ]\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"updated\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"licence_label\": \"{{softLicence}}\"\n        }\n    },\n    \"available_formats\": [\n        {\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{softMedia1Id}}\",\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.1.0\"\n            },\n            \"file_type\": \"application/json\",\n            \"file_size\": 59016,\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"4c9ee0f14e835927a1bbafde0eb89fb3\"\n            }\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{data}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete meta 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Metadata 1 deleted\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    const metaId = pm.variables.get('softMeta1Id');",
+									"    pm.expect(responseJson.global_id).to.eq(metaId);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}/{{softMeta1Id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{data}}",
+								"{{softMeta1Id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Delete media 1 & 2",
 					"event": [
 						{
@@ -3528,46 +3882,6 @@
 								"{{adminUrl}}",
 								"{{cont}}",
 								"{{deletion}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "[PUB] No metadata left",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const stamp = pm.collectionVariables.get('stamp')",
-									"pm.test(`No metadata left with '${stamp}' stamp'`, () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const publicMetadataList = pm.response.json();",
-									"    pm.expect(publicMetadataList.total).to.eq(0);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?collection_tag={{stamp}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{apiUrl}}",
-								"{{data}}"
-							],
-							"query": [
-								{
-									"key": "collection_tag",
-									"value": "{{stamp}}"
-								}
 							]
 						}
 					},
@@ -4109,20 +4423,21 @@
 					"            }@irisa.fr`;",
 					"    },",
 					"",
-					"    randomPickInList: function (list) {",
-					"        const randomNumber = _.random(0, list.length-1);",
-					"        return list[randomNumber];",
-					"    },",
-					"    ",
-					"    randomPick: function (listName) {",
-					"        return this.randomPickInList(pm.collectionVariables.get(listName));",
-					"    },",
 					"};",
 					"",
 					"rand = {",
 					"    get: function (randName) {",
 					"        return pm.variables.replaceIn(randName);",
-					"    }",
+					"    },",
+					"",
+					"    pickInList: function (list) {",
+					"        const randomNumber = _.random(0, list.length - 1);",
+					"        return list[randomNumber];",
+					"    },",
+					"",
+					"    pick: function (listName) {",
+					"        return this.pickInList(pm.collectionVariables.get(listName));",
+					"    },",
 					"};"
 				]
 			}
@@ -4324,6 +4639,18 @@
 		},
 		{
 			"key": "mediaId2",
+			"value": ""
+		},
+		{
+			"key": "encodedPwd",
+			"value": ""
+		},
+		{
+			"key": "accessToken",
+			"value": ""
+		},
+		{
+			"key": "jti",
 			"value": ""
 		}
 	]

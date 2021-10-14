@@ -10,6 +10,8 @@ const mod = 'routes'
 // Internal dependencies
 // -----------------------------------------------------------------------------
 const log = require('../utils/logging')
+const { beautify, displayIps, logApiCall } = require('../utils/jsUtils')
+const { ForbiddenError } = require('../utils/errors')
 
 // -----------------------------------------------------------------------------
 // Swagger documentation
@@ -66,9 +68,8 @@ const {
   URL_PV_APP_ENV_ACCESS,
   PARAM_THESAURUS_LANG,
 } = require('../config/confApi')
-const { beautify } = require('../utils/jsUtils')
+
 const { SHOULD_CONTROL_PRIVATE_REQUESTS } = require('../config/confSystem')
-const { ForbiddenError } = require('../utils/errors')
 
 // -----------------------------------------------------------------------------
 // Route names
@@ -127,10 +128,9 @@ const DEV_TEST = 'dev_test'
 // -----------------------------------------------------------------------------
 
 async function onFreeRoute(req, reply) {
-  const fun = 'onPublicRoute'
+  const fun = 'onFreeRoute'
   log.d(mod, fun, `${req.method} ${req.url} `)
   try {
-    // TODO : ajouter X-Forwarded-For à l'IP !!
     return
   } catch (err) {
     log.w(mod, fun, err)
@@ -142,7 +142,7 @@ async function onPublicRoute(req, reply) {
   const fun = 'onPublicRoute'
   log.d(mod, fun, `${req.method} ${req.url} `)
   try {
-    // TODO : ajouter X-Forwarded-For à l'IP !!
+    const subject = await portalController.checkPortalTokenInHeader(req, reply)
     return
   } catch (err) {
     log.w(mod, fun, err)
@@ -160,7 +160,7 @@ async function onPrivateRoute(req, reply) {
     // TODO : ajouter X-Forwarded-For à l'IP !!
 
     const subject = await tokenController.checkRudiProdPermission(req, reply)
-    log.i(mod, fun, `subject: ${subject} -> route ${req.context.config.routeName}`)
+    log.i(mod, fun, logApiCall(req, subject))
     return
   } catch (err) {
     log.w(mod, fun, err)
@@ -178,7 +178,7 @@ async function onDevRoute(req, reply) {
 
     // log.d(mod, fun, `${req.ip}: ${req.method} ${req.url} ${req.context.config.routeName}`)
     const subject = await tokenController.checkRudiProdPermission(req, reply)
-    log.i(mod, fun, `subject: ${subject} -> route ${req.context.config.routeName}`)
+    log.i(mod, fun, logApiCall(req, subject))
     return
   } catch (err) {
     log.w(mod, fun, err)
@@ -674,7 +674,7 @@ exports.devRoutes = [
   // -----------------------------------------------------------------------------
   // Tests entry
   // -----------------------------------------------------------------------------
- /*  {
+  /*  {
     method: 'GET',
     url: `${URL_PREFIX_PRIVATE}/test`,
     preHandler: onDevRoute,

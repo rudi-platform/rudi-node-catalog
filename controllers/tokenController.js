@@ -245,6 +245,18 @@ exports.verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
     return subject
   } catch (err) {
     log.w(mod, fun, err)
-    throw new ForbiddenError(`JWT not accepted: ${err.message}`)
+    throw new ForbiddenError(`JWT is not a valid RUDI Producer JWT: ${err.message}`)
+  }
+}
+
+exports.isRudiProducerToken = (token) => {
+  const fun = 'isRudiProducerToken'
+  try {
+    const jwtPayloadBase64url = token.split('.')[1]
+    const jwtPayload = JSON.parse(decodeBase64url(jwtPayloadBase64url))
+    return !!jwtPayload.req_mtd
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
   }
 }

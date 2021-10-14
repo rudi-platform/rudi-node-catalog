@@ -88,11 +88,12 @@ const API_GET_URL = getIniValue(PORTAL_SECTION, 'get_url')
 const API_SEND_URL = getIniValue(PORTAL_SECTION, 'put_url')
 
 exports.getPortalMetaUrl = (id) => {
-  if (id) return `${API_PORTAL_URL}/${API_GET_URL.replace(/{{id}}/, id)}`
-  return `${API_PORTAL_URL}/${API_GET_URL}`
+  if (!id) return `${API_PORTAL_URL}/${API_GET_URL}`
+  return `${API_PORTAL_URL}/${API_GET_URL.replace(/{{id}}/, id)}`
 }
-exports.postPortalMetaUrl = () => {
-  return `${API_PORTAL_URL}/${API_SEND_URL}`
+exports.postPortalMetaUrl = (id) => {
+  if (!id) return `${API_PORTAL_URL}/${API_SEND_URL}`
+  return `${API_PORTAL_URL}/${API_SEND_URL}/${id}`
 }
 const apiGetUrlElements = this.getPortalMetaUrl().split('/')
 const API_GET_PROTOCOL = apiGetUrlElements[0].replace(/:/, '')

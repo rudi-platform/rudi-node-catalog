@@ -10,7 +10,7 @@ const { pick } = require('lodash')
 // Internal dependencies
 // -----------------------------------------------------------------------------
 const { logger, sysLogger } = require('../config/confLogs')
-const { consoleErr, displayStr, logWhere, beautify, displayRedirections } = require('./jsUtils')
+const { consoleErr, displayStr, logWhere, beautify, displayIps } = require('./jsUtils')
 const { addLogEntry } = require('../db/dbQueries')
 const { API_METADATA_ID, API_DATA_NAME_PROPERTY } = require('../db/dbFields')
 
@@ -111,12 +111,17 @@ exports.d = (mod, fun, msg) => {
 // -----------------------------------------------------------------------------
 // Http
 // -----------------------------------------------------------------------------
-
+function shorten(str, len) {
+  if (!str) return
+  if (str.length < len) return str
+  return str.substring(0, len) + '[...]'
+}
 exports.logHttpAnswer = (loggedMod, loggedFun, httpAnswer) => {
   try {
-    const respExtract = pick(httpAnswer.config, ['method', 'headers', 'url'])
-    respExtract.url = respExtract.url.length>50?respExtract.url.substring(0,50):respExtract.url
-    this.d(loggedMod, loggedFun, `HTTP answer: ${beautify(respExtract)}`)
+    const resExtract = pick(httpAnswer.config, ['method', 'headers', 'url'])
+    resExtract.url = shorten(resExtract.url, 70)
+    resExtract.headers.Authorization = shorten(resExtract.headers.Authorization, 30)
+    this.d(loggedMod, loggedFun, `HTTP answer: ${beautify(resExtract)}`)
   } catch (err) {
     this.w(mod, 'showHttpAnswer', err)
     throw err
@@ -136,7 +141,7 @@ exports.logMetadata = (metadata) => {
 
 exports.logRequest = (req, res) => {
   const fun = 'apiCall'
-  this.i('http', fun, `${req.method} ${req.url} <- ${req.ip} ` + displayRedirections(req.headers))
+  this.i('http', fun, `${req.method} ${req.url} <- ${displayIps(req)}`)
   // return
   // this.d(mod, fun, `method: ${utils.beautify(req.method)}`)
   // this.d(mod, fun, `url: ${utils.beautify(req.url)}`)
