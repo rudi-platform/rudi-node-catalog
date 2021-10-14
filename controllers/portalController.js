@@ -32,9 +32,7 @@ const {
   BadRequestError,
   ForbiddenError,
   createRudiHttpError,
-  ParameterExpectedError,
   NotAcceptableError,
-  ObjectNotFoundError,
 } = require('../utils/errors')
 
 const { extractJwt } = require('../utils/crypto')
