@@ -6,7 +6,7 @@
 const mongoose = require('mongoose')
 const { omit } = require('lodash')
 
-const Int32 = require('mongoose-int32')
+const Int32 = require('mongoose-int32').loadType(mongoose)
 
 // -----------------------------------------------------------------------------
 // Inbternal dependancies
