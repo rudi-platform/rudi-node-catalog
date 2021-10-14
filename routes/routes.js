@@ -143,6 +143,7 @@ async function onPublicRoute(req, reply) {
   log.d(mod, fun, `${req.method} ${req.url} `)
   try {
     const subject = await portalController.checkPortalTokenInHeader(req, reply)
+    log.i(mod, fun, logApiCall(req, subject))
     return
   } catch (err) {
     log.w(mod, fun, err)

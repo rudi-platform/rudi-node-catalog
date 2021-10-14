@@ -69,46 +69,24 @@
 					"name": "Request new portal token",
 					"event": [
 						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"const encodedPwd = encodeURI(pm.globals.get('pwd'))",
-									"pm.collectionVariables.set('encodedPwd',encodedPwd)"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
 							"listen": "test",
 							"script": {
 								"exec": [
 									"pm.test(`Token received`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
+									"    //const answer = Buffer.from(pm.response.stream, 'base64').toString('utf8')",
 									"    const answer = pm.response.json();",
-									"    //const answer = pm.response.stream.toString('utf8');",
-									"    const accessToken = answer.access_token",
-									"    // console.log(accessToken)",
+									"    //console.log(answer)",
 									"    pm.collectionVariables.set('accessToken', answer.access_token);",
-									"    pm.collectionVariables.set('jti', answer.jti);",
-									"    //console.log('authToken:' + pm.environment.get('authToken'))",
 									"",
-									"    const secondsBeforeExpiration = answer.expires_in",
-									"    const headerTime = new Date(pm.response.headers.get('Date')).getTime()",
-									"    const expirationDate  = new Date(headerTime + secondsBeforeExpiration * 1000).toISOString()",
-									"    ",
+									"    const token = answer.access_token",
 									"",
-									"    const jwt = accessToken.split('.')",
-									"    const jwtHeaderEncoded = jwt[0]",
-									"    const jwtBodyEncoded = jwt[1]",
-									"    const jwtSignature = jwt[2]",
+									"    const [jwtHeaderEncoded, jwtBodyEncoded, jwtSignature] = token.split('.')",
+									"    const jwtHeader = JSON.parse(codec.fromBase64Url(jwtHeaderEncoded))",
+									"    const jwtBody = JSON.parse(codec.fromBase64Url(jwtBodyEncoded))",
+									"    console.log('header: ' + JSON.stringify(jwtHeader))",
+									"    console.log('body: ' + JSON.stringify(jwtBody))",
 									"",
-									"    //const jwtHeader = JSON.parse(codec.fromBase64Url(jwtHeaderEncoded))",
-									"    // console.log(jwtHeader)",
-									"    //const jwtBody = JSON.parse(codec.fromBase64Url(jwtBodyEncoded))",
-									"    // console.log(jwtBody)",
-									"",
-									"    //const jwtSign = JSON.parse(codec.fromBase64Url(jwtSignature))",
-									"    // console.log(jwtSign)",
 									"",
 									"});"
 								],
@@ -118,67 +96,25 @@
 					],
 					"request": {
 						"auth": {
-							"type": "basic",
-							"basic": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "password",
-									"value": "{{pwd}}",
-									"type": "string"
-								},
-								{
-									"key": "username",
-									"value": "{{usr}}",
+									"key": "token",
+									"value": "{{pm_jwt}}",
 									"type": "string"
 								}
 							]
 						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "",
-								"type": "text",
-								"disabled": true
-							}
-						],
-						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
-								{
-									"key": "grant_type",
-									"value": "password",
-									"type": "text"
-								},
-								{
-									"key": "scope",
-									"value": "read",
-									"type": "text"
-								},
-								{
-									"key": "password",
-									"value": "{{pwd}}",
-									"type": "text"
-								},
-								{
-									"key": "username",
-									"value": "{{usr}}",
-									"type": "text"
-								},
-								{
-									"key": "client_id",
-									"value": "",
-									"type": "text",
-									"disabled": true
-								}
-							]
-						},
+						"method": "GET",
+						"header": [],
 						"url": {
-							"raw": "{{portalBaseUrl}}/oauth/token",
+							"raw": "{{baseUrl}}/{{adminUrl}}/portal/token",
 							"host": [
-								"{{portalBaseUrl}}"
+								"{{baseUrl}}"
 							],
 							"path": [
-								"oauth",
+								"{{adminUrl}}",
+								"portal",
 								"token"
 							]
 						}
@@ -4282,6 +4218,29 @@
 					"pm.collectionVariables.set(\"timezone\", new Date().getTimezoneOffset());",
 					"pm.collectionVariables.set(\"nowEpochS\", _.floor(new Date().getTime() / 1000));",
 					"",
+					"codec = {",
+					"",
+					"    fromBase64: function (data) {",
+					"        return Buffer.from(data, 'base64').toString('utf-8');",
+					"    },",
+					"",
+					"    fromBase64Url: function (base64Url) {",
+					"        const padded = (base64Url.Length % 4 == 0)",
+					"            ? base64Url",
+					"            : base64Url + \"====\".substring(base64Url.Length % 4);",
+					"",
+					"        const base64 = padded",
+					"            .replace(\"_\", \"/\")",
+					"            .replace(\"-\", \"+\");",
+					"",
+					"        return this.fromBase64(base64);",
+					"    },",
+					"",
+					"    decodeBase64Url: function (data) {",
+					"        return Buffer.from(data, 'base64').toString('utf-8')",
+					"    }",
+					"};",
+					"",
 					"utils = {",
 					"    getContactEmail: function (contactName) {",
 					"        return `${contactName",
@@ -4291,7 +4250,7 @@
 					"            .replace(/^\\.+|\\.+$|\\'+/g, '')",
 					"            }@irisa.fr`;",
 					"    },",
-					"    ",
+					"",
 					"    now: function () {",
 					"        return new Date().toISOString()",
 					"    },",
@@ -4300,9 +4259,6 @@
 					"        return _.floor(new Date().getTime() / 1000)",
 					"    },",
 					"",
-					"    decodeBase64Url: function (data) {",
-					"        return Buffer.from(data, 'base64').toString('utf-8')",
-					"    }",
 					"};",
 					"",
 					"rand = {",
