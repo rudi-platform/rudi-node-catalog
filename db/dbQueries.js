@@ -303,13 +303,17 @@ async function dropCollection(collectionName) {
   try {
     const listCollections = await mongoose.connection.db.listCollections().toArray()
     // log.d(mod, fun, `listCollections: ${utils.beautify(listCollections)}`)
-    for (const collection of listCollections) {
-      if (collection.name === collectionName) {
-        await mongoose.connection.db.dropCollection(collectionName)
-        log.d(mod, fun, `Dropped collection '${collectionName}'`)
-        return true
-      }
-    }
+    await Promise.all(
+      listCollections.map(async (collection) => {
+        if (collection.name === collectionName) {
+          await mongoose.connection.db.dropCollection(collectionName)
+          log.d(mod, fun, `Dropped collection '${collectionName}'`)
+          return true
+        }
+        return
+      })
+    )
+
     log.d(mod, fun, `Collection '${collectionName}' was not found`)
     return false
   } catch (err) {

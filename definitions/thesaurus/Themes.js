@@ -85,7 +85,7 @@ const fun = `init ${CODE}`
   try {
     await themes.init()
     // log.d(mod, fun, `ok`)
-  } catch (e) {
+  } catch (err) {
     log.w(mod, fun, `Init failed: ${err}`)
   }
 })()

@@ -79,7 +79,12 @@ const {
   URL_SUFFIX_LICENCE: URL_LICENCE_SUFFIX,
   PARAM_THESAURUS_LANG,
 } = require('../config/confApi')
-const { InternalServerError, ParameterExpectedError, NotFoundError, NotImplementedError } = require('../utils/errors')
+const {
+  InternalServerError,
+  ParameterExpectedError,
+  NotFoundError,
+  NotImplementedError,
+} = require('../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
 // Controllers: Scheme
@@ -434,7 +439,6 @@ exports.dbConceptListToRudiRecursive = async (dbConceptList) => {
 // ------------------------------------------------------------------------------------------------
 
 exports.getThesaurusList = async (lang) => {
-  
   const keywords = await Keywords.get(lang)
   const themes = await Themes.get(lang)
   const licences = await await licenceController.getAllLicenceCodes()
@@ -481,7 +485,7 @@ exports.getThesaurusLabel = async (thesaurusCode, lang) => {
   const code = thesaurusCode.toLowerCase()
 
   if (code === 'themes') return await Themes.getLabels(lang)
-  
+
   if (code === 'keywords') return await Keywords.get()
   if (code === 'licences') return await licenceController.getAllLicenceCodes()
 
@@ -545,7 +549,11 @@ exports.getSingleThesaurus = async (req, reply) => {
 exports.getSingleThesaurusLabels = async (req, reply) => {
   const fun = 'getThesaurusLabels'
   try {
-    log.v(mod, fun, `< GET ${URL_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}/:${PARAM_THESAURUS_LANG}`)
+    log.v(
+      mod,
+      fun,
+      `< GET ${URL_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}/:${PARAM_THESAURUS_LANG}`
+    )
 
     const thesaurusCode = json.accessReqParam(req, PARAM_THESAURUS_CODE)
     const thesaurusLang = json.accessReqParam(req, PARAM_THESAURUS_LANG)

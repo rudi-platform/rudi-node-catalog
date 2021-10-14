@@ -36,9 +36,7 @@ exports.newOrganization = async (orgJson) => {
     log.w(
       mod,
       fun,
-      `New object '${URL_OBJECT_ORGANIZATIONS}': ${utils.beautify(
-        orgJson
-      )} | Error: ${err}`
+      `New object '${URL_OBJECT_ORGANIZATIONS}': ${utils.beautify(orgJson)} | Error: ${err}`
     )
     // log.e(mod, fun, err)
     throw err

@@ -87,9 +87,9 @@ exports.initializeLicences = async () => {
     )
     // log.d(mod, fun, licenceData)
     const reply = await skosController.newSkosScheme(licenceData)
-    if(!reply)      throw new InternalServerError(`Licence integration failed`)
+    if (!reply) throw new InternalServerError(`Licence integration failed`)
     return await this.getLicenceCodes()
-/* 
+    /* 
     const res = await directPost(LICENCE_POST_ADDRESS, licenceData)
     if (res.status === 200) {
       log.d(mod, fun, `Integration done`)

@@ -2,6 +2,7 @@
 
 const mod = 'ftypThes'
 
+const { BadRequestError } = require('../../utils/errors')
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
@@ -148,7 +149,7 @@ exports.Extensions = {
   xls: 'application/vnd.ms-excel',
   xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   xml: 'application/xml',
-  xml: 'text/xml',
+  // xml: 'text/xml',
   zip: 'application/zip',
   zst: 'application/zstd',
 }

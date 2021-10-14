@@ -21,7 +21,7 @@ const msg = require('./msg')
  * @throws request parameter is missing
  */
 exports.accessReqParam = (req, param) => {
-    const value = req.params[param]
+  const value = req.params[param]
   if (!value) throw new BadRequestError(`${msg.missingRequestParameter(req, param)}`)
   return value
 }
@@ -37,8 +37,7 @@ exports.accessProperty = (jsonObject, jsonProperty) => {
   // log.d(mod, fun, `Accessing property '${jsonProperty}' from object '${utils.beautify(jsonObject)}'`)
   const value = jsonObject[jsonProperty]
   // log.d(mod, fun, `=> value = ${utils.beautify(value)}`)
-  if (!value)
-    throw new BadRequestError(`${msg.missingObjectProperty(jsonObject, jsonProperty)}`)
+  if (!value) throw new BadRequestError(`${msg.missingObjectProperty(jsonObject, jsonProperty)}`)
   // log.d(mod, fun, `=> ${jsonProperty} = ${utils.beautify(value)}`)
   return value
 }
@@ -80,12 +79,7 @@ exports.requireSubProperty = (obj, prop, subProp, enumProp, enumVal) => {
     if (objProp[enumProp] === enumVal) {
       // log.d(mod, fun, `obj.${prop}.${enumProp} == ${enumVal}`)
       if (utils.isNothing(objProp[subProp])) {
-        const errMsg = msg.subPropNeededWhenPropSetToEnum(
-          prop,
-          subProp,
-          enumProp,
-          enumVal
-        )
+        const errMsg = msg.subPropNeededWhenPropSetToEnum(prop, subProp, enumProp, enumVal)
         // log.e(mod, fun, errMsg)
         throw new BadRequestError(errMsg)
       } else {
@@ -95,9 +89,7 @@ exports.requireSubProperty = (obj, prop, subProp, enumProp, enumVal) => {
       log.d(
         mod,
         fun,
-        `obj.${prop}.${enumProp} == ${this.beautify(
-          objProp[enumProp]
-        )} != ${enumVal}`
+        `obj.${prop}.${enumProp} == ${this.beautify(objProp[enumProp])} != ${enumVal}`
       )
     }
   }

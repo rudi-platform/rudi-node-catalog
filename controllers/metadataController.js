@@ -529,28 +529,22 @@ exports.newMetadata = async (rudiMetadata) => {
   try {
     dbMetadata = await new Metadata(dbReadyObject)
   } catch (err) {
-    log.w(
-      mod,
-      fun,
-      `New object '${PARAM_OBJECT_METADATA}': ${rudiId} | Error: ${err}`
-    )
+    log.w(mod, fun, `New object '${PARAM_OBJECT_METADATA}': ${rudiId} | Error: ${err}`)
     throw err
   }
   try {
     await dbMetadata.save()
   } catch (err) {
-    log.w(
-      mod,
-      fun,
-      `Saving object '${PARAM_OBJECT_METADATA}': ${rudiId} | Error: ${err}`
-    )
+    log.w(mod, fun, `Saving object '${PARAM_OBJECT_METADATA}': ${rudiId} | Error: ${err}`)
     throw err
   }
   // log.d(mod, fun, `dbMetadata: ${beautify(dbMetadata)}`)
 
   this.sendToPortal(dbMetadata)
     .catch((err) => log.e(mod, fun, `Sending to portal failed for metadata '${rudiId}': ${err}`))
-    .then((result) => log.i(mod, fun, `Creation request received by the portal for metadata '${rudiId}'`))
+    .then((result) =>
+      log.i(mod, fun, `Creation request received by the portal for metadata '${rudiId}'`)
+    )
 
   return dbMetadata
   // return this.dbMetadataToRudi(dbMetadata)
@@ -578,7 +572,9 @@ exports.overwriteMetadata = async (incomingRudiMetadata) => {
 
   this.sendToPortal(dbMetadata)
     .catch((err) => log.e(mod, fun, `Sending to portal failed for metadata '${rudiId}': ${err}`))
-    .then((result) => log.i(mod, fun, `'Update request received by the portal for metadata '${rudiId}'`))
+    .then((result) =>
+      log.i(mod, fun, `'Update request received by the portal for metadata '${rudiId}'`)
+    )
 
   return dbMetadata
 }
@@ -610,7 +606,9 @@ exports.updateMetadata = async (incomingRudiMetadata) => {
   // log.d(mod, fun, `metadata saved: ${beautify(reply)}`)
   this.sendToPortal(dbMetadata)
     .catch((err) => log.e(mod, fun, `Sending to portal failed for metadata '${rudiId}': ${err}`))
-    .then((result) => log.i(mod, fun, `'Update request received by the portal for metadata '${rudiId}'`))
+    .then((result) =>
+      log.i(mod, fun, `'Update request received by the portal for metadata '${rudiId}'`)
+    )
 
   return reply
 }

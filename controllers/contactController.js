@@ -35,9 +35,7 @@ exports.newContact = async (contactJson) => {
     log.w(
       mod,
       fun,
-      `New object '${URL_OBJECT_CONTACTS}': ${utils.beautify(
-        contactJson
-      )} | Error: ${err}`
+      `New object '${URL_OBJECT_CONTACTS}': ${utils.beautify(contactJson)} | Error: ${err}`
     )
     throw err
   }
@@ -47,9 +45,7 @@ exports.newContact = async (contactJson) => {
     log.w(
       mod,
       fun,
-      `Saving object '${URL_OBJECT_CONTACTS}': ${utils.beautify(
-        dbContact
-      )} | Error: ${err}`
+      `Saving object '${URL_OBJECT_CONTACTS}': ${utils.beautify(dbContact)} | Error: ${err}`
     )
     throw err
   }

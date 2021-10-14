@@ -121,7 +121,6 @@ exports.LOCAL_REPORT_ERROR = 'report_treatment_error'
 exports.LOCAL_REPORT_ERROR_TYPE = 'error_type'
 exports.LOCAL_REPORT_ERROR_MSG = 'error_message'
 
-
 // ------------------------------------------------------------------------------------------------
 // Integration reports
 // ------------------------------------------------------------------------------------------------

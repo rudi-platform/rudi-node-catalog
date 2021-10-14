@@ -33,8 +33,8 @@ exports.bboxToGeoJsonPolygon = (western, southern, eastern, northern) => {
     throw new BadRequestError(errMsg)
   }
 
-  if(western === eastern && southern === northern)
-  return this.coordsToGeoJsonPoint(western, southern)
+  if (western === eastern && southern === northern)
+    return this.coordsToGeoJsonPoint(western, southern)
   // The values of a "bbox" array are "[west, south, east, north]"
   // given in decimal degrees
   // source: https://tools.ietf.org/html/rfc7946#appendix-B.1
@@ -63,7 +63,6 @@ exports.bboxToGeoJsonPolygon = (western, southern, eastern, northern) => {
 
   return geoJsonPolygon
 }
-
 
 exports.coordsToGeoJsonPoint = (westLongitude, southLatitude) => {
   const fun = 'coordsToGeoJsonPoint'

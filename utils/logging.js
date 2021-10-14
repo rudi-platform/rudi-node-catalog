@@ -10,7 +10,7 @@ const { pick } = require('lodash')
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const { logger, sysLogger } = require('../config/confLogs')
-const { consoleErr, displayStr, logWhere, beautify, displayIps } = require('./jsUtils')
+const { displayStr, logWhere, beautify, displayIps } = require('./jsUtils')
 const { addLogEntry } = require('../db/dbQueries')
 const { API_METADATA_ID, API_DATA_NAME_PROPERTY } = require('../db/dbFields')
 

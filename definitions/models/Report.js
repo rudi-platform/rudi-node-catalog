@@ -1,25 +1,20 @@
 'use strict'
 
-const mod = 'reportSch'
+// const mod = 'reportSch'
 
 // ------------------------------------------------------------------------------------------------
 // External dependancies
 // ------------------------------------------------------------------------------------------------
 const mongoose = require('mongoose')
-const Int32 = require('mongoose-int32')
 const { omit } = require('lodash')
 
 // ------------------------------------------------------------------------------------------------
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
-const log = require('../../utils/logging')
 const ids = require('../schemas/Identifiers')
 const api = require('../../config/confApi')
 
-const Validation = require('../schemaValidators')
 const { FIELDS_TO_SKIP } = require('../../db/dbFields')
-const { beautify } = require('../../utils/jsUtils')
-// const IntegrationStatus = require('../enums/IntegrationStatus')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
@@ -85,7 +80,7 @@ const ReportSchema = new mongoose.Schema(
     /**
      * List of all the errors that were encountered during the
      * integration of the resource.
-     */ 
+     */
     integration_errors: {
       type: [
         {

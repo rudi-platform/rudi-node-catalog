@@ -118,7 +118,7 @@ exports.isObject = (obj) => {
 }
 
 exports.isEmptyObject = (obj) => {
-  const fun = 'isEmptyObject'
+  // const fun = 'isEmptyObject'
   // this.consoleLog(mod, fun, `isString: ${this.isString(obj)}`)
   // this.consoleLog(mod, fun, `isArray: ${this.isArray(obj)}`)
   // this.consoleLog(mod, fun, `keys(obj).length: ${Object.keys(obj).length === 0}`)

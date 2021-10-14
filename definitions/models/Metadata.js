@@ -95,12 +95,10 @@ const {
 
   FIELDS_TO_SKIP,
   API_DATA_DATES_PROPERTY,
-  API_METADATA_ID,
   API_THEME_PROPERTY,
   API_KEYWORDS_PROPERTY,
   API_LANGUAGES_PROPERTY,
   API_COLLECTION_TAG,
-  API_PURPOSE,
   API_MEDIA_CHECKSUM_PROPERTY,
   API_MEDIA_TYPE_PROPERTY,
   API_END_DATE_PROPERTY,
@@ -329,7 +327,7 @@ const MetadataSchema = new mongoose.Schema(
        * Source: https://tools.ietf.org/html/rfc7946#section-3.1.1
        */
       geographic_distribution: {
-        type: mongoose.SchemaTypes.GeoJSON,
+        type: GeoJSON,
       },
 
       /**
@@ -571,9 +569,9 @@ async function checkThesaurus(metadata) {
   try {
     const dataTheme = metadata[API_THEME_PROPERTY]
 
-    const themes = Themes.get()
+    // const themes = Themes.get()
     const themeLabels = Themes.getLabels(DEFAULT_LANG)
-    
+
     const themeKeyIndex = Object.keys(themeLabels).indexOf(dataTheme)
     if (themeKeyIndex === -1) {
       const themeValIndex = Object.values(themeLabels).indexOf(dataTheme)
@@ -588,7 +586,7 @@ async function checkThesaurus(metadata) {
         )
       }
     }
-    
+
     const keywords = metadata[API_KEYWORDS_PROPERTY]
     // log.d(mod, fun, `keywords: ${utils.beautify(keywords)}`)
 
@@ -603,7 +601,7 @@ async function checkThesaurus(metadata) {
           .catch((err) => log.w(mod, fun, err))
       })
     )
-   
+
     const languages = metadata[API_LANGUAGES_PROPERTY]
     if (languages) {
       const langStr = utils.beautify(languages)
@@ -639,26 +637,27 @@ async function checkThesaurus(metadata) {
     throw err
   }
 }
-
-function checkMedia(metadata) {
-  const fun = 'checkMedia'
-  log.d(mod, fun, `metadata: ${utils.beautify(metadata)}`)
-  try {
-    const media = metadata[API_MEDIA_PROPERTY]
-    if (!media) throw new BadRequestError(msg.missingField(API_MEDIA_PROPERTY))
-    if (media[API_MEDIA_TYPE_PROPERTY] === MediaTypes.File) {
-      if (!utils.isNotEmptyObject(media[API_MEDIA_CHECKSUM_PROPERTY])) {
-        throw new BadRequestError(msg.missingObjectProperty(this, API_MEDIA_CHECKSUM_PROPERTY))
+/* 
+  function checkMedia(metadata) {
+    const fun = 'checkMedia'
+    log.d(mod, fun, `metadata: ${utils.beautify(metadata)}`)
+    try {
+      const media = metadata[API_MEDIA_PROPERTY]
+      if (!media) throw new BadRequestError(msg.missingField(API_MEDIA_PROPERTY))
+      if (media[API_MEDIA_TYPE_PROPERTY] === MediaTypes.File) {
+        if (!utils.isNotEmptyObject(media[API_MEDIA_CHECKSUM_PROPERTY])) {
+          throw new BadRequestError(msg.missingObjectProperty(this, API_MEDIA_CHECKSUM_PROPERTY))
+        }
+      } else {
+        log.d(mod, fun, `media: ${utils.beautify(metadata[API_MEDIA_PROPERTY])}`)
+        log.d(mod, fun, `type: ${media[API_MEDIA_TYPE_PROPERTY]}`)
       }
-    } else {
-      log.d(mod, fun, `media: ${utils.beautify(metadata[API_MEDIA_PROPERTY])}`)
-      log.d(mod, fun, `type: ${media[API_MEDIA_TYPE_PROPERTY]}`)
+    } catch (err) {
+      log.w(mod, fun, err)
+      throw err
     }
-  } catch (err) {
-    log.w(mod, fun, err)
-    throw err
   }
-}
+*/
 
 function toDate(dateStr) {
   try {
@@ -722,7 +721,7 @@ MetadataSchema.virtual(
 })
 
 MetadataSchema.pre('save', async function (next) {
-  const fun = 'pre save hook'
+  // const fun = 'pre save hook'
   // log.d(mod, fun, ``)
   const metadata = this
 

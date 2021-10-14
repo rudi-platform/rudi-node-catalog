@@ -1,5 +1,7 @@
 'use strict'
+
 const mod = 'msg'
+
 // ------------------------------------------------------------------------------------------------
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
@@ -75,14 +77,14 @@ exports.subPropNeededWhenPropSet = (prop, subProp) => {
     case 'en-US':
       return `Subproperty '${prop}.${subProp}' is required when parent property '${prop}' is set`.replace(
         /\\"/g,
-        "'"
+        `'`
       )
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
       return `La propriété '${prop}.${subProp}' est requise lorsque la propriété parente '${prop}' est renseignée`.replace(
         /\\"/g,
-        "'"
+        `'`
       )
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
@@ -94,16 +96,16 @@ exports.subPropNeededWhenPropSetToEnum = (prop, subProp, enumProp, enumVal) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Subproperty '${prop}.${subProp}' is required when property '${prop}.${enumProp}' is set to '${enumVal}'`.replace(
-        /\\"/g,
-        "'"
+      return (
+        `Subproperty '${prop}.${subProp}' is required when property '${prop}.${enumProp}' ` +
+        `is set to '${enumVal}'`.replace(/\\"/g, `'`)
       )
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `La propriété '${prop}.${subProp}' est requise lorsque la propriété '${prop}.${enumProp}' vaut '${enumVal}'`.replace(
-        /\\"/g,
-        "'"
+      return (
+        `La propriété '${prop}.${subProp}' est requise lorsque la propriété '${prop}.${enumProp}'` +
+        ` vaut '${enumVal}'`.replace(/\\"/g, `'`)
       )
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
@@ -132,13 +134,13 @@ exports.missingObjectProperty = (jsonObject, property) => {
     case 'en-US':
       return `The property '${property}' must be defined for object: ${utils.beautify(
         jsonObject
-      )} `.replace(/\\"/g, "'")
+      )} `.replace(/\\"/g, `'`)
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
       return `La propriété '${property}' doit être définie pour l'object : ${utils.beautify(
         jsonObject
-      )} `.replace(/\\"/g, "'")
+      )} `.replace(/\\"/g, `'`)
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -149,11 +151,17 @@ exports.parametersMismatch = (paramUrl, paramBody) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Parameters should be the same between body and URL call!\n- URL parameter: '${paramUrl}'\n- body parameter: '${paramBody}' `
+      return (
+        `Parameters should be the same between body and URL call!\n- URL parameter:` +
+        ` '${paramUrl}'\n- body parameter: '${paramBody}' `
+      )
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Les paramètres doivent être identiques entre le corps de la requête et l'URL\n- URL : '${paramUrl}'\n- requête : '${paramBody}' `
+      return (
+        `Les paramètres doivent être identiques entre le corps de la requête et` +
+        ` l'URL\n- URL : '${paramUrl}'\n- requête : '${paramBody}' `
+      )
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }

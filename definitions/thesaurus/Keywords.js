@@ -54,13 +54,13 @@ const fun = `init ${CODE}`
 //     log.w(mod, fun, `Init failed: ${err}`)
 //   })
 
-  ;(async () => {
-    try {
-      await keywords.init()
-      // log.d(mod, fun, `ok`)
-    } catch (e) {
-      log.w(mod, fun, `Init failed: ${err}`)
-    }
-  })()
+;(async () => {
+  try {
+    await keywords.init()
+    // log.d(mod, fun, `ok`)
+  } catch (err) {
+    log.w(mod, fun, `Init failed: ${err}`)
+  }
+})()
 
 module.exports = keywords

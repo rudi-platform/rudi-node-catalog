@@ -6,6 +6,7 @@
 // ------------------------------------------------------------------------------------------------
 const mongoose = require('mongoose')
 const { omit } = require('lodash')
+const { FIELDS_TO_SKIP } = require('../../db/dbFields')
 
 // ------------------------------------------------------------------------------------------------
 // Custom schema definition

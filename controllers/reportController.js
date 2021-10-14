@@ -67,6 +67,7 @@ const {
   NotFoundError,
   ObjectNotFoundError,
   ForbiddenError,
+  MethodNotAllowedError,
 } = require('../utils/errors')
 const { getTokenCheckedByPortal } = require('./portalController')
 
@@ -184,10 +185,10 @@ exports.addOrEditSingleReport = async (objectType, req, reply) => {
     // retrieve url parameters: object type, object id
     const urlObjectId = json.accessReqParam(req, PARAM_ID)
     const reportBody = fromPortalToRudiFormat(req.body)
-    
-    let reportSrc = reportBody[API_COLLECTION_TAG]?'test':'Portal'
+
+    let reportSrc = reportBody[API_COLLECTION_TAG] ? 'test' : 'Portal'
     log.d(mod, fun, `Incoming ${reportSrc} report: ${utils.beautify(req.body)}`)
-    
+
     // log.v(mod, fun, `new report: ${utils.beautify(reportBody)}`)
     /* if (reportBody[API_COLLECTION_TAG]) {
       try {

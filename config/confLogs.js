@@ -165,11 +165,11 @@ const syslogOptions = {
   port: sys.SYSLOG_PORT,
   path: sys.SYSLOG_PATH,
   level: sys.SYSLOG_LEVEL,
-  type: sys.SYSLOG_TYPE
+  type: sys.SYSLOG_TYPE,
 }
 
 exports.sysLogger = winston.createLogger(syslogOptions)
-  
+
 function extractErrorFromFastifyMsg(msg) {
   try {
     return msg.split('err: ')[1].split('\n')

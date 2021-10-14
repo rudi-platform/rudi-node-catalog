@@ -28,7 +28,7 @@ const {
   API_MEDIA_NAME_PROPERTY,
 } = require('../../db/dbFields')
 const { isNotEmptyObject } = require('../../utils/jsUtils')
-const { missingObjectProperty, missingField } = require('../../utils/msg')
+const { missingField } = require('../../utils/msg')
 const { BadRequestError } = require('../../utils/errors')
 
 // ------------------------------------------------------------------------------------------------

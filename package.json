@@ -44,10 +44,11 @@
     "winston-syslog": "^2.4.4"
   },
   "devDependencies": {
-    "js-beautify": "^1.14.0",
     "eslint": "^7.0.0",
     "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-unused-imports": "^1.1.5",
+    "js-beautify": "^1.14.0",
     "nodemon": "^2.0.13",
     "prettier": "^2.4.1"
   }

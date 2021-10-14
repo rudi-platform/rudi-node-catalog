@@ -38,6 +38,7 @@ const {
 } = require('../utils/errors')
 
 const { extractJwt } = require('../utils/crypto')
+// const { createHmac } = require('crypto')
 
 // ------------------------------------------------------------------------------------------------
 // Token manager
@@ -336,38 +337,38 @@ jwtBody = {
   scope: ['read']
 }
 */
+/* 
+  exports.checkSignatureWithSecret = (accessToken) => {
+    const fun = 'verifyPortalToken'
+    log.d(mod, fun, ``)
 
-exports.checkSignatureWithSecret = (accessToken) => {
-  const fun = 'verifyPortalToken'
-  log.d(mod, fun, ``)
+    try {
+      if (!accessToken) throw new BadRequestError('No token = no signature to verify!')
+      const [jwtHeaderBase64, jwtPayloadBase64, jwtSignatureBase64] = accessToken.split('.')
 
-  try {
-    if (!accessToken) throw new BadRequestError('No token = no signature to verify!')
-    const [jwtHeaderBase64, jwtPayloadBase64, jwtSignatureBase64] = accessToken.split('.')
+      const hash = createHmac('sha256', portal.getSecret())
+        .update(`${jwtHeaderBase64}.${jwtPayloadBase64}`)
+        .digest('base64url')
 
-    const hash = createHmac('sha256', portal.getSecret())
-      .update(`${jwtHeaderBase64}.${jwtPayloadBase64}`)
-      .digest('base64url')
+      if (hash !== jwtSignatureBase64) {
+        const errMsg = `Forged token? Computed hash: ${hash} != jwt signature: ${jwtSignatureBase64}`
+        log.w(mod, fun, errMsg)
+      }
+      return hash === jwtSignatureBase64
 
-    if (hash !== jwtSignatureBase64) {
-      const errMsg = `Forged token? Computed hash: ${hash} != jwt signature: ${jwtSignatureBase64}`
+      // if (hash !== jwtSignatureBase64) {
+      //   const errMsg = `Forged token? Computed hash: ${hash} != jwt signature: ${jwtSignatureBase64}`
+      //   log.w(mod, fun, errMsg)
+      //   throw new Error(errMsg)
+      // }
+      // return true
+    } catch (err) {
+      const errMsg = `Invalid token: ${err}`
       log.w(mod, fun, errMsg)
+      throw err
     }
-    return hash === jwtSignatureBase64
-
-    // if (hash !== jwtSignatureBase64) {
-    //   const errMsg = `Forged token? Computed hash: ${hash} != jwt signature: ${jwtSignatureBase64}`
-    //   log.w(mod, fun, errMsg)
-    //   throw new Error(errMsg)
-    // }
-    // return true
-  } catch (err) {
-    const errMsg = `Invalid token: ${err}`
-    log.w(mod, fun, errMsg)
-    throw err
   }
-}
-
+ */
 const RUDI_PK_NAME = 'rudiPortal'
 exports.checkSignatureWithPubKey = (accessToken) => {
   const fun = 'checkSignatureWithPubKey'
