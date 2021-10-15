@@ -274,7 +274,7 @@ exports.getNewTokenFromPortal = async () => {
       return portalToken
     } else {
       const errMsg = `${utils.beautify(answer)}`
-      // log.w(mod, fun, ôerrMsg)
+      // log.w(mod, fun, errMsg)
       throw createRudiHttpError(answer.status, errMsg)
     }
   } catch (err) {

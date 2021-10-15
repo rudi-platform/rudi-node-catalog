@@ -9,6 +9,7 @@ const mod = 'logger'
 const winston = require('winston')
 require('winston-daily-rotate-file')
 require('winston-syslog').Syslog
+// const { Syslog } = require('winston-syslog')
 
 const { transports } = winston
 // const {
@@ -168,7 +169,10 @@ const syslogOptions = {
   type: sys.SYSLOG_TYPE,
 }
 
-exports.sysLogger = winston.createLogger(syslogOptions)
+
+winston.add(new winston.transports.Syslog(syslogOptions))
+
+// exports.sysLogger = winston.createLogger(syslogOptions)
 
 function extractErrorFromFastifyMsg(msg) {
   try {
