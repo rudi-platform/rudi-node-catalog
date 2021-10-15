@@ -2,8 +2,6 @@
 
 const mod = 'main'
 
-const APP_TITLE = 'rudiprod.api'
-
 // ------------------------------------------------------------------------------------------------
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
@@ -164,7 +162,7 @@ devRoutes.forEach((devRoute, index) => {
 // ------------------------------------------------------------------------------------------------
 const start = async () => {
   try {
-    process.title = APP_TITLE
+    process.title = sys.APP_NAME
     await fastify
       .listen(sys.LISTENING_PORT, sys.LISTENING_ADDR)
       .catch((err) => log.e(mod, 'Fastify listen', `${err}`))

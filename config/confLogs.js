@@ -6,12 +6,13 @@ const mod = 'logger'
 // ------------------------------------------------------------------------------------------------
 // External dependencies
 // ------------------------------------------------------------------------------------------------
+const { existsSync, mkdirSync } = require('fs')
+
 const winston = require('winston')
 require('winston-daily-rotate-file')
 require('winston-syslog').Syslog
-// const { Syslog } = require('winston-syslog')
 
-const { transports } = winston
+// const { transports } = winston
 // const {
 //   combine,
 //   timestamp,
@@ -19,7 +20,6 @@ const { transports } = winston
 //   printf
 // } = format
 
-const { existsSync, mkdirSync } = require('fs')
 
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
@@ -30,8 +30,8 @@ const utils = require('../utils/jsUtils')
 // ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
-const errorLogsFileName = 'rudiProxy-errors.log'
-const errorDBLogsFileName = 'ff-errors.log'
+const ERR_LOGS_FILE = 'rudiProxy-errors.log'
+const ERR_FASTIFY_FILE = 'ff-errors.log'
 
 // ------------------------------------------------------------------------------------------------
 // Creating local log dir
@@ -138,7 +138,7 @@ const logOutputs = {
   */
   ffError: new winston.transports.File({
     name: 'ffLogs',
-    filename: `${sys.LOG_DIR}/${errorDBLogsFileName}`,
+    filename: `${sys.LOG_DIR}/${ERR_FASTIFY_FILE}`,
     level: 'error',
     maxsize: MAX_SIZE,
     maxFiles: 2,
