@@ -27,13 +27,7 @@ RegExp.prototype.toJSON = RegExp.prototype.toString
 // ------------------------------------------------------------------------------------------------
 // Require external modules
 const mongoose = require('mongoose')
-const {
-  ForbiddenError,
-  finalErrorHandler,
-  UnauthorizedError,
-  RudiError,
-  createRudiHttpError,
-} = require('./utils/errors')
+const { createRudiHttpError } = require('./utils/errors')
 
 // Require the fastify framework and instantiate it
 const fastify = require('fastify')({
@@ -46,7 +40,7 @@ const fastify = require('fastify')({
 })
 
 fastify.setErrorHandler((error, request, reply) => {
-  const fun = 'finalErrorHandler'
+  const fun = 'setErrorHandler'
   try {
     log.e(mod, fun, error)
     const rudiHttpError = createRudiHttpError(error.statusCode, error.message)
