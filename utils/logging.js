@@ -9,8 +9,8 @@ const { pick } = require('lodash')
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
-const { logger, sysLogger } = require('../config/confLogs')
-const { displayStr, logWhere, beautify, displayIps } = require('./jsUtils')
+const { logger } = require('../config/confLogs')
+const { displayStr, logWhere, beautify, displayIps, shorten, consoleErr } = require('./jsUtils')
 const { addLogEntry } = require('../db/dbQueries')
 const { API_METADATA_ID, API_DATA_NAME_PROPERTY } = require('../db/dbFields')
 
@@ -54,8 +54,8 @@ const Colors = {
 // ------------------------------------------------------------------------------------------------
 // Display functions
 // ------------------------------------------------------------------------------------------------
-exports.displaySyslog = (loc_mod, loc_fun, msg) => {
-  return `[ ${logWhere(loc_mod, loc_fun)} ] ${msg !== '' ? msg : '<-'}`
+exports.displaySyslog = (srcMod, srcFun, msg) => {
+  return `[ ${logWhere(srcMod, srcFun)} ] ${msg !== '' ? msg : '<-'}`
 }
 
 // function displayColor(fgColor, bgColor, msg) {
@@ -77,45 +77,60 @@ exports.displaySyslog = (loc_mod, loc_fun, msg) => {
 // Logging functions
 // ------------------------------------------------------------------------------------------------
 
-exports.e = (mod, fun, msg) => {
+exports.e = (srcMod, srcFun, msg) => {
   const logLevel = 'error'
-  logger.error(displayStr(mod, fun, msg))
-  sysLogger.error(displayStr(mod, fun, msg))
-  addLogEntry(logLevel, mod, fun, msg)
+  try {
+    logger.error(displayStr(srcMod, srcFun, msg))
+    addLogEntry(logLevel, srcMod, srcFun, msg)
+  } catch (e) {
+    consoleErr(e)
+  }
 }
 
-exports.w = (mod, fun, msg) => {
+exports.w = (srcMod, srcFun, msg) => {
   const logLevel = 'warn'
-  logger.warn(displayStr(mod, fun, msg))
-  addLogEntry(logLevel, mod, fun, msg)
+  try {
+    logger.warn(displayStr(srcMod, srcFun, msg))
+    addLogEntry(logLevel, srcMod, srcFun, msg)
+  } catch (e) {
+    consoleErr(e)
+  }
 }
 
-exports.i = (mod, fun, msg) => {
+exports.i = (srcMod, srcFun, msg) => {
   const logLevel = 'info'
-  logger.info(displayStr(mod, fun, msg))
-  addLogEntry(logLevel, mod, fun, msg)
+  try {
+    logger.info(displayStr(srcMod, srcFun, msg))
+    addLogEntry(logLevel, srcMod, srcFun, msg)
+  } catch (e) {
+    consoleErr(e)
+  }
 }
 
-exports.v = (mod, fun, msg) => {
-  logger.verbose(displayStr(mod, fun, msg))
+exports.v = (srcMod, srcFun, msg) => {
   const logLevel = 'verbose'
-  addLogEntry(logLevel, mod, fun, msg)
+  try {
+    logger.verbose(displayStr(srcMod, srcFun, msg))
+    addLogEntry(logLevel, srcMod, srcFun, msg)
+  } catch (e) {
+    consoleErr(e)
+  }
 }
 
-exports.d = (mod, fun, msg) => {
-  logger.debug(displayStr(mod, fun, msg))
-  const logLevel = 'debug'
-  addLogEntry(logLevel, mod, fun, msg)
+exports.d = (srcMod, srcFun, msg) => {
+  try {
+    const logLevel = 'debug'
+    logger.debug(displayStr(srcMod, srcFun, msg))
+    addLogEntry(logLevel, srcMod, srcFun, msg)
+  } catch (e) {
+    consoleErr(e)
+  }
 }
 
 // ------------------------------------------------------------------------------------------------
 // Http
 // ------------------------------------------------------------------------------------------------
-function shorten(str, len) {
-  if (!str) return
-  if (str.length < len) return str
-  return str.substring(0, len) + '[...]'
-}
+
 exports.logHttpAnswer = (loggedMod, loggedFun, httpAnswer) => {
   try {
     const resExtract = pick(httpAnswer.config, ['method', 'headers', 'url'])
@@ -139,7 +154,7 @@ exports.logMetadata = (metadata) => {
 // Request inspector
 // ------------------------------------------------------------------------------------------------
 
-exports.logRequest = (req, res) => {
+exports.logRequest = (req) => {
   const fun = 'apiCall'
   this.i('http', fun, `${req.method} ${req.url} <- ${displayIps(req)}`)
   // return

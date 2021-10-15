@@ -49,6 +49,12 @@ exports.pad = (str, base, padSign) => {
   }
 }
 
+exports.shorten = (str, len) => {
+  if (!str) return
+  if (str.length < len) return str
+  return str.substring(0, len) + '[...]'
+}
+
 // ------------------------------------------------------------------------------------------------
 // Dates
 // ------------------------------------------------------------------------------------------------
@@ -247,21 +253,21 @@ exports.separateLogs = (insertStr) => {
   return logSeparator
 }
 
-exports.logWhere = (loc_mod, loc_fun) => {
-  return !loc_mod ? loc_fun : !loc_fun ? loc_mod : `${loc_mod} . ${loc_fun}`
+exports.logWhere = (srcMod, srcFun) => {
+  return !srcMod ? srcFun : !srcFun ? srcMod : `${srcMod} . ${srcFun}`
 }
 
-exports.displayStr = (loc_mod, loc_fun, msg) => {
-  return `[ ${this.logWhere(loc_mod, loc_fun)} ] ${msg !== '' ? msg : '<-'}`
+exports.displayStr = (srcMod, srcFun, msg) => {
+  return `[ ${this.logWhere(srcMod, srcFun)} ] ${msg !== '' ? msg : '<-'}`
 }
 
-exports.consoleLog = (loc_mod, loc_fun, msg) => {
-  console.log(this.nowLocaleFormatted(), '.debug.', this.displayStr(loc_mod, loc_fun, msg))
+exports.consoleLog = (srcMod, srcFun, msg) => {
+  console.log(this.nowLocaleFormatted(), '.debug.', this.displayStr(srcMod, srcFun, msg))
 }
 
-exports.consoleErr = (loc_mod, loc_fun, msg) => {
+exports.consoleErr = (srcMod, srcFun, msg) => {
   const errMsg = msg.err || msg
-  console.error(this.nowLocaleFormatted(), '.error.', this.displayStr(loc_mod, loc_fun, errMsg))
+  console.error(this.nowLocaleFormatted(), '.error.', this.displayStr(srcMod, srcFun, errMsg))
 }
 
 // ------------------------------------------------------------------------------------------------

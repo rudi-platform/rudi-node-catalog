@@ -37,21 +37,29 @@ const fastify = require('fastify')({
   ignoreTrailingSlash: true,
 })
 
-fastify.setErrorHandler((error, request, reply) => {
-  const fun = 'setErrorHandler'
+fastify.setErrorHandler((appError, request, reply) => {
+  const fun = 'finalErrorHandler'
+  log.d(mod, fun, ``)
   try {
-    log.e(mod, fun, error)
-    const rudiHttpError = createRudiHttpError(error.statusCode, error.message)
+    log.d(mod, fun, `2`)
+    let rudiHttpError
+    if (appError.isRudiHttpError) rudiHttpError = appError
+    else {
+      const code = appError.statusCode
+      const msg = appError.message
+      rudiHttpError = createRudiHttpError(code, msg)
+    }
+
     reply.code(rudiHttpError.statusCode).send(rudiHttpError)
   } catch (uncaughtErr) {
-    log.w(mod, fun, uncaughtErr)
+    log.e(mod, fun, `Uncaught! ${uncaughtErr}`)
   }
   log.d(mod, fun, 'done')
 })
 
 fastify.decorate('notFound', (req, reply) => {
   const fun = 'notFound'
-  const ip = req.ip
+  // const ip = req.ip
 
   const response = {
     message: `Route ${req.method}:${req.url} not found`,

@@ -11,18 +11,16 @@ const readLastLines = require('read-last-lines')
 // ------------------------------------------------------------------------------------------------
 const sys = require('../config/confSystem')
 const log = require('../utils/logging')
-const { consoleLog, consoleErr, beautify } = require('../utils/jsUtils')
+const { consoleErr } = require('../utils/jsUtils')
 
 const { getLogEntries } = require('../db/dbQueries')
 const { parseQueryParameters } = require('./genericController')
-const { logLineToString } = require('../definitions/models/LogEntry')
 
 const {
   URL_PV_LOGS_ACCESS,
   PARAM_LOGS_LINES,
   QUERY_LIMIT,
   QUERY_OFFSET,
-  DEFAULT_QUERY_OFFSET,
   PARAM_OBJECT_LOGS,
   QUERY_FILTER,
   QUERY_FIELDS,

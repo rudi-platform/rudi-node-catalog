@@ -13,7 +13,7 @@ const mod = 'genCtrl'
 const mongoose = require('mongoose')
 const { v4: UUIDv4 } = require('uuid')
 // const url = require('url')
-const { pick, isObject } = require('lodash')
+const { pick } = require('lodash')
 
 // ------------------------------------------------------------------------------------------------
 // Internal dependancies
@@ -21,17 +21,10 @@ const { pick, isObject } = require('lodash')
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
 
-const sys = require('../config/confSystem')
 const db = require('../db/dbQueries')
 const json = require('../utils/jsonAccess')
 
-const {
-  beautify,
-  nowISO,
-  isNotEmptyArray,
-  isEmptyObject,
-  isEmptyArray,
-} = require('../utils/jsUtils')
+const { beautify, nowISO, isNotEmptyArray, isEmptyObject } = require('../utils/jsUtils')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
@@ -505,10 +498,7 @@ exports.addSingleObject = async (req, reply) => {
     log.i(mod, fun, `${msg.objectAdded(objectType, rudiId)}`)
     return createdObject
   } catch (err) {
-    log.e(mod, fun, err)
-    // reply.statusCode = 500
-    // reply.message = err
-    // reply.send()
+    log.w(mod, fun, err)
     throw err
   }
 }
@@ -530,7 +520,7 @@ exports.getSingleObject = async (req, reply) => {
     // return the object
     return dbObject
   } catch (err) {
-    log.e(mod, fun, err)
+    log.w(mod, fun, err)
     throw err
   }
 }

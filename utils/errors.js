@@ -1,10 +1,11 @@
 'use strict'
 
-// const mod = 'errors'
+const mod = 'custErr'
 
 // ------------------------------------------------------------------------------------------------
-// Http errors
+// Internal dependencies
 // ------------------------------------------------------------------------------------------------
+const log = require('./logging')
 const { objectNotFound, parameterExpected } = require('./msg')
 
 // ------------------------------------------------------------------------------------------------
@@ -15,9 +16,11 @@ const DEFAULT_MESSAGE = 'Rudi producer node - API Server Error'
 class RudiHttpError extends Error {
   constructor(message, code, name, description) {
     super(message || DEFAULT_MESSAGE)
+    this.isRudiHttpError = true
     this.statusCode = code || 500
     this.name = name || 'Internal Server Error'
     this.error = description || 'An unexpected error occured'
+    this.type = this.constructor.name
   }
   toString() {
     return `Error ${this.statusCode} (${this.name}): ${this.message}`
@@ -109,25 +112,31 @@ class NotImplementedError extends RudiHttpError {
 }
 
 function createRudiHttpError(code, message) {
-  let err
-  switch (code) {
-    case 400:
-      return new BadRequestError(message)
-    case 401:
-      return new UnauthorizedError(message)
-    case 403:
-      return new ForbiddenError(message)
-    case 404:
-      return new NotFoundError(message)
-    case 405:
-      return new MethodNotAllowedError(message)
-    case 406:
-      return new NotAcceptableError(message)
-    case 501:
-      return new NotImplementedError(message)
-    case 500:
-    default:
-      return new InternalServerError(message)
+  const fun = 'createRudiHttpError'
+  try {
+    log.d(mod, fun, `Error ${code}: ${message}`)
+    switch (code) {
+      case 400:
+        return new BadRequestError(message)
+      case 401:
+        return new UnauthorizedError(message)
+      case 403:
+        return new ForbiddenError(message)
+      case 404:
+        return new NotFoundError(message)
+      case 405:
+        return new MethodNotAllowedError(message)
+      case 406:
+        return new NotAcceptableError(message)
+      case 501:
+        return new NotImplementedError(message)
+      case 500:
+      default:
+        return new InternalServerError(message)
+    }
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
   }
 }
 

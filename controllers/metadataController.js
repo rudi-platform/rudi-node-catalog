@@ -44,12 +44,9 @@ const {
 
   API_MEDIA_PROPERTY,
 
-  API_DATA_DATES_PROPERTY,
-
   API_METAINFO_PROPERTY,
   API_METAINFO_PROVIDER_PROPERTY,
   API_METAINFO_CONTACTS_PROPERTY,
-  API_METAINFO_DATES_PROPERTY,
 
   API_GEOGRAPHY_PROPERTY,
   API_GEO_GEOJSON_PROPERTY,
@@ -59,8 +56,6 @@ const {
   API_GEO_BBOX_NORTH,
   API_GEO_BBOX_SOUTH,
   API_MEDIA_ID,
-  API_DATES_CREATED_PROPERTY,
-  API_DATES_PUBLISHED_PROPERTY,
   API_COLLECTION_TAG,
   API_PURPOSE,
   API_LANGUAGES_PROPERTY,
@@ -100,7 +95,6 @@ const portalController = require('./portalController')
 const {
   NotFoundError,
   BadRequestError,
-  MethodNotAllowedError,
   InternalServerError,
   ParameterExpectedError,
   ObjectNotFoundError,
@@ -535,7 +529,7 @@ exports.newMetadata = async (rudiMetadata) => {
   try {
     await dbMetadata.save()
   } catch (err) {
-    log.w(mod, fun, `Saving object '${PARAM_OBJECT_METADATA}': ${rudiId} | Error: ${err}`)
+    log.w(mod, fun, `Error while saving object '${PARAM_OBJECT_METADATA}' (${rudiId}): ${err}`)
     throw err
   }
   // log.d(mod, fun, `dbMetadata: ${beautify(dbMetadata)}`)

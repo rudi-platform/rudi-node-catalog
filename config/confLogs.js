@@ -20,7 +20,6 @@ require('winston-syslog').Syslog
 //   printf
 // } = format
 
-
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
@@ -30,7 +29,6 @@ const utils = require('../utils/jsUtils')
 // ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
-const ERR_LOGS_FILE = 'rudiProxy-errors.log'
 const ERR_FASTIFY_FILE = 'ff-errors.log'
 
 // ------------------------------------------------------------------------------------------------
@@ -168,7 +166,6 @@ const syslogOptions = {
   level: sys.SYSLOG_LEVEL,
   type: sys.SYSLOG_TYPE,
 }
-
 
 winston.add(new winston.transports.Syslog(syslogOptions))
 

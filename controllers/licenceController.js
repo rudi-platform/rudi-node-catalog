@@ -12,17 +12,14 @@ const uuid = require('uuid')
 // ------------------------------------------------------------------------------------------------
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
-const sys = require('../config/confSystem')
 const log = require('../utils/logging')
 const utils = require('../utils/jsUtils')
-const json = require('../utils/jsonAccess')
+const db = require('../db/dbQueries')
+const skosController = require('./skosController')
+
 const { InternalServerError } = require('../utils/errors')
 
-const db = require('../db/dbQueries')
-const { httpPost, directPost } = require('../utils/httpReq')
 const {
-  URL_PREFIX_PRIVATE,
-  PARAM_OBJECT_SKOS_SCHEME,
   URL_PV_LICENCE_ACCESS,
   URL_PV_LICENCE_CODES_ACCESS,
   PARAM_ACTION_INIT,
@@ -30,7 +27,6 @@ const {
 
 const { API_SKOS_CONCEPT_CODE } = require('../db/dbFields')
 
-const skosController = require('./skosController')
 // ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
@@ -38,7 +34,6 @@ exports.LicenceSchemeCode = 'software_licences'
 exports.LicenceConceptRole = 'licence'
 
 const LICENCES_FILE = `../api/licences.json`
-const LICENCE_POST_ADDRESS = `${sys.getHost()}${URL_PREFIX_PRIVATE}/${PARAM_OBJECT_SKOS_SCHEME}`
 
 // ------------------------------------------------------------------------------------------------
 // Controller
@@ -74,7 +69,6 @@ exports.getLicenceCodes = async () => {
 
 exports.initializeLicences = async () => {
   const fun = 'initializeLicences'
-  // log.v(mod, fun, `${LICENCE_POST_ADDRESS}`)
   try {
     await db.cleanLicences()
     LICENCE_CODE_LIST = null
@@ -89,15 +83,6 @@ exports.initializeLicences = async () => {
     const reply = await skosController.newSkosScheme(licenceData)
     if (!reply) throw new InternalServerError(`Licence integration failed`)
     return await this.getLicenceCodes()
-    /* 
-    const res = await directPost(LICENCE_POST_ADDRESS, licenceData)
-    if (res.status === 200) {
-      log.d(mod, fun, `Integration done`)
-      return await this.getLicenceCodes()
-    } else {
-      throw new InternalServerError(`Licence integration failed`)
-    } */
-    // log.d(mod, fun, `Body: ${utils.beautify(res.data)}`)
   } catch (err) {
     log.w(mod, fun, err)
     throw err
