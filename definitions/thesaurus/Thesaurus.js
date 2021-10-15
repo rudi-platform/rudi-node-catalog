@@ -6,7 +6,6 @@ const mod = 'thsrClass'
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const log = require('../../utils/logging')
-const { beautify } = require('../../utils/jsUtils')
 const { parameterExpected } = require('../../utils/msg')
 
 const DynamicEnum = require('../models/DynamicEnum')
@@ -28,7 +27,7 @@ module.exports = class Thesaurus {
    * @param {string[]} initValues Default values to be used when none are provided
    */
   constructor(code, initValues, initLabels) {
-    const fun = 'constructor'
+    // const fun = 'constructor'
     // log.d(mod, fun, `${code}`)
 
     this.#isInit = false
@@ -204,7 +203,7 @@ module.exports = class Thesaurus {
     // log.d(mod, fun, ``)
 
     try {
-      const dbEnum = await DynamicEnum.findOneAndUpdate(
+      await DynamicEnum.findOneAndUpdate(
         { code: typeThesaurus },
         { $set: { values: listValues } },
         { upsert: true, new: true }

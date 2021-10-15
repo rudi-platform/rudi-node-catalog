@@ -43,7 +43,6 @@ const ReferenceDates = require('../schemas/ReferenceDates')
 // Model definitions
 // ------------------------------------------------------------------------------------------------
 const Licence = require('./Licence')
-const { Media, MediaTypes } = require('./Media')
 
 // ------------------------------------------------------------------------------------------------
 // Other controllers
@@ -99,8 +98,6 @@ const {
   API_KEYWORDS_PROPERTY,
   API_LANGUAGES_PROPERTY,
   API_COLLECTION_TAG,
-  API_MEDIA_CHECKSUM_PROPERTY,
-  API_MEDIA_TYPE_PROPERTY,
   API_END_DATE_PROPERTY,
 } = require('../../db/dbFields')
 const { NotFoundError, BadRequestError } = require('../../utils/errors')

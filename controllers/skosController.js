@@ -14,7 +14,6 @@ const mod = 'skosCtrl'
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
-const msg = require('../utils/msg')
 
 const json = require('../utils/jsonAccess')
 const utils = require('../utils/jsUtils')
@@ -74,17 +73,11 @@ const PROPERTIES_WITH_CONCEPT_REFS = [
 ]
 
 const {
-  URL_PV_THESAURUS_ACCESS: URL_THESAURUS_ACCESS,
+  URL_PV_THESAURUS_ACCESS,
   PARAM_THESAURUS_CODE,
-  URL_SUFFIX_LICENCE: URL_LICENCE_SUFFIX,
   PARAM_THESAURUS_LANG,
 } = require('../config/confApi')
-const {
-  InternalServerError,
-  ParameterExpectedError,
-  NotFoundError,
-  NotImplementedError,
-} = require('../utils/errors')
+const { ParameterExpectedError, NotFoundError } = require('../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
 // Controllers: Scheme
@@ -511,7 +504,7 @@ exports.getThesaurusLabel = async (thesaurusCode, lang) => {
 exports.getEveryThesaurus = async (req, reply) => {
   const fun = 'getEveryThesaurus'
   try {
-    log.v(mod, fun, `< GET ${URL_THESAURUS_ACCESS}`)
+    log.v(mod, fun, `< GET ${URL_PV_THESAURUS_ACCESS}`)
     log.d(mod, fun, ``)
 
     const lang = req.query[PARAM_THESAURUS_LANG]
@@ -529,7 +522,7 @@ exports.getEveryThesaurus = async (req, reply) => {
 exports.getSingleThesaurus = async (req, reply) => {
   const fun = 'getSingleThesaurus'
   try {
-    log.v(mod, fun, `< GET ${URL_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}`)
+    log.v(mod, fun, `< GET ${URL_PV_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}`)
 
     const thesaurusCode = json.accessReqParam(req, PARAM_THESAURUS_CODE)
     log.d(mod, fun, `thesaurusCode: ${thesaurusCode}`)
@@ -552,7 +545,7 @@ exports.getSingleThesaurusLabels = async (req, reply) => {
     log.v(
       mod,
       fun,
-      `< GET ${URL_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}/:${PARAM_THESAURUS_LANG}`
+      `< GET ${URL_PV_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}/:${PARAM_THESAURUS_LANG}`
     )
 
     const thesaurusCode = json.accessReqParam(req, PARAM_THESAURUS_CODE)

@@ -5,9 +5,8 @@ const mod = 'jwtCtrl'
 // ------------------------------------------------------------------------------------------------
 // External dependancies
 // ------------------------------------------------------------------------------------------------
-const { readFileSync, access } = require('fs')
-const { v4: uuidv4 } = require('uuid')
-const { parseKey, parsePrivateKey } = require('sshpk')
+const { readFileSync } = require('fs')
+const { parseKey } = require('sshpk')
 
 // ------------------------------------------------------------------------------------------------
 // Internal dependancies
@@ -16,24 +15,14 @@ const log = require('../utils/logging')
 
 const {
   beautify,
-  isEmptyObject,
-  toBase64url,
   decodeBase64url,
-  convertEncoding,
   nowEpochS,
   nowISO,
   dateEpochSToIso,
 } = require('../utils/jsUtils')
 const { getProfile } = require('../config/confSystem')
 const { accessProperty } = require('../utils/jsonAccess')
-const {
-  ForbiddenError,
-  UnauthorizedError,
-  RudiHttpError,
-  createRudiHttpError,
-  BadRequestError,
-  NotFoundError,
-} = require('../utils/errors')
+const { ForbiddenError, UnauthorizedError } = require('../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
@@ -49,11 +38,11 @@ const REQ_MTD = 'req_mtd'
 const REQ_URL = 'req_url'
 
 // Optional fields for RUDI JWT:
-const JWT_ID = 'jti' // https://www.rfc-editor.org/rfc/rfc7519.html#section-4.1.7
-const JWT_IAT = 'iat' // Issued At https://www.rfc-editor.org/rfc/rfc7519.html#section-4.1.6
-const JWT_CLIENT = 'client_id' // https://www.rfc-editor.org/rfc/rfc6749.html#section-2.2
+// const JWT_ID = 'jti' // https://www.rfc-editor.org/rfc/rfc7519.html#section-4.1.7
+// const JWT_IAT = 'iat' // Issued At https://www.rfc-editor.org/rfc/rfc7519.html#section-4.1.6
+// const JWT_CLIENT = 'client_id' // https://www.rfc-editor.org/rfc/rfc6749.html#section-2.2
 
-const DEFAULT_EXP = 600
+// const DEFAULT_EXP = 600
 
 const PUB_KEY = 'pub_key'
 const SUB_ACL = 'routes'

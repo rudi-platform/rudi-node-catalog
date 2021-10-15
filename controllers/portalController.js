@@ -24,7 +24,6 @@ const portal = require('../config/confPortal')
 
 const validate = require('../definitions/schemaValidators')
 
-const { Metadata } = require('../definitions/models/Metadata')
 const {
   NotFoundError,
   InternalServerError,

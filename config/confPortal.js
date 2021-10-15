@@ -5,15 +5,8 @@ const mod = 'sysPortal'
 // ------------------------------------------------------------------------------------------------
 // Internal dependecies
 // ------------------------------------------------------------------------------------------------
-const fa = require('../utils/fileActions')
 const utils = require('../utils/jsUtils')
-const {
-  USER_CONF_FILE,
-  DEFAULT_CONF_FILE,
-  USER_CONF,
-  LOCAL_CONF,
-  getIniValue,
-} = require('./confSystem')
+const { getIniValue } = require('./confSystem')
 
 // ------------------------------------------------------------------------------------------------
 // Constants: Portal JWT

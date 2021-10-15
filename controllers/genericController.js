@@ -39,7 +39,6 @@ const {
   PARAM_OBJECT_MEDIA,
   PARAM_OBJECT_SKOS_CONCEPT,
   PARAM_OBJECT_SKOS_SCHEME,
-  PARAM_ACTION_REPORT,
   PARAM_ACTION_DELETION,
   PARAM_ID,
   PARAM_OBJECT,
@@ -86,7 +85,7 @@ const {
 // ------------------------------------------------------------------------------------------------
 // Models
 // ------------------------------------------------------------------------------------------------
-
+/* 
 const Organization = require('../definitions/models/Organization')
 const Contact = require('../definitions/models/Contact')
 const SkosConcept = require('../definitions/models/SkosConcept')
@@ -97,7 +96,7 @@ const { Metadata } = require('../definitions/models/Metadata')
 const { Media, MediaFile, MediaSeries } = require('../definitions/models/Media')
 
 const { LogEntry } = require('../definitions/models/LogEntry')
-
+ */
 // ------------------------------------------------------------------------------------------------
 // Specific controllers
 // ------------------------------------------------------------------------------------------------
@@ -108,9 +107,7 @@ const skosController = require('./skosController')
 const { deletePortalMetadata } = require('./portalController')
 const {
   NotFoundError,
-  UnauthorizedError,
   ForbiddenError,
-  MethodNotAllowedError,
   ObjectNotFoundError,
   BadRequestError,
   ParameterExpectedError,
@@ -177,6 +174,7 @@ function cleanDateOperations(inputDateOperations) {
 const DATA_DATES = `${API_DATA_DATES_PROPERTY}.`
 const META_DATES = `${API_METAINFO_PROPERTY}.${API_METAINFO_DATES_PROPERTY}.`
 
+// eslint-disable-next-line complexity
 exports.parseQueryParameters = async (objectType, reqUrl) => {
   const fun = 'parseQueryParameters'
   try {
@@ -338,7 +336,7 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
               [EXT_OBJ_VAL]: obj,
             })
           } catch (err) {
-            const errMsg = `Couldn't parse: '${beautify(value)}': ${err}}`
+            // const errMsg = `Couldn't parse: '${beautify(value)}': ${err}}`
             // log.w(mod, fun, errMsg)
             returnedFilter[EXT_REFS].push({
               [EXT_OBJ]: nestedField,
@@ -374,7 +372,6 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
             throw err
           }
           // log.d(mod, fun, `nestedFieldIds: ${beautify(nestedFieldIds)}`)
-          let queryFilter
 
           const ids = await Promise.all(
             nestedFieldIds.map(async (foundObj) => {
@@ -545,7 +542,7 @@ exports.getObjectList = async (req, reply) => {
 /**
  * Get several objects for a particular object type
  */
-exports.getManyObjects = async (objectType, req, reply) => {
+exports.getManyObjects = async (objectType, req) => {
   const fun = 'getManyObjects'
   try {
     let parsedParameters
@@ -721,7 +718,7 @@ exports.deleteSingleObject = async (req, reply) => {
     const objectRudiId = json.accessReqParam(req, PARAM_ID)
 
     // ensure the object exists
-    const objectToDelete = await db.getEnsuredObjectWithRudiId(objectType, objectRudiId)
+    await db.getEnsuredObjectWithRudiId(objectType, objectRudiId)
 
     if (await isObjectReferenced(objectType, objectRudiId))
       throw new ForbiddenError(msg.objectNotDeletedBecauseUsed(objectType, objectRudiId))
@@ -732,7 +729,7 @@ exports.deleteSingleObject = async (req, reply) => {
 
     if (objectType === PARAM_OBJECT_METADATA) {
       deletePortalMetadata(objectRudiId)
-        .then((result) =>
+        .then(() =>
           log.i(mod, fun, `Portal accepted the deletion request for metadata '${objectRudiId}'`)
         )
         .catch((err) =>

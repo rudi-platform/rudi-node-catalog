@@ -22,7 +22,6 @@ const utils = require('../utils/jsUtils')
 const json = require('../utils/jsonAccess')
 
 const { setPublishedFlag } = require('../controllers/genericController')
-const { checkRudiProdPermission } = require('../controllers/tokenController')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
@@ -62,14 +61,7 @@ const {
 // Data models
 // ------------------------------------------------------------------------------------------------
 const { Report, IntegrationStatus } = require('../definitions/models/Report')
-const {
-  BadRequestError,
-  NotFoundError,
-  ObjectNotFoundError,
-  ForbiddenError,
-  MethodNotAllowedError,
-} = require('../utils/errors')
-const { getTokenCheckedByPortal } = require('./portalController')
+const { BadRequestError, ObjectNotFoundError, MethodNotAllowedError } = require('../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
 // Comformity functions
@@ -102,7 +94,7 @@ function dateArrayToDate(dateArray) {
   }
 }
 function pad(number, nbZeros) {
-  const fun = 'pad'
+  // const fun = 'pad'
   if (!nbZeros) nbZeros = 2
   return String(number).padStart(nbZeros, '0')
 }

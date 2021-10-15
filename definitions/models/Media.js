@@ -1,6 +1,6 @@
 'use strict'
 
-const mod = 'mediaSch'
+// const mod = 'mediaSch'
 
 // ------------------------------------------------------------------------------------------------
 // External dependancies

@@ -1,36 +1,28 @@
 'use strict'
 
-const mod = 'logDb'
+// const mod = 'logDb'
 // ------------------------------------------------------------------------------------------------
 // External dependancies
 // ------------------------------------------------------------------------------------------------
 const { Schema, model } = require('mongoose')
-const { omit } = require('lodash')
 const datetime = require('date-and-time')
 const { v4 } = require('uuid')
+// const { omit } = require('lodash')
 
 // ------------------------------------------------------------------------------------------------
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
-const {
-  beautify,
-  nowEpochMs,
-  LOG_DATE_FORMAT,
-  consoleErr,
-  consoleLog,
-} = require('../../utils/jsUtils')
+const { LOG_DATE_FORMAT } = require('../../utils/jsUtils')
 
 const { LOG_EXP } = require('../../config/confSystem')
-const { UUIDv4 } = require('../schemas/Identifiers')
 const { VALID_UUID, VALID_EPOCH_MS } = require('../schemaValidators')
-const { DB_ID, DB_V, DB_UPDATED_AT, DB_CREATED_AT } = require('../../db/dbFields')
-const log = require('../../utils/logging')
+const { DB_CREATED_AT } = require('../../db/dbFields')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
-const dayS = 60 * 60 * 24
-const logExpirationTime = 100 // 7 * dayS
+// const dayS = 60 * 60 * 24
+// const logExpirationTime = 100 // 7 * dayS
 
 // ------------------------------------------------------------------------------------------------
 // Custom schema definition
@@ -134,7 +126,7 @@ function makeLogInfo(logLvl, mod, fun, msg) {
 }
 
 function logLineToString(logLine) {
-  const fun = 'logLineToString'
+  // const fun = 'logLineToString'
   // log.d(mod, fun , `logLine: ${beautify(logLine)}`)
   // const dateStr = `${format(logLine[DB_CREATED_AT], LOG_DATE_FORMAT)} ${logLine[
   //   DB_CREATED_AT
@@ -151,7 +143,7 @@ function logLineToString(logLine) {
 // ------------------------------------------------------------------------------------------------
 const LogEntry = model('LogEntry', LogEntrySchema)
 
-LogEntry.collection.dropIndex({ updatedAt: 1 }).catch((err) => 'nevermind')
+LogEntry.collection.dropIndex({ updatedAt: 1 }).catch(() => 'nevermind')
 //log.d(mod, 'LogEntry.dropIndex', err + ' (nevermind)'))
 
 module.exports = { LogEntry, makeLogInfo, logLineToString }

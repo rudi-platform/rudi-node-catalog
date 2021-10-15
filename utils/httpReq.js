@@ -5,8 +5,8 @@ const mod = 'http'
 // ------------------------------------------------------------------------------------------------
 // External dependecies
 // ------------------------------------------------------------------------------------------------
-const https = require('https')
-const http = require('http')
+// const https = require('https')
+// const http = require('http')
 const axios = require('axios')
 
 // ------------------------------------------------------------------------------------------------
@@ -15,14 +15,6 @@ const axios = require('axios')
 const log = require('./logging')
 const utils = require('./jsUtils')
 const { InternalServerError, createRudiHttpError } = require('./errors')
-
-// ------------------------------------------------------------------------------------------------
-// Http protocols
-// ------------------------------------------------------------------------------------------------
-const PROTOCOL = {
-  HTTP: 'http',
-  HTTPS: 'https',
-}
 
 // ------------------------------------------------------------------------------------------------
 // Functions: header treatments
@@ -35,49 +27,6 @@ exports.getHeaderRedirectUrls = (req) => {
 // ------------------------------------------------------------------------------------------------
 // Functions: http requests
 // ------------------------------------------------------------------------------------------------
-function doHttpRequest(options, protocol, data) {
-  const fun = 'doHttpRequest'
-  // log.d(mod, fun, ``)
-
-  const httpProtocol = protocol === PROTOCOL.HTTP ? http : https
-  // options.agent = new httpProtocol.Agent({rejectUnauthorized: false})
-  log.d(mod, fun, `options: ${utils.beautify(options)}`)
-
-  return new Promise((resolve, reject) => {
-    const req = httpProtocol.request(options, (res) => {
-      log.d(mod, fun, `statusCode: ${res.statusCode}`)
-      if (res.statusCode < 200 || res.statusCode >= 300) {
-        return reject(new Error(`statusCode: ${res.statusCode}`))
-      }
-      // res.setEncoding('utf8')
-      let body = []
-
-      res.on('data', (chunk) => {
-        // log.d(mod, fun, `chunk: ${utils.beautify(chunk)}`)
-        body.push(chunk)
-      })
-
-      res.on('end', () => {
-        try {
-          body = JSON.parse(Buffer.concat(body).toString())
-        } catch (e) {
-          log.w(mod, fun, e)
-          // reject(e)
-        }
-        resolve(body)
-      })
-    })
-
-    req.on('error', (err) => {
-      log.w(mod, fun, `${err.stack} - ${utils.beautify(err)}`)
-      reject(err)
-    })
-
-    if (data) req.write(data)
-
-    req.end()
-  })
-}
 
 exports.httpGet = async (destUrl, authorizationToken) => {
   const fun = 'httpGet'
@@ -257,3 +206,48 @@ exports.directGet = async (destUrl, reqOpts) => {
     log.w(mod, fun, `err.message: ${utils.beautify(err.message)}`)
   }
 }
+
+/* function doHttpRequest(options, protocol, data) {
+  const fun = 'doHttpRequest'
+  // log.d(mod, fun, ``)
+
+  const httpProtocol = protocol === PROTOCOL.HTTP ? http : https
+  // options.agent = new httpProtocol.Agent({rejectUnauthorized: false})
+  log.d(mod, fun, `options: ${utils.beautify(options)}`)
+
+  return new Promise((resolve, reject) => {
+    const req = httpProtocol.request(options, (res) => {
+      log.d(mod, fun, `statusCode: ${res.statusCode}`)
+      if (res.statusCode < 200 || res.statusCode >= 300) {
+        return reject(new Error(`statusCode: ${res.statusCode}`))
+      }
+      // res.setEncoding('utf8')
+      let body = []
+
+      res.on('data', (chunk) => {
+        // log.d(mod, fun, `chunk: ${utils.beautify(chunk)}`)
+        body.push(chunk)
+      })
+
+      res.on('end', () => {
+        try {
+          body = JSON.parse(Buffer.concat(body).toString())
+        } catch (e) {
+          log.w(mod, fun, e)
+          // reject(e)
+        }
+        resolve(body)
+      })
+    })
+
+    req.on('error', (err) => {
+      log.w(mod, fun, `${err.stack} - ${utils.beautify(err)}`)
+      reject(err)
+    })
+
+    if (data) req.write(data)
+
+    req.end()
+  })
+}
+ */

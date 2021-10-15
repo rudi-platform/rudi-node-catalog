@@ -1,5 +1,3 @@
-/* eslint-disable prefer-const */
-/* eslint-disable no-unused-vars */
 'use strict'
 
 const mod = 'licenceCtrl'
@@ -38,33 +36,30 @@ const LICENCES_FILE = `../api/licences.json`
 // ------------------------------------------------------------------------------------------------
 // Controller
 // ------------------------------------------------------------------------------------------------
-let LICENCE_LIST
-let LICENCE_CODE_LIST
+// Cache for licences
+let LICENCE_LIST, LICENCE_CODE_LIST
 
 exports.getLicences = async () => {
   const fun = 'getLicenceList'
-  if (!this.LICENCE_LIST) {
+  if (!LICENCE_LIST) {
     log.d(mod, fun, `Init LICENCE_LIST`)
     let dblicenceList = await db.getAllConceptsWithRole(this.LicenceConceptRole)
     if (utils.isEmptyArray(dblicenceList)) {
       await this.initializeLicences()
       dblicenceList = await db.getAllConceptsWithRole(this.LicenceConceptRole)
     }
-    this.LICENCE_LIST = await skosController.dbConceptListToRudiRecursive(dblicenceList)
+    LICENCE_LIST = await skosController.dbConceptListToRudiRecursive(dblicenceList)
   }
-  return this.LICENCE_LIST
+  return LICENCE_LIST
 }
 
 exports.getLicenceCodes = async () => {
   // const fun = `getLicenceCodes`
-  if (!this.LICENCE_CODE_LIST) {
+  if (!LICENCE_CODE_LIST) {
     const licenceList = await this.getLicences()
-    // log.d(mod, fun, `licence list: ${utils.beautify(licenceList)}`)
-
-    this.LICENCE_CODE_LIST = licenceList.map((obj) => obj[API_SKOS_CONCEPT_CODE])
+    LICENCE_CODE_LIST = licenceList.map((obj) => obj[API_SKOS_CONCEPT_CODE])
   }
-  // log.d(mod, fun, `licence codes: ${utils.beautify(this.LICENCE_CODE_LIST)}`)
-  return this.LICENCE_CODE_LIST
+  return LICENCE_CODE_LIST
 }
 
 exports.initializeLicences = async () => {
@@ -74,11 +69,7 @@ exports.initializeLicences = async () => {
     LICENCE_CODE_LIST = null
     log.d(mod, fun, `Licences initialized`)
     const licenceStr = JSON.stringify(require(LICENCES_FILE))
-    const licenceData = JSON.parse(
-      licenceStr.replace(/\{\{\w+\}\}/g, function (matched) {
-        return uuid.v4()
-      })
-    )
+    const licenceData = JSON.parse(licenceStr.replace(/\{\{\w+\}\}/g, () => uuid.v4()))
     // log.d(mod, fun, licenceData)
     const reply = await skosController.newSkosScheme(licenceData)
     if (!reply) throw new InternalServerError(`Licence integration failed`)

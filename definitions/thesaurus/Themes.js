@@ -6,7 +6,6 @@ const mod = 'themeThes'
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const log = require('../../utils/logging')
-const { parameterExpected } = require('../../utils/msg')
 const Thesaurus = require('./Thesaurus')
 
 // ------------------------------------------------------------------------------------------------

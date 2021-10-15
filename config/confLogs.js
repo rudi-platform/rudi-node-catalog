@@ -171,22 +171,22 @@ winston.add(new winston.transports.Syslog(syslogOptions))
 
 // exports.sysLogger = winston.createLogger(syslogOptions)
 
-function extractErrorFromFastifyMsg(msg) {
-  try {
-    return msg.split('err: ')[1].split('\n')
-  } catch (err) {
-    return msg
-  }
-}
-const FORMAT_PRINTFF = (info) =>
-  `${info.timestamp} .${info.level}. [fastify] ${extractErrorFromFastifyMsg(info.message)}`
+// function extractErrorFromFastifyMsg(msg) {
+//   try {
+//     return msg.split('err: ')[1].split('\n')
+//   } catch (err) {
+//     return msg
+//   }
+// }
+// const FORMAT_PRINTFF = (info) =>
+//   `${info.timestamp} .${info.level}. [fastify] ${extractErrorFromFastifyMsg(info.message)}`
 
-const formatConsoleFastifyLogs = winston.format.combine(
-  winston.format.json(),
-  winston.format.colorize(COLORIZE_ALL),
-  winston.format.timestamp(FORMAT_TIMESTAMP),
-  winston.format.printf(FORMAT_PRINTFF)
-)
+// const formatConsoleFastifyLogs = winston.format.combine(
+//   winston.format.json(),
+//   winston.format.colorize(COLORIZE_ALL),
+//   winston.format.timestamp(FORMAT_TIMESTAMP),
+//   winston.format.printf(FORMAT_PRINTFF)
+// )
 
 exports.initFFLogger = (appname) => {
   const fun = 'initFFLogger'

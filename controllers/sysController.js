@@ -16,18 +16,8 @@ const mongoose = require('mongoose')
 // ------------------------------------------------------------------------------------------------
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
-const sys = require('../config/confSystem')
 const log = require('../utils/logging')
 const utils = require('../utils/jsUtils')
-const json = require('../utils/jsonAccess')
-
-const {
-  URL_PV_LOGS_ACCESS,
-  URL_PV_GIT_HASH_ACCESS,
-  URL_PV_NODE_VERSION_ACCESS,
-  PARAM_LOGS_LINES,
-  QUERY_LIMIT,
-} = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
 // Constants

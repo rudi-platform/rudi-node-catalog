@@ -10,8 +10,7 @@ const mod = 'routes'
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
-const { beautify, displayIps, logApiCall } = require('../utils/jsUtils')
-const { ForbiddenError } = require('../utils/errors')
+const { logApiCall } = require('../utils/jsUtils')
 
 // ------------------------------------------------------------------------------------------------
 // Swagger documentation
@@ -31,7 +30,7 @@ const { getLastLogLines, getLogs } = require('../controllers/logController')
 const skosController = require('../controllers/skosController')
 const licenceController = require('../controllers/licenceController')
 
-const devController = require('../controllers/testController')
+// const devController = require('../controllers/testController')
 const portalController = require('../controllers/portalController')
 const tokenController = require('../controllers/tokenController')
 
@@ -64,7 +63,6 @@ const {
   PARAM_ACTION_DELETION,
   PARAM_ACTION_UUID_GEN,
   PARAM_ACTION_UNLINKED,
-  PARAM_ACTION_SIGN,
   URL_PV_APP_ENV_ACCESS,
   PARAM_THESAURUS_LANG,
 } = require('../config/confApi')
@@ -121,7 +119,6 @@ const DEV_GET_LOGS = 'dev_get_logs'
 const DEV_GET_LAST_LOG_LINES = 'dev_get_last_log_lines'
 const DEV_GET_COLLECTIONS = 'dev_get_collections'
 const DEV_DROP_DB = 'dev_drop_db'
-const DEV_TEST = 'dev_test'
 
 // ------------------------------------------------------------------------------------------------
 // Helper functions

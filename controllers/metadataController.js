@@ -79,12 +79,6 @@ const { Metadata } = require('../definitions/models/Metadata')
 const { Media } = require('../definitions/models/Media')
 
 // ------------------------------------------------------------------------------------------------
-// Data models
-// ------------------------------------------------------------------------------------------------
-const Themes = require('../definitions/thesaurus/Themes')
-const Keywords = require('../definitions/thesaurus/Themes')
-
-// ------------------------------------------------------------------------------------------------
 // Controllers
 // ------------------------------------------------------------------------------------------------
 const genericController = require('./genericController')
