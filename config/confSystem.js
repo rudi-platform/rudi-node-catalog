@@ -27,41 +27,6 @@ const userConfFile = `${iniDir}/conf_custom.ini`
 // - default conf path
 const defaultConfFile = `${iniDir}/conf_default.ini`
 
-// Node Server section
-const SERVER_SECTION = 'server'
-const _serverAddress = 'listening_address'
-const _serverPort = 'listening_port'
-
-// DB section
-const DB_SECTION = 'database'
-
-const _dbUrl = 'db_url'
-const _dbName = 'db_name'
-const _dbPort = 'db_port'
-
-// Logs section
-const LOG_SECTION = 'logging'
-
-const _appName = 'app_name'
-const _logDir = 'log_dir'
-const _logFileName = 'log_file'
-const _logLevel = 'log_level'
-const _expires = 'expires'
-
-// Logs section
-const SYSLOG_SECTION = 'syslog'
-
-const _syslogHost = 'syslog_host'
-const _syslogPort = 'syslog_port'
-const _syslogPath = 'syslog_path'
-const _syslogLevel = 'syslog_lvl'
-const _syslogType = 'syslog_type'
-
-// Security section
-const SECURITY_SECTION = 'security'
-const _profilesConfFile = 'profiles'
-const _should_control_private_requests = 'should_control_private_requests'
-
 // ------------------------------------------------------------------------------------------------
 // Constants: user and local configuration
 // ------------------------------------------------------------------------------------------------
@@ -92,37 +57,47 @@ exports.getIniValue = (section, field) => {
 // Extracting and exporting sys configuration
 // ------------------------------------------------------------------------------------------------
 
-// Server
-exports.LISTENING_ADDR = this.getIniValue(SERVER_SECTION, _serverAddress)
-exports.LISTENING_PORT = this.getIniValue(SERVER_SECTION, _serverPort)
+// Node Server section
+const SERVER_SECTION = 'server'
 
-// DB
-exports.DB_NAME = this.getIniValue(DB_SECTION, _dbName)
-const DB_URL_PREFIX = this.getIniValue(DB_SECTION, _dbUrl)
+exports.LISTENING_ADDR = this.getIniValue(SERVER_SECTION, 'listening_address')
+exports.LISTENING_PORT = this.getIniValue(SERVER_SECTION, 'listening_port')
+
+// DB section
+const DB_SECTION = 'database'
+
+exports.DB_NAME = this.getIniValue(DB_SECTION, 'db_name')
+const DB_URL_PREFIX = this.getIniValue(DB_SECTION, 'db_url')
 exports.DB_URL = `${DB_URL_PREFIX}${this.DB_NAME}`
 
-// Logs
-exports.APP_NAME = this.getIniValue(LOG_SECTION, _appName)
-exports.LOG_DIR = this.getIniValue(LOG_SECTION, _logDir)
-exports.LOG_FILE = this.getIniValue(LOG_SECTION, _logFileName)
+// Logs section
+const LOG_SECTION = 'logging'
+
+exports.APP_NAME = this.getIniValue(LOG_SECTION, 'app_name')
+exports.LOG_DIR = this.getIniValue(LOG_SECTION, 'log_dir')
+exports.LOG_FILE = this.getIniValue(LOG_SECTION, 'log_file')
 exports.OUT_LOG = `${this.LOG_DIR}/${this.LOG_FILE}`
 exports.SYMLINK_NAME = `${this.APP_NAME}-current.log`
-exports.LOG_LVL = this.getIniValue(LOG_SECTION, _logLevel)
-exports.LOG_EXP = this.getIniValue(LOG_SECTION, _expires)
+exports.LOG_LVL = this.getIniValue(LOG_SECTION, 'log_level')
+exports.LOG_EXP = this.getIniValue(LOG_SECTION, 'expires')
 
 // Syslog
-exports.SYSLOG_HOST = this.getIniValue(SYSLOG_SECTION, _syslogHost)
-exports.SYSLOG_PORT = this.getIniValue(SYSLOG_SECTION, _syslogPort)
-exports.SYSLOG_PATH = this.getIniValue(SYSLOG_SECTION, _syslogPath)
-exports.SYSLOG_LEVEL = this.getIniValue(SYSLOG_SECTION, _syslogLevel)
-exports.SYSLOG_TYPE = this.getIniValue(SYSLOG_SECTION, _syslogType)
+const SYSLOG_SECTION = 'syslog'
 
-// Security
-const profilesConfFile = this.getIniValue(SECURITY_SECTION, _profilesConfFile)
+exports.SYSLOG_HOST = this.getIniValue(SYSLOG_SECTION, 'syslog_host')
+exports.SYSLOG_PORT = this.getIniValue(SYSLOG_SECTION, 'syslog_port')
+exports.SYSLOG_PATH = this.getIniValue(SYSLOG_SECTION, 'syslog_path')
+exports.SYSLOG_LEVEL = this.getIniValue(SYSLOG_SECTION, 'syslog_lvl')
+exports.SYSLOG_TYPE = this.getIniValue(SYSLOG_SECTION, 'syslog_type')
+
+// Security section
+const SECURITY_SECTION = 'security'
+
+const profilesConfFile = this.getIniValue(SECURITY_SECTION, 'profiles')
 const PROFILES = fa.readIniFile(profilesConfFile)
 exports.SHOULD_CONTROL_PRIVATE_REQUESTS = this.getIniValue(
   SECURITY_SECTION,
-  _should_control_private_requests
+  'should_control_private_requests'
 )
 
 exports.getProfile = (subject) => {
