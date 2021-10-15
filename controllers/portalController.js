@@ -366,7 +366,6 @@ jwtBody = {
     }
   }
  */
-const RUDI_PK_NAME = 'rudiPortal'
 exports.checkSignatureWithPubKey = (accessToken) => {
   const fun = 'checkSignatureWithPubKey'
   log.d(mod, fun, ``)
@@ -422,7 +421,7 @@ exports.verifyPortalToken = (accessToken) => {
 
   try {
     if (!accessToken) throw new BadRequestError('No token to verify!')
-    const [jwtHeaderBase64, jwtPayloadBase64, jwtSignatureBase64] = accessToken.split('.')
+    const [jwtHeaderBase64, jwtPayloadBase64, _] = accessToken.split('.')
 
     // Check JWT header
     const jwtHeader = JSON.parse(utils.decodeBase64url(jwtHeaderBase64))

@@ -184,16 +184,11 @@ exports.mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFound) 
   return mediaDbIds
 }
 
-function customMerger(value, srcValue, key, object, source) {
+function customMerger(value, srcValue, key) {
   const fun = 'customMerger'
   log.v(mod, fun, `'${key}': ${beautify(srcValue)} -> ${beautify(value)}`)
   if (Array.isArray(srcValue)) return srcValue
   return undefined
-  // switch(key){
-  //   case API_METADATA_ID: return
-  // }
-  // return value
-  // return Array.isArray(b) ? b : undefined
 }
 
 // Parameter 'dbMetadata' gets mutated!
@@ -449,7 +444,7 @@ exports.setGeography = (metadata) => {
       `Both '${API_GEO_BBOX_PROPERTY}' ` +
       `and '${API_GEO_GEOJSON_PROPERTY}' properties are already set`
 
-    // log.d(mod, fun, msg)
+    log.d(mod, fun, msg)
     // log.d(mod, fun, `'${API_GEO_BBOX_PROPERTY}' = ${beautify(bbox)}`)
     // log.d(mod, fun, `'${API_GEO_GEOJSON_PROPERTY}' = ${beautify(geojson)}`)
 
@@ -530,9 +525,7 @@ exports.newMetadata = async (rudiMetadata) => {
 
   this.sendToPortal(dbMetadata)
     .catch((err) => log.e(mod, fun, `Sending to portal failed for metadata '${rudiId}': ${err}`))
-    .then((result) =>
-      log.i(mod, fun, `Creation request received by the portal for metadata '${rudiId}'`)
-    )
+    .then(() => log.i(mod, fun, `Creation request received by the portal for metadata '${rudiId}'`))
 
   return dbMetadata
   // return this.dbMetadataToRudi(dbMetadata)
@@ -560,9 +553,7 @@ exports.overwriteMetadata = async (incomingRudiMetadata) => {
 
   this.sendToPortal(dbMetadata)
     .catch((err) => log.e(mod, fun, `Sending to portal failed for metadata '${rudiId}': ${err}`))
-    .then((result) =>
-      log.i(mod, fun, `'Update request received by the portal for metadata '${rudiId}'`)
-    )
+    .then(() => log.i(mod, fun, `'Update request received by the portal for metadata '${rudiId}'`))
 
   return dbMetadata
 }
@@ -594,9 +585,7 @@ exports.updateMetadata = async (incomingRudiMetadata) => {
   // log.d(mod, fun, `metadata saved: ${beautify(reply)}`)
   this.sendToPortal(dbMetadata)
     .catch((err) => log.e(mod, fun, `Sending to portal failed for metadata '${rudiId}': ${err}`))
-    .then((result) =>
-      log.i(mod, fun, `'Update request received by the portal for metadata '${rudiId}'`)
-    )
+    .then(() => log.i(mod, fun, `'Update request received by the portal for metadata '${rudiId}'`))
 
   return reply
 }

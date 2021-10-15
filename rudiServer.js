@@ -112,6 +112,7 @@ const mongoConnectOptions = {
 
 const logSeparatorConf =
   '---------------------------------------------------------------[Conf OK]--'
+// eslint-disable-next-line no-console
 console.log(utils.nowLocaleFormatted(), logSeparatorConf)
 addLogEntry('info', 'app', 'logSeparatorConf', logSeparatorConf).catch((err) =>
   utils.consoleErr('info', 'app', 'logSeparatorConf: ' + err)
