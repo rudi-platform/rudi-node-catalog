@@ -202,7 +202,7 @@ const syslogOuts = {
 exports.sysLogger = winston.createLogger({
   levels: winston.config.syslog.levels,
   level: 'info',
-  transports: [syslogOuts.syslog, syslogOuts.console, syslogOuts.file],
+  transports: [syslogOuts.syslog, syslogOuts.console],
 })
 
 // Fastify logger
