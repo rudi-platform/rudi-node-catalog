@@ -152,36 +152,41 @@ exports.contactListRudiToDbFormat = async (rudiContactList, shouldCreateIfNotFou
 exports.mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFound) => {
   const fun = 'mediaListRudiToDbFormat'
   log.d(mod, fun, ``)
-  // log.d(mod, fun, `rudiMediaList: ${beautify(rudiMediaList)}`)
-  if (rudiMediaList == null) throw new ParameterExpectedError(fun, 'rudiMediaList')
+  try {
+    // log.d(mod, fun, `rudiMediaList: ${beautify(rudiMediaList)}`)
+    if (rudiMediaList == null) throw new ParameterExpectedError(fun, 'rudiMediaList')
 
-  const mediaDbIds = []
-  await Promise.all(
-    rudiMediaList.map(async (rudiMedia) => {
-      // log.d(mod, fun, `rudiMedia: ${beautify(rudiMedia)}`)
+    const mediaDbIds = []
+    await Promise.all(
+      rudiMediaList.map(async (rudiMedia) => {
+        // log.d(mod, fun, `rudiMedia: ${beautify(rudiMedia)}`)
+        if (!rudiMedia) throw new BadRequestError(`Parameter 'rudiMedia' should not be null`)
+        let mediaDbId = await db.getMediaDbIdWithJson(rudiMedia)
 
-      let mediaDbId = await db.getMediaDbIdWithJson(rudiMedia)
+        if (!mediaDbId) {
+          if (!shouldCreateIfNotFound)
+            throw new ObjectNotFoundError(PARAM_OBJECT_MEDIA, rudiMedia[API_MEDIA_ID])
 
-      if (!mediaDbId) {
-        if (!shouldCreateIfNotFound)
-          throw new ObjectNotFoundError(PARAM_OBJECT_MEDIA, rudiMedia[API_MEDIA_ID])
+          // log.d(mod, fun, `rudiMedia[API_MEDIA_TYPE_PROPERTY]: ${beautify(rudiMedia[API_MEDIA_TYPE_PROPERTY])}`)
+          const media = new Media(rudiMedia)
+          // log.d(mod, fun, `new Media: ${beautify(media)}`)
 
-        // log.d(mod, fun, `rudiMedia[API_MEDIA_TYPE_PROPERTY]: ${beautify(rudiMedia[API_MEDIA_TYPE_PROPERTY])}`)
-        const media = new Media(rudiMedia)
-        // log.d(mod, fun, `new Media: ${beautify(media)}`)
+          // log.d(mod, fun, media)
+          const dbActionResult = await media.save()
+          log.d(mod, fun, `dbActionResult: ${beautify(dbActionResult)}`)
 
-        // log.d(mod, fun, media)
-        const dbActionResult = await media.save()
-        log.d(mod, fun, `dbActionResult: ${beautify(dbActionResult)}`)
-
-        mediaDbId = media[DB_ID]
-        // log.d(mod, fun, `newly created mediaDbId: ${beautify(mediaDbId)}`)
-      }
-      mediaDbIds.push(new mongoose.Types.ObjectId(mediaDbId))
-      // log.d(mod, fun, `${beautify(rudiMedia)} -> ${mediaDbId} `)
-    })
-  )
-  return mediaDbIds
+          mediaDbId = media[DB_ID]
+          // log.d(mod, fun, `newly created mediaDbId: ${beautify(mediaDbId)}`)
+        }
+        mediaDbIds.push(new mongoose.Types.ObjectId(mediaDbId))
+        // log.d(mod, fun, `${beautify(rudiMedia)} -> ${mediaDbId} `)
+      })
+    )
+    return mediaDbIds
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
 }
 
 function customMerger(value, srcValue, key) {
@@ -321,6 +326,10 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
     let contacts
     if (shouldBeStrict) {
       contacts = json.accessProperty(dbReadyMetadata, API_DATA_CONTACTS_PROPERTY)
+      if (!isNotEmptyArray(contacts))
+        throw new BadRequestError(
+          `${msg.missingObjectProperty(dbReadyMetadata, API_DATA_CONTACTS_PROPERTY)}`
+        )
     } else {
       contacts = dbReadyMetadata[API_DATA_CONTACTS_PROPERTY]
     }
@@ -331,12 +340,16 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
       )
     }
 
-    // ----- Updating contacts field with db instead of incoming data
+    // ----- Updating media field with db instead of incoming data
     // TODO[VALIDATE]: The contact info already in database is not updated with possible new data,
     //                 and only the contact RUDI id is really necessary in the request body
     let mediaList
     if (shouldBeStrict) {
       mediaList = json.accessProperty(dbReadyMetadata, API_MEDIA_PROPERTY)
+      if (!isNotEmptyArray(mediaList))
+        throw new BadRequestError(
+          `${msg.missingObjectProperty(dbReadyMetadata, API_MEDIA_PROPERTY)}`
+        )
     } else {
       mediaList = dbReadyMetadata[API_MEDIA_PROPERTY]
     }
@@ -492,6 +505,7 @@ exports.upsertMetadata = async (rudiMetadata) => {
       return await this.overwriteMetadata(rudiMetadata)
     }
   } catch (err) {
+    err.message = err.message + ` (metadata: ${rudiMetadata[API_METADATA_ID]})`
     log.w(mod, fun, err)
     throw err
   }
@@ -611,38 +625,46 @@ exports.sendToPortal = async (metadata) => {
 
 exports.initWithODR = async (req, reply) => {
   const fun = 'massInit'
-  log.v(mod, fun, `> ${URL_PREFIX_PUBLIC}/${PARAM_OBJECT_METADATA}/${PARAM_ACTION_INIT}`)
+  try {
+    log.v(mod, fun, `> ${URL_PREFIX_PUBLIC}/${PARAM_OBJECT_METADATA}/${PARAM_ACTION_INIT}`)
 
-  // await db.dropDB()
+    // await db.dropDB()
 
-  const initProd = require(`../data/datarennes_prod.json`)
-  const initCont = require(`../data/datarennes_cont.json`)
-  const initData = require(`../data/datarennes_meta.json`)
+    const initProd = require(`../data/datarennes_prod.json`)
+    const initCont = require(`../data/datarennes_cont.json`)
+    const initData = require(`../data/datarennes_meta.json`)
 
-  await licenceController.initLicences()
-  // Themes.init('reset')
-  // Keywords.init('reset')
+    await licenceController.initLicences()
+    // Themes.init('reset')
+    // Keywords.init('reset')
 
-  await Promise.all(
-    initProd.map(async (prod) => {
-      await organisationController.newOrganization(prod)
+    await Promise.all(
+      initProd.map(async (prod) => {
+        await organisationController.newOrganization(prod)
+      })
+    )
+
+    await Promise.all(
+      initCont.map(async (cont) => {
+        await contactController.newContact(cont)
+      })
+    )
+
+    Promise.all(
+      initData.map(async (metadata) => {
+        log.d(mod, fun, beautify(metadata))
+        await this.upsertMetadata(metadata)
+        return true
+      })
+    ).catch((err) => {
+      log.e(mod, fun, err)
+      log.sysError(err.message)
     })
-  )
-
-  await Promise.all(
-    initCont.map(async (cont) => {
-      await contactController.newContact(cont)
-    })
-  )
-
-  Promise.all(
-    initData.map(async (metadata) => {
-      log.d(mod, fun, beautify(metadata))
-      await this.upsertMetadata(metadata)
-      return true
-    })
-  )
-  return 'Initialization initiated'
+    return 'Initialization initiated'
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
 }
 
 // ------------------------------------------------------------------------------------------------

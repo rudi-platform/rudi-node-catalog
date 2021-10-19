@@ -9,8 +9,8 @@ const { pick } = require('lodash')
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
-const { logger } = require('../config/confLogs')
-const { displayStr, logWhere, beautify, displayIps, shorten, consoleErr } = require('./jsUtils')
+const { logger, sysLogger } = require('../config/confLogs')
+const { displayStr, logWhere, beautify, shorten, consoleErr } = require('./jsUtils')
 const { addLogEntry } = require('../db/dbQueries')
 const { API_METADATA_ID, API_DATA_NAME_PROPERTY } = require('../db/dbFields')
 
@@ -54,9 +54,6 @@ const Colors = {
 // ------------------------------------------------------------------------------------------------
 // Display functions
 // ------------------------------------------------------------------------------------------------
-exports.displaySyslog = (srcMod, srcFun, msg) => {
-  return `[ ${logWhere(srcMod, srcFun)} ] ${msg !== '' ? msg : '<-'}`
-}
 
 // function displayColor(fgColor, bgColor, msg) {
 //   console.log(fgColor, bgColor, msg, Colors.Reset)
@@ -128,6 +125,64 @@ exports.d = (srcMod, srcFun, msg) => {
 }
 
 // ------------------------------------------------------------------------------------------------
+// Syslog functions
+// ------------------------------------------------------------------------------------------------
+exports.displaySyslog = (srcMod, srcFun, msg) => {
+  return `[ ${logWhere(srcMod, srcFun)} ] ${msg !== '' ? msg : '<-'}`
+}
+
+// System-related "panic" conditions
+exports.sysEmerg = (msg, info) => {
+  if (info) sysLogger.emerg(msg, info)
+  else sysLogger.emerg(msg)
+}
+
+// Something bad happened, deal with it NOW!
+exports.sysAlert = (msg, info) => {
+  if (info) sysLogger.alert(msg, info)
+  else sysLogger.alert(msg)
+}
+
+// Something bad is about to happen, deal with it NOW!
+exports.sysCrit = (msg, info) => {
+  if (info) sysLogger.crit(msg, info)
+  else sysLogger.crit(msg)
+}
+
+// A failure in the system that needs attention.
+exports.sysError = (msg, info) => {
+  if (info) sysLogger.error(msg, info)
+  else sysLogger.error(msg)
+}
+
+// Something will happen if it is not dealt within a timeframe.
+exports.sysWarn = (msg, info) => {
+  if (info) sysLogger.warn(msg, info)
+  else sysLogger.warn(msg)
+}
+
+// Events that are unusual but not error conditions - might be summarized in an email to developers
+// or admins to spot potential problems - no immediate action required.
+exports.sysNotice = (msg, info) => {
+  if (info) sysLogger.notice(msg, info)
+  else sysLogger.notice(msg)
+}
+
+// Normal operational messages - may be harvested for reporting, measuring throughput, etc.
+// No action required.
+exports.sysInfo = (msg, info) => {
+  if (info) sysLogger.info(msg, info)
+  else sysLogger.info(msg)
+}
+
+// Normal operational messages - may be harvested for reporting, measuring throughput, etc.
+// No action required.
+exports.sysDebug = (msg, info) => {
+  if (info) sysLogger.debug(msg, info)
+  else sysLogger.debug(msg)
+}
+
+// ------------------------------------------------------------------------------------------------
 // Http
 // ------------------------------------------------------------------------------------------------
 
@@ -136,7 +191,9 @@ exports.logHttpAnswer = (loggedMod, loggedFun, httpAnswer) => {
     const resExtract = pick(httpAnswer.config, ['method', 'headers', 'url'])
     resExtract.url = shorten(resExtract.url, 70)
     resExtract.headers.Authorization = shorten(resExtract.headers.Authorization, 30)
-    this.d(loggedMod, loggedFun, `HTTP answer: ${beautify(resExtract)}`)
+    const redactedRes = `HTTP answer: ${beautify(resExtract)}`
+    this.d(loggedMod, loggedFun, redactedRes)
+    this.sysInfo(redactedRes)
   } catch (err) {
     this.w(mod, 'showHttpAnswer', err)
     throw err
@@ -154,23 +211,23 @@ exports.logMetadata = (metadata) => {
 // Request inspector
 // ------------------------------------------------------------------------------------------------
 
-exports.logRequest = (req) => {
-  const fun = 'apiCall'
-  this.i('http', fun, `${req.method} ${req.url} <- ${displayIps(req)}`)
-  // return
-  // this.d(mod, fun, `method: ${utils.beautify(req.method)}`)
-  // this.d(mod, fun, `url: ${utils.beautify(req.url)}`)
-  // this.d(mod, fun, `routerMethod: ${utils.beautify(req.routerMethod)}`)
-  // this.d(mod, fun, `routerPath: ${utils.beautify(req.routerPath)}`)
-  // this.d(mod, fun, `params: ${utils.beautify(req.params)}`)
-  // this.d(mod, fun, `body: ${utils.beautify(req.body)}`)
-  // this.d(mod, fun, `query: ${utils.beautify(req.query)}`)
-  // this.d(mod, fun, `headers: ${utils.beautify(req.headers)}`)
-  // this.d(mod, fun, `id: ${utils.beautify(req.id)}`)
-  // this.d(mod, fun, `ip: ${utils.beautify(req.ip)}`)
-  // this.d(mod, fun, `ips: ${utils.beautify(req.ips)}`)
-  // this.d(mod, fun, `hostname: ${utils.beautify(req.hostname)}`)
-  // this.d(mod, fun, `protocol: ${utils.beautify(req.protocol)}`)
-  // this.d(mod, fun, `raw: ${utils.beautify(req.req)}`)
-  // this.d(mod, fun, `socket: ${util.inspect(req.socket)}`)
-}
+// exports.logRequest = (req) => {
+//   const fun = 'apiCall'
+//   this.i('http', fun, `${req.method} ${req.url} <- ${displayIps(req)}`)
+// }
+// return
+// this.d(mod, fun, `method: ${utils.beautify(req.method)}`)
+// this.d(mod, fun, `url: ${utils.beautify(req.url)}`)
+// this.d(mod, fun, `routerMethod: ${utils.beautify(req.routerMethod)}`)
+// this.d(mod, fun, `routerPath: ${utils.beautify(req.routerPath)}`)
+// this.d(mod, fun, `params: ${utils.beautify(req.params)}`)
+// this.d(mod, fun, `body: ${utils.beautify(req.body)}`)
+// this.d(mod, fun, `query: ${utils.beautify(req.query)}`)
+// this.d(mod, fun, `headers: ${utils.beautify(req.headers)}`)
+// this.d(mod, fun, `id: ${utils.beautify(req.id)}`)
+// this.d(mod, fun, `ip: ${utils.beautify(req.ip)}`)
+// this.d(mod, fun, `ips: ${utils.beautify(req.ips)}`)
+// this.d(mod, fun, `hostname: ${utils.beautify(req.hostname)}`)
+// this.d(mod, fun, `protocol: ${utils.beautify(req.protocol)}`)
+// this.d(mod, fun, `raw: ${utils.beautify(req.req)}`)
+// this.d(mod, fun, `socket: ${util.inspect(req.socket)}`)

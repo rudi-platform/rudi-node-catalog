@@ -67,7 +67,10 @@ const {
   PARAM_THESAURUS_LANG,
 } = require('../config/confApi')
 
-const { SHOULD_CONTROL_PRIVATE_REQUESTS } = require('../config/confSystem')
+const {
+  SHOULD_CONTROL_PRIVATE_REQUESTS,
+  SHOULD_CONTROL_PUBLIC_REQUESTS,
+} = require('../config/confSystem')
 
 // ------------------------------------------------------------------------------------------------
 // Route names
@@ -126,76 +129,83 @@ const DEV_DROP_DB = 'dev_drop_db'
 
 async function onFreeRoute(req, reply) {
   const fun = 'onFreeRoute'
-  log.d(mod, fun, `${req.method} ${req.url} `)
   try {
+    log.d(mod, fun, `${req.method} ${req.url} `)
+    log.sysInfo(logApiCall(req))
     return
   } catch (err) {
     log.w(mod, fun, err)
+    log.sysCrit(logApiCall(req))
     throw err
   }
 }
 
 async function onPublicRoute(req, reply) {
   const fun = 'onPublicRoute'
-  log.d(mod, fun, `${req.method} ${req.url} `)
   try {
+    log.d(mod, fun, `${req.method} ${req.url} `)
+    if (!SHOULD_CONTROL_PUBLIC_REQUESTS) return true
+
     const subject = await portalController.checkPortalTokenInHeader(req, reply)
-    log.i(mod, fun, logApiCall(req, subject))
+
+    const apiCallMsg = logApiCall(req, subject)
+    log.i(mod, fun, apiCallMsg)
+    log.sysInfo(apiCallMsg)
+
     return
   } catch (err) {
     log.w(mod, fun, err)
+    log.sysCrit(logApiCall(req))
     throw err
   }
 }
 
 async function onPrivateRoute(req, reply) {
   const fun = 'onPrivateRoute'
-  log.d(mod, fun, `${req.method} ${req.url} `)
   try {
+    log.d(mod, fun, `${req.method} ${req.url} `)
     // log.w(mod, fun, `JWT are ${SHOULD_CONTROL_PRIVATE_REQUESTS ? '' : 'not '}controlled`)
     if (!SHOULD_CONTROL_PRIVATE_REQUESTS) return true
 
-    // TODO : ajouter X-Forwarded-For à l'IP !!
-
     const subject = await tokenController.checkRudiProdPermission(req, reply)
-    log.i(mod, fun, logApiCall(req, subject))
+
+    const apiCallMsg = logApiCall(req, subject)
+    log.i(mod, fun, apiCallMsg)
+    log.sysInfo(apiCallMsg)
     return
   } catch (err) {
     log.w(mod, fun, err)
+    log.sysCrit(logApiCall(req))
     throw err
   }
 }
 
 async function onDevRoute(req, reply) {
   const fun = 'onDevRoute'
-  log.d(mod, fun, `${req.method} ${req.url} `)
   try {
+    log.d(mod, fun, `${req.method} ${req.url} `)
     // log.w(mod, fun, `JWT are ${SHOULD_CONTROL_PRIVATE_REQUESTS ? '' : 'not '}controlled`)
     if (!SHOULD_CONTROL_PRIVATE_REQUESTS) return true
     // TODO : ajouter X-Forwarded-For à l'IP !!
 
     // log.d(mod, fun, `${req.ip}: ${req.method} ${req.url} ${req.context.config.routeName}`)
     const subject = await tokenController.checkRudiProdPermission(req, reply)
-    log.i(mod, fun, logApiCall(req, subject))
+    const apiCallMsg = logApiCall(req, subject)
+    log.i(mod, fun, apiCallMsg)
+    log.sysInfo(apiCallMsg)
     return
   } catch (err) {
     log.w(mod, fun, err)
+    log.sysCrit(logApiCall(req))
     throw err
   }
   // log.d(mod, fun, `${beautify(req)}`)
 }
+
+// ------------------------------------------------------------------------------------------------
+// Redirected routes
+// ------------------------------------------------------------------------------------------------
 exports.redirectRoutes = [
-  {
-    method: 'GET',
-    url: `/`,
-    preHandler: onPublicRoute,
-    config: { routeName: REDIRECT_GET_DATA },
-    handler: function (req, reply) {
-      log.d(mod, `redirect`, `${req.method} ${URL_PUB_METADATA}`)
-      return 'RUDI producer node'
-      //reply.redirect(URL_PUB_METADATA)
-    },
-  },
   {
     method: 'GET',
     url: `/api`,
@@ -336,6 +346,7 @@ exports.backOfficeRoutes = [
     preHandler: onPrivateRoute,
     handler: genericController.addSingleObject,
     config: { routeName: PRV_ADD_ONE },
+
     // schema: documentation.addMetadataSchema
   },
   // Edit 1

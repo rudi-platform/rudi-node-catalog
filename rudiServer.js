@@ -7,7 +7,7 @@ const mod = 'main'
 // ------------------------------------------------------------------------------------------------
 const utils = require('./utils/jsUtils')
 const sys = require('./config/confSystem')
-const logConf = require('./config/confLogs')
+require('./config/confLogs')
 const log = require('./utils/logging')
 
 const api = require('./config/confApi')
@@ -25,65 +25,7 @@ RegExp.prototype.toJSON = RegExp.prototype.toString
 // ------------------------------------------------------------------------------------------------
 // Require external modules
 const mongoose = require('mongoose')
-const { createRudiHttpError } = require('./utils/errors')
-
-// Require the fastify framework and instantiate it
-const fastify = require('fastify')({
-  logger: {
-    level: 'warn',
-    logger: logConf.initFFLogger(sys.APP_NAME),
-    // file: sys.OUT_LOG
-  },
-  ignoreTrailingSlash: true,
-})
-
-fastify.setErrorHandler((appError, request, reply) => {
-  const fun = 'finalErrorHandler'
-  log.d(mod, fun, ``)
-  try {
-    log.d(mod, fun, `2`)
-    let rudiHttpError
-    if (appError.isRudiHttpError) rudiHttpError = appError
-    else {
-      const code = appError.statusCode
-      const msg = appError.message
-      rudiHttpError = createRudiHttpError(code, msg)
-    }
-
-    reply.code(rudiHttpError.statusCode).send(rudiHttpError)
-  } catch (uncaughtErr) {
-    log.e(mod, fun, `Uncaught! ${uncaughtErr}`)
-  }
-  log.d(mod, fun, 'done')
-})
-
-fastify.decorate('notFound', (req, reply) => {
-  const fun = 'notFound'
-  // const ip = req.ip
-
-  const response = {
-    message: `Route ${req.method}:${req.url} not found`,
-    error: 'Not Found',
-    statusCode: 404,
-  }
-
-  log.w(mod, fun, `${response.message} <- ${utils.displayIps(req)}`)
-
-  // log.d(mod, fun, utils.beautify(req))
-  reply.code(404).send(response)
-})
-
-fastify.setNotFoundHandler(fastify.notFound)
-
-fastify.addHook('onRequest', (req, res, next) => {
-  log.logRequest(req)
-  next()
-})
-fastify.addHook('onError', (request, reply, error, done) => {
-  const fun = 'onError'
-  log.e(mod, fun, error)
-  done()
-})
+const fastify = require('./routes/fastify')
 // Import Swagger Options
 // const swagger = require('./config/swagger')
 
@@ -97,13 +39,6 @@ fastify.addHook('onError', (request, reply, error, done) => {
 // Setting flags to avoid deprecation warnings
 mongoose.set('useFindAndModify', false)
 
-// Connect to DB
-/*
-const user = "rudiuser"
-const pass = "rQgzqcMORG9Owkl0z"
-const dbUrl = "rudi.kzlag.mongodb.net"
-//const url = `mongodb+srv://${user}:${pass}@${dbUrl}/${dbName}?retryWrites=true&w=majority`
-*/
 const mongoConnectOptions = {
   useUnifiedTopology: true,
   useCreateIndex: true,
@@ -123,48 +58,18 @@ mongoose
   .connect(sys.DB_URL, mongoConnectOptions)
   .then(() => {
     log.i(mod, 'mongo', `MongoDB connected`)
-    log.i(
-      mod,
-      'app',
-      `API v${
-        api.VERSION
-      } | App version: '${sysController.getAppHash()}' | '${sysController.getEnvironment()}' env`
-    )
+    const startMsg =
+      `API v${api.VERSION} ` +
+      `| App version: '${sysController.getAppHash()}' ` +
+      `| '${sysController.getEnvironment()}' env`
+    log.i(mod, 'app', startMsg)
+    log.sysInfo(startMsg)
     const logSeparatorEnd = utils.separateLogs('Init OK')
     addLogEntry('info', 'app', 'logSeparatorEnd', logSeparatorEnd).catch((err) =>
       utils.consoleErr('info', 'app', 'logSeparatorEnd: ' + err)
     )
   })
   .catch((err) => log.e(mod, 'mongoConnection', err))
-
-// ------------------------------------------------------------------------------------------------
-// ROUTES
-// ------------------------------------------------------------------------------------------------
-
-// Import Routes
-const { publicRoutes, backOfficeRoutes, devRoutes, redirectRoutes } = require('./routes/routes')
-
-// Loop over each public route
-redirectRoutes.forEach((pubRoute, index) => {
-  fastify.route(pubRoute)
-  log.v(mod, 'routes', `Redirect route #${index} = ${pubRoute.method} ${pubRoute.url}`)
-})
-// Loop over each public route
-publicRoutes.forEach((pubRoute, index) => {
-  fastify.route(pubRoute)
-  log.i(mod, 'routes', `Public route #${index} = ${pubRoute.method} ${pubRoute.url}`)
-})
-
-// Loop over each backoffice route
-backOfficeRoutes.forEach((boRoute, index) => {
-  fastify.route(boRoute)
-  log.v(mod, 'routes', `Private route #${index} = ${boRoute.method} ${boRoute.url}`)
-})
-
-devRoutes.forEach((devRoute, index) => {
-  fastify.route(devRoute)
-  log.d(mod, 'routes', `Dev route #${index} = ${devRoute.method} ${devRoute.url}`)
-})
 
 // ------------------------------------------------------------------------------------------------
 // SERVER

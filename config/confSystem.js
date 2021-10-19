@@ -83,11 +83,14 @@ exports.LOG_EXP = this.getIniValue(LOG_SECTION, 'expires')
 // Syslog
 const SYSLOG_SECTION = 'syslog'
 
+exports.SYSLOG_NODE_NAME = this.getIniValue(SYSLOG_SECTION, 'syslog_node_name')
+exports.SYSLOG_PROTOCOL = this.getIniValue(SYSLOG_SECTION, 'syslog_protocol')
+exports.SYSLOG_FACILITY = this.getIniValue(SYSLOG_SECTION, 'syslog_facility')
 exports.SYSLOG_HOST = this.getIniValue(SYSLOG_SECTION, 'syslog_host')
-exports.SYSLOG_PORT = this.getIniValue(SYSLOG_SECTION, 'syslog_port')
-exports.SYSLOG_PATH = this.getIniValue(SYSLOG_SECTION, 'syslog_path')
-exports.SYSLOG_LEVEL = this.getIniValue(SYSLOG_SECTION, 'syslog_lvl')
-exports.SYSLOG_TYPE = this.getIniValue(SYSLOG_SECTION, 'syslog_type')
+exports.SYSLOG_PORT = this.getIniValue(SYSLOG_SECTION, 'syslog_port') // default: 514
+exports.SYSLOG_TYPE = this.getIniValue(SYSLOG_SECTION, 'syslog_type') // bsd | 5424
+exports.SYSLOG_PATH = this.getIniValue(SYSLOG_SECTION, 'syslog_path') // the path for sending syslog diagrams
+exports.SYSLOG_FILE = this.getIniValue(SYSLOG_SECTION, 'syslog_file') // redundancy to backup syslog, in case something is wrong with the 'path' solution
 
 // Security section
 const SECURITY_SECTION = 'security'
@@ -97,6 +100,10 @@ const PROFILES = fa.readIniFile(profilesConfFile)
 exports.SHOULD_CONTROL_PRIVATE_REQUESTS = this.getIniValue(
   SECURITY_SECTION,
   'should_control_private_requests'
+)
+exports.SHOULD_CONTROL_PUBLIC_REQUESTS = this.getIniValue(
+  SECURITY_SECTION,
+  'should_control_public_requests'
 )
 
 exports.getProfile = (subject) => {

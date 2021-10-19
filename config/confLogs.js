@@ -147,7 +147,7 @@ const logOutputs = {
   // new(winston.transports.Http)({host: 'localhost', port: 3000, path: '/logs'}),
 }
 
-// Loggers creation
+// Console/file logger creation
 exports.logger = winston.createLogger({
   level: sys.LOG_LVL,
   defaultMeta: {
@@ -157,37 +157,55 @@ exports.logger = winston.createLogger({
   transports: [logOutputs.console, logOutputs.datedFile, logOutputs.combined],
 })
 
-const syslogOptions = {
-  levels: winston.config.syslog.levels,
-  transports: [new winston.transports.Syslog()],
-  host: sys.SYSLOG_HOST,
-  port: sys.SYSLOG_PORT,
-  path: sys.SYSLOG_PATH,
-  level: sys.SYSLOG_LEVEL,
-  type: sys.SYSLOG_TYPE,
+// Syslog logger creation
+
+const formatConsoleSysLogs = winston.format.combine(
+  // winston.format.json(),
+  // winston.format.colorize(COLORIZE_ALL),
+  // winston.format.timestamp(FORMAT_TIMESTAMP),
+  winston.format.printf(
+    (err) =>
+      `${err.level} ${utils.toISOLocale()} ${err.message} ${
+        err.meta ? utils.beautify(err.meta) : ''
+      }`
+  )
+)
+
+const syslogOuts = {
+  syslog: new winston.transports.Syslog({
+    localhost: sys.SYSLOG_NODE_NAME,
+    facility: sys.SYSLOG_FACILITY,
+    protocol: sys.SYSLOG_PROTOCOL,
+    host: sys.SYSLOG_HOST,
+    port: sys.SYSLOG_PORT,
+    path: sys.SYSLOG_PATH,
+    type: sys.SYSLOG_TYPE,
+    app_name: sys.APP_NAME,
+    level: 'info',
+  }),
+  file: new winston.transports.File({
+    filename: sys.SYSLOG_FILE,
+    name: 'sys.log',
+    format: formatFileLogs,
+    zippedArchive: true,
+    maxsize: MAX_SIZE,
+    maxFiles: 5,
+    level: 'info',
+  }),
+  console: new winston.transports.Console({
+    levels: winston.config.syslog.levels,
+    name: 'consoleLogs',
+    format: formatConsoleSysLogs,
+  }),
 }
 
-winston.add(new winston.transports.Syslog(syslogOptions))
+exports.sysLogger = winston.createLogger({
+  levels: winston.config.syslog.levels,
+  level: 'info',
+  transports: [syslogOuts.syslog, syslogOuts.console, syslogOuts.file],
+})
 
-// exports.sysLogger = winston.createLogger(syslogOptions)
-
-// function extractErrorFromFastifyMsg(msg) {
-//   try {
-//     return msg.split('err: ')[1].split('\n')
-//   } catch (err) {
-//     return msg
-//   }
-// }
-// const FORMAT_PRINTFF = (info) =>
-//   `${info.timestamp} .${info.level}. [fastify] ${extractErrorFromFastifyMsg(info.message)}`
-
-// const formatConsoleFastifyLogs = winston.format.combine(
-//   winston.format.json(),
-//   winston.format.colorize(COLORIZE_ALL),
-//   winston.format.timestamp(FORMAT_TIMESTAMP),
-//   winston.format.printf(FORMAT_PRINTFF)
-// )
-
+// Fastify logger
 exports.initFFLogger = (appname) => {
   const fun = 'initFFLogger'
   // Here we use winston.containers IoC
@@ -211,16 +229,6 @@ exports.initFFLogger = (appname) => {
 
   // Here we use winston.containers IoC get accessor
   const logger = winston.loggers.get('default')
-  /* 
-  if (process.env.NODE_ENV !== 'production') {
-    logger.add(
-      new transports.Console({
-        format: formatConsoleFastifyLogs,
-
-        handleExceptions: true,
-      })
-    )
-  } */
 
   process.on('uncaughtException', function (err) {
     utils.consoleErr(mod, fun, `UncaughtException processing: ${err}`)

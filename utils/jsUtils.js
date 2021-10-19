@@ -34,7 +34,7 @@ exports.pad = (str, base, padSign) => {
   const fun = 'pad'
   // this.consoleLog(mod, fun, `base = ${base}, sign = '${padSign}'`)
   try {
-    if (padSign.length > 1) padSign = padSign[0]
+    padSign = padSign && padSign.length > 1 ? padSign[0] : ''
     const modulo = str.length % base
     // this.consoleLog(`modulo = ${modulo}`)
     let paddedStr = str
@@ -55,11 +55,41 @@ exports.shorten = (str, len) => {
   return str.substring(0, len) + '[...]'
 }
 
+exports.padA1 = (num) => {
+  var norm = Math.floor(Math.abs(num))
+  return (norm < 10 ? '0' : '') + norm
+}
+
 // ------------------------------------------------------------------------------------------------
 // Dates
 // ------------------------------------------------------------------------------------------------
 exports.nowISO = () => {
   return new Date().toISOString()
+}
+
+exports.toISOLocale = (date) => {
+  if (!date) date = new Date()
+
+  const isoTimezoneOffset = -date.getTimezoneOffset()
+  const dif = isoTimezoneOffset >= 0 ? '+' : '-'
+
+  return (
+    date.getFullYear() +
+    '-' +
+    this.padA1(date.getMonth() + 1) +
+    '-' +
+    this.padA1(date.getDate()) +
+    'T' +
+    this.padA1(date.getHours()) +
+    ':' +
+    this.padA1(date.getMinutes()) +
+    ':' +
+    this.padA1(date.getSeconds()) +
+    dif +
+    this.padA1(isoTimezoneOffset / 60) +
+    ':' +
+    this.padA1(isoTimezoneOffset % 60)
+  )
 }
 
 exports.nowEpochMs = () => {
@@ -76,6 +106,7 @@ exports.dateEpochSToIso = (utcSeconds) => {
     this.consoleErr(mod, fun, `input: ${utcSeconds} -> err: ${err}`)
   }
 }
+
 exports.dateEpochMsToIso = (utcMs) => {
   const fun = 'dateEpochMsToIso'
   try {
@@ -284,6 +315,9 @@ exports.displayIps = (req) => {
   return `${ip}${this.displayRedirections(headers)}`
 }
 exports.logApiCall = (req, subject) => {
+  if (!subject)
+    return `${req.method} ${req.url} (${req.context.config.routeName}) <- ${this.displayIps(req)}`
+
   return (
     `${req.method} ${req.url} (${req.context.config.routeName})` +
     ` <- ${subject} @ ${this.displayIps(req)}`

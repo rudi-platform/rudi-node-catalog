@@ -99,6 +99,7 @@ const {
   API_LANGUAGES_PROPERTY,
   API_COLLECTION_TAG,
   API_END_DATE_PROPERTY,
+  API_METADATA_ID,
 } = require('../../db/dbFields')
 const { NotFoundError, BadRequestError } = require('../../utils/errors')
 const { DEFAULT_LANG } = require('../../config/confApi')
@@ -579,7 +580,8 @@ async function checkThesaurus(metadata) {
       } else if (!(await Themes.isValid(dataTheme, shouldInit))) {
         throw new BadRequestError(
           `${msg.incorrectVal(API_THEME_PROPERTY, dataTheme)}. ` +
-            `Allowed: ${utils.beautify(Themes.get())}`
+            `Allowed: ${utils.beautify(Themes.get())} ` +
+            `(metadata ${this[API_METADATA_ID]}) `
         )
       }
     }
@@ -595,7 +597,10 @@ async function checkThesaurus(metadata) {
             if (resolve) return true
             else throw new BadRequestError(msg.incorrectVal(API_KEYWORDS_PROPERTY, keyword))
           })
-          .catch((err) => log.w(mod, fun, err))
+          .catch((err) => {
+            log.w(mod, fun, err)
+            throw err
+          })
       })
     )
 
@@ -608,7 +613,10 @@ async function checkThesaurus(metadata) {
         await Promise.all(
           languages.map((lang) => {
             if (!Languages.isValid(lang, shouldInit))
-              throw new BadRequestError(msg.incorrectVal(API_LANGUAGES_PROPERTY, lang))
+              throw new BadRequestError(
+                msg.incorrectVal(API_LANGUAGES_PROPERTY, lang) +
+                  ` (metadata ${this[API_METADATA_ID]})`
+              )
             return true
           })
         )
@@ -640,10 +648,10 @@ async function checkThesaurus(metadata) {
     log.d(mod, fun, `metadata: ${utils.beautify(metadata)}`)
     try {
       const media = metadata[API_MEDIA_PROPERTY]
-      if (!media) throw new BadRequestError(msg.missingField(API_MEDIA_PROPERTY))
+      if (!media) throw new BadRequestError(msg.missingField(API_MEDIA_PROPERTY)+` (metadata ${this[API_METADATA_ID]})`)
       if (media[API_MEDIA_TYPE_PROPERTY] === MediaTypes.File) {
         if (!utils.isNotEmptyObject(media[API_MEDIA_CHECKSUM_PROPERTY])) {
-          throw new BadRequestError(msg.missingObjectProperty(this, API_MEDIA_CHECKSUM_PROPERTY))
+          throw new BadRequestError(msg.missingObjectProperty(this, API_MEDIA_CHECKSUM_PROPERTY)+` (metadata ${this[API_METADATA_ID]})`)
         }
       } else {
         log.d(mod, fun, `media: ${utils.beautify(metadata[API_MEDIA_PROPERTY])}`)
@@ -660,7 +668,9 @@ function toDate(dateStr) {
   try {
     return new Date(dateStr)
   } catch (err) {
-    throw new BadRequestError(`This is not a date: '${dateStr}'`)
+    throw new BadRequestError(
+      `This is not a date: '${dateStr}' (metadata ${this[API_METADATA_ID]})`
+    )
   }
 }
 
@@ -768,6 +778,7 @@ MetadataSchema.pre('save', async function (next) {
 
     // await checkMedia(metadata)
   } catch (err) {
+    err.message = err.message + ` (metadata ${this[API_METADATA_ID]})`
     next(err)
   }
 

@@ -143,7 +143,7 @@ function cleanDate(inputDate) {
   try {
     const cleanDate = new Date(cleanValue)
     if (cleanDate == 'Invalid Date') throw new BadRequestError(`Invalid date: '${cleanValue}'`)
-    log.d(mod, fun, `cl eanDate: ${cleanDate.toISOString()}`)
+    log.d(mod, fun, `clean date: ${cleanDate.toISOString()}`)
     return cleanDate
   } catch (err) {
     log.w(mod, fun, err)
@@ -395,7 +395,20 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
   }
 }
 
+function getObjectParam(req) {
+  const fun = 'getObjectParam'
+  const objectType = json.accessReqParam(req, PARAM_OBJECT)
+  try {
+    checkIsUrlObject(objectType)
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw new NotFoundError(`Route '${req.method} ${req.url}' not found `)
+  }
+  return objectType
+}
+
 function checkIsUrlObject(objectType) {
+  db.getObjectModel
   if (URL_OBJECTS.indexOf(objectType) === -1)
     throw new NotFoundError(msg.objectTypeNotFound(objectType))
 }
@@ -404,7 +417,7 @@ async function newObject(objectType, objectData) {
   const fun = 'newObject'
 
   try {
-    checkIsUrlObject(objectType)
+    // checkIsUrlObject(objectType)
 
     switch (objectType) {
       case PARAM_OBJECT_METADATA:
@@ -429,7 +442,6 @@ async function newObject(objectType, objectData) {
 
 async function isObjectReferenced(objectType, rudiId) {
   const fun = 'isObjectReferenced'
-  checkIsUrlObject(objectType)
 
   switch (objectType) {
     case PARAM_OBJECT_ORGANIZATIONS:
@@ -473,8 +485,8 @@ exports.addSingleObject = async (req, reply) => {
   const fun = 'addSingleObject'
   log.v(mod, fun, `< POST ${URL_PV_OBJECT_GENERIC}`)
   try {
-    // retrieve url parameters: object type, object id
-    const objectType = json.accessReqParam(req, PARAM_OBJECT)
+    // retrieve url parameters: object type
+    const objectType = getObjectParam(req, PARAM_OBJECT)
 
     // get the rudiId field for this object type
     const idField = db.getObjectIdField(objectType)
@@ -509,7 +521,7 @@ exports.getSingleObject = async (req, reply) => {
   log.v(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`)
   try {
     // retrieve url parameters: object type, object id
-    const objectType = json.accessReqParam(req, PARAM_OBJECT)
+    const objectType = getObjectParam(req)
     const objectId = json.accessReqParam(req, PARAM_ID)
 
     // ensure the object exists
@@ -531,7 +543,8 @@ exports.getObjectList = async (req, reply) => {
   log.v(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}`)
   try {
     // retrieve url parameter: object type
-    const objectType = json.accessReqParam(req, PARAM_OBJECT)
+    const objectType = getObjectParam(req)
+
     return await this.getManyObjects(objectType, req, reply)
   } catch (err) {
     log.w(mod, fun, err)
@@ -649,7 +662,7 @@ exports.updateSingleObject = async (req, reply) => {
   log.v(mod, fun, `< PUT ${URL_PV_OBJECT_GENERIC}`)
   try {
     // retrieve url parameters: object type, object id
-    const objectType = json.accessReqParam(req, PARAM_OBJECT)
+    const objectType = getObjectParam(req)
     const idField = db.getObjectIdField(objectType)
 
     const updateData = req.body
@@ -680,7 +693,7 @@ exports.upsertSingleObject = async (req, reply) => {
   log.v(mod, fun, `< PUT ${URL_PV_OBJECT_GENERIC}`)
   try {
     // retrieve url parameters: object type, object id
-    const objectType = json.accessReqParam(req, PARAM_OBJECT)
+    const objectType = getObjectParam(req)
     const idField = db.getObjectIdField(objectType)
 
     const updateData = req.body
@@ -714,7 +727,7 @@ exports.deleteSingleObject = async (req, reply) => {
   log.v(mod, fun, `< DELETE ${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`)
   try {
     // retrieve url parameters: object type, object id
-    const objectType = json.accessReqParam(req, PARAM_OBJECT)
+    const objectType = getObjectParam(req)
     const objectRudiId = json.accessReqParam(req, PARAM_ID)
 
     // ensure the object exists
@@ -753,10 +766,10 @@ exports.deleteObjectList = async (req, reply) => {
   log.v(mod, fun, `< POST ${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_DELETION}`)
   try {
     // retrieve url parameters: object type, object id
-    const objectType = json.accessReqParam(req, PARAM_OBJECT)
+    const objectType = getObjectParam(req)
 
     // identify object model
-    const { Model, idField } = db.getObjectAccesses(objectType)
+    // const { Model, idField } = db.getObjectAccesses(objectType)
 
     // TODO: retrieve the metadata ids, DELETE on portal side with
     // deletePortalMetadata(id)
@@ -789,12 +802,11 @@ exports.deleteManyObjects = async (req, reply) => {
   const fun = 'deleteManyObjects'
   log.v(mod, fun, `< DELETE ${URL_PV_OBJECT_GENERIC}`)
   try {
-    const objectType = json.accessReqParam(req, PARAM_OBJECT)
-
+    const objectType = getObjectParam(req)
     let parsedParameters = await this.parseQueryParameters(objectType, req.url)
     log.d(mod, fun, `parsedParameters: ${beautify(parsedParameters)}`)
     const filter = parsedParameters[QUERY_FILTER]
-    const fields = parsedParameters[QUERY_FIELDS]
+    // const fields = parsedParameters[QUERY_FIELDS]
     const confirmation = parsedParameters[QUERY_CONFIRM] || false
 
     if (isEmptyObject(filter)) {
