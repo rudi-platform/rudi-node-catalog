@@ -172,26 +172,26 @@ const formatConsoleSysLogs = winston.format.combine(
 )
 
 const syslogOuts = {
-  syslog: new winston.transports.Syslog({
-    localhost: sys.SYSLOG_NODE_NAME,
-    facility: sys.SYSLOG_FACILITY,
-    protocol: sys.SYSLOG_PROTOCOL,
-    host: sys.SYSLOG_HOST,
-    port: sys.SYSLOG_PORT,
-    path: sys.SYSLOG_PATH,
-    type: sys.SYSLOG_TYPE,
-    app_name: sys.APP_NAME,
-    level: 'info',
-  }),
-  file: new winston.transports.File({
-    filename: sys.SYSLOG_FILE,
-    name: 'sys.log',
-    format: formatFileLogs,
-    zippedArchive: true,
-    maxsize: MAX_SIZE,
-    maxFiles: 5,
-    level: 'info',
-  }),
+  // syslog: new winston.transports.Syslog({
+  //   localhost: sys.SYSLOG_NODE_NAME,
+  //   facility: sys.SYSLOG_FACILITY,
+  //   protocol: sys.SYSLOG_PROTOCOL,
+  //   host: sys.SYSLOG_HOST,
+  //   port: sys.SYSLOG_PORT,
+  //   path: sys.SYSLOG_PATH,
+  //   type: sys.SYSLOG_TYPE,
+  //   app_name: sys.APP_NAME,
+  //   level: 'info',
+  // }),
+  // file: new winston.transports.File({
+  //   filename: sys.SYSLOG_FILE,
+  //   name: 'sys.log',
+  //   format: formatFileLogs,
+  //   zippedArchive: true,
+  //   maxsize: MAX_SIZE,
+  //   maxFiles: 5,
+  //   level: 'info',
+  // }),
   console: new winston.transports.Console({
     levels: winston.config.syslog.levels,
     name: 'consoleLogs',
