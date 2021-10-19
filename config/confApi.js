@@ -32,17 +32,6 @@ exports.PARAM_OBJECT_SKOS_SCHEME = 'skos_schemes'
 exports.PARAM_OBJECT_SKOS_CONCEPT = 'skos_concepts'
 exports.PARAM_OBJECT_LOGS = 'logs'
 
-exports.URL_OBJECTS = [
-  this.PARAM_OBJECT_METADATA,
-  this.PARAM_OBJECT_ORGANIZATIONS,
-  this.PARAM_OBJECT_CONTACTS,
-  this.PARAM_OBJECT_MEDIA,
-  this.PARAM_OBJECT_SKOS_CONCEPT,
-  this.PARAM_OBJECT_SKOS_SCHEME,
-  this.PARAM_ACTION_REPORT,
-  this.PARAM_OBJECT_LOGS,
-]
-
 // --- "In query" parameters
 exports.QUERY_LIMIT = 'limit'
 exports.QUERY_OFFSET = 'offset'
@@ -81,6 +70,17 @@ exports.PARAM_ACTION_REPORT = 'report'
 // ------------------------------------------------------------------------------------------------
 // DB actions
 // ------------------------------------------------------------------------------------------------
+
+exports.URL_OBJECTS = [
+  this.PARAM_OBJECT_METADATA,
+  this.PARAM_OBJECT_ORGANIZATIONS,
+  this.PARAM_OBJECT_CONTACTS,
+  this.PARAM_OBJECT_MEDIA,
+  this.PARAM_OBJECT_SKOS_CONCEPT,
+  this.PARAM_OBJECT_SKOS_SCHEME,
+  this.PARAM_ACTION_REPORT,
+  this.PARAM_OBJECT_LOGS,
+]
 
 exports.URL_PREFIX_PRIVATE = '/api/admin'
 

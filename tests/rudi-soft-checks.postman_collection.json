@@ -1593,7 +1593,9 @@
 									"    pm.expect(pm.response.code).to.gte(400);",
 									"    const responseJson = pm.response.json();",
 									"    ////console.log(responseJson.message);",
-									"    pm.expect(responseJson.message).to.eql(\"La propriété 'geography.bounding_box' est requise lorsque la propriété parente 'geography' est renseignée\");",
+									"",
+									"    const msg = \"La propriété 'geography.bounding_box' est requise lorsque la propriété parente 'geography' est renseignée\"",
+									"    pm.expect(responseJson.message.substring(0, msg.length)).to.eql(msg);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1647,7 +1649,8 @@
 									"    pm.expect(pm.response.code).to.gte(400);",
 									"    const responseJson = pm.response.json();",
 									"    ////console.log(responseJson.message);",
-									"    pm.expect(responseJson.message).to.eql(\"La propriété 'temporal_spread.start_date' est requise lorsque la propriété parente 'temporal_spread' est renseignée\");",
+									"    const msg = \"La propriété 'temporal_spread.start_date' est requise lorsque la propriété parente 'temporal_spread' est renseignée\"",
+									"    pm.expect(responseJson.message.substring(0, msg.length)).to.eql(msg);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1699,7 +1702,9 @@
 									"    pm.expect(pm.response.code).to.gte(400);",
 									"    const responseJson = pm.response.json();",
 									"    //console.log(responseJson.message);",
-									"    pm.expect(responseJson.message).to.eql(\"Metadata validation failed: access_condition: Path `access_condition` is required.\");",
+									"    const msg = \"Metadata validation failed: access_condition: Path `access_condition` is required.\"",
+									"    pm.expect(responseJson.message.substring(0, msg.length)).to.eql(msg);",
+									"",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1751,7 +1756,9 @@
 									"    pm.expect(pm.response.code).to.gte(400);",
 									"    const responseJson = pm.response.json();",
 									"    ////console.log(responseJson.message);",
-									"    pm.expect(responseJson.message).to.eql(\"La propriété 'access_condition.licence' est requise lorsque la propriété parente 'access_condition' est renseignée\");",
+									"    const msg = \"La propriété 'access_condition.licence' est requise lorsque la propriété parente 'access_condition' est renseignée\"",
+									"    pm.expect(responseJson.message.substring(0, msg.length)).to.eql(msg);",
+									"",
 									"});"
 								],
 								"type": "text/javascript"

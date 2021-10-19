@@ -408,7 +408,8 @@ function getObjectParam(req) {
 }
 
 function checkIsUrlObject(objectType) {
-  db.getObjectModel
+  const fun = 'checkIsUrlObject'
+  log.d(mod, fun, beautify(URL_OBJECTS))
   if (URL_OBJECTS.indexOf(objectType) === -1)
     throw new NotFoundError(msg.objectTypeNotFound(objectType))
 }
