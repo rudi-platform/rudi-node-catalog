@@ -136,6 +136,7 @@ function createRudiHttpError(code, message) {
     }
   } catch (err) {
     log.w(mod, fun, err)
+    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }

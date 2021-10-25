@@ -63,9 +63,7 @@ exports.padA1 = (num) => {
 // ------------------------------------------------------------------------------------------------
 // Dates
 // ------------------------------------------------------------------------------------------------
-exports.nowISO = () => {
-  return new Date().toISOString()
-}
+exports.nowISO = () => new Date().toISOString()
 
 exports.toISOLocale = (date) => {
   if (!date) date = new Date()
@@ -92,12 +90,10 @@ exports.toISOLocale = (date) => {
   )
 }
 
-exports.nowEpochMs = () => {
-  return new Date().getTime()
-}
-exports.nowEpochS = () => {
-  return floor(this.nowEpochMs() / 1000)
-}
+exports.nowEpochMs = () => new Date().getTime()
+
+exports.nowEpochS = () => floor(this.nowEpochMs() / 1000)
+
 exports.dateEpochSToIso = (utcSeconds) => {
   const fun = 'dateEpochSToIso'
   try {
@@ -118,53 +114,34 @@ exports.dateEpochMsToIso = (utcMs) => {
 
 exports.LOG_DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss SSS'
 
-exports.nowLocaleFormatted = () => {
-  return datetime.format(new Date(), this.LOG_DATE_FORMAT)
-  // const [date, month, year] = new Date().toLocaleDateString('fr-FR').split('/')
-  // const [h, m, s] = new Date().toLocaleTimeString('fr-FR').split(/:| /)
-  // return `${year}/${month}/${date} ${h}:${m}:${s}`
-}
+exports.nowLocaleFormatted = () => datetime.format(new Date(), this.LOG_DATE_FORMAT)
+// const [date, month, year] = new Date().toLocaleDateString('fr-FR').split('/')
+// const [h, m, s] = new Date().toLocaleTimeString('fr-FR').split(/:| /)
+// return `${year}/${month}/${date} ${h}:${m}:${s}`
 
 // ------------------------------------------------------------------------------------------------
 // Arrays
 // ------------------------------------------------------------------------------------------------
-exports.isString = (str) => {
-  return typeof str === 'string'
-}
+exports.isString = (str) => typeof str === 'string'
 
 // ------------------------------------------------------------------------------------------------
 // Arrays
 // ------------------------------------------------------------------------------------------------
-exports.isArray = (anArray) => {
-  return Array.isArray(anArray)
-}
+exports.isArray = (anArray) => Array.isArray(anArray)
 
-exports.isNotEmptyArray = (anArray) => {
-  return Array.isArray(anArray) && anArray.length > 0
-}
+exports.isNotEmptyArray = (anArray) => Array.isArray(anArray) && anArray.length > 0
 
-exports.isEmptyArray = (anArray) => {
-  return Array.isArray(anArray) && anArray.length === 0
-}
+exports.isEmptyArray = (anArray) => Array.isArray(anArray) && anArray.length === 0
 
 // ------------------------------------------------------------------------------------------------
 // Objects
 // ------------------------------------------------------------------------------------------------
-exports.isObject = (obj) => {
-  return Object.keys(obj).length > 0
-}
+exports.isObject = (obj) => Object.keys(obj).length > 0
 
-exports.isEmptyObject = (obj) => {
-  // const fun = 'isEmptyObject'
-  // this.consoleLog(mod, fun, `isString: ${this.isString(obj)}`)
-  // this.consoleLog(mod, fun, `isArray: ${this.isArray(obj)}`)
-  // this.consoleLog(mod, fun, `keys(obj).length: ${Object.keys(obj).length === 0}`)
-  return !this.isString(obj) && !this.isArray(obj) && Object.keys(obj).length === 0
-}
+exports.isEmptyObject = (obj) =>
+  !this.isString(obj) && !this.isArray(obj) && Object.keys(obj).length === 0
 
-exports.isNotEmptyObject = (obj) => {
-  return obj && Object.keys(obj).length > 0
-}
+exports.isNotEmptyObject = (obj) => obj && Object.keys(obj).length > 0
 
 exports.NOT_FOUND = '!_not_found_!'
 exports.quietAccess = (obj, prop) => {
@@ -271,6 +248,24 @@ exports.beautify = (jsonObject, option) => {
  */
 exports.deepClone = (jsonObject) => {
   return JSON.parse(JSON.stringify(jsonObject))
+}
+
+// ------------------------------------------------------------------------------------------------
+// Errors
+// ------------------------------------------------------------------------------------------------
+exports.CONTEXT = 'app_context'
+exports.addErrorContext = (error, info) => {
+  if (!error[this.CONTEXT]) {
+    error[this.CONTEXT] = [info]
+    return
+  }
+  if (!this.isArray(error[this.CONTEXT])) {
+    const msg = `Reserved field '${this.CONTEXT}' should be an array`
+    this.consoleErr(msg)
+    throw new Error(msg)
+  }
+  error[this.CONTEXT].push(info)
+  return error
 }
 
 // ------------------------------------------------------------------------------------------------

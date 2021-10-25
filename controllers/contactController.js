@@ -10,7 +10,7 @@ const mod = 'contCtrl'
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
-const utils = require('../utils/jsUtils')
+const { beautify, addErrorContext } = require('../utils/jsUtils')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
@@ -27,26 +27,22 @@ const Contact = require('../definitions/models/Contact')
 // ------------------------------------------------------------------------------------------------
 exports.newContact = async (contactJson) => {
   const fun = 'newContact'
-  log.d(mod, fun, `${utils.beautify(contactJson)}`)
+  log.d(mod, fun, `${beautify(contactJson)}`)
   let dbContact
   try {
     dbContact = await new Contact(contactJson)
   } catch (err) {
-    log.w(
-      mod,
-      fun,
-      `New object '${URL_OBJECT_CONTACTS}': ${utils.beautify(contactJson)} | Error: ${err}`
-    )
+    const errMsg = `New object '${URL_OBJECT_CONTACTS}': ${beautify(contactJson)} | Error: ${err}`
+    log.w(mod, fun, errMsg)
+    addErrorContext(err, { mod: mod, fun: fun, err: errMsg })
     throw err
   }
   try {
     await dbContact.save()
   } catch (err) {
-    log.w(
-      mod,
-      fun,
-      `Saving object '${URL_OBJECT_CONTACTS}': ${utils.beautify(dbContact)} | Error: ${err}`
-    )
+    const errMsg = `Saving object '${URL_OBJECT_CONTACTS}': ${beautify(dbContact)} | Error: ${err}`
+    log.w(mod, fun, errMsg)
+    addErrorContext(err, { mod: mod, fun: fun, err: errMsg })
     throw err
   }
   return dbContact

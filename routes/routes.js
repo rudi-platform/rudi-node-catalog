@@ -195,7 +195,7 @@ async function onDevRoute(req, reply) {
     log.sysInfo(apiCallMsg)
     return
   } catch (err) {
-    log.w(mod, fun, err)
+    // log.w(mod, fun, err)
     log.sysCrit(logApiCall(req))
     throw err
   }

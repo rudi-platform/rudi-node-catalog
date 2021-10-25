@@ -14,15 +14,18 @@ const { map } = require('lodash')
 // ------------------------------------------------------------------------------------------------
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
+const { addErrorContext } = require('../utils/jsUtils')
 const log = require('../utils/logging')
+
+const { URL_PV_DB_ACCESS } = require('../config/confApi')
+const { DB_NAME } = require('../config/confSystem')
+
 const db = require('../db/dbQueries')
+const { NotFoundError, BadRequestError } = require('../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
-const { URL_PV_DB_ACCESS } = require('../config/confApi')
-const { DB_NAME } = require('../config/confSystem')
-const { NotFoundError, BadRequestError } = require('../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
 // Controllers
@@ -36,6 +39,7 @@ exports.getCollections = async (req, reply) => {
     return map(dbActionResult, 'name')
   } catch (err) {
     log.e(mod, fun, err)
+    addErrorContext(err, { mod: mod, fun: fun, err: err })
     if (err.name === 'MongoError') throw new BadRequestError(err)
     throw new NotFoundError(err)
   }
@@ -49,6 +53,7 @@ exports.dropDB = async (req, reply) => {
     return dbActionResult
   } catch (err) {
     log.e(mod, fun, err)
+    addErrorContext(err, { mod: mod, fun: fun, err: err })
     if (err.name === 'MongoError') throw new BadRequestError(err)
     throw new NotFoundError(err)
   }

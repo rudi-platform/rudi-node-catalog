@@ -10,7 +10,7 @@ const mod = 'orgCtrl'
 // External dependancies
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
-const utils = require('../utils/jsUtils')
+const { beautify, addErrorContext } = require('../utils/jsUtils')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
@@ -26,33 +26,27 @@ const Organization = require('../definitions/models/Organization')
 
 exports.newOrganization = async (orgJson) => {
   const fun = 'newOrganization'
-  log.d(mod, fun, `${utils.beautify(orgJson)}`)
+  log.d(mod, fun, `${beautify(orgJson)}`)
 
   let dbOrganization
 
   try {
     dbOrganization = await new Organization(orgJson)
   } catch (err) {
-    log.w(
-      mod,
-      fun,
-      `New object '${URL_OBJECT_ORGANIZATIONS}': ${utils.beautify(orgJson)} | Error: ${err}`
-    )
-    // log.e(mod, fun, err)
+    const errMsg = `New object '${URL_OBJECT_ORGANIZATIONS}': ${beautify(orgJson)} | Error: ${err}`
+    log.w(mod, fun, errMsg)
+    addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
   try {
     await dbOrganization.save()
     // cache.addOrganization(dbOrganization)
   } catch (err) {
-    log.w(
-      mod,
-      fun,
-      `Saving object '${URL_OBJECT_ORGANIZATIONS}': ${utils.beautify(
-        dbOrganization
-      )} | Error: ${err}`
-    )
-    // log.e(mod, fun, err)
+    const errMsg = `Saving object '${URL_OBJECT_ORGANIZATIONS}': ${beautify(
+      dbOrganization
+    )} | Error: ${err}`
+    log.w(mod, fun, errMsg)
+    addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
   return dbOrganization

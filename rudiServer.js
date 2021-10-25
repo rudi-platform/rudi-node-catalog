@@ -69,7 +69,11 @@ mongoose
       utils.consoleErr('info', 'app', 'logSeparatorEnd: ' + err)
     )
   })
-  .catch((err) => log.e(mod, 'mongoConnection', err))
+  .catch((err) => {
+    log.e(mod, 'mongoConnection', err)
+    utils.addErrorContext(err, { mod: mod, fun: 'mongoConnection', err: err })
+    log.sysAlert(`Mongo connection: ${err}`)
+  })
 
 // ------------------------------------------------------------------------------------------------
 // SERVER
@@ -85,6 +89,7 @@ const start = async () => {
   } catch (err) {
     // fastify.log.error(err)
     log.e(mod, 'exitServer', err)
+    log.sysAlert(`Server exited anormally: ${err}`)
     process.exit(1)
   }
 }
@@ -94,19 +99,26 @@ try {
     .then(() => {
       log.i(mod, 'server', 'Ready')
     })
-    .catch((err) => log.e(mod, 'server', `Crashed: ${err}`))
-} catch (uncaught) {
-  log.e(mod, 'server', `Uncaught error: ${uncaught}`)
+    .catch((err) => {
+      log.e(mod, 'server', `Crashed: ${err}`)
+      log.sysCrit(`Server crashed: ${err}`)
+    })
+} catch (err) {
+  log.e(mod, 'server', `Uncaught error: ${err}`)
+  log.sysCrit(`Uncaught error: ${err}`)
 }
 
 process.on('uncaughtException', (err) => {
-  log.e(mod, 'process', `Uncaught error: ${err}`)
+  log.e(mod, 'process', `Uncaught exception: ${err}`)
+  log.sysCrit(`Uncaught exception: ${err}`)
   // console.error('There was an uncaught error', err)
   // process.exit(1) //mandatory (as per the Node.js docs)
 })
 
-process.on('unhandledRejection', (error, promise) => {
+process.on('unhandledRejection', (err, promise) => {
   const fun = 'catching promise rejection'
   log.e(mod, fun, 'DAMN!!! Promise rejection not handled here: ' + utils.beautify(promise))
-  log.e(mod, fun, 'The error was: ' + error)
+  log.e(mod, fun, 'The error was: ' + err)
+  log.sysCrit(`Promise rejection not handled: ${utils.beautify(promise)})`)
+  log.sysCrit(`Promise rejection error: ${err}`)
 })

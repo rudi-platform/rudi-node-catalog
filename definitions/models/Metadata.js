@@ -599,6 +599,7 @@ async function checkThesaurus(metadata) {
           })
           .catch((err) => {
             log.w(mod, fun, err)
+            utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
             throw err
           })
       })
@@ -639,6 +640,7 @@ async function checkThesaurus(metadata) {
     }
   } catch (err) {
     log.w(mod, fun, err)
+    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }
@@ -658,8 +660,10 @@ async function checkThesaurus(metadata) {
         log.d(mod, fun, `type: ${media[API_MEDIA_TYPE_PROPERTY]}`)
       }
     } catch (err) {
-      log.w(mod, fun, err)
-      throw err
+          log.w(mod, fun, err)
+    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
+    throw err
+
     }
   }
 */
@@ -697,6 +701,7 @@ function checkDates(datesObj, firstDateProp, secondDateProp, shouldInitialize) {
     )
   } catch (err) {
     log.w(mod, fun, err)
+    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }

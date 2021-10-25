@@ -72,6 +72,7 @@ exports.DB_URL = `${DB_URL_PREFIX}${this.DB_NAME}`
 // Logs section
 const LOG_SECTION = 'logging'
 
+exports.SHOULD_FILELOG = this.getIniValue(LOG_SECTION, 'should_log_in_file')
 exports.APP_NAME = this.getIniValue(LOG_SECTION, 'app_name')
 exports.LOG_DIR = this.getIniValue(LOG_SECTION, 'log_dir')
 exports.LOG_FILE = this.getIniValue(LOG_SECTION, 'log_file')
@@ -83,6 +84,7 @@ exports.LOG_EXP = this.getIniValue(LOG_SECTION, 'expires')
 // Syslog
 const SYSLOG_SECTION = 'syslog'
 
+exports.SHOULD_SYSLOG = this.getIniValue(SYSLOG_SECTION, 'should_syslog')
 exports.SYSLOG_NODE_NAME = this.getIniValue(SYSLOG_SECTION, 'syslog_node_name')
 exports.SYSLOG_PROTOCOL = this.getIniValue(SYSLOG_SECTION, 'syslog_protocol')
 exports.SYSLOG_FACILITY = this.getIniValue(SYSLOG_SECTION, 'syslog_facility')

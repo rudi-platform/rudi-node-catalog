@@ -90,6 +90,7 @@ function dateArrayToDate(dateArray) {
     // log.d(mod, fun, `Date: ${date}`)
   } catch (err) {
     log.w(mod, fun, err)
+    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }
@@ -151,6 +152,7 @@ exports.addSingleReportForObject = async (req, reply) => {
     return dbReadyReport
   } catch (err) {
     log.e(mod, fun, err)
+    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }
@@ -259,6 +261,7 @@ exports.addOrEditSingleReport = async (objectType, req, reply) => {
     return dbReadyReport
   } catch (err) {
     log.w(mod, fun, err)
+    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }
@@ -304,6 +307,7 @@ exports.getReportList = async (objectType, req, reply) => {
     return dbReportList
   } catch (err) {
     log.w(mod, fun, err)
+    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }
@@ -355,6 +359,7 @@ exports.getSingleReport = async (objectType, req, reply) => {
     return dbReport
   } catch (err) {
     log.w(mod, fun, err)
+    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }
@@ -378,6 +383,7 @@ exports.deleteSingleReportForObject = async (req, reply) => {
     return `Function '${fun}' still needs to be implemented in module ${mod}`
   } catch (err) {
     log.e(mod, fun, err)
+    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }
@@ -395,18 +401,16 @@ exports.deleteEveryReportForObject = async (req, reply) => {
     return `Function '${fun}' still needs to be implemented in module ${mod}`
   } catch (err) {
     log.e(mod, fun, err)
-    throw err
+    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
+    err
   }
 }
 
 // Get every reports for one object integration
 exports.deleteManyReportForObject = async (req, reply) => {
   const fun = 'deleteManyReportForObject'
-  log.d(
-    mod,
-    fun,
-    `< POST ${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}/${PARAM_ACTION_DELETION}`
-  )
+  const errMsg = `< POST ${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}/${PARAM_ACTION_DELETION}`
+  log.d(mod, fun, errMsg)
   try {
     // retrieve url parameters: object id
 
@@ -416,6 +420,7 @@ exports.deleteManyReportForObject = async (req, reply) => {
     return `Function '${fun}' still needs to be implemented in module ${mod}`
   } catch (err) {
     log.e(mod, fun, err)
+    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }
@@ -429,6 +434,7 @@ exports.getReportListForObjectType = async (req, reply) => {
     return `Function '${fun}' still needs to be implemented in module ${mod}`
   } catch (err) {
     log.e(mod, fun, err)
+    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }

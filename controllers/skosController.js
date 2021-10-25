@@ -115,6 +115,7 @@ exports.newSkosScheme = async (rudiScheme) => {
     }
   } catch (err) {
     log.e(mod, fun, err)
+    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 
@@ -515,6 +516,7 @@ exports.getEveryThesaurus = async (req, reply) => {
     return listThesauri
   } catch (err) {
     log.e(mod, fun, err)
+    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }
@@ -535,6 +537,7 @@ exports.getSingleThesaurus = async (req, reply) => {
     return thesaurus
   } catch (err) {
     log.e(mod, fun, err)
+    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }
@@ -560,6 +563,7 @@ exports.getSingleThesaurusLabels = async (req, reply) => {
     return thesaurus
   } catch (err) {
     log.e(mod, fun, err)
+    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }

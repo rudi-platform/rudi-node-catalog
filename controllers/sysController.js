@@ -48,6 +48,7 @@ exports.getGitHash = () => {
     return `${hashId}`.trim()
   } catch (err) {
     log.e(mod, fun, err)
+    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }
@@ -60,6 +61,7 @@ exports.getAppHash = () => {
     return CURRENT_APP_HASH
   } catch (err) {
     log.e(mod, fun, err)
+    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }
@@ -77,6 +79,7 @@ exports.getEnvironment = () => {
     return env
   } catch (err) {
     log.e(mod, fun, err)
+    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }
@@ -114,6 +117,7 @@ exports.getNodeVersion = async () => {
     return nVersions
   } catch (err) {
     log.e(mod, fun, err)
+    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }
@@ -127,6 +131,7 @@ async function getMongDbVersion() {
     return mongoInfo.version
   } catch (err) {
     log.w(mod, fun, err)
+    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }

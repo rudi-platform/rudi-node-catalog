@@ -91,6 +91,7 @@ exports.getWithOpts = async (options, authorizationToken) => {
     return answer.data
   } catch (err) {
     log.w(mod, fun, err)
+    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
   // log.d(mod, fun, `destUrl: ${destUrl}`)
@@ -132,6 +133,7 @@ exports.httpPost = async (destUrl, dataToSend, authorizationToken) => {
     return answer.data
   } catch (err) {
     log.w(mod, fun, err)
+    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
   /*

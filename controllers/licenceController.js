@@ -11,7 +11,7 @@ const uuid = require('uuid')
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
-const utils = require('../utils/jsUtils')
+const { isEmptyArray, addErrorContext } = require('../utils/jsUtils')
 const db = require('../db/dbQueries')
 const skosController = require('./skosController')
 
@@ -44,7 +44,7 @@ exports.getLicences = async () => {
   if (!LICENCE_LIST) {
     log.d(mod, fun, `Init LICENCE_LIST`)
     let dblicenceList = await db.getAllConceptsWithRole(this.LicenceConceptRole)
-    if (utils.isEmptyArray(dblicenceList)) {
+    if (isEmptyArray(dblicenceList)) {
       await this.initializeLicences()
       dblicenceList = await db.getAllConceptsWithRole(this.LicenceConceptRole)
     }
@@ -76,6 +76,7 @@ exports.initializeLicences = async () => {
     return await this.getLicenceCodes()
   } catch (err) {
     log.w(mod, fun, err)
+    addErrorContext(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }

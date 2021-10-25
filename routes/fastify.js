@@ -73,7 +73,7 @@ fastify.addHook('onRequest', (req, res, next) => {
 fastify.addHook('onError', (request, reply, error, done) => {
   const fun = 'onError'
   try {
-    log.e(mod, fun, error)
+    log.e(mod, fun, utils.beautify(error))
     if (error.isRudiHttpError) {
       log.sysError(`Error ${error.statusCode}: ${error.message} <- ${utils.displayIps(request)}`)
     } else {
@@ -85,8 +85,8 @@ fastify.addHook('onError', (request, reply, error, done) => {
   done()
 })
 
-fastify.addHook('onSend', function (_request, reply, payload, next) {
-  const fun = 'onSend'
+fastify.addHook('onSend', (_request, reply, payload, next) => {
+  // const fun = 'onSend'
   // log.d(mod, fun, utils.beautify(payload))
   next()
 })

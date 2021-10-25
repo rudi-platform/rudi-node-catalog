@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 'use strict'
 
 const mod = 'logger'
@@ -11,14 +10,6 @@ const { existsSync, mkdirSync } = require('fs')
 const winston = require('winston')
 require('winston-daily-rotate-file')
 require('winston-syslog').Syslog
-
-// const { transports } = winston
-// const {
-//   combine,
-//   timestamp,
-//   label,
-//   printf
-// } = format
 
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
@@ -44,8 +35,8 @@ try {
     utils.consoleLog(mod, '', 'Log directory exists.')
   }
 } catch (err) {
-  console.error(utils.nowLocaleFormatted(), `[${mod}]`, 'Log directory creation failed:')
-  console.error(utils.nowLocaleFormatted(), `[${mod}]`, err)
+  utils.consoleErr(utils.nowLocaleFormatted(), `[${mod}]`, 'Log directory creation failed:')
+  utils.consoleErr(utils.nowLocaleFormatted(), `[${mod}]`, err)
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -110,19 +101,18 @@ const logOutputs = {
     maxSize: '75m',
     maxFiles: '7d',
     extension: '.log',
-    zippedArchive: true,
     format: formatFileLogs,
   }),
-  // - Write all logs with level `debug`
-  combined: new winston.transports.File({
-    name: 'combinedlogs',
-    filename: sys.OUT_LOG,
-    level: sys.LOG_LVL,
-    maxsize: MAX_SIZE,
-    maxFiles: 5,
-    zippedArchive: true,
-    format: formatFileLogs,
-  }),
+  // // - Write all logs with level `debug`
+  // combined: new winston.transports.File({
+  //   name: 'combinedlogs',
+  //   filename: sys.OUT_LOG,
+  //   level: sys.LOG_LVL,
+  //   maxsize: MAX_SIZE,
+  //   maxFiles: 5,
+  //   zippedArchive: true,
+  //   format: formatFileLogs,
+  // }),
   /* 
   // - Write all logs with level `error` and below to `error.log`
   error: new winston.transports.File({
@@ -140,7 +130,6 @@ const logOutputs = {
     level: 'error',
     maxsize: MAX_SIZE,
     maxFiles: 2,
-    zippedArchive: true,
     format: formatFileLogs,
   }),
   // - Write to the web
@@ -154,7 +143,8 @@ exports.logger = winston.createLogger({
     service: 'user-service',
   },
 
-  transports: [logOutputs.console, logOutputs.datedFile, logOutputs.combined],
+  transports: [logOutputs.console, logOutputs.datedFile],
+  // transports: [logOutputs.console, logOutputs.datedFile, logOutputs.combined],
 })
 
 // Syslog logger creation
@@ -201,16 +191,17 @@ const syslogOuts = {
 
 exports.sysLogger = winston.createLogger({
   levels: winston.config.syslog.levels,
-  level: 'info',
+  level: 'debug',
   transports: [syslogOuts.console],
   // transports: [syslogOuts.syslog, syslogOuts.console, syslogOuts.file],
 })
 
 // Fastify logger
-exports.initFFLogger = (appname) => {
+const FF_LOGGER = 'ffLogger'
+exports.initFFLogger = (appName) => {
   const fun = 'initFFLogger'
   // Here we use winston.containers IoC
-  winston.loggers.add('default', {
+  winston.loggers.add(FF_LOGGER, {
     level: 'warn',
     // Adding ISO levels of logging from PINO
     levels: Object.assign(
@@ -223,23 +214,20 @@ exports.initFFLogger = (appname) => {
     ),
     // format: format.combine(format.splat(), format.json()),
     defaultMeta: {
-      service: appname + '_' + (process.env.NODE_ENV || 'development'),
+      service: appName + '_' + (process.env.NODE_ENV || 'development'),
     },
     transports: [logOutputs.ffError],
   })
 
   // Here we use winston.containers IoC get accessor
-  const logger = winston.loggers.get('default')
+  const ffLogger = winston.loggers.get(FF_LOGGER)
 
-  process.on('uncaughtException', function (err) {
+  process.on('uncaughtException', (err) => {
     utils.consoleErr(mod, fun, `UncaughtException processing: ${err}`)
-    console.error('UncaughtException processing: %s', err)
   })
 
   // PINO like, we link winston.containers to use only one instance of logger
-  logger.child = function () {
-    return winston.loggers.get('default')
-  }
+  ffLogger.child = () => winston.loggers.get(FF_LOGGER)
 
-  return logger
+  return ffLogger
 }
