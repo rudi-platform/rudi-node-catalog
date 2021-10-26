@@ -10,7 +10,7 @@ const mod = 'orgCtrl'
 // External dependancies
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
-const { beautify, addErrorContext } = require('../utils/jsUtils')
+const { beautify, treatAndSendError } = require('../utils/jsUtils')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
@@ -35,7 +35,7 @@ exports.newOrganization = async (orgJson) => {
   } catch (err) {
     const errMsg = `New object '${URL_OBJECT_ORGANIZATIONS}': ${beautify(orgJson)} | Error: ${err}`
     log.w(mod, fun, errMsg)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
+    treatAndSendError(err, { mod: mod, fun: fun, err: err })
     throw err
   }
   try {
@@ -46,7 +46,7 @@ exports.newOrganization = async (orgJson) => {
       dbOrganization
     )} | Error: ${err}`
     log.w(mod, fun, errMsg)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
+    treatAndSendError(err, { mod: mod, fun: fun, err: err })
     throw err
   }
   return dbOrganization

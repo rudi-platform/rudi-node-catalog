@@ -119,7 +119,7 @@ module.exports = class Thesaurus {
       }
     } catch (err) {
       log.w(mod, fun, err)
-      utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
+      utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
       throw err
     }
   }
@@ -141,7 +141,7 @@ module.exports = class Thesaurus {
       return isIn
     } catch (err) {
       log.w(mod, fun, err)
-      utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
+      utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
       throw err
     }
   }
@@ -168,7 +168,7 @@ module.exports = class Thesaurus {
       await this.#storeEnum(this.#code, this.#currentValues)
     } catch (err) {
       log.w(mod, fun, err)
-      utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
+      utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
       throw err
     }
   }
@@ -213,7 +213,7 @@ module.exports = class Thesaurus {
       )
     } catch (err) {
       log.w(mod, fun, err)
-      utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
+      utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
       throw err
     }
   }

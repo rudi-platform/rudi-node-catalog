@@ -71,7 +71,7 @@ mongoose
   })
   .catch((err) => {
     log.e(mod, 'mongoConnection', err)
-    utils.addErrorContext(err, { mod: mod, fun: 'mongoConnection', err: err })
+    utils.treatAndSendError(err, { mod: mod, fun: 'mongoConnection', err: err })
     log.sysAlert(`Mongo connection: ${err}`)
   })
 

@@ -10,7 +10,7 @@ const mod = 'contCtrl'
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
-const { beautify, addErrorContext } = require('../utils/jsUtils')
+const { beautify, treatAndSendError } = require('../utils/jsUtils')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
@@ -34,7 +34,7 @@ exports.newContact = async (contactJson) => {
   } catch (err) {
     const errMsg = `New object '${URL_OBJECT_CONTACTS}': ${beautify(contactJson)} | Error: ${err}`
     log.w(mod, fun, errMsg)
-    addErrorContext(err, { mod: mod, fun: fun, err: errMsg })
+    treatAndSendError(err, { mod: mod, fun: fun, err: errMsg })
     throw err
   }
   try {
@@ -42,7 +42,7 @@ exports.newContact = async (contactJson) => {
   } catch (err) {
     const errMsg = `Saving object '${URL_OBJECT_CONTACTS}': ${beautify(dbContact)} | Error: ${err}`
     log.w(mod, fun, errMsg)
-    addErrorContext(err, { mod: mod, fun: fun, err: errMsg })
+    treatAndSendError(err, { mod: mod, fun: fun, err: errMsg })
     throw err
   }
   return dbContact

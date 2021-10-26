@@ -48,9 +48,7 @@ exports.set = (newValue) => {
     newValue = `${newValue}`.trim()
     if (Thesaurus.indexOf(newValue) === -1) Thesaurus.push(newValue)
   } catch (err) {
-    log.w(mod, fun, err)
-    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
   }
 }
 

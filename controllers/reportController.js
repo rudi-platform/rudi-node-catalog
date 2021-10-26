@@ -89,9 +89,7 @@ function dateArrayToDate(dateArray) {
       `${pad(dateArray[3])}:${pad(dateArray[4])}:${pad(dateArray[5])}.${dateArray[6]}Z`
     // log.d(mod, fun, `Date: ${date}`)
   } catch (err) {
-    log.w(mod, fun, err)
-    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
   }
 }
 function pad(number, nbZeros) {
@@ -152,7 +150,7 @@ exports.addSingleReportForObject = async (req, reply) => {
     return dbReadyReport
   } catch (err) {
     log.e(mod, fun, err)
-    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
+    utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }
@@ -260,9 +258,7 @@ exports.addOrEditSingleReport = async (objectType, req, reply) => {
 
     return dbReadyReport
   } catch (err) {
-    log.w(mod, fun, err)
-    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
   }
 }
 
@@ -306,9 +302,7 @@ exports.getReportList = async (objectType, req, reply) => {
 
     return dbReportList
   } catch (err) {
-    log.w(mod, fun, err)
-    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
   }
 }
 
@@ -358,9 +352,7 @@ exports.getSingleReport = async (objectType, req, reply) => {
 
     return dbReport
   } catch (err) {
-    log.w(mod, fun, err)
-    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
   }
 }
 
@@ -383,7 +375,7 @@ exports.deleteSingleReportForObject = async (req, reply) => {
     return `Function '${fun}' still needs to be implemented in module ${mod}`
   } catch (err) {
     log.e(mod, fun, err)
-    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
+    utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }
@@ -401,7 +393,7 @@ exports.deleteEveryReportForObject = async (req, reply) => {
     return `Function '${fun}' still needs to be implemented in module ${mod}`
   } catch (err) {
     log.e(mod, fun, err)
-    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
+    utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
     err
   }
 }
@@ -420,7 +412,7 @@ exports.deleteManyReportForObject = async (req, reply) => {
     return `Function '${fun}' still needs to be implemented in module ${mod}`
   } catch (err) {
     log.e(mod, fun, err)
-    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
+    utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }
@@ -434,7 +426,7 @@ exports.getReportListForObjectType = async (req, reply) => {
     return `Function '${fun}' still needs to be implemented in module ${mod}`
   } catch (err) {
     log.e(mod, fun, err)
-    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
+    utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }

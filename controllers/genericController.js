@@ -29,7 +29,7 @@ const {
   nowISO,
   isNotEmptyArray,
   isEmptyObject,
-  addErrorContext,
+  treatAndSendError,
 } = require('../utils/jsUtils')
 
 // ------------------------------------------------------------------------------------------------
@@ -152,9 +152,7 @@ function cleanDate(inputDate) {
     log.d(mod, fun, `clean date: ${cleanDate.toISOString()}`)
     return cleanDate
   } catch (err) {
-    log.w(mod, fun, err)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatAndSendError(err, { mod: mod, fun: fun, err: err })
   }
 }
 
@@ -376,7 +374,7 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
           } catch (err) {
             log.w(mod, fun, err)
             // returnedFilter[QUERY_FILTER][extObj] = 0
-            addErrorContext(err, { mod: mod, fun: fun, err: err })
+            treatAndSendError(err, { mod: mod, fun: fun, err: err })
             throw err
           }
           // log.d(mod, fun, `nestedFieldIds: ${beautify(nestedFieldIds)}`)
@@ -398,9 +396,7 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
     // log.d(mod, fun, `filter: ${beautify(returnedFilter[QUERY_FILTER])}`)
     return returnedFilter
   } catch (err) {
-    log.w(mod, fun, err)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatAndSendError(err, { mod: mod, fun: fun, err: err })
   }
 }
 
@@ -411,7 +407,7 @@ function getObjectParam(req) {
     checkIsUrlObject(objectType)
   } catch (err) {
     log.w(mod, fun, err)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
+    treatAndSendError(err, { mod: mod, fun: fun, err: err })
     throw new NotFoundError(`Route '${req.method} ${req.url}' not found `)
   }
   return objectType
@@ -446,9 +442,7 @@ async function newObject(objectType, objectData) {
         throw new NotFoundError(msg.objectTypeNotFound(objectType))
     }
   } catch (err) {
-    log.w(mod, fun, err)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatAndSendError(err, { mod: mod, fun: fun, err: err })
   }
 }
 
@@ -480,9 +474,7 @@ exports.setPublishedFlag = async (dbObject, rudiId) => {
       log.w(mod, fun, `Data was already published for id '${rudiId}'`)
     }
   } catch (err) {
-    log.w(mod, fun, err)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatAndSendError(err, { mod: mod, fun: fun, err: err })
   }
 }
 
@@ -520,9 +512,7 @@ exports.addSingleObject = async (req, reply) => {
     log.i(mod, fun, `${msg.objectAdded(objectType, rudiId)}`)
     return createdObject
   } catch (err) {
-    log.w(mod, fun, err)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatAndSendError(err, { mod: mod, fun: fun, err: err })
   }
 }
 
@@ -543,9 +533,7 @@ exports.getSingleObject = async (req, reply) => {
     // return the object
     return dbObject
   } catch (err) {
-    log.w(mod, fun, err)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatAndSendError(err, { mod: mod, fun: fun, err: err })
   }
 }
 
@@ -562,9 +550,7 @@ exports.getObjectList = async (req, reply) => {
 
     return await this.getManyObjects(objectType, req, reply)
   } catch (err) {
-    log.w(mod, fun, err)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatAndSendError(err, { mod: mod, fun: fun, err: err })
   }
 }
 
@@ -629,9 +615,7 @@ exports.getManyObjects = async (objectType, req) => {
 
     return objectList
   } catch (err) {
-    log.w(mod, fun, err)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatAndSendError(err, { mod: mod, fun: fun, err: err })
   }
 }
 
@@ -665,7 +649,7 @@ exports.getMetadataListAndCount = async (req, reply) => {
     return objectList
   } catch (err) {
     log.e(mod, fun, err)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
+    treatAndSendError(err, { mod: mod, fun: fun, err: err })
     if (err.name === 'MongoError') throw new BadRequestError(err)
     throw new NotFoundError(err)
   }
@@ -698,7 +682,7 @@ exports.updateSingleObject = async (req, reply) => {
     }
   } catch (err) {
     log.e(mod, fun, err)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
+    treatAndSendError(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }
@@ -733,7 +717,7 @@ exports.upsertSingleObject = async (req, reply) => {
     }
   } catch (err) {
     log.e(mod, fun, err)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
+    treatAndSendError(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }
@@ -773,7 +757,7 @@ exports.deleteSingleObject = async (req, reply) => {
     return answer
   } catch (err) {
     log.e(mod, fun, err)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
+    treatAndSendError(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }
@@ -811,7 +795,7 @@ exports.deleteObjectList = async (req, reply) => {
     log.e(mod, fun, `url: ${beautify(req.url)}`)
     log.e(mod, fun, `params: ${beautify(req.params)}`)
     log.e(mod, fun, `body: ${beautify(req.body)}`)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
+    treatAndSendError(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }
@@ -845,7 +829,7 @@ exports.deleteManyObjects = async (req, reply) => {
     return await db.deleteManyWithFilter(objectType, filter)
   } catch (err) {
     log.e(mod, fun, err)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
+    treatAndSendError(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }
@@ -870,7 +854,7 @@ exports.generateUUID = async (req, reply) => {
     return UUIDv4()
   } catch (err) {
     log.e(mod, fun, err)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
+    treatAndSendError(err, { mod: mod, fun: fun, err: err })
     throw err
   }
 }

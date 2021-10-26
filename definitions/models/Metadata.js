@@ -599,7 +599,7 @@ async function checkThesaurus(metadata) {
           })
           .catch((err) => {
             log.w(mod, fun, err)
-            utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
+            utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
             throw err
           })
       })
@@ -639,9 +639,7 @@ async function checkThesaurus(metadata) {
       throw new BadRequestError(msg.incorrectVal('storage_status', metadata.storage_status))
     }
   } catch (err) {
-    log.w(mod, fun, err)
-    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
   }
 }
 /* 
@@ -660,9 +658,7 @@ async function checkThesaurus(metadata) {
         log.d(mod, fun, `type: ${media[API_MEDIA_TYPE_PROPERTY]}`)
       }
     } catch (err) {
-          log.w(mod, fun, err)
-    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
-    throw err
+          throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
 
     }
   }
@@ -700,9 +696,7 @@ function checkDates(datesObj, firstDateProp, secondDateProp, shouldInitialize) {
         `to '${firstDateProp}' = '${date1.toISOString()}' `
     )
   } catch (err) {
-    log.w(mod, fun, err)
-    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
   }
 }
 

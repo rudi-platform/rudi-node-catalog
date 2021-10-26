@@ -19,7 +19,7 @@ const {
   nowEpochS,
   nowISO,
   dateEpochSToIso,
-  addErrorContext,
+  treatAndSendError,
 } = require('../utils/jsUtils')
 const { getProfile } = require('../config/confSystem')
 const { accessProperty } = require('../utils/jsonAccess')
@@ -84,9 +84,7 @@ exports.getJwtAlgo = (algo) => {
         throw new Error(`Algo not recognized: '${algo}'`)
     }
   } catch (err) {
-    log.w(mod, fun, err)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatAndSendError(err, { mod: mod, fun: fun, err: err })
   }
 }
 
@@ -115,9 +113,7 @@ exports.getHashAlgo = (algo) => {
         throw new Error(`Algo not recognized: '${algo}'`)
     }
   } catch (err) {
-    log.w(mod, fun, err)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatAndSendError(err, { mod: mod, fun: fun, err: err })
   }
 }
 
@@ -144,8 +140,8 @@ exports.checkRudiProdPermission = async (req, reply) => {
     return subject
     // return 'ok'
   } catch (err) {
-    // log.w(mod, fun, err)
-    throw addErrorContext(err, { mod: mod, fun: fun, err: err })
+    log.w(mod, fun, err)
+    throw treatAndSendError(err, { mod: mod, fun: fun, err: err })
   }
 }
 
@@ -236,8 +232,8 @@ exports.verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
 
     return subject
   } catch (err) {
-    // log.w(mod, fun, err)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
+    log.w(mod, fun, err)
+    treatAndSendError(err, { mod: mod, fun: fun, err: err })
     throw new ForbiddenError(`JWT is not a valid RUDI Producer JWT: ${err.message}`)
   }
 }
@@ -249,8 +245,6 @@ exports.isRudiProducerToken = (token) => {
     const jwtPayload = JSON.parse(decodeBase64url(jwtPayloadBase64url))
     return !!jwtPayload.req_mtd
   } catch (err) {
-    log.w(mod, fun, err)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatAndSendError(err, { mod: mod, fun: fun, err: err })
   }
 }

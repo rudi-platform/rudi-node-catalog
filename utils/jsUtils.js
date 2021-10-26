@@ -254,18 +254,27 @@ exports.deepClone = (jsonObject) => {
 // Errors
 // ------------------------------------------------------------------------------------------------
 exports.CONTEXT = 'app_context'
-exports.addErrorContext = (error, info) => {
-  if (!error[this.CONTEXT]) {
-    error[this.CONTEXT] = [info]
-    return
+
+exports.treatAndSendError = (error, context) => {
+  const fun = 'treatAndSendError'
+  try {
+    const { mod: ctxMod, fun: ctxFun, err: ctxErr } = context
+    this.consoleLog(ctxMod, ctxFun, ctxErr)
+    if (!error[this.CONTEXT]) {
+      error[this.CONTEXT] = [context]
+      return
+    }
+    if (!this.isArray(error[this.CONTEXT])) {
+      const msg = `Reserved field '${this.CONTEXT}' should be an array`
+      this.consoleErr(msg)
+      throw new Error(msg)
+    }
+    error[this.CONTEXT].push(context)
+    return error
+  } catch (err) {
+    this.consoleLog(mod, fun, err)
+    throw err
   }
-  if (!this.isArray(error[this.CONTEXT])) {
-    const msg = `Reserved field '${this.CONTEXT}' should be an array`
-    this.consoleErr(msg)
-    throw new Error(msg)
-  }
-  error[this.CONTEXT].push(info)
-  return error
 }
 
 // ------------------------------------------------------------------------------------------------

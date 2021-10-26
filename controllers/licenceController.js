@@ -11,7 +11,7 @@ const uuid = require('uuid')
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
-const { isEmptyArray, addErrorContext } = require('../utils/jsUtils')
+const { isEmptyArray, treatAndSendError } = require('../utils/jsUtils')
 const db = require('../db/dbQueries')
 const skosController = require('./skosController')
 
@@ -75,9 +75,7 @@ exports.initializeLicences = async () => {
     if (!reply) throw new InternalServerError(`Licence integration failed`)
     return await this.getLicenceCodes()
   } catch (err) {
-    log.w(mod, fun, err)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatAndSendError(err, { mod: mod, fun: fun, err: err })
   }
 }
 

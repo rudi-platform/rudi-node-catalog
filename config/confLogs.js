@@ -231,3 +231,4 @@ exports.initFFLogger = (appName) => {
 
   return ffLogger
 }
+  

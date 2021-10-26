@@ -31,6 +31,7 @@ fastify.setErrorHandler((error, request, reply) => {
   const fun = 'finalErrorHandler'
   log.d(mod, fun, ``)
   try {
+    log.d(mod, fun, error)
     let rudiHttpError
     if (error.isRudiHttpError) rudiHttpError = error
     else {

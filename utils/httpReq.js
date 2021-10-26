@@ -90,9 +90,7 @@ exports.getWithOpts = async (options, authorizationToken) => {
     const answer = await this.httpGet(destUrl, authorizationToken)
     return answer.data
   } catch (err) {
-    log.w(mod, fun, err)
-    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
   }
   // log.d(mod, fun, `destUrl: ${destUrl}`)
   // log.d(mod, fun, `options: ${utils.beautify(options)}`)
@@ -132,9 +130,7 @@ exports.httpPost = async (destUrl, dataToSend, authorizationToken) => {
     log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
     return answer.data
   } catch (err) {
-    log.w(mod, fun, err)
-    utils.addErrorContext(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
   }
   /*
   const options = {

@@ -14,7 +14,7 @@ const { map } = require('lodash')
 // ------------------------------------------------------------------------------------------------
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
-const { addErrorContext } = require('../utils/jsUtils')
+const { treatAndSendError } = require('../utils/jsUtils')
 const log = require('../utils/logging')
 
 const { URL_PV_DB_ACCESS } = require('../config/confApi')
@@ -39,7 +39,7 @@ exports.getCollections = async (req, reply) => {
     return map(dbActionResult, 'name')
   } catch (err) {
     log.e(mod, fun, err)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
+    treatAndSendError(err, { mod: mod, fun: fun, err: err })
     if (err.name === 'MongoError') throw new BadRequestError(err)
     throw new NotFoundError(err)
   }
@@ -53,7 +53,7 @@ exports.dropDB = async (req, reply) => {
     return dbActionResult
   } catch (err) {
     log.e(mod, fun, err)
-    addErrorContext(err, { mod: mod, fun: fun, err: err })
+    treatAndSendError(err, { mod: mod, fun: fun, err: err })
     if (err.name === 'MongoError') throw new BadRequestError(err)
     throw new NotFoundError(err)
   }
