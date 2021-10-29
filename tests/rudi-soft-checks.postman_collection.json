@@ -3376,7 +3376,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{reports}}?sort=-updatedAt",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{reports}}?sort_by=-updatedAt",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -3386,7 +3386,7 @@
 							],
 							"query": [
 								{
-									"key": "sort",
+									"key": "sort_by",
 									"value": "-updatedAt"
 								}
 							]

@@ -13,6 +13,7 @@ const { logger, sysLogger } = require('../config/confLogs')
 const { displayStr, logWhere, beautify, shorten, consoleErr } = require('./jsUtils')
 const { addLogEntry } = require('../db/dbQueries')
 const { API_METADATA_ID, API_DATA_NAME_PROPERTY } = require('../db/dbFields')
+const sys = require('../config/confSystem')
 
 // ------------------------------------------------------------------------------------------------
 // Colors
@@ -117,6 +118,17 @@ exports.v = (srcMod, srcFun, msg) => {
 exports.d = (srcMod, srcFun, msg) => {
   try {
     const logLevel = 'debug'
+    logger.debug(displayStr(srcMod, srcFun, msg))
+    addLogEntry(logLevel, srcMod, srcFun, msg)
+  } catch (e) {
+    consoleErr(e)
+  }
+}
+
+exports.t = (srcMod, srcFun, msg) => {
+  const logLevel = 'trace'
+  if (sys.logLevel() != logLevel) return
+  try {
     logger.debug(displayStr(srcMod, srcFun, msg))
     addLogEntry(logLevel, srcMod, srcFun, msg)
   } catch (e) {

@@ -109,7 +109,7 @@ const MediaSchema = new mongoose.Schema(
 MediaSchema.pre('save', function (next) {
   const mod = 'MediaSchema'
   const fun = 'pre save hook'
-  // log.d(mod, fun, ``)
+  // log.t(mod, fun, ``)
   try {
     if (
       this[API_MEDIA_TYPE_PROPERTY] === MediaTypes.File &&

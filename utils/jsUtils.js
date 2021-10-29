@@ -9,6 +9,7 @@ const mod = 'utils'
 const { inspect } = require('util')
 const { floor, pick } = require('lodash')
 const datetime = require('date-and-time')
+const { ROUTE_NAME } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
 // String
@@ -251,33 +252,6 @@ exports.deepClone = (jsonObject) => {
 }
 
 // ------------------------------------------------------------------------------------------------
-// Errors
-// ------------------------------------------------------------------------------------------------
-exports.CONTEXT = 'app_context'
-
-exports.treatAndSendError = (error, context) => {
-  const fun = 'treatAndSendError'
-  try {
-    const { mod: ctxMod, fun: ctxFun, err: ctxErr } = context
-    this.consoleLog(ctxMod, ctxFun, ctxErr)
-    if (!error[this.CONTEXT]) {
-      error[this.CONTEXT] = [context]
-      return
-    }
-    if (!this.isArray(error[this.CONTEXT])) {
-      const msg = `Reserved field '${this.CONTEXT}' should be an array`
-      this.consoleErr(msg)
-      throw new Error(msg)
-    }
-    error[this.CONTEXT].push(context)
-    return error
-  } catch (err) {
-    this.consoleLog(mod, fun, err)
-    throw err
-  }
-}
-
-// ------------------------------------------------------------------------------------------------
 // Basic logging
 // ------------------------------------------------------------------------------------------------
 exports.separateLogs = (insertStr) => {
@@ -308,22 +282,63 @@ exports.consoleErr = (srcMod, srcFun, msg) => {
 // ------------------------------------------------------------------------------------------------
 // IP Redirections display
 // ------------------------------------------------------------------------------------------------
-exports.displayRedirections = (headers) => {
+
+exports.reqIpAndRedirections = (req) => {
+  const headers = req.headers
+  return headers['x-forwarded-for'] || headers['X-Forwarded-For']
+}
+
+exports.reqIpRedirections = (req) => {
+  const headers = req.headers
+  return headers['x-forwarded-for'] || headers['X-Forwarded-For']
+}
+
+exports.displayRedirections = (req) => {
+  const headers = req.headers
   if (!headers) return ''
-  const redirections = headers['x-forwarded-for'] || headers['X-Forwarded-For']
+  const redirections = this.reqIpRedirections(req)
   return redirections ? ` <- ${redirections} ` : ''
 }
+
 exports.displayIps = (req) => {
   const ip = req.ip
-  const headers = req.headers
-  return `${ip}${this.displayRedirections(headers)}`
+  return `${ip}${this.displayRedirections(req)}`
 }
+
 exports.logApiCall = (req, subject) => {
   if (!subject)
-    return `${req.method} ${req.url} (${req.context.config.routeName}) <- ${this.displayIps(req)}`
+    return `${req.method} ${req.url} (${req.context.config[ROUTE_NAME]}) <- ${this.displayIps(req)}`
 
   return (
-    `${req.method} ${req.url} (${req.context.config.routeName})` +
+    `${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})` +
     ` <- ${subject} @ ${this.displayIps(req)}`
   )
+}
+/**
+ *
+ * @param {object} req Request
+ * @param {string} subject (optional) the application the request is coming from
+ * @param {string} user (optional) the identified user that launched the request
+ * @returns {object} Details of the API call:
+ *    - "req": details of the request
+ *        - "method": HTTP method
+ *        - "url": URL
+ *        - "route_name": local route name
+ *    - "src": details on the requester
+ *        - "ip":
+ */
+exports.apiCallDetails = (req, subject, user) => {
+  if (!subject)
+    return {
+      req: {
+        method: req.method,
+        url: req.url,
+        [ROUTE_NAME]: req.context.config[ROUTE_NAME],
+      },
+      src: { ip: this.displayIps(req) },
+    }
+  return {
+    req: { method: req.method, url: req.url, [ROUTE_NAME]: req.context.config[ROUTE_NAME] },
+    src: { ip: this.displayIps(req), subject: subject, user: user },
+  }
 }

@@ -26,6 +26,7 @@ RegExp.prototype.toJSON = RegExp.prototype.toString
 // Require external modules
 const mongoose = require('mongoose')
 const fastify = require('./routes/fastify')
+const { treatError } = require('./utils/errors')
 // Import Swagger Options
 // const swagger = require('./config/swagger')
 
@@ -70,9 +71,9 @@ mongoose
     )
   })
   .catch((err) => {
-    log.e(mod, 'mongoConnection', err)
-    utils.treatAndSendError(err, { mod: mod, fun: 'mongoConnection', err: err })
-    log.sysAlert(`Mongo connection: ${err}`)
+    const error = treatError(err, { mod: mod, fun: 'mongoConnection' })
+    log.e(mod, 'mongoConnection', error)
+    log.sysAlert(`Mongo connection: ${error}`)
   })
 
 // ------------------------------------------------------------------------------------------------

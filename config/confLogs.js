@@ -138,7 +138,7 @@ const logOutputs = {
 
 // Console/file logger creation
 exports.logger = winston.createLogger({
-  level: sys.LOG_LVL,
+  level: sys.logLevel(),
   defaultMeta: {
     service: 'user-service',
   },
@@ -231,4 +231,3 @@ exports.initFFLogger = (appName) => {
 
   return ffLogger
 }
-  

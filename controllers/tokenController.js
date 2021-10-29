@@ -19,11 +19,11 @@ const {
   nowEpochS,
   nowISO,
   dateEpochSToIso,
-  treatAndSendError,
 } = require('../utils/jsUtils')
 const { getProfile } = require('../config/confSystem')
 const { accessProperty } = require('../utils/jsonAccess')
-const { ForbiddenError, UnauthorizedError } = require('../utils/errors')
+const { ForbiddenError, UnauthorizedError, treatError } = require('../utils/errors')
+const { ROUTE_NAME } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
@@ -84,7 +84,7 @@ exports.getJwtAlgo = (algo) => {
         throw new Error(`Algo not recognized: '${algo}'`)
     }
   } catch (err) {
-    throw treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
@@ -113,13 +113,13 @@ exports.getHashAlgo = (algo) => {
         throw new Error(`Algo not recognized: '${algo}'`)
     }
   } catch (err) {
-    throw treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
 exports.checkRudiProdPermission = async (req, reply) => {
   const fun = 'checkRudiProdPermission'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
   try {
     const header = req.headers
     // log.d(mod, fun, `${beautify(header)}`)
@@ -134,20 +134,19 @@ exports.checkRudiProdPermission = async (req, reply) => {
     const subject = await this.verifyRudiProdToken(token, req.method, req.url)
 
     // Check the ACL (= does the subject have permission to enter this route?)
-    log.d(mod, fun, `req: ${beautify(req.context.config.routeName)}`)
-    const reqRouteName = accessProperty(req.context.config, 'routeName')
+    log.d(mod, fun, `req: ${beautify(req.context.config[ROUTE_NAME])}`)
+    const reqRouteName = accessProperty(req.context.config, ROUTE_NAME)
     checkSubjPermission(subject, reqRouteName)
     return subject
     // return 'ok'
   } catch (err) {
-    log.w(mod, fun, err)
-    throw treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
 function checkSubjPermission(subject, reqRouteName) {
   const fun = 'checkSubjPermission'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
 
   const subjProfile = getProfile(subject)
   const subjAcl = accessProperty(subjProfile, SUB_ACL)
@@ -178,7 +177,7 @@ exports.verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
 
     if (nowEpochS() > jwtExp)
       throw new ForbiddenError(
-        `JWT expired: JWT expires after ${dateEpochSToIso(jwtExp)},now is ${nowISO()}`
+        `JWT expired: JWT expires after ${dateEpochSToIso(jwtExp)}, now is ${nowISO()}`
       )
 
     // Check the current route
@@ -232,9 +231,9 @@ exports.verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
 
     return subject
   } catch (err) {
-    log.w(mod, fun, err)
-    treatAndSendError(err, { mod: mod, fun: fun, err: err })
-    throw new ForbiddenError(`JWT is not a valid RUDI Producer JWT: ${err.message}`)
+    // log.w(mod, fun, err)
+    const error = new ForbiddenError(`JWT is not a valid RUDI Producer JWT: ${err.message}`)
+    throw treatError(error, { mod: mod, fun: fun })
   }
 }
 
@@ -245,6 +244,6 @@ exports.isRudiProducerToken = (token) => {
     const jwtPayload = JSON.parse(decodeBase64url(jwtPayloadBase64url))
     return !!jwtPayload.req_mtd
   } catch (err) {
-    throw treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }

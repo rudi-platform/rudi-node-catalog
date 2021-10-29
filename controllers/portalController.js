@@ -32,6 +32,7 @@ const {
   ForbiddenError,
   createRudiHttpError,
   NotAcceptableError,
+  treatError,
 } = require('../utils/errors')
 
 const { extractJwt } = require('../utils/crypto')
@@ -58,23 +59,23 @@ const { extractJwt } = require('../utils/crypto')
 // ------------------------------------------------------------------------------------------------
 exports.exposedGetPortalToken = async (req, reply) => {
   const fun = 'exposedGetPortalToken'
-  log.d(mod, fun, `< GET new portal token`)
+  log.t(mod, fun, `< GET new portal token`)
   try {
     // log.d(mod, fun, portal.getAuthUrl())
     return await this.getNewTokenFromPortal()
   } catch (err) {
-    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
 exports.checkPortalTokenInHeader = async (req, reply) => {
   const fun = 'checkPortalTokenInHeader'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
   try {
     const token = extractJwt(req)
     return await this.getTokenCheckedByPortal(token)
   } catch (err) {
-    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
@@ -87,7 +88,7 @@ exports.checkPortalTokenInHeader = async (req, reply) => {
  */
 exports.getPortalToken = async () => {
   const fun = 'getPortalToken'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
   let token, rmToken
   try {
     rmToken = await db.getLatestStoredPortalToken()
@@ -104,7 +105,7 @@ exports.getPortalToken = async () => {
     return token
     // log.d(mod, fun, 'Stored token was validated by the Portal')
   } catch (err) {
-    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
     //  new InternalServerError(`Failed to get a new token from the portal: ${err}`)
   }
 }
@@ -114,31 +115,31 @@ exports.getPortalToken = async () => {
  */
 exports.checkStoredToken = async (req, reply) => {
   const fun = 'checkStoredToken'
-  log.d(mod, fun, ``)
-  // log.d(mod, fun, `< GET portal check token`)
+  log.t(mod, fun, ``)
+  // log.t(mod, fun, `< GET portal check token`)
   try {
     const token = await db.getLatestStoredPortalToken()
     if (!token) throw new NotFoundError('No Portal token is actually stored')
     return await this.getTokenCheckedByPortal(token[portal.FIELD_TOKEN])
   } catch (err) {
-    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
 exports.checkInputToken = async (req, reply) => {
   const fun = 'checkInputToken'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
   try {
     const token = json.accessReqParam(req.params, portal.PARAM_TOKEN)
     return await this.getTokenCheckedByPortal(token[portal.FIELD_TOKEN])
   } catch (err) {
-    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
 exports.getMetadata = async (req, reply) => {
   const fun = 'getMetadata'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
   try {
     let metadataId = req.params[api.PARAM_ID]
     log.d(mod, fun, `metadataId: ${metadataId}`)
@@ -146,13 +147,13 @@ exports.getMetadata = async (req, reply) => {
 
     return await this.getMetadataFromPortal(metadataId)
   } catch (err) {
-    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
 exports.sendMetadata = async (req, reply) => {
   const fun = 'sendMetadata'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
   try {
     let metadataId = req.params[api.PARAM_ID]
     log.d(mod, fun, `metadataId: ${metadataId}`)
@@ -160,13 +161,13 @@ exports.sendMetadata = async (req, reply) => {
 
     return await this.postMetadataToPortal(metadataId)
   } catch (err) {
-    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
 exports.deleteMetadata = async (req, reply) => {
   const fun = 'deleteMetadata'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
   try {
     let metadataId = req.params[api.PARAM_ID]
     log.d(mod, fun, `metadataId: ${metadataId}`)
@@ -174,7 +175,7 @@ exports.deleteMetadata = async (req, reply) => {
 
     return await this.deletePortalMetadata(metadataId)
   } catch (err) {
-    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 // ------------------------------------------------------------------------------------------------
@@ -184,7 +185,7 @@ exports.deleteMetadata = async (req, reply) => {
 // ----- GET Portal public key
 exports.getPortalPublicKey = () => {
   const fun = 'getPortalPublicKey'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
 
   const publicKeyObj = this.PUBLIC_KEY_URL ? httpGet(this.PUBLIC_KEY_URL) : null
   const publicKey = publicKeyObj ? publicKeyObj.value : null
@@ -198,7 +199,7 @@ exports.getPortalPublicKey = () => {
 
 exports.getNewTokenFromPortal = async () => {
   const fun = 'getNewTokenFromPortal'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
   try {
     const [usr, pwdb64] = portal.getCredentials()
     const portalAuthUrl = portal.getAuthUrl()
@@ -237,8 +238,7 @@ exports.getNewTokenFromPortal = async () => {
     } catch (error) {
       const err = new InternalServerError(`Post to portal failed: ${error}`)
       log.w(mod, fun, err)
-      utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
-      throw err
+      throw treatError(err, { mod: mod, fun: fun })
     }
     // log.d(mod, fun, `answer.status: ${answer.status}`)
 
@@ -271,13 +271,13 @@ exports.getNewTokenFromPortal = async () => {
     }
   } catch (error) {
     const err = new ForbiddenError(`Failed to get a token from Portal: ${utils.beautify(err)}`)
-    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
 exports.getTokenCheckedByPortal = async (token) => {
   const fun = 'getTokenCheckedByPortal'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
   try {
     if (!token) throw new BadRequestError('No token to check!')
     const portalUrl = portal.getCheckAuthUrl()
@@ -291,7 +291,7 @@ exports.getTokenCheckedByPortal = async (token) => {
       return portalResponse.data
     } else throw new ForbiddenError(`Portal invalidated the token: ${portalResponse.data}`)
   } catch (err) {
-    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
@@ -324,7 +324,7 @@ jwtBody = {
 /* 
   exports.checkSignatureWithSecret = (accessToken) => {
     const fun = 'verifyPortalToken'
-    log.d(mod, fun, ``)
+    log.t(mod, fun, ``)
 
     try {
       if (!accessToken) throw new BadRequestError('No token = no signature to verify!')
@@ -355,7 +355,7 @@ jwtBody = {
  */
 exports.checkSignatureWithPubKey = (accessToken) => {
   const fun = 'checkSignatureWithPubKey'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
 
   try {
     if (!accessToken) throw new BadRequestError('No token = no signature to check!')
@@ -397,13 +397,13 @@ exports.checkSignatureWithPubKey = (accessToken) => {
     return signatureIsValid
   } catch (err) {
     // const errMsg = `Invalid token: ${err}`
-    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
 exports.verifyPortalToken = (accessToken) => {
   const fun = 'verifyPortalToken'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
 
   try {
     if (!accessToken) throw new BadRequestError('No token to verify!')
@@ -440,8 +440,7 @@ exports.verifyPortalToken = (accessToken) => {
   } catch (err) {
     const errMsg = `Invalid token: ${err}`
     log.w(mod, fun, errMsg)
-    utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
@@ -451,7 +450,7 @@ exports.verifyPortalToken = (accessToken) => {
 
 exports.postMetadataToPortal = async (metadataId) => {
   const fun = 'postMetadataToPortal'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
   try {
     if (!metadataId) throw new NotImplementedError('Not yet implemented')
 
@@ -471,13 +470,13 @@ exports.postMetadataToPortal = async (metadataId) => {
     // log.d(mod, fun, `reply: ${utils.beautify(reply)}`)
     return reply
   } catch (err) {
-    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
 exports.getMetadataFromPortal = async (metadataId) => {
   const fun = 'getMetadataFromPortal'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
   try {
     if (!metadataId) throw new NotImplementedError('Not yet implemented on Portal side') // Can't get the resouces list yet.
 
@@ -486,13 +485,13 @@ exports.getMetadataFromPortal = async (metadataId) => {
 
     return reply
   } catch (err) {
-    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
 exports.deletePortalMetadata = async (metadataId) => {
   const fun = 'deletePortalMetadata'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
   try {
     if (!metadataId) throw new BadRequestError('Metadata id required') // Can't get the resouces list yet.
 
@@ -502,7 +501,6 @@ exports.deletePortalMetadata = async (metadataId) => {
     return reply
   } catch (err) {
     log.w(mod, fun, `Couldn't delete on Portal side: ${err}`)
-    utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }

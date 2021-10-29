@@ -25,7 +25,7 @@ const log = require('./logging')
  */
 exports.bboxToGeoJsonPolygon = (western, southern, eastern, northern) => {
   const fun = 'bboxToGeoJsonPolygon'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
 
   if (southern > northern) {
     const errMsg = `Southern coordinate must be lower than northern coordinate`
@@ -66,7 +66,7 @@ exports.bboxToGeoJsonPolygon = (western, southern, eastern, northern) => {
 
 exports.coordsToGeoJsonPoint = (westLongitude, southLatitude) => {
   const fun = 'coordsToGeoJsonPoint'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
 
   // The values of a "bbox" array are "[west, south, east, north]"
   // given in decimal degrees
@@ -93,7 +93,7 @@ exports.coordsToGeoJsonPoint = (westLongitude, southLatitude) => {
 /*
 exports.bboxFromGeoJsonObject = (geoJsonObject) => {
   const fun = 'bboxFromGeoJsonObject'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
 
   const bbox = geojson.geo_bbox(geoJsonObject)
   log.d(mod, fun, `bbox: ${bbox}`)

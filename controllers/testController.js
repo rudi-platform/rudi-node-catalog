@@ -11,7 +11,7 @@ const mod = 'devCtrl'
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
 const db = require('../db/dbQueries')
-const { treatAndSendError } = require('../utils/jsUtils')
+const { treatError } = require('../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
 // tests
@@ -28,7 +28,6 @@ exports.test = async (req, reply) => {
     return await db.isReferencedInMetadata(objectType, rudiId)
   } catch (err) {
     log.e(mod, fun, err)
-    treatAndSendError(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }

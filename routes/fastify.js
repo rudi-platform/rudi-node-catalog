@@ -9,7 +9,7 @@ const utils = require('../utils/jsUtils')
 const sys = require('../config/confSystem')
 const logConf = require('../config/confLogs')
 const log = require('../utils/logging')
-const { createRudiHttpError } = require('../utils/errors')
+const { createRudiHttpError, showErrorPile } = require('../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
 // External dependancies
@@ -29,9 +29,9 @@ const fastify = require('fastify')({
 // ------------------------------------------------------------------------------------------------
 fastify.setErrorHandler((error, request, reply) => {
   const fun = 'finalErrorHandler'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
   try {
-    log.d(mod, fun, error)
+    // log.d(mod, fun, error.isRudiHttpError)
     let rudiHttpError
     if (error.isRudiHttpError) rudiHttpError = error
     else {
@@ -45,7 +45,7 @@ fastify.setErrorHandler((error, request, reply) => {
     log.e(mod, fun, `Uncaught! ${uncaughtErr}`)
     log.sysCrit(`Uncaught error: ${uncaughtErr}`)
   }
-  log.d(mod, fun, 'done')
+  log.t(mod, fun, 'done')
 })
 
 fastify.decorate('notFound', (req, reply) => {
@@ -74,6 +74,7 @@ fastify.addHook('onRequest', (req, res, next) => {
 fastify.addHook('onError', (request, reply, error, done) => {
   const fun = 'onError'
   try {
+    if (sys.SHOULD_SHOW_ERROR_PILE) showErrorPile(error)
     log.e(mod, fun, utils.beautify(error))
     if (error.isRudiHttpError) {
       log.sysError(`Error ${error.statusCode}: ${error.message} <- ${utils.displayIps(request)}`)

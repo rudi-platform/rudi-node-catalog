@@ -9,7 +9,12 @@ const log = require('../../utils/logging')
 const { parameterExpected } = require('../../utils/msg')
 
 const DynamicEnum = require('../models/DynamicEnum')
-const { MethodNotAllowedError, BadRequestError, NotFoundError } = require('../../utils/errors')
+const {
+  MethodNotAllowedError,
+  BadRequestError,
+  NotFoundError,
+  treatError,
+} = require('../../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
 // Thesaurus class
@@ -81,7 +86,7 @@ module.exports = class Thesaurus {
 
   getLabels(lang) {
     const fun = 'getLabels'
-    log.d(mod, fun, ``)
+    log.t(mod, fun, ``)
 
     if (!this.#isInit) {
       const errMsg = 'Init first'
@@ -119,8 +124,7 @@ module.exports = class Thesaurus {
       }
     } catch (err) {
       log.w(mod, fun, err)
-      utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
-      throw err
+      throw treatError(err, { mod: mod, fun: fun })
     }
   }
 
@@ -141,8 +145,7 @@ module.exports = class Thesaurus {
       return isIn
     } catch (err) {
       log.w(mod, fun, err)
-      utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
-      throw err
+      throw treatError(err, { mod: mod, fun: fun })
     }
   }
 
@@ -168,14 +171,13 @@ module.exports = class Thesaurus {
       await this.#storeEnum(this.#code, this.#currentValues)
     } catch (err) {
       log.w(mod, fun, err)
-      utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
-      throw err
+      throw treatError(err, { mod: mod, fun: fun })
     }
   }
 
   #getEnum = async (typeThesaurus) => {
     const fun = '#getEnum'
-    // log.d(mod, fun, ``)
+    // log.t(mod, fun, ``)
 
     try {
       const dbEnum = await DynamicEnum.findOne({ code: typeThesaurus })
@@ -189,7 +191,7 @@ module.exports = class Thesaurus {
 
   #getLabels = async (typeThesaurus) => {
     const fun = '#getEnum'
-    // log.d(mod, fun, ``)
+    // log.t(mod, fun, ``)
 
     try {
       const dbEnum = await DynamicEnum.findOne({ code: typeThesaurus })
@@ -203,7 +205,7 @@ module.exports = class Thesaurus {
 
   #storeEnum = async (typeThesaurus, listValues) => {
     const fun = '#storeEnum'
-    // log.d(mod, fun, ``)
+    // log.t(mod, fun, ``)
 
     try {
       await DynamicEnum.findOneAndUpdate(
@@ -213,8 +215,7 @@ module.exports = class Thesaurus {
       )
     } catch (err) {
       log.w(mod, fun, err)
-      utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
-      throw err
+      throw treatError(err, { mod: mod, fun: fun })
     }
   }
 }

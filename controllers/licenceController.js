@@ -11,11 +11,11 @@ const uuid = require('uuid')
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
-const { isEmptyArray, treatAndSendError } = require('../utils/jsUtils')
+const { isEmptyArray } = require('../utils/jsUtils')
 const db = require('../db/dbQueries')
 const skosController = require('./skosController')
 
-const { InternalServerError } = require('../utils/errors')
+const { InternalServerError, treatError } = require('../utils/errors')
 
 const {
   URL_PV_LICENCE_ACCESS,
@@ -75,7 +75,7 @@ exports.initializeLicences = async () => {
     if (!reply) throw new InternalServerError(`Licence integration failed`)
     return await this.getLicenceCodes()
   } catch (err) {
-    throw treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
@@ -85,7 +85,7 @@ exports.initializeLicences = async () => {
 exports.getAllLicences = async (req, reply) => {
   const fun = `getAlllicences`
   log.v(mod, fun, `< GET ${URL_PV_LICENCE_ACCESS}`)
-  // log.d(mod, fun, ``)
+  // log.t(mod, fun, ``)
 
   return await this.getLicences()
 }
@@ -93,7 +93,7 @@ exports.getAllLicences = async (req, reply) => {
 exports.getAllLicenceCodes = async (req, reply) => {
   const fun = `getAlllicenceCodes`
   log.v(mod, fun, `< GET ${URL_PV_LICENCE_CODES_ACCESS}`)
-  // log.d(mod, fun, ``)
+  // log.t(mod, fun, ``)
 
   return await this.getLicenceCodes()
 }

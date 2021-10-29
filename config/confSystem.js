@@ -43,13 +43,13 @@ exports.LOCAL_CONF = fa.readIniFile(defaultConfFile)
 // -> gets user conf file value
 //    if null get local conf file value
 //    if null get default value
-exports.getIniValue = (section, field) => {
+exports.getIniValue = (section, field, defaultVal) => {
   const userValue = utils.quietAccess(this.USER_CONF[section], field)
   const localValue = utils.quietAccess(this.LOCAL_CONF[section], field)
 
   if (userValue != utils.NOT_FOUND) return userValue
   if (localValue != utils.NOT_FOUND) return localValue
-  return utils.NOT_FOUND
+  return typeof defaultVal === 'undefined' ? utils.NOT_FOUND : defaultVal
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -72,14 +72,19 @@ exports.DB_URL = `${DB_URL_PREFIX}${this.DB_NAME}`
 // Logs section
 const LOG_SECTION = 'logging'
 
-exports.SHOULD_FILELOG = this.getIniValue(LOG_SECTION, 'should_log_in_file')
-exports.APP_NAME = this.getIniValue(LOG_SECTION, 'app_name')
+exports.SHOULD_FILELOG = this.getIniValue(LOG_SECTION, 'should_log_in_file', false)
+exports.SHOULD_SHOW_ERROR_PILE = this.getIniValue(LOG_SECTION, 'should_show_error_pile', false) // TODO || true
+exports.APP_NAME = this.getIniValue(LOG_SECTION, 'app_name', 'rudiprod.api')
 exports.LOG_DIR = this.getIniValue(LOG_SECTION, 'log_dir')
 exports.LOG_FILE = this.getIniValue(LOG_SECTION, 'log_file')
 exports.OUT_LOG = `${this.LOG_DIR}/${this.LOG_FILE}`
 exports.SYMLINK_NAME = `${this.APP_NAME}-current.log`
-exports.LOG_LVL = this.getIniValue(LOG_SECTION, 'log_level')
-exports.LOG_EXP = this.getIniValue(LOG_SECTION, 'expires')
+const LOG_LVL = this.getIniValue(LOG_SECTION, 'log_level', 'info')
+exports.LOG_EXP = this.getIniValue(LOG_SECTION, 'expires', '7d')
+
+exports.logLevel = () => {
+  return LOG_LVL
+}
 
 // Syslog
 const SYSLOG_SECTION = 'syslog'
@@ -119,7 +124,7 @@ utils.consoleLog(mod, fun, `APP_NAME: ${this.APP_NAME}`)
 utils.consoleLog(mod, fun, `LISTENING_ADDR: ${this.LISTENING_ADDR}`)
 utils.consoleLog(mod, fun, `LISTENING_PORT: ${this.LISTENING_PORT}`)
 utils.consoleLog(mod, fun, `OUT_LOG: ${this.OUT_LOG}`)
-utils.consoleLog(mod, fun, `LOG_LVL: ${this.LOG_LVL}`)
+utils.consoleLog(mod, fun, `LOG_LVL: ${LOG_LVL}`)
 utils.consoleLog(mod, fun, `LOG_EXP: ${this.LOG_EXP}`)
 utils.consoleLog(mod, fun, `DB_NAME: ${this.DB_NAME}`)
 utils.consoleLog(mod, fun, `DB_URL: ${this.DB_URL}`)

@@ -78,7 +78,7 @@ const INIT_VALUES = {
 const themes = new Thesaurus(CODE, Object.keys(INIT_VALUES), INIT_VALUES)
 
 const fun = `init ${CODE}`
-// log.d(mod, fun, ``)
+// log.t(mod, fun, ``)
 
 ;(async () => {
   try {

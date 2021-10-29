@@ -2,7 +2,7 @@
 
 const mod = 'encodThes'
 
-const { BadRequestError } = require('../../utils/errors')
+const { BadRequestError, treatError } = require('../../utils/errors')
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ exports.set = (newValue) => {
     newValue = `${newValue}`.trim()
     if (Thesaurus.indexOf(newValue) === -1) Thesaurus.push(newValue)
   } catch (err) {
-    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 

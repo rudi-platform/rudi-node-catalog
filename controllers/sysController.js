@@ -18,6 +18,7 @@ const mongoose = require('mongoose')
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
 const utils = require('../utils/jsUtils')
+const { treatError } = require('../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
@@ -31,7 +32,7 @@ let CURRENT_APP_HASH
 /** Returns the actual git hash */
 exports.getGitHash = () => {
   const fun = 'getGitHash'
-  // log.d(mod, fun, ``)
+  // log.t(mod, fun, ``)
   try {
     // log.d(mod, fun, ` GET ${URL_PV_GIT_HASH_ACCESS}`)
     let hashId
@@ -48,8 +49,7 @@ exports.getGitHash = () => {
     return `${hashId}`.trim()
   } catch (err) {
     log.e(mod, fun, err)
-    utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
@@ -61,8 +61,7 @@ exports.getAppHash = () => {
     return CURRENT_APP_HASH
   } catch (err) {
     log.e(mod, fun, err)
-    utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 exports.ENV_DEV = 'local'
@@ -79,8 +78,7 @@ exports.getEnvironment = () => {
     return env
   } catch (err) {
     log.e(mod, fun, err)
-    utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
@@ -117,8 +115,7 @@ exports.getNodeVersion = async () => {
     return nVersions
   } catch (err) {
     log.e(mod, fun, err)
-    utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
@@ -130,6 +127,6 @@ async function getMongDbVersion() {
     // log.d(mod, fun, `Mongo : ${mongoInfo.version}`)
     return mongoInfo.version
   } catch (err) {
-    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }

@@ -11,7 +11,7 @@ const readLastLines = require('read-last-lines')
 // ------------------------------------------------------------------------------------------------
 const sys = require('../config/confSystem')
 const log = require('../utils/logging')
-const { consoleErr, treatAndSendError } = require('../utils/jsUtils')
+const { consoleErr } = require('../utils/jsUtils')
 
 const { getLogEntries } = require('../db/dbQueries')
 const { parseQueryParameters } = require('./genericController')
@@ -26,6 +26,7 @@ const {
   QUERY_FIELDS,
 } = require('../config/confApi')
 const { pick } = require('lodash')
+const { treatError } = require('../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
 // Logs API access
@@ -51,8 +52,7 @@ exports.getLogs = async (req, reply) => {
     return logLines //.map((logLine) => logLineToString(logLine))
   } catch (err) {
     consoleErr(mod, fun, err)
-    treatAndSendError(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
@@ -66,7 +66,6 @@ exports.getLastLogLines = async (req, reply) => {
     return logs
   } catch (err) {
     log.e(mod, fun, err)
-    treatAndSendError(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }

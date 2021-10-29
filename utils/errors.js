@@ -2,6 +2,7 @@
 
 const mod = 'custErr'
 
+const { isArray } = require('./jsUtils')
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
@@ -17,6 +18,7 @@ class RudiHttpError extends Error {
   constructor(message, code, name, description) {
     super(message || DEFAULT_MESSAGE)
     this.isRudiHttpError = true
+    this.isRudiError = true
     this.statusCode = code || 500
     this.name = name || 'Internal Server Error'
     this.error = description || 'An unexpected error occured'
@@ -135,8 +137,48 @@ function createRudiHttpError(code, message) {
         return new InternalServerError(message)
     }
   } catch (err) {
-    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw this.treatError(err, { mod: mod, fun: fun })
   }
+}
+
+// ------------------------------------------------------------------------------------------------
+// Errors
+// ------------------------------------------------------------------------------------------------
+const CONTEXT = 'app_context'
+const ERR = 'err'
+
+const treatError = (error, errContext) => {
+  const fun = 'treatError'
+  try {
+    if (!error) throw new Error(`Input error shouldn't be null`)
+    // log.d(mod, fun, beautify(error))
+    // log.d(mod, fun, error.isRudiError)
+    if (!errContext[ERR]) errContext[ERR] = error //|| error.toString()
+    const { mod: ctxMod, fun: ctxFun, [ERR]: ctxErr } = errContext
+    // log.d(ctxMod, ctxFun, beautify(ctxErr))
+    if (!error[CONTEXT]) {
+      error[CONTEXT] = [errContext]
+    } else if (!isArray(error[CONTEXT])) {
+      const msg = `Reserved field '${CONTEXT}' should be an array`
+      log.w(ctxMod, ctxFun, msg + `Original error: ${ctxErr}`)
+      throw new Error(msg)
+    } else {
+      error[CONTEXT].push(errContext)
+    }
+    return error
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
+}
+
+const showErrorPile = (error) => {
+  // const fun = 'showErrorPile'
+  const errContext = error[CONTEXT]
+  if (!errContext) return
+  errContext.map((err) => {
+    log.w(err.mod, err.fun, `${err[ERR]}`)
+  })
 }
 
 module.exports = {
@@ -152,4 +194,7 @@ module.exports = {
   ParameterExpectedError,
   NotImplementedError,
   createRudiHttpError,
+  treatError,
+  showErrorPile,
+  CONTEXT,
 }

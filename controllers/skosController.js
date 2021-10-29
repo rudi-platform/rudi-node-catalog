@@ -77,7 +77,7 @@ const {
   PARAM_THESAURUS_CODE,
   PARAM_THESAURUS_LANG,
 } = require('../config/confApi')
-const { ParameterExpectedError, NotFoundError } = require('../utils/errors')
+const { ParameterExpectedError, NotFoundError, treatError } = require('../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
 // Controllers: Scheme
@@ -93,7 +93,7 @@ const { ParameterExpectedError, NotFoundError } = require('../utils/errors')
  */
 exports.newSkosScheme = async (rudiScheme) => {
   const fun = 'newScheme'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
 
   if (!rudiScheme) throw new ParameterExpectedError(fun, 'rudiScheme')
 
@@ -115,8 +115,7 @@ exports.newSkosScheme = async (rudiScheme) => {
     }
   } catch (err) {
     log.e(mod, fun, err)
-    utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatError(err, { mod: mod, fun: fun })
   }
 
   // TODO: reinforce the associations between concepts through siblings/relative properties
@@ -130,7 +129,7 @@ const CONCEPT_HIERARCHY_DISPLAY = `${API_SKOS_CONCEPT_ID} ${API_SKOS_CONCEPT_COD
 
 exports.dbSchemeToRudi = async (dbScheme) => {
   const fun = 'dbSchemeToRudi'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
 
   // log.d(mod, fun, `dbScheme: ${utils.beautify(dbScheme)}`)
 
@@ -161,7 +160,7 @@ exports.dbSchemeToRudi = async (dbScheme) => {
  */
 exports.createConceptHierarchy = async (listConcepts, schemeDbId, parentConcept) => {
   const fun = 'createConceptHierarchy'
-  // log.d(mod, fun, ``)
+  // log.t(mod, fun, ``)
 
   // Check input parameters
   if (!listConcepts) throw new ParameterExpectedError(fun, 'listConcepts')
@@ -253,7 +252,7 @@ exports.createConceptHierarchy = async (listConcepts, schemeDbId, parentConcept)
  */
 exports.newSkosConcept = async (rudiConcept, inSchemeDbId) => {
   const fun = 'newConcept'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
 
   await this.setDbScheme(rudiConcept, inSchemeDbId)
 
@@ -282,7 +281,7 @@ exports.newSkosConcept = async (rudiConcept, inSchemeDbId) => {
  */
 exports.setDbScheme = async (rudiConcept, inSchemeDbId) => {
   const fun = 'setDbScheme'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
 
   let schemeDbId
   if (!inSchemeDbId) {
@@ -304,7 +303,7 @@ exports.setDbScheme = async (rudiConcept, inSchemeDbId) => {
 
 exports.setDbConceptRefs = async (rudiConcept, prop) => {
   const fun = 'setDbConceptRefs'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
 
   const listConceptsReferences = rudiConcept[prop]
 
@@ -343,7 +342,7 @@ const CONCEPT_SHORT_DISPLAY = `${API_SKOS_CONCEPT_ID} ${API_SKOS_CONCEPT_CODE} -
 
 exports.dbConceptToRudiMinimal = async (dbConcept) => {
   const fun = 'dbConceptToRudi'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
 
   const rudiConcept = await dbConcept
     .populate({
@@ -374,7 +373,7 @@ exports.dbConceptToRudiMinimal = async (dbConcept) => {
 
 exports.dbConceptToRudiRecursive = async (dbConcept) => {
   // const fun = 'dbConceptToRudiRecursive'
-  // log.d(mod, fun, ``)
+  // log.t(mod, fun, ``)
 
   // log.d(mod, fun, `dbConcept: ${utils.beautify(dbConcept)}`)
   if (!dbConcept) return
@@ -413,7 +412,7 @@ exports.dbConceptToRudiRecursive = async (dbConcept) => {
 
 exports.dbConceptListToRudiRecursive = async (dbConceptList) => {
   // const fun = 'dbConceptListToRudiRecursive'
-  // log.d(mod, fun, ``)
+  // log.t(mod, fun, ``)
 
   // log.d(mod, fun, `dbConceptList: ${utils.beautify(dbConceptList)}`)
   if (!dbConceptList) return
@@ -506,7 +505,7 @@ exports.getEveryThesaurus = async (req, reply) => {
   const fun = 'getEveryThesaurus'
   try {
     log.v(mod, fun, `< GET ${URL_PV_THESAURUS_ACCESS}`)
-    log.d(mod, fun, ``)
+    log.t(mod, fun, ``)
 
     const lang = req.query[PARAM_THESAURUS_LANG]
     // log.d(mod, fun, `lang: ${lang}`)
@@ -516,8 +515,7 @@ exports.getEveryThesaurus = async (req, reply) => {
     return listThesauri
   } catch (err) {
     log.e(mod, fun, err)
-    utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
@@ -537,8 +535,7 @@ exports.getSingleThesaurus = async (req, reply) => {
     return thesaurus
   } catch (err) {
     log.e(mod, fun, err)
-    utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
@@ -563,7 +560,6 @@ exports.getSingleThesaurusLabels = async (req, reply) => {
     return thesaurus
   } catch (err) {
     log.e(mod, fun, err)
-    utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }

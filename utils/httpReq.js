@@ -14,7 +14,7 @@ const axios = require('axios')
 // ------------------------------------------------------------------------------------------------
 const log = require('./logging')
 const utils = require('./jsUtils')
-const { InternalServerError, createRudiHttpError } = require('./errors')
+const { InternalServerError, createRudiHttpError, treatError } = require('./errors')
 
 // ------------------------------------------------------------------------------------------------
 // Functions: header treatments
@@ -30,7 +30,7 @@ exports.getHeaderRedirectUrls = (req) => {
 
 exports.httpGet = async (destUrl, authorizationToken) => {
   const fun = 'httpGet'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
   try {
     const reqOpts = {
       headers: {
@@ -51,7 +51,7 @@ exports.httpGet = async (destUrl, authorizationToken) => {
 
 exports.httpDelete = async (destUrl, authorizationToken) => {
   const fun = 'httpDelete'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
 
   const reqOpts = {
     headers: {
@@ -84,13 +84,13 @@ exports.httpDelete = async (destUrl, authorizationToken) => {
 
 exports.getWithOpts = async (options, authorizationToken) => {
   const fun = 'getWithOpts'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
   try {
     const destUrl = `${options.protocol}://${options.hostname}/${options.path}`
     const answer = await this.httpGet(destUrl, authorizationToken)
     return answer.data
   } catch (err) {
-    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
   // log.d(mod, fun, `destUrl: ${destUrl}`)
   // log.d(mod, fun, `options: ${utils.beautify(options)}`)
@@ -115,7 +115,7 @@ exports.getWithOpts = async (options, authorizationToken) => {
 
 exports.httpPost = async (destUrl, dataToSend, authorizationToken) => {
   const fun = 'httpPost'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
   try {
     const reqOpts = {
       headers: {
@@ -130,7 +130,7 @@ exports.httpPost = async (destUrl, dataToSend, authorizationToken) => {
     log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
     return answer.data
   } catch (err) {
-    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
   /*
   const options = {
@@ -156,7 +156,7 @@ exports.httpPost = async (destUrl, dataToSend, authorizationToken) => {
 
 exports.directPost = async (destUrl, dataToSend, reqOpts) => {
   const fun = 'directPost'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
   // log.d(mod, fun, `${destUrl}`)
   // if (reqOpts) reqOpts.httpsAgent = sslAgent
   // else reqOpts = { httpsAgent: sslAgent }
@@ -186,7 +186,7 @@ exports.directPost = async (destUrl, dataToSend, reqOpts) => {
 
 exports.directGet = async (destUrl, reqOpts) => {
   const fun = 'directGet'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
   // log.d(mod, fun, `destUrl: ${destUrl}`)
   // if (reqOpts) reqOpts.httpsAgent = sslAgent
   // else reqOpts = { httpsAgent: sslAgent }
@@ -207,7 +207,7 @@ exports.directGet = async (destUrl, reqOpts) => {
 
 /* function doHttpRequest(options, protocol, data) {
   const fun = 'doHttpRequest'
-  // log.d(mod, fun, ``)
+  // log.t(mod, fun, ``)
 
   const httpProtocol = protocol === PROTOCOL.HTTP ? http : https
   // options.agent = new httpProtocol.Agent({rejectUnauthorized: false})

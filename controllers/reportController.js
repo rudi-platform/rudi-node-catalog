@@ -61,7 +61,12 @@ const {
 // Data models
 // ------------------------------------------------------------------------------------------------
 const { Report, IntegrationStatus } = require('../definitions/models/Report')
-const { BadRequestError, ObjectNotFoundError, MethodNotAllowedError } = require('../utils/errors')
+const {
+  BadRequestError,
+  ObjectNotFoundError,
+  MethodNotAllowedError,
+  treatError,
+} = require('../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
 // Comformity functions
@@ -89,7 +94,7 @@ function dateArrayToDate(dateArray) {
       `${pad(dateArray[3])}:${pad(dateArray[4])}:${pad(dateArray[5])}.${dateArray[6]}Z`
     // log.d(mod, fun, `Date: ${date}`)
   } catch (err) {
-    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 function pad(number, nbZeros) {
@@ -104,7 +109,7 @@ function pad(number, nbZeros) {
 // Add a new report for one object integration
 exports.addSingleReportForObject = async (req, reply) => {
   const fun = 'addSingleReportForObject'
-  log.d(mod, fun, `< POST ${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`)
+  log.t(mod, fun, `< POST ${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -150,29 +155,28 @@ exports.addSingleReportForObject = async (req, reply) => {
     return dbReadyReport
   } catch (err) {
     log.e(mod, fun, err)
-    utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
 // Update an existing report for one object integration (public)
 exports.addOrEditSingleReportForMetadata = async (req, reply) => {
   const fun = 'addOrEditSingleReportForMetadata'
-  log.d(mod, fun, `< PUT ${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`)
+  log.t(mod, fun, `< PUT ${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`)
   return await this.addOrEditSingleReport(PARAM_OBJECT_METADATA, req, reply)
 }
 
 // Update an existing report for one object integration (private)
 exports.addOrEditSingleReportForObject = async (req, reply) => {
   const fun = 'addOrEditSingleReportForObject'
-  log.d(mod, fun, `< PUT ${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`)
+  log.t(mod, fun, `< PUT ${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`)
   const objectType = json.accessReqParam(req, PARAM_OBJECT)
   return await this.addOrEditSingleReport(objectType, req, reply)
 }
 
 exports.addOrEditSingleReport = async (objectType, req, reply) => {
   const fun = 'addOrEditSingleReport'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
   try {
     // retrieve url parameters: object type, object id
     const urlObjectId = json.accessReqParam(req, PARAM_ID)
@@ -258,28 +262,28 @@ exports.addOrEditSingleReport = async (objectType, req, reply) => {
 
     return dbReadyReport
   } catch (err) {
-    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
 // Get every reports for one object integration (public)
 exports.getReportListForMetadata = async (req, reply) => {
   const fun = 'getReportListForMetadata'
-  log.d(mod, fun, `< GET ${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`)
+  log.t(mod, fun, `< GET ${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`)
   return await this.getReportList(PARAM_OBJECT_METADATA, req, reply)
 }
 
 // Get every reports for one object integration (private)
 exports.getReportListForObject = async (req, reply) => {
   const fun = 'getReportListForObject'
-  log.d(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`)
+  log.t(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`)
   const objectType = json.accessReqParam(req, PARAM_OBJECT)
   return await this.getReportList(objectType, req, reply)
 }
 
 exports.getReportList = async (objectType, req, reply) => {
   const fun = 'getReportList'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
   try {
     // retrieve url parameters: object id
     const urlObjectId = json.accessReqParam(req, PARAM_ID)
@@ -302,7 +306,7 @@ exports.getReportList = async (objectType, req, reply) => {
 
     return dbReportList
   } catch (err) {
-    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
@@ -352,7 +356,7 @@ exports.getSingleReport = async (objectType, req, reply) => {
 
     return dbReport
   } catch (err) {
-    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
@@ -375,15 +379,14 @@ exports.deleteSingleReportForObject = async (req, reply) => {
     return `Function '${fun}' still needs to be implemented in module ${mod}`
   } catch (err) {
     log.e(mod, fun, err)
-    utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
 // Get every reports for one object integration
 exports.deleteEveryReportForObject = async (req, reply) => {
   const fun = 'deleteEveryReportForObject'
-  log.d(mod, fun, `< DELETE ${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`)
+  log.t(mod, fun, `< DELETE ${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`)
   try {
     // retrieve url parameters: object id
 
@@ -393,8 +396,7 @@ exports.deleteEveryReportForObject = async (req, reply) => {
     return `Function '${fun}' still needs to be implemented in module ${mod}`
   } catch (err) {
     log.e(mod, fun, err)
-    utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
-    err
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
@@ -412,21 +414,19 @@ exports.deleteManyReportForObject = async (req, reply) => {
     return `Function '${fun}' still needs to be implemented in module ${mod}`
   } catch (err) {
     log.e(mod, fun, err)
-    utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
 // Get every reports for one object integration
 exports.getReportListForObjectType = async (req, reply) => {
   const fun = 'getReportListForObjectType'
-  log.d(mod, fun, `< GET ${URL_PUB_METADATA}/${PARAM_ACTION_REPORT}`)
+  log.t(mod, fun, `< GET ${URL_PUB_METADATA}/${PARAM_ACTION_REPORT}`)
   try {
     // delete every integration report for all objects
     return `Function '${fun}' still needs to be implemented in module ${mod}`
   } catch (err) {
     log.e(mod, fun, err)
-    utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
-    throw err
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }

@@ -25,6 +25,7 @@ import utils from '../../utils/jsUtils'
 import { RMToken } from './RMToken'
 import { UUIDv4 } from './UUIDv4'
 import { httpGet, httpPost } from '../../utils/httpReq'
+import { treatError } from '../../utils/errors'
 
 /*
  * -----------------------------------------------------------------------------
@@ -169,7 +170,7 @@ export class RMTokenManager {
    */
   public async checkTokenByPortal(rmToken: RMToken): Promise<any> {
     const fun = 'checkTokenByPortal'
-    log.d(mod, fun, ``)
+    log.t(mod, fun, ``)
     try {
       const requestUrl = `${this.portal.host}/${this.portal.path_check}?token=${rmToken.jwtString}`
       // log.d(mod, fun, requestUrl)
@@ -184,7 +185,7 @@ export class RMTokenManager {
         throw new Error(errMsg)
       }
     } catch (err) {
-          throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+          throw treatError(err, { mod: mod, fun: fun})
 
     }
   }

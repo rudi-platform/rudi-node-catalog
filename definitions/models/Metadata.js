@@ -101,7 +101,7 @@ const {
   API_END_DATE_PROPERTY,
   API_METADATA_ID,
 } = require('../../db/dbFields')
-const { NotFoundError, BadRequestError } = require('../../utils/errors')
+const { NotFoundError, BadRequestError, treatError } = require('../../utils/errors')
 const { DEFAULT_LANG } = require('../../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
@@ -599,8 +599,7 @@ async function checkThesaurus(metadata) {
           })
           .catch((err) => {
             log.w(mod, fun, err)
-            utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
-            throw err
+            throw treatError(err, { mod: mod, fun: fun })
           })
       })
     )
@@ -639,7 +638,7 @@ async function checkThesaurus(metadata) {
       throw new BadRequestError(msg.incorrectVal('storage_status', metadata.storage_status))
     }
   } catch (err) {
-    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 /* 
@@ -658,7 +657,7 @@ async function checkThesaurus(metadata) {
         log.d(mod, fun, `type: ${media[API_MEDIA_TYPE_PROPERTY]}`)
       }
     } catch (err) {
-          throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+          throw treatError(err, { mod: mod, fun: fun})
 
     }
   }
@@ -676,7 +675,7 @@ function toDate(dateStr) {
 
 function checkDates(datesObj, firstDateProp, secondDateProp, shouldInitialize) {
   const fun = 'checkDates'
-  // log.d(mod, fun, ``)
+  // log.t(mod, fun, ``)
   try {
     if (!datesObj) return
 
@@ -696,7 +695,7 @@ function checkDates(datesObj, firstDateProp, secondDateProp, shouldInitialize) {
         `to '${firstDateProp}' = '${date1.toISOString()}' `
     )
   } catch (err) {
-    throw utils.treatAndSendError(err, { mod: mod, fun: fun, err: err })
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
@@ -728,7 +727,7 @@ MetadataSchema.virtual(
 
 MetadataSchema.pre('save', async function (next) {
   // const fun = 'pre save hook'
-  // log.d(mod, fun, ``)
+  // log.t(mod, fun, ``)
   const metadata = this
 
   try {
@@ -786,7 +785,7 @@ MetadataSchema.pre('save', async function (next) {
 
 MetadataSchema.post('save', async function (doc, next) {
   const fun = 'post save hook'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
 
   try {
     await this.populate(POPULATE_OPTS).execPopulate()
@@ -800,7 +799,7 @@ MetadataSchema.post('save', async function (doc, next) {
 /*
 MetadataSchema.post('find', async function (docs, next) {
   const fun = 'post find hook'
-  log.d(mod, fun, ``)
+  log.t(mod, fun, ``)
 
   try {
     for (let doc of docs) {
