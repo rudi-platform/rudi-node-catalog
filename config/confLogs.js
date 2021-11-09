@@ -9,7 +9,8 @@ const { existsSync, mkdirSync } = require('fs')
 
 const winston = require('winston')
 require('winston-daily-rotate-file')
-require('winston-syslog').Syslog
+// require('winston-syslog').Syslog
+const { combine, timestamp, prettyPrint } = winston.format
 
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
@@ -31,20 +32,15 @@ const SHOULD_SYSLOG = sys.getIniValue(FLAGS_SECTION, 'should_syslog')
 const SHOULD_SYSLOG_IN_FILE = sys.getIniValue(FLAGS_SECTION, 'should_syslog_in_file')
 
 exports.shouldShowErrorPile = () => SHOULD_SHOW_ERROR_PILE
-utils.consoleLog(
-  mod,
-  '',
-  `[${sys.shouldControlPrivateRequests() ? 'x' : ' '}] Controle private requests`
-)
-utils.consoleLog(
-  mod,
-  '',
-  `[${sys.shouldControlPublicRequests() ? 'x' : ' '}] Controle public requests`
-)
-utils.consoleLog(mod, '', `[${SHOULD_FILELOG ? 'x' : ' '}] Logging in file`)
-utils.consoleLog(mod, '', `[${SHOULD_SHOW_ERROR_PILE ? 'x' : ' '}] Show error pile`)
-utils.consoleLog(mod, '', `[${SHOULD_SYSLOG ? 'x' : ' '}] Logs sent to syslog`)
-utils.consoleLog(mod, '', `[${SHOULD_SYSLOG_IN_FILE ? 'x' : ' '}] Syslogs backup in file`)
+
+const checkOption = (msg, flag) => utils.consoleLog(mod, '', `[${flag ? 'x' : ' '}] ${msg}`)
+
+checkOption('Control private requests', sys.shouldControlPrivateRequests())
+checkOption('Control public requests', sys.shouldControlPublicRequests())
+checkOption('Log in file', SHOULD_FILELOG)
+checkOption('Show error pile', SHOULD_SHOW_ERROR_PILE)
+checkOption('Sent syslogs', SHOULD_SYSLOG)
+checkOption('Backup syslogs in file', SHOULD_SYSLOG_IN_FILE)
 
 // ----- Logs section
 const LOG_SECTION = 'logging'
@@ -133,14 +129,15 @@ const FORMAT_TIMESTAMP = { format: utils.LOG_DATE_FORMAT }
 
 const FORMAT_PRINTF = (info) => `${info.timestamp} .${info.level}. ${info.message}`
 
-const formatConsoleLogs = winston.format.combine(
+const formatConsoleLogs = combine(
   winston.format.json(),
   winston.format.colorize({ all: true }),
   winston.format.timestamp(FORMAT_TIMESTAMP),
-  winston.format.printf(FORMAT_PRINTF)
+  winston.format.printf(FORMAT_PRINTF),
+  prettyPrint()
 )
 
-const formatFileLogs = winston.format.combine(
+const formatFileLogs = combine(
   winston.format.simple(),
   winston.format.timestamp(FORMAT_TIMESTAMP),
   winston.format.printf(FORMAT_PRINTF)
@@ -154,7 +151,7 @@ const logOutputs = {
   console: new winston.transports.Console({
     name: 'consoleLogs',
     level: LOG_LVL,
-    levels: winston.config.syslog.levels,
+    // levels: winston.config.syslog.levels,
     format: formatConsoleLogs,
   }),
 
@@ -289,20 +286,21 @@ const syslogOpts = {
 
 if (SHOULD_SYSLOG) {
   // Push to syslog socket
-  syslogOpts.transports.push(
-    new winston.transports.Syslog({
-      name: 'syslogSocket',
-      localhost: SYSLOG_NODE_NAME,
-      facility: SYSLOG_FACILITY,
-      protocol: SYSLOG_PROTOCOL,
-      host: SYSLOG_HOST,
-      port: SYSLOG_PORT,
-      path: SYSLOG_SOCKET,
-      type: SYSLOG_TYPE,
-      app_name: APP_NAME,
-      level: 'info',
-    })
-  )
+  // syslogOpts.transports.push(
+  //   new winston.transports.Syslog({
+  //     name: 'syslogSocket',
+  //     localhost: SYSLOG_NODE_NAME,
+  //     facility: SYSLOG_FACILITY,
+  //     protocol: SYSLOG_PROTOCOL,
+  //     host: SYSLOG_HOST,
+  //     port: SYSLOG_PORT,
+  //     path: SYSLOG_SOCKET,
+  //     type: SYSLOG_TYPE,
+  //     app_name: APP_NAME,
+  //     level: 'info',
+  //   })
+  // )
+  syslogOpts.transports.push(logOutputs.console)
 } else {
   syslogOpts.transports.push(logOutputs.console)
 }

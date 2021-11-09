@@ -86,6 +86,7 @@ const Colors = {
 function log(logLevel, srcMod, srcFun, msg) {
   try {
     logger[logLevel](displayStr(srcMod, srcFun, msg))
+    console.log(displayStr(srcMod, srcFun, msg))
     addLogEntry(logLevel, srcMod, srcFun, msg)
   } catch (e) {
     consoleErr(e)

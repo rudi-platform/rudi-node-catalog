@@ -10,7 +10,7 @@ const mod = 'routes'
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
-const { getApiCallMsg, beautify } = require('../utils/jsUtils')
+const { getApiCallMsg } = require('../utils/jsUtils')
 const { treatError } = require('../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
