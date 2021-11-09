@@ -598,7 +598,7 @@ async function checkThesaurus(metadata) {
             else throw new BadRequestError(msg.incorrectVal(API_KEYWORDS_PROPERTY, keyword))
           })
           .catch((err) => {
-            log.w(mod, fun, err)
+            // log.w(mod, fun, err)
             throw treatError(err, { mod: mod, fun: fun })
           })
       })

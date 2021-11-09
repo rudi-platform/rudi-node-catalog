@@ -368,7 +368,6 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
           try {
             nestedFieldIds = await db.getNestedObject(objectType, extObj, objFilter, DB_ID)
           } catch (err) {
-            log.w(mod, fun, err)
             // returnedFilter[QUERY_FILTER][extObj] = 0
             throw treatError(err, { mod: mod, fun: fun })
           }
@@ -643,10 +642,8 @@ exports.getMetadataListAndCount = async (req, reply) => {
     objectList = await db.getMetadataListAndCount(options)
     return objectList
   } catch (err) {
-    log.e(mod, fun, err)
-    const error = treatError(err, { mod: mod, fun: fun })
-    if (err.name === 'MongoError') throw new BadRequestError(error)
-    throw new NotFoundError(error)
+    const error = err.name === 'MongoError' ? new BadRequestError(error) : new NotFoundError(error)
+    throw treatError(error, { mod: mod, fun: fun })
   }
 }
 
@@ -676,9 +673,8 @@ exports.updateSingleObject = async (req, reply) => {
       return await db.overwriteObject(objectType, updateData)
     }
   } catch (err) {
-    log.e(mod, fun, err)
-    const error = treatError(err, { mod: mod, fun: fun })
-    throw error
+    // log.e(mod, fun, err)
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
@@ -711,7 +707,7 @@ exports.upsertSingleObject = async (req, reply) => {
       }
     }
   } catch (err) {
-    log.e(mod, fun, err)
+    // log.e(mod, fun, err)
     throw treatError(err, { mod: mod, fun: fun })
   }
 }
@@ -750,7 +746,7 @@ exports.deleteSingleObject = async (req, reply) => {
 
     return answer
   } catch (err) {
-    log.e(mod, fun, err)
+    // log.e(mod, fun, err)
     throw treatError(err, { mod: mod, fun: fun })
   }
 }
@@ -783,7 +779,7 @@ exports.deleteObjectList = async (req, reply) => {
     }
     return deletionResult
   } catch (err) {
-    log.w(mod, fun, err)
+    // log.w(mod, fun, err)
     // log.e(mod, fun, `method: ${beautify(req.method)}`)
     // log.e(mod, fun, `url: ${beautify(req.url)}`)
     // log.e(mod, fun, `params: ${beautify(req.params)}`)
@@ -820,7 +816,7 @@ exports.deleteManyObjects = async (req, reply) => {
 
     return await db.deleteManyWithFilter(objectType, filter)
   } catch (err) {
-    log.e(mod, fun, err)
+    // log.e(mod, fun, err)
     throw treatError(err, { mod: mod, fun: fun })
   }
 }
@@ -844,7 +840,7 @@ exports.generateUUID = async (req, reply) => {
   try {
     return UUIDv4()
   } catch (err) {
-    log.e(mod, fun, err)
+    // log.e(mod, fun, err)
     throw treatError(err, { mod: mod, fun: fun })
   }
 }

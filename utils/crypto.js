@@ -13,6 +13,27 @@ const mod = 'utils'
 const { accessProperty } = require('./jsonAccess')
 
 // ------------------------------------------------------------------------------------------------
+// Constants
+// ------------------------------------------------------------------------------------------------
+
+// norm : https://www.iana.org/assignments/jwt/jwt.xhtml
+
+// Required fields for RUDI JWT:
+exports.JWT_TYP = 'typ'
+exports.JWT_ALG = 'alg' // JWT signature algorithm
+
+exports.JWT_EXP = 'exp' // Expiration Time https://www.rfc-editor.org/rfc/rfc7519.html#section-4.1.4
+exports.JWT_SUB = 'sub' // Subject https://www.rfc-editor.org/rfc/rfc7519.html#section-4.1.2
+
+exports.REQ_MTD = 'req_mtd'
+exports.REQ_URL = 'req_url'
+
+// Optional fields for RUDI JWT:
+// const JWT_ID = 'jti' // https://www.rfc-editor.org/rfc/rfc7519.html#section-4.1.7
+// const JWT_IAT = 'iat' // Issued At https://www.rfc-editor.org/rfc/rfc7519.html#section-4.1.6
+exports.JWT_CLIENT = 'client_id' // https://www.rfc-editor.org/rfc/rfc6749.html#section-2.2
+
+// ------------------------------------------------------------------------------------------------
 // Crypto
 // ------------------------------------------------------------------------------------------------
 

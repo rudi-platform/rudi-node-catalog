@@ -6,14 +6,23 @@ const mod = 'logging'
 // External dependencies
 // ------------------------------------------------------------------------------------------------
 const { pick } = require('lodash')
+
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
-const { logger, sysLogger } = require('../config/confLogs')
-const { displayStr, logWhere, beautify, shorten, consoleErr } = require('./jsUtils')
+const {
+  displayStr,
+  logWhere,
+  beautify,
+  shorten,
+  consoleErr,
+  getReqIpAndRedirections,
+} = require('./jsUtils')
+
+const { logger, sysLogger, getLogLevel } = require('../config/confLogs')
 const { addLogEntry } = require('../db/dbQueries')
 const { API_METADATA_ID, API_DATA_NAME_PROPERTY } = require('../db/dbFields')
-const sys = require('../config/confSystem')
+const { TRACE } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
 // Colors
@@ -74,60 +83,23 @@ const Colors = {
 // ------------------------------------------------------------------------------------------------
 // Logging functions
 // ------------------------------------------------------------------------------------------------
-
-exports.e = (srcMod, srcFun, msg) => {
-  const logLevel = 'error'
+function log(logLevel, srcMod, srcFun, msg) {
   try {
-    logger.error(displayStr(srcMod, srcFun, msg))
+    logger[logLevel](displayStr(srcMod, srcFun, msg))
     addLogEntry(logLevel, srcMod, srcFun, msg)
   } catch (e) {
     consoleErr(e)
   }
 }
-
-exports.w = (srcMod, srcFun, msg) => {
-  const logLevel = 'warn'
-  try {
-    logger.warn(displayStr(srcMod, srcFun, msg))
-    addLogEntry(logLevel, srcMod, srcFun, msg)
-  } catch (e) {
-    consoleErr(e)
-  }
-}
-
-exports.i = (srcMod, srcFun, msg) => {
-  const logLevel = 'info'
-  try {
-    logger.info(displayStr(srcMod, srcFun, msg))
-    addLogEntry(logLevel, srcMod, srcFun, msg)
-  } catch (e) {
-    consoleErr(e)
-  }
-}
-
-exports.v = (srcMod, srcFun, msg) => {
-  const logLevel = 'verbose'
-  try {
-    logger.verbose(displayStr(srcMod, srcFun, msg))
-    addLogEntry(logLevel, srcMod, srcFun, msg)
-  } catch (e) {
-    consoleErr(e)
-  }
-}
-
-exports.d = (srcMod, srcFun, msg) => {
-  try {
-    const logLevel = 'debug'
-    logger.debug(displayStr(srcMod, srcFun, msg))
-    addLogEntry(logLevel, srcMod, srcFun, msg)
-  } catch (e) {
-    consoleErr(e)
-  }
-}
+exports.e = (srcMod, srcFun, msg) => log('error', srcMod, srcFun, msg)
+exports.w = (srcMod, srcFun, msg) => log('warn', srcMod, srcFun, msg)
+exports.i = (srcMod, srcFun, msg) => log('info', srcMod, srcFun, msg)
+exports.v = (srcMod, srcFun, msg) => log('verbose', srcMod, srcFun, msg)
+exports.d = (srcMod, srcFun, msg) => log('debug', srcMod, srcFun, msg)
 
 exports.t = (srcMod, srcFun, msg) => {
   const logLevel = 'trace'
-  if (sys.logLevel() != logLevel) return
+  if (getLogLevel() != logLevel) return
   try {
     logger.debug(displayStr(srcMod, srcFun, msg))
     addLogEntry(logLevel, srcMod, srcFun, msg)
@@ -143,56 +115,44 @@ exports.displaySyslog = (srcMod, srcFun, msg) => {
   return `[ ${logWhere(srcMod, srcFun)} ] ${msg !== '' ? msg : '<-'}`
 }
 
-// System-related "panic" conditions
-exports.sysEmerg = (msg, info) => {
-  if (info) sysLogger.emerg(msg, info)
-  else sysLogger.emerg(msg)
+const treatSyslogInfo = (info) => {
+  if (info && info.req) {
+    const req = info.req
+    info.req_ip = getReqIpAndRedirections(req)
+    info.req_mtd = req.method
+    info.req_url = req.url
+
+    info.req = undefined
+  }
+  return info
 }
+
+// System-related "panic" conditions
+exports.sysEmerg = (msg, info) => sysLogger.emerg(msg, treatSyslogInfo(info))
 
 // Something bad happened, deal with it NOW!
-exports.sysAlert = (msg, info) => {
-  if (info) sysLogger.alert(msg, info)
-  else sysLogger.alert(msg)
-}
+exports.sysAlert = (msg, info) => sysLogger.alert(msg, treatSyslogInfo(info))
 
 // Something bad is about to happen, deal with it NOW!
-exports.sysCrit = (msg, info) => {
-  if (info) sysLogger.crit(msg, info)
-  else sysLogger.crit(msg)
-}
+exports.sysCrit = (msg, info) => sysLogger.crit(msg, treatSyslogInfo(info))
 
 // A failure in the system that needs attention.
-exports.sysError = (msg, info) => {
-  if (info) sysLogger.error(msg, info)
-  else sysLogger.error(msg)
-}
+exports.sysError = (msg, info) => sysLogger.error(msg, treatSyslogInfo(info))
 
 // Something will happen if it is not dealt within a timeframe.
-exports.sysWarn = (msg, info) => {
-  if (info) sysLogger.warn(msg, info)
-  else sysLogger.warn(msg)
-}
+exports.sysWarn = (msg, info) => sysLogger.warn(msg, treatSyslogInfo(info))
 
 // Events that are unusual but not error conditions - might be summarized in an email to developers
 // or admins to spot potential problems - no immediate action required.
-exports.sysNotice = (msg, info) => {
-  if (info) sysLogger.notice(msg, info)
-  else sysLogger.notice(msg)
-}
+exports.sysNotice = (msg, info) => sysLogger.notice(msg, treatSyslogInfo(info))
 
 // Normal operational messages - may be harvested for reporting, measuring throughput, etc.
 // No action required.
-exports.sysInfo = (msg, info) => {
-  if (info) sysLogger.info(msg, info)
-  else sysLogger.info(msg)
-}
+exports.sysInfo = (msg, info) => sysLogger.info(msg, treatSyslogInfo(info))
 
 // Normal operational messages - may be harvested for reporting, measuring throughput, etc.
 // No action required.
-exports.sysDebug = (msg, info) => {
-  if (info) sysLogger.debug(msg, info)
-  else sysLogger.debug(msg)
-}
+exports.sysDebug = (msg, info) => sysLogger.debug(msg, treatSyslogInfo(info))
 
 // ------------------------------------------------------------------------------------------------
 // Http
@@ -220,9 +180,17 @@ exports.logMetadata = (metadata) => {
 }
 
 // ------------------------------------------------------------------------------------------------
-// Request inspector
+// Errors
 // ------------------------------------------------------------------------------------------------
 
+exports.logErrorPile = (error) => {
+  // const fun = 'showErrorPile'
+  const errContext = error.context
+  if (!errContext) return
+  errContext.map((error) => {
+    this.w(error.mod, error.fun, `${error[TRACE]}`)
+  })
+}
 // exports.logRequest = (req) => {
 //   const fun = 'apiCall'
 //   this.i('http', fun, `${req.method} ${req.url} <- ${displayIps(req)}`)

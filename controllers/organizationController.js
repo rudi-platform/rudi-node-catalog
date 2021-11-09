@@ -34,19 +34,19 @@ exports.newOrganization = async (orgJson) => {
   try {
     dbOrganization = await new Organization(orgJson)
   } catch (err) {
-    const errMsg = `New object '${URL_OBJECT_ORGANIZATIONS}': ${beautify(orgJson)} | Error: ${err}`
-    log.w(mod, fun, errMsg)
-    throw treatError(err, { mod: mod, fun: fun })
+    const error = new Error(
+      `New object '${URL_OBJECT_ORGANIZATIONS}': ${beautify(orgJson)} | Error: ${err}`
+    )
+    throw treatError(error, { mod: mod, fun: fun })
   }
   try {
     await dbOrganization.save()
     // cache.addOrganization(dbOrganization)
   } catch (err) {
-    const errMsg = `Saving object '${URL_OBJECT_ORGANIZATIONS}': ${beautify(
-      dbOrganization
-    )} | Error: ${err}`
-    log.w(mod, fun, errMsg)
-    throw treatError(err, { mod: mod, fun: fun })
+    const error = new Error(
+      `Saving object '${URL_OBJECT_ORGANIZATIONS}': ${beautify(dbOrganization)} | Error: ${err}`
+    )
+    throw treatError(error, { mod: mod, fun: fun })
   }
   return dbOrganization
 }

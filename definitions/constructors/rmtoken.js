@@ -7,6 +7,8 @@
  * @version: 1.0.0
  */
 const https = require('https');
+const { JWT_TYP, JWT_ALG } = require('../../utils/crypto');
+const { JWT_USER } = require('../../config/confPortal');
 
 /*
  * -------------------------------------------------
@@ -52,15 +54,15 @@ function RMToken(data) {
     const signature = Buffer.from(jwt[2], 'base64');
 
     //console.log(util.inspect(header));
-    if (header.alg != 'HS256' || header.typ !='JWT') {
+    if (header[JWT_ALG] != 'HS256' || header[JWT_TYP] !='JWT') {
         this.error = 'JWT: format not supported'; return;
     }
 
     //console.log(util.inspect(payload));
-    this.expire = new Date(payload['exp']*1000);
-    this.user_name = payload['user_name'];
+    this[JWT_EXP] = new Date(payload[JWT_EXP]*1000);
+    this[JWT_USER] = payload[JWT_USER];
     this.authorities = payload['authorities'];
-    this.client_id = payload['client_id'];
+    this[JWT_CLIENT] = payload[JWT_CLIENT];
     this.scope = payload['scope'];
     if (this.jti != payload['jti']) {
         this.error = 'JWT: inconsistent JTI'; return;

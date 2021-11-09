@@ -49,62 +49,74 @@ module.exports = class Thesaurus {
    */
   init = async (shouldReset) => {
     const fun = 'init'
-    // log.d(mod, fun, `Thesaurus: ${this.#code}`)
-    if (this.#isInit) throw new MethodNotAllowedError('Init should be called only once.')
+    try {
+      // log.d(mod, fun, `Thesaurus: ${this.#code}`)
+      if (this.#isInit) throw new MethodNotAllowedError('Init should be called only once.')
 
-    if (shouldReset) {
-      this.#currentValues = []
-      await this.#storeCurrentValues()
-    } else {
-      try {
-        await this.#retrieveDbValues()
-      } catch (err) {
-        log.d(mod, fun, 'No values found in DB')
-        this.#currentValues = this.#initValues
+      if (shouldReset) {
+        this.#currentValues = []
+        await this.#storeCurrentValues()
+      } else {
         try {
-          await this.#storeCurrentValues()
-          log.d(mod, fun, 'Current values stored in DB')
+          await this.#retrieveDbValues()
         } catch (err) {
-          log.w(mod, fun, 'Failed to store current enum values')
+          log.d(mod, fun, 'No values found in DB')
+          this.#currentValues = this.#initValues
+          try {
+            await this.#storeCurrentValues()
+            log.d(mod, fun, 'Current values stored in DB')
+          } catch (err) {
+            log.w(mod, fun, 'Failed to store current enum values')
+          }
         }
       }
+      this.#isInit = true
+      // log.d(mod, fun, `Thesaurus initialized: ${this.#code}`)
+    } catch (err) {
+      throw treatError(err, { mod: mod, fun: fun })
     }
-    this.#isInit = true
-    // log.d(mod, fun, `Thesaurus initialized: ${this.#code}`)
   }
 
   get(lang) {
     const fun = 'get'
-    if (!this.#isInit) {
-      const errMsg = 'Init first'
-      log.w(mod, fun, errMsg)
-      throw new MethodNotAllowedError(errMsg)
+    try {
+      if (!this.#isInit) {
+        const errMsg = 'Init first'
+        log.w(mod, fun, errMsg)
+        throw new MethodNotAllowedError(errMsg)
+      }
+      if (lang) return this.getLabels(lang)
+      return this.#currentValues
+    } catch (err) {
+      throw treatError(err, { mod: mod, fun: fun })
     }
-    if (lang) return this.getLabels(lang)
-    return this.#currentValues
   }
 
   getLabels(lang) {
     const fun = 'getLabels'
-    log.t(mod, fun, ``)
+    try {
+      log.t(mod, fun, ``)
 
-    if (!this.#isInit) {
-      const errMsg = 'Init first'
-      log.w(mod, fun, errMsg)
-      throw new MethodNotAllowedError(errMsg)
+      if (!this.#isInit) {
+        const errMsg = 'Init first'
+        log.w(mod, fun, errMsg)
+        throw new MethodNotAllowedError(errMsg)
+      }
+
+      if (!this.#initLabels) return this.#currentValues
+
+      if (!lang) return this.#initLabels
+      const labels = {}
+      Object.keys(this.#initLabels).map((key) => {
+        const val = this.#initLabels[key][lang]
+        const label = val ? val : key
+        // log.d(mod, fun, `${beautify(key)}: ${val}`)
+        labels[key] = label
+      })
+      return labels
+    } catch (err) {
+      throw treatError(err, { mod: mod, fun: fun })
     }
-
-    if (!this.#initLabels) return this.#currentValues
-
-    if (!lang) return this.#initLabels
-    const labels = {}
-    Object.keys(this.#initLabels).map((key) => {
-      const val = this.#initLabels[key][lang]
-      const label = val ? val : key
-      // log.d(mod, fun, `${beautify(key)}: ${val}`)
-      labels[key] = label
-    })
-    return labels
   }
 
   addSingleValue = async (newValue) => {
@@ -123,7 +135,7 @@ module.exports = class Thesaurus {
         await this.#storeCurrentValues()
       }
     } catch (err) {
-      log.w(mod, fun, err)
+      // log.w(mod, fun, err)
       throw treatError(err, { mod: mod, fun: fun })
     }
   }
@@ -144,7 +156,7 @@ module.exports = class Thesaurus {
       }
       return isIn
     } catch (err) {
-      log.w(mod, fun, err)
+      // log.w(mod, fun, err)
       throw treatError(err, { mod: mod, fun: fun })
     }
   }
@@ -159,8 +171,8 @@ module.exports = class Thesaurus {
         throw new NotFoundError(`No values found for thesaurus '${this.#code}'`)
       }
     } catch (err) {
-      log.d(mod, fun, err)
-      throw err
+      // log.d(mod, fun, err)
+      throw treatError(err, { mod: mod, fun: fun })
     }
   }
 
@@ -170,7 +182,7 @@ module.exports = class Thesaurus {
       if (!this.#currentValues) throw new MethodNotAllowedError('Values not inititalized')
       await this.#storeEnum(this.#code, this.#currentValues)
     } catch (err) {
-      log.w(mod, fun, err)
+      // log.w(mod, fun, err)
       throw treatError(err, { mod: mod, fun: fun })
     }
   }
@@ -184,8 +196,8 @@ module.exports = class Thesaurus {
       if (dbEnum) return dbEnum.values
       else throw new NotFoundError(`Enum '${typeThesaurus}' was not found`)
     } catch (err) {
-      log.d(mod, fun, err)
-      throw err
+      // log.d(mod, fun, err)
+      throw treatError(err, { mod: mod, fun: fun })
     }
   }
 
@@ -198,8 +210,8 @@ module.exports = class Thesaurus {
       if (dbEnum) return dbEnum.values
       else throw new NotFoundError(`Enum '${typeThesaurus}' was not found`)
     } catch (err) {
-      log.d(mod, fun, err)
-      throw err
+      // log.d(mod, fun, err)
+      throw treatError(err, { mod: mod, fun: fun })
     }
   }
 
@@ -214,7 +226,7 @@ module.exports = class Thesaurus {
         { upsert: true, new: true }
       )
     } catch (err) {
-      log.w(mod, fun, err)
+      // log.w(mod, fun, err)
       throw treatError(err, { mod: mod, fun: fun })
     }
   }

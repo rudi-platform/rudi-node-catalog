@@ -119,3 +119,12 @@ exports.URL_PV_LICENCE_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_LICENCE_S
 exports.URL_PV_LICENCE_CODES_ACCESS = `${this.URL_PREFIX_PRIVATE}/${URL_SUFFIX_LICENCE_CODES}`
 
 exports.ROUTE_NAME = 'route_name'
+
+// ------------------------------------------------------------------------------------------------
+// Errors trace
+// ------------------------------------------------------------------------------------------------
+exports.STATUS_CODE = 'statusCode'
+
+exports.CONTEXT = 'app_context'
+exports.TRACE = 'err_trace'
+exports.IS_RUDI_HTTP_ERROR = 'is_rudi_error'

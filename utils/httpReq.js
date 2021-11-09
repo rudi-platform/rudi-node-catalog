@@ -14,7 +14,7 @@ const axios = require('axios')
 // ------------------------------------------------------------------------------------------------
 const log = require('./logging')
 const utils = require('./jsUtils')
-const { InternalServerError, createRudiHttpError, treatError } = require('./errors')
+const { createRudiHttpError, treatError } = require('./errors')
 
 // ------------------------------------------------------------------------------------------------
 // Functions: header treatments
@@ -27,7 +27,33 @@ exports.getHeaderRedirectUrls = (req) => {
 // ------------------------------------------------------------------------------------------------
 // Functions: http requests
 // ------------------------------------------------------------------------------------------------
+function treatCommunicationError(portalError) {
+  const fun = 'treatPortalError'
+  let error
+  try {
+    if (portalError.response && portalError.response.data)
+      log.w(mod, fun, `details: ${utils.beautify(portalError.response.data)}`)
+    else if (portalError.response)
+      log.w(mod, fun, `details: ${utils.beautify(portalError.response)}`)
 
+    if (
+      portalError.response &&
+      portalError.response.data &&
+      portalError.response.data.label &&
+      portalError.response.data.code
+    ) {
+      error = createRudiHttpError(portalError.response.data.code, portalError.response.data.label)
+    } else if (portalError.response && portalError.response.data)
+      error = new Error(portalError.response.data)
+    else {
+      if (portalError.response) error = new Error(portalError.response)
+      else error = portalError
+    }
+    return error
+  } catch (err) {
+    throw treatError(err, { mod: mod, fun: fun })
+  }
+}
 exports.httpGet = async (destUrl, authorizationToken) => {
   const fun = 'httpGet'
   log.t(mod, fun, ``)
@@ -43,42 +69,29 @@ exports.httpGet = async (destUrl, authorizationToken) => {
     const answer = await this.directGet(destUrl, reqOpts)
     log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
     return answer.data
-  } catch (error) {
-    log.w(mod, fun, `GET: ${error}`)
-    throw error
+  } catch (err) {
+    throw treatCommunicationError(err, { mod: mod, fun: fun })
   }
 }
 
 exports.httpDelete = async (destUrl, authorizationToken) => {
   const fun = 'httpDelete'
-  log.t(mod, fun, ``)
-
-  const reqOpts = {
-    headers: {
-      'User-Agent': 'Rudi-Producer',
-      'Content-Type': 'application/json',
-    },
-  }
-  if (authorizationToken) reqOpts.headers.Authorization = `Bearer ${authorizationToken}`
-
   try {
+    log.t(mod, fun, ``)
+
+    const reqOpts = {
+      headers: {
+        'User-Agent': 'Rudi-Producer',
+        'Content-Type': 'application/json',
+      },
+    }
+    if (authorizationToken) reqOpts.headers.Authorization = `Bearer ${authorizationToken}`
+
     const answer = await axios.delete(destUrl, reqOpts)
     log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
     return answer.data
-  } catch (error) {
-    log.w(mod, fun, `DELETE: ${error}`)
-    if (error.response && error.response.data)
-      log.w(mod, fun, `details: ${utils.beautify(error.response.data)}`)
-    else if (error.response) log.w(mod, fun, `details: ${utils.beautify(error.response)}`)
-
-    if (
-      error.response &&
-      error.response.data &&
-      error.response.data.label &&
-      error.response.data.code
-    )
-      throw createRudiHttpError(error.response.data.code, error.response.data.label)
-    else throw error
+  } catch (err) {
+    throw treatCommunicationError(err, { mod: mod, fun: fun })
   }
 }
 
@@ -130,7 +143,7 @@ exports.httpPost = async (destUrl, dataToSend, authorizationToken) => {
     log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
     return answer.data
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw treatCommunicationError(err, { mod: mod, fun: fun })
   }
   /*
   const options = {
@@ -166,21 +179,7 @@ exports.directPost = async (destUrl, dataToSend, reqOpts) => {
     return answer
   } catch (err) {
     // log.w(mod, fun, err)
-    if (err.response && err.response.data) {
-      log.w(mod, fun, utils.beautify(err.response.data))
-      if (err.response.data.code && err.response.data.label) {
-        const postErr = new InternalServerError(
-          `${err.response.data.code}: ${err.response.data.label}`
-        )
-        postErr.status = err.status
-        throw new InternalServerError(`${err.response.data.code}: ${err.response.data.label}`)
-      } else {
-        throw new InternalServerError(`${utils.beautify(err.response.data)}`)
-      }
-    } else {
-      log.w(mod, fun, utils.beautify(err))
-      throw new InternalServerError(utils.beautify(err))
-    }
+    throw treatCommunicationError(err, { mod: mod, fun: fun })
   }
 }
 
@@ -195,13 +194,7 @@ exports.directGet = async (destUrl, reqOpts) => {
     log.logHttpAnswer(mod, fun, answer)
     return answer
   } catch (err) {
-    if (err.response && err.response.data)
-      throw new Error(`${err.response.data.code}: ${err.response.data.label}`)
-    if (err.message && err.code) throw new Error(`${err.code}: ${err.message}`)
-
-    log.w(mod, fun, `err: ${utils.beautify(err)}`)
-    if (err.response) log.w(mod, fun, `err.response: ${utils.beautify(err.response)}`)
-    log.w(mod, fun, `err.message: ${utils.beautify(err.message)}`)
+    throw treatCommunicationError(err, { mod: mod, fun: fun })
   }
 }
 

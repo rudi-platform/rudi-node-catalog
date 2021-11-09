@@ -27,7 +27,7 @@ exports.test = async (req, reply) => {
 
     return await db.isReferencedInMetadata(objectType, rudiId)
   } catch (err) {
-    log.e(mod, fun, err)
+    // log.e(mod, fun, err)
     throw treatError(err, { mod: mod, fun: fun })
   }
 }

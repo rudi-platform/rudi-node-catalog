@@ -11,7 +11,6 @@ const { parseKey } = require('sshpk')
 // ------------------------------------------------------------------------------------------------
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
-const log = require('../utils/logging')
 
 const {
   beautify,
@@ -20,30 +19,25 @@ const {
   nowISO,
   dateEpochSToIso,
 } = require('../utils/jsUtils')
-const { getProfile } = require('../config/confSystem')
-const { accessProperty } = require('../utils/jsonAccess')
-const { ForbiddenError, UnauthorizedError, treatError } = require('../utils/errors')
+
+const log = require('../utils/logging')
 const { ROUTE_NAME } = require('../config/confApi')
+const { getProfile } = require('../config/confSystem')
+const { ForbiddenError, UnauthorizedError, treatError } = require('../utils/errors')
+const { accessProperty } = require('../utils/jsonAccess')
+const {
+  extractJwt,
+  JWT_ALG,
+  JWT_EXP,
+  JWT_SUB,
+  JWT_CLIENT,
+  REQ_MTD,
+  REQ_URL,
+} = require('../utils/crypto')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
-
-// norm : https://www.iana.org/assignments/jwt/jwt.xhtml
-
-// Required fields for RUDI JWT:
-const JWT_ALG = 'alg' // JWT signature algorithm
-const JWT_EXP = 'exp' // Expiration Time https://www.rfc-editor.org/rfc/rfc7519.html#section-4.1.4
-const JWT_SUB = 'sub' // Subject https://www.rfc-editor.org/rfc/rfc7519.html#section-4.1.2
-const REQ_MTD = 'req_mtd'
-const REQ_URL = 'req_url'
-
-// Optional fields for RUDI JWT:
-// const JWT_ID = 'jti' // https://www.rfc-editor.org/rfc/rfc7519.html#section-4.1.7
-// const JWT_IAT = 'iat' // Issued At https://www.rfc-editor.org/rfc/rfc7519.html#section-4.1.6
-// const JWT_CLIENT = 'client_id' // https://www.rfc-editor.org/rfc/rfc6749.html#section-2.2
-
-// const DEFAULT_EXP = 600
 
 const PUB_KEY = 'pub_key'
 const SUB_ACL = 'routes'
@@ -121,23 +115,24 @@ exports.checkRudiProdPermission = async (req, reply) => {
   const fun = 'checkRudiProdPermission'
   log.t(mod, fun, ``)
   try {
-    const header = req.headers
-    // log.d(mod, fun, `${beautify(header)}`)
-    const auth = header.authorization
-
-    if (!auth)
-      throw new UnauthorizedError(
-        'Headers should include a JWT in the form "Authorization": Bearer <JWT>"'
+    let token
+    try {
+      token = extractJwt(req)
+    } catch (err) {
+      const error = new UnauthorizedError(
+        `Headers should include a JWT in the form "Authorization": Bearer <JWT>": ${err}`
       )
-    const token = auth.substring(7)
+      throw treatError(error, { mod: mod, fun: fun })
+    }
+
     // log.d(mod, fun, `token: ${token}`)
-    const subject = await this.verifyRudiProdToken(token, req.method, req.url)
+    const { subject, client_id } = await this.verifyRudiProdToken(token, req.method, req.url)
 
     // Check the ACL (= does the subject have permission to enter this route?)
     log.d(mod, fun, `req: ${beautify(req.context.config[ROUTE_NAME])}`)
     const reqRouteName = accessProperty(req.context.config, ROUTE_NAME)
     checkSubjPermission(subject, reqRouteName)
-    return subject
+    return { subject, client_id }
     // return 'ok'
   } catch (err) {
     throw treatError(err, { mod: mod, fun: fun })
@@ -195,6 +190,7 @@ exports.verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
     // Identify the subject (= caller/requester)
     const subject = accessProperty(jwtPayload, JWT_SUB)
     // log.d(mod, fun, `subject: ${subject}`)
+    const clientId = jwtPayload[JWT_CLIENT]
 
     // Retrieve the public key
     const subjProfile = getProfile(subject)
@@ -229,7 +225,7 @@ exports.verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
     // Check the ACL (= does the subject have permission to enter this route?)
     // const subjAcl = accessProperty(subjProfile, SUB_ACL)
 
-    return subject
+    return { subject, clientId }
   } catch (err) {
     // log.w(mod, fun, err)
     const error = new ForbiddenError(`JWT is not a valid RUDI Producer JWT: ${err.message}`)
@@ -242,7 +238,7 @@ exports.isRudiProducerToken = (token) => {
   try {
     const jwtPayloadBase64url = token.split('.')[1]
     const jwtPayload = JSON.parse(decodeBase64url(jwtPayloadBase64url))
-    return !!jwtPayload.req_mtd
+    return !!jwtPayload[REQ_MTD]
   } catch (err) {
     throw treatError(err, { mod: mod, fun: fun })
   }

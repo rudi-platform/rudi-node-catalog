@@ -35,7 +35,7 @@ const {
   treatError,
 } = require('../utils/errors')
 
-const { extractJwt } = require('../utils/crypto')
+const { extractJwt, JWT_EXP } = require('../utils/crypto')
 // const { createHmac } = require('crypto')
 
 // ------------------------------------------------------------------------------------------------
@@ -73,7 +73,9 @@ exports.checkPortalTokenInHeader = async (req, reply) => {
   log.t(mod, fun, ``)
   try {
     const token = extractJwt(req)
-    return await this.getTokenCheckedByPortal(token)
+    return await this.verifyPortalToken(token)
+
+    // return await this.getTokenCheckedByPortal(token)
   } catch (err) {
     throw treatError(err, { mod: mod, fun: fun })
   }
@@ -235,10 +237,9 @@ exports.getNewTokenFromPortal = async () => {
     let answer
     try {
       answer = await directPost(portalAuthUrl, body, opts)
-    } catch (error) {
-      const err = new InternalServerError(`Post to portal failed: ${error}`)
-      log.w(mod, fun, err)
-      throw treatError(err, { mod: mod, fun: fun })
+    } catch (err) {
+      const error = new InternalServerError(`Post to portal failed: ${err}`)
+      throw treatError(error, { mod: mod, fun: fun })
     }
     // log.d(mod, fun, `answer.status: ${answer.status}`)
 
@@ -254,11 +255,11 @@ exports.getNewTokenFromPortal = async () => {
       // log.d(mod, fun, `portalToken: ${utils.beautify(portalToken)}`)
 
       const jwtBody = this.verifyPortalToken(jwToken)[1]
-      portalToken[portal.JWT_EXP] = jwtBody[portal.JWT_EXP]
+      portalToken[JWT_EXP] = jwtBody[JWT_EXP]
       log.d(
         mod,
         fun,
-        `We got a new token, that expires on ${utils.dateEpochSToIso(jwtBody[portal.JWT_EXP])}`
+        `We got a new token, that expires on ${utils.dateEpochSToIso(jwtBody[JWT_EXP])}`
       )
       await this.getTokenCheckedByPortal(portalToken[portal.FIELD_TOKEN])
       await db.storePortalToken(portalToken)
@@ -269,9 +270,9 @@ exports.getNewTokenFromPortal = async () => {
       // log.w(mod, fun, errMsg)
       throw createRudiHttpError(answer.status, errMsg)
     }
-  } catch (error) {
-    const err = new ForbiddenError(`Failed to get a token from Portal: ${utils.beautify(err)}`)
-    throw treatError(err, { mod: mod, fun: fun })
+  } catch (err) {
+    const error = new ForbiddenError(`Failed to get a token from Portal: ${utils.beautify(err)}`)
+    throw treatError(error, { mod: mod, fun: fun })
   }
 }
 
@@ -396,7 +397,6 @@ exports.checkSignatureWithPubKey = (accessToken) => {
     }
     return signatureIsValid
   } catch (err) {
-    // const errMsg = `Invalid token: ${err}`
     throw treatError(err, { mod: mod, fun: fun })
   }
 }
@@ -416,17 +416,19 @@ exports.verifyPortalToken = (accessToken) => {
     const jwtPayload = JSON.parse(utils.decodeBase64url(jwtPayloadBase64))
 
     const login = portal.getCredentials()[0]
-    if (jwtPayload[portal.JWT_USER] !== login) {
-      log.w(mod, fun, `Portal JWT: incorrect user: : ${jwtPayload[portal.JWT_USER]}`)
+    const jwtPortalUser = jwtPayload[portal.JWT_USER]
+    // log.d(mod, fun, `JWT Portal user: ${jwtPortalUser}`)
+    if (jwtPortalUser !== login) {
+      log.w(mod, fun, `Portal JWT: incorrect user: : ${jwtPortalUser}`)
       throw new ForbiddenError(`Portal JWT: incorrect user`)
     }
     // if (jwtPayload[portal.JWT_CLIENT] !== login)
     //   throw new ForbiddenError('Portal JWT: incorrect client')
 
-    if (jwtPayload[portal.JWT_EXP] < utils.nowEpochS())
+    if (jwtPayload[JWT_EXP] < utils.nowEpochS())
       throw new ForbiddenError(
         `Portal JWT expired: ` +
-          `expire_date=${utils.dateEpochSToIso(jwtPayload[portal.JWT_EXP])}` +
+          `expire_date=${utils.dateEpochSToIso(jwtPayload[JWT_EXP])}` +
           ` < now=${utils.dateEpochSToIso(utils.nowEpochS())}`
       )
     // log.d(mod, fun, `jwtHeader: ${utils.beautify(jwtHeader)}`)
@@ -436,10 +438,12 @@ exports.verifyPortalToken = (accessToken) => {
     if (!this.checkSignatureWithPubKey(accessToken))
       throw new ForbiddenError('Portal JWT signature is not valid')
 
+    // log.d(mod, fun, `jwtHeader: ${utils.beautify(jwtHeader)}`)
+    // log.d(mod, fun, `jwtPayload: ${utils.beautify(jwtPayload)}`)
     return [jwtHeader, jwtPayload]
   } catch (err) {
-    const errMsg = `Invalid token: ${err}`
-    log.w(mod, fun, errMsg)
+    // const errMsg = `Invalid token: ${err}`
+    // log.w(mod, fun, errMsg)
     throw treatError(err, { mod: mod, fun: fun })
   }
 }
@@ -500,7 +504,7 @@ exports.deletePortalMetadata = async (metadataId) => {
 
     return reply
   } catch (err) {
-    log.w(mod, fun, `Couldn't delete on Portal side: ${err}`)
-    throw treatError(err, { mod: mod, fun: fun })
+    const error = new Error(`Couldn't delete on Portal side: ${err}`)
+    throw treatError(error, { mod: mod, fun: fun })
   }
 }

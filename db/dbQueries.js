@@ -325,8 +325,8 @@ async function dropCollection(collectionName) {
     log.d(mod, fun, `Collection '${collectionName}' was not found`)
     return false
   } catch (err) {
-    treatError(err, { mod: mod, fun: fun })
-    log.w(mod, fun, err)
+    // log.w(mod, fun, err)
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
@@ -1835,7 +1835,7 @@ exports.addLogEntry = async (logLvl, loc_module, loc_function, msg) => {
 }
 
 exports.getLogEntries = async (options) => {
-  // const fun = 'getLogEntries'
+  const fun = 'getLogEntries'
   try {
     // log.d(mod, fun, `options: ${utils.beautify(options)}`)
     // Extract options
@@ -1857,6 +1857,6 @@ exports.getLogEntries = async (options) => {
 
     return readableLogs
   } catch (err) {
-    throw err
+    throw treatError(err, { mod: mod, fun: fun })
   }
 }

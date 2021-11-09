@@ -2,40 +2,121 @@
 
 const mod = 'custErr'
 
-const { isArray } = require('./jsUtils')
+const { TRACE, CONTEXT, IS_RUDI_HTTP_ERROR, STATUS_CODE } = require('../config/confApi')
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
+const { isArray } = require('./jsUtils')
 const log = require('./logging')
 const { objectNotFound, parameterExpected } = require('./msg')
 
 // ------------------------------------------------------------------------------------------------
-// Http errors
+// Cosntants
 // ------------------------------------------------------------------------------------------------
 const DEFAULT_MESSAGE = 'Rudi producer node - API Server Error'
 
+// ------------------------------------------------------------------------------------------------
+// Helper functions
+// ------------------------------------------------------------------------------------------------
+
+const isRudiHttpError = (error) => typeof error[IS_RUDI_HTTP_ERROR] !== 'undefined'
+
+function treatError(error, errContext) {
+  const fun = 'treatError'
+  try {
+    if (!error)
+      throw new ParameterExpectedError('treatError', `Input parameter 'error' shouldn't be null`)
+    if (!errContext)
+      throw new ParameterExpectedError(
+        'treatError',
+        `Input parameter 'errContext' shouldn't be null`
+      )
+    // log.d(mod, fun, beautify(error))
+    // log.d(mod, fun, error.isRudiError())
+    if (!errContext[TRACE]) errContext[TRACE] = error //|| error.toString()
+    const { mod: ctxMod, fun: ctxFun, [TRACE]: ctxErr } = errContext
+    // log.d(ctxMod, ctxFun, beautify(ctxErr))
+    if (!error[CONTEXT]) {
+      error[CONTEXT] = [errContext]
+    } else if (!isArray(error[CONTEXT])) {
+      const msg = `Reserved field '${CONTEXT}' should be an array`
+      log.w(ctxMod, ctxFun, msg + `Original error: ${ctxErr}`)
+      throw new Error(msg)
+    } else {
+      error[CONTEXT].push(errContext)
+    }
+    return error
+  } catch (err) {
+    log.w(mod, fun, err)
+    throw err
+  }
+}
+
+function createRudiHttpError(code, message) {
+  const fun = 'createRudiHttpError'
+  try {
+    log.d(mod, fun, `Error ${code}: ${message}`)
+    switch (code) {
+      case 400:
+        return new BadRequestError(message)
+      case 401:
+        return new UnauthorizedError(message)
+      case 403:
+        return new ForbiddenError(message)
+      case 404:
+        return new NotFoundError(message)
+      case 405:
+        return new MethodNotAllowedError(message)
+      case 406:
+        return new NotAcceptableError(message)
+      case 501:
+        return new NotImplementedError(message)
+      case 500:
+      default:
+        return new InternalServerError(message)
+    }
+  } catch (err) {
+    // consoleErr(mod, fun, err)
+    throw treatError(err, { mod: mod, fun: fun })
+  }
+}
+// ------------------------------------------------------------------------------------------------
+// Custom http errors
+// ------------------------------------------------------------------------------------------------
 class RudiHttpError extends Error {
   constructor(message, code, name, description) {
     super(message || DEFAULT_MESSAGE)
-    this.isRudiHttpError = true
-    this.isRudiError = true
-    this.statusCode = code || 500
+    this[IS_RUDI_HTTP_ERROR] = true
+    this[STATUS_CODE] = code || 500
     this.name = name || 'Internal Server Error'
     this.error = description || 'An unexpected error occured'
     this.type = this.constructor.name
   }
   toString() {
-    return `Error ${this.statusCode} (${this.name}): ${this.message}`
+    return `Error ${this[STATUS_CODE]} (${this.name}): ${this.message}`
   }
   toJSON() {
     return {
-      statusCode: this.statusCode,
+      [STATUS_CODE]: this[STATUS_CODE],
       type: this.constructor.name,
       name: this.name,
       error: this.error,
       message: this.message,
     }
   }
+  logErrorPile() {
+    const fun = 'logErrorPile'
+    try {
+      const errContext = this[CONTEXT]
+      if (!errContext) return
+      errContext.map((err) => {
+        log.w(err.mod, err.fun, `${err[TRACE]}`)
+      })
+    } catch (err) {
+      throw treatError(err, { mod: mod, fun: fun })
+    }
+  }
+  statusCode = () => this[STATUS_CODE]
 }
 
 class BadRequestError extends RudiHttpError {
@@ -113,73 +194,9 @@ class NotImplementedError extends RudiHttpError {
   }
 }
 
-function createRudiHttpError(code, message) {
-  const fun = 'createRudiHttpError'
-  try {
-    log.d(mod, fun, `Error ${code}: ${message}`)
-    switch (code) {
-      case 400:
-        return new BadRequestError(message)
-      case 401:
-        return new UnauthorizedError(message)
-      case 403:
-        return new ForbiddenError(message)
-      case 404:
-        return new NotFoundError(message)
-      case 405:
-        return new MethodNotAllowedError(message)
-      case 406:
-        return new NotAcceptableError(message)
-      case 501:
-        return new NotImplementedError(message)
-      case 500:
-      default:
-        return new InternalServerError(message)
-    }
-  } catch (err) {
-    throw this.treatError(err, { mod: mod, fun: fun })
-  }
-}
-
 // ------------------------------------------------------------------------------------------------
-// Errors
+// Exports
 // ------------------------------------------------------------------------------------------------
-const CONTEXT = 'app_context'
-const ERR = 'err'
-
-const treatError = (error, errContext) => {
-  const fun = 'treatError'
-  try {
-    if (!error) throw new Error(`Input error shouldn't be null`)
-    // log.d(mod, fun, beautify(error))
-    // log.d(mod, fun, error.isRudiError)
-    if (!errContext[ERR]) errContext[ERR] = error //|| error.toString()
-    const { mod: ctxMod, fun: ctxFun, [ERR]: ctxErr } = errContext
-    // log.d(ctxMod, ctxFun, beautify(ctxErr))
-    if (!error[CONTEXT]) {
-      error[CONTEXT] = [errContext]
-    } else if (!isArray(error[CONTEXT])) {
-      const msg = `Reserved field '${CONTEXT}' should be an array`
-      log.w(ctxMod, ctxFun, msg + `Original error: ${ctxErr}`)
-      throw new Error(msg)
-    } else {
-      error[CONTEXT].push(errContext)
-    }
-    return error
-  } catch (err) {
-    log.w(mod, fun, err)
-    throw err
-  }
-}
-
-const showErrorPile = (error) => {
-  // const fun = 'showErrorPile'
-  const errContext = error[CONTEXT]
-  if (!errContext) return
-  errContext.map((err) => {
-    log.w(err.mod, err.fun, `${err[ERR]}`)
-  })
-}
 
 module.exports = {
   RudiHttpError,
@@ -194,7 +211,6 @@ module.exports = {
   ParameterExpectedError,
   NotImplementedError,
   createRudiHttpError,
+  isRudiHttpError,
   treatError,
-  showErrorPile,
-  CONTEXT,
 }

@@ -54,9 +54,9 @@ addLogEntry('info', 'app', 'logSeparatorConf', logSeparatorConf).catch((err) =>
   utils.consoleErr('info', 'app', 'logSeparatorConf: ' + err)
 )
 
-log.i(mod, 'mongo', `Connecting to [${sys.DB_URL}]`)
+log.i(mod, 'mongo', `Connecting to [${sys.getDbUrl()}]`)
 mongoose
-  .connect(sys.DB_URL, mongoConnectOptions)
+  .connect(sys.getDbUrl(), mongoConnectOptions)
   .then(() => {
     log.i(mod, 'mongo', `MongoDB connected`)
     const startMsg =
@@ -71,9 +71,9 @@ mongoose
     )
   })
   .catch((err) => {
-    const error = treatError(err, { mod: mod, fun: 'mongoConnection' })
-    log.e(mod, 'mongoConnection', error)
-    log.sysAlert(`Mongo connection: ${error}`)
+    log.e(mod, 'mongoConnection', err)
+    log.sysAlert(`Mongo connection: ${err}`, { error: err })
+    throw treatError(err, { mod: mod, fun: 'mongoConnection' })
   })
 
 // ------------------------------------------------------------------------------------------------
@@ -81,16 +81,16 @@ mongoose
 // ------------------------------------------------------------------------------------------------
 const start = async () => {
   try {
-    process.title = sys.APP_NAME
+    process.title = sys.getAppName()
     await fastify
-      .listen(sys.LISTENING_PORT, sys.LISTENING_ADDR)
+      .listen(sys.getServerPort(), sys.getServerAddress())
       .catch((err) => log.e(mod, 'Fastify listen', `${err}`))
     // fastify.swagger()
     // fastify.log.info(`Listening on ${fastify.server.address().address}:${fastify.server.address().port}`)
   } catch (err) {
     // fastify.log.error(err)
     log.e(mod, 'exitServer', err)
-    log.sysAlert(`Server exited anormally: ${err}`)
+    log.sysAlert(`Server exited anormally: ${err}`, { error: err })
     process.exit(1)
   }
 }
@@ -102,16 +102,16 @@ try {
     })
     .catch((err) => {
       log.e(mod, 'server', `Crashed: ${err}`)
-      log.sysCrit(`Server crashed: ${err}`)
+      log.sysCrit(`Server crashed: ${err}`, { error: err })
     })
 } catch (err) {
   log.e(mod, 'server', `Uncaught error: ${err}`)
-  log.sysCrit(`Uncaught error: ${err}`)
+  log.sysCrit(`Uncaught error: ${err}`, { error: err })
 }
 
 process.on('uncaughtException', (err) => {
   log.e(mod, 'process', `Uncaught exception: ${err}`)
-  log.sysCrit(`Uncaught exception: ${err}`)
+  log.sysCrit(`Uncaught exception: ${err}`, { error: err })
   // console.error('There was an uncaught error', err)
   // process.exit(1) //mandatory (as per the Node.js docs)
 })
@@ -120,6 +120,8 @@ process.on('unhandledRejection', (err, promise) => {
   const fun = 'catching promise rejection'
   log.e(mod, fun, 'DAMN!!! Promise rejection not handled here: ' + utils.beautify(promise))
   log.e(mod, fun, 'The error was: ' + err)
-  log.sysCrit(`Promise rejection not handled: ${utils.beautify(promise)})`)
-  log.sysCrit(`Promise rejection error: ${err}`)
+  log.sysCrit(`Promise rejection not handled: ${utils.beautify(promise)})`, {
+    context: utils.beautify(promise),
+  })
+  log.sysCrit(`Promise rejection error: ${err}`, { error: err })
 })

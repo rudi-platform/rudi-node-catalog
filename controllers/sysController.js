@@ -29,7 +29,9 @@ let CURRENT_APP_HASH
 // App ID
 // ------------------------------------------------------------------------------------------------
 
-/** Returns the actual git hash */
+/**
+ * @returns the actual git hash
+ */
 exports.getGitHash = () => {
   const fun = 'getGitHash'
   // log.t(mod, fun, ``)
@@ -48,19 +50,19 @@ exports.getGitHash = () => {
 
     return `${hashId}`.trim()
   } catch (err) {
-    log.e(mod, fun, err)
+    // log.e(mod, fun, err)
     throw treatError(err, { mod: mod, fun: fun })
   }
 }
 
-/** Returns the git hash of the last time the app was launched */
+/** @returns the git hash of the last time the app was launched */
 exports.getAppHash = () => {
   const fun = 'getCurrentAppId'
   try {
     if (!CURRENT_APP_HASH) CURRENT_APP_HASH = this.getGitHash()
     return CURRENT_APP_HASH
   } catch (err) {
-    log.e(mod, fun, err)
+    // log.e(mod, fun, err)
     throw treatError(err, { mod: mod, fun: fun })
   }
 }
@@ -69,7 +71,7 @@ exports.ENV_TEST = 'test'
 exports.ENV_SHARED = 'shared'
 exports.ENV_RELEASE = 'release'
 
-/** Returns the current environment for this module */
+/** @returns the current environment for this module */
 exports.getEnvironment = () => {
   const fun = 'getEnvironment'
   try {
@@ -77,7 +79,7 @@ exports.getEnvironment = () => {
     const env = process.env.RUDI_API_ENV ? process.env.RUDI_API_ENV : utils.NOT_FOUND
     return env
   } catch (err) {
-    log.e(mod, fun, err)
+    // log.e(mod, fun, err)
     throw treatError(err, { mod: mod, fun: fun })
   }
 }
@@ -114,7 +116,7 @@ exports.getNodeVersion = async () => {
 
     return nVersions
   } catch (err) {
-    log.e(mod, fun, err)
+    // log.e(mod, fun, err)
     throw treatError(err, { mod: mod, fun: fun })
   }
 }

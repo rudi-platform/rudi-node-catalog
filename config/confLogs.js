@@ -14,33 +14,100 @@ require('winston-syslog').Syslog
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
-const sys = require('../config/confSystem')
 const utils = require('../utils/jsUtils')
+const sys = require('../config/confSystem')
 
 // ------------------------------------------------------------------------------------------------
-// Constants
+// Reading conf file
 // ------------------------------------------------------------------------------------------------
-const ERR_FASTIFY_FILE = 'ff-errors.log'
+const APP_NAME = sys.getAppName()
+
+// ----- Flags section
+const FLAGS_SECTION = 'flags'
+
+const SHOULD_FILELOG = sys.getIniValue(FLAGS_SECTION, 'should_log_in_file', false)
+const SHOULD_SHOW_ERROR_PILE = sys.getIniValue(FLAGS_SECTION, 'should_show_error_pile', false) // TODO || true
+const SHOULD_SYSLOG = sys.getIniValue(FLAGS_SECTION, 'should_syslog')
+const SHOULD_SYSLOG_IN_FILE = sys.getIniValue(FLAGS_SECTION, 'should_syslog_in_file')
+
+exports.shouldShowErrorPile = () => SHOULD_SHOW_ERROR_PILE
+utils.consoleLog(
+  mod,
+  '',
+  `[${sys.shouldControlPrivateRequests() ? 'x' : ' '}] Controle private requests`
+)
+utils.consoleLog(
+  mod,
+  '',
+  `[${sys.shouldControlPublicRequests() ? 'x' : ' '}] Controle public requests`
+)
+utils.consoleLog(mod, '', `[${SHOULD_FILELOG ? 'x' : ' '}] Logging in file`)
+utils.consoleLog(mod, '', `[${SHOULD_SHOW_ERROR_PILE ? 'x' : ' '}] Show error pile`)
+utils.consoleLog(mod, '', `[${SHOULD_SYSLOG ? 'x' : ' '}] Logs sent to syslog`)
+utils.consoleLog(mod, '', `[${SHOULD_SYSLOG_IN_FILE ? 'x' : ' '}] Syslogs backup in file`)
+
+// ----- Logs section
+const LOG_SECTION = 'logging'
+
+const LOG_LVL = sys.getIniValue(LOG_SECTION, 'log_level', 'debug')
+utils.consoleLog(mod, '', `Log level set to '${LOG_LVL}'`)
+exports.getLogLevel = () => LOG_LVL
+
+const LOG_DIR = sys.getIniValue(LOG_SECTION, 'log_dir')
+const LOG_FILE = sys.getIniValue(LOG_SECTION, 'log_file')
+
+// const SYMLINK_NAME = `${APP_NAME}-current.log`
+
+exports.LOG_EXP = sys.getIniValue(LOG_SECTION, 'expires', '7d')
+
+// ----- Syslog
+const SYSLOG_SECTION = 'syslog'
+
+const SYSLOG_NODE_NAME = sys.getIniValue(SYSLOG_SECTION, 'syslog_node_name')
+const SYSLOG_PROTOCOL = sys.getIniValue(SYSLOG_SECTION, 'syslog_protocol')
+const SYSLOG_FACILITY = sys.getIniValue(SYSLOG_SECTION, 'syslog_facility')
+const SYSLOG_HOST = sys.getIniValue(SYSLOG_SECTION, 'syslog_host')
+const SYSLOG_PORT = sys.getIniValue(SYSLOG_SECTION, 'syslog_port', 514) // default: 514
+const SYSLOG_TYPE = sys.getIniValue(SYSLOG_SECTION, 'syslog_type', 'RFC5424') // bsd | 5424
+const SYSLOG_SOCKET = sys.getIniValue(SYSLOG_SECTION, 'syslog_socket') // the socket for sending syslog diagrams
+const SYSLOG_DIR = sys.getIniValue(SYSLOG_SECTION, 'syslog_dir') // path of the syslog backup file
+const SYSLOG_FILE = sys.getIniValue(SYSLOG_SECTION, 'syslog_file') // redundancy to backup syslog, in case something is wrong with the 'path' solution
 
 // ------------------------------------------------------------------------------------------------
 // Creating local log dir
 // ------------------------------------------------------------------------------------------------
-
-try {
-  // first check if directory already exists
-  if (!existsSync(sys.LOG_DIR)) {
-    mkdirSync(sys.LOG_DIR, { recursive: true })
-    utils.consoleLog(mod, '', 'Log directory has been created.')
-  } else {
-    utils.consoleLog(mod, '', 'Log directory exists.')
+if (SHOULD_FILELOG) {
+  try {
+    // first check if directory already exists
+    if (!existsSync(LOG_DIR)) {
+      mkdirSync(LOG_DIR, { recursive: true })
+      utils.consoleLog(mod, '', 'Log directory has been created.')
+    } else {
+      utils.consoleLog(mod, '', 'Log directory exists.')
+    }
+  } catch (err) {
+    utils.consoleErr(mod, '', `Log directory creation failed: ${err}`)
+    throw err
   }
-} catch (err) {
-  utils.consoleErr(utils.nowLocaleFormatted(), `[${mod}]`, 'Log directory creation failed:')
-  utils.consoleErr(utils.nowLocaleFormatted(), `[${mod}]`, err)
+}
+
+if (SHOULD_SYSLOG_IN_FILE) {
+  try {
+    // first check if directory already exists
+    if (!existsSync(SYSLOG_DIR)) {
+      mkdirSync(SYSLOG_DIR, { recursive: true })
+      utils.consoleLog(mod, '', 'Syslog directory has been created.')
+    } else {
+      utils.consoleLog(mod, '', 'Syslog directory exists.')
+    }
+  } catch (err) {
+    utils.consoleErr(mod, '', `Log directory creation failed: ${err}`)
+    throw err
+  }
 }
 
 // ------------------------------------------------------------------------------------------------
-// Winston logger creation
+// Winston logger creation : LOG FILE
 // ------------------------------------------------------------------------------------------------
 
 // datedRotatingFile.on('rotate', function (oldFilename, newFilename) {
@@ -63,13 +130,12 @@ winston.addColors({
 })
 
 const FORMAT_TIMESTAMP = { format: utils.LOG_DATE_FORMAT }
-const COLORIZE_ALL = { all: true }
 
 const FORMAT_PRINTF = (info) => `${info.timestamp} .${info.level}. ${info.message}`
 
 const formatConsoleLogs = winston.format.combine(
   winston.format.json(),
-  winston.format.colorize(COLORIZE_ALL),
+  winston.format.colorize({ all: true }),
   winston.format.timestamp(FORMAT_TIMESTAMP),
   winston.format.printf(FORMAT_PRINTF)
 )
@@ -87,118 +153,83 @@ const logOutputs = {
   // - Write to the console
   console: new winston.transports.Console({
     name: 'consoleLogs',
+    level: LOG_LVL,
+    levels: winston.config.syslog.levels,
     format: formatConsoleLogs,
   }),
 
-  // - Write all logs with logger level to a dated file
-  datedFile: new winston.transports.DailyRotateFile({
-    name: 'datedLogs',
-    dirname: sys.LOG_DIR,
-    filename: `${sys.APP_NAME}-%DATE%`,
-    datePattern: 'YYYY-MM-DD-HH',
-    createSymlink: true,
-    symlinkName: sys.SYMLINK_NAME,
-    maxSize: '75m',
-    maxFiles: '7d',
-    extension: '.log',
-    format: formatFileLogs,
-  }),
-  // // - Write all logs with level `debug`
-  // combined: new winston.transports.File({
-  //   name: 'combinedlogs',
-  //   filename: sys.OUT_LOG,
-  //   level: sys.LOG_LVL,
-  //   maxsize: MAX_SIZE,
-  //   maxFiles: 5,
-  //   zippedArchive: true,
-  //   format: formatFileLogs,
-  // }),
-  /* 
-  // - Write all logs with level `error` and below to `error.log`
-  error: new winston.transports.File({
-    name: 'errorLogs',
-    filename: `${sys.LOG_DIR}/${errorLogsFileName}`,
-    level: 'error',
-    maxsize: MAX_SIZE,
-    maxFiles: 2,
-    format: formatFileLogs,
-  }),
-  */
+  // To log errors caught on fastify level (obsolete)
   ffError: new winston.transports.File({
     name: 'ffLogs',
-    filename: `${sys.LOG_DIR}/${ERR_FASTIFY_FILE}`,
+    filename: `${LOG_DIR}/ff-errors.log`,
     level: 'error',
     maxsize: MAX_SIZE,
     maxFiles: 2,
     format: formatFileLogs,
   }),
-  // - Write to the web
-  // new(winston.transports.Http)({host: 'localhost', port: 3000, path: '/logs'}),
 }
 
 // Console/file logger creation
-exports.logger = winston.createLogger({
-  level: sys.logLevel(),
+const loggerOpts = {
+  level: LOG_LVL,
   defaultMeta: {
     service: 'user-service',
   },
 
-  transports: [logOutputs.console, logOutputs.datedFile],
+  transports: [logOutputs.console],
   // transports: [logOutputs.console, logOutputs.datedFile, logOutputs.combined],
-})
-
-// Syslog logger creation
-
-const formatConsoleSysLogs = winston.format.combine(
-  // winston.format.json(),
-  // winston.format.colorize(COLORIZE_ALL),
-  // winston.format.timestamp(FORMAT_TIMESTAMP),
-  winston.format.printf(
-    (err) =>
-      `${err.level} ${utils.toISOLocale()} ${err.message} ${
-        err.meta ? utils.beautify(err.meta) : ''
-      }`
-  )
-)
-
-const syslogOuts = {
-  // syslog: new winston.transports.Syslog({
-  //   localhost: sys.SYSLOG_NODE_NAME,
-  //   facility: sys.SYSLOG_FACILITY,
-  //   protocol: sys.SYSLOG_PROTOCOL,
-  //   host: sys.SYSLOG_HOST,
-  //   port: sys.SYSLOG_PORT,
-  //   path: sys.SYSLOG_PATH,
-  //   type: sys.SYSLOG_TYPE,
-  //   app_name: sys.APP_NAME,
-  //   level: 'info',
-  // }),
-  // file: new winston.transports.File({
-  //   filename: sys.SYSLOG_FILE,
-  //   name: 'sys.log',
-  //   format: formatFileLogs,
-  //   zippedArchive: true,
-  //   maxsize: MAX_SIZE,
-  //   maxFiles: 5,
-  //   level: 'info',
-  // }),
-  console: new winston.transports.Console({
-    levels: winston.config.syslog.levels,
-    name: 'consoleLogs',
-    format: formatConsoleSysLogs,
-  }),
 }
 
-exports.sysLogger = winston.createLogger({
-  levels: winston.config.syslog.levels,
-  level: 'debug',
-  transports: [syslogOuts.console],
-  // transports: [syslogOuts.syslog, syslogOuts.console, syslogOuts.file],
-})
+if (SHOULD_FILELOG) {
+  // Dated files
+  loggerOpts.transports.push(
+    new winston.transports.DailyRotateFile({
+      name: 'datedLogs',
+      dirname: LOG_DIR,
+      filename: `${APP_NAME}-%DATE%`,
+      datePattern: 'YYYY-MM-DD-HH',
+      createSymlink: true,
+      symlinkName: sys.SYMLINK_NAME,
+      maxSize: '75m',
+      maxFiles: '7d',
+      extension: '.log',
+      format: formatFileLogs,
+    })
+  )
 
-// Fastify logger
+  // - Write all logs with level `debug`
+  loggerOpts.transports.push(
+    new winston.transports.File({
+      name: 'combinedlogs',
+      filename: `${LOG_DIR}/${LOG_FILE}`,
+      level: sys.LOG_LVL,
+      maxsize: MAX_SIZE,
+      maxFiles: 5,
+      zippedArchive: true,
+      format: formatFileLogs,
+    })
+  )
+
+  // // - Write all logs with level `error` and below to `error.log`
+  // loggerOpts.transports.push(
+  //   new winston.transports.File({
+  //     name: 'errorLogs',
+  //     filename: `${this.logDir()}/${errorLogsFileName}`,
+  //     level: 'error',
+  //     maxsize: MAX_SIZE,
+  //     maxFiles: 2,
+  //     format: formatFileLogs,
+  //   })
+  // )
+}
+
+exports.logger = winston.createLogger(loggerOpts)
+
+// ------------------------------------------------------------------------------------------------
+// Winston logger creation : logger for errors caught only on Fastify level (should be obsolete)
+// ------------------------------------------------------------------------------------------------
 const FF_LOGGER = 'ffLogger'
-exports.initFFLogger = (appName) => {
+exports.initFFLogger = () => {
   const fun = 'initFFLogger'
   // Here we use winston.containers IoC
   winston.loggers.add(FF_LOGGER, {
@@ -214,7 +245,7 @@ exports.initFFLogger = (appName) => {
     ),
     // format: format.combine(format.splat(), format.json()),
     defaultMeta: {
-      service: appName + '_' + (process.env.NODE_ENV || 'development'),
+      service: sys.getAppName() + '_' + (process.env.NODE_ENV || 'development'),
     },
     transports: [logOutputs.ffError],
   })
@@ -231,3 +262,64 @@ exports.initFFLogger = (appName) => {
 
   return ffLogger
 }
+
+// ------------------------------------------------------------------------------------------------
+// Winston logger creation : SYSLOG
+// ------------------------------------------------------------------------------------------------
+
+// const formatConsoleSysLogs = winston.format.combine(
+//   // winston.format.json(),
+//   // winston.format.colorize(COLORIZE_ALL),
+//   // winston.format.timestamp(FORMAT_TIMESTAMP),
+//   winston.format.printf(
+//     (err) =>
+//       `${err.level} ${utils.toISOLocale()} ${err.message} ${
+//         err.meta ? utils.beautify(err.meta) : ''
+//       }`
+//   )
+// )
+
+const syslogOpts = {
+  levels: winston.config.syslog.levels,
+  level: 'debug',
+  // transports: [logOutputs.console],
+  transports: [],
+  // transports: [syslogOuts.syslog, syslogOuts.console, syslogOuts.file],
+}
+
+if (SHOULD_SYSLOG) {
+  // Push to syslog socket
+  syslogOpts.transports.push(
+    new winston.transports.Syslog({
+      name: 'syslogSocket',
+      localhost: SYSLOG_NODE_NAME,
+      facility: SYSLOG_FACILITY,
+      protocol: SYSLOG_PROTOCOL,
+      host: SYSLOG_HOST,
+      port: SYSLOG_PORT,
+      path: SYSLOG_SOCKET,
+      type: SYSLOG_TYPE,
+      app_name: APP_NAME,
+      level: 'info',
+    })
+  )
+} else {
+  syslogOpts.transports.push(logOutputs.console)
+}
+
+if (SHOULD_SYSLOG_IN_FILE) {
+  // Write in a dedicated syslog file
+  syslogOpts.transports.push(
+    new winston.transports.File({
+      name: 'syslogFile',
+      filename: `${SYSLOG_DIR}/${SYSLOG_FILE}`,
+      format: formatFileLogs,
+      zippedArchive: false, // zip doesn't work unfortunately
+      maxsize: MAX_SIZE,
+      maxFiles: 5,
+      level: 'info',
+    })
+  )
+}
+
+exports.sysLogger = winston.createLogger(syslogOpts)

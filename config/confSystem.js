@@ -1,6 +1,7 @@
 'use strict'
 
 const mod = 'sysConf'
+
 // ------------------------------------------------------------------------------------------------
 // External dependecies
 // ------------------------------------------------------------------------------------------------
@@ -20,11 +21,12 @@ utils.separateLogs()
 
 // Conf files name
 // - directory
-const iniDir = './0-ini'
+const INI_DIR = './0-ini'
 // - user conf path
-const userConfFile = `${iniDir}/conf_custom.ini`
+const USER_CONF_FILE = process.env.RUDI_API_USER_CONF || `${INI_DIR}/conf_custom.ini`
+// utils.consoleLog(mod, 'init', USER_CONF_FILE)
 // - default conf path
-const defaultConfFile = `${iniDir}/conf_default.ini`
+const DEFT_CONF_FILE = `${INI_DIR}/conf_default.ini`
 
 // ------------------------------------------------------------------------------------------------
 // Constants: user and local configuration
@@ -32,8 +34,25 @@ const defaultConfFile = `${iniDir}/conf_default.ini`
 // Getting user conf file value
 // if null, local conf file value
 // if null , default value
-exports.USER_CONF = fa.readIniFile(userConfFile)
-exports.LOCAL_CONF = fa.readIniFile(defaultConfFile)
+const getUserConf = () => {
+  try {
+    return fa.readIniFile(USER_CONF_FILE)
+  } catch (err) {
+    utils.consoleErr(mod, 'getUserConf', err)
+    throw err
+  }
+}
+const getLocalConf = () => {
+  try {
+    return fa.readIniFile(DEFT_CONF_FILE)
+  } catch (err) {
+    utils.consoleErr(mod, 'getLocalConf', err)
+    throw err
+  }
+}
+
+const USER_CONF = getUserConf()
+const LOCAL_CONF = getLocalConf()
 
 // ------------------------------------------------------------------------------------------------
 // Helper functions
@@ -44,12 +63,17 @@ exports.LOCAL_CONF = fa.readIniFile(defaultConfFile)
 //    if null get local conf file value
 //    if null get default value
 exports.getIniValue = (section, field, defaultVal) => {
-  const userValue = utils.quietAccess(this.USER_CONF[section], field)
-  const localValue = utils.quietAccess(this.LOCAL_CONF[section], field)
+  try {
+    const userValue = utils.quietAccess(USER_CONF[section], field)
+    const localValue = utils.quietAccess(LOCAL_CONF[section], field)
 
-  if (userValue != utils.NOT_FOUND) return userValue
-  if (localValue != utils.NOT_FOUND) return localValue
-  return typeof defaultVal === 'undefined' ? utils.NOT_FOUND : defaultVal
+    if (userValue != utils.NOT_FOUND) return userValue
+    if (localValue != utils.NOT_FOUND) return localValue
+    return typeof defaultVal === 'undefined' ? utils.NOT_FOUND : defaultVal
+  } catch (err) {
+    utils.consoleErr(mod, 'getIniValue', err)
+    throw err
+  }
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -57,78 +81,51 @@ exports.getIniValue = (section, field, defaultVal) => {
 // ------------------------------------------------------------------------------------------------
 
 // Node Server section
+const FLAGS_SECTION = 'flags'
+
+const SHOULD_CONTROL_PRIVATE_REQUESTS = this.getIniValue(
+  FLAGS_SECTION,
+  'should_control_private_requests'
+)
+const SHOULD_CONTROL_PUBLIC_REQUESTS = this.getIniValue(
+  FLAGS_SECTION,
+  'should_control_public_requests'
+)
+
+exports.shouldControlPrivateRequests = () => SHOULD_CONTROL_PRIVATE_REQUESTS
+exports.shouldControlPublicRequests = () => SHOULD_CONTROL_PUBLIC_REQUESTS
+
+// Node Server section
 const SERVER_SECTION = 'server'
 
-exports.LISTENING_ADDR = this.getIniValue(SERVER_SECTION, 'listening_address')
-exports.LISTENING_PORT = this.getIniValue(SERVER_SECTION, 'listening_port')
+const APP_NAME = this.getIniValue(SERVER_SECTION, 'app_name', 'rudiprod.api')
+const LISTENING_ADDR = this.getIniValue(SERVER_SECTION, 'listening_address')
+const LISTENING_PORT = this.getIniValue(SERVER_SECTION, 'listening_port')
+
+exports.getAppName = () => APP_NAME
+exports.getServerAddress = () => LISTENING_ADDR
+exports.getServerPort = () => LISTENING_PORT
+exports.getHost = () => `http://${LISTENING_ADDR}:${LISTENING_PORT}`
 
 // DB section
 const DB_SECTION = 'database'
 
-exports.DB_NAME = this.getIniValue(DB_SECTION, 'db_name')
+const DB_NAME = this.getIniValue(DB_SECTION, 'db_name')
 const DB_URL_PREFIX = this.getIniValue(DB_SECTION, 'db_url')
-exports.DB_URL = `${DB_URL_PREFIX}${this.DB_NAME}`
+const DB_URL = `${DB_URL_PREFIX}${DB_NAME}`
 
-// Logs section
-const LOG_SECTION = 'logging'
-
-exports.SHOULD_FILELOG = this.getIniValue(LOG_SECTION, 'should_log_in_file', false)
-exports.SHOULD_SHOW_ERROR_PILE = this.getIniValue(LOG_SECTION, 'should_show_error_pile', false) // TODO || true
-exports.APP_NAME = this.getIniValue(LOG_SECTION, 'app_name', 'rudiprod.api')
-exports.LOG_DIR = this.getIniValue(LOG_SECTION, 'log_dir')
-exports.LOG_FILE = this.getIniValue(LOG_SECTION, 'log_file')
-exports.OUT_LOG = `${this.LOG_DIR}/${this.LOG_FILE}`
-exports.SYMLINK_NAME = `${this.APP_NAME}-current.log`
-const LOG_LVL = this.getIniValue(LOG_SECTION, 'log_level', 'info')
-exports.LOG_EXP = this.getIniValue(LOG_SECTION, 'expires', '7d')
-
-exports.logLevel = () => {
-  return LOG_LVL
-}
-
-// Syslog
-const SYSLOG_SECTION = 'syslog'
-
-exports.SHOULD_SYSLOG = this.getIniValue(SYSLOG_SECTION, 'should_syslog')
-exports.SYSLOG_NODE_NAME = this.getIniValue(SYSLOG_SECTION, 'syslog_node_name')
-exports.SYSLOG_PROTOCOL = this.getIniValue(SYSLOG_SECTION, 'syslog_protocol')
-exports.SYSLOG_FACILITY = this.getIniValue(SYSLOG_SECTION, 'syslog_facility')
-exports.SYSLOG_HOST = this.getIniValue(SYSLOG_SECTION, 'syslog_host')
-exports.SYSLOG_PORT = this.getIniValue(SYSLOG_SECTION, 'syslog_port') // default: 514
-exports.SYSLOG_TYPE = this.getIniValue(SYSLOG_SECTION, 'syslog_type') // bsd | 5424
-exports.SYSLOG_PATH = this.getIniValue(SYSLOG_SECTION, 'syslog_path') // the path for sending syslog diagrams
-exports.SYSLOG_FILE = this.getIniValue(SYSLOG_SECTION, 'syslog_file') // redundancy to backup syslog, in case something is wrong with the 'path' solution
+exports.getDbName = () => DB_NAME
+exports.getDbUrl = () => DB_URL
 
 // Security section
 const SECURITY_SECTION = 'security'
 
 const profilesConfFile = this.getIniValue(SECURITY_SECTION, 'profiles')
 const PROFILES = fa.readIniFile(profilesConfFile)
-exports.SHOULD_CONTROL_PRIVATE_REQUESTS = this.getIniValue(
-  SECURITY_SECTION,
-  'should_control_private_requests'
-)
-exports.SHOULD_CONTROL_PUBLIC_REQUESTS = this.getIniValue(
-  SECURITY_SECTION,
-  'should_control_public_requests'
-)
 
-exports.getProfile = (subject) => {
-  return PROFILES[subject]
-}
+exports.getProfile = (subject) => PROFILES[subject]
 
 // const now = utils.nowLocaleFormatted()
-const fun = 'feedback'
-
-utils.consoleLog(mod, fun, `APP_NAME: ${this.APP_NAME}`)
-utils.consoleLog(mod, fun, `LISTENING_ADDR: ${this.LISTENING_ADDR}`)
-utils.consoleLog(mod, fun, `LISTENING_PORT: ${this.LISTENING_PORT}`)
-utils.consoleLog(mod, fun, `OUT_LOG: ${this.OUT_LOG}`)
-utils.consoleLog(mod, fun, `LOG_LVL: ${LOG_LVL}`)
-utils.consoleLog(mod, fun, `LOG_EXP: ${this.LOG_EXP}`)
-utils.consoleLog(mod, fun, `DB_NAME: ${this.DB_NAME}`)
-utils.consoleLog(mod, fun, `DB_URL: ${this.DB_URL}`)
-
-exports.getHost = () => {
-  return `http://${this.LISTENING_ADDR}:${this.LISTENING_PORT}`
-}
+const appMsg = `App '${APP_NAME}' listening on: ${this.getHost()}`
+utils.consoleLog(mod, 'init', appMsg)
+utils.consoleLog(mod, 'init', `DB: ${DB_URL}`)

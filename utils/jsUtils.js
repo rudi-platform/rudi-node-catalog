@@ -9,7 +9,7 @@ const mod = 'utils'
 const { inspect } = require('util')
 const { floor, pick } = require('lodash')
 const datetime = require('date-and-time')
-const { ROUTE_NAME } = require('../config/confApi')
+const { ROUTE_NAME, TRACE } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
 // String
@@ -129,24 +129,21 @@ exports.isString = (str) => typeof str === 'string'
 // Arrays
 // ------------------------------------------------------------------------------------------------
 exports.isArray = (anArray) => Array.isArray(anArray)
-
 exports.isNotEmptyArray = (anArray) => Array.isArray(anArray) && anArray.length > 0
-
 exports.isEmptyArray = (anArray) => Array.isArray(anArray) && anArray.length === 0
 
 // ------------------------------------------------------------------------------------------------
 // Objects
 // ------------------------------------------------------------------------------------------------
 exports.isObject = (obj) => Object.keys(obj).length > 0
-
 exports.isEmptyObject = (obj) =>
   !this.isString(obj) && !this.isArray(obj) && Object.keys(obj).length === 0
-
 exports.isNotEmptyObject = (obj) => obj && Object.keys(obj).length > 0
 
 exports.NOT_FOUND = '!_not_found_!'
 exports.quietAccess = (obj, prop) => {
   try {
+    if (typeof obj[prop] === 'undefined') return this.NOT_FOUND
     return obj[prop]
   } catch {
     return this.NOT_FOUND
@@ -275,7 +272,7 @@ exports.consoleLog = (srcMod, srcFun, msg) => {
 }
 
 exports.consoleErr = (srcMod, srcFun, msg) => {
-  const errMsg = msg.err || msg
+  const errMsg = !msg ? undefined : msg[TRACE] || msg
   console.error(this.nowLocaleFormatted(), '.error.', this.displayStr(srcMod, srcFun, errMsg))
 }
 
@@ -283,35 +280,36 @@ exports.consoleErr = (srcMod, srcFun, msg) => {
 // IP Redirections display
 // ------------------------------------------------------------------------------------------------
 
-exports.reqIpAndRedirections = (req) => {
+exports.getReqIpAndRedirections = (req) => {
+  const ip = req.ip
+  const redirections = this.getReqIpRedirections(req)
+  return redirections && this.isNotEmptyArray(redirections) ? [ip, ...redirections] : [ip]
+}
+
+exports.getReqIpRedirections = (req) => {
   const headers = req.headers
   return headers['x-forwarded-for'] || headers['X-Forwarded-For']
 }
 
-exports.reqIpRedirections = (req) => {
-  const headers = req.headers
-  return headers['x-forwarded-for'] || headers['X-Forwarded-For']
-}
-
-exports.displayRedirections = (req) => {
+exports.getIpRedirectionsMsg = (req) => {
   const headers = req.headers
   if (!headers) return ''
-  const redirections = this.reqIpRedirections(req)
+  const redirections = this.getReqIpRedirections(req)
   return redirections ? ` <- ${redirections} ` : ''
 }
 
-exports.displayIps = (req) => {
+exports.getIpsMsg = (req) => {
   const ip = req.ip
-  return `${ip}${this.displayRedirections(req)}`
+  return `${ip}${this.getIpRedirectionsMsg(req)}`
 }
 
-exports.logApiCall = (req, subject) => {
+exports.getApiCallMsg = (req, subject, client_id) => {
   if (!subject)
-    return `${req.method} ${req.url} (${req.context.config[ROUTE_NAME]}) <- ${this.displayIps(req)}`
+    return `${req.method} ${req.url} (${req.context.config[ROUTE_NAME]}) <- ${this.getIpsMsg(req)}`
 
   return (
     `${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})` +
-    ` <- ${subject} @ ${this.displayIps(req)}`
+    ` <- ${subject} ${client_id ? ' | ' + client_id : ''} @ ${this.getIpsMsg(req)}`
   )
 }
 /**
@@ -335,10 +333,10 @@ exports.apiCallDetails = (req, subject, user) => {
         url: req.url,
         [ROUTE_NAME]: req.context.config[ROUTE_NAME],
       },
-      src: { ip: this.displayIps(req) },
+      src: { ip: this.getIpsMsg(req) },
     }
   return {
     req: { method: req.method, url: req.url, [ROUTE_NAME]: req.context.config[ROUTE_NAME] },
-    src: { ip: this.displayIps(req), subject: subject, user: user },
+    src: { ip: this.getIpsMsg(req), subject: subject, user: user },
   }
 }

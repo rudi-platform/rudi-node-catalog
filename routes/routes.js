@@ -10,7 +10,7 @@ const mod = 'routes'
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
-const { logApiCall } = require('../utils/jsUtils')
+const { getApiCallMsg, beautify } = require('../utils/jsUtils')
 const { treatError } = require('../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
@@ -32,8 +32,8 @@ const skosController = require('../controllers/skosController')
 const licenceController = require('../controllers/licenceController')
 
 // const devController = require('../controllers/testController')
+const { checkRudiProdPermission } = require('../controllers/tokenController')
 const portalController = require('../controllers/portalController')
-const tokenController = require('../controllers/tokenController')
 
 // ------------------------------------------------------------------------------------------------
 // API request constants
@@ -70,9 +70,11 @@ const {
 } = require('../config/confApi')
 
 const {
-  SHOULD_CONTROL_PRIVATE_REQUESTS,
-  SHOULD_CONTROL_PUBLIC_REQUESTS,
+  shouldControlPrivateRequests,
+  shouldControlPublicRequests,
 } = require('../config/confSystem')
+const { JWT_USER, JWT_CLIENT } = require('../config/confPortal')
+const { JWT_SUB } = require('../utils/crypto')
 
 // ------------------------------------------------------------------------------------------------
 // Route names
@@ -134,11 +136,11 @@ async function onFreeRoute(req, reply) {
   const fun = 'onFreeRoute'
   try {
     // log.d(mod, fun, `${req.method} ${req.url} `)
-    log.sysInfo(logApiCall(req))
+    log.sysInfo(getApiCallMsg(req))
     return
   } catch (err) {
     // log.w(mod, fun, err)
-    log.sysCrit(logApiCall(req))
+    log.sysCrit(getApiCallMsg(req))
     throw treatError(err, { mod: mod, fun: fun })
   }
 }
@@ -147,18 +149,23 @@ async function onPublicRoute(req, reply) {
   const fun = 'onPublicRoute'
   try {
     // log.d(mod, fun, `${req.method} ${req.url} `)
-    if (!SHOULD_CONTROL_PUBLIC_REQUESTS) return true
+    if (!shouldControlPublicRequests()) return true
 
-    const subject = await portalController.checkPortalTokenInHeader(req, reply)
+    const jwtPayload = (await portalController.checkPortalTokenInHeader(req, reply))[1]
+    // log.d(mod, fun, `Payload: ${beautify(jwtPayload)}`)
+    const apiCallMsg = getApiCallMsg(
+      req,
+      jwtPayload[JWT_USER] || jwtPayload[JWT_SUB],
+      jwtPayload[JWT_CLIENT]
+    )
 
-    const apiCallMsg = logApiCall(req, subject)
     log.i(mod, fun, apiCallMsg)
     log.sysInfo(apiCallMsg)
 
     return
   } catch (err) {
     // log.w(mod, fun, err)
-    log.sysCrit(logApiCall(req))
+    log.sysCrit(getApiCallMsg(req))
     throw treatError(err, { mod: mod, fun: fun })
   }
 }
@@ -167,18 +174,17 @@ async function onPrivateRoute(req, reply) {
   const fun = 'onPrivateRoute'
   try {
     // log.d(mod, fun, `${req.method} ${req.url} `)
-    // log.w(mod, fun, `JWT are ${SHOULD_CONTROL_PRIVATE_REQUESTS ? '' : 'not '}controlled`)
-    if (!SHOULD_CONTROL_PRIVATE_REQUESTS) return true
+    if (!shouldControlPrivateRequests()) return true
 
-    const subject = await tokenController.checkRudiProdPermission(req, reply)
+    const { subject, client_id } = await checkRudiProdPermission(req, reply)
 
-    const apiCallMsg = logApiCall(req, subject)
+    const apiCallMsg = getApiCallMsg(req, subject, client_id)
     log.i(mod, fun, apiCallMsg)
     log.sysInfo(apiCallMsg)
     return
   } catch (err) {
     // log.w(mod, fun, err)
-    log.sysCrit(logApiCall(req))
+    log.sysCrit(getApiCallMsg(req))
     throw treatError(err, { mod: mod, fun: fun })
   }
 }
@@ -187,17 +193,16 @@ async function onDevRoute(req, reply) {
   const fun = 'onDevRoute'
   try {
     // log.d(mod, fun, `${req.method} ${req.url} `)
-    // log.w(mod, fun, `JWT are ${SHOULD_CONTROL_PRIVATE_REQUESTS ? '' : 'not '}controlled`)
-    if (!SHOULD_CONTROL_PRIVATE_REQUESTS) return true
+    if (!shouldControlPrivateRequests()) return true
 
-    const subject = await tokenController.checkRudiProdPermission(req, reply)
-    const apiCallMsg = logApiCall(req, subject)
+    const { subject, client_id } = await checkRudiProdPermission(req, reply)
+    const apiCallMsg = getApiCallMsg(req, subject, client_id)
     log.i(mod, fun, apiCallMsg)
     log.sysInfo(apiCallMsg)
     return
   } catch (err) {
     // log.w(mod, fun, err)
-    log.sysCrit(logApiCall(req))
+    log.sysCrit(getApiCallMsg(req))
     throw treatError(err, { mod: mod, fun: fun })
   }
   // log.d(mod, fun, `${beautify(req)}`)

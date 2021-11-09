@@ -110,9 +110,7 @@ exports.organizationRudiToDbFormat = async (rudiProducer, shouldCreateIfNotFound
   if (!organizationDbId) {
     if (!shouldCreateIfNotFound) {
       const errMsg = msg.organizationNotFound(rudiProducer[API_ORGANIZATION_ID])
-      log.w(mod, fun, errMsg)
-      const err = new NotFoundError(errMsg)
-      throw treatError(err, { mod: mod, fun: fun })
+      throw treatError(new NotFoundError(errMsg), { mod: mod, fun: fun })
     }
     const newOrg = await organisationController.newOrganization(rudiProducer)
     newOrg.save()
@@ -505,8 +503,8 @@ exports.upsertMetadata = async (rudiMetadata) => {
       return await this.overwriteMetadata(rudiMetadata)
     }
   } catch (err) {
-    err.message = err.message + ` (metadata: ${rudiMetadata[API_METADATA_ID]})`
-    throw treatError(err, { mod: mod, fun: fun })
+    const error = new Error(err.message + ` (metadata: ${rudiMetadata[API_METADATA_ID]})`)
+    throw treatError(error, { mod: mod, fun: fun })
   }
 }
 exports.newMetadata = async (rudiMetadata) => {
@@ -524,20 +522,18 @@ exports.newMetadata = async (rudiMetadata) => {
   let dbMetadata
   try {
     dbMetadata = await new Metadata(dbReadyObject)
-  } catch (err) {
-    // const errMsg = `New object '${PARAM_OBJECT_METADATA}': ${rudiId} | Error: ${err}`
-    // err.message = errMsg
-    // log.w(mod, fun, errMsg)
-    throw treatError(err, { mod: mod, fun: fun })
-  }
-  try {
     await dbMetadata.save()
   } catch (err) {
-    // const errMsg = `Error while saving object '${PARAM_OBJECT_METADATA}' (${rudiId}): ${err}`
-    // err.message = errMsg
-    // log.w(mod, fun, errMsg)
+    // const errMsg = `New object '${PARAM_OBJECT_METADATA}': ${rudiId} | Error: ${err}`
+    // const error = new Error(errMsg)
     throw treatError(err, { mod: mod, fun: fun })
   }
+  // try {
+  // await dbMetadata.save()
+  // } catch (err) {
+  //   // const errMsg = `Error while saving object '${PARAM_OBJECT_METADATA}' (${rudiId}): ${err}`
+  //   throw treatError(err, { mod: mod, fun: fun })
+  // }
   // log.d(mod, fun, `dbMetadata: ${beautify(dbMetadata)}`)
 
   this.sendToPortal(dbMetadata)
@@ -660,7 +656,7 @@ exports.initWithODR = async (req, reply) => {
       })
     ).catch((err) => {
       log.e(mod, fun, err)
-      log.sysError(err.message)
+      log.sysError(err.message, { error: err })
     })
     return 'Initialization initiated'
   } catch (err) {
@@ -687,10 +683,9 @@ exports.getSingleMetadata = async (req, reply) => {
     // return the object
     return dbObject
   } catch (err) {
-    log.e(mod, fun, err)
-    const error = treatError(err, { mod: mod, fun: fun })
-    if (err.name === 'MongoError') throw new BadRequestError(error)
-    throw new NotFoundError(error)
+    // log.e(mod, fun, err)
+    const error = err.name === 'MongoError' ? new BadRequestError(error) : new NotFoundError(error)
+    throw treatError(error, { mod: mod, fun: fun })
   }
 }
 
@@ -704,9 +699,8 @@ exports.getMetadataList = async (req, reply) => {
   try {
     return await genericController.getManyObjects(PARAM_OBJECT_METADATA, req, reply)
   } catch (err) {
-    log.e(mod, fun, err)
-    const error = treatError(err, { mod: mod, fun: fun })
-    if (err.name === 'MongoError') throw new BadRequestError(error)
-    throw new NotFoundError(error)
+    // log.e(mod, fun, err)
+    const error = err.name === 'MongoError' ? new BadRequestError(error) : new NotFoundError(error)
+    throw treatError(error, { mod: mod, fun: fun })
   }
 }

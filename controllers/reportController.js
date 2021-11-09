@@ -154,7 +154,7 @@ exports.addSingleReportForObject = async (req, reply) => {
 
     return dbReadyReport
   } catch (err) {
-    log.e(mod, fun, err)
+    // log.e(mod, fun, err)
     throw treatError(err, { mod: mod, fun: fun })
   }
 }
@@ -378,7 +378,7 @@ exports.deleteSingleReportForObject = async (req, reply) => {
     // delete this integration report for this object
     return `Function '${fun}' still needs to be implemented in module ${mod}`
   } catch (err) {
-    log.e(mod, fun, err)
+    // log.e(mod, fun, err)
     throw treatError(err, { mod: mod, fun: fun })
   }
 }
@@ -395,7 +395,7 @@ exports.deleteEveryReportForObject = async (req, reply) => {
     // delete every integration report for this object
     return `Function '${fun}' still needs to be implemented in module ${mod}`
   } catch (err) {
-    log.e(mod, fun, err)
+    // log.e(mod, fun, err)
     throw treatError(err, { mod: mod, fun: fun })
   }
 }
@@ -413,7 +413,7 @@ exports.deleteManyReportForObject = async (req, reply) => {
     // delete every integration report for this object
     return `Function '${fun}' still needs to be implemented in module ${mod}`
   } catch (err) {
-    log.e(mod, fun, err)
+    // log.e(mod, fun, err)
     throw treatError(err, { mod: mod, fun: fun })
   }
 }
@@ -426,7 +426,7 @@ exports.getReportListForObjectType = async (req, reply) => {
     // delete every integration report for all objects
     return `Function '${fun}' still needs to be implemented in module ${mod}`
   } catch (err) {
-    log.e(mod, fun, err)
+    // log.e(mod, fun, err)
     throw treatError(err, { mod: mod, fun: fun })
   }
 }

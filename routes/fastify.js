@@ -6,10 +6,9 @@ const mod = 'fastify'
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
 const utils = require('../utils/jsUtils')
-const sys = require('../config/confSystem')
-const logConf = require('../config/confLogs')
+const { initFFLogger, shouldShowErrorPile } = require('../config/confLogs')
 const log = require('../utils/logging')
-const { createRudiHttpError, showErrorPile } = require('../utils/errors')
+const { createRudiHttpError, isRudiHttpError } = require('../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
 // External dependancies
@@ -18,7 +17,7 @@ const { createRudiHttpError, showErrorPile } = require('../utils/errors')
 const fastify = require('fastify')({
   logger: {
     level: 'warn',
-    logger: logConf.initFFLogger(sys.APP_NAME),
+    logger: initFFLogger(),
     // file: sys.OUT_LOG
   },
   ignoreTrailingSlash: true,
@@ -31,9 +30,9 @@ fastify.setErrorHandler((error, request, reply) => {
   const fun = 'finalErrorHandler'
   log.t(mod, fun, ``)
   try {
-    // log.d(mod, fun, error.isRudiHttpError)
+    // log.d(mod, fun, isRudiHttpError(error))
     let rudiHttpError
-    if (error.isRudiHttpError) rudiHttpError = error
+    if (isRudiHttpError(error)) rudiHttpError = error
     else {
       const code = error.statusCode
       const msg = error.message
@@ -43,7 +42,7 @@ fastify.setErrorHandler((error, request, reply) => {
     // log.sysError(`Error ${rudiHttpError.statusCode}: ${rudiHttpError.message}`)
   } catch (uncaughtErr) {
     log.e(mod, fun, `Uncaught! ${uncaughtErr}`)
-    log.sysCrit(`Uncaught error: ${uncaughtErr}`)
+    log.sysCrit(`Uncaught error: ${uncaughtErr}`, { error: uncaughtErr })
   }
   log.t(mod, fun, 'done')
 })
@@ -58,8 +57,10 @@ fastify.decorate('notFound', (req, reply) => {
     statusCode: 404,
   }
 
-  log.w(mod, fun, `${response.message} <- ${utils.displayIps(req)}`)
-  log.sysNotice(`Error 404: ${response.message} <- ${utils.displayIps(req)}`)
+  log.w(mod, fun, `${response.message} <- ${utils.getIpsMsg(req)}`)
+  log.sysNotice(`Error 404: ${response.message}`, {
+    req: req,
+  })
   // log.d(mod, fun, utils.beautify(req))
   reply.code(404).send(response)
 })
@@ -67,19 +68,24 @@ fastify.decorate('notFound', (req, reply) => {
 fastify.setNotFoundHandler(fastify.notFound)
 
 fastify.addHook('onRequest', (req, res, next) => {
-  log.v('http', 'apiCall', utils.logApiCall(req))
+  log.v('http', 'apiCall', utils.getApiCallMsg(req))
   next()
 })
 
 fastify.addHook('onError', (request, reply, error, done) => {
   const fun = 'onError'
   try {
-    if (sys.SHOULD_SHOW_ERROR_PILE) showErrorPile(error)
-    log.e(mod, fun, utils.beautify(error))
-    if (error.isRudiHttpError) {
-      log.sysError(`Error ${error.statusCode}: ${error.message} <- ${utils.displayIps(request)}`)
+    log.d(mod, fun, ``)
+    if (isRudiHttpError(error)) {
+      if (shouldShowErrorPile()) error.logErrorPile()
+
+      log.sysError(
+        `Error ${error.statusCode} (${error.name}): ${error.message}` +
+          ` <- ${utils.getIpsMsg(request)}`,
+        { req: request }
+      )
     } else {
-      log.sysError(error)
+      log.sysError(error, { req: request })
     }
   } catch (err) {
     log.e(mod, fun, err)
