@@ -41,7 +41,8 @@
     "sshpk": "^1.16.1",
     "uuid": "^8.3.2",
     "winston": "^3.3.3",
-    "winston-daily-rotate-file": "^4.5.5"
+    "winston-daily-rotate-file": "^4.5.5",
+    "winston-syslog": "^2.4.4"
   },
   "devDependencies": {
     "@babel/core": "^7.15.8",

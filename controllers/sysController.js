@@ -66,6 +66,7 @@ exports.getAppHash = () => {
     throw treatError(err, { mod: mod, fun: fun })
   }
 }
+
 exports.ENV_DEV = 'local'
 exports.ENV_TEST = 'test'
 exports.ENV_SHARED = 'shared'
@@ -75,7 +76,7 @@ exports.ENV_RELEASE = 'release'
 exports.getEnvironment = () => {
   const fun = 'getEnvironment'
   try {
-    // log.d(mod, fun, utils.beautify(process.env))
+    log.t(mod, fun, process.env.RUDI_API_ENV)
     const env = process.env.RUDI_API_ENV ? process.env.RUDI_API_ENV : utils.NOT_FOUND
     return env
   } catch (err) {
