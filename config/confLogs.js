@@ -247,11 +247,7 @@ const SYSLOGS_FORMAT_PRINTF = (info) =>
   `${info.level} ${utils.toISOLocale()} ${info.message}` +
   ` ${info.meta ? utils.beautify(info.meta) : ''}`
 
-const formatConsoleSyslogs = combine(
-  colorize({ all: true }),
-  timestamp(),
-  printf(SYSLOGS_FORMAT_PRINTF)
-)
+const formatConsoleSyslogs = combine(timestamp(), printf(SYSLOGS_FORMAT_PRINTF))
 
 const syslogOpts = {
   levels: syslogLevels,
