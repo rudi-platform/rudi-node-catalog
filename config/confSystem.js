@@ -35,10 +35,12 @@ const DEFT_CONF_FILE = `${INI_DIR}/conf_default.ini`
 // if null, local conf file value
 // if null , default value
 const getUserConf = () => {
+  const fun = 'getUserConf'
   try {
+    utils.consoleLog(mod, fun, `Conf file: ${process.env.RUDI_API_USER_CONF ? 'env' : 'ini'}`)
     return fa.readIniFile(USER_CONF_FILE)
   } catch (err) {
-    utils.consoleErr(mod, 'getUserConf', err)
+    utils.consoleErr(mod, fun, err)
     throw err
   }
 }
@@ -80,7 +82,7 @@ exports.getIniValue = (section, field, defaultVal) => {
 // Extracting and exporting sys configuration
 // ------------------------------------------------------------------------------------------------
 
-// Node Server section
+// ----- Flags section
 const FLAGS_SECTION = 'flags'
 
 const SHOULD_CONTROL_PRIVATE_REQUESTS = this.getIniValue(
@@ -95,7 +97,7 @@ const SHOULD_CONTROL_PUBLIC_REQUESTS = this.getIniValue(
 exports.shouldControlPrivateRequests = () => SHOULD_CONTROL_PRIVATE_REQUESTS
 exports.shouldControlPublicRequests = () => SHOULD_CONTROL_PUBLIC_REQUESTS
 
-// Node Server section
+// ----- Node Server section
 const SERVER_SECTION = 'server'
 
 const APP_NAME = this.getIniValue(SERVER_SECTION, 'app_name', 'rudiprod.api')
@@ -107,7 +109,7 @@ exports.getServerAddress = () => LISTENING_ADDR
 exports.getServerPort = () => LISTENING_PORT
 exports.getHost = () => `http://${LISTENING_ADDR}:${LISTENING_PORT}`
 
-// DB section
+// ----- DB section
 const DB_SECTION = 'database'
 
 const DB_NAME = this.getIniValue(DB_SECTION, 'db_name')
@@ -117,7 +119,7 @@ const DB_URL = `${DB_URL_PREFIX}${DB_NAME}`
 exports.getDbName = () => DB_NAME
 exports.getDbUrl = () => DB_URL
 
-// Security section
+// ----- Security section
 const SECURITY_SECTION = 'security'
 
 const profilesConfFile = this.getIniValue(SECURITY_SECTION, 'profiles')

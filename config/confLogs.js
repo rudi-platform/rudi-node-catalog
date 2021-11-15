@@ -34,16 +34,26 @@ const SHOULD_SYSLOG_IN_FILE = sys.getIniValue(FLAGS_SECTION, 'should_syslog_in_f
 
 exports.shouldShowErrorPile = () => SHOULD_SHOW_ERROR_PILE
 
+// Log feedback
+const checkOption = (msg, flag) => utils.consoleLog(mod, '', `[${flag ? 'x' : ' '}] ${msg}`)
+checkOption('Control private requests', sys.shouldControlPrivateRequests())
+checkOption('Control public requests', sys.shouldControlPublicRequests())
+checkOption('Log in file', SHOULD_FILELOG)
+checkOption('Show error pile', SHOULD_SHOW_ERROR_PILE)
+checkOption('Sent syslogs', SHOULD_SYSLOG)
+checkOption('Backup syslogs in file', SHOULD_SYSLOG_IN_FILE)
+
 // ----- Logs section
 const LOG_SECTION = 'logging'
 
 const LOG_LVL = sys.getIniValue(LOG_SECTION, 'log_level', 'debug')
 utils.consoleLog(mod, '', `Log level set to '${LOG_LVL}'`)
-exports.getLogLevel = () => LOG_LVL
 
 const LOG_DIR = sys.getIniValue(LOG_SECTION, 'log_dir')
 const LOG_FILE = sys.getIniValue(LOG_SECTION, 'log_file')
+
 exports.LOG_EXP = sys.getIniValue(LOG_SECTION, 'expires', '7d')
+exports.getLogLevel = () => LOG_LVL
 
 // ----- Syslog
 const SYSLOG_SECTION = 'syslog'
@@ -66,9 +76,9 @@ if (SHOULD_FILELOG) {
     // first check if directory already exists
     if (!existsSync(LOG_DIR)) {
       mkdirSync(LOG_DIR, { recursive: true })
-      utils.consoleLog(mod, '', 'Log directory has been created.')
+      utils.consoleLog(mod, '', 'Log directory has been created')
     } else {
-      utils.consoleLog(mod, '', 'Log directory exists.')
+      utils.consoleLog(mod, '', 'Log directory exists')
     }
   } catch (err) {
     utils.consoleErr(mod, '', `Log directory creation failed: ${err}`)
@@ -300,11 +310,3 @@ if (SHOULD_SYSLOG_IN_FILE) {
 }
 
 exports.sysLogger = winston.createLogger(syslogOpts)
-
-const checkOption = (msg, flag) => utils.consoleLog(mod, '', `[${flag ? 'x' : ' '}] ${msg}`)
-checkOption('Control private requests', sys.shouldControlPrivateRequests())
-checkOption('Control public requests', sys.shouldControlPublicRequests())
-checkOption('Log in file', SHOULD_FILELOG)
-checkOption('Show error pile', SHOULD_SHOW_ERROR_PILE)
-checkOption('Sent syslogs', SHOULD_SYSLOG)
-checkOption('Backup syslogs in file', SHOULD_SYSLOG_IN_FILE)
