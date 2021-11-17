@@ -5,7 +5,6 @@ const mod = 'sysConf'
 // ------------------------------------------------------------------------------------------------
 // External dependecies
 // ------------------------------------------------------------------------------------------------
-// const { format } = require('date-and-time')
 
 // ------------------------------------------------------------------------------------------------
 // Internal dependecies
@@ -17,6 +16,11 @@ utils.separateLogs()
 
 // ------------------------------------------------------------------------------------------------
 // Constants: local ini file configuration settings
+// ------------------------------------------------------------------------------------------------
+let CURRENT_APP_HASH
+
+// ------------------------------------------------------------------------------------------------
+// Constants
 // ------------------------------------------------------------------------------------------------
 
 // Conf files name
@@ -131,3 +135,42 @@ exports.getProfile = (subject) => PROFILES[subject]
 const appMsg = `App '${APP_NAME}' listening on: ${this.getHost()}`
 utils.consoleLog(mod, 'init', appMsg)
 utils.consoleLog(mod, 'init', `DB: ${DB_URL}`)
+
+// ------------------------------------------------------------------------------------------------
+// App ID
+// ------------------------------------------------------------------------------------------------
+
+exports.getGitHash = () => {
+  const fun = 'getGitHash'
+  // log.t(mod, fun, ``)
+  try {
+    // log.d(mod, fun, ` GET ${URL_PV_GIT_HASH_ACCESS}`)
+    let hashId
+    hashId = process.env.RUDI_API_GIT_REV
+
+    if (!hashId)
+      try {
+        hashId = require('child_process').execSync('git rev-parse --short HEAD')
+        // log.d(mod, fun, utils.beautify(process.env))
+      } catch (err) {
+        throw new Error(`No git hash: ${err}`, { mod: mod, fun: fun })
+      }
+
+    return `${hashId}`.trim()
+  } catch (err) {
+    // log.e(mod, fun, err)
+    throw new Error(err, { mod: mod, fun: fun })
+  }
+}
+
+/** @returns the git hash of the last time the app was launched */
+exports.getAppHash = () => {
+  const fun = 'getCurrentAppId'
+  try {
+    if (!CURRENT_APP_HASH) CURRENT_APP_HASH = this.getGitHash()
+    return CURRENT_APP_HASH
+  } catch (err) {
+    // log.e(mod, fun, err)
+    throw new Error(err, { mod: mod, fun: fun })
+  }
+}

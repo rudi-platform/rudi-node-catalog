@@ -9,7 +9,9 @@ const { existsSync, mkdirSync } = require('fs')
 
 const winston = require('winston')
 require('winston-daily-rotate-file')
-require('winston-syslog').Syslog
+// require('winston-syslog').Syslog
+const rudiLogger = require('rudilogger')
+
 const { combine, timestamp, printf, colorize, simple } = winston.format
 const syslogLevels = winston.config.syslog.levels
 
@@ -253,60 +255,68 @@ exports.initFFLogger = () => {
 // Winston logger creation : SYSLOG
 // ------------------------------------------------------------------------------------------------
 
-const SYSLOGS_FORMAT_PRINTF = (info) =>
-  `${info.level} ${utils.toISOLocale()} ${info.message}` +
-  ` ${info.meta ? utils.beautify(info.meta) : ''}`
+// const SYSLOGS_FORMAT_PRINTF = (info) =>
+//   `${info.level} ${utils.toISOLocale()} ${info.message}` +
+//   ` ${info.meta ? utils.beautify(info.meta) : ''}`
 
-const formatConsoleSyslogs = combine(timestamp(), printf(SYSLOGS_FORMAT_PRINTF))
+// const formatConsoleSyslogs = combine(timestamp(), printf(SYSLOGS_FORMAT_PRINTF))
 
-const syslogOpts = {
-  levels: syslogLevels,
-  transports: [
-    new winston.transports.Console({
-      name: 'consoleSysLogs',
-      levels: syslogLevels,
-      format: formatConsoleSyslogs,
-    }),
-  ],
-}
+// const syslogOpts = {
+//   levels: syslogLevels,
+//   transports: [
+//     new winston.transports.Console({
+//       name: 'consoleSysLogs',
+//       levels: syslogLevels,
+//       format: formatConsoleSyslogs,
+//     }),
+//   ],
+// }
 
-if (SHOULD_SYSLOG) {
-  // Push to syslog socket
-  syslogOpts.transports.push(
-    new winston.transports.Syslog({
-      name: 'syslogSocket',
-      localhost: SYSLOG_NODE_NAME,
-      facility: SYSLOG_FACILITY,
-      protocol: SYSLOG_PROTOCOL,
-      host: SYSLOG_HOST,
-      port: SYSLOG_PORT,
-      path: SYSLOG_SOCKET,
-      type: SYSLOG_TYPE,
-      app_name: APP_NAME,
-      level: SYSLOG_LVL,
-    })
-  )
-  // syslogOpts.transports.push(logOutputs.console)
-  // } else {
-  //   syslogOpts.transports.push(logOutputs.console)
-}
+// if (SHOULD_SYSLOG) {
+//   // Push to syslog socket
+//   syslogOpts.transports.push(
+//     new winston.transports.Syslog({
+//       name: 'syslogSocket',
+//       localhost: SYSLOG_NODE_NAME,
+//       facility: SYSLOG_FACILITY,
+//       protocol: SYSLOG_PROTOCOL,
+//       host: SYSLOG_HOST,
+//       port: SYSLOG_PORT,
+//       path: SYSLOG_SOCKET,
+//       type: SYSLOG_TYPE,
+//       app_name: APP_NAME,
+//       level: SYSLOG_LVL,
+//     })
+//   )
+//   // syslogOpts.transports.push(logOutputs.console)
+//   // } else {
+//   //   syslogOpts.transports.push(logOutputs.console)
+// }
 
-if (SHOULD_SYSLOG_IN_FILE) {
-  // Write in a dedicated syslog file
-  syslogOpts.transports.push(
-    new winston.transports.DailyRotateFile({
-      name: 'syslogFile',
-      dirname: SYSLOG_DIR,
-      filename: `syslog-${APP_NAME}-%DATE%`,
-      datePattern: 'YYYY-MM-DD-HH',
-      createSymlink: true,
-      symlinkName: `syslog-${APP_NAME}-current.log`,
-      maxSize: '75m',
-      maxFiles: '7d',
-      extension: '.log',
-      format: formatFileLogs,
-    })
-  )
-}
+// if (SHOULD_SYSLOG_IN_FILE) {
+//   // Write in a dedicated syslog file
+//   syslogOpts.transports.push(
+//     new winston.transports.DailyRotateFile({
+//       name: 'syslogFile',
+//       dirname: SYSLOG_DIR,
+//       filename: `syslog-${APP_NAME}-%DATE%`,
+//       datePattern: 'YYYY-MM-DD-HH',
+//       createSymlink: true,
+//       symlinkName: `syslog-${APP_NAME}-current.log`,
+//       maxSize: '75m',
+//       maxFiles: '7d',
+//       extension: '.log',
+//       format: formatFileLogs,
+//     })
+//   )
+// }
 
-exports.sysLogger = winston.createLogger(syslogOpts)
+// exports.sysLogger = winston.createLogger(syslogOpts)
+
+exports.sysLogger = new rudiLogger.RudiLogger(sys.getAppName(), sys.getGitHash(), {
+  log_server: { path: SYSLOG_SOCKET, port: SYSLOG_PORT, facility: 20, transport: 4 },
+})
+
+// exports.rudiSysLog = (severity, msg, context) => {
+//   this.sysLogger.log(severity, msg, '', context)
+// }

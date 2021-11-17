@@ -132,7 +132,7 @@ exports.checkRudiProdPermission = async (req, reply) => {
     log.d(mod, fun, `req: ${beautify(req.context.config[ROUTE_NAME])}`)
     const reqRouteName = accessProperty(req.context.config, ROUTE_NAME)
     checkSubjPermission(subject, reqRouteName)
-    return { subject, client_id }
+    return { subject, clientId: client_id }
     // return 'ok'
   } catch (err) {
     throw treatError(err, { mod: mod, fun: fun })
