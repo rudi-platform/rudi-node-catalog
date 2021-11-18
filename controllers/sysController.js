@@ -19,11 +19,7 @@ const mongoose = require('mongoose')
 const log = require('../utils/logging')
 const utils = require('../utils/jsUtils')
 const { treatError } = require('../utils/errors')
-
-// ------------------------------------------------------------------------------------------------
-// Constants
-// ------------------------------------------------------------------------------------------------
-let CURRENT_APP_HASH
+const { getGitHash, getAppHash } = require('../config/confSystem')
 
 // ------------------------------------------------------------------------------------------------
 // App ID
@@ -34,23 +30,9 @@ let CURRENT_APP_HASH
  */
 exports.getGitHash = () => {
   const fun = 'getGitHash'
-  // log.t(mod, fun, ``)
   try {
-    // log.d(mod, fun, ` GET ${URL_PV_GIT_HASH_ACCESS}`)
-    let hashId
-    hashId = process.env.RUDI_API_GIT_REV
-
-    if (!hashId)
-      try {
-        hashId = require('child_process').execSync('git rev-parse --short HEAD')
-        // log.d(mod, fun, utils.beautify(process.env))
-      } catch (err) {
-        new Error(mod, fun, `No git hash: ${err}`)
-      }
-
-    return `${hashId}`.trim()
+    return getGitHash()
   } catch (err) {
-    // log.e(mod, fun, err)
     throw treatError(err, { mod: mod, fun: fun })
   }
 }
@@ -59,10 +41,8 @@ exports.getGitHash = () => {
 exports.getAppHash = () => {
   const fun = 'getCurrentAppId'
   try {
-    if (!CURRENT_APP_HASH) CURRENT_APP_HASH = this.getGitHash()
-    return CURRENT_APP_HASH
+    return getAppHash()
   } catch (err) {
-    // log.e(mod, fun, err)
     throw treatError(err, { mod: mod, fun: fun })
   }
 }

@@ -129,13 +129,15 @@ const treatSyslogInfo = (info) => {
 }
 
 // System-related "panic" conditions
-exports.sysEmerg = (msg, info) => sysLogger.emerg(msg, treatSyslogInfo(info))
+// exports.sysEmerg = (msg, info) => sysLogger.emerg(msg, treatSyslogInfo(info))
+exports.sysEmerg = (msg, info) => sysLogger.emergency(msg, treatSyslogInfo(info))
 
 // Something bad happened, deal with it NOW!
 exports.sysAlert = (msg, info) => sysLogger.alert(msg, treatSyslogInfo(info))
 
 // Something bad is about to happen, deal with it NOW!
-exports.sysCrit = (msg, info) => sysLogger.crit(msg, treatSyslogInfo(info))
+// exports.sysCrit = (msg, info) => sysLogger.crit(msg, treatSyslogInfo(info))
+exports.sysCrit = (msg, info) => sysLogger.critical(msg, treatSyslogInfo(info))
 
 // A failure in the system that needs attention.
 exports.sysError = (msg, info) => sysLogger.error(msg, treatSyslogInfo(info))

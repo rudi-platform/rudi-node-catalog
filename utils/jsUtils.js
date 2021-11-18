@@ -303,13 +303,15 @@ exports.getIpsMsg = (req) => {
   return `${ip}${this.getIpRedirectionsMsg(req)}`
 }
 
-exports.getApiCallMsg = (req, subject, client_id) => {
-  if (!subject)
+exports.storeApiCallInfo = (req, ips, clientApp, userId) => {}
+
+exports.getApiCallMsg = (req, clientApp, userId) => {
+  if (!clientApp)
     return `${req.method} ${req.url} (${req.context.config[ROUTE_NAME]}) <- ${this.getIpsMsg(req)}`
 
   return (
     `${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})` +
-    ` <- ${subject} ${client_id ? ' | ' + client_id : ''} @ ${this.getIpsMsg(req)}`
+    ` <- ${clientApp} ${userId ? ' | ' + userId : ''} @ ${this.getIpsMsg(req)}`
   )
 }
 /**

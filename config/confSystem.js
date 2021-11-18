@@ -5,7 +5,6 @@ const mod = 'sysConf'
 // ------------------------------------------------------------------------------------------------
 // External dependecies
 // ------------------------------------------------------------------------------------------------
-// const { format } = require('date-and-time')
 
 // ------------------------------------------------------------------------------------------------
 // Internal dependecies
@@ -17,6 +16,11 @@ utils.separateLogs()
 
 // ------------------------------------------------------------------------------------------------
 // Constants: local ini file configuration settings
+// ------------------------------------------------------------------------------------------------
+let CURRENT_APP_HASH
+
+// ------------------------------------------------------------------------------------------------
+// Constants
 // ------------------------------------------------------------------------------------------------
 
 // Conf files name
@@ -35,10 +39,12 @@ const DEFT_CONF_FILE = `${INI_DIR}/conf_default.ini`
 // if null, local conf file value
 // if null , default value
 const getUserConf = () => {
+  const fun = 'getUserConf'
   try {
+    utils.consoleLog(mod, fun, `Conf file: ${process.env.RUDI_API_USER_CONF ? 'env' : 'ini'}`)
     return fa.readIniFile(USER_CONF_FILE)
   } catch (err) {
-    utils.consoleErr(mod, 'getUserConf', err)
+    utils.consoleErr(mod, fun, err)
     throw err
   }
 }
@@ -80,7 +86,7 @@ exports.getIniValue = (section, field, defaultVal) => {
 // Extracting and exporting sys configuration
 // ------------------------------------------------------------------------------------------------
 
-// Node Server section
+// ----- Flags section
 const FLAGS_SECTION = 'flags'
 
 const SHOULD_CONTROL_PRIVATE_REQUESTS = this.getIniValue(
@@ -95,7 +101,7 @@ const SHOULD_CONTROL_PUBLIC_REQUESTS = this.getIniValue(
 exports.shouldControlPrivateRequests = () => SHOULD_CONTROL_PRIVATE_REQUESTS
 exports.shouldControlPublicRequests = () => SHOULD_CONTROL_PUBLIC_REQUESTS
 
-// Node Server section
+// ----- Node Server section
 const SERVER_SECTION = 'server'
 
 const APP_NAME = this.getIniValue(SERVER_SECTION, 'app_name', 'rudiprod.api')
@@ -107,7 +113,7 @@ exports.getServerAddress = () => LISTENING_ADDR
 exports.getServerPort = () => LISTENING_PORT
 exports.getHost = () => `http://${LISTENING_ADDR}:${LISTENING_PORT}`
 
-// DB section
+// ----- DB section
 const DB_SECTION = 'database'
 
 const DB_NAME = this.getIniValue(DB_SECTION, 'db_name')
@@ -117,7 +123,7 @@ const DB_URL = `${DB_URL_PREFIX}${DB_NAME}`
 exports.getDbName = () => DB_NAME
 exports.getDbUrl = () => DB_URL
 
-// Security section
+// ----- Security section
 const SECURITY_SECTION = 'security'
 
 const profilesConfFile = this.getIniValue(SECURITY_SECTION, 'profiles')
@@ -129,3 +135,42 @@ exports.getProfile = (subject) => PROFILES[subject]
 const appMsg = `App '${APP_NAME}' listening on: ${this.getHost()}`
 utils.consoleLog(mod, 'init', appMsg)
 utils.consoleLog(mod, 'init', `DB: ${DB_URL}`)
+
+// ------------------------------------------------------------------------------------------------
+// App ID
+// ------------------------------------------------------------------------------------------------
+
+exports.getGitHash = () => {
+  const fun = 'getGitHash'
+  // log.t(mod, fun, ``)
+  try {
+    // log.d(mod, fun, ` GET ${URL_PV_GIT_HASH_ACCESS}`)
+    let hashId
+    hashId = process.env.RUDI_API_GIT_REV
+
+    if (!hashId)
+      try {
+        hashId = require('child_process').execSync('git rev-parse --short HEAD')
+        // log.d(mod, fun, utils.beautify(process.env))
+      } catch (err) {
+        throw new Error(`No git hash: ${err}`, { mod: mod, fun: fun })
+      }
+
+    return `${hashId}`.trim()
+  } catch (err) {
+    // log.e(mod, fun, err)
+    throw new Error(err, { mod: mod, fun: fun })
+  }
+}
+
+/** @returns the git hash of the last time the app was launched */
+exports.getAppHash = () => {
+  const fun = 'getCurrentAppId'
+  try {
+    if (!CURRENT_APP_HASH) CURRENT_APP_HASH = this.getGitHash()
+    return CURRENT_APP_HASH
+  } catch (err) {
+    // log.e(mod, fun, err)
+    throw new Error(err, { mod: mod, fun: fun })
+  }
+}

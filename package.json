@@ -37,12 +37,12 @@
     "mongoose-geojson-schema": "^2.1.6",
     "mongoose-int32": "^0.5.0",
     "read-last-lines": "^1.8.0",
+    "rudilogger": "git+https://deployment:V77s-5gnZM6PR_ihMRsN@gitlab.aqmo.org/rudidev/rudilogger.git#shared",
     "sanitize-filename": "^1.6.3",
     "sshpk": "^1.16.1",
     "uuid": "^8.3.2",
     "winston": "^3.3.3",
-    "winston-daily-rotate-file": "^4.5.5",
-    "winston-syslog": "^2.4.4"
+    "winston-daily-rotate-file": "^4.5.5"
   },
   "devDependencies": {
     "@babel/core": "^7.15.8",

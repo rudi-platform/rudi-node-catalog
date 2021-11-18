@@ -9,7 +9,9 @@ const { existsSync, mkdirSync } = require('fs')
 
 const winston = require('winston')
 require('winston-daily-rotate-file')
-require('winston-syslog').Syslog
+// require('winston-syslog').Syslog
+const rudiLogger = require('rudilogger')
+
 const { combine, timestamp, printf, colorize, simple } = winston.format
 const syslogLevels = winston.config.syslog.levels
 
@@ -34,16 +36,26 @@ const SHOULD_SYSLOG_IN_FILE = sys.getIniValue(FLAGS_SECTION, 'should_syslog_in_f
 
 exports.shouldShowErrorPile = () => SHOULD_SHOW_ERROR_PILE
 
+// Log feedback
+const checkOption = (msg, flag) => utils.consoleLog(mod, '', `[${flag ? 'x' : ' '}] ${msg}`)
+checkOption('Control private requests', sys.shouldControlPrivateRequests())
+checkOption('Control public requests', sys.shouldControlPublicRequests())
+checkOption('Log in file', SHOULD_FILELOG)
+checkOption('Show error pile', SHOULD_SHOW_ERROR_PILE)
+checkOption('Sent syslogs', SHOULD_SYSLOG)
+checkOption('Backup syslogs in file', SHOULD_SYSLOG_IN_FILE)
+
 // ----- Logs section
 const LOG_SECTION = 'logging'
 
 const LOG_LVL = sys.getIniValue(LOG_SECTION, 'log_level', 'debug')
 utils.consoleLog(mod, '', `Log level set to '${LOG_LVL}'`)
-exports.getLogLevel = () => LOG_LVL
 
 const LOG_DIR = sys.getIniValue(LOG_SECTION, 'log_dir')
 const LOG_FILE = sys.getIniValue(LOG_SECTION, 'log_file')
+
 exports.LOG_EXP = sys.getIniValue(LOG_SECTION, 'expires', '7d')
+exports.getLogLevel = () => LOG_LVL
 
 // ----- Syslog
 const SYSLOG_SECTION = 'syslog'
@@ -66,9 +78,9 @@ if (SHOULD_FILELOG) {
     // first check if directory already exists
     if (!existsSync(LOG_DIR)) {
       mkdirSync(LOG_DIR, { recursive: true })
-      utils.consoleLog(mod, '', 'Log directory has been created.')
+      utils.consoleLog(mod, '', 'Log directory has been created')
     } else {
-      utils.consoleLog(mod, '', 'Log directory exists.')
+      utils.consoleLog(mod, '', 'Log directory exists')
     }
   } catch (err) {
     utils.consoleErr(mod, '', `Log directory creation failed: ${err}`)
@@ -243,72 +255,93 @@ exports.initFFLogger = () => {
 // Winston logger creation : SYSLOG
 // ------------------------------------------------------------------------------------------------
 
-const SYSLOGS_FORMAT_PRINTF = (info) =>
-  `${info.level} ${utils.toISOLocale()} ${info.message}` +
-  ` ${info.meta ? utils.beautify(info.meta) : ''}`
+// const SYSLOGS_FORMAT_PRINTF = (info) =>
+//   `${info.level} ${utils.toISOLocale()} ${info.message}` +
+//   ` ${info.meta ? utils.beautify(info.meta) : ''}`
 
-const formatConsoleSyslogs = combine(
-  colorize({ all: true }),
-  timestamp(),
-  printf(SYSLOGS_FORMAT_PRINTF)
+// const formatConsoleSyslogs = combine(timestamp(), printf(SYSLOGS_FORMAT_PRINTF))
+
+// const syslogOpts = {
+//   levels: syslogLevels,
+//   transports: [
+//     new winston.transports.Console({
+//       name: 'consoleSysLogs',
+//       levels: syslogLevels,
+//       format: formatConsoleSyslogs,
+//     }),
+//   ],
+// }
+
+// if (SHOULD_SYSLOG) {
+//   // Push to syslog socket
+//   syslogOpts.transports.push(
+//     new winston.transports.Syslog({
+//       name: 'syslogSocket',
+//       localhost: SYSLOG_NODE_NAME,
+//       facility: SYSLOG_FACILITY,
+//       protocol: SYSLOG_PROTOCOL,
+//       host: SYSLOG_HOST,
+//       port: SYSLOG_PORT,
+//       path: SYSLOG_SOCKET,
+//       type: SYSLOG_TYPE,
+//       app_name: APP_NAME,
+//       level: SYSLOG_LVL,
+//     })
+//   )
+//   // syslogOpts.transports.push(logOutputs.console)
+//   // } else {
+//   //   syslogOpts.transports.push(logOutputs.console)
+// }
+
+// if (SHOULD_SYSLOG_IN_FILE) {
+//   // Write in a dedicated syslog file
+//   syslogOpts.transports.push(
+//     new winston.transports.DailyRotateFile({
+//       name: 'syslogFile',
+//       dirname: SYSLOG_DIR,
+//       filename: `syslog-${APP_NAME}-%DATE%`,
+//       datePattern: 'YYYY-MM-DD-HH',
+//       createSymlink: true,
+//       symlinkName: `syslog-${APP_NAME}-current.log`,
+//       maxSize: '75m',
+//       maxFiles: '7d',
+//       extension: '.log',
+//       format: formatFileLogs,
+//     })
+//   )
+// }
+
+// exports.sysLogger = winston.createLogger(syslogOpts)
+function getRudiLoggerOptions() {
+  var facility = 20
+  if (SYSLOG_FACILITY.substr(0, 5) == 'local') {
+    facility = 16 + Number(SYSLOG_FACILITY.substr(5, 1))
+  }
+  var transports = 2
+  var path = SYSLOG_HOST
+  switch (SYSLOG_PROTOCOL) {
+    case 'tcp':
+      transports = 1
+      break
+    case 'udp':
+      transports = 2
+      break
+    case 'unix':
+      transports = 4
+      path = SYSLOG_SOCKET
+      break
+  }
+  return {
+    log_server: { path: path, port: SYSLOG_PORT, facility: facility, transport: transports },
+  }
+}
+
+exports.sysLogger = new rudiLogger.RudiLogger(
+  sys.getAppName(),
+  sys.getGitHash(),
+  getRudiLoggerOptions()
 )
 
-const syslogOpts = {
-  levels: syslogLevels,
-  transports: [
-    new winston.transports.Console({
-      name: 'consoleSysLogs',
-      levels: syslogLevels,
-      format: formatConsoleSyslogs,
-    }),
-  ],
-}
-
-if (SHOULD_SYSLOG) {
-  // Push to syslog socket
-  syslogOpts.transports.push(
-    new winston.transports.Syslog({
-      name: 'syslogSocket',
-      localhost: SYSLOG_NODE_NAME,
-      facility: SYSLOG_FACILITY,
-      protocol: SYSLOG_PROTOCOL,
-      host: SYSLOG_HOST,
-      port: SYSLOG_PORT,
-      path: SYSLOG_SOCKET,
-      type: SYSLOG_TYPE,
-      app_name: APP_NAME,
-      level: SYSLOG_LVL,
-    })
-  )
-  // syslogOpts.transports.push(logOutputs.console)
-  // } else {
-  //   syslogOpts.transports.push(logOutputs.console)
-}
-
-if (SHOULD_SYSLOG_IN_FILE) {
-  // Write in a dedicated syslog file
-  syslogOpts.transports.push(
-    new winston.transports.DailyRotateFile({
-      name: 'syslogFile',
-      dirname: SYSLOG_DIR,
-      filename: `syslog-${APP_NAME}-%DATE%`,
-      datePattern: 'YYYY-MM-DD-HH',
-      createSymlink: true,
-      symlinkName: `syslog-${APP_NAME}-current.log`,
-      maxSize: '75m',
-      maxFiles: '7d',
-      extension: '.log',
-      format: formatFileLogs,
-    })
-  )
-}
-
-exports.sysLogger = winston.createLogger(syslogOpts)
-
-const checkOption = (msg, flag) => utils.consoleLog(mod, '', `[${flag ? 'x' : ' '}] ${msg}`)
-checkOption('Control private requests', sys.shouldControlPrivateRequests())
-checkOption('Control public requests', sys.shouldControlPublicRequests())
-checkOption('Log in file', SHOULD_FILELOG)
-checkOption('Show error pile', SHOULD_SHOW_ERROR_PILE)
-checkOption('Sent syslogs', SHOULD_SYSLOG)
-checkOption('Backup syslogs in file', SHOULD_SYSLOG_IN_FILE)
+// exports.rudiSysLog = (severity, msg, context) => {
+//   this.sysLogger.log(severity, msg, '', context)
+// }

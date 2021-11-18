@@ -176,9 +176,9 @@ async function onPrivateRoute(req, reply) {
     // log.d(mod, fun, `${req.method} ${req.url} `)
     if (!shouldControlPrivateRequests()) return true
 
-    const { subject, client_id } = await checkRudiProdPermission(req, reply)
+    const { subject, clientId } = await checkRudiProdPermission(req, reply)
 
-    const apiCallMsg = getApiCallMsg(req, subject, client_id)
+    const apiCallMsg = getApiCallMsg(req, subject, clientId)
     log.i(mod, fun, apiCallMsg)
     log.sysInfo(apiCallMsg)
     return
@@ -195,7 +195,7 @@ async function onDevRoute(req, reply) {
     // log.d(mod, fun, `${req.method} ${req.url} `)
     if (!shouldControlPrivateRequests()) return true
 
-    const { subject, client_id } = await checkRudiProdPermission(req, reply)
+    const { subject, clientId: client_id } = await checkRudiProdPermission(req, reply)
     const apiCallMsg = getApiCallMsg(req, subject, client_id)
     log.i(mod, fun, apiCallMsg)
     log.sysInfo(apiCallMsg)
