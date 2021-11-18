@@ -312,10 +312,35 @@ exports.initFFLogger = () => {
 // }
 
 // exports.sysLogger = winston.createLogger(syslogOpts)
+function getRudiLoggerOptions() {
+  var facility = 20
+  if (SYSLOG_FACILITY.substr(0, 5) == 'local') {
+    facility = 16 + Number(SYSLOG_FACILITY.substr(5, 1))
+  }
+  var transports = 2
+  var path = SYSLOG_HOST
+  switch (SYSLOG_PROTOCOL) {
+    case 'tcp':
+      transports = 1
+      break
+    case 'udp':
+      transports = 2
+      break
+    case 'unix':
+      transports = 4
+      path = SYSLOG_SOCKET
+      break
+  }
+  return {
+    log_server: { path: path, port: SYSLOG_PORT, facility: facility, transport: transports },
+  }
+}
 
-exports.sysLogger = new rudiLogger.RudiLogger(sys.getAppName(), sys.getGitHash(), {
-  log_server: { path: SYSLOG_SOCKET, port: SYSLOG_PORT, facility: 20, transport: 4 },
-})
+exports.sysLogger = new rudiLogger.RudiLogger(
+  sys.getAppName(),
+  sys.getGitHash(),
+  getRudiLoggerOptions()
+)
 
 // exports.rudiSysLog = (severity, msg, context) => {
 //   this.sysLogger.log(severity, msg, '', context)
