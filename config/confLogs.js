@@ -31,7 +31,7 @@ const FLAGS_SECTION = 'flags'
 
 const SHOULD_FILELOG = sys.getIniValue(FLAGS_SECTION, 'should_log_in_file', false)
 const SHOULD_SHOW_ERROR_PILE = sys.getIniValue(FLAGS_SECTION, 'should_show_error_pile', false) // TODO || true
-const SHOULD_SYSLOG = sys.getIniValue(FLAGS_SECTION, 'should_syslog')
+exports.SHOULD_SYSLOG = sys.getIniValue(FLAGS_SECTION, 'should_syslog')
 const SHOULD_SYSLOG_IN_FILE = sys.getIniValue(FLAGS_SECTION, 'should_syslog_in_file')
 
 exports.shouldShowErrorPile = () => SHOULD_SHOW_ERROR_PILE
@@ -42,7 +42,7 @@ checkOption('Control private requests', sys.shouldControlPrivateRequests())
 checkOption('Control public requests', sys.shouldControlPublicRequests())
 checkOption('Log in file', SHOULD_FILELOG)
 checkOption('Show error pile', SHOULD_SHOW_ERROR_PILE)
-checkOption('Sent syslogs', SHOULD_SYSLOG)
+checkOption('Sent syslogs', this.SHOULD_SYSLOG)
 checkOption('Backup syslogs in file', SHOULD_SYSLOG_IN_FILE)
 
 // ----- Logs section
@@ -60,13 +60,13 @@ exports.getLogLevel = () => LOG_LVL
 // ----- Syslog
 const SYSLOG_SECTION = 'syslog'
 
-const SYSLOG_LVL = sys.getIniValue(SYSLOG_SECTION, 'log_level', 'info')
-const SYSLOG_NODE_NAME = sys.getIniValue(SYSLOG_SECTION, 'syslog_node_name')
+// const SYSLOG_LVL = sys.getIniValue(SYSLOG_SECTION, 'log_level', 'info')
+// const SYSLOG_NODE_NAME = sys.getIniValue(SYSLOG_SECTION, 'syslog_node_name')
 const SYSLOG_PROTOCOL = sys.getIniValue(SYSLOG_SECTION, 'syslog_protocol', 'unix')
 const SYSLOG_FACILITY = sys.getIniValue(SYSLOG_SECTION, 'syslog_facility', 'local4')
 const SYSLOG_HOST = sys.getIniValue(SYSLOG_SECTION, 'syslog_host')
 const SYSLOG_PORT = sys.getIniValue(SYSLOG_SECTION, 'syslog_port', 514) // default: 514
-const SYSLOG_TYPE = sys.getIniValue(SYSLOG_SECTION, 'syslog_type', 'RFC5424') // bsd | 5424
+// const SYSLOG_TYPE = sys.getIniValue(SYSLOG_SECTION, 'syslog_type', 'RFC5424') // bsd | 5424
 const SYSLOG_SOCKET = sys.getIniValue(SYSLOG_SECTION, 'syslog_socket') // the socket for sending syslog diagrams
 const SYSLOG_DIR = sys.getIniValue(SYSLOG_SECTION, 'syslog_dir') // path of the syslog backup file
 
@@ -342,6 +342,6 @@ exports.sysLogger = new rudiLogger.RudiLogger(
   getRudiLoggerOptions()
 )
 
-// exports.rudiSysLog = (severity, msg, context) => {
-//   this.sysLogger.log(severity, msg, '', context)
-// }
+exports.rudiSysLog = (severity, msg, context) => {
+  this.sysLogger.log(severity, msg, '', context)
+}

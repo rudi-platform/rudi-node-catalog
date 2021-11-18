@@ -128,11 +128,3 @@ exports.STATUS_CODE = 'statusCode'
 exports.CONTEXT = 'app_context'
 exports.TRACE = 'err_trace'
 exports.IS_RUDI_HTTP_ERROR = 'is_rudi_error'
-
-// ------------------------------------------------------------------------------------------------
-// Request identification
-// ------------------------------------------------------------------------------------------------
-exports.REQ_INFO = 'client_info'
-exports.CLIENT_IPS = 'client_ips'
-exports.CLIENT_APP = 'client_app'
-exports.CLIENT_USR = 'client_usr'

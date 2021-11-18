@@ -74,7 +74,7 @@ exports.checkPortalTokenInHeader = async (req, reply) => {
   try {
     const token = extractJwt(req)
     const jwtInfo = await this.verifyPortalToken(token)
-    req[api.JWT_INFO] = { [api.JWT_HEADER]: jwtInfo[0], [api.JWT_PAYLOAD]: jwtInfo[1] }
+    return jwtInfo
     // return await this.getTokenCheckedByPortal(token)
   } catch (err) {
     throw treatError(err, { mod: mod, fun: fun })

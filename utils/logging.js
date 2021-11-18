@@ -19,7 +19,7 @@ const {
   getReqIpAndRedirections,
 } = require('./jsUtils')
 
-const { logger, sysLogger, getLogLevel } = require('../config/confLogs')
+const { logger, sysLogger, getLogLevel, SHOULD_SYSLOG } = require('../config/confLogs')
 const { addLogEntry } = require('../db/dbQueries')
 const { API_METADATA_ID, API_DATA_NAME_PROPERTY } = require('../db/dbFields')
 const { TRACE } = require('../config/confApi')
@@ -130,32 +130,48 @@ const treatSyslogInfo = (info) => {
 
 // System-related "panic" conditions
 // exports.sysEmerg = (msg, info) => sysLogger.emerg(msg, treatSyslogInfo(info))
-exports.sysEmerg = (msg, info) => sysLogger.emergency(msg, treatSyslogInfo(info))
+exports.sysEmerg = (msg, info) => {
+  if (SHOULD_SYSLOG) sysLogger.emergency(msg, treatSyslogInfo(info))
+}
 
 // Something bad happened, deal with it NOW!
-exports.sysAlert = (msg, info) => sysLogger.alert(msg, treatSyslogInfo(info))
+exports.sysAlert = (msg, info) => {
+  if (SHOULD_SYSLOG) sysLogger.alert(msg, treatSyslogInfo(info))
+}
 
 // Something bad is about to happen, deal with it NOW!
 // exports.sysCrit = (msg, info) => sysLogger.crit(msg, treatSyslogInfo(info))
-exports.sysCrit = (msg, info) => sysLogger.critical(msg, treatSyslogInfo(info))
+exports.sysCrit = (msg, info) => {
+  if (SHOULD_SYSLOG) sysLogger.critical(msg, treatSyslogInfo(info))
+}
 
 // A failure in the system that needs attention.
-exports.sysError = (msg, info) => sysLogger.error(msg, treatSyslogInfo(info))
+exports.sysError = (msg, info) => {
+  if (SHOULD_SYSLOG) sysLogger.error(msg, treatSyslogInfo(info))
+}
 
 // Something will happen if it is not dealt within a timeframe.
-exports.sysWarn = (msg, info) => sysLogger.warn(msg, treatSyslogInfo(info))
+exports.sysWarn = (msg, info) => {
+  if (SHOULD_SYSLOG) sysLogger.warn(msg, treatSyslogInfo(info))
+}
 
 // Events that are unusual but not error conditions - might be summarized in an email to developers
 // or admins to spot potential problems - no immediate action required.
-exports.sysNotice = (msg, info) => sysLogger.notice(msg, treatSyslogInfo(info))
+exports.sysNotice = (msg, info) => {
+  if (SHOULD_SYSLOG) sysLogger.notice(msg, treatSyslogInfo(info))
+}
 
 // Normal operational messages - may be harvested for reporting, measuring throughput, etc.
 // No action required.
-exports.sysInfo = (msg, info) => sysLogger.info(msg, treatSyslogInfo(info))
+exports.sysInfo = (msg, info) => {
+  if (SHOULD_SYSLOG) sysLogger.info(msg, treatSyslogInfo(info))
+}
 
 // Normal operational messages - may be harvested for reporting, measuring throughput, etc.
 // No action required.
-exports.sysDebug = (msg, info) => sysLogger.debug(msg, treatSyslogInfo(info))
+exports.sysDebug = (msg, info) => {
+  if (SHOULD_SYSLOG) sysLogger.debug(msg, treatSyslogInfo(info))
+}
 
 // ------------------------------------------------------------------------------------------------
 // Http

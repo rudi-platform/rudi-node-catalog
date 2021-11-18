@@ -9,6 +9,7 @@ const utils = require('../utils/jsUtils')
 const { initFFLogger, shouldShowErrorPile } = require('../config/confLogs')
 const log = require('../utils/logging')
 const { createRudiHttpError, isRudiHttpError } = require('../utils/errors')
+const { CallContext } = require('../definitions/constructors/callContext')
 
 // ------------------------------------------------------------------------------------------------
 // External dependancies
@@ -58,9 +59,7 @@ fastify.decorate('notFound', (req, reply) => {
   }
 
   log.w(mod, fun, `${response.message} <- ${utils.getIpsMsg(req)}`)
-  log.sysNotice(`Error 404: ${response.message}`, {
-    req: req,
-  })
+  log.sysNotice(`Error 404: ${response.message}`, CallContext.getContextFromReq(req))
   // log.d(mod, fun, utils.beautify(req))
   reply.code(404).send(response)
 })
@@ -80,12 +79,11 @@ fastify.addHook('onError', (request, reply, error, done) => {
       if (shouldShowErrorPile()) error.logErrorPile()
 
       log.sysError(
-        `Error ${error.statusCode} (${error.name}): ${error.message}` +
-          ` <- ${utils.getIpsMsg(request)}`,
-        { req: request }
+        `Error ${error.statusCode} (${error.name}): ${error.message}`,
+        CallContext.getContextFromReq(request)
       )
     } else {
-      log.sysError(error, { req: request })
+      log.sysError(error, CallContext.getContextFromReq(request))
     }
   } catch (err) {
     log.e(mod, fun, err)

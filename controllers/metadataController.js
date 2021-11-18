@@ -94,6 +94,7 @@ const {
   ObjectNotFoundError,
   treatError,
 } = require('../utils/errors')
+const { CallContext } = require('../definitions/constructors/callContext')
 
 // ------------------------------------------------------------------------------------------------
 // Atomic treatments of properties: RUDI -> DB
@@ -656,7 +657,7 @@ exports.initWithODR = async (req, reply) => {
       })
     ).catch((err) => {
       log.e(mod, fun, err)
-      log.sysError(err.message, { error: err })
+      log.sysError(err.message, CallContext.getContextFromReq(req))
     })
     return 'Initialization initiated'
   } catch (err) {

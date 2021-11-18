@@ -75,6 +75,7 @@ const {
 } = require('../config/confSystem')
 const { JWT_USER, JWT_CLIENT } = require('../config/confPortal')
 const { JWT_SUB } = require('../utils/crypto')
+const { CallContext } = require('../definitions/constructors/callContext')
 
 // ------------------------------------------------------------------------------------------------
 // Route names
@@ -136,7 +137,15 @@ async function onFreeRoute(req, reply) {
   const fun = 'onFreeRoute'
   try {
     // log.d(mod, fun, `${req.method} ${req.url} `)
-    log.sysInfo(getApiCallMsg(req))
+    const callContext = new CallContext()
+    callContext.setIpsFromRequest(req)
+    CallContext.setAsReqContext(req, callContext)
+
+    log.sysInfo(
+      { req: { method: req.method, url: req.url, [ROUTE_NAME]: req.context.config[ROUTE_NAME] } },
+      CallContext.getContextFromReq(req)
+    )
+
     return
   } catch (err) {
     // log.w(mod, fun, err)
@@ -153,15 +162,23 @@ async function onPublicRoute(req, reply) {
 
     const jwtPayload = (await portalController.checkPortalTokenInHeader(req, reply))[1]
     // log.d(mod, fun, `Payload: ${beautify(jwtPayload)}`)
+
+    const callContext = new CallContext()
+    callContext.setIpsFromRequest(req)
+    callContext.setClientApp('portal')
+    callContext.setUser(jwtPayload[JWT_USER] || jwtPayload[JWT_SUB])
+    CallContext.setAsReqContext(req, callContext)
+
     const apiCallMsg = getApiCallMsg(
       req,
       jwtPayload[JWT_USER] || jwtPayload[JWT_SUB],
       jwtPayload[JWT_CLIENT]
     )
-
     log.i(mod, fun, apiCallMsg)
-    log.sysInfo(apiCallMsg)
-
+    log.sysInfo(
+      { req: { method: req.method, url: req.url, [ROUTE_NAME]: req.context.config[ROUTE_NAME] } },
+      CallContext.getContextFromReq(req)
+    )
     return
   } catch (err) {
     // log.w(mod, fun, err)
@@ -178,9 +195,18 @@ async function onPrivateRoute(req, reply) {
 
     const { subject, clientId } = await checkRudiProdPermission(req, reply)
 
+    const callContext = new CallContext()
+    callContext.setIpsFromRequest(req)
+    callContext.setClientApp(subject)
+    callContext.setUser(clientId)
+    CallContext.setAsReqContext(req, callContext)
+
     const apiCallMsg = getApiCallMsg(req, subject, clientId)
     log.i(mod, fun, apiCallMsg)
-    log.sysInfo(apiCallMsg)
+    log.sysInfo(
+      { req: { method: req.method, url: req.url, [ROUTE_NAME]: req.context.config[ROUTE_NAME] } },
+      CallContext.getContextFromReq(req)
+    )
     return
   } catch (err) {
     // log.w(mod, fun, err)
@@ -195,10 +221,20 @@ async function onDevRoute(req, reply) {
     // log.d(mod, fun, `${req.method} ${req.url} `)
     if (!shouldControlPrivateRequests()) return true
 
-    const { subject, clientId: client_id } = await checkRudiProdPermission(req, reply)
-    const apiCallMsg = getApiCallMsg(req, subject, client_id)
+    const { subject, clientId } = await checkRudiProdPermission(req, reply)
+
+    const callContext = new CallContext()
+    callContext.setIpsFromRequest(req)
+    callContext.setClientApp(subject)
+    callContext.setUser(clientId)
+    CallContext.setAsReqContext(req, callContext)
+
+    const apiCallMsg = getApiCallMsg(req, subject, clientId)
     log.i(mod, fun, apiCallMsg)
-    log.sysInfo(apiCallMsg)
+    log.sysInfo(
+      { req: { method: req.method, url: req.url, [ROUTE_NAME]: req.context.config[ROUTE_NAME] } },
+      CallContext.getContextFromReq(req)
+    )
     return
   } catch (err) {
     // log.w(mod, fun, err)

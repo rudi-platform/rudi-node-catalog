@@ -303,8 +303,6 @@ exports.getIpsMsg = (req) => {
   return `${ip}${this.getIpRedirectionsMsg(req)}`
 }
 
-exports.storeApiCallInfo = (req, ips, clientApp, userId) => {}
-
 exports.getApiCallMsg = (req, clientApp, userId) => {
   if (!clientApp)
     return `${req.method} ${req.url} (${req.context.config[ROUTE_NAME]}) <- ${this.getIpsMsg(req)}`
