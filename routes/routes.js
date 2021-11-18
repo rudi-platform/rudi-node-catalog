@@ -10,7 +10,7 @@ const mod = 'routes'
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
-const { getApiCallMsg } = require('../utils/jsUtils')
+const { getApiCallMsg, beautify } = require('../utils/jsUtils')
 const { treatError } = require('../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
@@ -139,11 +139,13 @@ async function onFreeRoute(req, reply) {
     // log.d(mod, fun, `${req.method} ${req.url} `)
     const callContext = new CallContext()
     callContext.setIpsFromRequest(req)
+    callContext.setReqDetails(req.method, req.url, req.context.config[ROUTE_NAME])
     CallContext.setAsReqContext(req, callContext)
 
+    // log.t(mod, fun, beautify(callContext))
     log.sysInfo(
-      { req: { method: req.method, url: req.url, [ROUTE_NAME]: req.context.config[ROUTE_NAME] } },
-      CallContext.getContextFromReq(req)
+      `API call: ${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})`,
+      callContext
     )
 
     return
@@ -165,8 +167,10 @@ async function onPublicRoute(req, reply) {
 
     const callContext = new CallContext()
     callContext.setIpsFromRequest(req)
-    callContext.setClientApp('portal')
-    callContext.setUser(jwtPayload[JWT_USER] || jwtPayload[JWT_SUB])
+    callContext.clientApp = 'RUDI Portal' // TODO: deferentiate real poertal calls from tests
+    callContext.reqUser = jwtPayload[JWT_USER] || jwtPayload[JWT_SUB]
+    callContext.setReqDetails(req.method, req.url, req.context.config[ROUTE_NAME])
+    // log.d(mod, fun, beautify(callContext))
     CallContext.setAsReqContext(req, callContext)
 
     const apiCallMsg = getApiCallMsg(
@@ -176,8 +180,8 @@ async function onPublicRoute(req, reply) {
     )
     log.i(mod, fun, apiCallMsg)
     log.sysInfo(
-      { req: { method: req.method, url: req.url, [ROUTE_NAME]: req.context.config[ROUTE_NAME] } },
-      CallContext.getContextFromReq(req)
+      `API call: ${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})`,
+      callContext
     )
     return
   } catch (err) {
@@ -197,15 +201,15 @@ async function onPrivateRoute(req, reply) {
 
     const callContext = new CallContext()
     callContext.setIpsFromRequest(req)
-    callContext.setClientApp(subject)
-    callContext.setUser(clientId)
+    callContext.clientApp = subject
+    callContext.reqUser = clientId
+    callContext.setReqDetails(req.method, req.url, req.context.config[ROUTE_NAME])
     CallContext.setAsReqContext(req, callContext)
 
-    const apiCallMsg = getApiCallMsg(req, subject, clientId)
-    log.i(mod, fun, apiCallMsg)
+    log.i(mod, fun, getApiCallMsg(req, subject, clientId))
     log.sysInfo(
-      { req: { method: req.method, url: req.url, [ROUTE_NAME]: req.context.config[ROUTE_NAME] } },
-      CallContext.getContextFromReq(req)
+      `API call: ${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})`,
+      callContext
     )
     return
   } catch (err) {
@@ -225,14 +229,14 @@ async function onDevRoute(req, reply) {
 
     const callContext = new CallContext()
     callContext.setIpsFromRequest(req)
-    callContext.setClientApp(subject)
-    callContext.setUser(clientId)
+    callContext.clientApp = subject
+    callContext.reqUser = clientId
     CallContext.setAsReqContext(req, callContext)
 
     const apiCallMsg = getApiCallMsg(req, subject, clientId)
     log.i(mod, fun, apiCallMsg)
     log.sysInfo(
-      { req: { method: req.method, url: req.url, [ROUTE_NAME]: req.context.config[ROUTE_NAME] } },
+      `API call: ${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})`,
       CallContext.getContextFromReq(req)
     )
     return

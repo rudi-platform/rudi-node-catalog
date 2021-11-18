@@ -14,6 +14,14 @@ const rudiLogger = require('rudilogger')
 
 const { combine, timestamp, printf, colorize, simple } = winston.format
 const syslogLevels = winston.config.syslog.levels
+Object.assign(
+  {
+    fatal: 0,
+    warn: 4,
+    trace: 7,
+  },
+  syslogLevels
+)
 
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
@@ -60,7 +68,7 @@ exports.getLogLevel = () => LOG_LVL
 // ----- Syslog
 const SYSLOG_SECTION = 'syslog'
 
-// const SYSLOG_LVL = sys.getIniValue(SYSLOG_SECTION, 'log_level', 'info')
+// const SYSLOG_LVL = sys.getIniValue(SYSLOG_SECTION, '◊log_level', 'info')
 // const SYSLOG_NODE_NAME = sys.getIniValue(SYSLOG_SECTION, 'syslog_node_name')
 const SYSLOG_PROTOCOL = sys.getIniValue(SYSLOG_SECTION, 'syslog_protocol', 'unix')
 const SYSLOG_FACILITY = sys.getIniValue(SYSLOG_SECTION, 'syslog_facility', 'local4')
@@ -143,6 +151,7 @@ const logOutputs = {
   // - Write to the console
   console: new winston.transports.Console({
     name: 'consoleLogs',
+    level: LOG_LVL === 'trace' ? 'debug' : LOG_LVL,
     levels: syslogLevels,
     format: formatConsoleLogs,
   }),
@@ -223,17 +232,10 @@ exports.initFFLogger = () => {
   winston.loggers.add(FF_LOGGER, {
     level: 'warn',
     // Adding ISO levels of logging from PINO
-    levels: Object.assign(
-      {
-        fatal: 0,
-        warn: 4,
-        trace: 7,
-      },
-      syslogLevels
-    ),
+    levels: syslogLevels,
     // format: format.combine(format.splat(), format.json()),
     defaultMeta: {
-      service: sys.getAppName() + '_' + (process.env.NODE_ENV || 'development'),
+      service: sys.getAppName() + '_' + (process.env.NODE_ENV || 'dev'),
     },
     transports: [logOutputs.ffError],
   })
@@ -343,5 +345,5 @@ exports.sysLogger = new rudiLogger.RudiLogger(
 )
 
 exports.rudiSysLog = (severity, msg, context) => {
-  this.sysLogger.log(severity, msg, '', context)
+  if (this.SHOULD_SYSLOG) this.sysLogger.log(severity, msg, '', context)
 }

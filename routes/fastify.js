@@ -75,6 +75,7 @@ fastify.addHook('onError', (request, reply, error, done) => {
   const fun = 'onError'
   try {
     log.d(mod, fun, ``)
+    log.d(mod, fun, `request: ${utils.beautify(request.call_context)}`)
     if (isRudiHttpError(error)) {
       if (shouldShowErrorPile()) error.logErrorPile()
 

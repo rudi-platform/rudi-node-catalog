@@ -1,5 +1,7 @@
 'use strict'
 
+const { ROUTE_NAME } = require('../../config/confApi')
+const { REQ_MTD, REQ_URL } = require('../../utils/crypto')
 const { treatError } = require('../../utils/errors')
 const { getReqIpAndRedirections } = require('../../utils/jsUtils')
 const log = require('../../utils/logging')
@@ -45,38 +47,58 @@ exports.CallContext = class CallContext {
     this[OP] = {}
   }
 
-  get context() {
-    log.t(mod, 'getContext', ``)
-    return { [AUTH]: this[AUTH], [OP]: this[OP] }
-  }
-
-  setIps(ipArray) {
+  set ips(ipArray) {
     log.t(mod, 'setIps', ``)
     this[AUTH][REQ_IPS] = ipArray
   }
+  get ips() {
+    return this[AUTH][REQ_IPS]
+  }
+
   setIpsFromRequest(req) {
     log.t(mod, 'setIpsFromRequest', ``)
-    this.setIps(getReqIpAndRedirections(req))
+    this.ips = getReqIpAndRedirections(req)
   }
-  setClientApp(clientApp) {
+
+  set clientApp(clientApp) {
     log.t(mod, 'setClientApp', ``)
     this[AUTH][REQ_APP] = clientApp
   }
-  setUser(userId) {
+  get clientApp() {
+    return this[AUTH][REQ_APP]
+  }
+
+  set reqUser(userId) {
     log.t(mod, 'setUser', ``)
     this[AUTH][REQ_USR] = userId
   }
-  setAuth(ips, clientApp, userId) {
-    log.t(mod, 'setAuth', ``)
-    this.setIps(Array.isArray(ips) ? ips : [ips])
-    if (clientApp) this.setClientApp(clientApp)
-    if (userId) this.setUser(userId)
+  get reqUser() {
+    return this[AUTH][REQ_USR]
   }
 
-  setCallContext(callContext) {
+  setAuth(ips, clientApp, userId) {
+    log.t(mod, 'setAuth', ``)
+    this.ips = Array.isArray(ips) ? ips : [ips]
+    if (clientApp) this.clientApp = clientApp
+    if (userId) this.reqUser = userId
+  }
+
+  setReqDetails(reqMethod, reqUrl, routeName) {
+    log.t(mod, 'setReqDetails', ``)
+    this[OP][REQ_MTD] = reqMethod
+    this[OP][REQ_URL] = reqUrl
+    this[OP][ROUTE_NAME] = routeName
+  }
+
+  set context(callContext) {
     log.t(mod, 'setCallContext', ``)
     const auth = callContext[AUTH]
     if (auth & auth[REQ_IPS]) this.setIps(auth[REQ_IPS])
+  }
+
+  get context() {
+    log.t(mod, 'getContext', ``)
+    return { [AUTH]: this[AUTH], [OP]: this[OP] }
   }
 
   static setAsReqContext(req, callContext) {
