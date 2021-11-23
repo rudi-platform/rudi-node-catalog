@@ -49,7 +49,7 @@ const OP_ID = 'id'
 exports.CallContext = class CallContext {
   constructor(authDetails, opDetails, rawDetails) {
     const fun = 'CallContext()'
-    log.d(mod, fun, `${beautify(authDetails)}, ${beautify(opDetails)}, ${beautify(rawDetails)}`)
+    log.t(mod, fun, `${beautify(authDetails)}, ${beautify(opDetails)}, ${beautify(rawDetails)}`)
     this[AUTH] = !authDetails ? {} : authDetails
     this[OP] = !opDetails ? {} : opDetails
     this[DETAILS] = !rawDetails ? {} : rawDetails
