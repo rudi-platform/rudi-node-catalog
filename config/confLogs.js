@@ -37,6 +37,7 @@ const APP_NAME = sys.getAppName()
 // ----- Flags section
 const FLAGS_SECTION = 'flags'
 
+exports.SHOULD_LOG_CONSOLE = sys.getIniValue(FLAGS_SECTION, 'should_log_console', false)
 const SHOULD_FILELOG = sys.getIniValue(FLAGS_SECTION, 'should_log_in_file', false)
 const SHOULD_SHOW_ERROR_PILE = sys.getIniValue(FLAGS_SECTION, 'should_show_error_pile', false) // TODO || true
 exports.SHOULD_SYSLOG = sys.getIniValue(FLAGS_SECTION, 'should_syslog')
@@ -46,6 +47,7 @@ exports.shouldShowErrorPile = () => SHOULD_SHOW_ERROR_PILE
 
 // Log feedback
 const checkOption = (msg, flag) => utils.consoleLog(mod, '', `[${flag ? 'x' : ' '}] ${msg}`)
+checkOption('Should log on console', this.SHOULD_LOG_CONSOLE)
 checkOption('Control private requests', sys.shouldControlPrivateRequests())
 checkOption('Control public requests', sys.shouldControlPublicRequests())
 checkOption('Log in file', SHOULD_FILELOG)

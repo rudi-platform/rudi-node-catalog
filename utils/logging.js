@@ -12,10 +12,15 @@ const { pick } = require('lodash')
 // ------------------------------------------------------------------------------------------------
 const { displayStr, logWhere, beautify, shorten, consoleErr } = require('./jsUtils')
 
-const { logger, getLogLevel, sysLogger, SHOULD_SYSLOG } = require('../config/confLogs')
+const {
+  logger,
+  sysLogger,
+  getLogLevel,
+  SHOULD_SYSLOG,
+  SHOULD_LOG_CONSOLE,
+} = require('../config/confLogs')
 const { addLogEntry } = require('../db/dbQueries')
 const { API_METADATA_ID, API_DATA_NAME_PROPERTY } = require('../db/dbFields')
-const { TRACE } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
 // Colors
@@ -85,15 +90,25 @@ function log(logLevel, srcMod, srcFun, msg) {
     consoleErr(e)
   }
 }
-exports.e = (srcMod, srcFun, msg) => log('error', srcMod, srcFun, msg)
-exports.w = (srcMod, srcFun, msg) => log('warn', srcMod, srcFun, msg)
-exports.i = (srcMod, srcFun, msg) => log('info', srcMod, srcFun, msg)
-exports.v = (srcMod, srcFun, msg) => log('verbose', srcMod, srcFun, msg)
-exports.d = (srcMod, srcFun, msg) => log('debug', srcMod, srcFun, msg)
+exports.e = !SHOULD_LOG_CONSOLE
+  ? () => {}
+  : (srcMod, srcFun, msg) => log('error', srcMod, srcFun, msg)
+exports.w = !SHOULD_LOG_CONSOLE
+  ? () => {}
+  : (srcMod, srcFun, msg) => log('warn', srcMod, srcFun, msg)
+exports.i = !SHOULD_LOG_CONSOLE
+  ? () => {}
+  : (srcMod, srcFun, msg) => log('info', srcMod, srcFun, msg)
+exports.v = !SHOULD_LOG_CONSOLE
+  ? () => {}
+  : (srcMod, srcFun, msg) => log('verbose', srcMod, srcFun, msg)
+exports.d = !SHOULD_LOG_CONSOLE
+  ? () => {}
+  : (srcMod, srcFun, msg) => log('debug', srcMod, srcFun, msg)
 
 exports.t = (srcMod, srcFun, msg) => {
   const level = 'trace'
-  if (getLogLevel() !== level) return
+  if (!SHOULD_LOG_CONSOLE || getLogLevel() !== level) return
   try {
     logger.debug(displayStr(srcMod, srcFun, msg))
     addLogEntry(level, srcMod, srcFun, msg)
