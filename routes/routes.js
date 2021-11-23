@@ -179,7 +179,8 @@ async function onPublicRoute(req, reply) {
     log.sysInfo(
       `API call: ${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})`,
       'routes.public.in',
-      callContext
+      callContext,
+      callContext.getDetails()
     )
     return
   } catch (err) {
@@ -217,7 +218,8 @@ async function onPrivateRoute(req, reply) {
     log.sysInfo(
       `API call: ${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})`,
       'routes.private.in',
-      callContext
+      callContext,
+      callContext.getDetails()
     )
     return
   } catch (err) {
@@ -251,7 +253,8 @@ async function onDevRoute(req, reply) {
     log.sysInfo(
       `API call: ${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})`,
       'routes.dev.in',
-      callContext
+      callContext,
+      callContext.getDetails()
     )
 
     // log.v(mod, fun, `${beautify(CallContext.getReqContext(req))}`)

@@ -25,7 +25,7 @@ const {
   QUERY_FIELDS,
 } = require('../config/confApi')
 const { pick } = require('lodash')
-const { treatError } = require('../utils/errors')
+const { RudiError } = require('../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
 // Logs API access

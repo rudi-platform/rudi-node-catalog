@@ -12,13 +12,7 @@ const { parseKey } = require('sshpk')
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
 
-const {
-  beautify,
-  decodeBase64url,
-  nowEpochS,
-  nowISO,
-  dateEpochSToIso,
-} = require('../utils/jsUtils')
+const { decodeBase64url, nowEpochS, nowISO, dateEpochSToIso } = require('../utils/jsUtils')
 
 const log = require('../utils/logging')
 const { ROUTE_NAME } = require('../config/confApi')

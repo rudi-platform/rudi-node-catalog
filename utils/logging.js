@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable no-console */
 'use strict'
 
@@ -140,35 +141,77 @@ exports.sysNotice = SHOULD_SYSLOG
 
 // Something bad happened, deal with it NOW!
 exports.sysAlert = SHOULD_SYSLOG
-  ? (msg, location, context, info, cid) => sysLogger.alert(msg, location, context, cid, info)
+  ? (msg, location, context, info, cid) =>
+    sysLogger.alert(
+      msg,
+      location,
+      context,
+      cid,
+      info ? info : context ? context.getDetails() : null
+    )
   : () => null
 
 // A failure in the system that needs attention.
 exports.sysError = SHOULD_SYSLOG
-  ? (msg, location, context, info, cid) => sysLogger.error(msg, location, context, cid, info)
+  ? (msg, location, context, info, cid) =>
+    sysLogger.error(
+      msg,
+      location,
+      context,
+      cid,
+      info ? info : context ? context.getDetails() : null
+    )
   : () => null
 
 // Something will happen if it is not dealt within a timeframe.
 exports.sysWarn = SHOULD_SYSLOG
-  ? (msg, location, context, info, cid) => sysLogger.warn(msg, location, context, cid, info)
+  ? (msg, location, context, info, cid) =>
+    sysLogger.warn(
+      msg,
+      location,
+      context,
+      cid,
+      info ? info : context ? context.getDetails() : null
+    )
   : () => null
 
 // Normal operational messages - may be harvested for reporting, measuring throughput, etc.
 // No action required.
 exports.sysInfo = SHOULD_SYSLOG
-  ? (msg, location, context, info, cid) => sysLogger.info(msg, location, context, cid, info)
+  ? (msg, location, context, info, cid) =>
+    sysLogger.info(
+      msg,
+      location,
+      context,
+      cid,
+      info ? info : context ? context.getDetails() : null
+    )
   : () => null
 
 // Normal operational messages - may be harvested for reporting, measuring throughput, etc.
 // No action required.
 exports.sysDebug = SHOULD_SYSLOG
-  ? (mod, fun, msg, context, info, cid) => sysLogger.debug(msg, `${mod.fun}`, context, cid, info)
+  ? (mod, fun, msg, context, info, cid) =>
+    sysLogger.debug(
+      msg,
+      `${mod.fun}`,
+      context,
+      cid,
+      info ? info : context ? context.getDetails() : null
+    )
   : () => null
 
 // Normal operational messages - may be harvested for reporting, measuring throughput, etc.
 // No action required.
 exports.sysTrace = SHOULD_SYSLOG
-  ? (mod, fun, msg, context, info, cid) => sysLogger.debug(msg, `${mod.fun}`, context, cid, info)
+  ? (mod, fun, msg, context, info, cid) =>
+    sysLogger.debug(
+      msg,
+      `${mod.fun}`,
+      context,
+      cid,
+      info ? info : context ? context.getDetails() : null
+    )
   : () => null
 
 // ------------------------------------------------------------------------------------------------
