@@ -83,32 +83,22 @@ const Colors = {
 // ------------------------------------------------------------------------------------------------
 function log(logLevel, srcMod, srcFun, msg) {
   try {
-    logger[logLevel](displayStr(srcMod, srcFun, msg))
+    if (SHOULD_LOG_CONSOLE) logger[logLevel](displayStr(srcMod, srcFun, msg))
     // console.log(displayStr(srcMod, srcFun, msg))
     addLogEntry(logLevel, srcMod, srcFun, msg)
   } catch (e) {
     consoleErr(e)
   }
 }
-exports.e = !SHOULD_LOG_CONSOLE
-  ? () => {}
-  : (srcMod, srcFun, msg) => log('error', srcMod, srcFun, msg)
-exports.w = !SHOULD_LOG_CONSOLE
-  ? () => {}
-  : (srcMod, srcFun, msg) => log('warn', srcMod, srcFun, msg)
-exports.i = !SHOULD_LOG_CONSOLE
-  ? () => {}
-  : (srcMod, srcFun, msg) => log('info', srcMod, srcFun, msg)
-exports.v = !SHOULD_LOG_CONSOLE
-  ? () => {}
-  : (srcMod, srcFun, msg) => log('verbose', srcMod, srcFun, msg)
-exports.d = !SHOULD_LOG_CONSOLE
-  ? () => {}
-  : (srcMod, srcFun, msg) => log('debug', srcMod, srcFun, msg)
+exports.e = (srcMod, srcFun, msg) => log('error', srcMod, srcFun, msg)
+exports.w = (srcMod, srcFun, msg) => log('warn', srcMod, srcFun, msg)
+exports.i = (srcMod, srcFun, msg) => log('info', srcMod, srcFun, msg)
+exports.v = (srcMod, srcFun, msg) => log('verbose', srcMod, srcFun, msg)
+exports.d = (srcMod, srcFun, msg) => log('debug', srcMod, srcFun, msg)
 
 exports.t = (srcMod, srcFun, msg) => {
   const level = 'trace'
-  if (!SHOULD_LOG_CONSOLE || getLogLevel() !== level) return
+  if (getLogLevel() !== level) return
   try {
     logger.debug(displayStr(srcMod, srcFun, msg))
     addLogEntry(level, srcMod, srcFun, msg)
