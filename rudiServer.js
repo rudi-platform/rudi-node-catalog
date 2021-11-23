@@ -26,7 +26,7 @@ RegExp.prototype.toJSON = RegExp.prototype.toString
 // Require external modules
 const mongoose = require('mongoose')
 const fastify = require('./routes/fastify')
-const { treatError } = require('./utils/errors')
+const { RudiError } = require('./utils/errors')
 // Import Swagger Options
 // const swagger = require('./config/swagger')
 
@@ -64,7 +64,10 @@ mongoose
       `| App version: '${sysController.getAppHash()}' ` +
       `| '${sysController.getEnvironment()}' env`
     log.i(mod, 'app', startMsg)
-    log.sysInfo(startMsg)
+    log.sysInfo(startMsg, null, null, {
+      apiVersion: api.VERSION,
+      env: sysController.getEnvironment(),
+    })
     const logSeparatorEnd = utils.separateLogs('Init OK')
     addLogEntry('info', 'app', 'logSeparatorEnd', logSeparatorEnd).catch((err) =>
       utils.consoleErr('info', 'app', 'logSeparatorEnd: ' + err)
@@ -72,8 +75,8 @@ mongoose
   })
   .catch((err) => {
     log.e(mod, 'mongoConnection', err)
-    log.sysAlert(`Mongo connection: ${err}`, { error: err })
-    throw treatError(err, { mod: mod, fun: 'mongoConnection' })
+    log.sysAlert(`Mongo connection: ${err}`, 'rudiServer.dbConnect', {}, { error: err })
+    throw RudiError.treatError(mod, 'mongoConnection', err)
   })
 
 // ------------------------------------------------------------------------------------------------
@@ -90,7 +93,7 @@ const start = async () => {
   } catch (err) {
     // fastify.log.error(err)
     log.e(mod, 'exitServer', err)
-    log.sysAlert(`Server exited anormally: ${err}`, { error: err })
+    log.sysAlert(`Server exited anormally: ${err}`, 'rudiServer.starting', {}, { error: err })
     process.exit(1)
   }
 }
@@ -102,16 +105,16 @@ try {
     })
     .catch((err) => {
       log.e(mod, 'server', `Crashed: ${err}`)
-      log.sysCrit(`Server crashed: ${err}`, { error: err })
+      log.sysCrit(`Server crashed: ${err}`, 'rudiServer.running', {}, { error: err })
     })
 } catch (err) {
   log.e(mod, 'server', `Uncaught error: ${err}`)
-  log.sysCrit(`Uncaught error: ${err}`, { error: err })
+  log.sysCrit(`Uncaught error: ${err}`, 'rudiServer.uncaughtError', {}, { error: err })
 }
 
 process.on('uncaughtException', (err) => {
   log.e(mod, 'process', `Uncaught exception: ${err}`)
-  log.sysCrit(`Uncaught exception: ${err}`, { error: err })
+  log.sysCrit(`Uncaught exception: ${err}`, 'rudiServer.uncaughtException', {}, { error: err })
   // console.error('There was an uncaught error', err)
   // process.exit(1) //mandatory (as per the Node.js docs)
 })
@@ -120,8 +123,13 @@ process.on('unhandledRejection', (err, promise) => {
   const fun = 'catching promise rejection'
   log.e(mod, fun, 'DAMN!!! Promise rejection not handled here: ' + utils.beautify(promise))
   log.e(mod, fun, 'The error was: ' + err)
-  log.sysCrit(`Promise rejection not handled: ${utils.beautify(promise)})`, {
-    context: utils.beautify(promise),
-  })
-  log.sysCrit(`Promise rejection error: ${err}`, { error: err })
+  log.sysCrit(
+    `Promise rejection not handled: ${utils.beautify(promise)})`,
+    'rudiServer.promiseUnhandled',
+    {},
+    {
+      promise: utils.beautify(promise),
+    }
+  )
+  log.sysCrit(`Promise rejection error: ${err}`, 'rudiServer.on', {}, { error: err })
 })

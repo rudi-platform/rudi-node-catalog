@@ -51,7 +51,7 @@ exports.getLogs = async (req, reply) => {
     return logLines //.map((logLine) => logLineToString(logLine))
   } catch (err) {
     // consoleErr(mod, fun, err)
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -64,7 +64,6 @@ exports.getLastLogLines = async (req, reply) => {
     const logs = readLastLines.read(LOG_FILE, nbLines)
     return logs
   } catch (err) {
-    // log.e(mod, fun, err)
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }

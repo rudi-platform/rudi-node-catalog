@@ -37,7 +37,7 @@ exports.newOrganization = async (orgJson) => {
     const error = new Error(
       `New object '${URL_OBJECT_ORGANIZATIONS}': ${beautify(orgJson)} | Error: ${err}`
     )
-    throw treatError(error, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, error)
   }
   try {
     await dbOrganization.save()
@@ -46,7 +46,7 @@ exports.newOrganization = async (orgJson) => {
     const error = new Error(
       `Saving object '${URL_OBJECT_ORGANIZATIONS}': ${beautify(dbOrganization)} | Error: ${err}`
     )
-    throw treatError(error, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, error)
   }
   return dbOrganization
 }

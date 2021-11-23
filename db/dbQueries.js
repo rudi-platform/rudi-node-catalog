@@ -20,6 +20,15 @@ const msg = require('../utils/msg')
 const json = require('../utils/jsonAccess')
 const utils = require('../utils/jsUtils')
 
+const {
+  ParameterExpectedError,
+  NotFoundError,
+  ObjectNotFoundError,
+  NotImplementedError,
+  BadRequestError,
+  RudiError,
+} = require('../utils/errors')
+
 // ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
@@ -27,7 +36,7 @@ const {
   PARAM_ID,
   PARAM_OBJECT_METADATA,
   PARAM_OBJECT_ORGANIZATIONS,
-  PARAM_OBJECT_CONTACTS,
+  PARAM_OBJECT_CONTACTS: PARAM_OBJECT_CONTACTS,
   PARAM_OBJECT_MEDIA,
   PARAM_OBJECT_SKOS_SCHEME,
   PARAM_OBJECT_SKOS_CONCEPT,
@@ -68,7 +77,7 @@ const {
   LOG_ID,
 } = require('./dbFields')
 
-const { JWT_EXP } = require('../config/confPortal')
+const { JWT_EXP } = require('../utils/crypto')
 
 // ------------------------------------------------------------------------------------------------
 // Data models
@@ -85,14 +94,6 @@ const { Metadata, METADATA_FIELDS_TO_POPULATE } = require('../definitions/models
 
 const { Report } = require('../definitions/models/Report')
 const { LogEntry, makeLogInfo, logLineToString } = require('../definitions/models/LogEntry')
-const {
-  ParameterExpectedError,
-  NotFoundError,
-  ObjectNotFoundError,
-  NotImplementedError,
-  BadRequestError,
-  treatError,
-} = require('../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
 // Properties with special treatments
@@ -130,7 +131,7 @@ const ID_PROP = {
 function assertIsString(fun, param) {
   if (typeof param !== 'string') {
     const err = new BadRequestError(msg.parameterTypeExpected(fun, 'string', param))
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -144,7 +145,7 @@ exports.getObjectModel = (objectType) => {
 
     return Model
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -158,7 +159,7 @@ exports.getObjectIdField = (objectType) => {
 
     return idField
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -273,7 +274,7 @@ exports.getCollections = async () => {
     })
     return collections
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -285,7 +286,7 @@ exports.dropDB = async () => {
     log.d(mod, fun, 'DB dropped')
     return dbActionResult
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -300,9 +301,8 @@ exports.cleanLicences = async () => {
     await dropCollection(CONCEPTS_COLLECTION_NAME)
     await dropCollection(SCHEMES_COLLECTION_NAME)
   } catch (err) {
-    log.w(mod, fun, err)
-    treatError(err, { mod: mod, fun: fun })
-    err
+    // log.w(mod, fun, err)
+    RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -326,7 +326,7 @@ async function dropCollection(collectionName) {
     return false
   } catch (err) {
     // log.w(mod, fun, err)
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -351,7 +351,7 @@ exports.getObject = async (objectType, filter) => {
       return obj
     }
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -373,7 +373,7 @@ exports.getObjectWithRudiId = async (objectType, rudiId) => {
 
     return await this.getObject(objectType, filter)
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -386,7 +386,7 @@ exports.getEnsuredObjectWithRudiId = async (objectType, rudiId) => {
     if (!dbObject) throw new ObjectNotFoundError(objectType, rudiId)
     return dbObject
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -398,7 +398,7 @@ exports.getObjectWithJson = async (objectType, rudiObject) => {
     const rudiId = json.accessProperty(rudiObject, idField)
     return await this.getObjectWithRudiId(objectType, rudiId)
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -412,7 +412,7 @@ exports.getEnsuredObjectWithJson = async (objectType, rudiObject) => {
     if (!dbObject) throw new ObjectNotFoundError(objectType, rudiId)
     return dbObject
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -424,7 +424,7 @@ exports.getEnsuredObjectWithDbId = async (objectType, dbId) => {
     if (!dbObject) throw new ObjectNotFoundError(objectType, dbId)
     return dbObject
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -435,7 +435,7 @@ exports.doesObjectExistWithRudiId = async (objectType, rudiId) => {
     const dbObject = await this.getObjectWithRudiId(objectType, rudiId)
     return !!dbObject
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -446,7 +446,7 @@ exports.doesObjectExistWithJson = async (objectType, rudiObject) => {
     const dbObject = await this.getObjectWithJson(objectType, rudiObject)
     return !!dbObject
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -475,7 +475,7 @@ exports.getNestedObject = async (objectType, nestedObjectProperty, filter, field
       return dbObjects // .map((obj) => new mongoose.Types.ObjectId(obj._id))
     }
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -497,7 +497,7 @@ exports.getObjectPropertiesWithDbId = async (objectType, dbId, propertyList) => 
       return await Model.findOne(filter, fields).populate(populateFields)
     }
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -516,7 +516,7 @@ exports.getObjectPropertiesWithRudiId = async (objectType, rudiId, propertyList)
       return await Model.findOne(filter, fields).populate(populateFields)
     }
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -530,7 +530,7 @@ exports.getDbIdWithRudiId = async (objectType, rudiId) => {
     const partialDbObject = await this.getObjectPropertiesWithRudiId(objectType, rudiId, [DB_ID])
     return partialDbObject ? partialDbObject[DB_ID] : null
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -542,7 +542,7 @@ exports.getEnsuredDbIdWithRudiId = async (objectType, rudiId) => {
     if (!dbId) throw new ObjectNotFoundError(objectType, rudiId)
     return dbId
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -554,7 +554,7 @@ exports.getDbIdWithJson = async (objectType, rudiObject) => {
     const rudiId = json.accessProperty(rudiObject, idField)
     return await this.getDbIdWithRudiId(objectType, rudiId)
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -569,7 +569,7 @@ exports.getEnsuredDbIdWithJson = async (objectType, rudiObject) => {
     const rudiId = json.accessProperty(rudiObject, idField)
     return await this.getEnsuredDbIdWithRudiId(objectType, rudiId)
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -585,7 +585,7 @@ exports.getObjectWithField = async (Model, fieldName, fieldValue, populateFields
     }
     return await this.getObject(Model, filter, populateFields)
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun})
+    throw RudiError.treatError(err, { mod: mod, fun: fun})
   }
 }
  */
@@ -692,7 +692,7 @@ exports.getObjectList = async (objectType, options) => {
       return utils.listPick(objectList, fields)
     }
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 exports.getObjectListAndCount = async (objectType, options) => {
@@ -754,7 +754,7 @@ exports.getObjectListAndCount = async (objectType, options) => {
       }
     }
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -843,7 +843,7 @@ exports.getMetadataListAndCount = async (options) => {
     // log.d(mod, fun, `reshapedResult: ${utils.beautify(reshapedResult)}`)
     return reshapedResult
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -983,7 +983,7 @@ exports.groupObjectList = async (objectType, unionField, options) => {
     if (!FieldModel) return finalGroupList
     return await FieldModel.populate(finalGroupList, pivot)
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -1043,7 +1043,7 @@ exports.countObjectList = async (objectType, unionField, options) => {
     )
     return objectList
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -1067,7 +1067,7 @@ exports.updateObject = async (objectType, updateData) => {
       return await Model.findOneAndUpdate(filter, updateData, updateOpts).populate(populateOptions)
     }
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
   // log.d(mod, fun, `updatedObject: ${utils.beautify(updatedObject)}`)
 }
@@ -1102,7 +1102,7 @@ exports.overwriteObject = async (objectType, updateData) => {
     // log.d(mod, fun, `dbObject: ${utils.beautify(dbObject)}`)
     return dbObject
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
   // log.d(mod, fun, `updatedObject: ${utils.beautify(updatedObject)}`)
 }
@@ -1151,7 +1151,7 @@ exports.deleteObject = async (objectType, rudiId) => {
       return await Model.findOneAndRemove(filter).populate(populateFields)
     }
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -1162,7 +1162,7 @@ exports.deleteAll = async (objectType) => {
   try {
     return await Model.deleteMany()
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -1191,7 +1191,7 @@ exports.deleteManyWithRudiIds = async (objectType, rudiIdList) => {
     const deletionInfo = await Model.deleteMany(filter)
     return deletionInfo
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -1213,7 +1213,7 @@ exports.deleteManyWithFilter = async (objectType, conditions) => {
     const deletionInfo = await Model.deleteMany(conditions)
     return deletionInfo
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -1283,7 +1283,7 @@ exports.updateMetadata = async (jsonMetadata) => {
 
     return updatedMetadata
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -1704,7 +1704,7 @@ exports.isReferencedInMetadata = async (objectType, rudiId) => {
     // res = await Metadata.find(metadataFilter, API_METADATA_ID)
     // return !!utils.isEmptyArray(res)
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 // ensure the organization is not in metadata.producer
@@ -1787,7 +1787,7 @@ exports.getLatestStoredPortalToken = async () => {
     // log.d(mod, fun, `lastToken: ${utils.beautify(lastToken)}`)
     return lastToken
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -1799,7 +1799,7 @@ exports.cleanStoredToken = (dbToken) => {
     log.d(mod, fun, `token: ${utils.beautify(token)}`)
     return token
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 exports.storePortalToken = async (token) => {
@@ -1808,7 +1808,7 @@ exports.storePortalToken = async (token) => {
     const dbToken = await new PortalToken(token)
     return await dbToken.save()
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -1857,6 +1857,6 @@ exports.getLogEntries = async (options) => {
 
     return readableLogs
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }

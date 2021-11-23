@@ -30,12 +30,11 @@ const {
   NotImplementedError,
   BadRequestError,
   ForbiddenError,
-  createRudiHttpError,
   NotAcceptableError,
-  treatError,
+  RudiError,
 } = require('../utils/errors')
 
-const { extractJwt, JWT_EXP } = require('../utils/crypto')
+const { extractJwt, JWT_EXP, JWT_SUB, REQ_MTD } = require('../utils/crypto')
 // const { createHmac } = require('crypto')
 
 // ------------------------------------------------------------------------------------------------
@@ -64,7 +63,7 @@ exports.exposedGetPortalToken = async (req, reply) => {
     // log.d(mod, fun, portal.getAuthUrl())
     return await this.getNewTokenFromPortal()
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -77,7 +76,7 @@ exports.checkPortalTokenInHeader = async (req, reply) => {
     return jwtInfo
     // return await this.getTokenCheckedByPortal(token)
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -107,7 +106,7 @@ exports.getPortalToken = async () => {
     return token
     // log.d(mod, fun, 'Stored token was validated by the Portal')
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
     //  new InternalServerError(`Failed to get a new token from the portal: ${err}`)
   }
 }
@@ -124,7 +123,7 @@ exports.checkStoredToken = async (req, reply) => {
     if (!token) throw new NotFoundError('No Portal token is actually stored')
     return await this.getTokenCheckedByPortal(token[portal.FIELD_TOKEN])
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -135,7 +134,7 @@ exports.checkInputToken = async (req, reply) => {
     const token = json.accessReqParam(req.params, portal.PARAM_TOKEN)
     return await this.getTokenCheckedByPortal(token[portal.FIELD_TOKEN])
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -149,7 +148,7 @@ exports.getMetadata = async (req, reply) => {
 
     return await this.getMetadataFromPortal(metadataId)
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -163,7 +162,7 @@ exports.sendMetadata = async (req, reply) => {
 
     return await this.postMetadataToPortal(metadataId)
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -177,7 +176,7 @@ exports.deleteMetadata = async (req, reply) => {
 
     return await this.deletePortalMetadata(metadataId)
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 // ------------------------------------------------------------------------------------------------
@@ -239,7 +238,7 @@ exports.getNewTokenFromPortal = async () => {
       answer = await directPost(portalAuthUrl, body, opts)
     } catch (err) {
       const error = new InternalServerError(`Post to portal failed: ${err}`)
-      throw treatError(error, { mod: mod, fun: fun })
+      throw RudiError.treatError(mod, fun, error)
     }
     // log.d(mod, fun, `answer.status: ${answer.status}`)
 
@@ -268,11 +267,11 @@ exports.getNewTokenFromPortal = async () => {
     } else {
       const errMsg = `${utils.beautify(answer)}`
       // log.w(mod, fun, errMsg)
-      throw createRudiHttpError(answer.status, errMsg)
+      throw RudiError.createRudiHttpError(answer.status, errMsg)
     }
   } catch (err) {
     const error = new ForbiddenError(`Failed to get a token from Portal: ${utils.beautify(err)}`)
-    throw treatError(error, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, error)
   }
 }
 
@@ -292,7 +291,7 @@ exports.getTokenCheckedByPortal = async (token) => {
       return portalResponse.data
     } else throw new ForbiddenError(`Portal invalidated the token: ${portalResponse.data}`)
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -324,7 +323,7 @@ jwtBody = {
 */
 /* 
   exports.checkSignatureWithSecret = (accessToken) => {
-    const fun = 'verifyPortalToken'
+    const fun = 'checkSignatureWithSecret'
     log.t(mod, fun, ``)
 
     try {
@@ -397,7 +396,7 @@ exports.checkSignatureWithPubKey = (accessToken) => {
     }
     return signatureIsValid
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -417,6 +416,10 @@ exports.verifyPortalToken = (accessToken) => {
 
     const login = portal.getCredentials()[0]
     const jwtPortalUser = jwtPayload[portal.JWT_USER]
+    if (!jwtPortalUser && jwtPayload[REQ_MTD])
+      throw new ForbiddenError(`Using a RUDI internal JWT to access a Portal route is incorrect.`)
+
+    // log.d(mod, fun, `JWT Portal payload: ${utils.beautify(jwtPayload)}`)
     // log.d(mod, fun, `JWT Portal user: ${jwtPortalUser}`)
     if (jwtPortalUser !== login) {
       log.w(mod, fun, `Portal JWT: incorrect user: : ${jwtPortalUser}`)
@@ -442,9 +445,9 @@ exports.verifyPortalToken = (accessToken) => {
     // log.d(mod, fun, `jwtPayload: ${utils.beautify(jwtPayload)}`)
     return [jwtHeader, jwtPayload]
   } catch (err) {
-    // const errMsg = `Invalid token: ${err}`
-    // log.w(mod, fun, errMsg)
-    throw treatError(err, { mod: mod, fun: fun })
+    const errMsg = `Invalid token: ${err}`
+    log.w(mod, fun, errMsg)
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -474,7 +477,7 @@ exports.postMetadataToPortal = async (metadataId) => {
     // log.d(mod, fun, `reply: ${utils.beautify(reply)}`)
     return reply
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -489,7 +492,7 @@ exports.getMetadataFromPortal = async (metadataId) => {
 
     return reply
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -505,6 +508,6 @@ exports.deletePortalMetadata = async (metadataId) => {
     return reply
   } catch (err) {
     const error = new Error(`Couldn't delete on Portal side: ${err}`)
-    throw treatError(error, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, error)
   }
 }

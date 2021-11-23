@@ -11,12 +11,12 @@ const mod = 'contCtrl'
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
 const { beautify } = require('../utils/jsUtils')
-const { treatError, InternalServerError } = require('../utils/errors')
+const { RudiError, InternalServerError } = require('../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
-const { PARAM_OBJECT_CONTACTS: URL_OBJECT_CONTACTS } = require('../config/confApi')
+const { PARAM_OBJECT_CONTACTS } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
 // Data models
@@ -34,17 +34,17 @@ exports.newContact = async (contactJson) => {
     dbContact = await new Contact(contactJson)
   } catch (err) {
     const error = new InternalServerError(
-      `New object '${URL_OBJECT_CONTACTS}': ${beautify(contactJson)} | Error: ${err}`
+      `New object '${PARAM_OBJECT_CONTACTS}': ${beautify(contactJson)} | Error: ${err}`
     )
-    throw treatError(error, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, error)
   }
   try {
     await dbContact.save()
   } catch (err) {
     const error = new InternalServerError(
-      `Saving object '${URL_OBJECT_CONTACTS}': ${beautify(dbContact)} | Error: ${err}`
+      `Saving object '${PARAM_OBJECT_CONTACTS}': ${beautify(dbContact)} | Error: ${err}`
     )
-    throw treatError(error, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, error)
   }
   return dbContact
 }

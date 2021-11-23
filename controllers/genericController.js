@@ -35,7 +35,7 @@ const {
 
   PARAM_OBJECT_METADATA,
   PARAM_OBJECT_ORGANIZATIONS,
-  PARAM_OBJECT_CONTACTS,
+  PARAM_OBJECT_CONTACTS: PARAM_OBJECT_CONTACTS,
   PARAM_OBJECT_MEDIA,
   PARAM_OBJECT_SKOS_CONCEPT,
   PARAM_OBJECT_SKOS_SCHEME,
@@ -111,8 +111,9 @@ const {
   ObjectNotFoundError,
   BadRequestError,
   ParameterExpectedError,
-  treatError,
+  RudiError,
 } = require('../utils/errors')
+const { CallContext } = require('../definitions/constructors/callContext')
 
 // ------------------------------------------------------------------------------------------------
 // Specific object type helper functions
@@ -148,7 +149,7 @@ function cleanDate(inputDate) {
     log.d(mod, fun, `clean date: ${cleanDate.toISOString()}`)
     return cleanDate
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -369,7 +370,7 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
             nestedFieldIds = await db.getNestedObject(objectType, extObj, objFilter, DB_ID)
           } catch (err) {
             // returnedFilter[QUERY_FILTER][extObj] = 0
-            throw treatError(err, { mod: mod, fun: fun })
+            throw RudiError.treatError(mod, fun, err)
           }
           // log.d(mod, fun, `nestedFieldIds: ${beautify(nestedFieldIds)}`)
 
@@ -390,7 +391,7 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
     // log.d(mod, fun, `filter: ${beautify(returnedFilter[QUERY_FILTER])}`)
     return returnedFilter
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -400,16 +401,15 @@ function getObjectParam(req) {
   try {
     checkIsUrlObject(objectType)
   } catch (err) {
-    log.w(mod, fun, err)
     const error = new NotFoundError(`Route '${req.method} ${req.url}' not found `)
-    throw treatError(error, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, error)
   }
   return objectType
 }
 
 function checkIsUrlObject(objectType) {
-  const fun = 'checkIsUrlObject'
-  log.d(mod, fun, beautify(URL_OBJECTS))
+  // const fun = 'checkIsUrlObject'
+  // log.d(mod, fun, beautify(URL_OBJECTS))
   if (URL_OBJECTS.indexOf(objectType) === -1)
     throw new NotFoundError(msg.objectTypeNotFound(objectType))
 }
@@ -436,7 +436,7 @@ async function newObject(objectType, objectData) {
         throw new NotFoundError(msg.objectTypeNotFound(objectType))
     }
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -468,7 +468,7 @@ exports.setPublishedFlag = async (dbObject, rudiId) => {
       log.i(mod, fun, `Data had already been published for id '${rudiId}'`)
     }
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -504,9 +504,13 @@ exports.addSingleObject = async (req, reply) => {
     const createdObject = await newObject(objectType, rudiObject)
     // log.v(mod, fun, beautify(createdObject, 2))
     log.i(mod, fun, `${msg.objectAdded(objectType, rudiId)}`)
+
+    const context = CallContext.getCallContextFromReq(req)
+    if (context) context.addObjId(objectType, rudiId)
+
     return createdObject
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -525,9 +529,13 @@ exports.getSingleObject = async (req, reply) => {
     // ensure the object exists
     const dbObject = await db.getEnsuredObjectWithRudiId(objectType, objectId)
     // return the object
+
+    const context = CallContext.getCallContextFromReq(req)
+    if (context) context.addObjId(objectType, objectId)
+
     return dbObject
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -544,7 +552,7 @@ exports.getObjectList = async (req, reply) => {
 
     return await this.getManyObjects(objectType, req, reply)
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -609,7 +617,7 @@ exports.getManyObjects = async (objectType, req) => {
 
     return objectList
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -643,7 +651,7 @@ exports.getMetadataListAndCount = async (req, reply) => {
     return objectList
   } catch (err) {
     const error = err.name === 'MongoError' ? new BadRequestError(error) : new NotFoundError(error)
-    throw treatError(error, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, error)
   }
 }
 
@@ -667,14 +675,17 @@ exports.updateSingleObject = async (req, reply) => {
     const existsObject = await db.doesObjectExistWithRudiId(objectType, rudiId)
     if (!existsObject) throw new ObjectNotFoundError(objectType, rudiId)
 
+    const context = CallContext.getCallContextFromReq(req)
+
     if (objectType === PARAM_OBJECT_METADATA) {
+      if (context) context.addMetaId(rudiId)
       return await metadataController.overwriteMetadata(updateData)
     } else {
+      if (context) context.addObjId(objectType, rudiId)
       return await db.overwriteObject(objectType, updateData)
     }
   } catch (err) {
-    // log.e(mod, fun, err)
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -697,18 +708,22 @@ exports.upsertSingleObject = async (req, reply) => {
 
     const existsObject = await db.doesObjectExistWithRudiId(objectType, rudiId)
 
+    const context = CallContext.getCallContextFromReq(req)
     if (!existsObject) {
+      if (context) context.addObjId(objectType, rudiId)
+
       return await newObject(objectType, updateData)
     } else {
       if (objectType === PARAM_OBJECT_METADATA) {
+        if (context) context.addMetaId(rudiId)
         return await metadataController.overwriteMetadata(updateData)
       } else {
+        if (context) context.addObjId(objectType, rudiId)
         return await db.overwriteObject(objectType, updateData)
       }
     }
   } catch (err) {
-    // log.e(mod, fun, err)
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -722,32 +737,32 @@ exports.deleteSingleObject = async (req, reply) => {
   try {
     // retrieve url parameters: object type, object id
     const objectType = getObjectParam(req)
-    const objectRudiId = json.accessReqParam(req, PARAM_ID)
+    const rudiId = json.accessReqParam(req, PARAM_ID)
 
     // ensure the object exists
-    await db.getEnsuredObjectWithRudiId(objectType, objectRudiId)
+    await db.getEnsuredObjectWithRudiId(objectType, rudiId)
 
-    if (await isObjectReferenced(objectType, objectRudiId))
-      throw new ForbiddenError(msg.objectNotDeletedBecauseUsed(objectType, objectRudiId))
+    if (await isObjectReferenced(objectType, rudiId))
+      throw new ForbiddenError(msg.objectNotDeletedBecauseUsed(objectType, rudiId))
 
     // TODO: if SkosScheme: delete all SkosConcepts that reference it
     // TODO: if SkosConcept: update all other SkosConcepts that reference it (parents/children/siblings/relatives)
-    const answer = await db.deleteObject(objectType, objectRudiId)
+    const answer = await db.deleteObject(objectType, rudiId)
 
     if (objectType === PARAM_OBJECT_METADATA) {
-      deletePortalMetadata(objectRudiId)
+      deletePortalMetadata(rudiId)
         .then(() =>
-          log.i(mod, fun, `Portal accepted the deletion request for metadata '${objectRudiId}'`)
+          log.i(mod, fun, `Portal accepted the deletion request for metadata '${rudiId}'`)
         )
-        .catch((err) =>
-          log.e(mod, fun, `Portal couldn't delete metadata '${objectRudiId}': ${err}`)
-        )
+        .catch((err) => log.e(mod, fun, `Portal couldn't delete metadata '${rudiId}': ${err}`))
     }
+
+    const context = CallContext.getCallContextFromReq(req)
+    if (context) context.addObjId(objectType, rudiId)
 
     return answer
   } catch (err) {
-    // log.e(mod, fun, err)
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -784,7 +799,7 @@ exports.deleteObjectList = async (req, reply) => {
     // log.e(mod, fun, `url: ${beautify(req.url)}`)
     // log.e(mod, fun, `params: ${beautify(req.params)}`)
     // log.e(mod, fun, `body: ${beautify(req.body)}`)
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -816,8 +831,7 @@ exports.deleteManyObjects = async (req, reply) => {
 
     return await db.deleteManyWithFilter(objectType, filter)
   } catch (err) {
-    // log.e(mod, fun, err)
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -840,7 +854,6 @@ exports.generateUUID = async (req, reply) => {
   try {
     return UUIDv4()
   } catch (err) {
-    // log.e(mod, fun, err)
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }

@@ -9,7 +9,7 @@ const mod = 'utils'
 const { inspect } = require('util')
 const { floor, pick } = require('lodash')
 const datetime = require('date-and-time')
-const { ROUTE_NAME, TRACE } = require('../config/confApi')
+const { TRACE } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
 // String
@@ -121,7 +121,7 @@ exports.nowLocaleFormatted = () => datetime.format(new Date(), this.LOG_DATE_FOR
 // return `${year}/${month}/${date} ${h}:${m}:${s}`
 
 // ------------------------------------------------------------------------------------------------
-// Arrays
+// Strings
 // ------------------------------------------------------------------------------------------------
 exports.isString = (str) => typeof str === 'string'
 
@@ -131,7 +131,7 @@ exports.isString = (str) => typeof str === 'string'
 exports.isArray = (anArray) => Array.isArray(anArray)
 exports.isNotEmptyArray = (anArray) => Array.isArray(anArray) && anArray.length > 0
 exports.isEmptyArray = (anArray) => Array.isArray(anArray) && anArray.length === 0
-
+exports.getLast = (array) => (Array.isArray(array) ? array[array.length - 1] : null)
 // ------------------------------------------------------------------------------------------------
 // Objects
 // ------------------------------------------------------------------------------------------------
@@ -274,69 +274,4 @@ exports.consoleLog = (srcMod, srcFun, msg) => {
 exports.consoleErr = (srcMod, srcFun, msg) => {
   const errMsg = !msg ? undefined : msg[TRACE] || msg
   console.error(this.nowLocaleFormatted(), '.error.', this.displayStr(srcMod, srcFun, errMsg))
-}
-
-// ------------------------------------------------------------------------------------------------
-// IP Redirections display
-// ------------------------------------------------------------------------------------------------
-
-exports.getReqIpAndRedirections = (req) => {
-  const ip = req.ip
-  const redirections = this.getReqIpRedirections(req)
-  return redirections && this.isNotEmptyArray(redirections) ? [ip, ...redirections] : [ip]
-}
-
-exports.getReqIpRedirections = (req) => {
-  const headers = req.headers
-  return headers['x-forwarded-for'] || headers['X-Forwarded-For']
-}
-
-exports.getIpRedirectionsMsg = (req) => {
-  const headers = req.headers
-  if (!headers) return ''
-  const redirections = this.getReqIpRedirections(req)
-  return redirections ? ` <- ${redirections} ` : ''
-}
-
-exports.getIpsMsg = (req) => {
-  const ip = req.ip
-  return `${ip}${this.getIpRedirectionsMsg(req)}`
-}
-
-exports.getApiCallMsg = (req, clientApp, userId) => {
-  if (!clientApp)
-    return `${req.method} ${req.url} (${req.context.config[ROUTE_NAME]}) <- ${this.getIpsMsg(req)}`
-
-  return (
-    `${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})` +
-    ` <- ${clientApp} ${userId ? ' | ' + userId : ''} @ ${this.getIpsMsg(req)}`
-  )
-}
-/**
- *
- * @param {object} req Request
- * @param {string} subject (optional) the application the request is coming from
- * @param {string} user (optional) the identified user that launched the request
- * @returns {object} Details of the API call:
- *    - "req": details of the request
- *        - "method": HTTP method
- *        - "url": URL
- *        - "route_name": local route name
- *    - "src": details on the requester
- *        - "ip":
- */
-exports.apiCallDetails = (req, subject, user) => {
-  if (!subject)
-    return {
-      req: {
-        method: req.method,
-        url: req.url,
-        [ROUTE_NAME]: req.context.config[ROUTE_NAME],
-      },
-      src: { ip: this.getIpsMsg(req) },
-    }
-  return {
-    req: { method: req.method, url: req.url, [ROUTE_NAME]: req.context.config[ROUTE_NAME] },
-    src: { ip: this.getIpsMsg(req), subject: subject, user: user },
-  }
 }

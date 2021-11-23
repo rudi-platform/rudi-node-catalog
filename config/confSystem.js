@@ -11,6 +11,7 @@ const mod = 'sysConf'
 // ------------------------------------------------------------------------------------------------
 const fa = require('../utils/fileActions')
 const utils = require('../utils/jsUtils')
+const { TRACE, TRACE_MOD, TRACE_FUN, TRACE_ERR } = require('./confApi')
 
 utils.separateLogs()
 
@@ -27,7 +28,8 @@ let CURRENT_APP_HASH
 // - directory
 const INI_DIR = './0-ini'
 // - user conf path
-const USER_CONF_FILE = process.env.RUDI_API_USER_CONF || `${INI_DIR}/conf_custom.ini`
+const RUDI_API_USER_ENV = process.env.RUDI_API_USER_CONF
+const USER_CONF_FILE = RUDI_API_USER_ENV || `${INI_DIR}/conf_custom.ini`
 // utils.consoleLog(mod, 'init', USER_CONF_FILE)
 // - default conf path
 const DEFT_CONF_FILE = `${INI_DIR}/conf_default.ini`
@@ -41,7 +43,7 @@ const DEFT_CONF_FILE = `${INI_DIR}/conf_default.ini`
 const getUserConf = () => {
   const fun = 'getUserConf'
   try {
-    utils.consoleLog(mod, fun, `Conf file: ${process.env.RUDI_API_USER_CONF ? 'env' : 'ini'}`)
+    utils.consoleLog(mod, fun, `Conf file: ${RUDI_API_USER_ENV ? 'env' : 'ini'}`)
     return fa.readIniFile(USER_CONF_FILE)
   } catch (err) {
     utils.consoleErr(mod, fun, err)
@@ -68,10 +70,13 @@ const LOCAL_CONF = getLocalConf()
 // -> gets user conf file value
 //    if null get local conf file value
 //    if null get default value
-exports.getIniValue = (section, field, defaultVal) => {
+exports.getIniValue = (section, field, defaultVal, customConf, defaultConf) => {
   try {
-    const userValue = utils.quietAccess(USER_CONF[section], field)
-    const localValue = utils.quietAccess(LOCAL_CONF[section], field)
+    const userConf = customConf ? customConf : USER_CONF
+    const localConf = defaultConf ? defaultConf : LOCAL_CONF
+
+    const userValue = utils.quietAccess(userConf[section], field)
+    const localValue = utils.quietAccess(localConf[section], field)
 
     if (userValue != utils.NOT_FOUND) return userValue
     if (localValue != utils.NOT_FOUND) return localValue
@@ -143,23 +148,19 @@ utils.consoleLog(mod, 'init', `DB: ${DB_URL}`)
 exports.getGitHash = () => {
   const fun = 'getGitHash'
   // log.t(mod, fun, ``)
+  // log.d(mod, fun, ` GET ${URL_PV_GIT_HASH_ACCESS}`)
   try {
-    // log.d(mod, fun, ` GET ${URL_PV_GIT_HASH_ACCESS}`)
-    let hashId
-    hashId = process.env.RUDI_API_GIT_REV
+    let hashId = process.env.RUDI_API_GIT_REV
 
-    if (!hashId)
-      try {
-        hashId = require('child_process').execSync('git rev-parse --short HEAD')
-        // log.d(mod, fun, utils.beautify(process.env))
-      } catch (err) {
-        throw new Error(`No git hash: ${err}`, { mod: mod, fun: fun })
-      }
-
+    if (!hashId) {
+      hashId = require('child_process').execSync('git rev-parse --short HEAD')
+      // log.d(mod, fun, utils.beautify(process.env))
+    }
     return `${hashId}`.trim()
   } catch (err) {
-    // log.e(mod, fun, err)
-    throw new Error(err, { mod: mod, fun: fun })
+    const error = new Error(`No git hash: ${err}`)
+    error[TRACE] = [{ [TRACE_MOD]: mod, [TRACE_FUN]: fun, [TRACE_ERR]: err }]
+    throw error
   }
 }
 
@@ -170,7 +171,8 @@ exports.getAppHash = () => {
     if (!CURRENT_APP_HASH) CURRENT_APP_HASH = this.getGitHash()
     return CURRENT_APP_HASH
   } catch (err) {
-    // log.e(mod, fun, err)
-    throw new Error(err, { mod: mod, fun: fun })
+    const error = new Error(`No git hash: ${err}`)
+    error[TRACE] = [{ [TRACE_MOD]: mod, [TRACE_FUN]: fun, [TRACE_ERR]: err }]
+    throw error
   }
 }

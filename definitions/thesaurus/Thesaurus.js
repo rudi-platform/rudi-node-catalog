@@ -13,7 +13,7 @@ const {
   MethodNotAllowedError,
   BadRequestError,
   NotFoundError,
-  treatError,
+  RudiError,
 } = require('../../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
@@ -73,7 +73,7 @@ module.exports = class Thesaurus {
       this.#isInit = true
       // log.d(mod, fun, `Thesaurus initialized: ${this.#code}`)
     } catch (err) {
-      throw treatError(err, { mod: mod, fun: fun })
+      throw RudiError.treatError(mod, fun, err)
     }
   }
 
@@ -88,7 +88,7 @@ module.exports = class Thesaurus {
       if (lang) return this.getLabels(lang)
       return this.#currentValues
     } catch (err) {
-      throw treatError(err, { mod: mod, fun: fun })
+      throw RudiError.treatError(mod, fun, err)
     }
   }
 
@@ -115,7 +115,7 @@ module.exports = class Thesaurus {
       })
       return labels
     } catch (err) {
-      throw treatError(err, { mod: mod, fun: fun })
+      throw RudiError.treatError(mod, fun, err)
     }
   }
 
@@ -136,7 +136,7 @@ module.exports = class Thesaurus {
       }
     } catch (err) {
       // log.w(mod, fun, err)
-      throw treatError(err, { mod: mod, fun: fun })
+      throw RudiError.treatError(mod, fun, err)
     }
   }
 
@@ -157,7 +157,7 @@ module.exports = class Thesaurus {
       return isIn
     } catch (err) {
       // log.w(mod, fun, err)
-      throw treatError(err, { mod: mod, fun: fun })
+      throw RudiError.treatError(mod, fun, err)
     }
   }
 
@@ -172,7 +172,7 @@ module.exports = class Thesaurus {
       }
     } catch (err) {
       // log.d(mod, fun, err)
-      throw treatError(err, { mod: mod, fun: fun })
+      throw RudiError.treatError(mod, fun, err)
     }
   }
 
@@ -183,7 +183,7 @@ module.exports = class Thesaurus {
       await this.#storeEnum(this.#code, this.#currentValues)
     } catch (err) {
       // log.w(mod, fun, err)
-      throw treatError(err, { mod: mod, fun: fun })
+      throw RudiError.treatError(mod, fun, err)
     }
   }
 
@@ -197,7 +197,7 @@ module.exports = class Thesaurus {
       else throw new NotFoundError(`Enum '${typeThesaurus}' was not found`)
     } catch (err) {
       // log.d(mod, fun, err)
-      throw treatError(err, { mod: mod, fun: fun })
+      throw RudiError.treatError(mod, fun, err)
     }
   }
 
@@ -211,7 +211,7 @@ module.exports = class Thesaurus {
       else throw new NotFoundError(`Enum '${typeThesaurus}' was not found`)
     } catch (err) {
       // log.d(mod, fun, err)
-      throw treatError(err, { mod: mod, fun: fun })
+      throw RudiError.treatError(mod, fun, err)
     }
   }
 
@@ -227,7 +227,7 @@ module.exports = class Thesaurus {
       )
     } catch (err) {
       // log.w(mod, fun, err)
-      throw treatError(err, { mod: mod, fun: fun })
+      throw RudiError.treatError(mod, fun, err)
     }
   }
 }

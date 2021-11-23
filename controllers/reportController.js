@@ -65,7 +65,7 @@ const {
   BadRequestError,
   ObjectNotFoundError,
   MethodNotAllowedError,
-  treatError,
+  RudiError,
 } = require('../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
@@ -94,7 +94,7 @@ function dateArrayToDate(dateArray) {
       `${pad(dateArray[3])}:${pad(dateArray[4])}:${pad(dateArray[5])}.${dateArray[6]}Z`
     // log.d(mod, fun, `Date: ${date}`)
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 function pad(number, nbZeros) {
@@ -154,8 +154,7 @@ exports.addSingleReportForObject = async (req, reply) => {
 
     return dbReadyReport
   } catch (err) {
-    // log.e(mod, fun, err)
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -262,7 +261,7 @@ exports.addOrEditSingleReport = async (objectType, req, reply) => {
 
     return dbReadyReport
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -306,7 +305,7 @@ exports.getReportList = async (objectType, req, reply) => {
 
     return dbReportList
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -356,7 +355,7 @@ exports.getSingleReport = async (objectType, req, reply) => {
 
     return dbReport
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -378,8 +377,7 @@ exports.deleteSingleReportForObject = async (req, reply) => {
     // delete this integration report for this object
     return `Function '${fun}' still needs to be implemented in module ${mod}`
   } catch (err) {
-    // log.e(mod, fun, err)
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -395,8 +393,7 @@ exports.deleteEveryReportForObject = async (req, reply) => {
     // delete every integration report for this object
     return `Function '${fun}' still needs to be implemented in module ${mod}`
   } catch (err) {
-    // log.e(mod, fun, err)
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -413,8 +410,7 @@ exports.deleteManyReportForObject = async (req, reply) => {
     // delete every integration report for this object
     return `Function '${fun}' still needs to be implemented in module ${mod}`
   } catch (err) {
-    // log.e(mod, fun, err)
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -426,7 +422,6 @@ exports.getReportListForObjectType = async (req, reply) => {
     // delete every integration report for all objects
     return `Function '${fun}' still needs to be implemented in module ${mod}`
   } catch (err) {
-    // log.e(mod, fun, err)
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }

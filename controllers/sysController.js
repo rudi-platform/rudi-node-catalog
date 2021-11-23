@@ -18,7 +18,7 @@ const mongoose = require('mongoose')
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
 const utils = require('../utils/jsUtils')
-const { treatError } = require('../utils/errors')
+const { RudiError } = require('../utils/errors')
 const { getGitHash, getAppHash } = require('../config/confSystem')
 
 // ------------------------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ exports.getGitHash = () => {
   try {
     return getGitHash()
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -43,7 +43,7 @@ exports.getAppHash = () => {
   try {
     return getAppHash()
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -60,8 +60,7 @@ exports.getEnvironment = () => {
     const env = process.env.RUDI_API_ENV ? process.env.RUDI_API_ENV : utils.NOT_FOUND
     return env
   } catch (err) {
-    // log.e(mod, fun, err)
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -97,8 +96,7 @@ exports.getNodeVersion = async () => {
 
     return nVersions
   } catch (err) {
-    // log.e(mod, fun, err)
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -110,6 +108,6 @@ async function getMongDbVersion() {
     // log.d(mod, fun, `Mongo : ${mongoInfo.version}`)
     return mongoInfo.version
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }

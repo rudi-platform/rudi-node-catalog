@@ -8,7 +8,7 @@ const mod = 'fastify'
 const utils = require('../utils/jsUtils')
 const { initFFLogger, shouldShowErrorPile } = require('../config/confLogs')
 const log = require('../utils/logging')
-const { createRudiHttpError, isRudiHttpError } = require('../utils/errors')
+const { RudiError } = require('../utils/errors')
 const { CallContext } = require('../definitions/constructors/callContext')
 
 // ------------------------------------------------------------------------------------------------
@@ -25,25 +25,73 @@ const fastify = require('fastify')({
 })
 
 // ------------------------------------------------------------------------------------------------
-// Fastify init
+// Cosntants
 // ------------------------------------------------------------------------------------------------
+const TRACE_TIME = 'traceTiming'
+const REQ_DURATION = 'reqTimeMs'
+
+// ------------------------------------------------------------------------------------------------
+// Fastify hooks: errors
+// ------------------------------------------------------------------------------------------------
+fastify.addHook('onError', (request, reply, error, done) => {
+  const fun = 'onError'
+  log.d(mod, fun, ``)
+  try {
+    const reqContext = CallContext.getCallContextFromReq(request)
+    if (reqContext) log.d(mod, fun, `request: ${utils.beautify(reqContext)}`)
+    reqContext.addError(error)
+    if (RudiError.isRudiHttpError(error)) {
+      if (shouldShowErrorPile()) {
+        RudiError.logErrorPile(error)
+      }
+      reqContext.addError(error)
+      const primeError = error[TRACE][0]
+      log.e(
+        primeError.mod,
+        primeError.fun,
+        `Error ${error.statusCode} (${error.name}): ${error.message}`,
+        reqContext
+      )
+      log.sysError(
+        `Error ${error.statusCode} (${error.name}): ${error.message}`,
+        `${primeError.mod}.${primeError.fun}`,
+        reqContext,
+        reqContext.getDetails()
+      )
+    } else {
+      log.sysError(error, `${mod}.${fun}`, reqContext, reqContext.getDetails())
+    }
+  } catch (err) {
+    log.e(mod, fun, err)
+    const context = CallContext.getCallContextFromReq(request)
+    log.sysError(err, `${mod}.${fun}`, context, context.getDetails())
+    throw RudiError.treatError(mod, fun, err)
+  }
+  done()
+})
+
 fastify.setErrorHandler((error, request, reply) => {
   const fun = 'finalErrorHandler'
   log.t(mod, fun, ``)
   try {
-    // log.d(mod, fun, isRudiHttpError(error))
+    // log.d(mod, fun, RudiError.isRudiHttpError(error))
     let rudiHttpError
-    if (isRudiHttpError(error)) rudiHttpError = error
+    if (RudiError.isRudiHttpError(error)) rudiHttpError = error
     else {
-      const code = error.statusCode
-      const msg = error.message
-      rudiHttpError = createRudiHttpError(code, msg)
+      rudiHttpError = RudiError.createRudiHttpError(error.statusCode, error.message || error)
     }
-    reply.code(rudiHttpError.statusCode).send(rudiHttpError)
+    reply.code(rudiHttpError[STATUS_CODE]).send(rudiHttpError)
     // log.sysError(`Error ${rudiHttpError.statusCode}: ${rudiHttpError.message}`)
   } catch (uncaughtErr) {
     log.e(mod, fun, `Uncaught! ${uncaughtErr}`)
-    log.sysCrit(`Uncaught error: ${uncaughtErr}`, { error: uncaughtErr })
+    log.sysCrit(
+      `Uncaught error: ${uncaughtErr}`,
+      'ff.errorHandler',
+      CallContext.getReqContext(request),
+      {
+        error: uncaughtErr,
+      }
+    )
   }
   log.t(mod, fun, 'done')
 })
@@ -59,42 +107,57 @@ fastify.decorate('notFound', (req, reply) => {
   }
 
   log.w(mod, fun, `${response.message} <- ${utils.getIpsMsg(req)}`)
-  log.sysNotice(`Error 404: ${response.message}`, CallContext.getContextFromReq(req))
+  log.sysNotice(`Error 404: ${response.message}`, CallContext.getReqContext(req))
   // log.d(mod, fun, utils.beautify(req))
   reply.code(404).send(response)
 })
 
 fastify.setNotFoundHandler(fastify.notFound)
 
+// ------------------------------------------------------------------------------------------------
+// Fastify hooks: request receive / send
+// ------------------------------------------------------------------------------------------------
 fastify.addHook('onRequest', (req, res, next) => {
-  log.v('http', 'apiCall', utils.getApiCallMsg(req))
+  const fun = 'onRequest'
+  log.t(mod, fun, `----- new request -----vvv---`)
+  req[TRACE_TIME] = utils.nowEpochMs()
+
+  const callContext = new CallContext()
+  callContext.setIpsFromRequest(req)
+  callContext.setReqDetails(req.method, req.url, req.context.config[ROUTE_NAME])
+  callContext.addDetails('callTime', req[TRACE_TIME])
+  CallContext.setAsReqContext(req, callContext)
+
+  log.d(mod, fun, `req context: ${utils.beautify(req.callContext)}`)
+  log.d(mod, fun, `callContext: ${utils.beautify(callContext)}`)
+  log.v('http', fun, CallContext.createApiCallMsg(req))
   next()
 })
 
-fastify.addHook('onError', (request, reply, error, done) => {
-  const fun = 'onError'
-  try {
-    log.d(mod, fun, ``)
-    log.d(mod, fun, `request: ${utils.beautify(request.call_context)}`)
-    if (isRudiHttpError(error)) {
-      if (shouldShowErrorPile()) error.logErrorPile()
+fastify.addHook('onSend', (request, reply, payload, next) => {
+  const fun = 'onSend'
+  log.t(mod, fun, ``)
+  const time = utils.nowEpochMs() - request[TRACE_TIME]
 
-      log.sysError(
-        `Error ${error.statusCode} (${error.name}): ${error.message}`,
-        CallContext.getContextFromReq(request)
-      )
-    } else {
-      log.sysError(error, CallContext.getContextFromReq(request))
-    }
-  } catch (err) {
-    log.e(mod, fun, err)
-  }
-  done()
-})
+  const callContext = CallContext.getCallContextFromReq(request)
+  callContext.addDetails(REQ_DURATION, time)
+  callContext.statusCode = reply.statusCode
+  // callContext.
+  log.i(
+    mod,
+    fun,
+    `API reply: ${request.method} ${request.url} (${
+      request.context.config[ROUTE_NAME]
+    }): ${utils.beautify(callContext)}`
+  )
 
-fastify.addHook('onSend', (_request, reply, payload, next) => {
-  // const fun = 'onSend'
-  // log.d(mod, fun, utils.beautify(payload))
+  // log.v(mod, fun, utils.beautify(callContext))
+  log.sysInfo(
+    `API reply: ${request.method} ${request.url} (${request.context.config[ROUTE_NAME]})`,
+    `${mod}.${fun}`,
+    callContext
+  )
+  log.t(mod, fun, `----- request sent (${time} ms) -----^^^--`)
   next()
 })
 
@@ -104,6 +167,7 @@ fastify.addHook('onSend', (_request, reply, payload, next) => {
 
 // Import Routes
 const { publicRoutes, backOfficeRoutes, devRoutes, redirectRoutes } = require('./routes')
+const { STATUS_CODE, ROUTE_NAME, TRACE } = require('../config/confApi')
 
 // Loop over each public route
 redirectRoutes.forEach((pubRoute, index) => {

@@ -10,17 +10,9 @@ const { pick } = require('lodash')
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
-const {
-  displayStr,
-  logWhere,
-  beautify,
-  shorten,
-  consoleErr,
-  getReqIpAndRedirections,
-  consoleLog,
-} = require('./jsUtils')
+const { displayStr, logWhere, beautify, shorten, consoleErr } = require('./jsUtils')
 
-const { logger, sysLogger, getLogLevel, SHOULD_SYSLOG } = require('../config/confLogs')
+const { logger, getLogLevel, sysLogger, SHOULD_SYSLOG } = require('../config/confLogs')
 const { addLogEntry } = require('../db/dbQueries')
 const { API_METADATA_ID, API_DATA_NAME_PROPERTY } = require('../db/dbFields')
 const { TRACE } = require('../config/confApi')
@@ -117,46 +109,62 @@ exports.displaySyslog = (srcMod, srcFun, msg) => {
   return `[ ${logWhere(srcMod, srcFun)} ] ${msg !== '' ? msg : '<-'}`
 }
 
-const treatSyslogInfo = (info) => {
-  if (info && info.req) {
-    const req = info.req
-    info.req_ip = getReqIpAndRedirections(req)
-    info.req_mtd = req.method
-    info.req_url = req.url
-
-    info.req = undefined
-  }
-  return info
-}
+// ------------------------------------------------------------------------------------------------
+// Syslog functions: system level
+// ------------------------------------------------------------------------------------------------
 
 // System-related "panic" conditions
-// exports.sysEmerg = (msg, info) => sysLogger.emerg(msg, treatSyslogInfo(info))
-exports.sysEmerg = (msg, info) => sysLogger.log('emergency', msg, '', treatSyslogInfo(info))
-
-// Something bad happened, deal with it NOW!
-exports.sysAlert = (msg, info) => sysLogger.log('alert', msg, '', treatSyslogInfo(info))
+exports.sysEmerg = SHOULD_SYSLOG
+  ? (msg, location, context, info, cid) => sysLogger.emergency(msg, location, context, cid, info)
+  : () => null
 
 // Something bad is about to happen, deal with it NOW!
-// exports.sysCrit = (msg, info) => sysLogger.crit(msg, treatSyslogInfo(info))
-exports.sysCrit = (msg, info) => sysLogger.log('critical', msg, '', treatSyslogInfo(info))
-
-// A failure in the system that needs attention.
-exports.sysError = (msg, info) => sysLogger.log('error', msg, '', treatSyslogInfo(info))
-
-// Something will happen if it is not dealt within a timeframe.
-exports.sysWarn = (msg, info) => sysLogger.log('warn', msg, '', treatSyslogInfo(info))
+exports.sysCrit = SHOULD_SYSLOG
+  ? (msg, location, context, info, cid) => sysLogger.critical(msg, location, context, cid, info)
+  : () => null
 
 // Events that are unusual but not error conditions - might be summarized in an email to developers
 // or admins to spot potential problems - no immediate action required.
-exports.sysNotice = (msg, info) => sysLogger.log('notice', msg, '', treatSyslogInfo(info))
+exports.sysNotice = SHOULD_SYSLOG
+  ? (msg, location, context, info, cid) => sysLogger.notice(msg, location, context, cid, info)
+  : () => null
+
+// ------------------------------------------------------------------------------------------------
+// Syslog functions: app level
+// ------------------------------------------------------------------------------------------------
+
+// Something bad happened, deal with it NOW!
+exports.sysAlert = SHOULD_SYSLOG
+  ? (msg, location, context, info, cid) => sysLogger.alert(msg, location, context, cid, info)
+  : () => null
+
+// A failure in the system that needs attention.
+exports.sysError = SHOULD_SYSLOG
+  ? (msg, location, context, info, cid) => sysLogger.error(msg, location, context, cid, info)
+  : () => null
+
+// Something will happen if it is not dealt within a timeframe.
+exports.sysWarn = SHOULD_SYSLOG
+  ? (msg, location, context, info, cid) => sysLogger.warn(msg, location, context, cid, info)
+  : () => null
 
 // Normal operational messages - may be harvested for reporting, measuring throughput, etc.
 // No action required.
-exports.sysInfo = (msg, info) => sysLogger.log('info', msg, '', treatSyslogInfo(info))
+exports.sysInfo = SHOULD_SYSLOG
+  ? (msg, location, context, info, cid) => sysLogger.info(msg, location, context, cid, info)
+  : () => null
 
 // Normal operational messages - may be harvested for reporting, measuring throughput, etc.
 // No action required.
-exports.sysDebug = (msg, info) => sysLogger.log('alert', msg, '', treatSyslogInfo(info))
+exports.sysDebug = SHOULD_SYSLOG
+  ? (mod, fun, msg, context, info, cid) => sysLogger.debug(msg, `${mod.fun}`, context, cid, info)
+  : () => null
+
+// Normal operational messages - may be harvested for reporting, measuring throughput, etc.
+// No action required.
+exports.sysTrace = SHOULD_SYSLOG
+  ? (mod, fun, msg, context, info, cid) => sysLogger.debug(msg, `${mod.fun}`, context, cid, info)
+  : () => null
 
 // ------------------------------------------------------------------------------------------------
 // Http
@@ -187,14 +195,14 @@ exports.logMetadata = (metadata) => {
 // Errors
 // ------------------------------------------------------------------------------------------------
 
-exports.logErrorPile = (error) => {
-  // const fun = 'showErrorPile'
-  const errContext = error.context
-  if (!errContext) return
-  errContext.map((error) => {
-    this.w(error.mod, error.fun, `${error[TRACE]}`)
-  })
-}
+// exports.logErrorPile = (error) => {
+//   // const fun = 'showErrorPile'
+//   const errContext = error.context
+//   if (!errContext) return
+//   errContext.map((error) => {
+//     this.w(error.mod, error.fun, `${error[TRACE]}`)
+//   })
+// }
 // exports.logRequest = (req) => {
 //   const fun = 'apiCall'
 //   this.i('http', fun, `${req.method} ${req.url} <- ${displayIps(req)}`)

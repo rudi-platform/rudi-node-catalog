@@ -1,6 +1,6 @@
 'use strict'
 
-const mod = 'logger'
+const mod = 'confLogger'
 
 // ------------------------------------------------------------------------------------------------
 // External dependencies
@@ -343,7 +343,3 @@ exports.sysLogger = new rudiLogger.RudiLogger(
   sys.getGitHash(),
   getRudiLoggerOptions()
 )
-
-exports.rudiSysLog = (severity, msg, context) => {
-  if (this.SHOULD_SYSLOG) this.sysLogger.log(severity, msg, '', context)
-}

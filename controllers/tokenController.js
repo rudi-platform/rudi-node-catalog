@@ -23,7 +23,7 @@ const {
 const log = require('../utils/logging')
 const { ROUTE_NAME } = require('../config/confApi')
 const { getProfile } = require('../config/confSystem')
-const { ForbiddenError, UnauthorizedError, treatError } = require('../utils/errors')
+const { ForbiddenError, UnauthorizedError, RudiError } = require('../utils/errors')
 const { accessProperty } = require('../utils/jsonAccess')
 const {
   extractJwt,
@@ -78,7 +78,7 @@ exports.getJwtAlgo = (algo) => {
         throw new Error(`Algo not recognized: '${algo}'`)
     }
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -107,7 +107,7 @@ exports.getHashAlgo = (algo) => {
         throw new Error(`Algo not recognized: '${algo}'`)
     }
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -122,20 +122,21 @@ exports.checkRudiProdPermission = async (req, reply) => {
       const error = new UnauthorizedError(
         `Headers should include a JWT in the form "Authorization": Bearer <JWT>": ${err}`
       )
-      throw treatError(error, { mod: mod, fun: fun })
+      throw RudiError.treatError(mod, fun, error)
     }
 
     // log.d(mod, fun, `token: ${token}`)
-    const { subject, client_id } = await this.verifyRudiProdToken(token, req.method, req.url)
+    const { subject, clientId } = await this.verifyRudiProdToken(token, req.method, req.url)
+    // log.d(mod, fun, `subject: ${subject}, clientId: ${clientId}`)
 
     // Check the ACL (= does the subject have permission to enter this route?)
-    log.d(mod, fun, `req: ${beautify(req.context.config[ROUTE_NAME])}`)
+    // log.d(mod, fun, `req: ${beautify(req.context.config[ROUTE_NAME])}`)
     const reqRouteName = accessProperty(req.context.config, ROUTE_NAME)
     checkSubjPermission(subject, reqRouteName)
-    return { subject, clientId: client_id }
+    return { subject, clientId }
     // return 'ok'
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -189,7 +190,6 @@ exports.verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
 
     // Identify the subject (= caller/requester)
     const subject = accessProperty(jwtPayload, JWT_SUB)
-    // log.d(mod, fun, `subject: ${subject}`)
     const clientId = jwtPayload[JWT_CLIENT]
 
     // Retrieve the public key
@@ -225,11 +225,12 @@ exports.verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
     // Check the ACL (= does the subject have permission to enter this route?)
     // const subjAcl = accessProperty(subjProfile, SUB_ACL)
 
+    // log.d(mod, fun, `subject: ${subject}, clientId: ${clientId}`)
     return { subject, clientId }
   } catch (err) {
     // log.w(mod, fun, err)
     const error = new ForbiddenError(`JWT is not a valid RUDI Producer JWT: ${err.message}`)
-    throw treatError(error, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, error)
   }
 }
 
@@ -240,6 +241,6 @@ exports.isRudiProducerToken = (token) => {
     const jwtPayload = JSON.parse(decodeBase64url(jwtPayloadBase64url))
     return !!jwtPayload[REQ_MTD]
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }

@@ -2,7 +2,7 @@
 
 const mod = 'projThes'
 
-const { BadRequestError, treatError } = require('../../utils/errors')
+const { BadRequestError, RudiError } = require('../../utils/errors')
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ exports.set = (newValue) => {
     newValue = `${newValue}`.trim()
     if (Thesaurus.indexOf(newValue) === -1) Thesaurus.push(newValue)
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 

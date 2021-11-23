@@ -77,7 +77,7 @@ const {
   PARAM_THESAURUS_CODE,
   PARAM_THESAURUS_LANG,
 } = require('../config/confApi')
-const { ParameterExpectedError, NotFoundError, treatError } = require('../utils/errors')
+const { ParameterExpectedError, NotFoundError, RudiError } = require('../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
 // Controllers: Scheme
@@ -114,8 +114,7 @@ exports.newSkosScheme = async (rudiScheme) => {
       )
     }
   } catch (err) {
-    // log.e(mod, fun, err)
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 
   // TODO: reinforce the associations between concepts through siblings/relative properties
@@ -234,7 +233,7 @@ exports.createConceptHierarchy = async (listConcepts, schemeDbId, parentConcept)
       try {
         await dbConcept.save()
       } catch (err) {
-        log.e(mod, fun, err)
+        throw RudiError.treatError(mod, fun, err)
       }
     })
   )
@@ -514,8 +513,7 @@ exports.getEveryThesaurus = async (req, reply) => {
 
     return listThesauri
   } catch (err) {
-    // log.e(mod, fun, err)
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -534,8 +532,7 @@ exports.getSingleThesaurus = async (req, reply) => {
       )
     return thesaurus
   } catch (err) {
-    // log.e(mod, fun, err)
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -559,7 +556,6 @@ exports.getSingleThesaurusLabels = async (req, reply) => {
       )
     return thesaurus
   } catch (err) {
-    // log.e(mod, fun, err)
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }

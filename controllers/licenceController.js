@@ -15,7 +15,7 @@ const { isEmptyArray } = require('../utils/jsUtils')
 const db = require('../db/dbQueries')
 const skosController = require('./skosController')
 
-const { InternalServerError, treatError } = require('../utils/errors')
+const { InternalServerError, RudiError } = require('../utils/errors')
 
 const {
   URL_PV_LICENCE_ACCESS,
@@ -75,7 +75,7 @@ exports.initializeLicences = async () => {
     if (!reply) throw new InternalServerError(`Licence integration failed`)
     return await this.getLicenceCodes()
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 

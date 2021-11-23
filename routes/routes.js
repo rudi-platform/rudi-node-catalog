@@ -10,8 +10,7 @@ const mod = 'routes'
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
-const { getApiCallMsg, beautify } = require('../utils/jsUtils')
-const { treatError } = require('../utils/errors')
+const { RudiError } = require('../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
 // Swagger documentation
@@ -76,6 +75,7 @@ const {
 const { JWT_USER, JWT_CLIENT } = require('../config/confPortal')
 const { JWT_SUB } = require('../utils/crypto')
 const { CallContext } = require('../definitions/constructors/callContext')
+const { beautify } = require('../utils/jsUtils')
 
 // ------------------------------------------------------------------------------------------------
 // Route names
@@ -130,120 +130,144 @@ const DEV_GET_COLLECTIONS = 'dev_get_collections'
 const DEV_DROP_DB = 'dev_drop_db'
 
 // ------------------------------------------------------------------------------------------------
-// Helper functions
+// Pre-handler functions
 // ------------------------------------------------------------------------------------------------
 
 async function onFreeRoute(req, reply) {
   const fun = 'onFreeRoute'
   try {
-    // log.d(mod, fun, `${req.method} ${req.url} `)
-    const callContext = new CallContext()
-    callContext.setIpsFromRequest(req)
-    callContext.setReqDetails(req.method, req.url, req.context.config[ROUTE_NAME])
-    CallContext.setAsReqContext(req, callContext)
+    log.t(mod, fun, `${req.method} ${req.url} `)
 
-    // log.t(mod, fun, beautify(callContext))
+    log.i(mod, fun, CallContext.createApiCallMsg(req))
     log.sysInfo(
       `API call: ${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})`,
-      callContext
+      'routes.free.in',
+      CallContext.getReqContext(req)
     )
-
     return
   } catch (err) {
     // log.w(mod, fun, err)
-    log.sysCrit(getApiCallMsg(req))
-    throw treatError(err, { mod: mod, fun: fun })
+    log.sysCrit(
+      CallContext.createApiCallMsg(req),
+      'routes.free.err',
+      CallContext.getReqContext(req),
+      {
+        error: err,
+      }
+    )
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
 async function onPublicRoute(req, reply) {
   const fun = 'onPublicRoute'
   try {
-    // log.d(mod, fun, `${req.method} ${req.url} `)
+    log.t(mod, fun, `${req.method} ${req.url} `)
     if (!shouldControlPublicRequests()) return true
 
     const jwtPayload = (await portalController.checkPortalTokenInHeader(req, reply))[1]
     // log.d(mod, fun, `Payload: ${beautify(jwtPayload)}`)
 
-    const callContext = new CallContext()
-    callContext.setIpsFromRequest(req)
-    callContext.clientApp = 'RUDI Portal' // TODO: deferentiate real poertal calls from tests
-    callContext.reqUser = jwtPayload[JWT_USER] || jwtPayload[JWT_SUB]
-    callContext.setReqDetails(req.method, req.url, req.context.config[ROUTE_NAME])
-    // log.d(mod, fun, beautify(callContext))
-    CallContext.setAsReqContext(req, callContext)
+    const callContext = CallContext.getCallContextFromReq(req)
+    callContext.clientApp = jwtPayload[JWT_SUB] || 'RUDI Portal'
+    callContext.reqUser = jwtPayload[JWT_USER] || jwtPayload[JWT_CLIENT]
 
-    const apiCallMsg = getApiCallMsg(
-      req,
-      jwtPayload[JWT_USER] || jwtPayload[JWT_SUB],
-      jwtPayload[JWT_CLIENT]
-    )
+    log.v(mod, fun, `${beautify(CallContext.getReqContext(req))}`)
+    const apiCallMsg = CallContext.createApiCallMsg(req)
+
     log.i(mod, fun, apiCallMsg)
     log.sysInfo(
       `API call: ${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})`,
+      'routes.public.in',
       callContext
     )
     return
   } catch (err) {
-    // log.w(mod, fun, err)
-    log.sysCrit(getApiCallMsg(req))
-    throw treatError(err, { mod: mod, fun: fun })
+    log.w(mod, fun, err)
+    // log.w(mod, fun, CallContext.createApiCallMsg(req))
+    // log.w(mod, fun, beautify(CallContext.getReqContext(req)))
+    // const context = CallContext.createApiCallMsg(req)
+    log.sysCrit(
+      CallContext.createApiCallMsg(req),
+      'routes.public.err',
+      CallContext.getReqContext(req),
+      {
+        error: err,
+      }
+    )
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
 async function onPrivateRoute(req, reply) {
   const fun = 'onPrivateRoute'
   try {
-    // log.d(mod, fun, `${req.method} ${req.url} `)
+    log.t(mod, fun, `${req.method} ${req.url} `)
     if (!shouldControlPrivateRequests()) return true
 
     const { subject, clientId } = await checkRudiProdPermission(req, reply)
 
-    const callContext = new CallContext()
-    callContext.setIpsFromRequest(req)
+    const callContext = CallContext.getCallContextFromReq(req)
     callContext.clientApp = subject
     callContext.reqUser = clientId
-    callContext.setReqDetails(req.method, req.url, req.context.config[ROUTE_NAME])
-    CallContext.setAsReqContext(req, callContext)
 
-    log.i(mod, fun, getApiCallMsg(req, subject, clientId))
+    log.v(mod, fun, `${beautify(CallContext.getReqContext(req))}`)
+
+    log.i(mod, fun, CallContext.createApiCallMsg(req, subject, clientId))
     log.sysInfo(
       `API call: ${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})`,
+      'routes.private.in',
       callContext
     )
     return
   } catch (err) {
     // log.w(mod, fun, err)
-    log.sysCrit(getApiCallMsg(req))
-    throw treatError(err, { mod: mod, fun: fun })
+    log.sysCrit(
+      CallContext.createApiCallMsg(req),
+      'routes.private.err',
+      CallContext.getReqContext(req),
+      {
+        error: err,
+      }
+    )
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
 async function onDevRoute(req, reply) {
   const fun = 'onDevRoute'
   try {
-    // log.d(mod, fun, `${req.method} ${req.url} `)
+    log.t(mod, fun, `${req.method} ${req.url} `)
     if (!shouldControlPrivateRequests()) return true
 
     const { subject, clientId } = await checkRudiProdPermission(req, reply)
 
-    const callContext = new CallContext()
-    callContext.setIpsFromRequest(req)
+    const callContext = CallContext.getCallContextFromReq(req)
     callContext.clientApp = subject
     callContext.reqUser = clientId
-    CallContext.setAsReqContext(req, callContext)
 
-    const apiCallMsg = getApiCallMsg(req, subject, clientId)
+    const apiCallMsg = CallContext.createApiCallMsg(req, subject, clientId)
     log.i(mod, fun, apiCallMsg)
     log.sysInfo(
       `API call: ${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})`,
-      CallContext.getContextFromReq(req)
+      'routes.dev.in',
+      callContext
     )
+
+    // log.v(mod, fun, `${beautify(CallContext.getReqContext(req))}`)
+
     return
   } catch (err) {
     // log.w(mod, fun, err)
-    log.sysCrit(getApiCallMsg(req))
-    throw treatError(err, { mod: mod, fun: fun })
+    log.sysCrit(
+      CallContext.createApiCallMsg(req),
+      'routes.dev.err',
+      CallContext.getReqContext(req),
+      {
+        error: err,
+      }
+    )
+    throw RudiError.treatError(mod, fun, err)
   }
   // log.d(mod, fun, `${beautify(req)}`)
 }

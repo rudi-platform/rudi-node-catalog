@@ -101,7 +101,7 @@ const {
   API_END_DATE_PROPERTY,
   API_METADATA_ID,
 } = require('../../db/dbFields')
-const { NotFoundError, BadRequestError, treatError } = require('../../utils/errors')
+const { NotFoundError, BadRequestError, RudiError } = require('../../utils/errors')
 const { DEFAULT_LANG } = require('../../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
@@ -599,7 +599,7 @@ async function checkThesaurus(metadata) {
           })
           .catch((err) => {
             // log.w(mod, fun, err)
-            throw treatError(err, { mod: mod, fun: fun })
+            throw RudiError.treatError(mod, fun, err)
           })
       })
     )
@@ -638,7 +638,7 @@ async function checkThesaurus(metadata) {
       throw new BadRequestError(msg.incorrectVal('storage_status', metadata.storage_status))
     }
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 /* 
@@ -657,7 +657,7 @@ async function checkThesaurus(metadata) {
         log.d(mod, fun, `type: ${media[API_MEDIA_TYPE_PROPERTY]}`)
       }
     } catch (err) {
-          throw treatError(err, { mod: mod, fun: fun})
+          throw RudiError.treatError(err, { mod: mod, fun: fun})
 
     }
   }
@@ -695,7 +695,7 @@ function checkDates(datesObj, firstDateProp, secondDateProp, shouldInitialize) {
         `to '${firstDateProp}' = '${date1.toISOString()}' `
     )
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 

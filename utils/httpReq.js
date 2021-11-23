@@ -14,7 +14,7 @@ const axios = require('axios')
 // ------------------------------------------------------------------------------------------------
 const log = require('./logging')
 const utils = require('./jsUtils')
-const { createRudiHttpError, treatError } = require('./errors')
+const { RudiError } = require('./errors')
 
 // ------------------------------------------------------------------------------------------------
 // Functions: header treatments
@@ -27,33 +27,7 @@ exports.getHeaderRedirectUrls = (req) => {
 // ------------------------------------------------------------------------------------------------
 // Functions: http requests
 // ------------------------------------------------------------------------------------------------
-function treatCommunicationError(portalError) {
-  const fun = 'treatPortalError'
-  let error
-  try {
-    if (portalError.response && portalError.response.data)
-      log.w(mod, fun, `details: ${utils.beautify(portalError.response.data)}`)
-    else if (portalError.response)
-      log.w(mod, fun, `details: ${utils.beautify(portalError.response)}`)
 
-    if (
-      portalError.response &&
-      portalError.response.data &&
-      portalError.response.data.label &&
-      portalError.response.data.code
-    ) {
-      error = createRudiHttpError(portalError.response.data.code, portalError.response.data.label)
-    } else if (portalError.response && portalError.response.data)
-      error = new Error(portalError.response.data)
-    else {
-      if (portalError.response) error = new Error(portalError.response)
-      else error = portalError
-    }
-    return error
-  } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
-  }
-}
 exports.httpGet = async (destUrl, authorizationToken) => {
   const fun = 'httpGet'
   log.t(mod, fun, ``)
@@ -70,7 +44,7 @@ exports.httpGet = async (destUrl, authorizationToken) => {
     log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
     return answer.data
   } catch (err) {
-    throw treatCommunicationError(err, { mod: mod, fun: fun })
+    throw treatCommunicationError(err, mod, fun)
   }
 }
 
@@ -91,7 +65,7 @@ exports.httpDelete = async (destUrl, authorizationToken) => {
     log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
     return answer.data
   } catch (err) {
-    throw treatCommunicationError(err, { mod: mod, fun: fun })
+    throw treatCommunicationError(err, mod, fun)
   }
 }
 
@@ -103,7 +77,7 @@ exports.getWithOpts = async (options, authorizationToken) => {
     const answer = await this.httpGet(destUrl, authorizationToken)
     return answer.data
   } catch (err) {
-    throw treatError(err, { mod: mod, fun: fun })
+    throw RudiError.treatError(mod, fun, err)
   }
   // log.d(mod, fun, `destUrl: ${destUrl}`)
   // log.d(mod, fun, `options: ${utils.beautify(options)}`)
@@ -143,7 +117,7 @@ exports.httpPost = async (destUrl, dataToSend, authorizationToken) => {
     log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
     return answer.data
   } catch (err) {
-    throw treatCommunicationError(err, { mod: mod, fun: fun })
+    throw treatCommunicationError(err, mod, fun)
   }
   /*
   const options = {
@@ -179,7 +153,7 @@ exports.directPost = async (destUrl, dataToSend, reqOpts) => {
     return answer
   } catch (err) {
     // log.w(mod, fun, err)
-    throw treatCommunicationError(err, { mod: mod, fun: fun })
+    throw treatCommunicationError(err, mod, fun)
   }
 }
 
@@ -194,7 +168,7 @@ exports.directGet = async (destUrl, reqOpts) => {
     log.logHttpAnswer(mod, fun, answer)
     return answer
   } catch (err) {
-    throw treatCommunicationError(err, { mod: mod, fun: fun })
+    throw treatCommunicationError(err, mod, fun)
   }
 }
 
