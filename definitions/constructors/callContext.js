@@ -201,7 +201,11 @@ exports.CallContext = class CallContext {
 
   static extractIpRedirections(req) {
     const headers = req.headers
-    return headers['x-forwarded-for'] || headers['X-Forwarded-For']
+    const redirections = headers['x-forwarded-for'] || headers['X-Forwarded-For']
+    if (Array.isArray(redirections)) return redirections
+    if (typeof redirections === 'string') return redirections.split(',')
+    if (!redirections) return
+    log.d(mod, 'extractIpRedirections', `redirections: ${beautify(redirections)}`)
   }
 
   static extractIpAndRedirections(req) {
