@@ -274,10 +274,10 @@ exports.getNewTokenFromPortal = async () => {
     }
   } catch (err) {
     if (RudiError.isRudiError(err)) {
-      log.d(mod, fun, 'isRudiError')
+      log.t(mod, fun, 'is a RudiError')
       throw RudiError.treatError(mod, fun, err)
     } else {
-      log.d(mod, fun, `is not a RudiHttpError: ${err}`)
+      log.t(mod, fun, `is not a RudiError: ${err}`)
       const error = new ForbiddenError(`Failed to get a token from Portal: ${utils.beautify(err)}`)
       throw RudiError.treatError(mod, fun, error)
     }

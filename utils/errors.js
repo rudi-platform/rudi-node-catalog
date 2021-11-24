@@ -50,7 +50,9 @@ class RudiError extends Error {
       message: this.message,
     }
   }
-
+  addTrace(ctxMod, ctxFun, ctxErr) {
+    this[TRACE].push({ [TRACE_MOD]: ctxMod, [TRACE_FUN]: ctxFun, [TRACE_ERR]: ctxErr })
+  }
   static logErrorPile(error) {
     const fun = 'logErrorPile'
     try {
@@ -166,29 +168,25 @@ class RudiError extends Error {
   // eslint-disable-next-line complexity
   static treatCommunicationError(ctxMod, ctxFun, portalError) {
     const fun = 'treatCommunicationError'
-    log.t(mod, fun, `${beautify(portalError)}}`)
+    log.t(mod, fun, ``)
 
     let error
     try {
-      if (portalError.response && portalError.response.data) {
-        log.w(mod, fun, `portal error data: ${beautify(portalError.response.data)}`)
-      } else if (portalError.response) {
-        log.w(mod, fun, `portal error response: ${beautify(portalError.response)}`)
-      }
-
       if (
         portalError.response &&
         portalError.response.data &&
         portalError.response.data.label &&
         portalError.response.data.code
       ) {
+        log.d(mod, fun, `portal error code: ${beautify(portalError.response.data.code)}`)
+        log.d(mod, fun, `portal error msg: ${beautify(portalError.response.data.label)}`)
         error = RudiError.createRudiHttpError(
           portalError.response.data.code,
           portalError.response.data.label
         )
       } else if (portalError.response && portalError.response.data) {
         if (portalError.response.data.status == 401) {
-          log.d(mod, fun, `Portal error 401: ${beautify(portalError)}`)
+          log.d(mod, fun, `Portal error 401`)
           error = new UnauthorizedError('Credentials used for Portal are incorrect')
         } else {
           log.t(mod, fun, `Portal error data: ${beautify(portalError)}`)
@@ -206,30 +204,31 @@ class RudiError extends Error {
       } else if (portalError.message) {
         if (portalError.message === 'Request failed with status code 401') {
           log.t(mod, fun, `Portal error message 401: ${beautify(portalError)}`)
-          error = RudiError.createRudiHttpError(401, portalError.message)
+          error = new UnauthorizedError(portalError.message)
         } else if (portalError.message === 'Request failed with status code 403') {
           log.t(mod, fun, `Portal error message 403: ${beautify(portalError)}`)
-          error = RudiError.createRudiHttpError(403, portalError.message)
+          error = new ForbiddenError(portalError.message)
         } else {
           log.t(mod, fun, `Portal error message: ${beautify(portalError)}`)
-          error = RudiError.createRudiHttpError(500, portalError.message)
+          error = new RudiError(portalError.message)
         }
       } else {
         if (portalError.response) {
-          error = RudiError.createRudiHttpError(500, portalError.response)
+          log.t(mod, fun, `Portal error response: ${beautify(portalError)}`)
+          error = new RudiError(portalError.response)
         } else {
           log.t(mod, fun, `Portal error: ${beautify(portalError)}`)
           if (portalError === 'Error 401: Request failed with status code 401') {
-            error = RudiError.createRudiHttpError(401, portalError)
+            error = new UnauthorizedError(portalError)
           } else if (portalError === 'Error 403: Request failed with status code 401') {
-            error = RudiError.createRudiHttpError(403, portalError)
+            error = new ForbiddenError(portalError)
           } else {
-            error = RudiError.createRudiHttpError(500, portalError)
+            error = new RudiError(portalError)
           }
         }
       }
       log.d(mod, fun, beautify(error))
-      error[TRACE] = [{ [TRACE_MOD]: ctxMod, [TRACE_FUN]: ctxFun, [TRACE_ERR]: portalError }]
+      error.addTrace(ctxMod, ctxFun, portalError)
       return error
     } catch (err) {
       throw RudiError.treatError(mod, fun, err)

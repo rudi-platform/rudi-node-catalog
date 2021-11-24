@@ -152,7 +152,7 @@ exports.directPost = async (destUrl, dataToSend, reqOpts) => {
     log.logHttpAnswer(mod, fun, answer)
     return answer
   } catch (err) {
-    log.w(mod, fun, utils.beautify(err) || err)
+    // log.w(mod, fun, utils.beautify(err) || err)
     throw RudiError.treatCommunicationError(mod, fun, err)
   }
 }
