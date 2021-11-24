@@ -212,9 +212,9 @@ exports.sysTrace = SHOULD_SYSLOG
 
 exports.logHttpAnswer = (loggedMod, loggedFun, httpAnswer) => {
   const fun = 'logHttpAnswer'
-  log.t(mod, fun, ``)
-  log.d(mod, fun, `${loggedMod}.${loggedFun} : ${httpAnswer}`)
   try {
+    this.t(mod, fun, ``)
+    this.d(mod, fun, `${loggedMod}.${loggedFun} : ${httpAnswer}`)
     if (httpAnswer.config) {
       const resExtract = pick(httpAnswer.config, ['method', 'headers', 'url'])
       resExtract.url = resExtract.url ? shorten(resExtract.url, 70) : undefined
@@ -224,7 +224,7 @@ exports.logHttpAnswer = (loggedMod, loggedFun, httpAnswer) => {
           : undefined
       const redactedRes = `HTTP answer: ${beautify(resExtract)}`
       this.d(loggedMod, loggedFun, redactedRes)
-      this.sysInfo(redactedRes) // TODO ?
+      // this.sysInfo(redactedRes) // TODO ?
     }
   } catch (err) {
     this.w(mod, fun, err)

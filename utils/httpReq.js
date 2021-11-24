@@ -143,7 +143,7 @@ exports.httpPost = async (destUrl, dataToSend, authorizationToken) => {
 
 exports.directPost = async (destUrl, dataToSend, reqOpts) => {
   const fun = 'directPost'
-  // log.t(mod, fun, ``)
+  log.t(mod, fun, ``)
   // log.d(mod, fun, `${destUrl}`)
   // if (reqOpts) reqOpts.httpsAgent = sslAgent
   // else reqOpts = { httpsAgent: sslAgent }
