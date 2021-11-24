@@ -34,7 +34,7 @@ const {
   RudiError,
 } = require('../utils/errors')
 
-const { extractJwt, JWT_EXP, JWT_SUB, REQ_MTD } = require('../utils/crypto')
+const { extractJwt, JWT_EXP, REQ_MTD } = require('../utils/crypto')
 // const { createHmac } = require('crypto')
 
 // ------------------------------------------------------------------------------------------------

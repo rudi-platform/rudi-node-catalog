@@ -220,14 +220,19 @@ exports.sysTrace = SHOULD_SYSLOG
 
 exports.logHttpAnswer = (loggedMod, loggedFun, httpAnswer) => {
   try {
-    const resExtract = pick(httpAnswer.config, ['method', 'headers', 'url'])
-    resExtract.url = shorten(resExtract.url, 70)
-    resExtract.headers.Authorization = shorten(resExtract.headers.Authorization, 30)
+    const resExtract = httpAnswer.config
+      ? pick(httpAnswer.config, ['method', 'headers', 'url'])
+      : undefined
+    resExtract.url = resExtract.url ? shorten(resExtract.url, 70) : undefined
+    resExtract.headers.Authorization =
+      resExtract.headers && resExtract.headers.Authorization
+        ? shorten(resExtract.headers.Authorization, 30)
+        : undefined
     const redactedRes = `HTTP answer: ${beautify(resExtract)}`
     this.d(loggedMod, loggedFun, redactedRes)
-    this.sysInfo(redactedRes)
+    this.sysInfo(redactedRes) // TODO ?
   } catch (err) {
-    this.w(mod, 'showHttpAnswer', err)
+    this.w(mod, 'logHttpAnswer', err)
     throw err
   }
 }
