@@ -97,16 +97,8 @@ exports.i = (srcMod, srcFun, msg) => log('info', srcMod, srcFun, msg)
 exports.v = (srcMod, srcFun, msg) => log('verbose', srcMod, srcFun, msg)
 exports.d = (srcMod, srcFun, msg) => log('debug', srcMod, srcFun, msg)
 
-exports.t = function (srcMod, srcFun, msg) {
-  const level = 'trace'
-  if (getLogLevel() !== level) return
-  try {
-    logger.debug(displayStr(srcMod, srcFun, msg))
-    addLogEntry(level, srcMod, srcFun, msg)
-  } catch (e) {
-    consoleErr(e)
-  }
-}
+exports.t = (srcMod, srcFun, msg) =>
+  getLogLevel() === 'trace' ? log('debug', displayStr(srcMod, srcFun, msg)) : () => null
 
 // ------------------------------------------------------------------------------------------------
 // Syslog functions
