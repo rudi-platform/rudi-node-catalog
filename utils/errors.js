@@ -187,17 +187,22 @@ class RudiError extends Error {
           portalError.response.data.label
         )
       } else if (portalError.response && portalError.response.data) {
-        log.t(mod, fun, `Portal error data: ${beautify(portalError)}`)
-        const errMsg =
-          (portalError.response.data.path ? `Path '${portalError.response.data.path} ` : '') +
-          (portalError.response.data.error
-            ? `${portalError.response.data.error}`
-            : portalError.response.data)
-        log.t(mod, fun, `Portal error msg: ${errMsg}`)
-        error = RudiError.createRudiHttpError(
-          portalError.response.data.status ? portalError.response.data.status : 500,
-          errMsg
-        )
+        if (portalError.response.data.status == 401) {
+          log.d(mod, fun, `Portal error 401: ${beautify(portalError)}`)
+          error = new UnauthorizedError('Credentials used for Portal are incorrect')
+        } else {
+          log.t(mod, fun, `Portal error data: ${beautify(portalError)}`)
+          const errMsg =
+            (portalError.response.data.path ? `Path '${portalError.response.data.path} ` : '') +
+            (portalError.response.data.error
+              ? `${portalError.response.data.error}`
+              : portalError.response.data)
+          log.t(mod, fun, `Portal error msg: ${errMsg}`)
+          error = RudiError.createRudiHttpError(
+            portalError.response.data.status ? portalError.response.data.status : 500,
+            errMsg
+          )
+        }
       } else if (portalError.message) {
         if (portalError.message === 'Request failed with status code 401') {
           log.t(mod, fun, `Portal error message 401: ${beautify(portalError)}`)
