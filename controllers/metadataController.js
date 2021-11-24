@@ -661,7 +661,7 @@ exports.initWithODR = async (req, reply) => {
       })
     ).catch((err) => {
       const context = CallContext.getCallContextFromReq(req)
-      log.sysError(err.message, `${mod}.${fun}`, context, context.getDetails())
+      log.sysError(err.message, `${mod}.${fun}`, context)
     })
     return 'Initialization initiated'
   } catch (err) {

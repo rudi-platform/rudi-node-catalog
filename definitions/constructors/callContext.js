@@ -1,5 +1,23 @@
 'use strict'
 
+const mod = 'callCtxt'
+
+// ------------------------------------------------------------------------------------------------
+// External dependencies
+// ------------------------------------------------------------------------------------------------
+const { nanoid } = require('nanoid')
+
+// ------------------------------------------------------------------------------------------------
+// Internal dependencies
+// ------------------------------------------------------------------------------------------------
+const { isNotEmptyArray, beautify } = require('../../utils/jsUtils')
+const log = require('../../utils/logging')
+const { RudiError } = require('../../utils/errors')
+
+// ------------------------------------------------------------------------------------------------
+// External constants
+// ------------------------------------------------------------------------------------------------
+const { REQ_MTD, REQ_URL } = require('../../utils/crypto')
 const {
   ROUTE_NAME,
   PARAM_OBJECT_METADATA,
@@ -8,23 +26,38 @@ const {
   PARAM_OBJECT_MEDIA,
   PARAM_ACTION_REPORT,
 } = require('../../config/confApi')
-const { REQ_MTD, REQ_URL } = require('../../utils/crypto')
-const { RudiError } = require('../../utils/errors')
-const { isNotEmptyArray, beautify } = require('../../utils/jsUtils')
-const log = require('../../utils/logging')
-
-const mod = 'callCtxt'
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependencies
+// Internal constants
 // ------------------------------------------------------------------------------------------------
 
-// ------------------------------------------------------------------------------------------------
-// Constants
-// ------------------------------------------------------------------------------------------------
-// ------------------------------------------------------------------------------------------------
-// Request identification
-// ------------------------------------------------------------------------------------------------
+/**
+ * This class makes it possible to add to the request received by node a context that will be
+ * helpful to create syslog lines.
+ * Technically, it adds a new property to the request [CALL_CONTEXT] that is structured along
+ * the RudiLogger structure (see https://gitlab.aqmo.org/rudidev/rudilogger)
+ * and more specifically like this:
+ * {
+ *    [AUTH]: {JS object} identification informations
+ *    {
+ *        [REQ_IPS]: {array} list of IP redirections, in inverse chronological order
+ *        [REQ_APP]: {string} identifier of the app/module that sends the request
+ *        [REQ_USR]: {string} identified user that launches the request
+ *    },
+ *    [OP]: {JS object} operations informations
+ *    {
+ *        [OP_TYPE]: {string} identifies the operation corresponding to the request
+ *        [STATUS_CODE]: {int} HTTP status code of the reply
+ *        [OP_ID]: {array} list of the objects affected by the operation in the shape "op_type:id"
+ *    },
+ *    [DETAILS]: {JS object} additional details (this is )
+ *    {
+ *        [ERROR]: {JS object} error details
+ *        [TIME]: {JS object} timestamp and request duration
+ *        [REQ]: {string} an identifier for this request
+ *    }
+ * }
+ */
 const CALL_CONTEXT = 'callContext'
 
 const AUTH = 'auth'
@@ -35,10 +68,15 @@ const REQ_USR = 'userId'
 const OP = 'operation'
 const OP_TYPE = 'opType'
 const STATUS_CODE = 'statusCode'
+const OP_ID = 'id'
 
 const DETAILS = 'raw'
 const ERROR = 'error'
-const OP_ID = 'id'
+
+const REQ = 'req'
+const REQ_ID = 'id'
+const REQ_TIMESTAMP = 'tsMs'
+const REQ_DURATION = 'durMs'
 
 // ------------------------------------------------------------------------------------------------
 // Class CallContext
@@ -49,10 +87,14 @@ const OP_ID = 'id'
 exports.CallContext = class CallContext {
   constructor(authDetails, opDetails, rawDetails) {
     const fun = 'CallContext()'
-    log.t(mod, fun, `${beautify(authDetails)}, ${beautify(opDetails)}, ${beautify(rawDetails)}`)
+    const msg = `${authDetails ? beautify(authDetails) : ''}, ${
+      opDetails ? beautify(opDetails) : ''
+    }, ${rawDetails ? beautify(rawDetails) : ''}`
+    log.t(mod, fun, msg)
     this[AUTH] = !authDetails ? {} : authDetails
     this[OP] = !opDetails ? {} : opDetails
     this[DETAILS] = !rawDetails ? {} : rawDetails
+    this.setId()
   }
 
   // ------------------------------------------------------------------------------------------------
@@ -96,8 +138,7 @@ exports.CallContext = class CallContext {
   }
 
   addObjId(type, id) {
-    if (!this[OP][OP_ID]) this[OP][OP_ID] = []
-
+    if (!this[OP] || !this[OP][OP_ID]) this[OP][OP_ID] = []
     this[OP][OP_ID].push(`${type}:${id}`)
   }
 
@@ -107,15 +148,46 @@ exports.CallContext = class CallContext {
   addMediaId = (id) => this.addObjId(`${PARAM_OBJECT_MEDIA}:${id}`)
   addReportId = (id) => this.addObjId(`${PARAM_ACTION_REPORT}:${id}`)
 
-  setReqDetails(reqMethod, reqUrl, routeName) {
-    log.t(mod, 'setReqDetails', ``)
+  setReqDescription(reqMethod, reqUrl, routeName) {
+    log.t(mod, 'setReqDescription', ``)
     this[DETAILS][REQ_MTD] = reqMethod
     this[DETAILS][REQ_URL] = reqUrl
     this[OP][OP_TYPE] = routeName
   }
 
-  addDetails = (key, val) => (this[DETAILS][key] = val)
+  addDetails(key, val) {
+    this[DETAILS][key] = val
+  }
   getDetails = () => this[DETAILS]
+
+  getReqDetails() {
+    if (!this[DETAILS][REQ]) this[DETAILS][REQ] = {}
+    return this[DETAILS][REQ]
+  }
+  setId() {
+    const reqDetails = this.getReqDetails()
+    if (!reqDetails[REQ_ID]) reqDetails[REQ_ID] = nanoid(8)
+  }
+  get id() {
+    const reqDetails = this.getReqDetails()
+    if (!reqDetails[REQ_ID]) this.setId()
+    return reqDetails[REQ_ID]
+  }
+
+  set timestamp(epochTimeMs) {
+    const reqDetails = this.getReqDetails()
+    if (!reqDetails[REQ_TIMESTAMP]) reqDetails[REQ_TIMESTAMP] = epochTimeMs
+  }
+  get timestamp() {
+    return this.getReqDetails()[REQ_TIMESTAMP]
+  }
+  set duration(durationMs) {
+    const reqDetails = this.getReqDetails()
+    if (!reqDetails[REQ_DURATION]) reqDetails[REQ_DURATION] = durationMs
+  }
+  get duration() {
+    return this.getReqDetails()[REQ_DURATION]
+  }
 
   addError = (error) => (this[DETAILS][ERROR] = error)
 

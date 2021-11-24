@@ -59,14 +59,15 @@ mongoose
   .connect(sys.getDbUrl(), mongoConnectOptions)
   .then(() => {
     log.i(mod, 'mongo', `MongoDB connected`)
+    const curEnv = sysController.getEnvironment()
     const startMsg =
       `API v${api.VERSION} ` +
       `| App version: '${sysController.getAppHash()}' ` +
-      `| '${sysController.getEnvironment()}' env`
+      `| '${curEnv}' env`
     log.i(mod, 'app', startMsg)
     log.sysInfo(startMsg, null, null, {
       apiVersion: api.VERSION,
-      env: sysController.getEnvironment(),
+      env: curEnv,
     })
     const logSeparatorEnd = utils.separateLogs('Init OK')
     addLogEntry('info', 'app', 'logSeparatorEnd', logSeparatorEnd).catch((err) =>

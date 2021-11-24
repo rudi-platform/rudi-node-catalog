@@ -27,8 +27,6 @@ const fastify = require('fastify')({
 // ------------------------------------------------------------------------------------------------
 // Cosntants
 // ------------------------------------------------------------------------------------------------
-const TRACE_TIME = 'traceTiming'
-const REQ_DURATION = 'reqTimeMs'
 
 // ------------------------------------------------------------------------------------------------
 // Fastify hooks: errors
@@ -55,16 +53,15 @@ fastify.addHook('onError', (request, reply, error, done) => {
       log.sysError(
         `Error ${error.statusCode} (${error.name}): ${error.message}`,
         `${primeError.mod}.${primeError.fun}`,
-        reqContext,
-        reqContext.getDetails()
+        reqContext
       )
     } else {
-      log.sysError(error, `${mod}.${fun}`, reqContext, reqContext.getDetails())
+      log.sysError(error, `${mod}.${fun}`, reqContext)
     }
   } catch (err) {
     log.e(mod, fun, err)
     const context = CallContext.getCallContextFromReq(request)
-    log.sysError(err, `${mod}.${fun}`, context, context.getDetails())
+    log.sysError(err, `${mod}.${fun}`, context)
     throw RudiError.treatError(mod, fun, err)
   }
   done()
@@ -120,16 +117,14 @@ fastify.setNotFoundHandler(fastify.notFound)
 fastify.addHook('onRequest', (req, res, next) => {
   const fun = 'onRequest'
   log.t(mod, fun, `----- new request -----vvv---`)
-  req[TRACE_TIME] = utils.nowEpochMs()
+  const now = utils.nowEpochMs()
 
   const callContext = new CallContext()
   callContext.setIpsFromRequest(req)
-  callContext.setReqDetails(req.method, req.url, req.context.config[ROUTE_NAME])
-  callContext.addDetails('callTime', req[TRACE_TIME])
+  callContext.setReqDescription(req.method, req.url, req.context.config[ROUTE_NAME])
+  callContext.timestamp = now
   CallContext.setAsReqContext(req, callContext)
 
-  log.d(mod, fun, `req context: ${utils.beautify(req.callContext)}`)
-  log.d(mod, fun, `callContext: ${utils.beautify(callContext)}`)
   log.v('http', fun, CallContext.createApiCallMsg(req))
   next()
 })
@@ -137,10 +132,10 @@ fastify.addHook('onRequest', (req, res, next) => {
 fastify.addHook('onSend', (request, reply, payload, next) => {
   const fun = 'onSend'
   log.t(mod, fun, ``)
-  const time = utils.nowEpochMs() - request[TRACE_TIME]
+  const now = utils.nowEpochMs()
 
   const callContext = CallContext.getCallContextFromReq(request)
-  callContext.addDetails(REQ_DURATION, time)
+  callContext.duration = now - callContext.timestamp
   callContext.statusCode = reply.statusCode
   // callContext.
   log.i(
@@ -154,10 +149,10 @@ fastify.addHook('onSend', (request, reply, payload, next) => {
   // log.v(mod, fun, utils.beautify(callContext))
   log.sysInfo(
     `API reply: ${request.method} ${request.url} (${request.context.config[ROUTE_NAME]})`,
-    `${mod}.${fun}`,
+    fun,
     callContext
   )
-  log.t(mod, fun, `----- request sent (${time} ms) -----^^^--`)
+  log.t(mod, fun, `----- request sent (${callContext.duration} ms) -----^^^--`)
   next()
 })
 

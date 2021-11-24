@@ -146,7 +146,7 @@ exports.sysAlert = SHOULD_SYSLOG
       msg,
       location,
       context,
-      cid,
+      cid ? cid : context ? context.id : null,
       info ? info : context ? context.getDetails() : null
     )
   : () => null
@@ -158,7 +158,7 @@ exports.sysError = SHOULD_SYSLOG
       msg,
       location,
       context,
-      cid,
+      cid ? cid : context ? context.id : null,
       info ? info : context ? context.getDetails() : null
     )
   : () => null
@@ -170,7 +170,7 @@ exports.sysWarn = SHOULD_SYSLOG
       msg,
       location,
       context,
-      cid,
+      cid ? cid : context ? context.id : null,
       info ? info : context ? context.getDetails() : null
     )
   : () => null
@@ -183,7 +183,7 @@ exports.sysInfo = SHOULD_SYSLOG
       msg,
       location,
       context,
-      cid,
+      cid ? cid : context ? context.id : null,
       info ? info : context ? context.getDetails() : null
     )
   : () => null
@@ -196,7 +196,7 @@ exports.sysDebug = SHOULD_SYSLOG
       msg,
       `${mod.fun}`,
       context,
-      cid,
+      cid ? cid : context ? context.id : null,
       info ? info : context ? context.getDetails() : null
     )
   : () => null
@@ -209,7 +209,7 @@ exports.sysTrace = SHOULD_SYSLOG
       msg,
       `${mod.fun}`,
       context,
-      cid,
+      cid ? cid : context ? context.id : null,
       info ? info : context ? context.getDetails() : null
     )
   : () => null

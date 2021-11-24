@@ -173,14 +173,14 @@ async function onPublicRoute(req, reply) {
     callContext.reqUser = jwtPayload[JWT_USER] || jwtPayload[JWT_CLIENT]
 
     log.v(mod, fun, `${beautify(CallContext.getReqContext(req))}`)
+
     const apiCallMsg = CallContext.createApiCallMsg(req)
 
     log.i(mod, fun, apiCallMsg)
     log.sysInfo(
       `API call: ${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})`,
-      'routes.public.in',
-      callContext,
-      callContext.getDetails()
+      'routes.pub.in',
+      callContext
     )
     return
   } catch (err) {
@@ -190,7 +190,7 @@ async function onPublicRoute(req, reply) {
     // const context = CallContext.createApiCallMsg(req)
     log.sysCrit(
       CallContext.createApiCallMsg(req),
-      'routes.public.err',
+      'routes.pub.err',
       CallContext.getReqContext(req),
       {
         error: err,
@@ -217,16 +217,15 @@ async function onPrivateRoute(req, reply) {
     log.i(mod, fun, CallContext.createApiCallMsg(req, subject, clientId))
     log.sysInfo(
       `API call: ${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})`,
-      'routes.private.in',
-      callContext,
-      callContext.getDetails()
+      'routes.prv.in',
+      callContext
     )
     return
   } catch (err) {
     // log.w(mod, fun, err)
     log.sysCrit(
       CallContext.createApiCallMsg(req),
-      'routes.private.err',
+      'routes.prv.err',
       CallContext.getReqContext(req),
       {
         error: err,
@@ -253,8 +252,7 @@ async function onDevRoute(req, reply) {
     log.sysInfo(
       `API call: ${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})`,
       'routes.dev.in',
-      callContext,
-      callContext.getDetails()
+      callContext
     )
 
     // log.v(mod, fun, `${beautify(CallContext.getReqContext(req))}`)
