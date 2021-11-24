@@ -97,7 +97,7 @@ exports.i = (srcMod, srcFun, msg) => log('info', srcMod, srcFun, msg)
 exports.v = (srcMod, srcFun, msg) => log('verbose', srcMod, srcFun, msg)
 exports.d = (srcMod, srcFun, msg) => log('debug', srcMod, srcFun, msg)
 
-exports.t = (srcMod, srcFun, msg) => {
+exports.t = function (srcMod, srcFun, msg) {
   const level = 'trace'
   if (getLogLevel() !== level) return
   try {
@@ -223,13 +223,13 @@ exports.logHttpAnswer = (loggedMod, loggedFun, httpAnswer) => {
   log.t(mod, fun, ``)
   log.d(mod, fun, `${loggedMod}.${loggedFun} : ${httpAnswer}`)
   try {
-    if(httpAnswer.config){
-      const resExtract =  pick(httpAnswer.config, ['method', 'headers', 'url'])
+    if (httpAnswer.config) {
+      const resExtract = pick(httpAnswer.config, ['method', 'headers', 'url'])
       resExtract.url = resExtract.url ? shorten(resExtract.url, 70) : undefined
       resExtract.headers.Authorization =
-      resExtract.headers && resExtract.headers.Authorization
-        ? shorten(resExtract.headers.Authorization, 30)
-        : undefined
+        resExtract.headers && resExtract.headers.Authorization
+          ? shorten(resExtract.headers.Authorization, 30)
+          : undefined
       const redactedRes = `HTTP answer: ${beautify(resExtract)}`
       this.d(loggedMod, loggedFun, redactedRes)
       this.sysInfo(redactedRes) // TODO ?
