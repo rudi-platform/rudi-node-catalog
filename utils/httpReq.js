@@ -44,7 +44,7 @@ exports.httpGet = async (destUrl, authorizationToken) => {
     log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
     return answer.data
   } catch (err) {
-    throw RudiError.treatCommunicationError(err, mod, fun)
+    throw RudiError.treatCommunicationError(mod, fun, err)
   }
 }
 
@@ -65,7 +65,7 @@ exports.httpDelete = async (destUrl, authorizationToken) => {
     log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
     return answer.data
   } catch (err) {
-    throw RudiError.treatCommunicationError(err, mod, fun)
+    throw RudiError.treatCommunicationError(mod, fun, err)
   }
 }
 
@@ -117,7 +117,7 @@ exports.httpPost = async (destUrl, dataToSend, authorizationToken) => {
     log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
     return answer.data
   } catch (err) {
-    throw RudiError.treatCommunicationError(err, mod, fun)
+    throw RudiError.treatCommunicationError(mod, fun, err)
   }
   /*
   const options = {
@@ -153,7 +153,7 @@ exports.directPost = async (destUrl, dataToSend, reqOpts) => {
     return answer
   } catch (err) {
     // log.w(mod, fun, err)
-    throw RudiError.treatCommunicationError(err, mod, fun)
+    throw RudiError.treatCommunicationError(mod, fun, err)
   }
 }
 
@@ -168,7 +168,7 @@ exports.directGet = async (destUrl, reqOpts) => {
     log.logHttpAnswer(mod, fun, answer)
     return answer
   } catch (err) {
-    throw RudiError.treatCommunicationError(err, mod, fun)
+    throw RudiError.treatCommunicationError(mod, fun, err)
   }
 }
 

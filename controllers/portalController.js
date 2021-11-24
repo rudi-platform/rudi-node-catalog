@@ -237,8 +237,11 @@ exports.getNewTokenFromPortal = async () => {
     try {
       answer = await directPost(portalAuthUrl, body, opts)
     } catch (err) {
-      const error = new InternalServerError(`Post to portal failed: ${err}`)
-      throw RudiError.treatError(mod, fun, error)
+      if (RudiError.isRudiError(err)) throw RudiError.treatError(mod, fun, err)
+      else {
+        const error = new InternalServerError(`Post to portal failed: ${utils.beautify(err)}`)
+        throw RudiError.treatError(mod, fun, error)
+      }
     }
     // log.d(mod, fun, `answer.status: ${answer.status}`)
 
@@ -270,8 +273,14 @@ exports.getNewTokenFromPortal = async () => {
       throw RudiError.createRudiHttpError(answer.status, errMsg)
     }
   } catch (err) {
-    const error = new ForbiddenError(`Failed to get a token from Portal: ${utils.beautify(err)}`)
-    throw RudiError.treatError(mod, fun, error)
+    if (RudiError.isRudiError(err)) {
+      log.d(mod, fun, 'isRudiError')
+      throw RudiError.treatError(mod, fun, err)
+    } else {
+      log.d(mod, fun, `is not a RudiHttpError: ${err}`)
+      const error = new ForbiddenError(`Failed to get a token from Portal: ${utils.beautify(err)}`)
+      throw RudiError.treatError(mod, fun, error)
+    }
   }
 }
 

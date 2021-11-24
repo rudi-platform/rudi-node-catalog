@@ -38,7 +38,7 @@ fastify.addHook('onError', (request, reply, error, done) => {
     const reqContext = CallContext.getCallContextFromReq(request)
     if (reqContext) log.d(mod, fun, `request: ${utils.beautify(reqContext)}`)
     reqContext.addError(error)
-    if (RudiError.isRudiHttpError(error)) {
+    if (RudiError.isRudiError(error)) {
       if (shouldShowErrorPile()) {
         RudiError.logErrorPile(error)
       }
@@ -71,9 +71,9 @@ fastify.setErrorHandler((error, request, reply) => {
   const fun = 'finalErrorHandler'
   log.t(mod, fun, ``)
   try {
-    // log.d(mod, fun, RudiError.isRudiHttpError(error))
+    // log.d(mod, fun, RudiError.isRudiError(error))
     let rudiHttpError
-    if (RudiError.isRudiHttpError(error)) rudiHttpError = error
+    if (RudiError.isRudiError(error)) rudiHttpError = error
     else {
       rudiHttpError = RudiError.createRudiHttpError(error.statusCode, error.message || error)
     }

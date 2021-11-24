@@ -2,14 +2,7 @@
 
 const mod = 'custErr'
 
-const {
-  TRACE,
-  IS_RUDI_HTTP_ERROR,
-  STATUS_CODE,
-  TRACE_MOD,
-  TRACE_FUN,
-  TRACE_ERR,
-} = require('../config/confApi')
+const { TRACE, STATUS_CODE, TRACE_MOD, TRACE_FUN, TRACE_ERR } = require('../config/confApi')
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
@@ -21,6 +14,7 @@ const { objectNotFound, parameterExpected } = require('./msg')
 // Cosntants
 // ------------------------------------------------------------------------------------------------
 const DEFAULT_MESSAGE = 'Rudi producer node - API Server Error'
+const IS_RUDI_ERROR = 'is_rudi_error'
 
 // ------------------------------------------------------------------------------------------------
 // Helper functions
@@ -37,7 +31,7 @@ class RudiError extends Error {
     // if (lastTrace) log.d(lastTrace.mod, lastTrace.fun, lastTrace.err)
     // else log.t(mod, fun, ``)
     super(message || DEFAULT_MESSAGE)
-    this[IS_RUDI_HTTP_ERROR] = true
+    this[IS_RUDI_ERROR] = true
     this[STATUS_CODE] = code || 500
     this.name = name || 'Internal Server Error'
     this.error = description || 'An unexpected error occured'
@@ -77,11 +71,12 @@ class RudiError extends Error {
     }
   }
 
-  static isRudiHttpError = (error) => typeof error[IS_RUDI_HTTP_ERROR] !== 'undefined'
+  static isRudiError = (error) => error[IS_RUDI_ERROR] === true
 
   static createNewRudiError(error, ctxMod, ctxFun) {
     // log.d(ctxMod, ctxFun, beautify(ctxErr))
-    const errTrace = (error[TRACE] || []).concat({
+    if (!error[TRACE]) error[TRACE] = []
+    const errTrace = error[TRACE].concat({
       [TRACE_MOD]: ctxMod,
       [TRACE_FUN]: ctxFun,
       [TRACE_ERR]: error.message || error,
@@ -132,15 +127,20 @@ class RudiError extends Error {
    * @returns
    */
   static treatError(ctxMod, ctxFun, error) {
-    // const fun = 'treatError'
+    const fun = 'treatError'
     try {
       if (!error) throw new ParameterExpectedError('treatError', 'error')
       if (!ctxMod) throw new ParameterExpectedError('treatError', 'ctxMod')
       if (!ctxFun) throw new ParameterExpectedError('treatError', 'ctxFun')
 
       // log.d(mod, fun, `A) ${error} -> ${beautify(error)}`)
-
-      const errTrace = (error[TRACE] || []).concat({
+      if (!error[TRACE]) {
+        error[TRACE] = []
+      } else if (!Array.isArray(error[TRACE])) {
+        log.w(mod, fun, beautify(error[TRACE]))
+        throw new InternalServerError('Misuse of error trace')
+      }
+      const errTrace = error[TRACE].concat({
         [TRACE_MOD]: ctxMod,
         [TRACE_FUN]: ctxFun,
         [TRACE_ERR]: error.message || error,
@@ -163,16 +163,17 @@ class RudiError extends Error {
     }
   }
 
-  static treatCommunicationError(portalError, ctxMod, ctxFun) {
+  // eslint-disable-next-line complexity
+  static treatCommunicationError(ctxMod, ctxFun, portalError) {
     const fun = 'treatCommunicationError'
-    log.t(mod, fun, ``)
+    log.t(mod, fun, `${beautify(portalError)}}`)
 
     let error
     try {
       if (portalError.response && portalError.response.data) {
-        log.w(mod, fun, `details: ${beautify(portalError.response.data)}`)
+        log.w(mod, fun, `portal error data: ${beautify(portalError.response.data)}`)
       } else if (portalError.response) {
-        log.w(mod, fun, `details: ${beautify(portalError.response)}`)
+        log.w(mod, fun, `portal error response: ${beautify(portalError.response)}`)
       }
 
       if (
@@ -185,19 +186,45 @@ class RudiError extends Error {
           portalError.response.data.code,
           portalError.response.data.label
         )
-        error[TRACE] = { [TRACE_MOD]: ctxMod, [TRACE_FUN]: ctxFun, [TRACE_ERR]: portalError }
       } else if (portalError.response && portalError.response.data) {
-        error = new Error(portalError.response.data)
-        error[TRACE] = { [TRACE_MOD]: ctxMod, [TRACE_FUN]: ctxFun, [TRACE_ERR]: portalError }
+        log.t(mod, fun, `Portal error data: ${beautify(portalError)}`)
+        const errMsg =
+          (portalError.response.data.path ? `Path '${portalError.response.data.path} ` : '') +
+          (portalError.response.data.error
+            ? `${portalError.response.data.error}`
+            : portalError.response.data)
+        log.t(mod, fun, `Portal error msg: ${errMsg}`)
+        error = RudiError.createRudiHttpError(
+          portalError.response.data.status ? portalError.response.data.status : 500,
+          errMsg
+        )
+      } else if (portalError.message) {
+        if (portalError.message === 'Request failed with status code 401') {
+          log.t(mod, fun, `Portal error message 401: ${beautify(portalError)}`)
+          error = RudiError.createRudiHttpError(401, portalError.message)
+        } else if (portalError.message === 'Request failed with status code 403') {
+          log.t(mod, fun, `Portal error message 403: ${beautify(portalError)}`)
+          error = RudiError.createRudiHttpError(403, portalError.message)
+        } else {
+          log.t(mod, fun, `Portal error message: ${beautify(portalError)}`)
+          error = RudiError.createRudiHttpError(500, portalError.message)
+        }
       } else {
         if (portalError.response) {
-          error = new Error(portalError.response)
-          error[TRACE] = { [TRACE_MOD]: ctxMod, [TRACE_FUN]: ctxFun, [TRACE_ERR]: portalError }
+          error = RudiError.createRudiHttpError(500, portalError.response)
         } else {
-          error = portalError
-          error[TRACE] = { [TRACE_MOD]: ctxMod, [TRACE_FUN]: ctxFun, [TRACE_ERR]: portalError }
+          log.t(mod, fun, `Portal error: ${beautify(portalError)}`)
+          if (portalError === 'Error 401: Request failed with status code 401') {
+            error = RudiError.createRudiHttpError(401, portalError)
+          } else if (portalError === 'Error 403: Request failed with status code 401') {
+            error = RudiError.createRudiHttpError(403, portalError)
+          } else {
+            error = RudiError.createRudiHttpError(500, portalError)
+          }
         }
       }
+      log.d(mod, fun, beautify(error))
+      error[TRACE] = [{ [TRACE_MOD]: ctxMod, [TRACE_FUN]: ctxFun, [TRACE_ERR]: portalError }]
       return error
     } catch (err) {
       throw RudiError.treatError(mod, fun, err)

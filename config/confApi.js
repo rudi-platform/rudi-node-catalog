@@ -129,5 +129,3 @@ exports.TRACE = 'err_trace'
 exports.TRACE_MOD = 'mod'
 exports.TRACE_FUN = 'fun'
 exports.TRACE_ERR = 'err'
-
-exports.IS_RUDI_HTTP_ERROR = 'is_rudi_error'
