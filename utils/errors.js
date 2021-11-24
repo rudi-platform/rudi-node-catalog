@@ -13,7 +13,7 @@ const {
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
-const { beautify, getLast } = require('./jsUtils')
+const { beautify } = require('./jsUtils')
 const log = require('./logging')
 const { objectNotFound, parameterExpected } = require('./msg')
 

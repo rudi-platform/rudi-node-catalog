@@ -60,11 +60,11 @@ module.exports = class Thesaurus {
         try {
           await this.#retrieveDbValues()
         } catch (err) {
-          log.d(mod, fun, 'No values found in DB')
+          log.t(mod, fun, 'No values found in DB')
           this.#currentValues = this.#initValues
           try {
             await this.#storeCurrentValues()
-            log.d(mod, fun, 'Current values stored in DB')
+            log.t(mod, fun, 'Current values stored in DB')
           } catch (err) {
             log.w(mod, fun, 'Failed to store current enum values')
           }
