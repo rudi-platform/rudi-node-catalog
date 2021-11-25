@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 /* eslint-disable no-console */
 'use strict'
 
@@ -78,6 +77,7 @@ const Colors = {
 // function displayLine(logLvl, mod, fun, msg) {
 //   display(logLvl, `. ${displayStr(mod, fun, msg)}`)
 // }
+// "indent": ["info", 2, { "SwitchCase": 1 }],
 
 // ------------------------------------------------------------------------------------------------
 // Logging functions
@@ -113,18 +113,39 @@ exports.displaySyslog = (srcMod, srcFun, msg) => {
 
 // System-related "panic" conditions
 exports.sysEmerg = SHOULD_SYSLOG
-  ? (msg, location, context, info, cid) => sysLogger.emergency(msg, location, context, cid, info)
+  ? (msg, location, context, info, cid) =>
+      sysLogger.emergency(
+        msg,
+        location,
+        context,
+        cid ? cid : context ? context.id : null,
+        info ? info : context ? context.getDetails() : null
+      )
   : () => null
 
 // Something bad is about to happen, deal with it NOW!
 exports.sysCrit = SHOULD_SYSLOG
-  ? (msg, location, context, info, cid) => sysLogger.critical(msg, location, context, cid, info)
+  ? (msg, location, context, info, cid) =>
+      sysLogger.critical(
+        msg,
+        location,
+        context,
+        cid ? cid : context ? context.id : null,
+        info ? info : context ? context.getDetails() : null
+      )
   : () => null
 
 // Events that are unusual but not error conditions - might be summarized in an email to developers
 // or admins to spot potential problems - no immediate action required.
 exports.sysNotice = SHOULD_SYSLOG
-  ? (msg, location, context, info, cid) => sysLogger.notice(msg, location, context, cid, info)
+  ? (msg, location, context, info, cid) =>
+      sysLogger.notice(
+        msg,
+        location,
+        context,
+        cid ? cid : context ? context.id : null,
+        info ? info : context ? context.getDetails() : null
+      )
   : () => null
 
 // ------------------------------------------------------------------------------------------------
@@ -134,76 +155,76 @@ exports.sysNotice = SHOULD_SYSLOG
 // Something bad happened, deal with it NOW!
 exports.sysAlert = SHOULD_SYSLOG
   ? (msg, location, context, info, cid) =>
-    sysLogger.alert(
-      msg,
-      location,
-      context,
-      cid ? cid : context ? context.id : null,
-      info ? info : context ? context.getDetails() : null
-    )
+      sysLogger.alert(
+        msg,
+        location,
+        context,
+        cid ? cid : context ? context.id : null,
+        info ? info : context ? context.getDetails() : null
+      )
   : () => null
 
 // A failure in the system that needs attention.
 exports.sysError = SHOULD_SYSLOG
   ? (msg, location, context, info, cid) =>
-    sysLogger.error(
-      msg,
-      location,
-      context,
-      cid ? cid : context ? context.id : null,
-      info ? info : context ? context.getDetails() : null
-    )
+      sysLogger.error(
+        msg,
+        location,
+        context,
+        cid ? cid : context ? context.id : null,
+        info ? info : context ? context.getDetails() : null
+      )
   : () => null
 
 // Something will happen if it is not dealt within a timeframe.
 exports.sysWarn = SHOULD_SYSLOG
   ? (msg, location, context, info, cid) =>
-    sysLogger.warn(
-      msg,
-      location,
-      context,
-      cid ? cid : context ? context.id : null,
-      info ? info : context ? context.getDetails() : null
-    )
+      sysLogger.warn(
+        msg,
+        location,
+        context,
+        cid ? cid : context ? context.id : null,
+        info ? info : context ? context.getDetails() : null
+      )
   : () => null
 
 // Normal operational messages - may be harvested for reporting, measuring throughput, etc.
 // No action required.
 exports.sysInfo = SHOULD_SYSLOG
   ? (msg, location, context, info, cid) =>
-    sysLogger.info(
-      msg,
-      location,
-      context,
-      cid ? cid : context ? context.id : null,
-      info ? info : context ? context.getDetails() : null
-    )
+      sysLogger.info(
+        msg,
+        location,
+        context,
+        cid ? cid : context ? context.id : null,
+        info ? info : context ? context.getDetails() : null
+      )
   : () => null
 
 // Normal operational messages - may be harvested for reporting, measuring throughput, etc.
 // No action required.
 exports.sysDebug = SHOULD_SYSLOG
   ? (mod, fun, msg, context, info, cid) =>
-    sysLogger.debug(
-      msg,
-      `${mod.fun}`,
-      context,
-      cid ? cid : context ? context.id : null,
-      info ? info : context ? context.getDetails() : null
-    )
+      sysLogger.debug(
+        msg,
+        `${mod.fun}`,
+        context,
+        cid ? cid : context ? context.id : null,
+        info ? info : context ? context.getDetails() : null
+      )
   : () => null
 
 // Normal operational messages - may be harvested for reporting, measuring throughput, etc.
 // No action required.
 exports.sysTrace = SHOULD_SYSLOG
   ? (mod, fun, msg, context, info, cid) =>
-    sysLogger.debug(
-      msg,
-      `${mod.fun}`,
-      context,
-      cid ? cid : context ? context.id : null,
-      info ? info : context ? context.getDetails() : null
-    )
+      sysLogger.debug(
+        msg,
+        `${mod.fun}`,
+        context,
+        cid ? cid : context ? context.id : null,
+        info ? info : context ? context.getDetails() : null
+      )
   : () => null
 
 // ------------------------------------------------------------------------------------------------
@@ -214,7 +235,7 @@ exports.logHttpAnswer = (loggedMod, loggedFun, httpAnswer) => {
   const fun = 'logHttpAnswer'
   try {
     this.t(mod, fun, ``)
-    this.d(mod, fun, `${loggedMod}.${loggedFun} : ${httpAnswer}`)
+    // this.d(mod, fun, `${loggedMod}.${loggedFun} : ${httpAnswer}`)
     if (httpAnswer.config) {
       const resExtract = pick(httpAnswer.config, ['method', 'headers', 'url'])
       resExtract.url = resExtract.url ? shorten(resExtract.url, 70) : undefined
