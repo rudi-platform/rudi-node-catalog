@@ -32,6 +32,9 @@ const FileTypes = require('../definitions/thesaurus/FileTypes')
 const HashAlgorithms = require('../definitions/thesaurus/HashAlgorithms')
 const Languages = require('../definitions/thesaurus/Languages')
 const Projections = require('../definitions/thesaurus/Projections')
+const StorageStatus = require('../definitions/thesaurus/StorageStatus')
+
+const { LicenceTypes } = require('../definitions/models/Licence')
 
 // ------------------------------------------------------------------------------------------------
 // Controllers
@@ -443,7 +446,9 @@ exports.getThesaurusList = async (lang) => {
     keywords: keywords,
     languages: Languages.get(lang),
     licences: licences,
+    licencetypes: Object.values(LicenceTypes),
     projections: Projections.get(lang),
+    storagestatus: StorageStatus.get(lang),
     themes: themes,
   }
 
