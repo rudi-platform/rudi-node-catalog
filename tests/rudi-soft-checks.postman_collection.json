@@ -71,6 +71,7 @@
 								"exec": [
 									"pm.test(`Token received`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
+									"",
 									"    //const answer = Buffer.from(pm.response.stream, 'base64').toString('utf8')",
 									"    const answer = pm.response.json();",
 									"    //console.log(answer)",
@@ -83,9 +84,8 @@
 									"    const jwtBody = JSON.parse(codec.fromBase64Url(jwtBodyEncoded))",
 									"    console.log('header: ' + JSON.stringify(jwtHeader))",
 									"    console.log('body: ' + JSON.stringify(jwtBody))",
-									"",
-									"",
-									"});"
+									"});",
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -861,7 +861,7 @@
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    const listEnums = Object.keys(responseJson);",
-									"    pm.expect(listEnums.length).to.eq(9);",
+									"    pm.expect(listEnums.length).to.eq(11);",
 									"});",
 									""
 								],
