@@ -508,7 +508,7 @@ exports.getThesaurusLabel = async (thesaurusCode, lang) => {
 exports.getEveryThesaurus = async (req, reply) => {
   const fun = 'getEveryThesaurus'
   try {
-    log.v(mod, fun, `< GET ${URL_PV_THESAURUS_ACCESS}`)
+    log.t(mod, fun, `< GET ${URL_PV_THESAURUS_ACCESS}`)
     log.t(mod, fun, ``)
 
     const lang = req.query[PARAM_THESAURUS_LANG]
@@ -525,7 +525,7 @@ exports.getEveryThesaurus = async (req, reply) => {
 exports.getSingleThesaurus = async (req, reply) => {
   const fun = 'getSingleThesaurus'
   try {
-    log.v(mod, fun, `< GET ${URL_PV_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}`)
+    log.t(mod, fun, `< GET ${URL_PV_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}`)
 
     const thesaurusCode = json.accessReqParam(req, PARAM_THESAURUS_CODE)
     log.d(mod, fun, `thesaurusCode: ${thesaurusCode}`)

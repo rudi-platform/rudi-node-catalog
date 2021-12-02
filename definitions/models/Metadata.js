@@ -657,7 +657,7 @@ async function checkThesaurus(metadata) {
         log.d(mod, fun, `type: ${media[API_MEDIA_TYPE_PROPERTY]}`)
       }
     } catch (err) {
-          throw RudiError.treatError(err, { mod: mod, fun: fun})
+          throw RudiError.treatError(mod, fun, err)
 
     }
   }

@@ -10,14 +10,13 @@ const { nanoid } = require('nanoid')
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
-const { isNotEmptyArray, beautify } = require('../../utils/jsUtils')
+const { isNotEmptyArray, beautify, dateEpochMsToIso } = require('../../utils/jsUtils')
 const log = require('../../utils/logging')
 const { RudiError } = require('../../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
 // External constants
 // ------------------------------------------------------------------------------------------------
-const { REQ_MTD, REQ_URL } = require('../../utils/crypto')
 const {
   ROUTE_NAME,
   PARAM_OBJECT_METADATA,
@@ -72,9 +71,13 @@ const OP_ID = 'id'
 
 const DETAILS = 'raw'
 const ERROR = 'error'
+const ERR_PLACE = 'errPlace'
+const ERR_ON_REQ = 'errOnReq'
 
 const REQ = 'req'
 const REQ_ID = 'id'
+const REQ_MTD = 'mtd'
+const REQ_URL = 'url'
 const REQ_TIMESTAMP = 'tsMs'
 const REQ_DURATION = 'durMs'
 
@@ -103,6 +106,7 @@ exports.CallContext = class CallContext {
 
   set ips(ipArray) {
     log.t(mod, 'setIps', ``)
+    if (!Array.isArray(ipArray)) throw new RudiError(`Context IPs can only be set as an array`)
     this[AUTH][REQ_IPS] = ipArray
   }
   get ips() {
@@ -150,20 +154,63 @@ exports.CallContext = class CallContext {
 
   setReqDescription(reqMethod, reqUrl, routeName) {
     log.t(mod, 'setReqDescription', ``)
-    this[DETAILS][REQ_MTD] = reqMethod
-    this[DETAILS][REQ_URL] = reqUrl
+    if (!this[DETAILS][REQ]) this[DETAILS][REQ] = {}
+    this[DETAILS][REQ][REQ_MTD] = reqMethod
+    this[DETAILS][REQ][REQ_URL] = reqUrl
     this[OP][OP_TYPE] = routeName
+  }
+  get routeName() {
+    return this[OP][OP_TYPE]
+  }
+  get reqMethod() {
+    return this[DETAILS][REQ][REQ_MTD]
+  }
+  get reqUrl() {
+    return this[DETAILS][REQ][REQ_URL]
   }
 
   addDetails(key, val) {
     this[DETAILS][key] = val
   }
   getDetails = () => this[DETAILS]
+  getDetailsStr = () => JSON.stringify(this[DETAILS])
 
   getReqDetails() {
     if (!this[DETAILS][REQ]) this[DETAILS][REQ] = {}
     return this[DETAILS][REQ]
   }
+
+  formatReqDetails = () => {
+    const reqDetails = this.getReqDetails()
+    return `${dateEpochMsToIso(this.timestamp)} [${this.id}] ${this.reqMethod} ${this.reqUrl}`
+  }
+
+  get apiCallMsg() {
+    const fun = 'apiCallMsg'
+    log.t(mod, fun, ``)
+    try {
+      return (
+        this.reqDetailsMsg +
+        ` <- ${this.clientApp ? `${this.clientApp}` : ''}` +
+        `${this.reqUser ? ` | ${this.reqUser}` : ''}${
+          this.clientApp || this.reqUser ? ' @ ' : ''
+        }${this.ips.join(' <- ')}`
+      )
+    } catch (err) {
+      throw RudiError.treatError(mod, fun, err)
+    }
+  }
+
+  get reqDetailsMsg() {
+    const fun = 'reqDetailsMsg'
+    log.t(mod, fun, ``)
+    try {
+      return `${this.reqMethod} ${this.reqUrl} (${this.routeName})`
+    } catch (err) {
+      throw RudiError.treatError(mod, fun, err)
+    }
+  }
+
   setId() {
     const reqDetails = this.getReqDetails()
     if (!reqDetails[REQ_ID]) reqDetails[REQ_ID] = nanoid(8)
@@ -189,8 +236,50 @@ exports.CallContext = class CallContext {
     return this.getReqDetails()[REQ_DURATION]
   }
 
-  addError = (error) => (this[DETAILS][ERROR] = error)
+  getError = () => this[DETAILS][ERROR]
+  addError = (ctxMod, ctxFun, error) => {
+    const fun = 'addError'
+    log.t(mod, fun, ``)
+    if (RudiError.isRudiError(error) && !this[DETAILS][ERROR]) {
+      this[DETAILS][ERROR] = error
+    } else {
+      const rudiError = RudiError.treatError(ctxMod, ctxFun, error)
+      this.addError(ctxMod, ctxFun, rudiError)
+    }
+  }
 
+  logInfo = (ctxMod, ctxFun, msg) => {
+    log.i(ctxMod, ctxFun, `${msg}: ${this.apiCallMsg}`)
+    log.sysInfo(`${msg}: ${this.reqDetailsMsg}`, '', this, ' ') //, `reqDetails: '${this.formatReqDetails()}'`
+  }
+
+  logErr = (ctxMod, ctxFun, err) => {
+    const fun = 'logErr'
+    log.t(ctxMod, fun, ``)
+    if (!err && !this.getError()) throw new RudiError('No error found in current context')
+    this.addError(ctxMod, ctxFun, err)
+    const error = this.getError()
+    const primeError = error.primeError
+
+    const errMsg = `Error ${error.statusCode} (${error.name}): ${error.message}`
+    const errDetails =
+      `${ERR_PLACE}: '${primeError.mod}.${primeError.fun}', ` +
+      `${ERR_ON_REQ}: '${this.formatReqDetails()}'`
+
+    log.sysOnError(error.statusCode, errMsg, this, errDetails)
+  }
+
+  get errorLocation() {
+    const fun = 'getErrorLocation'
+    log.t(mod, fun, ``)
+    const err = this.getError()
+    log.d(mod, fun, `${beautify(err)}`)
+    if (err) {
+      if (err.primeError) return `${err.primeError.mod}.${err.primeError.fun}`
+      else log.w(mod, fun, beautify(err))
+    }
+    return undefined
+  }
   set statusCode(code) {
     this[OP][STATUS_CODE] = code
   }
@@ -311,12 +400,7 @@ exports.CallContext = class CallContext {
         )
       } else {
         log.t(mod, fun, 'A context was found')
-        return (
-          `${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})` +
-          ` <- ${context.clientApp ? `${context.clientApp}` : ''}${
-            context.reqUser ? ` | ${context.reqUser}` : ''
-          }${context.clientApp || context.reqUser ? ' @ ' : ''}${CallContext.createIpsMsg(req)}`
-        )
+        return context.apiCallMsg
       }
     } catch (err) {
       throw RudiError.treatError(mod, fun, err)

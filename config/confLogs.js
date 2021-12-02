@@ -39,11 +39,14 @@ const FLAGS_SECTION = 'flags'
 
 exports.SHOULD_LOG_CONSOLE = sys.getIniValue(FLAGS_SECTION, 'should_log_console', false)
 const SHOULD_FILELOG = sys.getIniValue(FLAGS_SECTION, 'should_log_in_file', false)
-const SHOULD_SHOW_ERROR_PILE = sys.getIniValue(FLAGS_SECTION, 'should_show_error_pile', false) // TODO || true
+const SHOULD_SHOW_ERROR_PILE = sys.getIniValue(FLAGS_SECTION, 'should_show_error_pile', false)
+const SHOULD_SHOW_ROUTES = sys.getIniValue(FLAGS_SECTION, 'should_show_routes', true)
 exports.SHOULD_SYSLOG = sys.getIniValue(FLAGS_SECTION, 'should_syslog')
+const SHOULD_SYSLOG_IN_CONSOLE = sys.getIniValue(FLAGS_SECTION, 'should_syslog_in_console')
 const SHOULD_SYSLOG_IN_FILE = sys.getIniValue(FLAGS_SECTION, 'should_syslog_in_file')
 
 exports.shouldShowErrorPile = () => SHOULD_SHOW_ERROR_PILE
+exports.shouldShowRoutes = () => SHOULD_SHOW_ROUTES
 
 // Log feedback
 const checkOption = (msg, flag) => utils.consoleLog(mod, '', `[${flag ? 'x' : ' '}] ${msg}`)
@@ -335,9 +338,17 @@ function getRudiLoggerOptions() {
       path = SYSLOG_SOCKET
       break
   }
-  return {
+  const rudiLoggerOpts = {
     log_server: { path: path, port: SYSLOG_PORT, facility: facility, transport: transports },
   }
+
+  rudiLoggerOpts.log_local = {
+    console: !!SHOULD_SYSLOG_IN_CONSOLE,
+    consoleData: !!SHOULD_SYSLOG_IN_CONSOLE,
+    directory: LOG_DIR,
+    prefix: 'rudiProd.api.syslog',
+  }
+  return rudiLoggerOpts
 }
 
 exports.sysLogger = new rudiLogger.RudiLogger(

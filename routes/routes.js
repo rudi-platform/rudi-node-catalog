@@ -9,8 +9,15 @@ const mod = 'routes'
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
+const {
+  shouldControlPrivateRequests,
+  shouldControlPublicRequests,
+} = require('../config/confSystem')
+
 const log = require('../utils/logging')
+
 const { RudiError } = require('../utils/errors')
+const { CallContext } = require('../definitions/constructors/callContext')
 
 // ------------------------------------------------------------------------------------------------
 // Swagger documentation
@@ -68,14 +75,8 @@ const {
   ROUTE_NAME,
 } = require('../config/confApi')
 
-const {
-  shouldControlPrivateRequests,
-  shouldControlPublicRequests,
-} = require('../config/confSystem')
 const { JWT_USER, JWT_CLIENT } = require('../config/confPortal')
 const { JWT_SUB } = require('../utils/crypto')
-const { CallContext } = require('../definitions/constructors/callContext')
-const { beautify } = require('../utils/jsUtils')
 
 // ------------------------------------------------------------------------------------------------
 // Route names
@@ -132,18 +133,18 @@ const DEV_DROP_DB = 'dev_drop_db'
 // ------------------------------------------------------------------------------------------------
 // Pre-handler functions
 // ------------------------------------------------------------------------------------------------
-
+/**
+ * TODO : create sysLog functions to
+ *  - log incoming requests
+ *  - log replies
+ *  - log errors
+ */
 async function onFreeRoute(req, reply) {
   const fun = 'onFreeRoute'
   try {
     log.t(mod, fun, `${req.method} ${req.url} `)
-
-    log.i(mod, fun, CallContext.createApiCallMsg(req))
-    log.sysInfo(
-      `API call: ${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})`,
-      'routes.free.in',
-      CallContext.getReqContext(req)
-    )
+    const context = CallContext.getCallContextFromReq(req)
+    context.logInfo('route', fun, 'API call')
     return
   } catch (err) {
     // log.w(mod, fun, err)
@@ -168,26 +169,14 @@ async function onPublicRoute(req, reply) {
     const jwtPayload = (await portalController.checkPortalTokenInHeader(req, reply))[1]
     // log.d(mod, fun, `Payload: ${beautify(jwtPayload)}`)
 
-    const callContext = CallContext.getCallContextFromReq(req)
-    callContext.clientApp = jwtPayload[JWT_SUB] || 'RUDI Portal'
-    callContext.reqUser = jwtPayload[JWT_USER] || jwtPayload[JWT_CLIENT]
+    const context = CallContext.getCallContextFromReq(req)
+    context.clientApp = jwtPayload[JWT_SUB] || 'RUDI Portal'
+    context.reqUser = jwtPayload[JWT_USER] || jwtPayload[JWT_CLIENT]
 
-    log.v(mod, fun, `${beautify(CallContext.getReqContext(req))}`)
-
-    const apiCallMsg = CallContext.createApiCallMsg(req)
-
-    log.i(mod, fun, apiCallMsg)
-    log.sysInfo(
-      `API call: ${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})`,
-      'routes.pub.in',
-      callContext
-    )
+    context.logInfo('route', fun, 'API call')
     return
   } catch (err) {
     log.w(mod, fun, err)
-    // log.w(mod, fun, CallContext.createApiCallMsg(req))
-    // log.w(mod, fun, beautify(CallContext.getReqContext(req)))
-    // const context = CallContext.createApiCallMsg(req)
     log.sysCrit(
       CallContext.createApiCallMsg(req),
       'routes.pub.err',
@@ -208,30 +197,16 @@ async function onPrivateRoute(req, reply) {
 
     const { subject, clientId } = await checkRudiProdPermission(req, reply)
 
-    const callContext = CallContext.getCallContextFromReq(req)
-    callContext.clientApp = subject
-    callContext.reqUser = clientId
+    const context = CallContext.getCallContextFromReq(req)
+    context.clientApp = subject
+    context.reqUser = clientId
 
-    log.v(mod, fun, `${beautify(CallContext.getReqContext(req))}`)
-
-    log.i(mod, fun, CallContext.createApiCallMsg(req, subject, clientId))
-    log.sysInfo(
-      `API call: ${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})`,
-      'routes.prv.in',
-      callContext
-    )
+    context.logInfo('route', fun, 'API call')
     return
   } catch (err) {
-    // log.w(mod, fun, err)
-    log.sysCrit(
-      CallContext.createApiCallMsg(req),
-      'routes.prv.err',
-      CallContext.getReqContext(req),
-      {
-        error: err,
-      }
-    )
-    throw RudiError.treatError(mod, fun, err)
+    const context = CallContext.getCallContextFromReq(req)
+    context.logErr(mod, fun, err)
+    throw context.getError()
   }
 }
 
@@ -243,20 +218,11 @@ async function onDevRoute(req, reply) {
 
     const { subject, clientId } = await checkRudiProdPermission(req, reply)
 
-    const callContext = CallContext.getCallContextFromReq(req)
-    callContext.clientApp = subject
-    callContext.reqUser = clientId
+    const context = CallContext.getCallContextFromReq(req)
+    context.clientApp = subject
+    context.reqUser = clientId
 
-    const apiCallMsg = CallContext.createApiCallMsg(req, subject, clientId)
-    log.i(mod, fun, apiCallMsg)
-    log.sysInfo(
-      `API call: ${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})`,
-      'routes.dev.in',
-      callContext
-    )
-
-    // log.v(mod, fun, `${beautify(CallContext.getReqContext(req))}`)
-
+    context.logInfo('route', fun, 'API call')
     return
   } catch (err) {
     // log.w(mod, fun, err)

@@ -660,8 +660,9 @@ exports.initWithODR = async (req, reply) => {
         return true
       })
     ).catch((err) => {
+      log.e(mod, fun, err)
       const context = CallContext.getCallContextFromReq(req)
-      log.sysError(err.message, `${mod}.${fun}`, context)
+      context.logErr(mod, fun, err)
     })
     return 'Initialization initiated'
   } catch (err) {
@@ -669,7 +670,7 @@ exports.initWithODR = async (req, reply) => {
   }
 }
 
-// ------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------  -------------------------
 // Portal accessible controllers
 // ------------------------------------------------------------------------------------------------
 
@@ -679,7 +680,7 @@ exports.initWithODR = async (req, reply) => {
  */
 exports.getSingleMetadata = async (req, reply) => {
   const fun = 'getSingleMetadata'
-  log.v(mod, fun, `< GET ${URL_PUB_METADATA}/:${PARAM_ID}`)
+  log.t(mod, fun, `< GET ${URL_PUB_METADATA}/:${PARAM_ID}`)
   try {
     // retrieve url parameters: object id
     const objectId = json.accessReqParam(req, PARAM_ID)
@@ -699,7 +700,7 @@ exports.getSingleMetadata = async (req, reply) => {
  */
 exports.getMetadataList = async (req, reply) => {
   const fun = 'getMetadataList'
-  log.v(mod, fun, `< GET ${URL_PUB_METADATA}`)
+  log.t(mod, fun, `< GET ${URL_PUB_METADATA}`)
   try {
     return await genericController.getManyObjects(PARAM_OBJECT_METADATA, req, reply)
   } catch (err) {

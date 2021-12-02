@@ -267,11 +267,7 @@ exports.getCollections = async () => {
   const fun = `getCollections`
   try {
     const collections = await mongoose.connection.db.listCollections().toArray()
-
-    collections.map((collection) => {
-      log.d(mod, fun, `${utils.beautify(collection.name)}`)
-      return collection.name
-    })
+    collections.map((collection) => collection.name)
     return collections
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -302,7 +298,7 @@ exports.cleanLicences = async () => {
     await dropCollection(SCHEMES_COLLECTION_NAME)
   } catch (err) {
     // log.w(mod, fun, err)
-    RudiError.treatError(mod, fun, err)
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -366,7 +362,7 @@ exports.getObjectWithRudiId = async (objectType, rudiId) => {
   const fun = `getObjectWithRudiId`
   // // log.t(mod, fun, ``)
   try {
-    if (!rudiId) throw new ParameterExpectedError(fun, PARAM_ID) // TODO xxxx   treatError(err, { mod: mod, fun: fun})
+    if (!rudiId) throw new ParameterExpectedError(fun, PARAM_ID) // TODO xxxx   treatError(mod, fun, err)
 
     const idField = this.getObjectIdField(objectType)
     const filter = { [idField]: rudiId }
@@ -585,7 +581,7 @@ exports.getObjectWithField = async (Model, fieldName, fieldValue, populateFields
     }
     return await this.getObject(Model, filter, populateFields)
   } catch (err) {
-    throw RudiError.treatError(err, { mod: mod, fun: fun})
+    throw RudiError.treatError(mod, fun, err)
   }
 }
  */
@@ -1075,10 +1071,9 @@ exports.updateObject = async (objectType, updateData) => {
 exports.overwriteObject = async (objectType, updateData) => {
   const fun = `overwriteObject`
   // log.t(mod, fun, ``)
+  log.t(mod, fun, `objectType: ${objectType}`)
   try {
     assertIsString(fun, objectType)
-
-    log.d(mod, fun, `objectType: ${objectType}`)
 
     const { Model, idField } = this.getObjectAccesses(objectType)
     const rudiId = json.accessProperty(updateData, idField)

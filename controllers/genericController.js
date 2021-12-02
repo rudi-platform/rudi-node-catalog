@@ -482,7 +482,7 @@ exports.setPublishedFlag = async (dbObject, rudiId) => {
  */
 exports.addSingleObject = async (req, reply) => {
   const fun = 'addSingleObject'
-  log.v(mod, fun, `< POST ${URL_PV_OBJECT_GENERIC}`)
+  log.t(mod, fun, `< POST ${URL_PV_OBJECT_GENERIC}`)
   try {
     // retrieve url parameters: object type
     const objectType = getObjectParam(req, PARAM_OBJECT)
@@ -520,7 +520,7 @@ exports.addSingleObject = async (req, reply) => {
  */
 exports.getSingleObject = async (req, reply) => {
   const fun = 'getSingleObject'
-  log.v(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`)
+  log.t(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = getObjectParam(req)
@@ -545,7 +545,7 @@ exports.getSingleObject = async (req, reply) => {
  */
 exports.getObjectList = async (req, reply) => {
   const fun = 'getObjectList'
-  log.v(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}`)
+  log.t(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}`)
   try {
     // retrieve url parameter: object type
     const objectType = getObjectParam(req)
@@ -630,7 +630,7 @@ exports.getManyObjects = async (objectType, req) => {
 exports.getMetadataListAndCount = async (req, reply) => {
   const fun = 'getMetadataListAndCount'
   try {
-    log.v(mod, fun, `< GET ${URL_PUB_METADATA}`)
+    log.t(mod, fun, `< GET ${URL_PUB_METADATA}`)
 
     let parsedParameters
     try {
@@ -661,7 +661,7 @@ exports.getMetadataListAndCount = async (req, reply) => {
  */
 exports.updateSingleObject = async (req, reply) => {
   const fun = 'updateSingleObject'
-  log.v(mod, fun, `< PUT ${URL_PV_OBJECT_GENERIC}`)
+  log.t(mod, fun, `< PUT ${URL_PV_OBJECT_GENERIC}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = getObjectParam(req)
@@ -695,7 +695,7 @@ exports.updateSingleObject = async (req, reply) => {
  */
 exports.upsertSingleObject = async (req, reply) => {
   const fun = 'upsertSingleObject'
-  log.v(mod, fun, `< PUT ${URL_PV_OBJECT_GENERIC}`)
+  log.t(mod, fun, `< PUT ${URL_PV_OBJECT_GENERIC}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = getObjectParam(req)
@@ -733,7 +733,7 @@ exports.upsertSingleObject = async (req, reply) => {
  */
 exports.deleteSingleObject = async (req, reply) => {
   const fun = 'deleteSingleObject'
-  log.v(mod, fun, `< DELETE ${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`)
+  log.t(mod, fun, `< DELETE ${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = getObjectParam(req)
@@ -772,7 +772,7 @@ exports.deleteSingleObject = async (req, reply) => {
  */
 exports.deleteObjectList = async (req, reply) => {
   const fun = 'deleteObjectList'
-  log.v(mod, fun, `< POST ${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_DELETION}`)
+  log.t(mod, fun, `< POST ${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_DELETION}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = getObjectParam(req)
@@ -809,7 +809,7 @@ exports.deleteObjectList = async (req, reply) => {
  */
 exports.deleteManyObjects = async (req, reply) => {
   const fun = 'deleteManyObjects'
-  log.v(mod, fun, `< DELETE ${URL_PV_OBJECT_GENERIC}`)
+  log.t(mod, fun, `< DELETE ${URL_PV_OBJECT_GENERIC}`)
   try {
     const objectType = getObjectParam(req)
     let parsedParameters = await this.parseQueryParameters(objectType, req.url)

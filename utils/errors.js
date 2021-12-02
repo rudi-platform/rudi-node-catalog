@@ -38,6 +38,7 @@ class RudiError extends Error {
     this.type = this.constructor.name
     this[TRACE] = errTrace || []
   }
+
   toString() {
     return `Error ${this[STATUS_CODE]} (${this.name}): ${this.message}`
   }
@@ -52,6 +53,9 @@ class RudiError extends Error {
   }
   addTrace(ctxMod, ctxFun, ctxErr) {
     this[TRACE].push({ [TRACE_MOD]: ctxMod, [TRACE_FUN]: ctxFun, [TRACE_ERR]: ctxErr })
+  }
+  get primeError() {
+    return this[TRACE][0]
   }
   static logErrorPile(error) {
     const fun = 'logErrorPile'

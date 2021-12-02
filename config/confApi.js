@@ -118,14 +118,19 @@ exports.URL_PV_THESAURUS_ACCESS = `${this.URL_PREFIX_PRIVATE}/${URL_SUFFIX_THESA
 exports.URL_PV_LICENCE_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_LICENCE_SUFFIX}`
 exports.URL_PV_LICENCE_CODES_ACCESS = `${this.URL_PREFIX_PRIVATE}/${URL_SUFFIX_LICENCE_CODES}`
 
-exports.ROUTE_NAME = 'route_name'
+// ------------------------------------------------------------------------------------------------
+// Syslog places
+// ------------------------------------------------------------------------------------------------
+exports.ROUTE_NAME = 'routeName'
+
+exports.IO = 'io'
 
 // ------------------------------------------------------------------------------------------------
 // Errors trace
 // ------------------------------------------------------------------------------------------------
 exports.STATUS_CODE = 'statusCode'
 
-exports.TRACE = 'err_trace'
+exports.TRACE = 'errTrace'
 exports.TRACE_MOD = 'mod'
 exports.TRACE_FUN = 'fun'
 exports.TRACE_ERR = 'err'

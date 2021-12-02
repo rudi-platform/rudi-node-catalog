@@ -98,7 +98,7 @@ exports.v = (srcMod, srcFun, msg) => log('verbose', srcMod, srcFun, msg)
 exports.d = (srcMod, srcFun, msg) => log('debug', srcMod, srcFun, msg)
 
 exports.t = (srcMod, srcFun, msg) =>
-  getLogLevel() === 'trace' ? log('debug', displayStr(srcMod, srcFun, msg)) : () => null
+  getLogLevel() === 'trace' ? log('debug', srcMod, srcFun, msg) : () => null
 
 // ------------------------------------------------------------------------------------------------
 // Syslog functions
@@ -197,7 +197,7 @@ exports.sysInfo = SHOULD_SYSLOG
         location,
         context,
         cid ? cid : context ? context.id : null,
-        info ? info : context ? context.getDetails() : null
+        info == ' ' ? '' : info ? info : context ? context.getDetails() : null
       )
   : () => null
 
@@ -227,6 +227,28 @@ exports.sysTrace = SHOULD_SYSLOG
       )
   : () => null
 
+// ------------------------------------------------------------------------------------------------
+// Syslog functions: specific macros
+// ------------------------------------------------------------------------------------------------
+// exports.sysOnSend = (request, context, reply) => {}
+exports.sysOnError = (statusCode, errMsg, context, details) => {
+  const fun = 'sysOnError'
+  try {
+    this.t(mod, fun, ``)
+    this.e(mod, fun, errMsg) //`Error ${err.statusCode} (${err.name}): ${err.message}`)
+
+    let sysLogErr = statusCode < 500 ? this.sysError : this.sysCrit
+    sysLogErr(errMsg, '', context, details)
+    //   `Error ${err.statusCode} (${err.name}): ${err.message}`,
+    //   '',
+    //   context,
+    //   `errPlace:'${context.errorLocation}', errOnReq:'${context.formatReqDetails()}'`
+    // )
+  } catch (err) {
+    this.e(mod, 'sysOnError', err)
+    throw err
+  }
+}
 // ------------------------------------------------------------------------------------------------
 // Http
 // ------------------------------------------------------------------------------------------------

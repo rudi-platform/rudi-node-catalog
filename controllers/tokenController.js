@@ -167,7 +167,7 @@ exports.verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
 
     if (nowEpochS() > jwtExp)
       throw new ForbiddenError(
-        `JWT expired: JWT expires after ${dateEpochSToIso(jwtExp)}, now is ${nowISO()}`
+        `JWT expired: JWT expires after ${dateEpochSToIso(jwtExp)} (now is ${nowISO()})`
       )
 
     // Check the current route

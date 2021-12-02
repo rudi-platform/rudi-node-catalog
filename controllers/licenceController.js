@@ -84,7 +84,7 @@ exports.initializeLicences = async () => {
 // ------------------------------------------------------------------------------------------------
 exports.getAllLicences = async (req, reply) => {
   const fun = `getAlllicences`
-  log.v(mod, fun, `< GET ${URL_PV_LICENCE_ACCESS}`)
+  log.t(mod, fun, `< GET ${URL_PV_LICENCE_ACCESS}`)
   // log.t(mod, fun, ``)
 
   return await this.getLicences()
@@ -92,7 +92,7 @@ exports.getAllLicences = async (req, reply) => {
 
 exports.getAllLicenceCodes = async (req, reply) => {
   const fun = `getAlllicenceCodes`
-  log.v(mod, fun, `< GET ${URL_PV_LICENCE_CODES_ACCESS}`)
+  log.t(mod, fun, `< GET ${URL_PV_LICENCE_CODES_ACCESS}`)
   // log.t(mod, fun, ``)
 
   return await this.getLicenceCodes()
@@ -100,6 +100,6 @@ exports.getAllLicenceCodes = async (req, reply) => {
 
 exports.initLicences = async (req, reply) => {
   const fun = `initLicences`
-  log.v(mod, fun, `< POST ${URL_PV_LICENCE_ACCESS}/${PARAM_ACTION_INIT}`)
+  log.t(mod, fun, `< POST ${URL_PV_LICENCE_ACCESS}/${PARAM_ACTION_INIT}`)
   return await this.initializeLicences()
 }
