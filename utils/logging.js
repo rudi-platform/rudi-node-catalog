@@ -237,7 +237,7 @@ exports.sysOnError = (statusCode, errMsg, context, details) => {
     this.t(mod, fun, ``)
     this.e(mod, fun, errMsg) //`Error ${err.statusCode} (${err.name}): ${err.message}`)
 
-    let sysLogErr = statusCode < 500 ? this.sysError : this.sysCrit
+    let sysLogErr = parseInt(statusCode) < 500 ? this.sysError : this.sysCrit
     sysLogErr(errMsg, '', context, details)
     //   `Error ${err.statusCode} (${err.name}): ${err.message}`,
     //   '',

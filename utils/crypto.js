@@ -11,6 +11,7 @@ const mod = 'utils'
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
 const { accessProperty } = require('./jsonAccess')
+const { consoleErr } = require('./jsUtils')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
@@ -46,7 +47,7 @@ exports.extractJwt = (req) => {
     return token
   } catch (err) {
     const errMsg = `${err} -> no token was found in the header`
-    this.consoleErr(mod, fun, errMsg)
+    consoleErr(mod, fun, errMsg)
     throw new Error(errMsg)
   }
 }
