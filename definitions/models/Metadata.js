@@ -562,11 +562,9 @@ async function checkLicence(metadata) {
 async function checkThesaurus(metadata) {
   const fun = 'checkThesaurus'
   // if (metadata.init) log.d(mod, fun, `init`)
-  const shouldInit = metadata[API_COLLECTION_TAG] == 'init'
-
   try {
+    const shouldInit = metadata[API_COLLECTION_TAG] === 'init'
     const dataTheme = metadata[API_THEME_PROPERTY]
-
     // const themes = Themes.get()
     const themeLabels = Themes.getLabels(DEFAULT_LANG)
 
@@ -581,7 +579,7 @@ async function checkThesaurus(metadata) {
         throw new BadRequestError(
           `${msg.incorrectVal(API_THEME_PROPERTY, dataTheme)}. ` +
             `Allowed: ${utils.beautify(Themes.get())} ` +
-            `(metadata ${this[API_METADATA_ID]}) `
+            `(metadata ${metadata[API_METADATA_ID]}) `
         )
       }
     }
@@ -615,7 +613,7 @@ async function checkThesaurus(metadata) {
             if (!Languages.isValid(lang, shouldInit))
               throw new BadRequestError(
                 msg.incorrectVal(API_LANGUAGES_PROPERTY, lang) +
-                  ` (metadata ${this[API_METADATA_ID]})`
+                  ` (metadata ${metadata[API_METADATA_ID]})`
               )
             return true
           })

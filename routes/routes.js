@@ -73,6 +73,7 @@ const {
   URL_PV_APP_ENV_ACCESS,
   PARAM_THESAURUS_LANG,
   ROUTE_NAME,
+  URL_PUB_API_VERSION,
 } = require('../config/confApi')
 
 const { JWT_USER, JWT_CLIENT } = require('../config/confPortal')
@@ -123,6 +124,7 @@ const DEV_SEND_METADATA_TO_PORTAL = 'dev_send_metadata_to_portal'
 const DEV_DEL_PORTAL_METADATA = 'dev_del_portal_metadata'
 const DEV_GET_GIT_HASH = 'dev_get_git_hash'
 const DEV_GET_APP_HASH = 'dev_get_app_hash'
+const DEV_GET_API_VERSION = 'dev_get_api_version'
 const DEV_GET_NODE_VERSION = 'dev_get_node_version'
 const DEV_GET_APP_ENV = 'dev_get_app_env'
 const DEV_GET_LOGS = 'dev_get_logs'
@@ -657,6 +659,16 @@ exports.devRoutes = [
     preHandler: onFreeRoute,
     handler: sysController.getAppHash,
     config: { [ROUTE_NAME]: DEV_GET_APP_HASH },
+  },
+  /**
+   * Get current API version
+   */
+  {
+    method: 'GET',
+    url: `${URL_PUB_API_VERSION}`,
+    preHandler: onFreeRoute,
+    handler: sysController.getApiVersion,
+    config: { [ROUTE_NAME]: DEV_GET_API_VERSION },
   },
   /**
    * Get node and npm versions

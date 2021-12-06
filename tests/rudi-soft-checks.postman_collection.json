@@ -9,116 +9,6 @@
 			"name": "00. Tokens",
 			"item": [
 				{
-					"name": "Request pm token",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"pm.collectionVariables.set('exp', pm.collectionVariables.get('nowEpochS') + 10000)"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									" pm.test(\"Receiving a JWT\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const token = pm.response.stream.toString('utf8');",
-									"    //console.log(token)",
-									"    pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
-									"    pm.collectionVariables.set('pm_jwt', token);",
-									"    //console.log('token stored')",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"exp\": {{exp}},\n    \"jti\": \"{{$randomUUID}}\",\n    \"sub\": \"{{pm_client_name}}\",\n    \"client_id\": \"pm\",\n    \"req_mtd\": \"all\",\n    \"req_url\": \"all\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{cryptoJwtUrl}}/forge",
-							"host": [
-								"{{cryptoJwtUrl}}"
-							],
-							"path": [
-								"forge"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Request new portal token",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(`Token received`, () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"",
-									"    //const answer = Buffer.from(pm.response.stream, 'base64').toString('utf8')",
-									"    const answer = pm.response.json();",
-									"    //console.log(answer)",
-									"    pm.collectionVariables.set('accessToken', answer.access_token);",
-									"",
-									"    const token = answer.access_token",
-									"",
-									"    const [jwtHeaderEncoded, jwtBodyEncoded, jwtSignature] = token.split('.')",
-									"    const jwtHeader = JSON.parse(codec.fromBase64Url(jwtHeaderEncoded))",
-									"    const jwtBody = JSON.parse(codec.fromBase64Url(jwtBodyEncoded))",
-									"    console.log('header: ' + JSON.stringify(jwtHeader))",
-									"    console.log('body: ' + JSON.stringify(jwtBody))",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{pm_jwt}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/portal/token",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{adminUrl}}",
-								"portal",
-								"token"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Check JWT",
 					"event": [
 						{
@@ -136,16 +26,6 @@
 						}
 					],
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{pm_jwt}}",
-									"type": "string"
-								}
-							]
-						},
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -271,6 +151,43 @@
 							"path": [
 								"{{adminUrl}}",
 								"apphash"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get API version",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"API version\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const apiVersion = pm.response.stream.toString('utf8');",
+									"    pm.expect(apiVersion).to.match(/^([0-9]+\\.){2}[0-9]+[a-z]*$/)",
+									"    pm.collectionVariables.set('apiVersion',apiVersion)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/version",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"version"
 							]
 						}
 					},
@@ -698,7 +615,6 @@
 									"pm.test(\"Themes received\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
-									"    pm.collectionVariables.set('themes', responseJson);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -733,7 +649,6 @@
 									"pm.test(\"Themes received\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
-									"    pm.collectionVariables.set('themes', responseJson);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -814,7 +729,7 @@
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    pm.expect(responseJson.indexOf('mit')).to.gte(0)",
-									"    pm.collectionVariables.set('softLicence', responseJson[1])",
+									"    pm.collectionVariables.set('licences', responseJson)",
 									"});",
 									""
 								],
@@ -1486,6 +1401,73 @@
 					"name": "Add meta 1",
 					"event": [
 						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"log.d('pre-req scripts')",
+									"pm.collectionVariables.set('now', time.now())",
+									"",
+									"//————— Id",
+									"log.d('Ids')",
+									"pm.collectionVariables.set('softMeta1Id', rand.get('{{$randomUUID}}'));",
+									"pm.collectionVariables.set('softMedia1Id', rand.get('{{$randomUUID}}'));",
+									"",
+									"",
+									"//————— Thesauri",
+									"log.d('Thesaurus: themes')",
+									"pm.collectionVariables.set('randomTheme', rand.pick('themes'));",
+									"log.d('Thesaurus: keywords')",
+									"pm.collectionVariables.set('randomKeyword1', rand.pick('keywords'));",
+									"pm.collectionVariables.set('randomKeyword2', rand.pick('keywords'));",
+									"log.d('Thesaurus: licences')",
+									"pm.collectionVariables.set('softLicence', rand.pick('licences'));",
+									"log.d('Thesaurus: ok')",
+									"",
+									"//————— Producer",
+									"log.d('Producer')",
+									"const orgs = [",
+									"    pm.collectionVariables.get('softOrg1Id'), ",
+									"    pm.collectionVariables.get('softOrg2Id')]",
+									"const randomOrgId = rand.pickInList(orgs)",
+									"//console.log(`randomOrgId: ${randomOrgId}`)",
+									"pm.collectionVariables.set('randomOrgId', randomOrgId);",
+									"",
+									"//————— Contact 1",
+									"log.d('Contact 1')",
+									"const contacts = [ ",
+									"    pm.collectionVariables.get('softContact1Id'), ",
+									"    pm.collectionVariables.get('softContact2Id'), ",
+									"    pm.collectionVariables.get('softContact3Id')];",
+									"//console.log(`contacts: ${contacts}`)",
+									"",
+									"",
+									"const randomContId1 = rand.pickInList(contacts)",
+									"//console.log(`randomContId1: ${randomContId1}`)",
+									"",
+									"pm.collectionVariables.set('randomContact1', randomContId1);",
+									"",
+									"//————— Contact 2",
+									"log.d('Contact 2')",
+									"const contactsLeft = contacts",
+									"    .filter(function(value, index, arr){ return value != randomContId1 });",
+									"",
+									"const randomContId2 = rand.pickInList(contactsLeft)",
+									"//console.log(`randomContId2: ${randomContId2}`)",
+									"",
+									"pm.collectionVariables.set('randomContact2', randomContId2);",
+									"",
+									"//————— Description",
+									"log.d('Description')",
+									"pm.collectionVariables.set('randomTitle', rand.get('{{$randomCatchPhrase}}'));",
+									"pm.collectionVariables.set('randomSynopsis', `${rand.get('{{$randomProductAdjective}}')} ${rand.get('{{$randomBs}}')}`);",
+									"pm.collectionVariables.set('randomSummary', `${rand.get('{{$randomPhrase}}')} ${rand.get('{{$randomPhrase}}')} ${rand.get('{{$randomLoremParagraph}}')}`);",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
 							"listen": "test",
 							"script": {
 								"exec": [
@@ -1505,61 +1487,6 @@
 								],
 								"type": "text/javascript"
 							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"//————— Id",
-									"pm.collectionVariables.set('softMeta1Id', rand.get('{{$randomUUID}}'));",
-									"pm.collectionVariables.set('softMedia1Id', rand.get('{{$randomUUID}}'));",
-									"",
-									"",
-									"//————— Thesauri",
-									"pm.collectionVariables.set('randomTheme', rand.pick('themes'));",
-									"pm.collectionVariables.set('randomKeyword1', rand.pick('keywords'));",
-									"pm.collectionVariables.set('randomKeyword2', rand.pick('keywords'));",
-									"pm.collectionVariables.set('randomLicence', rand.pick('licences'));",
-									"",
-									"//————— Producer",
-									"const orgs = [",
-									"    pm.collectionVariables.get('softOrg1Id'), ",
-									"    pm.collectionVariables.get('softOrg2Id')]",
-									"const randomOrgId = rand.pickInList(orgs)",
-									"//console.log(`randomOrgId: ${randomOrgId}`)",
-									"pm.collectionVariables.set('randomOrgId', randomOrgId);",
-									"",
-									"//————— Contact 1",
-									"const contacts = [ ",
-									"    pm.collectionVariables.get('softContact1Id'), ",
-									"    pm.collectionVariables.get('softContact2Id'), ",
-									"    pm.collectionVariables.get('softContact3Id')];",
-									"//console.log(`contacts: ${contacts}`)",
-									"",
-									"",
-									"const randomContId1 = rand.pickInList(contacts)",
-									"//console.log(`randomContId1: ${randomContId1}`)",
-									"",
-									"pm.collectionVariables.set('randomContact1', randomContId1);",
-									"",
-									"//————— Contact 2",
-									"const contactsLeft = contacts",
-									"    .filter(function(value, index, arr){ return value != randomContId1 });",
-									"",
-									"const randomContId2 = rand.pickInList(contactsLeft)",
-									"//console.log(`randomContId2: ${randomContId2}`)",
-									"",
-									"pm.collectionVariables.set('randomContact2', randomContId2);",
-									"",
-									"//————— Description",
-									"pm.collectionVariables.set('randomTitle', rand.get('{{$randomCatchPhrase}}'));",
-									"pm.collectionVariables.set('randomSynopsis', `${rand.get('{{$randomProductAdjective}}')} ${rand.get('{{$randomBs}}')}`);",
-									"pm.collectionVariables.set('randomSummary', `${rand.get('{{$randomPhrase}}')} ${rand.get('{{$randomPhrase}}')} ${rand.get('{{$randomLoremParagraph}}')}`);",
-									"",
-									""
-								],
-								"type": "text/javascript"
-							}
 						}
 					],
 					"request": {
@@ -1567,7 +1494,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"global_id\": \"{{softMeta1Id}}\",\n    \"local_id\": \"testingID {{softMeta1Id}}\",\n    \"doi\": \"10.1007/s00223-003-0070-444/{{softMeta1Id}}\",\n    \"resource_title\": \"Test de RUDI en local {{softMeta1Id}}\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 4444\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 4\"\n        }\n    ],\n    \"collection_tag\": \"{{stamp}}\",\n    \"purpose\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{stamp}}\"\n        }\n    ],\n    \"theme\": \"energyNetworks\",\n    \"keywords\": [\n        \"energy_consommation\",\n        \"electricity\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{softOrg1Id}}\",\n        \"organization_name\": \"{{softOrg1Name}}\",\n        \"organization_address\": \"{{softOrg1Address}}\",\n        \"collection_tag\": \"{{stamp}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{softContact1Id}}\",\n            \"contact_name\": \"M. Fazo\",\n            \"email\": \"gpizj@pzorjeg.gt\",\n            \"collection_tag\": \"{{stamp}}\"\n        },\n        {\n            \"contact_id\": \"{{softContact2Id}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\",\n            \"collection_tag\": \"{{stamp}}\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_provider\": {\n            \"organization_id\": \"{{softOrg1Id}}\",\n            \"collection_tag\": \"{{stamp}}\"\n        },\n        \"metadata_contacts\": [\n            {\n                \"contact_id\": \"{{softContact2Id}}\",\n                \"collection_tag\": \"{{stamp}}\"\n            }\n        ]\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"licence_label\": \"{{softLicence}}\"\n        }\n    },\n    \"available_formats\": [\n        {\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{softMedia1Id}}\",\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.1.0\"\n            },\n            \"file_type\": \"application/json\",\n            \"file_size\": 59016,\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"4c9ee0f14e835927a1bbafde0eb89fb3\"\n            }\n        }\n    ]\n}",
+							"raw": "{\n    \"global_id\": \"{{softMeta1Id}}\",\n    \"local_id\": \"testingID {{softMeta1Id}}\",\n    \"doi\": \"10.1007/s00223-003-0070-444/{{softMeta1Id}}\",\n    \"resource_title\": \"Test de RUDI en local {{softMeta1Id}}\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 4444\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 4\"\n        }\n    ],\n    \"collection_tag\": \"{{stamp}}\",\n    \"purpose\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{stamp}}\"\n        }\n    ],\n    \"theme\": \"{{randomTheme}}\",\n    \"keywords\": [\n        \"{{randomKeyword1}}\",\n        \"{{randomKeyword2}}\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{softOrg1Id}}\",\n        \"organization_name\": \"{{softOrg1Name}}\",\n        \"organization_address\": \"{{softOrg1Address}}\",\n        \"collection_tag\": \"{{stamp}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{softContact1Id}}\",\n            \"contact_name\": \"M. Fazo\",\n            \"email\": \"gpizj@pzorjeg.gt\",\n            \"collection_tag\": \"{{stamp}}\"\n        },\n        {\n            \"contact_id\": \"{{softContact2Id}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\",\n            \"collection_tag\": \"{{stamp}}\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_provider\": {\n            \"organization_id\": \"{{softOrg1Id}}\",\n            \"collection_tag\": \"{{stamp}}\"\n        },\n        \"metadata_contacts\": [\n            {\n                \"contact_id\": \"{{softContact2Id}}\",\n                \"collection_tag\": \"{{stamp}}\"\n            }\n        ]\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"licence_label\": \"{{softLicence}}\"\n        }\n    },\n    \"available_formats\": [\n        {\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{softMedia1Id}}\",\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/1.1.0\"\n            },\n            \"file_type\": \"application/json\",\n            \"file_size\": 59016,\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"4c9ee0f14e835927a1bbafde0eb89fb3\"\n            }\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2166,7 +2093,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{accessToken}}",
+									"value": "{{{{portalTokenName}}}}",
 									"type": "string"
 								}
 							]
@@ -2221,7 +2148,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{accessToken}}",
+									"value": "{{{{portalTokenName}}}}",
 									"type": "string"
 								}
 							]
@@ -2276,7 +2203,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{accessToken}}",
+									"value": "{{{{portalTokenName}}}}",
 									"type": "string"
 								}
 							]
@@ -2604,7 +2531,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{accessToken}}",
+									"value": "{{{{portalTokenName}}}}",
 									"type": "string"
 								}
 							]
@@ -2808,7 +2735,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{accessToken}}",
+									"value": "{{{{portalTokenName}}}}",
 									"type": "string"
 								}
 							]
@@ -2915,7 +2842,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{accessToken}}",
+									"value": "{{{{portalTokenName}}}}",
 									"type": "string"
 								}
 							]
@@ -2983,7 +2910,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{accessToken}}",
+									"value": "{{{{portalTokenName}}}}",
 									"type": "string"
 								}
 							]
@@ -3053,7 +2980,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{accessToken}}",
+									"value": "{{{{portalTokenName}}}}",
 									"type": "string"
 								}
 							]
@@ -3109,7 +3036,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{accessToken}}",
+									"value": "{{{{portalTokenName}}}}",
 									"type": "string"
 								}
 							]
@@ -3224,7 +3151,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{accessToken}}",
+									"value": "{{{{portalTokenName}}}}",
 									"type": "string"
 								}
 							]
@@ -3582,7 +3509,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{accessToken}}",
+									"value": "{{{{portalTokenName}}}}",
 									"type": "string"
 								}
 							]
@@ -4346,7 +4273,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "{{pm_jwt}}",
+				"value": "{{{{apiTokenName}}}}",
 				"type": "string"
 			}
 		]
@@ -4358,10 +4285,19 @@
 				"type": "text/javascript",
 				"exec": [
 					"const TOKEN_DURATION_S = 1200",
-					"const API_TOKEN_NAME = 'pm_jwt'",
-					"const PORTAL_TOKEN_NAME = 'portal_jwt'",
+					"const API_TOKEN_NAME = pm.variables.get('apiTokenName')",
+					"const PORTAL_TOKEN_NAME = pm.variables.get('portalTokenName')",
 					"const TRACE = false",
 					"const DEBUG = false",
+					"",
+					"log = {",
+					"    d: (msg) => {",
+					"        if (DEBUG || TRACE) console.log(msg)",
+					"    },",
+					"    t: (msg) => {",
+					"        if (TRACE) console.log(msg)",
+					"    }",
+					"}",
 					"",
 					"utils = {",
 					"    getContactEmail: function (contactName) {",
@@ -4375,53 +4311,55 @@
 					"};",
 					"",
 					"time = {",
-					"    now: function () {",
+					"    now: () => {",
 					"        return new Date().toISOString()",
 					"    },",
 					"",
-					"    nowEpochS: function () {",
+					"    nowEpochS: () => {",
 					"        return _.floor(new Date().getTime() / 1000)",
 					"    },",
 					"",
-					"    timezone: function () {",
+					"    timezone: () => {",
 					"        return new Date().getTimezoneOffset()",
 					"    },",
 					"}",
 					"codec = {",
-					"    fromBase64: function (data) {",
-					"        return Buffer.from(data, 'base64').toString('utf-8');",
+					"    fromBase64: (data) => {",
+					"        log.t('-- fromBase64 --')",
+					"        const decodedStr = Buffer.from(data, 'base64').toString('utf-8');",
+					"        log.d('decodedStr: ' + decodedStr)",
+					"        return decodedStr",
 					"    },",
 					"",
-					"    fromBase64Url: function (base64Url) {",
-					"        const padded = (base64Url.Length % 4 == 0)",
-					"            ? base64Url",
-					"            : base64Url + \"====\".substring(base64Url.Length % 4);",
-					"",
-					"        const base64 = padded",
+					"    fromBase64Url: (base64UrlStr) => {",
+					"        log.t('-- base64UrlStr --')",
+					"        if (!base64UrlStr) return ''",
+					"        //        log.d('base64UrlStr: ' + base64UrlStr)",
+					"        //        log.d('base64UrlStr.length: ' + base64UrlStr.length)",
+					"        const paddedStr = (base64UrlStr.length % 4 == 0)",
+					"            ? base64UrlStr",
+					"            : base64UrlStr + \"====\".substring(base64UrlStr.length % 4);",
+					"        // log.d('paddedStr: ' + paddedStr)",
+					"        const base64Str = paddedStr",
 					"            .replace(\"_\", \"/\")",
 					"            .replace(\"-\", \"+\");",
-					"",
-					"        return this.fromBase64(base64);",
+					"        // log.d('base64Str: ' + base64Str)",
+					"        return codec.fromBase64(base64Str);",
 					"    },",
 					"",
-					"    streamToUtf8: function (data) {",
-					"        return data.stream.toString('utf8')",
-					"    }",
+					"    streamToUtf8: (data) => data.stream.toString('utf8')",
+					"",
 					"};",
 					"",
 					"rand = {",
-					"    get: function (randName) {",
-					"        return pm.variables.replaceIn(randName);",
-					"    },",
+					"    get: (randName) => pm.variables.replaceIn(randName),",
 					"",
 					"    pickInList: function (list) {",
 					"        const randomNumber = _.random(0, list.length - 1);",
 					"        return list[randomNumber];",
 					"    },",
 					"",
-					"    pick: function (listName) {",
-					"        return this.pickInList(pm.collectionVariables.get(listName));",
-					"    },",
+					"    pick: (listName) => rand.pickInList(pm.collectionVariables.get(listName)),",
 					"",
 					"    initVal: function (field) {",
 					"        const val = pm.collectionVariables.get(field);",
@@ -4444,29 +4382,33 @@
 					"secu = {",
 					"",
 					"    isTokenValid: function (tokenName) {",
-					"        if (TRACE) console.log('-- is ' + tokenName + ' Valid --')",
+					"        log.t('-- is ' + tokenName + ' Valid --')",
 					"        const token = pm.collectionVariables.get(tokenName)",
 					"        // console.log('typeof token: ' + typeof token)",
 					"        if (!token || typeof token !== 'string') {",
-					"            if (DEBUG) console.log('Token ' + tokenName + ' is invalid: ' + JSON.stringify(token))",
+					"            log.d('Token ' + tokenName + ' is invalid: ' + JSON.stringify(token))",
 					"            return false",
 					"        }",
-					"        // console.log('jwt: ' + JSON.stringify(token))",
+					"        // log.d('splitting token: ' + token)",
 					"        const jwtBodyEncoded = token.split('.')[1]",
+					"        // log.d('split token: ' + jwtBodyEncoded)",
+					"",
 					"        const jwtBody = JSON.parse(codec.fromBase64Url(jwtBodyEncoded))",
+					"        // log.d('decoded body: ' + jwtBody)",
 					"        if (!jwtBody.exp) {",
-					"            if (DEBUG) console.log('No expiration time was found')",
+					"            log.d('No expiration time was found')",
 					"            return false",
 					"        }",
+					"        // log.d('is token valid?')",
 					"        const isValid = jwtBody.exp > time.nowEpochS()",
-					"        if (DEBUG) console.log(tokenName + ' is ' + (isValid ? '' : 'not ') + 'valid')",
+					"        // log.d(tokenName + ' is ' + (isValid ? '' : 'not ') + 'valid')",
 					"        return isValid",
 					"    },",
 					"",
 					"    renewApiToken: async function (tokenName, next) {",
-					"        if (TRACE) console.log('-- renewApiToken --')",
+					"        log.t('-- renewApiToken --')",
 					"        const reqUrl = pm.variables.get('cryptoJwtUrl') + '/forge'",
-					"        if (DEBUG) console.log('reqUrl: ' + reqUrl)",
+					"        // log.d('reqUrl: ' + reqUrl)",
 					"        const reqNewToken = {",
 					"            url: reqUrl,",
 					"            method: 'POST',",
@@ -4485,11 +4427,11 @@
 					"        }",
 					"        pm.sendRequest(reqNewToken, (err, res) => {",
 					"            const token = codec.streamToUtf8(res)",
-					"            if (DEBUG) console.log('rudiProdToken : ' + token)",
+					"            // log.d('rudiProdToken : ' + token)",
 					"            pm.expect(res).to.have.property('code', 200);",
 					"            pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
 					"            pm.collectionVariables.set(tokenName, token)",
-					"            if (DEBUG) console.log('API token stored')",
+					"            log.d('API token stored')",
 					"",
 					"            next(token)",
 					"            //return token",
@@ -4497,9 +4439,9 @@
 					"    },",
 					"",
 					"    renewPortalToken: async function (tokenName, rudiProdToken) {",
-					"        if (TRACE) console.log('-- renewPortalToken --')",
+					"        log.t('-- renewPortalToken --')",
 					"        const reqUrl = pm.variables.get('baseUrl') + '/' + pm.variables.get('adminUrl') + '/portal/token'",
-					"        // if (DEBUG) console.log('reqUrl: ' + reqUrl)",
+					"        // log.d('reqUrl: ' + reqUrl)",
 					"        const rpToken = rudiProdToken",
 					"        const reqNewToken = {",
 					"            url: reqUrl,",
@@ -4511,20 +4453,20 @@
 					"        }",
 					"        pm.sendRequest(reqNewToken, (err, res) => {",
 					"            pm.expect(res).to.have.property('code', 200);",
-					"            //if (DEBUG) console.log('renewPortalToken res: ' + JSON.stringify(res))",
+					"            //log.d('renewPortalToken res: ' + JSON.stringify(res))",
 					"            const token = JSON.parse(codec.streamToUtf8(res)).access_token",
 					"            //const token = res.json()",
-					"            if (DEBUG) console.log('Portal token: ' + token)",
+					"            // log.d('Portal token: ' + token)",
 					"",
 					"            pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
 					"            pm.collectionVariables.set(tokenName, token)",
-					"            if (DEBUG) console.log('Portal token stored')",
+					"            log.d('Portal token stored')",
 					"",
 					"        })",
 					"    },",
 					"",
 					"    getRudiProdToken: async function (next) {",
-					"        if (TRACE) console.log('-- getRudiProdToken --')",
+					"        log.t('-- getRudiProdToken --')",
 					"        const tokenName = API_TOKEN_NAME",
 					"        if (!secu.isTokenValid(tokenName)) await secu.renewApiToken(tokenName, next)",
 					"        else next(pm.variables.get(tokenName))",
@@ -4532,7 +4474,7 @@
 					"    },",
 					"",
 					"    getPortalToken: async function (apiToken) {",
-					"        if (TRACE) console.log('-- getPortalToken --')",
+					"        log.t('-- getPortalToken --')",
 					"        const tokenName = PORTAL_TOKEN_NAME",
 					"        if (!secu.isTokenValid(tokenName)) await secu.renewPortalToken(tokenName, apiToken)",
 					"        return pm.variables.get(tokenName)",
@@ -4542,6 +4484,7 @@
 					"",
 					"",
 					"secu.getRudiProdToken(secu.getPortalToken)",
+					"log.t('Init OK')",
 					""
 				]
 			}
@@ -4562,7 +4505,19 @@
 			"value": "rudi-soft-checks"
 		},
 		{
+			"key": "apiJwt",
+			"value": ""
+		},
+		{
+			"key": "portalJwt",
+			"value": ""
+		},
+		{
 			"key": "gitHash",
+			"value": ""
+		},
+		{
+			"key": "apiVersion",
 			"value": ""
 		},
 		{
@@ -4638,6 +4593,10 @@
 			"value": ""
 		},
 		{
+			"key": "now",
+			"value": ""
+		},
+		{
 			"key": "softMeta1Id",
 			"value": ""
 		},
@@ -4658,7 +4617,7 @@
 			"value": ""
 		},
 		{
-			"key": "randomLicence",
+			"key": "softLicence",
 			"value": ""
 		},
 		{
@@ -4690,7 +4649,15 @@
 			"value": ""
 		},
 		{
+			"key": "mediaId2",
+			"value": ""
+		},
+		{
 			"key": "softMedia2Id",
+			"value": ""
+		},
+		{
+			"key": "countWithOrg1",
 			"value": ""
 		},
 		{
@@ -4702,39 +4669,11 @@
 			"value": ""
 		},
 		{
-			"key": "countWithOrg1",
-			"value": ""
-		},
-		{
 			"key": "unkownMetaId",
 			"value": ""
 		},
 		{
 			"key": "softReport3Id",
-			"value": ""
-		},
-		{
-			"key": "softLicence",
-			"value": ""
-		},
-		{
-			"key": "mediaId2",
-			"value": ""
-		},
-		{
-			"key": "pm_jwt",
-			"value": ""
-		},
-		{
-			"key": "portal_jwt",
-			"value": ""
-		},
-		{
-			"key": "exp",
-			"value": ""
-		},
-		{
-			"key": "accessToken",
 			"value": ""
 		}
 	]
