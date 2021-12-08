@@ -851,7 +851,296 @@
 			]
 		},
 		{
-			"name": "03. Add/edit/get contacts",
+			"name": "03. Add/edit/get organizations",
+			"item": [
+				{
+					"name": "Add org 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Producer 1 created\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    const orgId = pm.variables.get('softOrg1Id');",
+									"    pm.expect(responseJson.organization_id).to.eq(orgId);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set('softOrg1Id', rand.get('{{$randomUUID}}'))",
+									"pm.collectionVariables.set('softOrg1Name', rand.get('{{$randomCompanyName}}'))",
+									"const orgAddress = `${rand.get('{{$randomStreetAddress}}')}, ${rand.get('{{$randomCity}}')}`",
+									"pm.collectionVariables.set('softOrg1Address', orgAddress)",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"organization_id\": \"{{softOrg1Id}}\",\n    \"organization_name\": \"{{softOrg1Name}}\",\n    \"organization_address\": \"{{softOrg1Address}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{org}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add org 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Producer 2 created\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    const orgId = pm.variables.get('softOrg2Id');",
+									"    pm.expect(responseJson.organization_id).to.eq(orgId);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set('softOrg2Id', rand.get('{{$randomUUID}}'))",
+									"pm.collectionVariables.set('softOrg2Name', rand.get('{{$randomCompanyName}}'))",
+									"const orgAddress = `${rand.get('{{$randomStreetAddress}}')}, ${rand.get('{{$randomCity}}')}`",
+									"pm.collectionVariables.set('softOrg2Address', orgAddress)",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"organization_id\": \"{{softOrg2Id}}\",\n    \"organization_name\": \"{{softOrg2Name}}\",\n    \"organization_address\": \"{{softOrg2Address}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{org}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all organizations",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"2 producers created\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const orgList = pm.response.json();",
+									"    pm.expect(orgList.length).to.gte(2);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{org}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search organization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"1 organization found\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.total).to.eq(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}/search?{{softOrg2Name}}&collection_tag={{stamp}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{org}}",
+								"search"
+							],
+							"query": [
+								{
+									"key": "{{softOrg2Name}}",
+									"value": null
+								},
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit org 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Producer 2 edited\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    const orgId = pm.variables.get('softOrg2Id');",
+									"    const orgName = pm.variables.get('softOrg2Name');",
+									"    const orgAddress = pm.variables.get('softOrg2Address');",
+									"    ",
+									"    pm.expect(responseJson.organization_name).to.eq(orgName);",
+									"    pm.expect(responseJson.organization_address).to.eq(orgAddress);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set('softOrg2Name', rand.get('{{$randomCompanyName}}'))",
+									"const orgAddress = `${rand.get('{{$randomStreetAddress}}')}, ${rand.get('{{$randomCity}}')}`",
+									"pm.collectionVariables.set('softOrg2Address', orgAddress)",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"organization_id\": \"{{softOrg2Id}}\",\n    \"organization_name\": \"{{softOrg2Name}}\",\n    \"organization_address\": \"{{softOrg2Address}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{org}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get org 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Producer 2 edition correctly saved\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    const orgId = pm.variables.get('softOrg2Id');",
+									"    pm.expect(responseJson.organization_id).to.eq(orgId);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}/{{softOrg2Id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{org}}",
+								"{{softOrg2Id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "04. Add/edit/get contacts",
 			"item": [
 				{
 					"name": "Add contact 1",
@@ -1060,6 +1349,50 @@
 					"response": []
 				},
 				{
+					"name": "Search contact",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"1 contact found\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.total).to.eq(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}/search?{{softContact1Name}}&collection_tag={{stamp}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{cont}}",
+								"search"
+							],
+							"query": [
+								{
+									"key": "{{softContact1Name}}",
+									"value": null
+								},
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Edit contact 1",
 					"event": [
 						{
@@ -1150,251 +1483,6 @@
 								"{{adminUrl}}",
 								"{{cont}}",
 								"{{softContact1Id}}"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "04. Add/edit/get organizations",
-			"item": [
-				{
-					"name": "Add org 1",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Producer 1 created\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    const orgId = pm.variables.get('softOrg1Id');",
-									"    pm.expect(responseJson.organization_id).to.eq(orgId);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"pm.collectionVariables.set('softOrg1Id', rand.get('{{$randomUUID}}'))",
-									"pm.collectionVariables.set('softOrg1Name', rand.get('{{$randomCompanyName}}'))",
-									"const orgAddress = `${rand.get('{{$randomStreetAddress}}')}, ${rand.get('{{$randomCity}}')}`",
-									"pm.collectionVariables.set('softOrg1Address', orgAddress)",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"organization_id\": \"{{softOrg1Id}}\",\n    \"organization_name\": \"{{softOrg1Name}}\",\n    \"organization_address\": \"{{softOrg1Address}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{adminUrl}}",
-								"{{org}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Add org 2",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Producer 2 created\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    const orgId = pm.variables.get('softOrg2Id');",
-									"    pm.expect(responseJson.organization_id).to.eq(orgId);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"pm.collectionVariables.set('softOrg2Id', rand.get('{{$randomUUID}}'))",
-									"pm.collectionVariables.set('softOrg2Name', rand.get('{{$randomCompanyName}}'))",
-									"const orgAddress = `${rand.get('{{$randomStreetAddress}}')}, ${rand.get('{{$randomCity}}')}`",
-									"pm.collectionVariables.set('softOrg2Address', orgAddress)",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"organization_id\": \"{{softOrg2Id}}\",\n    \"organization_name\": \"{{softOrg2Name}}\",\n    \"organization_address\": \"{{softOrg2Address}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{adminUrl}}",
-								"{{org}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get all organizations",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"2 producers created\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const orgList = pm.response.json();",
-									"    pm.expect(orgList.length).to.gte(2);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{adminUrl}}",
-								"{{org}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Edit org 2",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Producer 2 edited\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    const orgId = pm.variables.get('softOrg2Id');",
-									"    const orgName = pm.variables.get('softOrg2Name');",
-									"    const orgAddress = pm.variables.get('softOrg2Address');",
-									"    ",
-									"    pm.expect(responseJson.organization_name).to.eq(orgName);",
-									"    pm.expect(responseJson.organization_address).to.eq(orgAddress);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"pm.collectionVariables.set('softOrg2Name', rand.get('{{$randomCompanyName}}'))",
-									"const orgAddress = `${rand.get('{{$randomStreetAddress}}')}, ${rand.get('{{$randomCity}}')}`",
-									"pm.collectionVariables.set('softOrg2Address', orgAddress)",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"organization_id\": \"{{softOrg2Id}}\",\n    \"organization_name\": \"{{softOrg2Name}}\",\n    \"organization_address\": \"{{softOrg2Address}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{adminUrl}}",
-								"{{org}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get org 2",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Producer 2 edition correctly saved\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    const orgId = pm.variables.get('softOrg2Id');",
-									"    pm.expect(responseJson.organization_id).to.eq(orgId);",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}/{{softOrg2Id}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{adminUrl}}",
-								"{{org}}",
-								"{{softOrg2Id}}"
 							]
 						}
 					},
@@ -2258,9 +2346,8 @@
 								"exec": [
 									"pm.test(\"Search metadata\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const metadataList = pm.response.json();",
-									"    pm.expect(metadataList.total).to.eq(1);",
-									"    // pm.expect(metadataList.items[0].synopsis[0].text).to.eq(\"Courte description de RUDI en local 33\");",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.total).to.eq(1);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2271,7 +2358,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}/search?\"local 33\"",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}/search?\"local 33\"&collection_tag={{stamp}}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -2284,6 +2371,10 @@
 								{
 									"key": "\"local 33\"",
 									"value": null
+								},
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
 								}
 							]
 						}

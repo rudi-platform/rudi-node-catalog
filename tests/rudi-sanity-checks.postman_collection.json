@@ -945,7 +945,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}/search?IRISA",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}/search?IRISA&collection_tag={{stamp}}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -958,6 +958,10 @@
 								{
 									"key": "IRISA",
 									"value": null
+								},
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
 								}
 							]
 						}
@@ -1282,7 +1286,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}/search?fazo",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}/search?fazo&collection_tag={{stamp}}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -1295,6 +1299,10 @@
 								{
 									"key": "fazo",
 									"value": null
+								},
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
 								}
 							]
 						}
@@ -1984,7 +1992,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}/search?\"local 33\"",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}/search?\"local 33\"&collection_tag={{stamp}}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -1997,6 +2005,10 @@
 								{
 									"key": "\"local 33\"",
 									"value": null
+								},
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
 								}
 							]
 						}
