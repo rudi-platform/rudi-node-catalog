@@ -730,7 +730,7 @@
 									"pm.test(\"All licence codes retrieved\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
-									"    pm.expect(responseJson.indexOf('mit')).to.gt(0)",
+									"    pm.expect(responseJson.indexOf('mit')).to.gte(0)",
 									"});",
 									""
 								],
@@ -4638,7 +4638,7 @@
 	"variable": [
 		{
 			"key": "stamp",
-			"value": "rudi-soft-checks"
+			"value": "softChecks"
 		},
 		{
 			"key": "apiJwt",
@@ -4665,7 +4665,35 @@
 			"value": ""
 		},
 		{
+			"key": "sanityLicence",
+			"value": ""
+		},
+		{
 			"key": "licences",
+			"value": ""
+		},
+		{
+			"key": "softOrg1Id",
+			"value": ""
+		},
+		{
+			"key": "softOrg1Name",
+			"value": ""
+		},
+		{
+			"key": "softOrg1Address",
+			"value": ""
+		},
+		{
+			"key": "softOrg2Id",
+			"value": ""
+		},
+		{
+			"key": "softOrg2Name",
+			"value": ""
+		},
+		{
+			"key": "softOrg2Address",
 			"value": ""
 		},
 		{
@@ -4702,30 +4730,6 @@
 		},
 		{
 			"key": "softContact3Email",
-			"value": ""
-		},
-		{
-			"key": "softOrg1Id",
-			"value": ""
-		},
-		{
-			"key": "softOrg1Name",
-			"value": ""
-		},
-		{
-			"key": "softOrg1Address",
-			"value": ""
-		},
-		{
-			"key": "softOrg2Id",
-			"value": ""
-		},
-		{
-			"key": "softOrg2Name",
-			"value": ""
-		},
-		{
-			"key": "softOrg2Address",
 			"value": ""
 		},
 		{
@@ -4810,10 +4814,6 @@
 		},
 		{
 			"key": "softReport3Id",
-			"value": ""
-		},
-		{
-			"key": "sanityLicence",
 			"value": ""
 		}
 	]

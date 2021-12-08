@@ -671,7 +671,7 @@
 									"pm.test(\"All licence codes retrieved\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
-									"    pm.expect(responseJson.indexOf('mit')).to.gt(0)",
+									"    pm.expect(responseJson.indexOf('mit')).to.gte(0)",
 									"});",
 									""
 								],
@@ -1437,7 +1437,8 @@
 									"rand.initVal('orgId1')",
 									"rand.initVal('contId1')",
 									"rand.initVal('contId2')",
-									""
+									"",
+									"pm.collectionVariables.set('now',time.now())"
 								],
 								"type": "text/javascript"
 							}
@@ -1892,6 +1893,15 @@
 									"    pm.expect(responseJson.producer.organization_id).to.eq(orgId);",
 									"    pm.expect(responseJson.producer.organization_address).to.eq(\"Campus de Beaulieu, 263 avenue du Général Leclerc, Bâtiment 12 F, allée Jean Perrin, 35042 RENNES Cedex\");",
 									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set('now',time.now())"
 								],
 								"type": "text/javascript"
 							}
@@ -4514,14 +4524,6 @@
 			"value": "sanity-checks"
 		},
 		{
-			"key": "gitHash",
-			"value": ""
-		},
-		{
-			"key": "apiVersion",
-			"value": ""
-		},
-		{
 			"key": "apiJwt",
 			"value": ""
 		},
@@ -4530,15 +4532,11 @@
 			"value": ""
 		},
 		{
-			"key": "sanityLicence",
+			"key": "gitHash",
 			"value": ""
 		},
 		{
-			"key": "keywords",
-			"value": ""
-		},
-		{
-			"key": "themes",
+			"key": "apiVersion",
 			"value": ""
 		},
 		{
@@ -4583,6 +4581,22 @@
 		},
 		{
 			"key": "mediaId2",
+			"value": ""
+		},
+		{
+			"key": "keywords",
+			"value": ""
+		},
+		{
+			"key": "themes",
+			"value": ""
+		},
+		{
+			"key": "sanityLicence",
+			"value": ""
+		},
+		{
+			"key": "now",
 			"value": ""
 		},
 		{
