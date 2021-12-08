@@ -1,5 +1,6 @@
 'use strict'
 
+const mod = 'contSch'
 // ------------------------------------------------------------------------------------------------
 // External dependancies
 // ------------------------------------------------------------------------------------------------
@@ -9,10 +10,26 @@ const { omit } = require('lodash')
 // ------------------------------------------------------------------------------------------------
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
-const { FIELDS_TO_SKIP } = require('../../db/dbFields')
-
+const log = require('../../utils/logging')
 const ids = require('../schemas/Identifiers')
-const Validation = require('../schemaValidators')
+const valid = require('../schemaValidators')
+
+const { RudiError } = require('../../utils/errors')
+const { makeSearchable } = require('../../db/dbActions')
+
+// ------------------------------------------------------------------------------------------------
+// Constants
+// ------------------------------------------------------------------------------------------------
+const {
+  FIELDS_TO_SKIP,
+  DB_PUBLISHED_AT,
+  API_COLLECTION_TAG,
+  API_CONTACT_ID,
+  API_CONTACT_MAIL,
+  API_CONTACT_ROLE,
+  API_CONTACT_NAME,
+  API_ORGANIZATION_NAME,
+} = require('../../db/dbFields')
 
 // ------------------------------------------------------------------------------------------------
 // Custom schema definition
@@ -21,26 +38,26 @@ const ContactSchema = new mongoose.Schema(
   {
     // Unique and permanent identifier for the contact in RUDI
     // system (required)
-    contact_id: ids.UUIDv4,
+    [API_CONTACT_ID]: ids.UUIDv4,
 
     /** Updated offical name of the contact's organization */
-    organization_name: {
+    [API_ORGANIZATION_NAME]: {
       type: String,
     },
 
     /** Updated name of the service, or possibly the person */
-    contact_name: {
+    [API_CONTACT_NAME]: {
       type: String,
       required: true,
     },
 
     /** Updated status of the contact person */
-    role: {
+    [API_CONTACT_ROLE]: {
       type: String,
     },
 
     /** Updated offical postal address of the organization */
-    email: {
+    [API_CONTACT_MAIL]: {
       type: String,
       trim: true,
       required: true, // [true, 'Please enter Email Address'],
@@ -48,16 +65,16 @@ const ContactSchema = new mongoose.Schema(
       index: true,
       lowercase: true,
       dropDups: true,
-      match: Validation.EMAIL,
+      match: valid.EMAIL,
     },
 
     /** Tag for identifying a collection of resources */
-    collection_tag: {
+    [API_COLLECTION_TAG]: {
       type: String,
     },
 
     /** Time when this contact was successfully published on RUDI portal  */
-    publishedAt: {
+    [DB_PUBLISHED_AT]: {
       type: Date,
     },
   },
@@ -82,4 +99,24 @@ ContactSchema.methods.toJSON = function () {
 // Exports
 // ------------------------------------------------------------------------------------------------
 const Contact = mongoose.model('Contact', ContactSchema)
-module.exports = Contact
+
+const fun = 'createSearchIndexes'
+Contact.createSearchIndexes = async () => {
+  try {
+    await makeSearchable(Contact, [
+      API_CONTACT_ID,
+      API_CONTACT_NAME,
+      API_CONTACT_ROLE,
+      API_CONTACT_MAIL,
+    ])
+  } catch (err) {
+    RudiError.treatError(mod, fun, err)
+  }
+}
+Contact.createSearchIndexes()
+  .catch((err) => {
+    throw RudiError.treatError(mod, fun, `Failed to create search indexes: ${err}`)
+  })
+  .then(log.d(mod, fun, 'done'))
+
+module.exports = { Contact }

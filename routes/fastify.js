@@ -51,9 +51,10 @@ fastify.addHook('onError', (request, reply, error, done) => {
     reply.isError = true
   } catch (err) {
     log.e(mod, fun, err)
-    const context = CallContext.getCallContextFromReq(request)
-    context.logErr(mod, fun, err)
-    throw context.getError()
+    // const context = CallContext.getCallContextFromReq(request)
+    // context.logErr(mod, fun, err)
+    // throw context.getError()
+    throw err
   }
   done()
 })

@@ -24,7 +24,13 @@ const msg = require('../utils/msg')
 const db = require('../db/dbQueries')
 const json = require('../utils/jsonAccess')
 
-const { beautify, nowISO, isNotEmptyArray, isEmptyObject } = require('../utils/jsUtils')
+const {
+  beautify,
+  nowISO,
+  isNotEmptyArray,
+  isEmptyObject,
+  isEmptyArray,
+} = require('../utils/jsUtils')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
@@ -35,11 +41,12 @@ const {
 
   PARAM_OBJECT_METADATA,
   PARAM_OBJECT_ORGANIZATIONS,
-  PARAM_OBJECT_CONTACTS: PARAM_OBJECT_CONTACTS,
+  PARAM_OBJECT_CONTACTS,
   PARAM_OBJECT_MEDIA,
   PARAM_OBJECT_SKOS_CONCEPT,
   PARAM_OBJECT_SKOS_SCHEME,
   PARAM_ACTION_DELETION,
+  PARAM_ACTION_SEARCH,
   PARAM_ID,
   PARAM_OBJECT,
 
@@ -62,6 +69,7 @@ const {
   QUERY_UPDATED_AFTER,
   QUERY_UPDATED_BEFORE,
   PARAM_ACTION_UNLINKED,
+  QUERY_UNKOWN,
 } = require('../config/confApi')
 
 const {
@@ -86,8 +94,8 @@ const {
 // Models
 // ------------------------------------------------------------------------------------------------
 /* 
-const Organization = require('../definitions/models/Organization')
-const Contact = require('../definitions/models/Contact')
+const {Organization} = require('../definitions/models/Organization')
+const {Contact} = require('../definitions/models/Contact')
 const SkosConcept = require('../definitions/models/SkosConcept')
 const SkosScheme = require('../definitions/models/SkosScheme')
 
@@ -192,6 +200,7 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
       [QUERY_FILTER]: {},
       [QUERY_CONFIRM]: false,
       [EXT_REFS]: [],
+      [QUERY_UNKOWN]: [],
     }
     const filters = []
 
@@ -266,59 +275,62 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
       } else if (modelProperties.includes(key)) {
         // log.d(mod, fun, `Key is a ${objectType} property: ${beautify(key)}`)
         const val = value
-        try {
-          const obj = JSON.parse(val)
-          log.d(mod, fun, `parsed String: ${beautify(obj)}`)
+        if (!value) returnedFilter[QUERY_UNKOWN].push(key)
+        else {
+          try {
+            const obj = JSON.parse(val)
+            log.d(mod, fun, `parsed String: ${beautify(obj)}`)
 
-          switch (key) {
-            case `${DB_CREATED_AT}`:
-            case `${DB_UPDATED_AT}`:
-            case `${DB_PUBLISHED_AT}`:
+            switch (key) {
+              case `${DB_CREATED_AT}`:
+              case `${DB_UPDATED_AT}`:
+              case `${DB_PUBLISHED_AT}`:
 
-            case `${DATA_DATES}${API_DATES_CREATED_PROPERTY}`:
-            case `${DATA_DATES}${API_DATES_EDITED_PROPERTY}`:
-            case `${DATA_DATES}${API_DATES_PUBLISHED_PROPERTY}`:
-            case `${DATA_DATES}${API_DATES_VALIDATED_PROPERTY}`:
-            case `${DATA_DATES}${API_DATES_DELETED_PROPERTY}`:
+              case `${DATA_DATES}${API_DATES_CREATED_PROPERTY}`:
+              case `${DATA_DATES}${API_DATES_EDITED_PROPERTY}`:
+              case `${DATA_DATES}${API_DATES_PUBLISHED_PROPERTY}`:
+              case `${DATA_DATES}${API_DATES_VALIDATED_PROPERTY}`:
+              case `${DATA_DATES}${API_DATES_DELETED_PROPERTY}`:
 
-            case `${META_DATES}${API_DATES_CREATED_PROPERTY}`:
-            case `${META_DATES}${API_DATES_EDITED_PROPERTY}`:
-            case `${META_DATES}${API_DATES_PUBLISHED_PROPERTY}`:
-            case `${META_DATES}${API_DATES_VALIDATED_PROPERTY}`:
-            case `${META_DATES}${API_DATES_DELETED_PROPERTY}`:
+              case `${META_DATES}${API_DATES_CREATED_PROPERTY}`:
+              case `${META_DATES}${API_DATES_EDITED_PROPERTY}`:
+              case `${META_DATES}${API_DATES_PUBLISHED_PROPERTY}`:
+              case `${META_DATES}${API_DATES_VALIDATED_PROPERTY}`:
+              case `${META_DATES}${API_DATES_DELETED_PROPERTY}`:
 
-            case `${API_PERIOD_PROPERTY}.${API_START_DATE_PROPERTY}`:
-            case `${API_PERIOD_PROPERTY}.${API_END_DATE_PROPERTY}`:
-              filters.push({ [key]: cleanDateOperations(obj) })
-              break
-            default:
-              filters.push({ [key]: obj })
-          }
-        } catch (err) {
-          // log.d(mod, fun, `Error while parsing: '${beautify(val)}': ${err}}`)
-          switch (key) {
-            case `${DB_CREATED_AT}`:
-            case `${DB_UPDATED_AT}`:
-            case `${DB_PUBLISHED_AT}`:
+              case `${API_PERIOD_PROPERTY}.${API_START_DATE_PROPERTY}`:
+              case `${API_PERIOD_PROPERTY}.${API_END_DATE_PROPERTY}`:
+                filters.push({ [key]: cleanDateOperations(obj) })
+                break
+              default:
+                filters.push({ [key]: obj })
+            }
+          } catch (err) {
+            // log.d(mod, fun, `Error while parsing: '${beautify(val)}': ${err}}`)
+            switch (key) {
+              case `${DB_CREATED_AT}`:
+              case `${DB_UPDATED_AT}`:
+              case `${DB_PUBLISHED_AT}`:
 
-            case `${DATA_DATES}${API_DATES_CREATED_PROPERTY}`:
-            case `${DATA_DATES}${API_DATES_EDITED_PROPERTY}`:
-            case `${DATA_DATES}${API_DATES_PUBLISHED_PROPERTY}`:
-            case `${DATA_DATES}${API_DATES_VALIDATED_PROPERTY}`:
-            case `${DATA_DATES}${API_DATES_DELETED_PROPERTY}`:
+              case `${DATA_DATES}${API_DATES_CREATED_PROPERTY}`:
+              case `${DATA_DATES}${API_DATES_EDITED_PROPERTY}`:
+              case `${DATA_DATES}${API_DATES_PUBLISHED_PROPERTY}`:
+              case `${DATA_DATES}${API_DATES_VALIDATED_PROPERTY}`:
+              case `${DATA_DATES}${API_DATES_DELETED_PROPERTY}`:
 
-            case `${META_DATES}${API_DATES_CREATED_PROPERTY}`:
-            case `${META_DATES}${API_DATES_EDITED_PROPERTY}`:
-            case `${META_DATES}${API_DATES_PUBLISHED_PROPERTY}`:
-            case `${META_DATES}${API_DATES_VALIDATED_PROPERTY}`:
-            case `${META_DATES}${API_DATES_DELETED_PROPERTY}`:
+              case `${META_DATES}${API_DATES_CREATED_PROPERTY}`:
+              case `${META_DATES}${API_DATES_EDITED_PROPERTY}`:
+              case `${META_DATES}${API_DATES_PUBLISHED_PROPERTY}`:
+              case `${META_DATES}${API_DATES_VALIDATED_PROPERTY}`:
+              case `${META_DATES}${API_DATES_DELETED_PROPERTY}`:
 
-            case `${API_PERIOD_PROPERTY}.${API_START_DATE_PROPERTY}`:
-            case `${API_PERIOD_PROPERTY}.${API_END_DATE_PROPERTY}`:
-              filters.push({ [key]: cleanDate(val) })
-              break
-            default:
-              filters.push({ [key]: val })
+              case `${API_PERIOD_PROPERTY}.${API_START_DATE_PROPERTY}`:
+              case `${API_PERIOD_PROPERTY}.${API_END_DATE_PROPERTY}`:
+                filters.push({ [key]: cleanDate(val) })
+                break
+              default:
+                filters.push({ [key]: val })
+            }
           }
         }
       } else {
@@ -340,14 +352,18 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
           } catch (err) {
             // const errMsg = `Couldn't parse: '${beautify(value)}': ${err}}`
             // log.w(mod, fun, errMsg)
-            returnedFilter[EXT_REFS].push({
-              [EXT_OBJ]: nestedField,
-              [EXT_OBJ_PROP]: nestedFieldProp,
-              [EXT_OBJ_VAL]: value,
-            })
+            if (!value) returnedFilter[QUERY_UNKOWN].push(nestedField)
+            else
+              returnedFilter[EXT_REFS].push({
+                [EXT_OBJ]: nestedField,
+                [EXT_OBJ_PROP]: nestedFieldProp,
+                [EXT_OBJ_VAL]: value,
+              })
           }
         } else {
-          log.w(mod, fun, `Key is unkown and ignored for ${objectType}: ${beautify(key)}`)
+          log.w(mod, fun, `Key is not a property of ${objectType}: ${beautify(key)}`)
+          key.split(',').map((term) => returnedFilter[QUERY_UNKOWN].push(term))
+
           // log.w(mod, fun, `Model properties: ${beautify(modelProperties)}`)
         }
       }
@@ -551,6 +567,56 @@ exports.getObjectList = async (req, reply) => {
     const objectType = getObjectParam(req)
 
     return await this.getManyObjects(objectType, req, reply)
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+/**
+ * Search objects
+ * => GET /{object}/search
+ */
+exports.searchObjects = async (req, reply) => {
+  const fun = 'searchObjects'
+  log.t(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_SEARCH}`)
+  try {
+    // retrieve url parameters: object type, object id
+    const objectType = getObjectParam(req)
+
+    let parsedParameters
+    try {
+      parsedParameters = await this.parseQueryParameters(objectType, req.url)
+    } catch (err) {
+      log.w(mod, fun, err)
+      return []
+    }
+
+    // If there w
+    if (isEmptyArray(parsedParameters)) {
+      log.w(mod, fun, 'No search parameters given')
+      return []
+    } else {
+      // log.w(mod, fun, `Parsed parameters: ${beautify(parsedParameters)}`)
+    }
+
+    const options = pick(parsedParameters, [
+      QUERY_LIMIT,
+      QUERY_OFFSET,
+      QUERY_SORT_BY,
+      QUERY_FILTER,
+      QUERY_FIELDS,
+      QUERY_UPDATED_AFTER,
+      QUERY_UPDATED_BEFORE,
+      QUERY_UNKOWN,
+    ])
+    const objectList = await db.searchObjects(objectType, options)
+
+    // return the object
+
+    // const context = CallContext.getCallContextFromReq(req)
+    // if (context) context.addObjId(objectType, objectId)
+
+    return objectList
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }

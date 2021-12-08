@@ -508,7 +508,7 @@
 									"pm.test(\"Keywords received\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
-									"    pm.collectionVariables.set('keywords', responseJson);",
+									"    pm.expect(responseJson.length).to.gt(0)",
 									"});"
 								],
 								"type": "text/javascript"
@@ -539,10 +539,10 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Themes received\", () => {",
+									"pm.test(\"Enum labels received\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
-									"    pm.collectionVariables.set('themes', responseJson);",
+									"    pm.expect(Object.keys(responseJson).length).to.gt(0)",
 									"});"
 								],
 								"type": "text/javascript"
@@ -581,7 +581,7 @@
 									"pm.test(\"Themes received\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
-									"    pm.collectionVariables.set('themes', responseJson);",
+									"    pm.expect(responseJson.length).to.gt(0)",
 									"});"
 								],
 								"type": "text/javascript"
@@ -612,9 +612,10 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Themes received\", () => {",
+									"pm.test(\"Theme labels received\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
+									"    pm.expect(Object.keys(responseJson).length).to.gt(0)",
 									"});"
 								],
 								"type": "text/javascript"
@@ -646,9 +647,10 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Themes received\", () => {",
+									"pm.test(\"Languages received\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.length).to.gt(0)",
 									"});"
 								],
 								"type": "text/javascript"
@@ -679,10 +681,10 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"All licence concept retrieved\", () => {",
+									"pm.test(\"All licence concepts retrieved\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
-									"    pm.expect(responseJson.length).to.gte(0)",
+									"    pm.expect(responseJson.length).to.gt(0)",
 									"});",
 									""
 								],
@@ -728,8 +730,7 @@
 									"pm.test(\"All licence codes retrieved\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
-									"    pm.expect(responseJson.indexOf('mit')).to.gte(0)",
-									"    pm.collectionVariables.set('licences', responseJson)",
+									"    pm.expect(responseJson.indexOf('mit')).to.gt(0)",
 									"});",
 									""
 								],
@@ -766,52 +767,20 @@
 					"response": []
 				},
 				{
-					"name": "Get every thesaurus",
+					"name": "Get thesaurus fr labels",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Testing thesaurus access\", () => {",
+									"pm.test(\"Thesaurus fr labels received\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    const listEnums = Object.keys(responseJson);",
 									"    pm.expect(listEnums.length).to.eq(11);",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/enum",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{adminUrl}}",
-								"enum"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get thesaurus",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Thesaurus received: Encodings\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    const listEnums = Object.keys(responseJson);",
-									"    pm.expect(listEnums.length).to.eq(11);",
+									"",
+									"    pm.expect(Object.keys(responseJson.fileextensions).length).to.gt(0)",
+									"    pm.expect(responseJson.fileextensions.aac).to.eq(\"audio/aac\")",
 									"});"
 								],
 								"type": "text/javascript"
@@ -835,6 +804,45 @@
 									"key": "lang",
 									"value": "fr"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get every thesaurus values",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Every thesaurus values received\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    const listEnums = Object.keys(responseJson);",
+									"    pm.expect(listEnums.length).to.eq(11);",
+									"",
+									"    pm.collectionVariables.set('keywords', responseJson['keywords']);",
+									"    pm.collectionVariables.set('themes', responseJson['themes']);",
+									"    pm.collectionVariables.set('sanityLicence', responseJson['licences'][1])",
+									"    pm.collectionVariables.set('licences', responseJson['licences'])",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/enum",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"enum"
 							]
 						}
 					},
@@ -2235,6 +2243,47 @@
 								{
 									"key": "collection_tag",
 									"value": "{{stamp}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search metadata",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Search metadata\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const metadataList = pm.response.json();",
+									"    pm.expect(metadataList.total).to.eq(1);",
+									"    // pm.expect(metadataList.items[0].synopsis[0].text).to.eq(\"Courte description de RUDI en local 33\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}/search?\"local 33\"",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{data}}",
+								"search"
+							],
+							"query": [
+								{
+									"key": "\"local 33\"",
+									"value": null
 								}
 							]
 						}
@@ -4291,16 +4340,12 @@
 					"const DEBUG = false",
 					"",
 					"log = {",
-					"    d: (msg) => {",
-					"        if (DEBUG || TRACE) console.log(msg)",
-					"    },",
-					"    t: (msg) => {",
-					"        if (TRACE) console.log(msg)",
-					"    }",
+					"    d: (msg) => { if (DEBUG || TRACE) console.log(msg) },",
+					"    t: (msg) => { if (TRACE) console.log(msg) }",
 					"}",
 					"",
 					"utils = {",
-					"    getContactEmail: function (contactName) {",
+					"    getContactEmail: (contactName) => {",
 					"        return `${contactName",
 					"            .replace(/(Miss|(Ms|Mrs|Mr|Dr)\\.)\\s|'Jr\\.'/gi, '')",
 					"            .toLowerCase()",
@@ -4354,14 +4399,14 @@
 					"rand = {",
 					"    get: (randName) => pm.variables.replaceIn(randName),",
 					"",
-					"    pickInList: function (list) {",
+					"    pickInList: (list) => {",
 					"        const randomNumber = _.random(0, list.length - 1);",
 					"        return list[randomNumber];",
 					"    },",
 					"",
 					"    pick: (listName) => rand.pickInList(pm.collectionVariables.get(listName)),",
 					"",
-					"    initVal: function (field) {",
+					"    initVal: (field) => {",
 					"        const val = pm.collectionVariables.get(field);",
 					"        if (val) return val;",
 					"        const randVal = rand.get('{{$randomUUID}}');",
@@ -4369,7 +4414,7 @@
 					"        return randVal;",
 					"    },",
 					"",
-					"    getContactEmail: function (contactName) {",
+					"    getContactEmail: (contactName) => {",
 					"        return `${contactName",
 					"            .replace(/(Miss|(Ms|Mrs|Mr|Dr)\\.)\\s|'Jr\\.'/gi, '')",
 					"            .toLowerCase()",
@@ -4381,7 +4426,7 @@
 					"",
 					"secu = {",
 					"",
-					"    isTokenValid: function (tokenName) {",
+					"    isTokenValid: (tokenName) => {",
 					"        log.t('-- is ' + tokenName + ' Valid --')",
 					"        const token = pm.collectionVariables.get(tokenName)",
 					"        // console.log('typeof token: ' + typeof token)",
@@ -4405,7 +4450,7 @@
 					"        return isValid",
 					"    },",
 					"",
-					"    renewApiToken: async function (tokenName, next) {",
+					"    renewApiToken: async (tokenName, next) => {",
 					"        log.t('-- renewApiToken --')",
 					"        const reqUrl = pm.variables.get('cryptoJwtUrl') + '/forge'",
 					"        // log.d('reqUrl: ' + reqUrl)",
@@ -4438,7 +4483,7 @@
 					"        })",
 					"    },",
 					"",
-					"    renewPortalToken: async function (tokenName, rudiProdToken) {",
+					"    renewPortalToken: async (tokenName, rudiProdToken) => {",
 					"        log.t('-- renewPortalToken --')",
 					"        const reqUrl = pm.variables.get('baseUrl') + '/' + pm.variables.get('adminUrl') + '/portal/token'",
 					"        // log.d('reqUrl: ' + reqUrl)",
@@ -4465,7 +4510,7 @@
 					"        })",
 					"    },",
 					"",
-					"    getRudiProdToken: async function (next) {",
+					"    getRudiProdToken: async (next) => {",
 					"        log.t('-- getRudiProdToken --')",
 					"        const tokenName = API_TOKEN_NAME",
 					"        if (!secu.isTokenValid(tokenName)) await secu.renewApiToken(tokenName, next)",
@@ -4473,7 +4518,7 @@
 					"        return pm.variables.get(tokenName)",
 					"    },",
 					"",
-					"    getPortalToken: async function (apiToken) {",
+					"    getPortalToken: async (apiToken) => {",
 					"        log.t('-- getPortalToken --')",
 					"        const tokenName = PORTAL_TOKEN_NAME",
 					"        if (!secu.isTokenValid(tokenName)) await secu.renewPortalToken(tokenName, apiToken)",
@@ -4674,6 +4719,10 @@
 		},
 		{
 			"key": "softReport3Id",
+			"value": ""
+		},
+		{
+			"key": "sanityLicence",
 			"value": ""
 		}
 	]

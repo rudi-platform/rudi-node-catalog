@@ -314,7 +314,7 @@ jwtBody = {
   exp: 1622063934,                  // Date d'expiration (absolue, Epoch, secondes)
   user_id: '<uuid>',                // Utilisateur qui effectue l'action
   org_id: '<uuid>',                 // Entreprise/organisation de l'utilisateur
-  roles: ['admin','editor']         // Autorisations de l'utilisateur
+  roles: ['admin', 'editor']         // Autorisations de l'utilisateur
 } */
 /*
 jwtHeader = {

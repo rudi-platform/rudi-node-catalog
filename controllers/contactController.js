@@ -21,7 +21,7 @@ const { PARAM_OBJECT_CONTACTS } = require('../config/confApi')
 // ------------------------------------------------------------------------------------------------
 // Data models
 // ------------------------------------------------------------------------------------------------
-const Contact = require('../definitions/models/Contact')
+const {Contact} = require('../definitions/models/Contact')
 
 // ------------------------------------------------------------------------------------------------
 // Controller functions

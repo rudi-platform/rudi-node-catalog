@@ -90,14 +90,19 @@ const REQ_DURATION = 'durMs'
 exports.CallContext = class CallContext {
   constructor(authDetails, opDetails, rawDetails) {
     const fun = 'CallContext()'
-    const msg = `${authDetails ? beautify(authDetails) : ''}, ${
-      opDetails ? beautify(opDetails) : ''
-    }, ${rawDetails ? beautify(rawDetails) : ''}`
-    log.t(mod, fun, msg)
-    this[AUTH] = !authDetails ? {} : authDetails
-    this[OP] = !opDetails ? {} : opDetails
-    this[DETAILS] = !rawDetails ? {} : rawDetails
-    this.setId()
+    try {
+      const msg = `${authDetails ? beautify(authDetails) : ''}, ${
+        opDetails ? beautify(opDetails) : ''
+      }, ${rawDetails ? beautify(rawDetails) : ''}`
+      log.t(mod, fun, msg)
+
+      this[AUTH] = !authDetails ? {} : authDetails
+      this[OP] = !opDetails ? {} : opDetails
+      this[DETAILS] = !rawDetails ? {} : rawDetails
+      this.setId()
+    } catch (err) {
+      throw RudiError.treatError(mod, fun, err)
+    }
   }
 
   // ------------------------------------------------------------------------------------------------
@@ -173,7 +178,14 @@ exports.CallContext = class CallContext {
     this[DETAILS][key] = val
   }
   getDetails = () => this[DETAILS]
+  get details() {
+    return this.getDetails()
+  }
+
   getDetailsStr = () => JSON.stringify(this[DETAILS])
+  get detailsStr() {
+    return this.getDetailsStr()
+  }
 
   getReqDetails() {
     if (!this[DETAILS][REQ]) this[DETAILS][REQ] = {}
@@ -240,8 +252,14 @@ exports.CallContext = class CallContext {
   addError = (ctxMod, ctxFun, error) => {
     const fun = 'addError'
     log.t(mod, fun, ``)
-    if (RudiError.isRudiError(error) && !this[DETAILS][ERROR]) {
-      this[DETAILS][ERROR] = error
+    if (RudiError.isRudiError(error)) {
+      if (!this[DETAILS][ERROR]) this[DETAILS][ERROR] = error
+      else {
+        {
+          log.w(mod, fun, `Error already added: ${beautify(this[DETAILS][ERROR])}`)
+          log.w(mod, fun, `Trying to add error: ${beautify(error)}`)
+        }
+      }
     } else {
       const rudiError = RudiError.treatError(ctxMod, ctxFun, error)
       this.addError(ctxMod, ctxFun, rudiError)
@@ -256,17 +274,23 @@ exports.CallContext = class CallContext {
   logErr = (ctxMod, ctxFun, err) => {
     const fun = 'logErr'
     log.t(ctxMod, fun, ``)
-    if (!err && !this.getError()) throw new RudiError('No error found in current context')
-    this.addError(ctxMod, ctxFun, err)
-    const error = this.getError()
-    const primeError = error.primeError
+    try {
+      if (!err && !this.getError()) throw new RudiError('No error found in current context')
 
-    const errMsg = `Error ${error.statusCode} (${error.name}): ${error.message}`
-    const errDetails =
-      `${ERR_PLACE}: '${primeError.mod}.${primeError.fun}', ` +
-      `${ERR_ON_REQ}: '${this.formatReqDetails()}'`
+      if (!this.getError()) this.addError(ctxMod, ctxFun, err)
+      const error = this.getError()
+      const primeError = error.primeError
 
-    log.sysOnError(error.statusCode, errMsg, this, errDetails)
+      const errMsg = `Error ${error.statusCode} (${error.name}): ${error.message}`
+      const errDetails =
+        `${ERR_PLACE}: '${primeError.mod}.${primeError.fun}', ` +
+        `${ERR_ON_REQ}: '${this.formatReqDetails()}'`
+
+      log.sysOnError(error.statusCode, errMsg, this, errDetails)
+    } catch (error) {
+      // log.e(mod, fun, error)
+      throw RudiError.treatError(mod, fun, error)
+    }
   }
 
   get errorLocation() {
@@ -303,8 +327,8 @@ exports.CallContext = class CallContext {
    */
   static getCallContextFromReq(req) {
     const fun = 'getCallContextFromReq'
-    log.t(mod, fun, ``)
     try {
+      // log.t(mod, fun, ``)
       const reqContext = CallContext.getReqContext(req)
       if (!reqContext) return undefined
 
@@ -325,9 +349,9 @@ exports.CallContext = class CallContext {
    */
   static setAsReqContext(req, callContext) {
     const fun = 'setAsReqContext'
-    log.t(mod, fun, ``)
 
     try {
+      // log.t(mod, fun, ``)
       if (req[CALL_CONTEXT]) throw new Error('Call context already set')
       req[CALL_CONTEXT] = callContext
       // {[AUTH]: callContext[AUTH],[OP]: callContext[OP],[DETAILS]: callContext[DETAILS],}
@@ -344,9 +368,9 @@ exports.CallContext = class CallContext {
    */
   static getReqContext(req) {
     const fun = 'getReqContext'
-    log.t(mod, fun, ``)
 
     try {
+      // log.t(mod, fun, ``)
       const context = req[CALL_CONTEXT]
       if (!context) return undefined
       return context

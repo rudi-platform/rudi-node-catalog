@@ -2,7 +2,11 @@
 
 const mod = 'custErr'
 
-const { TRACE, STATUS_CODE, TRACE_MOD, TRACE_FUN, TRACE_ERR } = require('../config/confApi')
+// ------------------------------------------------------------------------------------------------
+// External dependencies
+// ------------------------------------------------------------------------------------------------
+const { nanoid } = require('nanoid')
+
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
@@ -11,10 +15,13 @@ const log = require('./logging')
 const { objectNotFound, parameterExpected } = require('./msg')
 
 // ------------------------------------------------------------------------------------------------
-// Cosntants
+// Constants
 // ------------------------------------------------------------------------------------------------
+const { TRACE, STATUS_CODE, TRACE_MOD, TRACE_FUN, TRACE_ERR } = require('../config/confApi')
+
 const DEFAULT_MESSAGE = 'Rudi producer node - API Server Error'
 const IS_RUDI_ERROR = 'is_rudi_error'
+const ERR_ID = 'errId'
 
 // ------------------------------------------------------------------------------------------------
 // Helper functions
@@ -37,6 +44,7 @@ class RudiError extends Error {
     this.error = description || 'An unexpected error occured'
     this.type = this.constructor.name
     this[TRACE] = errTrace || []
+    this.setId()
   }
 
   toString() {
@@ -49,8 +57,17 @@ class RudiError extends Error {
       name: this.name,
       error: this.error,
       message: this.message,
+      id: this.id,
     }
   }
+
+  setId() {
+    if (!this[ERR_ID]) this[ERR_ID] = nanoid(8)
+  }
+  get id() {
+    return this[ERR_ID]
+  }
+
   addTrace(ctxMod, ctxFun, ctxErr) {
     this[TRACE].push({ [TRACE_MOD]: ctxMod, [TRACE_FUN]: ctxFun, [TRACE_ERR]: ctxErr })
   }

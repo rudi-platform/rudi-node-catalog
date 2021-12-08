@@ -45,7 +45,8 @@ exports.QUERY_GROUP_OFFSET = 'group_offset'
 exports.QUERY_UPDATED_AFTER = 'updated_after'
 exports.QUERY_UPDATED_BEFORE = 'updated_before'
 exports.QUERY_CONFIRM = 'confirm'
-exports.QUERY_CONFIRM = 'confirm'
+
+exports.QUERY_UNKOWN = 'unkown'
 
 exports.DEFAULT_QUERY_LIMIT = 100
 exports.DEFAULT_QUERY_OFFSET = 0
@@ -66,6 +67,7 @@ exports.PARAM_ACTION_SIGN = 'sign'
 exports.PARAM_ACTION_DELETION = 'deletion'
 exports.PARAM_ACTION_UNLINKED = 'unlinked'
 exports.PARAM_ACTION_REPORT = 'report'
+exports.PARAM_ACTION_SEARCH = 'search'
 
 // ------------------------------------------------------------------------------------------------
 // DB actions

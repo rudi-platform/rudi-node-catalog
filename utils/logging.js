@@ -19,8 +19,13 @@ const {
   SHOULD_SYSLOG,
   SHOULD_LOG_CONSOLE,
 } = require('../config/confLogs')
-const { addLogEntry } = require('../db/dbQueries')
 const { API_METADATA_ID, API_DATA_NAME_PROPERTY } = require('../db/dbFields')
+const { makeLogInfo, LogEntry } = require('../definitions/models/LogEntry')
+
+// ------------------------------------------------------------------------------------------------
+// Constants
+// ------------------------------------------------------------------------------------------------
+const ERR_LEVEL_TRACE = 'trace'
 
 // ------------------------------------------------------------------------------------------------
 // Colors
@@ -82,11 +87,11 @@ const Colors = {
 // ------------------------------------------------------------------------------------------------
 // Logging functions
 // ------------------------------------------------------------------------------------------------
-function log(logLevel, srcMod, srcFun, msg) {
+const log = (logLevel, srcMod, srcFun, msg) => {
   try {
     if (SHOULD_LOG_CONSOLE) logger[logLevel](displayStr(srcMod, srcFun, msg))
     // console.log(displayStr(srcMod, srcFun, msg))
-    addLogEntry(logLevel, srcMod, srcFun, msg)
+    this.addLogEntry(logLevel, srcMod, srcFun, msg)
   } catch (e) {
     consoleErr(e)
   }
@@ -98,7 +103,7 @@ exports.v = (srcMod, srcFun, msg) => log('verbose', srcMod, srcFun, msg)
 exports.d = (srcMod, srcFun, msg) => log('debug', srcMod, srcFun, msg)
 
 exports.t = (srcMod, srcFun, msg) =>
-  getLogLevel() === 'trace' ? log('debug', srcMod, srcFun, msg) : () => null
+  getLogLevel() === ERR_LEVEL_TRACE ? log('debug', srcMod, srcFun, msg) : () => null
 
 // ------------------------------------------------------------------------------------------------
 // Syslog functions
@@ -110,122 +115,62 @@ exports.displaySyslog = (srcMod, srcFun, msg) => {
 // ------------------------------------------------------------------------------------------------
 // Syslog functions: system level
 // ------------------------------------------------------------------------------------------------
-
+function sysLog(level, msg, location, context, cid, info) {
+  if (SHOULD_SYSLOG)
+    sysLogger[level](
+      msg,
+      location,
+      context,
+      cid ? cid : context ? context.id : null,
+      info ? info : context ? context.detailsStr : null
+    )
+  else () => null
+}
 // System-related "panic" conditions
-exports.sysEmerg = SHOULD_SYSLOG
-  ? (msg, location, context, info, cid) =>
-      sysLogger.emergency(
-        msg,
-        location,
-        context,
-        cid ? cid : context ? context.id : null,
-        info ? info : context ? context.getDetails() : null
-      )
-  : () => null
+exports.sysEmerg = (msg, location, context, info, cid) =>
+  sysLog('emergency', msg, location, context, cid, info)
 
 // Something bad is about to happen, deal with it NOW!
-exports.sysCrit = SHOULD_SYSLOG
-  ? (msg, location, context, info, cid) =>
-      sysLogger.critical(
-        msg,
-        location,
-        context,
-        cid ? cid : context ? context.id : null,
-        info ? info : context ? context.getDetails() : null
-      )
-  : () => null
+exports.sysCrit = (msg, location, context, info, cid) =>
+  sysLog('critical', msg, location, context, cid, info)
 
 // Events that are unusual but not error conditions - might be summarized in an email to developers
 // or admins to spot potential problems - no immediate action required.
-exports.sysNotice = SHOULD_SYSLOG
-  ? (msg, location, context, info, cid) =>
-      sysLogger.notice(
-        msg,
-        location,
-        context,
-        cid ? cid : context ? context.id : null,
-        info ? info : context ? context.getDetails() : null
-      )
-  : () => null
+exports.sysNotice = (msg, location, context, info, cid) =>
+  sysLog('notice', msg, location, context, cid, info)
 
 // ------------------------------------------------------------------------------------------------
 // Syslog functions: app level
 // ------------------------------------------------------------------------------------------------
 
 // Something bad happened, deal with it NOW!
-exports.sysAlert = SHOULD_SYSLOG
-  ? (msg, location, context, info, cid) =>
-      sysLogger.alert(
-        msg,
-        location,
-        context,
-        cid ? cid : context ? context.id : null,
-        info ? info : context ? context.getDetails() : null
-      )
-  : () => null
+exports.sysAlert = (msg, location, context, info, cid) =>
+  sysLog('alert', msg, location, context, cid, info)
 
 // A failure in the system that needs attention.
-exports.sysError = SHOULD_SYSLOG
-  ? (msg, location, context, info, cid) =>
-      sysLogger.error(
-        msg,
-        location,
-        context,
-        cid ? cid : context ? context.id : null,
-        info ? info : context ? context.getDetails() : null
-      )
-  : () => null
+exports.sysError = (msg, location, context, info, cid) =>
+  sysLog('error', msg, location, context, cid, info)
 
 // Something will happen if it is not dealt within a timeframe.
-exports.sysWarn = SHOULD_SYSLOG
-  ? (msg, location, context, info, cid) =>
-      sysLogger.warn(
-        msg,
-        location,
-        context,
-        cid ? cid : context ? context.id : null,
-        info ? info : context ? context.getDetails() : null
-      )
-  : () => null
+exports.sysWarn = (msg, location, context, info, cid) =>
+  sysLog('warn', msg, location, context, cid, info)
 
 // Normal operational messages - may be harvested for reporting, measuring throughput, etc.
 // No action required.
-exports.sysInfo = SHOULD_SYSLOG
-  ? (msg, location, context, info, cid) =>
-      sysLogger.info(
-        msg,
-        location,
-        context,
-        cid ? cid : context ? context.id : null,
-        info == ' ' ? '' : info ? info : context ? context.getDetails() : null
-      )
-  : () => null
+exports.sysInfo = (msg, location, context, info, cid) =>
+  sysLog('info', msg, location, context, cid, info)
 
 // Normal operational messages - may be harvested for reporting, measuring throughput, etc.
 // No action required.
-exports.sysDebug = SHOULD_SYSLOG
-  ? (mod, fun, msg, context, info, cid) =>
-      sysLogger.debug(
-        msg,
-        `${mod.fun}`,
-        context,
-        cid ? cid : context ? context.id : null,
-        info ? info : context ? context.getDetails() : null
-      )
-  : () => null
+exports.sysDebug = (mod, fun, msg, context, info, cid) =>
+  sysLog('debug', msg, `${mod.fun}`, context, cid, info)
 
 // Normal operational messages - may be harvested for reporting, measuring throughput, etc.
 // No action required.
-exports.sysTrace = SHOULD_SYSLOG
-  ? (mod, fun, msg, context, info, cid) =>
-      sysLogger.debug(
-        msg,
-        `${mod.fun}`,
-        context,
-        cid ? cid : context ? context.id : null,
-        info ? info : context ? context.getDetails() : null
-      )
-  : () => null
+exports.sysTrace = (mod, fun, msg, context, info, cid) =>
+  getLogLevel() === ERR_LEVEL_TRACE
+    ? sysLog('debug', msg, `${mod.fun}`, context, cid, info)
+    : () => null
 
 // ------------------------------------------------------------------------------------------------
 // Syslog functions: specific macros
@@ -245,14 +190,13 @@ exports.sysOnError = (statusCode, errMsg, context, details) => {
     //   `errPlace:'${context.errorLocation}', errOnReq:'${context.formatReqDetails()}'`
     // )
   } catch (err) {
-    this.e(mod, 'sysOnError', err)
+    this.e(mod, fun, err)
     throw err
   }
 }
 // ------------------------------------------------------------------------------------------------
 // Http
 // ------------------------------------------------------------------------------------------------
-
 exports.logHttpAnswer = (loggedMod, loggedFun, httpAnswer) => {
   const fun = 'logHttpAnswer'
   try {
@@ -280,6 +224,30 @@ exports.logHttpAnswer = (loggedMod, loggedFun, httpAnswer) => {
 // ------------------------------------------------------------------------------------------------
 exports.logMetadata = (metadata) => {
   return `${beautify(pick(metadata, [API_METADATA_ID, API_DATA_NAME_PROPERTY]))}`
+}
+
+// ------------------------------------------------------------------------------------------------
+// DB
+// ------------------------------------------------------------------------------------------------
+
+// No log.d / log.e function here or you'll create a loopback !!!
+exports.addLogEntry = async (logLvl, loc_module, loc_function, msg) => {
+  const fun = 'addLogEntry'
+  try {
+    if (!msg || msg === '') msg = '<-'
+    // utils.consoleLog(mod, fun, ``)
+    const logInfo = makeLogInfo(logLvl, loc_module, loc_function, msg)
+    const logEntry = await new LogEntry(logInfo)
+    return await logEntry.save()
+  } catch (err) {
+    // No log.d / log.e function here or you'll create a loopback !!!
+    consoleErr(
+      loc_module,
+      `${loc_function} > ${fun}`,
+      `${logLvl} logging failed! msg: ${msg}, err: ${err}`
+    )
+    // throw err
+  }
 }
 
 // ------------------------------------------------------------------------------------------------

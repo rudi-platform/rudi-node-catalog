@@ -18,9 +18,9 @@ const log = require('../utils/logging')
 
 const { URL_PV_DB_ACCESS } = require('../config/confApi')
 
-const db = require('../db/dbQueries')
 const { NotFoundError, BadRequestError, RudiError } = require('../utils/errors')
 const { getDbName } = require('../config/confSystem')
+const { dropDB, getCollections } = require('../db/dbActions')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
@@ -34,7 +34,7 @@ exports.getCollections = async (req, reply) => {
   const fun = 'getCollections'
   log.t(mod, fun, `< GET ${URL_PV_DB_ACCESS}`)
   try {
-    const dbActionResult = await db.getCollections(getDbName())
+    const dbActionResult = await getCollections(getDbName())
     return map(dbActionResult, 'name')
   } catch (err) {
     const error = err.name === 'MongoError' ? new BadRequestError(err) : new NotFoundError(err)
@@ -46,7 +46,7 @@ exports.dropDB = async (req, reply) => {
   const fun = 'dropDB'
   log.t(mod, fun, `< DELETE ${URL_PV_DB_ACCESS}`)
   try {
-    const dbActionResult = await db.dropDB(getDbName())
+    const dbActionResult = await dropDB(getDbName())
     return dbActionResult
   } catch (err) {
     const error = err.name === 'MongoError' ? new BadRequestError(err) : new NotFoundError(err)

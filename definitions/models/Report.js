@@ -1,7 +1,6 @@
 'use strict'
 
-// const mod = 'reportSch'
-
+const mod = 'reportSch'
 // ------------------------------------------------------------------------------------------------
 // External dependancies
 // ------------------------------------------------------------------------------------------------
@@ -11,14 +10,38 @@ const { omit } = require('lodash')
 // ------------------------------------------------------------------------------------------------
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
-const ids = require('../schemas/Identifiers')
+const log = require('../../utils/logging')
 const api = require('../../config/confApi')
 
-const { FIELDS_TO_SKIP } = require('../../db/dbFields')
+const { makeSearchable } = require('../../db/dbActions')
+const { RudiError } = require('../../utils/errors')
+
+const ids = require('../schemas/Identifiers')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
+const {
+  FIELDS_TO_SKIP,
+  API_COLLECTION_TAG,
+  API_REPORT_RESOURCE_ID,
+  API_REPORT_ID,
+  API_DATA_NAME_PROPERTY,
+  API_REPORT_SUBMISSION_DATE,
+  API_REPORT_TREATMENT_DATE,
+  API_REPORT_VERSION,
+  API_REPORT_STATUS,
+  API_REPORT_ERRORS,
+  LOCAL_REPORT_ERROR_MSG,
+  LOCAL_REPORT_ERROR,
+  LOCAL_REPORT_ERROR_TYPE,
+  API_REPORT_FIELD,
+  API_REPORT_ERROR_MSG,
+  API_REPORT_METHOD,
+  API_REPORT_COMMENT,
+  API_REPORT_ERROR_CODE,
+} = require('../../db/dbFields')
+
 const IntegrationStatus = {
   OK: 'OK',
   KO: 'KO',
@@ -31,40 +54,40 @@ const IntegrationStatus = {
 const ReportSchema = new mongoose.Schema(
   {
     /** Unique identifier of the integration report (required) */
-    report_id: ids.UUIDv4,
+    [API_REPORT_ID]: ids.UUIDv4,
 
     /**
      * Unique and permanent identifier for the resource in RUDI
      * system (required)
      */
-    resource_id: ids.UUID,
+    [API_REPORT_RESOURCE_ID]: ids.UUID,
 
     /**
      * Title of the resource
      */
-    resource_title: String,
+    [API_DATA_NAME_PROPERTY]: String,
 
     /** Date when the integration request was submitted by the Producer */
-    submission_date: Date,
+    [API_REPORT_SUBMISSION_DATE]: Date,
 
     /** Date when the integration request was processed by the Portal */
-    treatment_date: Date,
+    [API_REPORT_TREATMENT_DATE]: Date,
 
     /** Method used for the integration request by the Producer */
-    method: {
+    [API_REPORT_METHOD]: {
       type: String,
       enum: Object.values(api.HttpMethods),
     },
 
     /** Version number of the integration contract used for the file */
-    version: {
+    [API_REPORT_VERSION]: {
       type: String,
       required: true,
       // match: Validation.API_VERSION,
     },
 
     /** State of the integration of the resource in the Portal */
-    integration_status: {
+    [API_REPORT_STATUS]: {
       type: String,
       // enum: Object.values(this.IntegrationStatus),
     },
@@ -73,7 +96,7 @@ const ReportSchema = new mongoose.Schema(
      * Comment on the state of the integration of the resource in the
      * Portal
      */
-    comment: {
+    [API_REPORT_COMMENT]: {
       type: String,
     },
 
@@ -81,33 +104,33 @@ const ReportSchema = new mongoose.Schema(
      * List of all the errors that were encountered during the
      * integration of the resource.
      */
-    integration_errors: {
+    [API_REPORT_ERRORS]: {
       type: [
         {
-          error_code: {
+          [API_REPORT_ERROR_CODE]: {
             type: String,
             // type: Int32,
             // min: 0,
             required: true,
           },
-          error_message: {
+          [API_REPORT_ERROR_MSG]: {
             type: String,
             required: true,
           },
-          field_name: {
+          [API_REPORT_FIELD]: {
             type: String,
           },
         },
       ],
     },
 
-    report_treatment_error: {
-      error_type: String,
-      error_message: String,
+    [LOCAL_REPORT_ERROR]: {
+      [LOCAL_REPORT_ERROR_TYPE]: String,
+      [LOCAL_REPORT_ERROR_MSG]: String,
     },
 
     /** Tag for identifying a collection of resources */
-    collection_tag: {
+    [API_COLLECTION_TAG]: {
       type: String,
     },
   },
@@ -135,4 +158,29 @@ ReportSchema.pre('save', async function (next) {
 // Models definition
 // ------------------------------------------------------------------------------------------------
 const Report = mongoose.model('Report', ReportSchema)
+
+const fun = 'createSearchIndexes'
+Report.createSearchIndexes = async () => {
+  try {
+    await makeSearchable(Report, [
+      API_REPORT_ID,
+      API_REPORT_RESOURCE_ID,
+      API_DATA_NAME_PROPERTY,
+      API_REPORT_STATUS,
+      `${API_REPORT_ERRORS}.${API_REPORT_ERROR_MSG}`,
+      `${API_REPORT_ERRORS}.${API_REPORT_FIELD}`,
+      `${LOCAL_REPORT_ERROR}.${LOCAL_REPORT_ERROR_TYPE}`,
+      `${LOCAL_REPORT_ERROR}.${LOCAL_REPORT_ERROR_MSG}`,
+      ,
+    ])
+  } catch (err) {
+    RudiError.treatError(mod, fun, err)
+  }
+}
+Report.createSearchIndexes()
+  .catch((err) => {
+    throw RudiError.treatError(mod, fun, `Failed to create search indexes: ${err}`)
+  })
+  .then(log.d(mod, fun, 'done'))
+
 module.exports = { Report, IntegrationStatus }

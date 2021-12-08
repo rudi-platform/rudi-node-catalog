@@ -33,7 +33,10 @@ exports.API_MEDIA_ID = 'media_id'
 // ------------------------------------------------------------------------------------------------
 // Metadata properties
 // ------------------------------------------------------------------------------------------------
+exports.API_METADATA_LOCAL_ID = 'local_id'
 exports.API_DATA_NAME_PROPERTY = 'resource_title'
+exports.API_DATA_DETAILS_PROPERTY = 'synopsis'
+exports.API_DATA_DESCRIPTION_PROPERTY = 'summary'
 exports.API_DATA_PRODUCER_PROPERTY = 'producer'
 exports.API_DATA_CONTACTS_PROPERTY = 'contacts'
 exports.API_DATA_DATES_PROPERTY = 'dataset_dates'
@@ -42,9 +45,6 @@ exports.API_DATA_DATES_PROPERTY = 'dataset_dates'
 // Metadata properties: media
 // ------------------------------------------------------------------------------------------------
 exports.API_MEDIA_PROPERTY = 'available_formats'
-exports.API_MEDIA_TYPE_PROPERTY = 'media_type'
-exports.API_MEDIA_NAME_PROPERTY = 'media_name'
-exports.API_MEDIA_CHECKSUM_PROPERTY = 'checksum'
 
 // ------------------------------------------------------------------------------------------------
 // Metadata properties: metadata info
@@ -59,14 +59,15 @@ exports.API_METAINFO_VERSION_PROPERTY = 'api_version'
 // Metadata properties: geospatial
 // ------------------------------------------------------------------------------------------------
 exports.API_GEOGRAPHY_PROPERTY = 'geography'
-exports.API_GEO_GEOJSON_PROPERTY = 'geographic_distribution'
-exports.API_GEO_PROJECTION_PROPERTY = 'projection'
 
 exports.API_GEO_BBOX_PROPERTY = 'bounding_box'
 exports.API_GEO_BBOX_WEST = 'west_longitude'
 exports.API_GEO_BBOX_EAST = 'east_longitude'
 exports.API_GEO_BBOX_SOUTH = 'south_latitude'
 exports.API_GEO_BBOX_NORTH = 'north_latitude'
+
+exports.API_GEO_GEOJSON_PROPERTY = 'geographic_distribution'
+exports.API_GEO_PROJECTION_PROPERTY = 'projection'
 
 exports.API_PERIOD_PROPERTY = 'temporal_spread'
 exports.API_START_DATE_PROPERTY = 'start_date'
@@ -92,7 +93,7 @@ exports.API_DATES_VALIDATED_PROPERTY = 'validated'
 exports.API_DATES_DELETED_PROPERTY = 'deleted'
 
 // ------------------------------------------------------------------------------------------------
-// Producer Specific fields
+// Specific fields
 // ------------------------------------------------------------------------------------------------
 exports.API_COLLECTION_TAG = 'collection_tag'
 exports.API_PURPOSE = 'purpose'
@@ -104,7 +105,37 @@ exports.API_THEME_PROPERTY = 'theme'
 exports.API_KEYWORDS_PROPERTY = 'keywords'
 exports.API_LANGUAGES_PROPERTY = 'resource_languages'
 
-//——————————————————————————————————————————————————————————————————————————————
+//=================================================================================================
+
+// ------------------------------------------------------------------------------------------------
+// Organization properties
+// ------------------------------------------------------------------------------------------------
+exports.API_ORGANIZATION_NAME = 'organization_name'
+exports.API_ORGANIZATION_ADDRESS = 'organization_address'
+
+// ------------------------------------------------------------------------------------------------
+// Contact properties
+// ------------------------------------------------------------------------------------------------
+exports.API_CONTACT_NAME = 'contact_name'
+exports.API_CONTACT_ROLE = 'role'
+exports.API_CONTACT_MAIL = 'email'
+
+// ------------------------------------------------------------------------------------------------
+// Media properties
+// ------------------------------------------------------------------------------------------------
+exports.API_MEDIA_TYPE = 'media_type'
+exports.API_MEDIA_NAME = 'media_name'
+exports.API_MEDIA_CONNECTOR = 'connector'
+exports.API_MEDIA_INTERFACE_CONTRACT = 'interface_contract'
+
+exports.API_FILE_TYPE = 'file_type'
+exports.API_FILE_SIZE = 'file_size'
+exports.API_FILE_CHECKSUM = 'checksum'
+exports.API_FILE_STRUCTURE = 'file_structure'
+exports.API_FILE_ENCODING = 'file_encoding'
+exports.API_FILE_UPDATE_STATUS = 'update_status'
+
+//=================================================================================================
 
 // ------------------------------------------------------------------------------------------------
 // Integration reports
@@ -117,6 +148,10 @@ exports.API_REPORT_VERSION = 'version'
 exports.API_REPORT_SUBMISSION_DATE = 'submission_date'
 exports.API_REPORT_TREATMENT_DATE = 'treatment_date'
 exports.API_REPORT_METHOD = 'method'
+exports.API_REPORT_COMMENT = 'comment'
+exports.API_REPORT_FIELD = 'field_name'
+exports.API_REPORT_ERROR_MSG = 'error_message'
+exports.API_REPORT_ERROR_CODE = 'error_code'
 exports.LOCAL_REPORT_ERROR = 'report_treatment_error'
 exports.LOCAL_REPORT_ERROR_TYPE = 'error_type'
 exports.LOCAL_REPORT_ERROR_MSG = 'error_message'

@@ -33,6 +33,7 @@ const { VERSION } = require('../config/confApi')
 exports.getGitHash = () => {
   const fun = 'getGitHash'
   try {
+    log.t(mod, fun, ``)
     return getGitHash()
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -43,6 +44,7 @@ exports.getGitHash = () => {
 exports.getAppHash = () => {
   const fun = 'getCurrentAppId'
   try {
+    log.t(mod, fun, ``)
     return getAppHash()
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)

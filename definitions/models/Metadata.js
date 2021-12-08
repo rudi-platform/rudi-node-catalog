@@ -20,6 +20,8 @@ const json = require('../../utils/jsonAccess')
 const utils = require('../../utils/jsUtils')
 
 const Validation = require('../schemaValidators')
+const { NotFoundError, BadRequestError, RudiError } = require('../../utils/errors')
+const { makeSearchable } = require('../../db/dbActions')
 
 // ------------------------------------------------------------------------------------------------
 // Thesaurus definiitons
@@ -64,6 +66,8 @@ const validObjectNotEmpty = {
 // ------------------------------------------------------------------------------------------------
 // Fields
 // ------------------------------------------------------------------------------------------------
+const { DEFAULT_LANG } = require('../../config/confApi')
+
 const {
   API_DATA_PRODUCER_PROPERTY,
   API_DATA_CONTACTS_PROPERTY,
@@ -100,9 +104,18 @@ const {
   API_COLLECTION_TAG,
   API_END_DATE_PROPERTY,
   API_METADATA_ID,
+  API_DATA_NAME_PROPERTY,
+  API_METADATA_LOCAL_ID,
+  DB_PUBLISHED_AT,
+  API_DATA_DETAILS_PROPERTY,
+  API_DATA_DESCRIPTION_PROPERTY,
+  API_GEO_BBOX_WEST,
+  API_GEO_BBOX_EAST,
+  API_GEO_BBOX_SOUTH,
+  API_GEO_BBOX_NORTH,
+  API_GEO_GEOJSON_PROPERTY,
+  API_METAINFO_VERSION_PROPERTY,
 } = require('../../db/dbFields')
-const { NotFoundError, BadRequestError, RudiError } = require('../../utils/errors')
-const { DEFAULT_LANG } = require('../../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
 // Fields with specific treatments
@@ -132,17 +145,17 @@ const MetadataSchema = new mongoose.Schema(
     // ---------------------------
 
     /** Unique and permanent identifier for the ressource in RUDI system (required) */
-    global_id: UUIDv4,
+    [API_METADATA_ID]: UUIDv4,
 
     /** Identifier for the ressource in the producer system (optional) */
-    local_id: {
+    [API_METADATA_LOCAL_ID]: {
       type: String,
       trim: true,
       index: {
         unique: true,
         // accept empty values as non-duplicates
         partialFilterExpression: {
-          local_id: {
+          [API_METADATA_LOCAL_ID]: {
             $type: 'string',
           },
         },
@@ -156,22 +169,22 @@ const MetadataSchema = new mongoose.Schema(
     // Dataset description
     // ---------------------------
 
-    /** Simple name for the resource */
-    resource_title: {
+    /** 'global_id': simple name for the resource */
+    [API_DATA_NAME_PROPERTY]: {
       type: String,
       maxlength: 150,
       required: true,
     },
 
-    /** Short description for the whole dataset */
-    synopsis: {
+    /** 'synopsis': short description for the whole dataset */
+    [API_DATA_DETAILS_PROPERTY]: {
       type: [DictionaryEntry],
       required: true,
       validate: validArrayNotNull,
     },
 
-    /** More precise description for the whole dataset */
-    summary: {
+    /** 'summary': more precise description for the whole dataset */
+    [API_DATA_DESCRIPTION_PROPERTY]: {
       type: [DictionaryEntry],
       required: true,
       validate: validArrayNotNull,
@@ -187,14 +200,14 @@ const MetadataSchema = new mongoose.Schema(
     // Dataset classification
     // ---------------------------
 
-    /** Category for thematic classification of the data */
-    theme: {
+    /** 'theme': Category for thematic classification of the data */
+    [API_THEME_PROPERTY]: {
       type: String,
       required: true,
     },
 
-    /** List of tags that can be used to retrieve the data */
-    keywords: {
+    /** 'keywords': List of tags that can be used to retrieve the data */
+    [API_KEYWORDS_PROPERTY]: {
       type: [
         {
           type: String,
@@ -204,8 +217,8 @@ const MetadataSchema = new mongoose.Schema(
       validate: validArrayNotNull,
     },
 
-    /** Tag for identifying a collection of resources */
-    collection_tag: {
+    /** 'collection_tag': Tag for identifying a collection of resources */
+    [API_COLLECTION_TAG]: {
       type: String,
     },
 
@@ -214,14 +227,14 @@ const MetadataSchema = new mongoose.Schema(
     // ---------------------------
 
     /** Entity that produced the resource */
-    producer: {
+    [API_DATA_PRODUCER_PROPERTY]: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Organization',
       required: true,
     },
 
     /** Persons in charge of maintaining the resource */
-    contacts: {
+    [API_DATA_CONTACTS_PROPERTY]: {
       type: [
         {
           type: mongoose.Schema.Types.ObjectId,
@@ -237,7 +250,7 @@ const MetadataSchema = new mongoose.Schema(
     // ---------------------------
 
     /** List of files containing the data */
-    available_formats: {
+    [API_MEDIA_PROPERTY]: {
       type: [
         {
           type: mongoose.Schema.Types.ObjectId,
@@ -253,7 +266,7 @@ const MetadataSchema = new mongoose.Schema(
     // ---------------------------
 
     /** Language used in the dataset, if relevant */
-    resource_languages: {
+    [API_LANGUAGES_PROPERTY]: {
       type: [
         {
           type: String,
@@ -263,50 +276,52 @@ const MetadataSchema = new mongoose.Schema(
       default: undefined,
     },
 
-    /** Period of time described by the data */
-    temporal_spread: {
-      start_date: {
+    /** 'temporal_spread': period of time described by the data */
+    [API_PERIOD_PROPERTY]: {
+      // 'start_date'
+      [API_START_DATE_PROPERTY]: {
         type: Date,
         // Custom validation in pre-save hook: required if 'temporal_spread' is defined !
       },
-      end_date: {
+      // 'end_date'
+      [API_END_DATE_PROPERTY]: {
         type: Date,
       },
     },
 
     /**
-     * Geographic distribution of the data.
+     * 'geography': Geographic distribution of the data.
      * Particularly relevant in the case of located sensors.
      */
-    geography: {
+    [API_GEOGRAPHY_PROPERTY]: {
       /**
-       * Geographic distribution of the data as a rectangle.
+       * 'bounding_box': Geographic distribution of the data as a rectangle.
        * The 4 parameters are given as decimal as described in the norm ISO 6709
        */
-      bounding_box: {
+      [API_GEO_BBOX_PROPERTY]: {
         type: Object,
         // Custom validation in pre-save hook: required if 'geography' is defined !
 
-        /** Westernmost latitude given as a decimal number */
-        west_longitude: {
+        /** 'west_longitude': Westernmost latitude given as a decimal number */
+        [API_GEO_BBOX_WEST]: {
           type: Number,
           min: -180,
           max: 180,
         },
-        /* Easternmost latitude given as a decimal number */
-        east_longitude: {
+        /* 'east_longitude': Easternmost latitude given as a decimal number */
+        [API_GEO_BBOX_EAST]: {
           type: Number,
           min: -180,
           max: 180,
         },
-        /** Southernmost latitude given as a decimal number */
-        south_latitude: {
+        /** 'south_latitude': Southernmost latitude given as a decimal number */
+        [API_GEO_BBOX_SOUTH]: {
           type: Number,
           min: -90,
           max: 90,
         },
-        /** Northernmost latitude given as a decimal number */
-        north_latitude: {
+        /** 'north_latitude': Northernmost latitude given as a decimal number */
+        [API_GEO_BBOX_NORTH]: {
           type: Number,
           min: -90,
           max: 90,
@@ -314,7 +329,7 @@ const MetadataSchema = new mongoose.Schema(
       },
 
       /**
-       * Precise geographic distribution of the data
+       * 'geographic_distribution': Precise geographic distribution of the data
        *
        * Précisions: GeoJSON uses a geographic coordinate reference system,
        * World Geodetic System 1984, and units of decimal degrees.
@@ -324,14 +339,14 @@ const MetadataSchema = new mongoose.Schema(
        *
        * Source: https://tools.ietf.org/html/rfc7946#section-3.1.1
        */
-      geographic_distribution: {
+      [API_GEO_GEOJSON_PROPERTY]: {
         type: GeoJSON,
       },
 
       /**
-       * Cartographic projection used to describe the data
+       * 'projection': Cartographic projection used to describe the data
        */
-      projection: {
+      [API_GEO_PROJECTION_PROPERTY]: {
         type: String,
         // ,enum: Object.values(Projections)
         // default: 'WGS 84'
@@ -360,9 +375,9 @@ const MetadataSchema = new mongoose.Schema(
     },
 
     /**
-     * Dates of the actions performed on the data (creation, publishing, update, deletion...)
+     * 'dataset_dates': Dates of the actions performed on the data (creation, publishing, update, deletion...)
      */
-    dataset_dates: {
+    [API_DATA_DATES_PROPERTY]: {
       type: ReferenceDates,
       required: true,
     },
@@ -378,7 +393,12 @@ const MetadataSchema = new mongoose.Schema(
       required: true,
     },
 
-    access_condition: {
+    /**
+     * 'access_condition': Access restrictions for the use of data in the form of
+     * licence, confidentiality, terms of service, habilitation or required rights,
+     * economical model. Default is open licence.
+     */
+    [API_ACCESS_CONDITION]: {
       required: true,
       validate: validObjectNotEmpty,
       type: {
@@ -401,9 +421,9 @@ const MetadataSchema = new mongoose.Schema(
         },
 
         /**
-         * Standard licence (recognized by RUDI system)
+         * 'licence': Standard licence (recognized by RUDI system)
          */
-        licence: {
+        [API_LICENCE]: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'Licence',
           required: true,
@@ -437,17 +457,17 @@ const MetadataSchema = new mongoose.Schema(
       },
     },
 
-    /** Metadata on the metadata */
-    metadata_info: {
-      /** API version number (used for retro-compatibility) */
-      api_version: {
+    /** 'metadata_info': Metadata on the metadata */
+    [API_METAINFO_PROPERTY]: {
+      /** 'api_version': API version number (used for retro-compatibility) */
+      [API_METAINFO_VERSION_PROPERTY]: {
         type: String,
         required: true,
         match: Validation.API_VERSION,
       },
 
-      /** Dates of the actions performed on the metadata (creation, publishing, update...) */
-      metadata_dates: {
+      /** 'metadata_dates': Dates of the actions performed on the metadata (creation, publishing, update...) */
+      [API_METAINFO_DATES_PROPERTY]: {
         validated: {
           type: Date,
         },
@@ -456,14 +476,14 @@ const MetadataSchema = new mongoose.Schema(
         },
       },
 
-      /** Description of the organization that produced the metadata */
-      metadata_provider: {
+      /** 'metadata_provider': Description of the organization that produced the metadata */
+      [API_METAINFO_PROVIDER_PROPERTY]: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Organization',
       },
 
-      /** Addresses to get further information on the metadata */
-      metadata_contacts: {
+      /** 'metadata_contacts': Addresses to get further information on the metadata */
+      [API_METAINFO_CONTACTS_PROPERTY]: {
         type: [
           {
             type: mongoose.Schema.Types.ObjectId,
@@ -474,8 +494,8 @@ const MetadataSchema = new mongoose.Schema(
       },
     },
 
-    /** Date when the resource has been successfully integrated on Rudi Portal for the first time */
-    publishedAt: {
+    /** 'publishedAt': Date when the resource has been successfully integrated on Rudi Portal for the first time */
+    [DB_PUBLISHED_AT]: {
       type: Date,
     },
   },
@@ -647,8 +667,8 @@ async function checkThesaurus(metadata) {
       const media = metadata[API_MEDIA_PROPERTY]
       if (!media) throw new BadRequestError(msg.missingField(API_MEDIA_PROPERTY)+` (metadata ${this[API_METADATA_ID]})`)
       if (media[API_MEDIA_TYPE_PROPERTY] === MediaTypes.File) {
-        if (!utils.isNotEmptyObject(media[API_MEDIA_CHECKSUM_PROPERTY])) {
-          throw new BadRequestError(msg.missingObjectProperty(this, API_MEDIA_CHECKSUM_PROPERTY)+` (metadata ${this[API_METADATA_ID]})`)
+        if (!utils.isNotEmptyObject(media[API_FILE_CHECKSUM])) {
+          throw new BadRequestError(msg.missingObjectProperty(this, API_FILE_CHECKSUM)+` (metadata ${this[API_METADATA_ID]})`)
         }
       } else {
         log.d(mod, fun, `media: ${utils.beautify(metadata[API_MEDIA_PROPERTY])}`)
@@ -720,7 +740,7 @@ MetadataSchema.virtual(
 MetadataSchema.virtual(
   `${API_METAINFO_PROPERTY}.${API_METAINFO_DATES_PROPERTY}.${API_DATES_PUBLISHED_PROPERTY}`
 ).get(function () {
-  return this.publishedAt
+  return this[DB_PUBLISHED_AT]
 })
 
 MetadataSchema.pre('save', async function (next) {
@@ -815,6 +835,29 @@ MetadataSchema.post('find', async function (docs, next) {
 // Models definition
 // ------------------------------------------------------------------------------------------------
 const Metadata = mongoose.model('Metadata', MetadataSchema)
+
+// Making fields searchable
+
+const fun = 'createSearchIndexes'
+
+Metadata.createSearchIndexes = async () => {
+  try {
+    await makeSearchable(Metadata, [
+      API_METADATA_ID,
+      API_METADATA_LOCAL_ID,
+      API_DATA_NAME_PROPERTY,
+      `${API_DATA_DETAILS_PROPERTY}.text`,
+      `${API_DATA_DESCRIPTION_PROPERTY}.text`,
+    ])
+  } catch (err) {
+    RudiError.treatError(mod, fun, err)
+  }
+}
+Metadata.createSearchIndexes()
+  .catch((err) => {
+    throw RudiError.treatError(mod, fun, `Failed to create search indexes: ${err}`)
+  })
+  .then(log.d(mod, fun, 'done'))
 
 // ------------------------------------------------------------------------------------------------
 // Exports

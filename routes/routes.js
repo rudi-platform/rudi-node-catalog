@@ -74,6 +74,7 @@ const {
   PARAM_THESAURUS_LANG,
   ROUTE_NAME,
   URL_PUB_API_VERSION,
+  PARAM_ACTION_SEARCH,
 } = require('../config/confApi')
 
 const { JWT_USER, JWT_CLIENT } = require('../config/confPortal')
@@ -100,7 +101,10 @@ const PRV_GET_ONE = 'prv_get_one'
 const PRV_DEL_ONE = 'prv_del_one'
 const PRV_DEL_MANY = 'prv_del_many'
 const PRV_DEL_LIST = 'prv_del_list'
+
+const PRV_RCH_OBJ = 'prv_rch_obj'
 const PRV_GET_ORPHANS = 'prv_get_orphans'
+
 const PRV_ADD_OBJ_REPORT = 'prv_add_obj_report'
 const PRV_UPSERT_OBJ_REPORT = 'prv_upsert_obj_report'
 const PRV_GET_OBJ_REPORT_LIST = 'prv_get_obj_report_list'
@@ -150,14 +154,14 @@ async function onFreeRoute(req, reply) {
     return
   } catch (err) {
     // log.w(mod, fun, err)
-    log.sysCrit(
-      CallContext.createApiCallMsg(req),
-      'routes.free.err',
-      CallContext.getReqContext(req),
-      {
-        error: err,
-      }
-    )
+    // log.sysWarn(
+    //   CallContext.createApiCallMsg(req),
+    //   'routes.free.err',
+    //   CallContext.getReqContext(req),
+    //   {
+    //     error: err,
+    //   }
+    // )
     throw RudiError.treatError(mod, fun, err)
   }
 }
@@ -178,15 +182,15 @@ async function onPublicRoute(req, reply) {
     context.logInfo('route', fun, 'API call')
     return
   } catch (err) {
-    log.w(mod, fun, err)
-    log.sysCrit(
-      CallContext.createApiCallMsg(req),
-      'routes.pub.err',
-      CallContext.getReqContext(req),
-      {
-        error: err,
-      }
-    )
+    // log.w(mod, fun, err)
+    // log.sysWarn(
+    //   CallContext.createApiCallMsg(req),
+    //   'routes.pub.err',
+    //   CallContext.getReqContext(req),
+    //   {
+    //     error: err,
+    //   }
+    // )
     throw RudiError.treatError(mod, fun, err)
   }
 }
@@ -197,18 +201,17 @@ async function onPrivateRoute(req, reply) {
     log.t(mod, fun, `${req.method} ${req.url} `)
     if (!shouldControlPrivateRequests()) return true
 
+    const context = CallContext.getCallContextFromReq(req)
+
     const { subject, clientId } = await checkRudiProdPermission(req, reply)
 
-    const context = CallContext.getCallContextFromReq(req)
     context.clientApp = subject
     context.reqUser = clientId
 
     context.logInfo('route', fun, 'API call')
     return
   } catch (err) {
-    const context = CallContext.getCallContextFromReq(req)
-    context.logErr(mod, fun, err)
-    throw context.getError()
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -228,14 +231,14 @@ async function onDevRoute(req, reply) {
     return
   } catch (err) {
     // log.w(mod, fun, err)
-    log.sysCrit(
-      CallContext.createApiCallMsg(req),
-      'routes.dev.err',
-      CallContext.getReqContext(req),
-      {
-        error: err,
-      }
-    )
+    // log.sysWarn(
+    //   CallContext.createApiCallMsg(req),
+    //   'routes.dev.err',
+    //   CallContext.getReqContext(req),
+    //   {
+    //     error: err,
+    //   }
+    // )
     throw RudiError.treatError(mod, fun, err)
   }
   // log.d(mod, fun, `${beautify(req)}`)
@@ -446,7 +449,14 @@ exports.backOfficeRoutes = [
     handler: genericController.getOrphans,
     config: { [ROUTE_NAME]: PRV_GET_ORPHANS },
   },
-
+  // Search metadata
+  {
+    method: 'GET',
+    url: `${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_SEARCH}`,
+    preHandler: onPrivateRoute,
+    handler: genericController.searchObjects,
+    config: { [ROUTE_NAME]: PRV_RCH_OBJ },
+  },
   // ------------------------------------------------------------------------------------------------
   // Integration reports
   // ------------------------------------------------------------------------------------------------

@@ -1,7 +1,6 @@
 'use strict'
 
-// const mod = 'mediaSch'
-
+const mod = 'mediaSch'
 // ------------------------------------------------------------------------------------------------
 // External dependancies
 // ------------------------------------------------------------------------------------------------
@@ -14,6 +13,12 @@ const sanitize = require('sanitize-filename')
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
 const log = require('../../utils/logging')
+const { isNotEmptyObject } = require('../../utils/jsUtils')
+const { missingField } = require('../../utils/msg')
+
+const { BadRequestError, RudiError } = require('../../utils/errors')
+const { makeSearchable } = require('../../db/dbActions')
+
 const Ids = require('../schemas/Identifiers')
 const Validation = require('../schemaValidators')
 
@@ -21,19 +26,24 @@ const Encodings = require('../thesaurus/Encodings')
 const FileTypes = require('../thesaurus/FileTypes').get()
 const HashAlgorithms = require('../thesaurus/HashAlgorithms').get()
 
-const {
-  FIELDS_TO_SKIP,
-  API_MEDIA_TYPE_PROPERTY,
-  API_MEDIA_CHECKSUM_PROPERTY,
-  API_MEDIA_NAME_PROPERTY,
-} = require('../../db/dbFields')
-const { isNotEmptyObject } = require('../../utils/jsUtils')
-const { missingField } = require('../../utils/msg')
-const { BadRequestError } = require('../../utils/errors')
-
 // ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
+const {
+  FIELDS_TO_SKIP,
+  API_COLLECTION_TAG,
+  API_MEDIA_ID,
+  API_MEDIA_TYPE,
+  API_MEDIA_NAME,
+  API_MEDIA_CONNECTOR,
+  API_MEDIA_INTERFACE_CONTRACT,
+  API_FILE_TYPE,
+  API_FILE_SIZE,
+  API_FILE_CHECKSUM,
+  API_FILE_STRUCTURE,
+  API_FILE_ENCODING,
+  API_FILE_UPDATE_STATUS,
+} = require('../../db/dbFields')
 
 const MediaTypes = {
   File: 'FILE',
@@ -67,23 +77,23 @@ const MediaSchema = new mongoose.Schema(
      * Unique and permanent identifier for the organization in RUDI
      * system (required)
      */
-    media_id: Ids.UUIDv4,
+    [API_MEDIA_ID]: Ids.UUIDv4,
 
     /** Updated offical name of the organization */
-    media_type: {
+    [API_MEDIA_TYPE]: {
       type: String,
       enum: Object.values(MediaTypes),
       required: true,
     },
 
     /** Original name of the file */
-    media_name: {
+    [API_MEDIA_NAME]: {
       type: String,
       // required: true,
     },
 
     /** Updated name of the service, or possibly the person */
-    connector: {
+    [API_MEDIA_CONNECTOR]: {
       url: {
         type: String,
         required: true,
@@ -91,7 +101,7 @@ const MediaSchema = new mongoose.Schema(
       // TODO: define this properly.
       // Most likely an enum defined in Rudi that can be handled in
       // a known manner
-      interface_contract: {
+      [API_MEDIA_INTERFACE_CONTRACT]: {
         type: String,
         required: true,
         default: InterfaceContract.DWNLD,
@@ -99,7 +109,7 @@ const MediaSchema = new mongoose.Schema(
     },
 
     /** Tag for identifying a collection of resources */
-    collection_tag: {
+    [API_COLLECTION_TAG]: {
       type: String,
     },
   },
@@ -111,18 +121,15 @@ MediaSchema.pre('save', function (next) {
   const fun = 'pre save hook'
   // log.t(mod, fun, ``)
   try {
-    if (
-      this[API_MEDIA_TYPE_PROPERTY] === MediaTypes.File &&
-      !isNotEmptyObject(this[API_MEDIA_CHECKSUM_PROPERTY])
-    ) {
-      throw new BadRequestError(missingField(API_MEDIA_CHECKSUM_PROPERTY))
+    if (this[API_MEDIA_TYPE] === MediaTypes.File && !isNotEmptyObject(this[API_FILE_CHECKSUM])) {
+      throw new BadRequestError(missingField(API_FILE_CHECKSUM))
     }
 
-    if (!!this[API_MEDIA_NAME_PROPERTY]) {
-      const nameBefore = this[API_MEDIA_NAME_PROPERTY]
-      const nameAfter = sanitize(this[API_MEDIA_NAME_PROPERTY])
+    if (!!this[API_MEDIA_NAME]) {
+      const nameBefore = this[API_MEDIA_NAME]
+      const nameAfter = sanitize(this[API_MEDIA_NAME])
       if (nameBefore !== nameAfter) {
-        this[API_MEDIA_NAME_PROPERTY] = nameAfter
+        this[API_MEDIA_NAME] = nameAfter
         log.d(mod, fun, `sanitized: '${nameBefore}' -> '${nameAfter}'`)
       }
     }
@@ -139,20 +146,20 @@ MediaSchema.pre('save', function (next) {
 const FileSchema = new mongoose.Schema(
   {
     // Native format of the resource
-    file_type: {
+    [API_FILE_TYPE]: {
       type: String,
       enum: Object.values(FileTypes),
       required: true,
     },
 
     // Size of the file, in bytes
-    file_size: {
+    [API_FILE_SIZE]: {
       type: Int32,
       required: true,
     },
 
     // Makes it possible to check data integrity
-    checksum: {
+    [API_FILE_CHECKSUM]: {
       type: {
         algo: {
           type: String,
@@ -169,13 +176,13 @@ const FileSchema = new mongoose.Schema(
 
     // Link towards the resource that describes the structure of the data
     // (language, norm, data structure, JSON schema, OpenAPI, etc.)
-    file_structure: {
+    [API_FILE_STRUCTURE]: {
       type: String,
       match: Validation.URI,
     },
 
     // Source encoding of the data
-    file_encoding: {
+    [API_FILE_ENCODING]: {
       type: String,
       enum: Object.values(Encodings.get()),
       default: Encodings.Unicode,
@@ -188,7 +195,7 @@ const FileSchema = new mongoose.Schema(
     //   - 'historical' = ancient data that has been updated
     //   - 'obsolete'   = dataset that is too old but cannot be updated
     //                    or replaced with another
-    update_status: {
+    [API_FILE_UPDATE_STATUS]: {
       type: String,
       enum: Object.values(UpdateStatus),
     },
@@ -200,8 +207,8 @@ FileSchema.pre('save', function (next) {
   const fun = 'pre save hook'
   // log.d('FileSchema', fun, ``)
   try {
-    if (!isNotEmptyObject(this[API_MEDIA_CHECKSUM_PROPERTY])) {
-      throw new BadRequestError(missingField(API_MEDIA_CHECKSUM_PROPERTY))
+    if (!isNotEmptyObject(this[API_FILE_CHECKSUM])) {
+      throw new BadRequestError(missingField(API_FILE_CHECKSUM))
     }
     next()
   } catch (err) {
@@ -276,6 +283,26 @@ SeriesSchema.methods.toJSON = function () {
 const Media = mongoose.model('Media', MediaSchema)
 const MediaFile = Media.discriminator(MediaTypes.File, FileSchema)
 const MediaSeries = Media.discriminator(MediaTypes.Series, SeriesSchema)
+
+const fun = 'createSearchIndexes'
+Media.createSearchIndexes = async () => {
+  try {
+    await makeSearchable(Media, [
+      API_MEDIA_ID,
+      API_MEDIA_TYPE,
+      API_MEDIA_NAME,
+      API_FILE_TYPE,
+      API_FILE_UPDATE_STATUS,
+    ])
+  } catch (err) {
+    RudiError.treatError(mod, fun, err)
+  }
+}
+Media.createSearchIndexes()
+  .catch((err) => {
+    throw RudiError.treatError(mod, fun, `Failed to create search indexes: ${err}`)
+  })
+  .then(log.d(mod, fun, 'done'))
 
 // ------------------------------------------------------------------------------------------------
 // Exports

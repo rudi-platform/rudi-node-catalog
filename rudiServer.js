@@ -12,7 +12,6 @@ const log = require('./utils/logging')
 
 const api = require('./config/confApi')
 const sysController = require('./controllers/sysController')
-const { addLogEntry } = require('./db/dbQueries')
 
 // ------------------------------------------------------------------------------------------------
 // Prerequisites
@@ -50,9 +49,9 @@ const logSeparatorConf =
   '---------------------------------------------------------------[Conf OK]--'
 // eslint-disable-next-line no-console
 console.log(utils.nowLocaleFormatted(), logSeparatorConf)
-addLogEntry('info', 'app', 'logSeparatorConf', logSeparatorConf).catch((err) =>
-  utils.consoleErr('info', 'app', 'logSeparatorConf: ' + err)
-)
+log
+  .addLogEntry('info', 'app', 'logSeparatorConf', logSeparatorConf)
+  .catch((err) => utils.consoleErr('info', 'app', 'logSeparatorConf: ' + err))
 
 log.i(mod, 'mongo', `Connecting to [${sys.getDbUrl()}]`)
 mongoose
@@ -65,9 +64,9 @@ mongoose
     log.i(mod, 'app', startMsg)
     log.sysInfo(startMsg, '', '', `apiVersion: ${api.VERSION}, gitHash: ${appVer}, env: ${curEnv}`)
     const logSeparatorEnd = utils.separateLogs('Init OK')
-    addLogEntry('info', 'app', 'logSeparatorEnd', logSeparatorEnd).catch((err) =>
-      utils.consoleErr('info', 'app', 'logSeparatorEnd: ' + err)
-    )
+    log
+      .addLogEntry('info', 'app', 'logSeparatorEnd', logSeparatorEnd)
+      .catch((err) => utils.consoleErr('info', 'app', 'logSeparatorEnd: ' + err))
   })
   .catch((err) => {
     log.e(mod, 'mongoConnection', err)

@@ -36,7 +36,7 @@ const {
   PARAM_ID,
   PARAM_OBJECT_METADATA,
   PARAM_OBJECT_ORGANIZATIONS,
-  PARAM_OBJECT_CONTACTS: PARAM_OBJECT_CONTACTS,
+  PARAM_OBJECT_CONTACTS,
   PARAM_OBJECT_MEDIA,
   PARAM_OBJECT_SKOS_SCHEME,
   PARAM_OBJECT_SKOS_CONCEPT,
@@ -53,6 +53,7 @@ const {
   QUERY_SORT_BY,
   PARAM_OBJECT_LOGS,
   MAX_QUERY_LIMIT,
+  QUERY_UNKOWN,
 } = require('../config/confApi')
 
 // Fields from the JSON as definied in the API
@@ -86,14 +87,15 @@ const SkosScheme = require('../definitions/models/SkosScheme')
 const SkosConcept = require('../definitions/models/SkosConcept')
 const PortalToken = require('../definitions/models/PortalToken')
 
-const Organization = require('../definitions/models/Organization')
-const Contact = require('../definitions/models/Contact')
+const { Organization } = require('../definitions/models/Organization')
+const { Contact } = require('../definitions/models/Contact')
 
 const { Media } = require('../definitions/models/Media')
 const { Metadata, METADATA_FIELDS_TO_POPULATE } = require('../definitions/models/Metadata')
 
 const { Report } = require('../definitions/models/Report')
-const { LogEntry, makeLogInfo, logLineToString } = require('../definitions/models/LogEntry')
+const { LogEntry, logLineToString } = require('../definitions/models/LogEntry')
+const { dropCollection } = require('./dbActions')
 
 // ------------------------------------------------------------------------------------------------
 // Properties with special treatments
@@ -169,6 +171,24 @@ exports.getObjectAccesses = (objectType) => {
   return {
     Model: this.getObjectModel(objectType),
     idField: this.getObjectIdField(objectType),
+  }
+}
+
+exports.getObjectSearchableFields = (objectType) => {
+  const fun = 'getObjectSearchableFields'
+  // // log.t(mod, fun, ``)
+  try {
+    assertIsString(fun, objectType)
+    const Model = OBJ_MODEL[objectType]
+    if (!Model) throw new NotFoundError(msg.objectTypeNotFound(objectType))
+
+    switch (objectType) {
+      case PARAM_OBJECT_METADATA:
+        return []
+    }
+    return Model
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -263,28 +283,6 @@ exports.isProperty = (Model, prop) => {
 // ------------------------------------------------------------------------------------------------
 // Actions on DB tables
 // ------------------------------------------------------------------------------------------------
-exports.getCollections = async () => {
-  const fun = `getCollections`
-  try {
-    const collections = await mongoose.connection.db.listCollections().toArray()
-    collections.map((collection) => collection.name)
-    return collections
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
-
-exports.dropDB = async () => {
-  const fun = `dropDB`
-  try {
-    /* Drop the whole DB !!! */
-    const dbActionResult = await mongoose.connection.db.dropDatabase()
-    log.d(mod, fun, 'DB dropped')
-    return dbActionResult
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
 
 exports.cleanLicences = async () => {
   const fun = `cleanLicences`
@@ -296,30 +294,6 @@ exports.cleanLicences = async () => {
     // TODO: target only licences hierarchy!
     await dropCollection(CONCEPTS_COLLECTION_NAME)
     await dropCollection(SCHEMES_COLLECTION_NAME)
-  } catch (err) {
-    // log.w(mod, fun, err)
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
-
-async function dropCollection(collectionName) {
-  const fun = `dropCollection`
-  try {
-    const listCollections = await mongoose.connection.db.listCollections().toArray()
-    // log.d(mod, fun, `listCollections: ${utils.beautify(listCollections)}`)
-    await Promise.all(
-      listCollections.map(async (collection) => {
-        if (collection.name === collectionName) {
-          await mongoose.connection.db.dropCollection(collectionName)
-          log.d(mod, fun, `Dropped collection '${collectionName}'`)
-          return true
-        }
-        return
-      })
-    )
-
-    log.d(mod, fun, `Collection '${collectionName}' was not found`)
-    return false
   } catch (err) {
     // log.w(mod, fun, err)
     throw RudiError.treatError(mod, fun, err)
@@ -635,6 +609,52 @@ function getParamValue(options, param, defaultVal, maxVal) {
   return maxVal
 }
 
+const MDB_ERR_NO_INDEX = 'Error 500 (MongoError): text index required for $text query'
+exports.searchObjects = async (objectType, options) => {
+  const fun = 'searchObjects'
+  try {
+    log.t(mod, fun, ``)
+    // log.d(mod, fun, `options: ${utils.beautify(options)}`)
+
+    // Setting the filter as a research of terms
+    const searchTermsList = getParamValue(options, QUERY_UNKOWN)
+    if (!utils.isArray(searchTermsList))
+      throw new RudiError('Input option search terms should be an array')
+
+    options[QUERY_FILTER] = { $text: { $search: searchTermsList.join(' ') } }
+
+    // Case objectType is a metadata
+    try {
+      if (objectType === PARAM_OBJECT_METADATA) {
+        return await this.getMetadataListAndCount(options)
+      } else {
+        return await this.getObjectListAndCount(objectType, options)
+      }
+    } catch (err) {
+      if (err == MDB_ERR_NO_INDEX) {
+        log.v(mod, fun, `No search index: let's recreate them`)
+        const Model = this.getObjectModel(objectType)
+        try {
+          await Model.createSearchIndexes()
+        } catch (err) {
+          log.w(`Couldn't create indexes for collection '${Model.collection}'`)
+          throw RudiError(`Couldn't create indexes`)
+        }
+        return await this.searchObjects(objectType, options)
+      } else if (`${err}`.substring(0, MDB_ERR_NO_INDEX.length) == MDB_ERR_NO_INDEX) {
+        log.w(mod, fun, err)
+        return { total: 0, items: [] }
+      } else {
+        log.w(mod, fun, `${err}`.substring(0, MDB_ERR_NO_INDEX.length))
+        throw err
+      }
+    }
+  } catch (err) {
+    log.v(mod, fun, err)
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
 exports.getObjectList = async (objectType, options) => {
   const fun = `getObjectList`
   // log.t(mod, fun, ``)
@@ -692,8 +712,8 @@ exports.getObjectList = async (objectType, options) => {
   }
 }
 exports.getObjectListAndCount = async (objectType, options) => {
-  const fun = `getObjectList`
-  // log.t(mod, fun, ``)
+  const fun = `getObjectListAndCount`
+  log.t(mod, fun, ``)
   try {
     //--- Parameters
     // Identify object type characteristics
@@ -762,7 +782,7 @@ exports.getObjectListAndCount = async (objectType, options) => {
  */
 exports.getMetadataListAndCount = async (options) => {
   const fun = `getMetadataListAndCount`
-  // log.t(mod, fun, ``)
+  log.t(mod, fun, ``)
   try {
     //--- Parameters
 
@@ -1810,25 +1830,6 @@ exports.storePortalToken = async (token) => {
 // ----------------------------------------
 // - Logs
 // ----------------------------------------
-// No log.d / log.e function here or you'll create a loopback
-exports.addLogEntry = async (logLvl, loc_module, loc_function, msg) => {
-  const fun = 'addLogEntry'
-  try {
-    if (!msg || msg === '') msg = '<-'
-    // utils.consoleLog(mod, fun, ``)
-    const logInfo = makeLogInfo(logLvl, loc_module, loc_function, msg)
-    const logEntry = await new LogEntry(logInfo)
-    return await logEntry.save()
-  } catch (err) {
-    utils.consoleErr(
-      loc_module,
-      `${loc_function} > ${fun}`,
-      `${logLvl} logging failed! msg: ${msg}, err: ${err}`
-    )
-    // throw err
-  }
-}
-
 exports.getLogEntries = async (options) => {
   const fun = 'getLogEntries'
   try {

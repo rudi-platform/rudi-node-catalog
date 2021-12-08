@@ -12,7 +12,13 @@ const { parseKey } = require('sshpk')
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
 
-const { decodeBase64url, nowEpochS, nowISO, dateEpochSToIso } = require('../utils/jsUtils')
+const {
+  decodeBase64url,
+  nowEpochS,
+  nowISO,
+  dateEpochSToIso,
+  beautify,
+} = require('../utils/jsUtils')
 
 const log = require('../utils/logging')
 const { ROUTE_NAME } = require('../config/confApi')
@@ -153,6 +159,7 @@ exports.verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
 
   try {
     const [jwtHeaderBase64url, jwtPayloadBase64url, jwtSignatureBase64url] = token.split('.')
+    // log.d(mod, fun, `JWT header b64: ${jwtHeaderBase64url}`)
 
     // Identify the signature hash algorithm from the JWT header alg property
     const jwtHeader = JSON.parse(decodeBase64url(jwtHeaderBase64url))
@@ -164,6 +171,7 @@ exports.verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
 
     const jwtPayload = JSON.parse(decodeBase64url(jwtPayloadBase64url))
     const jwtExp = accessProperty(jwtPayload, JWT_EXP)
+    // log.d(mod, fun, `jwtPayload: ${beautify(jwtPayload)}`)
 
     if (nowEpochS() > jwtExp)
       throw new ForbiddenError(
@@ -187,6 +195,8 @@ exports.verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
     const clientId = jwtPayload[JWT_CLIENT]
 
     // Retrieve the public key
+    log.d(mod, fun, `Retrieve the public key for '${subject}'`)
+
     const subjProfile = getProfile(subject)
     if (!subjProfile)
       throw new ForbiddenError(`No profile was found for this subject: '${subject}'`)
@@ -212,6 +222,8 @@ exports.verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
     // log.d(mod, fun, `sslKey: ${beautify(sslKey)}`)
 
     // Check the signature
+    // log.d(mod, fun, `Check the signature: ${beautify(sslKey)}`)
+
     const verifier = sslKey.createVerify(hashAlgo)
     verifier.update(`${jwtHeaderBase64url}.${jwtPayloadBase64url}`)
     const signatureIsValid = verifier.verify(jwtSignatureBase64url, 'base64url')
