@@ -637,8 +637,15 @@ exports.searchObjects = async (objectType, options) => {
         try {
           await Model.createSearchIndexes()
         } catch (err) {
-          log.w(`Couldn't create indexes for collection '${Model.collection}'`)
-          throw RudiError(`Couldn't create indexes`)
+          if (err == 'TypeError: Model.createSearchIndexes is not a function')
+            throw new NotImplementedError(`Searching '${objectType}' is not yet implemented`)
+
+          log.w(
+            mod,
+            fun,
+            `Couldn't create indexes for collection '${Model.collection.name}': ${err}`
+          )
+          throw new RudiError(`Couldn't create indexes`)
         }
         return await this.searchObjects(objectType, options)
       } else if (`${err}`.substring(0, MDB_ERR_NO_INDEX.length) == MDB_ERR_NO_INDEX) {
