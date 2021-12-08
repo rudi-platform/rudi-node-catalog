@@ -537,13 +537,13 @@
 					"response": []
 				},
 				{
-					"name": "Get themes labels",
+					"name": "Get theme labels",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Themes received\", () => {",
+									"pm.test(\"Theme labels received\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    pm.expect(Object.keys(responseJson).length).to.gt(0)",
@@ -671,8 +671,7 @@
 									"pm.test(\"All licence codes retrieved\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
-									"    pm.expect(responseJson.indexOf('mit')).to.gte(0)",
-									"    pm.collectionVariables.set('sanityLicence', responseJson[1])",
+									"    pm.expect(responseJson.indexOf('mit')).to.gt(0)",
 									"});",
 									""
 								],
@@ -709,17 +708,19 @@
 					"response": []
 				},
 				{
-					"name": "Get thesaurus",
+					"name": "Get thesaurus fr labels",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Thesaurus received: Encodings\", () => {",
+									"pm.test(\"Thesaurus fr labels received\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    const listEnums = Object.keys(responseJson);",
-									"    pm.expect(listEnums.length).to.eq(9);",
+									"    pm.expect(listEnums.length).to.eq(11);",
+									"    pm.expect(Object.keys(responseJson.fileextensions).length).to.gt(0)",
+									"    pm.expect(responseJson.fileextensions.aac).to.eq(\"audio/aac\")",
 									"});"
 								],
 								"type": "text/javascript"
@@ -730,27 +731,32 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/enum/Encodings",
+							"raw": "{{baseUrl}}/{{adminUrl}}/enum?lang=fr",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{adminUrl}}",
-								"enum",
-								"Encodings"
+								"enum"
+							],
+							"query": [
+								{
+									"key": "lang",
+									"value": "fr"
+								}
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Get all thesauri",
+					"name": "Get every thesaurus values",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Every thesaurus received\", () => {",
+									"pm.test(\"Every thesaurus values received\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    const listEnums = Object.keys(responseJson);",
@@ -758,6 +764,7 @@
 									"",
 									"    pm.collectionVariables.set('keywords', responseJson['keywords']);",
 									"    pm.collectionVariables.set('themes', responseJson['themes']);",
+									"    pm.collectionVariables.set('sanityLicence', responseJson['licences'][1])",
 									"",
 									"});"
 								],
@@ -784,7 +791,278 @@
 			]
 		},
 		{
-			"name": "03. Add/edit/get contacts",
+			"name": "03. Add/edit/get organizations",
+			"item": [
+				{
+					"name": "Add org 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Producer 1 created\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    // console.log(responseJson);",
+									"    const orgId = pm.variables.get('orgId1');",
+									"    pm.expect(responseJson.organization_id).to.eq(orgId);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"organization_id\": \"{{orgId1}}\",\n    \"organization_name\": \"IRISA\",\n    \"organization_address\": \"Campus de Beaulieu, 263 avenue du Général Leclerc, Bâtiment 12 F, allée Jean Perrin, 35042 RENNES Cedex\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{org}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add org 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Producer 2 created\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    // console.log(responseJson);",
+									"    const orgId = pm.variables.get('orgId2');",
+									"    pm.expect(responseJson.organization_id).to.eq(orgId);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"rand.initVal('orgId2')",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"organization_id\": \"{{orgId2}}\",\n    \"organization_name\": \"UR1\",\n    \"organization_address\": \"Campus de Beaulieu, 263 avenue du Général Leclerc, Bâtiment 12 F, allée Jean Perrin, 35042 RENNES Cedex\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{org}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all organizations",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"2 producers created\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const orgList = pm.response.json();",
+									"     pm.expect(orgList.length).to.eq(2);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{org}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search organizations",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"1 producer found\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.total).to.eq(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}/search?IRISA",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{org}}",
+								"search"
+							],
+							"query": [
+								{
+									"key": "IRISA",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit org 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Producer 2 edited\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    // console.log(responseJson);",
+									"    const orgId = pm.variables.get('orgId2');",
+									"    pm.expect(responseJson.organization_id).to.eq(orgId);",
+									"    pm.expect(responseJson.organization_name).to.eq(\"UR1\");",
+									"    pm.expect(responseJson.organization_address).to.eq(\"2 rue du Thabor - CS 46510, 35065 Rennes CEDEX\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"rand.initVal('orgId2')",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"organization_id\": \"{{orgId2}}\",\n    \"organization_name\": \"UR1\",\n    \"organization_address\": \"2 rue du Thabor - CS 46510, 35065 Rennes CEDEX\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{org}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get org 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Producer 2 edition correctly saved\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    // console.log(responseJson);",
+									"    const orgId = pm.variables.get('orgId2');",
+									"    pm.expect(responseJson.organization_id).to.eq(orgId);",
+									"    pm.expect(responseJson.organization_name).to.eq(\"UR1\");",
+									"    pm.expect(responseJson.organization_address).to.eq(\"2 rue du Thabor - CS 46510, 35065 Rennes CEDEX\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}/{{orgId2}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{org}}",
+								"{{orgId2}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "04. Add/edit/get contacts",
 			"item": [
 				{
 					"name": "Add contact 1",
@@ -984,6 +1262,46 @@
 					"response": []
 				},
 				{
+					"name": "Search contact",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"    pm.test(\"1 contact found\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.total).to.eq(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}/search?fazo",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{cont}}",
+								"search"
+							],
+							"query": [
+								{
+									"key": "fazo",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Edit contact 1",
 					"event": [
 						{
@@ -1072,237 +1390,6 @@
 								"{{adminUrl}}",
 								"{{cont}}",
 								"{{contId1}}"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "04. Add/edit/get organizations",
-			"item": [
-				{
-					"name": "Add org 1",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Producer 1 created\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    // console.log(responseJson);",
-									"    const orgId = pm.variables.get('orgId1');",
-									"    pm.expect(responseJson.organization_id).to.eq(orgId);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"organization_id\": \"{{orgId1}}\",\n    \"organization_name\": \"IRISA\",\n    \"organization_address\": \"Campus de Beaulieu, 263 avenue du Général Leclerc, Bâtiment 12 F, allée Jean Perrin, 35042 RENNES Cedex\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{adminUrl}}",
-								"{{org}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Add org 2",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Producer 2 created\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    // console.log(responseJson);",
-									"    const orgId = pm.variables.get('orgId2');",
-									"    pm.expect(responseJson.organization_id).to.eq(orgId);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"rand.initVal('orgId2')",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"organization_id\": \"{{orgId2}}\",\n    \"organization_name\": \"UR1\",\n    \"organization_address\": \"Campus de Beaulieu, 263 avenue du Général Leclerc, Bâtiment 12 F, allée Jean Perrin, 35042 RENNES Cedex\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{adminUrl}}",
-								"{{org}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get all organizations",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"2 producers created\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const orgList = pm.response.json();",
-									"     pm.expect(orgList.length).to.eq(2);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{adminUrl}}",
-								"{{org}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Edit org 2",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Producer 2 edited\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    // console.log(responseJson);",
-									"    const orgId = pm.variables.get('orgId2');",
-									"    pm.expect(responseJson.organization_id).to.eq(orgId);",
-									"    pm.expect(responseJson.organization_name).to.eq(\"UR1\");",
-									"    pm.expect(responseJson.organization_address).to.eq(\"2 rue du Thabor - CS 46510, 35065 Rennes CEDEX\");",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"rand.initVal('orgId2')",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"organization_id\": \"{{orgId2}}\",\n    \"organization_name\": \"UR1\",\n    \"organization_address\": \"2 rue du Thabor - CS 46510, 35065 Rennes CEDEX\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{adminUrl}}",
-								"{{org}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get org 2",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Producer 2 edition correctly saved\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    // console.log(responseJson);",
-									"    const orgId = pm.variables.get('orgId2');",
-									"    pm.expect(responseJson.organization_id).to.eq(orgId);",
-									"    pm.expect(responseJson.organization_name).to.eq(\"UR1\");",
-									"    pm.expect(responseJson.organization_address).to.eq(\"2 rue du Thabor - CS 46510, 35065 Rennes CEDEX\");",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}/{{orgId2}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{adminUrl}}",
-								"{{org}}",
-								"{{orgId2}}"
 							]
 						}
 					},
@@ -1860,6 +1947,56 @@
 								{
 									"key": "limit",
 									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search metadata",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Search metadata\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.total).to.eq(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{apiJwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}/search?\"local 33\"",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{data}}",
+								"search"
+							],
+							"query": [
+								{
+									"key": "\"local 33\"",
+									"value": null
 								}
 							]
 						}

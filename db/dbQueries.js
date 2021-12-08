@@ -609,59 +609,6 @@ function getParamValue(options, param, defaultVal, maxVal) {
   return maxVal
 }
 
-const MDB_ERR_NO_INDEX = 'Error 500 (MongoError): text index required for $text query'
-exports.searchObjects = async (objectType, options) => {
-  const fun = 'searchObjects'
-  try {
-    log.t(mod, fun, ``)
-    // log.d(mod, fun, `options: ${utils.beautify(options)}`)
-
-    // Setting the filter as a research of terms
-    const searchTermsList = getParamValue(options, QUERY_UNKOWN)
-    if (!utils.isArray(searchTermsList))
-      throw new RudiError('Input option search terms should be an array')
-
-    options[QUERY_FILTER] = { $text: { $search: searchTermsList.join(' ') } }
-
-    // Case objectType is a metadata
-    try {
-      if (objectType === PARAM_OBJECT_METADATA) {
-        return await this.getMetadataListAndCount(options)
-      } else {
-        return await this.getObjectListAndCount(objectType, options)
-      }
-    } catch (err) {
-      if (err == MDB_ERR_NO_INDEX) {
-        log.v(mod, fun, `No search index: let's recreate them`)
-        const Model = this.getObjectModel(objectType)
-        try {
-          await Model.createSearchIndexes()
-        } catch (err) {
-          if (err == 'TypeError: Model.createSearchIndexes is not a function')
-            throw new NotImplementedError(`Searching '${objectType}' is not yet implemented`)
-
-          log.w(
-            mod,
-            fun,
-            `Couldn't create indexes for collection '${Model.collection.name}': ${err}`
-          )
-          throw new RudiError(`Couldn't create indexes`)
-        }
-        return await this.searchObjects(objectType, options)
-      } else if (`${err}`.substring(0, MDB_ERR_NO_INDEX.length) == MDB_ERR_NO_INDEX) {
-        log.w(mod, fun, err)
-        return { total: 0, items: [] }
-      } else {
-        log.w(mod, fun, `${err}`.substring(0, MDB_ERR_NO_INDEX.length))
-        throw err
-      }
-    }
-  } catch (err) {
-    log.v(mod, fun, err)
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
-
 exports.getObjectList = async (objectType, options) => {
   const fun = `getObjectList`
   // log.t(mod, fun, ``)
@@ -718,10 +665,18 @@ exports.getObjectList = async (objectType, options) => {
     throw RudiError.treatError(mod, fun, err)
   }
 }
+
+/**
+ * Request to access objects and return both the filtered list and the global count
+ * @param {String} objectType
+ * @param {JSON} options
+ * @returns
+ */
 exports.getObjectListAndCount = async (objectType, options) => {
   const fun = `getObjectListAndCount`
-  log.t(mod, fun, ``)
   try {
+    log.t(mod, fun, ``)
+
     //--- Parameters
     // Identify object type characteristics
     const Model = this.getObjectModel(objectType)
@@ -730,82 +685,14 @@ exports.getObjectListAndCount = async (objectType, options) => {
     const limit = getParamValue(options, QUERY_LIMIT, DEFAULT_QUERY_LIMIT, MAX_QUERY_LIMIT)
     const offset = getParamValue(options, QUERY_OFFSET, DEFAULT_QUERY_OFFSET)
     const filter = getParamValue(options, QUERY_FILTER)
-    const fields = getParamValue(options, QUERY_FIELDS)
+    const fieldsToKeep = getParamValue(options, QUERY_FIELDS)
     const sortByFields = getParamValue(options, QUERY_SORT_BY)
-
-    const populateFields = getPopulateFields(objectType)
 
     // log.d(mod, fun, `options: ${utils.beautify(options)}`)
 
     // log.d(mod, fun, `filter: ${utils.beautify(filter)}`)
 
     // const [sortOptions] = toMongoSortOptions({}, sortBy, { [idField]: 1 })
-    const sortOptions = {}
-    if (sortByFields) {
-      sortByFields.map((field) => {
-        if (field[0] === '-') {
-          sortOptions[field.substring(1)] = -1
-        } else {
-          sortOptions[field] = 1
-        }
-      })
-    }
-    sortOptions[DB_ID] = 1 // Default sort to get consistent offset/limit results
-
-    // log.d(mod, fun, `sortOptions: ${utils.beautify(sortOptions)}`)
-
-    //--- Find
-    if (utils.isEmptyArray(populateFields)) {
-      const fieldsToKeep = fields ? fields.join(' ') : ``
-      return await Model.find(filter, fieldsToKeep).sort(sortOptions).limit(limit).skip(offset)
-    } else {
-      // Populate
-      const objectListFiltered = await Model.find(filter).sort(sortOptions)
-      const objectListCount = objectListFiltered.length
-      const objectList = objectListFiltered
-        .skip(offset)
-        .limit(limit)
-        .populate(getPopulateOptions(objectType))
-
-      let objectListFinal
-      if (!fields) objectListFinal = objectList
-      else objectListFinal = utils.listPick(objectList, fields)
-
-      return {
-        total: objectListCount,
-        items: objectListFinal,
-      }
-    }
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
-
-/**
- * Request to access objects and return both the filtered list and the global count
- * @param {String} objectType
- * @param {JSON} options
- * @returns
- */
-exports.getMetadataListAndCount = async (options) => {
-  const fun = `getMetadataListAndCount`
-  log.t(mod, fun, ``)
-  try {
-    //--- Parameters
-
-    // Extract options
-    const limit = getParamValue(options, QUERY_LIMIT, DEFAULT_QUERY_LIMIT, MAX_QUERY_LIMIT)
-    const offset = getParamValue(options, QUERY_OFFSET, DEFAULT_QUERY_OFFSET)
-    const filter = getParamValue(options, QUERY_FILTER)
-    const fieldsToKeep = getParamValue(options, QUERY_FIELDS)
-    const sortByFields = getParamValue(options, QUERY_SORT_BY)
-
-    // const populateFields = getPopulateFields(PARAM_OBJECT_METADATA)
-
-    // log.d(mod, fun, `options: ${utils.beautify(options)}`)
-
-    // log.d(mod, fun, `filter: ${utils.beautify(filter)}`)
-
     const sortOptions = {}
     if (sortByFields) {
       sortByFields.map((field) => {
@@ -832,24 +719,15 @@ exports.getMetadataListAndCount = async (options) => {
       },
     ]
 
-    // log.d(mod, fun, `aggregateOptions: ${utils.beautify(aggregateOptions)}`)
-    // log.d(mod, fun, `sortOptions: ${utils.beautify(sortOptions)}`)
-
-    const result = await Metadata.aggregate(aggregateOptions).exec()
-    // log.d(mod, fun, `result: ${utils.beautify(result)}`)
+    const result = await Model.aggregate(aggregateOptions).exec()
 
     const globalCount = result[0][COUNT_LABEL][0] ? result[0][COUNT_LABEL][0].count : 0
     const objectList = result[0][LIST_LABEL]
 
     log.d(mod, fun, `total: ${globalCount}`)
-    // log.d(mod, fun, `items: ${utils.beautify(objectList)}`)
-    // log.d(mod, fun, `objectList: ${utils.beautify(objectList)}`)
-    // return objectList
 
-    //--- Reshaping
-    let populateOptions = getPopulateOptions(PARAM_OBJECT_METADATA)
-
-    const objListPopulated = await Metadata.populate(objectList, populateOptions)
+    let populateOptions = getPopulateOptions(objectType)
+    const objListPopulated = await Model.populate(objectList, populateOptions)
 
     // Reshaping: selecting fields
     let finalObjList
@@ -866,6 +744,74 @@ exports.getMetadataListAndCount = async (options) => {
     // log.d(mod, fun, `reshapedResult: ${utils.beautify(reshapedResult)}`)
     return reshapedResult
   } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+/**
+ * Request to access objects and return both the filtered list and the global count
+ * @param {JSON} options
+ * @returns
+ */
+exports.getMetadataListAndCount = async (options) => {
+  const fun = `getMetadataListAndCount`
+  try {
+    log.t(mod, fun, ``)
+    return await this.getObjectListAndCount(PARAM_OBJECT_METADATA, options)
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+const MDB_ERR_NO_INDEX = 'Error 500 (MongoError): text index required for $text query'
+exports.searchObjects = async (objectType, options) => {
+  const fun = 'searchObjects'
+  try {
+    log.t(mod, fun, ``)
+    // log.d(mod, fun, `options: ${utils.beautify(options)}`)
+
+    // Setting the filter as a research of terms
+    const searchTermsList = getParamValue(options, QUERY_UNKOWN)
+    if (!utils.isArray(searchTermsList))
+      throw new RudiError('Input option search terms should be an array')
+
+    options[QUERY_FILTER].$text = { $search: searchTermsList.join(' ') }
+
+    // Case objectType is a metadata
+    try {
+      if (objectType === PARAM_OBJECT_METADATA) {
+        return await this.getMetadataListAndCount(options)
+      } else {
+        return await this.getObjectListAndCount(objectType, options)
+      }
+    } catch (err) {
+      if (err == MDB_ERR_NO_INDEX) {
+        log.v(mod, fun, `No search index: let's recreate them`)
+        const Model = this.getObjectModel(objectType)
+        try {
+          await Model.createSearchIndexes()
+        } catch (err) {
+          if (err == 'TypeError: Model.createSearchIndexes is not a function')
+            throw new NotImplementedError(`Searching '${objectType}' is not yet implemented`)
+
+          log.w(
+            mod,
+            fun,
+            `Couldn't create indexes for collection '${Model.collection.name}': ${err}`
+          )
+          throw new RudiError(`Couldn't create indexes`)
+        }
+        return await this.searchObjects(objectType, options)
+      } else if (`${err}`.substring(0, MDB_ERR_NO_INDEX.length) == MDB_ERR_NO_INDEX) {
+        log.w(mod, fun, err)
+        return { total: 0, items: [] }
+      } else {
+        log.w(mod, fun, `${err}`.substring(0, MDB_ERR_NO_INDEX.length))
+        throw err
+      }
+    }
+  } catch (err) {
+    log.v(mod, fun, err)
     throw RudiError.treatError(mod, fun, err)
   }
 }
