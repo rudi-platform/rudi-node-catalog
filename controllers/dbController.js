@@ -16,11 +16,11 @@ const { map } = require('lodash')
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
 
-const { URL_PV_DB_ACCESS } = require('../config/confApi')
+const { URL_PV_DB_ACCESS, PARAM_OBJECT } = require('../config/confApi')
 
 const { NotFoundError, BadRequestError, RudiError } = require('../utils/errors')
-const { getDbName } = require('../config/confSystem')
-const { dropDB, getCollections } = require('../db/dbActions')
+const { dropDB, getCollections, dropCollection } = require('../db/dbActions')
+const { accessReqParam } = require('../utils/jsonAccess')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
@@ -34,8 +34,21 @@ exports.getCollections = async (req, reply) => {
   const fun = 'getCollections'
   log.t(mod, fun, `< GET ${URL_PV_DB_ACCESS}`)
   try {
-    const dbActionResult = await getCollections(getDbName())
+    const dbActionResult = await getCollections()
     return map(dbActionResult, 'name')
+  } catch (err) {
+    const error = err.name === 'MongoError' ? new BadRequestError(err) : new NotFoundError(err)
+    throw RudiError.treatError(mod, fun, error)
+  }
+}
+
+exports.dropCollection = async (req, reply) => {
+  const fun = 'dropDB'
+  log.t(mod, fun, `< DELETE ${URL_PV_DB_ACCESS}/:${PARAM_OBJECT}`)
+  try {
+    const collectionName = accessReqParam(req, PARAM_OBJECT)
+    const dbActionResult = await dropCollection(collectionName)
+    return dbActionResult
   } catch (err) {
     const error = err.name === 'MongoError' ? new BadRequestError(err) : new NotFoundError(err)
     throw RudiError.treatError(mod, fun, error)
@@ -46,7 +59,7 @@ exports.dropDB = async (req, reply) => {
   const fun = 'dropDB'
   log.t(mod, fun, `< DELETE ${URL_PV_DB_ACCESS}`)
   try {
-    const dbActionResult = await dropDB(getDbName())
+    const dbActionResult = await dropDB()
     return dbActionResult
   } catch (err) {
     const error = err.name === 'MongoError' ? new BadRequestError(err) : new NotFoundError(err)

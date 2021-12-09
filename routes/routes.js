@@ -76,6 +76,7 @@ const {
   URL_PUB_API_VERSION,
   ACT_SEARCH,
   OBJ_REPORTS,
+  PARAM_OBJECT,
 } = require('../config/confApi')
 
 const { JWT_USER, JWT_CLIENT } = require('../config/confPortal')
@@ -135,6 +136,7 @@ const DEV_GET_APP_ENV = 'dev_get_app_env'
 const DEV_GET_LOGS = 'dev_get_logs'
 const DEV_GET_LAST_LOG_LINES = 'dev_get_last_log_lines'
 const DEV_GET_COLLECTIONS = 'dev_get_collections'
+const DEV_DROP_COLLECTION = 'dev_drop_collection'
 const DEV_DROP_DB = 'dev_drop_db'
 
 // ------------------------------------------------------------------------------------------------
@@ -739,6 +741,14 @@ exports.devRoutes = [
     preHandler: onDevRoute,
     handler: dbController.getCollections,
     config: { [ROUTE_NAME]: DEV_GET_COLLECTIONS },
+  },
+  // Drop Collection
+  {
+    method: 'DELETE',
+    url: `${URL_PV_DB_ACCESS}/:${PARAM_OBJECT}`,
+    preHandler: onDevRoute,
+    handler: dbController.dropCollection,
+    config: { [ROUTE_NAME]: DEV_DROP_COLLECTION },
   },
   // Drop DB
   {

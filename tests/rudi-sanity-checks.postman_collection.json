@@ -332,6 +332,66 @@
 			"name": "01. Init DB",
 			"item": [
 				{
+					"name": "Clear collections",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Database cleared\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    pm.expect(pm.response.status).to.eq(\"OK\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const uuid = require('uuid');",
+									"[",
+									"    \"metaId1\", ",
+									"    \"metaId2\", ",
+									"    \"orgId1\", ",
+									"    \"orgId2\", ",
+									"    \"contId1\", ",
+									"    \"contId2\", ",
+									"    \"contId3\", ",
+									"    \"reportId1\", ",
+									"    \"reportId2\", ",
+									"    \"mediaId1\", ",
+									"    \"mediaId2\"",
+									"].map(idLabel => {",
+									"    const newUUID = uuid.v4()",
+									"    //console.log(`${idLabel}: ${newUUID}`)",
+									"    pm.collectionVariables.set(idLabel, newUUID)",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{db}}/dynamicenums",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{db}}",
+								"dynamicenums"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Clear all collections",
 					"event": [
 						{

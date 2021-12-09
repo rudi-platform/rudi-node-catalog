@@ -83,7 +83,6 @@ exports.URL_OBJECTS = [
   this.OBJ_SKOS_CONCEPT,
   this.OBJ_SKOS_SCHEME,
   this.OBJ_REPORTS,
-  this.ACT_REPORT,
   this.OBJ_LOGS,
 ]
 

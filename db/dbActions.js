@@ -27,7 +27,7 @@ exports.getCollections = async () => {
   }
 }
 
-exports.dropDB = async () => {
+exports.dropDB = async (req, reply) => {
   const fun = `dropDB`
   try {
     /* Drop the whole DB !!! */
@@ -44,19 +44,24 @@ exports.dropCollection = async (collectionName) => {
   try {
     const listCollections = await mongoose.connection.db.listCollections().toArray()
     // log.d(mod, fun, `listCollections: ${utils.beautify(listCollections)}`)
-    await Promise.all(
+    let found = false
+    const res = await Promise.all(
       listCollections.map(async (collection) => {
         if (collection.name === collectionName) {
-          await mongoose.connection.db.dropCollection(collectionName)
-          log.d(mod, fun, `Dropped collection '${collectionName}'`)
+          mongoose.connection.db.dropCollection(collectionName)
+          found = true
           return true
         }
         return
       })
     )
-
-    log.d(mod, fun, `Collection '${collectionName}' was not found`)
-    return false
+    if (found) {
+      log.d(mod, fun, `Dropped collection '${collectionName}'`)
+      return true
+    } else {
+      log.d(mod, fun, `Collection '${collectionName}' was not found`)
+      return false
+    }
   } catch (err) {
     // log.w(mod, fun, err)
     throw RudiError.treatError(mod, fun, err)
