@@ -65,7 +65,7 @@ const ContactSchema = new mongoose.Schema(
       index: true,
       lowercase: true,
       dropDups: true,
-      match: valid.EMAIL,
+      match: valid.VALID_EMAIL,
     },
 
     /** Tag for identifying a collection of resources */
@@ -117,6 +117,6 @@ Contact.createSearchIndexes()
   .catch((err) => {
     throw RudiError.treatError(mod, fun, `Failed to create search indexes: ${err}`)
   })
-  .then(log.d(mod, fun, 'done'))
+  .then(log.t(mod, fun, 'done'))
 
 module.exports = { Contact }

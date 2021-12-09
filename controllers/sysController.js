@@ -20,8 +20,7 @@ const log = require('../utils/logging')
 const utils = require('../utils/jsUtils')
 const { RudiError } = require('../utils/errors')
 const { getGitHash, getAppHash } = require('../config/confSystem')
-const { API_VERSION } = require('../definitions/schemaValidators')
-const { VERSION } = require('../config/confApi')
+const { API_VERSION } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
 // App ID
@@ -50,7 +49,7 @@ exports.getAppHash = () => {
     throw RudiError.treatError(mod, fun, err)
   }
 }
-exports.getApiVersion = () => VERSION
+exports.getApiVersion = () => API_VERSION
 
 exports.ENV_DEV = 'local'
 exports.ENV_TEST = 'test'

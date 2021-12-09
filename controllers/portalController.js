@@ -228,7 +228,7 @@ exports.getNewTokenFromPortal = async () => {
     const opts = {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': `RudiProd/${api.VERSION}`,
+        'User-Agent': `RudiProd/${api.API_VERSION}`,
         Authorization: `Basic ${basicAuth}`,
       },
     }

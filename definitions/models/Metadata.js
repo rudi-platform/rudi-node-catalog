@@ -463,7 +463,7 @@ const MetadataSchema = new mongoose.Schema(
       [API_METAINFO_VERSION_PROPERTY]: {
         type: String,
         required: true,
-        match: Validation.API_VERSION,
+        match: Validation.VALID_API_VERSION,
       },
 
       /** 'metadata_dates': Dates of the actions performed on the metadata (creation, publishing, update...) */
@@ -857,7 +857,7 @@ Metadata.createSearchIndexes()
   .catch((err) => {
     throw RudiError.treatError(mod, fun, `Failed to create search indexes: ${err}`)
   })
-  .then(log.d(mod, fun, 'done'))
+  .then(log.t(mod, fun, 'done'))
 
 // ------------------------------------------------------------------------------------------------
 // Exports

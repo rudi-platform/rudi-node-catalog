@@ -71,7 +71,7 @@ const SkosSchemeSchema = new mongoose.Schema(
     /** Web page that document the SKOS concept scheme */
     scheme_uri: {
       type: String,
-      match: Validation.URI,
+      match: Validation.VALID_URI,
     },
 
     /** List of the highest level concepts in the concept scheme */

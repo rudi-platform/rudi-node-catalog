@@ -181,6 +181,6 @@ Report.createSearchIndexes()
   .catch((err) => {
     throw RudiError.treatError(mod, fun, `Failed to create search indexes: ${err}`)
   })
-  .then(log.d(mod, fun, 'done'))
+  .then(log.t(mod, fun, 'done'))
 
 module.exports = { Report, IntegrationStatus }

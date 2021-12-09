@@ -50,7 +50,7 @@ exports.isUUID = (id) => {
 // source: https://www.crossref.org/blog/dois-and-matching-regular-expressions/
 // alternative: https://github.com/regexhq/doi-regex/blob/master/index.js
 exports.REGEX_DOI = /^10.\d{4,9}\/[-.;()/:\w]+$/i
-exports.DOI = [this.REGEX_DOI, `'{VALUE}' is not a valid DOI`]
+exports.VALID_DOI = [this.REGEX_DOI, `'{VALUE}' is not a valid DOI`]
 
 // ------------------------------------------------------------------------------------------------
 // URI
@@ -58,7 +58,7 @@ exports.DOI = [this.REGEX_DOI, `'{VALUE}' is not a valid DOI`]
 
 exports.REGEX_URI =
   /^(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:/~+#-]*[\w@?^=%&amp;/~+#-])?$/
-exports.URI = [this.REGEX_URI, `'{VALUE}' is not a valid URI`]
+exports.VALID_URI = [this.REGEX_URI, `'{VALUE}' is not a valid URI`]
 
 // ------------------------------------------------------------------------------------------------
 // E-mail
@@ -66,13 +66,13 @@ exports.URI = [this.REGEX_URI, `'{VALUE}' is not a valid URI`]
 
 exports.REGEX_EMAIL =
   /^([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-exports.EMAIL = [this.REGEX_EMAIL, `'{VALUE}' is not a valid e-mail`]
+exports.VALID_EMAIL = [this.REGEX_EMAIL, `'{VALUE}' is not a valid e-mail`]
 
 // ------------------------------------------------------------------------------------------------
 // API version
 // ------------------------------------------------------------------------------------------------
 exports.REGEX_API_VERSION = /^[0-9]+\.[0-9]+(\.[0-9]+)?[a-z]*$/
-exports.API_VERSION = [
+exports.VALID_API_VERSION = [
   this.REGEX_API_VERSION,
   `'{VALUE}' does not appear to be a valid RUDI API version number! Expected format: '0.0.0abc' `,
 ]

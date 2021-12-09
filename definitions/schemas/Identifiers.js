@@ -36,5 +36,5 @@ exports.DOI = {
   unique: true,
   sparse: true, // accept empty values as non-duplicates
   lowercase: true,
-  match: validation.DOI,
+  match: validation.VALID_DOI,
 }

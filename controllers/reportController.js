@@ -50,7 +50,7 @@ const {
   PARAM_ACTION_REPORT,
   URL_PUB_METADATA,
   PARAM_ACTION_DELETION,
-  VERSION,
+  API_VERSION,
   PARAM_OBJECT_METADATA,
   URL_PV_OBJECT_GENERIC,
   DEFAULT_QUERY_LIMIT,
@@ -73,7 +73,7 @@ const {
 // ------------------------------------------------------------------------------------------------
 function fromPortalToRudiFormat(reportBody) {
   if (reportBody[API_REPORT_VERSION] === 'v1') {
-    reportBody[API_REPORT_VERSION] = VERSION
+    reportBody[API_REPORT_VERSION] = API_VERSION
   }
   if (!reportBody[API_REPORT_ERRORS] && !!reportBody.errors) {
     reportBody[API_REPORT_ERRORS] = reportBody.errors

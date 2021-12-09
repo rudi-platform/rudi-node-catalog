@@ -178,7 +178,7 @@ const FileSchema = new mongoose.Schema(
     // (language, norm, data structure, JSON schema, OpenAPI, etc.)
     [API_FILE_STRUCTURE]: {
       type: String,
-      match: Validation.URI,
+      match: Validation.VALID_URI,
     },
 
     // Source encoding of the data
@@ -302,7 +302,7 @@ Media.createSearchIndexes()
   .catch((err) => {
     throw RudiError.treatError(mod, fun, `Failed to create search indexes: ${err}`)
   })
-  .then(log.d(mod, fun, 'done'))
+  .then(log.t(mod, fun, 'done'))
 
 // ------------------------------------------------------------------------------------------------
 // Exports

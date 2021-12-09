@@ -84,7 +84,7 @@ exports.makeSearchable = async (Model, listFields) => {
       })
     )
     // (Re)creating the indexes
-    log.d(mod, fun, `Creating search indexes for collection '${collection.name}'`)
+    log.t(mod, fun, `Creating search indexes for collection '${collection.name}'`)
     await collection.createIndex(searchIndexes)
   } catch (err) {
     log.w(mod, fun, `Couldn't create indexes for '${Model.collection.name}': ${err}`)

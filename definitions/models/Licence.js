@@ -69,7 +69,7 @@ const LicenceCustomSchema = new mongoose.Schema(
     custom_licence_uri: {
       type: String,
       unique: true,
-      match: Validation.URI,
+      match: Validation.VALID_URI,
     },
   },
   options
