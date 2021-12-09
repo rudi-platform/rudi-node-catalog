@@ -20,7 +20,7 @@ const { InternalServerError, RudiError } = require('../utils/errors')
 const {
   URL_PV_LICENCE_ACCESS,
   URL_PV_LICENCE_CODES_ACCESS,
-  PARAM_ACTION_INIT,
+  ACT_INIT,
 } = require('../config/confApi')
 
 const { API_SKOS_CONCEPT_CODE } = require('../db/dbFields')
@@ -100,6 +100,6 @@ exports.getAllLicenceCodes = async (req, reply) => {
 
 exports.initLicences = async (req, reply) => {
   const fun = `initLicences`
-  log.t(mod, fun, `< POST ${URL_PV_LICENCE_ACCESS}/${PARAM_ACTION_INIT}`)
+  log.t(mod, fun, `< POST ${URL_PV_LICENCE_ACCESS}/${ACT_INIT}`)
   return await this.initializeLicences()
 }

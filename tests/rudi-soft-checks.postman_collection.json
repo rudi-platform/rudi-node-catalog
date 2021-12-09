@@ -847,6 +847,39 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get searchable properties",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(`Searchable properties`, () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    pm.expect(res.resources.length).to.gte(3)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/search",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"search"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -2999,14 +3032,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{data}}/{{softMeta1Id}}/{{reports}}",
+							"raw": "{{baseUrl}}/{{data}}/{{softMeta1Id}}/{{report}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{data}}",
 								"{{softMeta1Id}}",
-								"{{reports}}"
+								"{{report}}"
 							]
 						}
 					},
@@ -3067,14 +3100,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{data}}/{{softMeta1Id}}/{{reports}}",
+							"raw": "{{baseUrl}}/{{data}}/{{softMeta1Id}}/{{report}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{data}}",
 								"{{softMeta1Id}}",
-								"{{reports}}"
+								"{{report}}"
 							]
 						}
 					},
@@ -3137,14 +3170,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{data}}/{{unkownMetaId}}/{{reports}}",
+							"raw": "{{baseUrl}}/{{data}}/{{unkownMetaId}}/{{report}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{data}}",
 								"{{unkownMetaId}}",
-								"{{reports}}"
+								"{{report}}"
 							]
 						}
 					},
@@ -3193,7 +3226,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{softMeta1Id}}/{{reports}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{softMeta1Id}}/{{report}}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -3201,7 +3234,7 @@
 								"{{apiUrl}}",
 								"{{data}}",
 								"{{softMeta1Id}}",
-								"{{reports}}"
+								"{{report}}"
 							]
 						}
 					},
@@ -3308,7 +3341,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{softMeta1Id}}/{{reports}}/{{softReport2Id}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{softMeta1Id}}/{{report}}/{{softReport2Id}}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -3316,7 +3349,7 @@
 								"{{apiUrl}}",
 								"{{data}}",
 								"{{softMeta1Id}}",
-								"{{reports}}",
+								"{{report}}",
 								"{{softReport2Id}}"
 							]
 						}

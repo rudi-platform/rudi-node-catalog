@@ -37,23 +37,25 @@ _See https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/ for further
 
 ## Private API
 
-POST /api/admin/:object
-PUT /api/admin/:object
-GET /api/admin/:object
-GET /api/admin/:object/:id
-DELETE /api/admin/:object/:id
-DELETE /api/admin/:object
-POST /api/admin/:object/deletion
-GET /api/admin/:object/unlinked
-POST /api/admin/:object/:id/report
-PUT /api/admin/:object/:id/report
-GET /api/admin/:object/:id/report
-GET /api/admin/:object/:id/report/:irid
-GET /api/admin/:object/report
-DELETE /api/admin/:object/:id/report/:irid
-DELETE /api/admin/:object/:id/report
-POST /api/admin/:object/:id/report/deletion
-GET /api/admin/enum
+`object`: one of [`resources`, `organizations`, `contacts`, `media`, `skos_schemes`, `skos_concepts`,
+
+- `POST /api/admin/:object`
+- `PUT /api/admin/:object`
+- `GET /api/admin/:object`
+- `GET /api/admin/:object/:id`
+- `DELETE /api/admin/:object/:id`
+- `DELETE /api/admin/:object`
+- `POST /api/admin/:object/deletion`
+- `GET /api/admin/:object/unlinked`
+- `POST /api/admin/:object/:id/reports`
+- `PUT /api/admin/:object/:id/reports`
+- `GET /api/admin/:object/:id/reports`
+- `GET /api/admin/:object/:id/reports/:irid`
+- `GET /api/admin/:object/reports`
+- `DELETE /api/admin/:object/:id/reports/:irid`
+- `DELETE /api/admin/:object/:id/reports`
+- `POST /api/admin/:object/:id/reports/deletion`
+- `GET /api/admin/enum`
 
 ---
 

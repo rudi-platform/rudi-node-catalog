@@ -787,6 +787,39 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get searchable objects",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(`Searchable object properties`, () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    pm.expect(res.resources.length).to.gte(3)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/search",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"search"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -2703,14 +2736,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{data}}/{{metaId1}}/{{reports}}",
+							"raw": "{{baseUrl}}/{{data}}/{{metaId1}}/{{report}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{data}}",
 								"{{metaId1}}",
-								"{{reports}}"
+								"{{report}}"
 							]
 						}
 					},
@@ -2807,7 +2840,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{metaId1}}/{{reports}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{metaId1}}/{{report}}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -2815,7 +2848,7 @@
 								"{{apiUrl}}",
 								"{{data}}",
 								"{{metaId1}}",
-								"{{reports}}"
+								"{{report}}"
 							]
 						}
 					},
@@ -2867,7 +2900,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{metaId1}}/{{reports}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{metaId1}}/{{report}}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -2875,7 +2908,7 @@
 								"{{apiUrl}}",
 								"{{data}}",
 								"{{metaId1}}",
-								"{{reports}}"
+								"{{report}}"
 							]
 						}
 					},
@@ -2930,7 +2963,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{metaId1}}/{{reports}}/{{reportId2}}",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{metaId1}}/{{report}}/{{reportId2}}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -2938,7 +2971,7 @@
 								"{{apiUrl}}",
 								"{{data}}",
 								"{{metaId1}}",
-								"{{reports}}",
+								"{{report}}",
 								"{{reportId2}}"
 							]
 						}
@@ -4601,6 +4634,10 @@
 		},
 		{
 			"key": "countWithOrg1",
+			"value": ""
+		},
+		{
+			"key": "pm_jwt",
 			"value": ""
 		}
 	]

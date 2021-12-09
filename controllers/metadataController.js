@@ -62,13 +62,12 @@ const {
 } = require('../db/dbFields')
 
 const {
-  PARAM_OBJECT_CONTACTS,
-  PARAM_OBJECT_MEDIA,
-  PARAM_OBJECT_METADATA,
   URL_PREFIX_PUBLIC,
-  PARAM_ACTION_INIT,
   URL_PUB_METADATA,
+  OBJ_METADATA,
+  OBJ_MEDIA,
   PARAM_ID,
+  ACT_INIT,
 } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
@@ -134,8 +133,10 @@ exports.contactListRudiToDbFormat = async (rudiContactList, shouldCreateIfNotFou
       let contactDbId
       contactDbId = await db.getContactDbIdWithJson(rudiContact)
       if (!contactDbId) {
-        if (!shouldCreateIfNotFound)
-          throw new ObjectNotFoundError(PARAM_OBJECT_CONTACTS, rudiContact[API_CONTACT_ID])
+        if (!shouldCreateIfNotFound) {
+          const err = new NotFoundError(msg.contactNotFound(rudiContact[API_CONTACT_ID]))
+          throw RudiError.treatError(mod, fun, err)
+        }
 
         const dbContact = await contactController.newContact(rudiContact)
         dbContact.save()
@@ -166,7 +167,7 @@ exports.mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFound) 
 
         if (!mediaDbId) {
           if (!shouldCreateIfNotFound)
-            throw new ObjectNotFoundError(PARAM_OBJECT_MEDIA, rudiMedia[API_MEDIA_ID])
+            throw new ObjectNotFoundError(OBJ_MEDIA, rudiMedia[API_MEDIA_ID])
 
           // log.d(mod, fun, `rudiMedia[API_MEDIA_TYPE_PROPERTY]: ${beautify(rudiMedia[API_MEDIA_TYPE_PROPERTY])}`)
           const media = new Media(rudiMedia)
@@ -376,13 +377,13 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
       const metaInfoProvider = metaInfo[API_METAINFO_PROVIDER_PROPERTY]
       if (metaInfoProvider) {
         dbReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_PROVIDER_PROPERTY] =
-          await this.organizationRudiToDbFormat(metaInfoProvider)
+          await this.organizationRudiToDbFormat(metaInfoProvider, SHOULD_CREATE_IF_NOT_FOUND)
       }
 
       const metaInfoContacts = metaInfo[API_METAINFO_CONTACTS_PROPERTY]
       if (isNotEmptyArray(metaInfoContacts)) {
         dbReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_CONTACTS_PROPERTY] =
-          await this.contactListRudiToDbFormat(metaInfoContacts)
+          await this.contactListRudiToDbFormat(metaInfoContacts, SHOULD_CREATE_IF_NOT_FOUND)
       }
     }
 
@@ -496,7 +497,7 @@ exports.upsertMetadata = async (rudiMetadata) => {
   log.t(mod, fun, ``)
   try {
     const rudiId = json.accessProperty(rudiMetadata, API_METADATA_ID)
-    const existsMetadata = await db.doesObjectExistWithRudiId(PARAM_OBJECT_METADATA, rudiId)
+    const existsMetadata = await db.doesObjectExistWithRudiId(OBJ_METADATA, rudiId)
 
     if (!existsMetadata) {
       return await this.newMetadata(rudiMetadata)
@@ -525,14 +526,14 @@ exports.newMetadata = async (rudiMetadata) => {
     dbMetadata = await new Metadata(dbReadyObject)
     await dbMetadata.save()
   } catch (err) {
-    // const errMsg = `New object '${PARAM_OBJECT_METADATA}': ${rudiId} | Error: ${err}`
+    // const errMsg = `New object '${OBJ_METADATA}': ${rudiId} | Error: ${err}`
     // const error = new Error(errMsg)
     throw RudiError.treatError(mod, fun, err)
   }
   // try {
   // await dbMetadata.save()
   // } catch (err) {
-  //   // const errMsg = `Error while saving object '${PARAM_OBJECT_METADATA}' (${rudiId}): ${err}`
+  //   // const errMsg = `Error while saving object '${OBJ_METADATA}' (${rudiId}): ${err}`
   //   throw RudiError.treatError(mod, fun, err)
   // }
   // log.d(mod, fun, `dbMetadata: ${beautify(dbMetadata)}`)
@@ -563,7 +564,7 @@ exports.overwriteMetadata = async (incomingRudiMetadata) => {
 
   const dbReadyEditedMetadata = await this.rudiToDbFormat(incomingRudiMetadata, true)
   // log.d(mod, fun, `dbReadyEditedMetadata: ${beautify(dbReadyEditedMetadata)}`)
-  const dbMetadata = await db.overwriteObject(PARAM_OBJECT_METADATA, dbReadyEditedMetadata)
+  const dbMetadata = await db.overwriteObject(OBJ_METADATA, dbReadyEditedMetadata)
   // log.d(mod, fun, `dbMetadata: ${beautify(dbMetadata)}`)
   // const reply = await dbMetadata.save()
   // log.d(mod, fun, `reply: ${beautify(reply)}`)
@@ -588,7 +589,7 @@ exports.updateMetadata = async (incomingRudiMetadata) => {
   // ensure the metadata already exist
   const rudiId = json.accessProperty(incomingRudiMetadata, API_METADATA_ID)
   // // let dbMetadata = await db.getEnsuredMetadataWithRudiId(rudiId) // No => no populate please !
-  const dbMetadata = await db.getEnsuredObjectWithRudiId(PARAM_OBJECT_METADATA, rudiId)
+  const dbMetadata = await db.getEnsuredObjectWithRudiId(OBJ_METADATA, rudiId)
   // log.v(mod, fun, `corresponding db object: ${beautify(dbMetadata)}\n`)
 
   const dbReadyEditedMetadata = await this.rudiToDbFormat(incomingRudiMetadata)
@@ -629,7 +630,7 @@ exports.sendToPortal = async (metadata) => {
 exports.initWithODR = async (req, reply) => {
   const fun = 'massInit'
   try {
-    log.v(mod, fun, `> ${URL_PREFIX_PUBLIC}/${PARAM_OBJECT_METADATA}/${PARAM_ACTION_INIT}`)
+    log.v(mod, fun, `> ${URL_PREFIX_PUBLIC}/${OBJ_METADATA}/${ACT_INIT}`)
 
     // await db.dropDB()
 
@@ -702,7 +703,7 @@ exports.getMetadataList = async (req, reply) => {
   const fun = 'getMetadataList'
   log.t(mod, fun, `< GET ${URL_PUB_METADATA}`)
   try {
-    return await genericController.getManyObjects(PARAM_OBJECT_METADATA, req, reply)
+    return await genericController.getManyObjects(OBJ_METADATA, req, reply)
   } catch (err) {
     const error = err.name === 'MongoError' ? new BadRequestError(error) : new NotFoundError(error)
     throw RudiError.treatError(mod, fun, error)

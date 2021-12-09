@@ -100,15 +100,13 @@ ContactSchema.methods.toJSON = function () {
 // ------------------------------------------------------------------------------------------------
 const Contact = mongoose.model('Contact', ContactSchema)
 
+const SEARCHABLE_FIELDS = [API_CONTACT_ID, API_CONTACT_NAME, API_CONTACT_ROLE, API_CONTACT_MAIL]
+Contact.searchableFields = () => SEARCHABLE_FIELDS
+
 const fun = 'createSearchIndexes'
 Contact.createSearchIndexes = async () => {
   try {
-    await makeSearchable(Contact, [
-      API_CONTACT_ID,
-      API_CONTACT_NAME,
-      API_CONTACT_ROLE,
-      API_CONTACT_MAIL,
-    ])
+    await makeSearchable(Contact, SEARCHABLE_FIELDS)
   } catch (err) {
     RudiError.treatError(mod, fun, err)
   }

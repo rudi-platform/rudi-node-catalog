@@ -838,17 +838,19 @@ const Metadata = mongoose.model('Metadata', MetadataSchema)
 
 // Making fields searchable
 
-const fun = 'createSearchIndexes'
+const SEARCHABLE_FIELDS = [
+  API_METADATA_ID,
+  API_METADATA_LOCAL_ID,
+  API_DATA_NAME_PROPERTY,
+  `${API_DATA_DETAILS_PROPERTY}.text`,
+  `${API_DATA_DESCRIPTION_PROPERTY}.text`,
+]
+Metadata.searchableFields = () => SEARCHABLE_FIELDS
 
+const fun = 'createSearchIndexes'
 Metadata.createSearchIndexes = async () => {
   try {
-    await makeSearchable(Metadata, [
-      API_METADATA_ID,
-      API_METADATA_LOCAL_ID,
-      API_DATA_NAME_PROPERTY,
-      `${API_DATA_DETAILS_PROPERTY}.text`,
-      `${API_DATA_DESCRIPTION_PROPERTY}.text`,
-    ])
+    await makeSearchable(Metadata, SEARCHABLE_FIELDS)
   } catch (err) {
     RudiError.treatError(mod, fun, err)
   }
@@ -865,4 +867,5 @@ Metadata.createSearchIndexes()
 module.exports = {
   Metadata,
   METADATA_FIELDS_TO_POPULATE,
+  SEARCHABLE_FIELDS,
 }

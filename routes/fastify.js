@@ -95,9 +95,9 @@ fastify.decorate('notFound', (req, reply) => {
     error: 'Not Found',
     statusCode: 404,
   }
-
-  log.w(mod, fun, `${response.message} <- ${utils.getIpsMsg(req)}`)
-  log.sysNotice(`Error 404: ${response.message}`, CallContext.getReqContext(req))
+  const context = CallContext.getCallContextFromReq(req)
+  log.w(mod, fun, `${response.message} <- ${context.apiCallMsg}`)
+  log.sysNotice(`Error 404: ${response.message}`, '', CallContext.getReqContext(req))
   // log.d(mod, fun, utils.beautify(req))
   reply.isError = true
   reply.code(404).send(response)

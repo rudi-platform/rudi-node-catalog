@@ -20,7 +20,7 @@ const {
   PARAM_LOGS_LINES,
   QUERY_LIMIT,
   QUERY_OFFSET,
-  PARAM_OBJECT_LOGS,
+  OBJ_LOGS,
   QUERY_FILTER,
   QUERY_FIELDS,
 } = require('../config/confApi')
@@ -40,7 +40,7 @@ exports.getLogs = async (req, reply) => {
     log.d(mod, fun, `GET ${URL_PV_LOGS_ACCESS}`)
     let parsedParameters
     try {
-      parsedParameters = await parseQueryParameters(PARAM_OBJECT_LOGS, req.url)
+      parsedParameters = await parseQueryParameters(OBJ_LOGS, req.url)
     } catch (err) {
       log.w(mod, fun, err)
       return []

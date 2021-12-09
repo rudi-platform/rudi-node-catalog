@@ -47,14 +47,15 @@ const {
   PARAM_REPORT_ID,
   QUERY_LIMIT,
   QUERY_OFFSET,
-  PARAM_ACTION_REPORT,
+  ACT_REPORT,
   URL_PUB_METADATA,
-  PARAM_ACTION_DELETION,
+  ACT_DELETION,
   API_VERSION,
-  PARAM_OBJECT_METADATA,
+  OBJ_METADATA,
   URL_PV_OBJECT_GENERIC,
   DEFAULT_QUERY_LIMIT,
   QUERY_FILTER,
+  OBJ_REPORTS,
 } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
@@ -109,7 +110,7 @@ function pad(number, nbZeros) {
 // Add a new report for one object integration
 exports.addSingleReportForObject = async (req, reply) => {
   const fun = 'addSingleReportForObject'
-  log.t(mod, fun, `< POST ${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`)
+  log.t(mod, fun, `< POST ${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = json.accessReqParam(req, PARAM_OBJECT)
@@ -136,9 +137,9 @@ exports.addSingleReportForObject = async (req, reply) => {
     }
 
     // ensure report doesn't exist
-    const existsReport = await db.doesObjectExistWithRudiId(PARAM_ACTION_REPORT, reportId)
+    const existsReport = await db.doesObjectExistWithRudiId(OBJ_REPORTS, reportId)
     if (existsReport)
-      throw new MethodNotAllowedError(`${msg.objectAlreadyExists(PARAM_ACTION_REPORT, reportId)}`)
+      throw new MethodNotAllowedError(`${msg.objectAlreadyExists(OBJ_REPORTS, reportId)}`)
 
     // add new integration report
     log.d(mod, fun, `add new integration report`)
@@ -161,14 +162,14 @@ exports.addSingleReportForObject = async (req, reply) => {
 // Update an existing report for one object integration (public)
 exports.addOrEditSingleReportForMetadata = async (req, reply) => {
   const fun = 'addOrEditSingleReportForMetadata'
-  log.t(mod, fun, `< PUT ${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`)
-  return await this.addOrEditSingleReport(PARAM_OBJECT_METADATA, req, reply)
+  log.t(mod, fun, `< PUT ${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}`)
+  return await this.addOrEditSingleReport(OBJ_METADATA, req, reply)
 }
 
 // Update an existing report for one object integration (private)
 exports.addOrEditSingleReportForObject = async (req, reply) => {
   const fun = 'addOrEditSingleReportForObject'
-  log.t(mod, fun, `< PUT ${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`)
+  log.t(mod, fun, `< PUT ${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${ACT_REPORT}`)
   const objectType = json.accessReqParam(req, PARAM_OBJECT)
   return await this.addOrEditSingleReport(objectType, req, reply)
 }
@@ -230,7 +231,7 @@ exports.addOrEditSingleReport = async (objectType, req, reply) => {
     }
 
     // check if the report exists
-    const dbReport = await db.getObjectWithRudiId(PARAM_ACTION_REPORT, reportId)
+    const dbReport = await db.getObjectWithRudiId(OBJ_REPORTS, reportId)
 
     let dbReadyReport
     if (!dbReport) {
@@ -251,7 +252,7 @@ exports.addOrEditSingleReport = async (objectType, req, reply) => {
     } else {
       // updating existing report
       log.d(mod, fun, `Updating existing report`)
-      dbReadyReport = await db.overwriteObject(PARAM_ACTION_REPORT, reportBody)
+      dbReadyReport = await db.overwriteObject(OBJ_REPORTS, reportBody)
       log.i(mod, fun, `Report edited: ${utils.beautify(dbReadyReport)}`)
     }
 
@@ -268,14 +269,14 @@ exports.addOrEditSingleReport = async (objectType, req, reply) => {
 // Get every reports for one object integration (public)
 exports.getReportListForMetadata = async (req, reply) => {
   const fun = 'getReportListForMetadata'
-  log.t(mod, fun, `< GET ${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`)
-  return await this.getReportList(PARAM_OBJECT_METADATA, req, reply)
+  log.t(mod, fun, `< GET ${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}`)
+  return await this.getReportList(OBJ_METADATA, req, reply)
 }
 
 // Get every reports for one object integration (private)
 exports.getReportListForObject = async (req, reply) => {
   const fun = 'getReportListForObject'
-  log.t(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`)
+  log.t(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${ACT_REPORT}`)
   const objectType = json.accessReqParam(req, PARAM_OBJECT)
   return await this.getReportList(objectType, req, reply)
 }
@@ -301,7 +302,7 @@ exports.getReportList = async (objectType, req, reply) => {
       [QUERY_OFFSET]: offset,
       [QUERY_FILTER]: { [API_REPORT_RESOURCE_ID]: urlObjectId },
     }
-    const dbReportList = await db.getObjectList(PARAM_ACTION_REPORT, options)
+    const dbReportList = await db.getObjectList(OBJ_REPORTS, options)
 
     return dbReportList
   } catch (err) {
@@ -312,22 +313,14 @@ exports.getReportList = async (objectType, req, reply) => {
 // Get every reports for one object integration
 exports.getSingleReportForMetadata = async (req, reply) => {
   const fun = 'getSingleReportForMetadata'
-  log.d(
-    mod,
-    fun,
-    `< GET ${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}/:${PARAM_REPORT_ID}`
-  )
-  return await this.getSingleReport(PARAM_OBJECT_METADATA, req, reply)
+  log.d(mod, fun, `< GET ${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}/:${PARAM_REPORT_ID}`)
+  return await this.getSingleReport(OBJ_METADATA, req, reply)
 }
 
 // Get every reports for one object integration
 exports.getSingleReportForObject = async (req, reply) => {
   const fun = 'getSingleReportForObject'
-  log.d(
-    mod,
-    fun,
-    `< GET ${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}/:${PARAM_REPORT_ID}`
-  )
+  log.d(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${ACT_REPORT}/:${PARAM_REPORT_ID}`)
   // retrieve url parameters: object type
   const objectType = json.accessReqParam(req, PARAM_OBJECT)
   return await this.getSingleReport(objectType, req, reply)
@@ -347,7 +340,7 @@ exports.getSingleReport = async (objectType, req, reply) => {
     if (!existsObject) throw new ObjectNotFoundError(objectType, urlObjectId)
 
     // ensure report doesn't exist
-    const dbReport = await db.getEnsuredObjectWithRudiId(PARAM_ACTION_REPORT, reportId)
+    const dbReport = await db.getEnsuredObjectWithRudiId(OBJ_REPORTS, reportId)
 
     // ensure report is for the object
     const resourceId = json.accessProperty(dbReport, API_REPORT_RESOURCE_ID)
@@ -362,11 +355,7 @@ exports.getSingleReport = async (objectType, req, reply) => {
 // Get every reports for one object integration
 exports.deleteSingleReportForObject = async (req, reply) => {
   const fun = 'deleteSingleReportForObject'
-  log.d(
-    mod,
-    fun,
-    `< DELETE ${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}/:${PARAM_REPORT_ID}`
-  )
+  log.d(mod, fun, `< DELETE ${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}/:${PARAM_REPORT_ID}`)
   try {
     // retrieve url parameters: object id
     // retrieve body parameters: report id
@@ -384,7 +373,7 @@ exports.deleteSingleReportForObject = async (req, reply) => {
 // Get every reports for one object integration
 exports.deleteEveryReportForObject = async (req, reply) => {
   const fun = 'deleteEveryReportForObject'
-  log.t(mod, fun, `< DELETE ${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`)
+  log.t(mod, fun, `< DELETE ${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}`)
   try {
     // retrieve url parameters: object id
 
@@ -400,7 +389,7 @@ exports.deleteEveryReportForObject = async (req, reply) => {
 // Get every reports for one object integration
 exports.deleteManyReportForObject = async (req, reply) => {
   const fun = 'deleteManyReportForObject'
-  const errMsg = `< POST ${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}/${PARAM_ACTION_DELETION}`
+  const errMsg = `< POST ${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}/${ACT_DELETION}`
   log.d(mod, fun, errMsg)
   try {
     // retrieve url parameters: object id
@@ -417,7 +406,7 @@ exports.deleteManyReportForObject = async (req, reply) => {
 // Get every reports for one object integration
 exports.getReportListForObjectType = async (req, reply) => {
   const fun = 'getReportListForObjectType'
-  log.t(mod, fun, `< GET ${URL_PUB_METADATA}/${PARAM_ACTION_REPORT}`)
+  log.t(mod, fun, `< GET ${URL_PUB_METADATA}/${ACT_REPORT}`)
   try {
     // delete every integration report for all objects
     return `Function '${fun}' still needs to be implemented in module ${mod}`

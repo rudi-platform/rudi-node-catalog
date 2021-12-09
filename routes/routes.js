@@ -64,17 +64,18 @@ const {
   PARAM_REPORT_ID,
   PARAM_LOGS_LINES,
   PARAM_THESAURUS_CODE,
-  PARAM_OBJECT_METADATA,
-  PARAM_ACTION_INIT,
-  PARAM_ACTION_REPORT,
-  PARAM_ACTION_DELETION,
-  PARAM_ACTION_UUID_GEN,
-  PARAM_ACTION_UNLINKED,
+  OBJ_METADATA,
+  ACT_INIT,
+  ACT_REPORT,
+  ACT_DELETION,
+  ACT_UUID_GEN,
+  ACT_UNLINKED,
   URL_PV_APP_ENV_ACCESS,
   PARAM_THESAURUS_LANG,
   ROUTE_NAME,
   URL_PUB_API_VERSION,
-  PARAM_ACTION_SEARCH,
+  ACT_SEARCH,
+  OBJ_REPORTS,
 } = require('../config/confApi')
 
 const { JWT_USER, JWT_CLIENT } = require('../config/confPortal')
@@ -84,9 +85,9 @@ const { JWT_SUB } = require('../utils/crypto')
 // Route names
 // ------------------------------------------------------------------------------------------------
 
-const REDIRECT_GET_DATA = 'pub_redirect_metadata'
-const REDIRECT_GET_PLUS = 'pub_redirect_metadata'
-const REDIRECT_PUT_PLUS = 'pub_redirect_metadata'
+const REDIRECT_GET_DATA = 'redir_pub_metadata'
+const REDIRECT_GET_PLUS = 'redir_pub_metadata'
+const REDIRECT_PUT_PLUS = 'redir_pub_metadata'
 
 const PUB_GET_ALL_METADATA = 'pub_get_all_metadata'
 const PUB_GET_ONE_METADATA = 'pub_get_one_metadata'
@@ -270,7 +271,7 @@ exports.redirectRoutes = [
   },
   {
     method: 'GET',
-    url: `/${PARAM_OBJECT_METADATA}`,
+    url: `/${OBJ_METADATA}`,
     preHandler: onPublicRoute,
     config: { [ROUTE_NAME]: REDIRECT_GET_DATA },
     handler: function (req, reply) {
@@ -281,7 +282,7 @@ exports.redirectRoutes = [
   },
   {
     method: 'GET',
-    url: `/${PARAM_OBJECT_METADATA}/*`,
+    url: `/${OBJ_METADATA}/*`,
     preHandler: onPublicRoute,
     config: { [ROUTE_NAME]: REDIRECT_GET_PLUS },
     handler: function (req, reply) {
@@ -292,7 +293,7 @@ exports.redirectRoutes = [
   },
   {
     method: 'PUT',
-    url: `/${PARAM_OBJECT_METADATA}/*`,
+    url: `/${OBJ_METADATA}/*`,
     preHandler: onPublicRoute,
     config: { [ROUTE_NAME]: REDIRECT_PUT_PLUS },
     handler: function (req, reply) {
@@ -339,7 +340,7 @@ exports.publicRoutes = [
   // Add/edit 1 report for one object integration
   {
     method: 'PUT',
-    url: `/${PARAM_OBJECT_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
+    url: `/${OBJ_METADATA}/:${PARAM_ID}/${ACT_REPORT}`,
     preHandler: onPublicRoute,
     handler: reportController.addOrEditSingleReportForMetadata,
     config: { [ROUTE_NAME]: PUB_UPSERT_ONE_REPORT },
@@ -348,7 +349,7 @@ exports.publicRoutes = [
   // Add/edit 1 report for one object integration
   {
     method: 'PUT',
-    url: `${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
+    url: `${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}`,
     preHandler: onPublicRoute,
     handler: reportController.addOrEditSingleReportForMetadata,
     config: { [ROUTE_NAME]: PUB_UPSERT_ONE_REPORT },
@@ -357,7 +358,7 @@ exports.publicRoutes = [
   // Get all reports for one object integration
   {
     method: 'GET',
-    url: `${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
+    url: `${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}`,
     preHandler: onPublicRoute,
     handler: reportController.getReportListForMetadata,
     config: { [ROUTE_NAME]: PUB_GET_ALL_OBJ_REPORT },
@@ -365,7 +366,7 @@ exports.publicRoutes = [
   // Get 1 report for one object integration
   {
     method: 'GET',
-    url: `${URL_PUB_METADATA}/:${PARAM_ID}/${PARAM_ACTION_REPORT}/:${PARAM_REPORT_ID}`,
+    url: `${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}/:${PARAM_REPORT_ID}`,
     preHandler: onPublicRoute,
     handler: reportController.getSingleReportForMetadata,
     config: { [ROUTE_NAME]: PUB_GET_ONE_OBJ_REPORT },
@@ -435,7 +436,7 @@ exports.backOfficeRoutes = [
   // Delete many
   {
     method: 'POST',
-    url: `${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_DELETION}`,
+    url: `${URL_PV_OBJECT_GENERIC}/${ACT_DELETION}`,
     preHandler: onPrivateRoute,
     handler: genericController.deleteObjectList,
     config: { [ROUTE_NAME]: PRV_DEL_LIST },
@@ -444,17 +445,25 @@ exports.backOfficeRoutes = [
   // Access unlinked data
   {
     method: 'GET',
-    url: `${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_UNLINKED}`,
+    url: `${URL_PV_OBJECT_GENERIC}/${ACT_UNLINKED}`,
     preHandler: onPrivateRoute,
     handler: genericController.getOrphans,
     config: { [ROUTE_NAME]: PRV_GET_ORPHANS },
   },
-  // Search metadata
+  // Search object
   {
     method: 'GET',
-    url: `${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_SEARCH}`,
+    url: `${URL_PV_OBJECT_GENERIC}/${ACT_SEARCH}`,
     preHandler: onPrivateRoute,
     handler: genericController.searchObjects,
+    config: { [ROUTE_NAME]: PRV_RCH_OBJ },
+  },
+  // Get searchable fields for an object type
+  {
+    method: 'GET',
+    url: `${URL_PREFIX_PRIVATE}/${ACT_SEARCH}`,
+    preHandler: onPrivateRoute,
+    handler: genericController.getSearchableProperties,
     config: { [ROUTE_NAME]: PRV_RCH_OBJ },
   },
   // ------------------------------------------------------------------------------------------------
@@ -464,7 +473,7 @@ exports.backOfficeRoutes = [
   // Add 1 integration report for an identified object
   {
     method: 'POST',
-    url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
+    url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}`,
     preHandler: onPrivateRoute,
     handler: reportController.addSingleReportForObject,
     config: { [ROUTE_NAME]: PRV_ADD_OBJ_REPORT },
@@ -473,7 +482,7 @@ exports.backOfficeRoutes = [
   // Add/edit 1 integration report for an identified object
   {
     method: 'PUT',
-    url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
+    url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}`,
     preHandler: onPrivateRoute,
     handler: reportController.addOrEditSingleReportForObject,
     config: { [ROUTE_NAME]: PRV_UPSERT_OBJ_REPORT },
@@ -482,7 +491,7 @@ exports.backOfficeRoutes = [
   // Get all integration reports for an identified object
   {
     method: 'GET',
-    url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
+    url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}`,
     preHandler: onPrivateRoute,
     handler: reportController.getReportListForObject,
     config: { [ROUTE_NAME]: PRV_GET_OBJ_REPORT_LIST },
@@ -490,7 +499,7 @@ exports.backOfficeRoutes = [
   // Get 1 report for one object integration
   {
     method: 'GET',
-    url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}/:${PARAM_REPORT_ID}`,
+    url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}/:${PARAM_REPORT_ID}`,
     preHandler: onPrivateRoute,
     handler: reportController.getSingleReportForObject,
     config: { [ROUTE_NAME]: PRV_GET_ONE_OBJ_REPORT },
@@ -498,7 +507,7 @@ exports.backOfficeRoutes = [
   // Get all integration reports for one object type
   {
     method: 'GET',
-    url: `${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_REPORT}`,
+    url: `${URL_PV_OBJECT_GENERIC}/${OBJ_REPORTS}`,
     preHandler: onPrivateRoute,
     handler: reportController.getReportListForObjectType,
     config: { [ROUTE_NAME]: PRV_GET_ALL_OBJ_REPORT },
@@ -507,7 +516,7 @@ exports.backOfficeRoutes = [
   // Delete 1 identified integration report for one object
   {
     method: 'DELETE',
-    url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}/:${PARAM_REPORT_ID}`,
+    url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}/:${PARAM_REPORT_ID}`,
     preHandler: onPrivateRoute,
     handler: reportController.deleteSingleReportForObject,
     config: { [ROUTE_NAME]: PRV_DEL_OBJ_REPORT },
@@ -515,7 +524,7 @@ exports.backOfficeRoutes = [
   // Delete all integration reports for one object
   {
     method: 'DELETE',
-    url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}`,
+    url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}`,
     preHandler: onPrivateRoute,
     handler: reportController.deleteEveryReportForObject,
     config: { [ROUTE_NAME]: PRV_DEL_ALL_OBJ_REPORT },
@@ -523,7 +532,7 @@ exports.backOfficeRoutes = [
   // Delete many integration reports for an identified object
   {
     method: 'POST',
-    url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${PARAM_ACTION_REPORT}/${PARAM_ACTION_DELETION}`,
+    url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}/${ACT_DELETION}`,
     preHandler: onPrivateRoute,
     handler: reportController.deleteManyReportForObject,
     config: { [ROUTE_NAME]: PRV_DEL_LIST_OBJ_REPORT },
@@ -574,7 +583,7 @@ exports.devRoutes = [
   },
   {
     method: 'POST',
-    url: `${URL_PV_LICENCE_ACCESS}/${PARAM_ACTION_INIT}`,
+    url: `${URL_PV_LICENCE_ACCESS}/${ACT_INIT}`,
     preHandler: onDevRoute,
     handler: licenceController.initLicences,
     config: { [ROUTE_NAME]: DEV_INIT_LICENCES },
@@ -586,7 +595,7 @@ exports.devRoutes = [
   // Mass init with ODS data
   {
     method: 'POST',
-    url: `${URL_PREFIX_PRIVATE}/${PARAM_OBJECT_METADATA}/${PARAM_ACTION_INIT}`,
+    url: `${URL_PREFIX_PRIVATE}/${OBJ_METADATA}/${ACT_INIT}`,
     preHandler: onDevRoute,
     handler: metadataController.initWithODR,
     config: { [ROUTE_NAME]: DEV_INIT_WITH_ODR },
@@ -597,7 +606,7 @@ exports.devRoutes = [
   // ------------------------------------------------------------------------------------------------
   {
     method: 'GET',
-    url: `${URL_PREFIX_PRIVATE}/${PARAM_ACTION_UUID_GEN}`,
+    url: `${URL_PREFIX_PRIVATE}/${ACT_UUID_GEN}`,
     preHandler: onDevRoute,
     handler: genericController.generateUUID,
     config: { [ROUTE_NAME]: DEV_GENERATE_UUID },
@@ -627,21 +636,21 @@ exports.devRoutes = [
   // ------------------------------------------------------------------------------------------------
   {
     method: 'GET',
-    url: `${URL_PV_PORTAL_PREFIX}/${PARAM_OBJECT_METADATA}/:${PARAM_ID}`,
+    url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}/:${PARAM_ID}`,
     preHandler: onDevRoute,
     handler: portalController.getMetadata,
     config: { [ROUTE_NAME]: DEV_GET_PORTAL_METADATA },
   },
   {
     method: 'POST',
-    url: `${URL_PV_PORTAL_PREFIX}/${PARAM_OBJECT_METADATA}/:${PARAM_ID}`,
+    url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}/:${PARAM_ID}`,
     preHandler: onDevRoute,
     handler: portalController.sendMetadata,
     config: { [ROUTE_NAME]: DEV_SEND_METADATA_TO_PORTAL },
   },
   {
     method: 'DELETE',
-    url: `${URL_PV_PORTAL_PREFIX}/${PARAM_OBJECT_METADATA}/:${PARAM_ID}`,
+    url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}/:${PARAM_ID}`,
     preHandler: onDevRoute,
     handler: portalController.deleteMetadata,
     config: { [ROUTE_NAME]: DEV_DEL_PORTAL_METADATA },

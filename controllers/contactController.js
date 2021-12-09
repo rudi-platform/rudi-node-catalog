@@ -16,7 +16,7 @@ const { RudiError, InternalServerError } = require('../utils/errors')
 // ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
-const { PARAM_OBJECT_CONTACTS } = require('../config/confApi')
+const { OBJ_CONTACTS } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
 // Data models
@@ -34,7 +34,7 @@ exports.newContact = async (contactJson) => {
     dbContact = await new Contact(contactJson)
   } catch (err) {
     const error = new InternalServerError(
-      `New object '${PARAM_OBJECT_CONTACTS}': ${beautify(contactJson)} | Error: ${err}`
+      `New object '${OBJ_CONTACTS}': ${beautify(contactJson)} | Error: ${err}`
     )
     throw RudiError.treatError(mod, fun, error)
   }
@@ -42,7 +42,7 @@ exports.newContact = async (contactJson) => {
     await dbContact.save()
   } catch (err) {
     const error = new InternalServerError(
-      `Saving object '${PARAM_OBJECT_CONTACTS}': ${beautify(dbContact)} | Error: ${err}`
+      `Saving object '${OBJ_CONTACTS}': ${beautify(dbContact)} | Error: ${err}`
     )
     throw RudiError.treatError(mod, fun, error)
   }

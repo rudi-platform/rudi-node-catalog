@@ -24,13 +24,15 @@ exports.PARAM_ID = 'id'
 exports.PARAM_REPORT_ID = 'irid'
 
 // --- "Objects" parameters
-exports.PARAM_OBJECT_METADATA = 'resources'
-exports.PARAM_OBJECT_ORGANIZATIONS = 'organizations'
-exports.PARAM_OBJECT_CONTACTS = 'contacts'
-exports.PARAM_OBJECT_MEDIA = 'media'
-exports.PARAM_OBJECT_SKOS_SCHEME = 'skos_schemes'
-exports.PARAM_OBJECT_SKOS_CONCEPT = 'skos_concepts'
-exports.PARAM_OBJECT_LOGS = 'logs'
+exports.OBJ_METADATA = 'resources'
+exports.OBJ_ORGANIZATIONS = 'organizations'
+exports.OBJ_CONTACTS = 'contacts'
+exports.OBJ_MEDIA = 'media'
+exports.OBJ_SKOS_SCHEME = 'skos_schemes'
+exports.OBJ_SKOS_CONCEPT = 'skos_concepts'
+exports.OBJ_SKOS_CONCEPT = 'skos_concepts'
+exports.OBJ_REPORTS = 'reports'
+exports.OBJ_LOGS = 'logs'
 
 // --- "In query" parameters
 exports.QUERY_LIMIT = 'limit'
@@ -59,29 +61,30 @@ exports.MAX_QUERY_LIMIT = 500
 exports.URL_PREFIX_PUBLIC = '/api/v1'
 
 // This generic URL will be used to factorize the treatments on resources, organizations, contacts, etc.
-exports.URL_PUB_METADATA = `${this.URL_PREFIX_PUBLIC}/${this.PARAM_OBJECT_METADATA}`
+exports.URL_PUB_METADATA = `${this.URL_PREFIX_PUBLIC}/${this.OBJ_METADATA}`
 
-exports.PARAM_ACTION_UUID_GEN = 'id_generation'
-exports.PARAM_ACTION_INIT = 'init'
-exports.PARAM_ACTION_SIGN = 'sign'
-exports.PARAM_ACTION_DELETION = 'deletion'
-exports.PARAM_ACTION_UNLINKED = 'unlinked'
-exports.PARAM_ACTION_REPORT = 'report'
-exports.PARAM_ACTION_SEARCH = 'search'
+exports.ACT_UUID_GEN = 'id_generation'
+exports.ACT_INIT = 'init'
+exports.ACT_SIGN = 'sign'
+exports.ACT_DELETION = 'deletion'
+exports.ACT_UNLINKED = 'unlinked'
+exports.ACT_REPORT = 'report'
+exports.ACT_SEARCH = 'search'
 
 // ------------------------------------------------------------------------------------------------
 // DB actions
 // ------------------------------------------------------------------------------------------------
 
 exports.URL_OBJECTS = [
-  this.PARAM_OBJECT_METADATA,
-  this.PARAM_OBJECT_ORGANIZATIONS,
-  this.PARAM_OBJECT_CONTACTS,
-  this.PARAM_OBJECT_MEDIA,
-  this.PARAM_OBJECT_SKOS_CONCEPT,
-  this.PARAM_OBJECT_SKOS_SCHEME,
-  this.PARAM_ACTION_REPORT,
-  this.PARAM_OBJECT_LOGS,
+  this.OBJ_METADATA,
+  this.OBJ_ORGANIZATIONS,
+  this.OBJ_CONTACTS,
+  this.OBJ_MEDIA,
+  this.OBJ_SKOS_CONCEPT,
+  this.OBJ_SKOS_SCHEME,
+  this.OBJ_REPORTS,
+  this.ACT_REPORT,
+  this.OBJ_LOGS,
 ]
 
 exports.URL_PREFIX_PRIVATE = '/api/admin'
@@ -107,7 +110,7 @@ exports.URL_PV_PORTAL_PREFIX = `${this.URL_PREFIX_PRIVATE}/${URL_SUFFIX_PORTAL}`
 exports.URL_PV_TOKEN_ACCESS = `${this.URL_PV_PORTAL_PREFIX}/${this.URL_SUFFIX_TOKEN_GET}`
 exports.URL_PV_TOKEN_CHECK_ACCESS = `${this.URL_PV_TOKEN_ACCESS}/${this.URL_SUFFIX_TOKEN_CHECK}`
 
-exports.URL_PV_LOGS_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.PARAM_OBJECT_LOGS}`
+exports.URL_PV_LOGS_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.OBJ_LOGS}`
 exports.URL_PV_GIT_HASH_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_SUFFIX_GIT_HASH}`
 exports.URL_PV_APP_HASH_ACCESS = `${this.URL_PREFIX_PRIVATE}/${this.URL_SUFFIX_APP_HASH}`
 exports.URL_PUB_API_VERSION = `/api/version`

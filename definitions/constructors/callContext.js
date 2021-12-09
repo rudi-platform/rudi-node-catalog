@@ -19,11 +19,11 @@ const { RudiError } = require('../../utils/errors')
 // ------------------------------------------------------------------------------------------------
 const {
   ROUTE_NAME,
-  PARAM_OBJECT_METADATA,
-  PARAM_OBJECT_ORGANIZATIONS,
-  PARAM_OBJECT_CONTACTS,
-  PARAM_OBJECT_MEDIA,
-  PARAM_ACTION_REPORT,
+  OBJ_METADATA,
+  OBJ_ORGANIZATIONS,
+  OBJ_CONTACTS,
+  OBJ_MEDIA,
+  OBJ_REPORTS,
 } = require('../../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
@@ -151,11 +151,11 @@ exports.CallContext = class CallContext {
     this[OP][OP_ID].push(`${type}:${id}`)
   }
 
-  addMetaId = (id) => this.addObjId(`${PARAM_OBJECT_METADATA}:${id}`)
-  addProducerId = (id) => this.addObjId(`${PARAM_OBJECT_ORGANIZATIONS}:${id}`)
-  addContactId = (id) => this.addObjId(`${PARAM_OBJECT_CONTACTS}:${id}`)
-  addMediaId = (id) => this.addObjId(`${PARAM_OBJECT_MEDIA}:${id}`)
-  addReportId = (id) => this.addObjId(`${PARAM_ACTION_REPORT}:${id}`)
+  addMetaId = (id) => this.addObjId(`${OBJ_METADATA}:${id}`)
+  addProducerId = (id) => this.addObjId(`${OBJ_ORGANIZATIONS}:${id}`)
+  addContactId = (id) => this.addObjId(`${OBJ_CONTACTS}:${id}`)
+  addMediaId = (id) => this.addObjId(`${OBJ_MEDIA}:${id}`)
+  addReportId = (id) => this.addObjId(`${OBJ_REPORTS}:${id}`)
 
   setReqDescription(reqMethod, reqUrl, routeName) {
     log.t(mod, 'setReqDescription', ``)

@@ -16,7 +16,7 @@ const { beautify } = require('../utils/jsUtils')
 // Constants
 // ------------------------------------------------------------------------------------------------
 
-const { PARAM_OBJECT_ORGANIZATIONS } = require('../config/confApi')
+const { OBJ_ORGANIZATIONS } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
 // Data models
@@ -35,7 +35,7 @@ exports.newOrganization = async (orgJson) => {
     dbOrganization = await new Organization(orgJson)
   } catch (err) {
     const error = new Error(
-      `New object '${PARAM_OBJECT_ORGANIZATIONS}': ${beautify(orgJson)} | Error: ${err}`
+      `New object '${OBJ_ORGANIZATIONS}': ${beautify(orgJson)} | Error: ${err}`
     )
     throw RudiError.treatError(mod, fun, error)
   }
@@ -44,7 +44,7 @@ exports.newOrganization = async (orgJson) => {
     // cache.addOrganization(dbOrganization)
   } catch (err) {
     const error = new Error(
-      `Saving object '${PARAM_OBJECT_ORGANIZATIONS}': ${beautify(dbOrganization)} | Error: ${err}`
+      `Saving object '${OBJ_ORGANIZATIONS}': ${beautify(dbOrganization)} | Error: ${err}`
     )
     throw RudiError.treatError(mod, fun, error)
   }

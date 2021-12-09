@@ -89,10 +89,13 @@ OrganizationSchema.methods.toJSON = function () {
 // ------------------------------------------------------------------------------------------------
 const Organization = mongoose.model('Organization', OrganizationSchema)
 
+const SEARCHABLE_FIELDS = [API_ORGANIZATION_ID, API_ORGANIZATION_NAME]
+Organization.searchableFields = () => SEARCHABLE_FIELDS
+
 const fun = 'createSearchIndexes'
 Organization.createSearchIndexes = async () => {
   try {
-    await makeSearchable(Organization, [API_ORGANIZATION_ID, API_ORGANIZATION_NAME])
+    await makeSearchable(Organization, SEARCHABLE_FIELDS)
   } catch (err) {
     RudiError.treatError(mod, fun, err)
   }

@@ -39,14 +39,14 @@ const {
 const {
   URL_PUB_METADATA,
 
-  PARAM_OBJECT_METADATA,
-  PARAM_OBJECT_ORGANIZATIONS,
-  PARAM_OBJECT_CONTACTS,
-  PARAM_OBJECT_MEDIA,
-  PARAM_OBJECT_SKOS_CONCEPT,
-  PARAM_OBJECT_SKOS_SCHEME,
-  PARAM_ACTION_DELETION,
-  PARAM_ACTION_SEARCH,
+  OBJ_METADATA,
+  OBJ_ORGANIZATIONS,
+  OBJ_CONTACTS,
+  OBJ_MEDIA,
+  OBJ_SKOS_CONCEPT,
+  OBJ_SKOS_SCHEME,
+  ACT_DELETION,
+  ACT_SEARCH,
   PARAM_ID,
   PARAM_OBJECT,
 
@@ -68,7 +68,7 @@ const {
   URL_PV_OBJECT_GENERIC,
   QUERY_UPDATED_AFTER,
   QUERY_UPDATED_BEFORE,
-  PARAM_ACTION_UNLINKED,
+  ACT_UNLINKED,
   QUERY_UNKOWN,
 } = require('../config/confApi')
 
@@ -437,15 +437,15 @@ async function newObject(objectType, objectData) {
     // checkIsUrlObject(objectType)
 
     switch (objectType) {
-      case PARAM_OBJECT_METADATA:
+      case OBJ_METADATA:
         return await metadataController.newMetadata(objectData)
-      case PARAM_OBJECT_ORGANIZATIONS:
+      case OBJ_ORGANIZATIONS:
         return await organizationController.newOrganization(objectData)
-      case PARAM_OBJECT_CONTACTS:
+      case OBJ_CONTACTS:
         return await contactController.newContact(objectData)
-      case PARAM_OBJECT_SKOS_CONCEPT:
+      case OBJ_SKOS_CONCEPT:
         return await skosController.newSkosConcept(objectData)
-      case PARAM_OBJECT_SKOS_SCHEME:
+      case OBJ_SKOS_SCHEME:
         // Custom creation to create the children scheme concepts
         return await skosController.newSkosScheme(objectData)
       default:
@@ -460,9 +460,9 @@ async function isObjectReferenced(objectType, rudiId) {
   const fun = 'isObjectReferenced'
 
   switch (objectType) {
-    case PARAM_OBJECT_ORGANIZATIONS:
-    case PARAM_OBJECT_CONTACTS:
-    case PARAM_OBJECT_MEDIA: {
+    case OBJ_ORGANIZATIONS:
+    case OBJ_CONTACTS:
+    case OBJ_MEDIA: {
       log.d(mod, fun, `objectType: ${objectType}, id: ${rudiId}`)
       return await db.isReferencedInMetadata(objectType, rudiId)
     }
@@ -578,7 +578,7 @@ exports.getObjectList = async (req, reply) => {
  */
 exports.searchObjects = async (req, reply) => {
   const fun = 'searchObjects'
-  log.t(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_SEARCH}`)
+  log.t(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}/${ACT_SEARCH}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = getObjectParam(req)
@@ -620,6 +620,23 @@ exports.searchObjects = async (req, reply) => {
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
+}
+
+exports.getSearchableProperties = (req, reply) => {
+  const fun = 'getSearchableProperties'
+  log.t(mod, fun, ``)
+
+  const rudiObjectList = db.getRudiObjectList()
+  const searchableFields = {}
+  log.d(mod, fun, `rudiObjectList: ${beautify(rudiObjectList)}`)
+  Object.keys(rudiObjectList).map((objectType) => {
+    try {
+      searchableFields[objectType] = rudiObjectList[objectType].Model.searchableFields()
+    } catch (err) {
+      log.d(mod, fun, `${objectType}: not searchable`)
+    }
+  })
+  return searchableFields
 }
 
 /**
@@ -700,7 +717,7 @@ exports.getMetadataListAndCount = async (req, reply) => {
 
     let parsedParameters
     try {
-      parsedParameters = await this.parseQueryParameters(PARAM_OBJECT_METADATA, req.url)
+      parsedParameters = await this.parseQueryParameters(OBJ_METADATA, req.url)
     } catch (err) {
       log.w(mod, fun, err)
       return []
@@ -743,7 +760,7 @@ exports.updateSingleObject = async (req, reply) => {
 
     const context = CallContext.getCallContextFromReq(req)
 
-    if (objectType === PARAM_OBJECT_METADATA) {
+    if (objectType === OBJ_METADATA) {
       if (context) context.addMetaId(rudiId)
       return await metadataController.overwriteMetadata(updateData)
     } else {
@@ -780,7 +797,7 @@ exports.upsertSingleObject = async (req, reply) => {
 
       return await newObject(objectType, updateData)
     } else {
-      if (objectType === PARAM_OBJECT_METADATA) {
+      if (objectType === OBJ_METADATA) {
         if (context) context.addMetaId(rudiId)
         return await metadataController.overwriteMetadata(updateData)
       } else {
@@ -815,7 +832,7 @@ exports.deleteSingleObject = async (req, reply) => {
     // TODO: if SkosConcept: update all other SkosConcepts that reference it (parents/children/siblings/relatives)
     const answer = await db.deleteObject(objectType, rudiId)
 
-    if (objectType === PARAM_OBJECT_METADATA) {
+    if (objectType === OBJ_METADATA) {
       deletePortalMetadata(rudiId)
         .then(() =>
           log.i(mod, fun, `Portal accepted the deletion request for metadata '${rudiId}'`)
@@ -838,7 +855,7 @@ exports.deleteSingleObject = async (req, reply) => {
  */
 exports.deleteObjectList = async (req, reply) => {
   const fun = 'deleteObjectList'
-  log.t(mod, fun, `< POST ${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_DELETION}`)
+  log.t(mod, fun, `< POST ${URL_PV_OBJECT_GENERIC}/${ACT_DELETION}`)
   try {
     // retrieve url parameters: object type, object id
     const objectType = getObjectParam(req)
@@ -906,7 +923,7 @@ exports.deleteManyObjects = async (req, reply) => {
  */
 exports.getOrphans = async (objectType) => {
   const fun = 'getUnlinkdedObjects'
-  log.t(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}/${PARAM_ACTION_UNLINKED}`)
+  log.t(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}/${ACT_UNLINKED}`)
 
   return await db.getOrphans(objectType)
 }

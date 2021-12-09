@@ -159,20 +159,22 @@ ReportSchema.pre('save', async function (next) {
 // ------------------------------------------------------------------------------------------------
 const Report = mongoose.model('Report', ReportSchema)
 
+const SEARCHABLE_FIELDS = [
+  API_REPORT_ID,
+  API_REPORT_RESOURCE_ID,
+  API_DATA_NAME_PROPERTY,
+  API_REPORT_STATUS,
+  `${API_REPORT_ERRORS}.${API_REPORT_ERROR_MSG}`,
+  `${API_REPORT_ERRORS}.${API_REPORT_FIELD}`,
+  `${LOCAL_REPORT_ERROR}.${LOCAL_REPORT_ERROR_TYPE}`,
+  `${LOCAL_REPORT_ERROR}.${LOCAL_REPORT_ERROR_MSG}`,
+]
+Report.searchableFields = () => SEARCHABLE_FIELDS
+
 const fun = 'createSearchIndexes'
 Report.createSearchIndexes = async () => {
   try {
-    await makeSearchable(Report, [
-      API_REPORT_ID,
-      API_REPORT_RESOURCE_ID,
-      API_DATA_NAME_PROPERTY,
-      API_REPORT_STATUS,
-      `${API_REPORT_ERRORS}.${API_REPORT_ERROR_MSG}`,
-      `${API_REPORT_ERRORS}.${API_REPORT_FIELD}`,
-      `${LOCAL_REPORT_ERROR}.${LOCAL_REPORT_ERROR_TYPE}`,
-      `${LOCAL_REPORT_ERROR}.${LOCAL_REPORT_ERROR_MSG}`,
-      ,
-    ])
+    await makeSearchable(Report, SEARCHABLE_FIELDS)
   } catch (err) {
     RudiError.treatError(mod, fun, err)
   }

@@ -284,16 +284,19 @@ const Media = mongoose.model('Media', MediaSchema)
 const MediaFile = Media.discriminator(MediaTypes.File, FileSchema)
 const MediaSeries = Media.discriminator(MediaTypes.Series, SeriesSchema)
 
+const SEARCHABLE_FIELDS = [
+  API_MEDIA_ID,
+  API_MEDIA_TYPE,
+  API_MEDIA_NAME,
+  API_FILE_TYPE,
+  API_FILE_UPDATE_STATUS,
+]
+Media.searchableFields = () => SEARCHABLE_FIELDS
+
 const fun = 'createSearchIndexes'
 Media.createSearchIndexes = async () => {
   try {
-    await makeSearchable(Media, [
-      API_MEDIA_ID,
-      API_MEDIA_TYPE,
-      API_MEDIA_NAME,
-      API_FILE_TYPE,
-      API_FILE_UPDATE_STATUS,
-    ])
+    await makeSearchable(Media, SEARCHABLE_FIELDS)
   } catch (err) {
     RudiError.treatError(mod, fun, err)
   }
