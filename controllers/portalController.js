@@ -432,7 +432,7 @@ exports.verifyPortalToken = (accessToken) => {
     // log.d(mod, fun, `JWT Portal user: ${jwtPortalUser}`)
     if (jwtPortalUser !== login) {
       log.w(mod, fun, `Portal JWT: incorrect user: ${jwtPortalUser}`)
-      log.sysOnError(401, `Portal JWT: incorrect user: ${jwtPortalUser}, token=${accessToken†}`)
+      log.sysOnError(401, `Portal JWT: incorrect user: ${jwtPortalUser}, token=${accessToken}`)
       // throw new ForbiddenError(`Portal JWT: incorrect user`)
     }
     // if (jwtPayload[portal.JWT_CLIENT] !== login)
