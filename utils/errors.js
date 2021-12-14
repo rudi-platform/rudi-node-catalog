@@ -72,7 +72,7 @@ class RudiError extends Error {
     this[TRACE].push({ [TRACE_MOD]: ctxMod, [TRACE_FUN]: ctxFun, [TRACE_ERR]: ctxErr })
   }
   get primeError() {
-    return this[TRACE][0]
+    return this[TRACE] ? this[TRACE][0] : this
   }
   static logErrorPile(error) {
     const fun = 'logErrorPile'

@@ -24,6 +24,8 @@ const {
   OBJ_CONTACTS,
   OBJ_MEDIA,
   OBJ_REPORTS,
+  TRACE_MOD,
+  TRACE_FUN,
 } = require('../../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
@@ -251,18 +253,26 @@ exports.CallContext = class CallContext {
   getError = () => this[DETAILS][ERROR]
   addError = (ctxMod, ctxFun, error) => {
     const fun = 'addError'
-    log.t(mod, fun, ``)
-    if (RudiError.isRudiError(error)) {
-      if (!this[DETAILS][ERROR]) this[DETAILS][ERROR] = error
-      else {
-        {
-          log.w(mod, fun, `Error already added: ${beautify(this[DETAILS][ERROR])}`)
-          log.w(mod, fun, `Trying to add error: ${beautify(error)}`)
+    try {
+      log.t(mod, fun, ``)
+      if (RudiError.isRudiError(error)) {
+        // log.t(mod, fun, `rudi error`)
+        // log.t(mod, fun, `this[DETAILS]: ${this[DETAILS]}`)
+        if (!this[DETAILS][ERROR]) this[DETAILS][ERROR] = error
+        else {
+          {
+            log.w(mod, fun, `Error already added: ${beautify(this[DETAILS][ERROR])}`)
+            log.w(mod, fun, `Trying to add error: ${beautify(error)}`)
+          }
         }
+      } else {
+        // log.t(mod, fun, `not rudi error`)
+        const rudiError = RudiError.treatError(ctxMod, ctxFun, error)
+        this.addError(ctxMod, ctxFun, rudiError)
       }
-    } else {
-      const rudiError = RudiError.treatError(ctxMod, ctxFun, error)
-      this.addError(ctxMod, ctxFun, rudiError)
+    } catch (err) {
+      log.w(mod, fun, err)
+      throw err
     }
   }
 
@@ -273,19 +283,19 @@ exports.CallContext = class CallContext {
 
   logErr = (ctxMod, ctxFun, err) => {
     const fun = 'logErr'
-    log.t(ctxMod, fun, ``)
+    log.t(mod, fun, ``)
     try {
       if (!err && !this.getError()) throw new RudiError('No error found in current context')
 
       if (!this.getError()) this.addError(ctxMod, ctxFun, err)
       const error = this.getError()
-      const primeError = error.primeError
+      const primeError = error.primeError || error
 
       const errMsg = `Error ${error.statusCode} (${error.name}): ${error.message}`
       const errDetails =
-        `${ERR_PLACE}: '${primeError.mod}.${primeError.fun}', ` +
+        `${ERR_PLACE}: '${primeError[TRACE_MOD]}.${primeError[TRACE_FUN]}', ` +
         `${ERR_ON_REQ}: '${this.formatReqDetails()}'`
-
+      log.d(mod, fun, errDetails)
       log.sysOnError(error.statusCode, errMsg, this, errDetails)
     } catch (error) {
       // log.e(mod, fun, error)

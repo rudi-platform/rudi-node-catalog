@@ -54,6 +54,7 @@ const {
   MAX_QUERY_LIMIT,
   DEFAULT_QUERY_LIMIT,
   DEFAULT_QUERY_OFFSET,
+  QUERY_COUNT_BY,
 } = require('../config/confApi')
 
 // Fields from the JSON as definied in the API
@@ -760,10 +761,16 @@ exports.searchObjects = async (objectType, options) => {
       throw new RudiError('Input option search terms should be an array')
 
     options[QUERY_FILTER].$text = { $search: searchTermsList.join(' ') }
+    const countBy = options[QUERY_COUNT_BY]
+    // const groupBy = options[QUERY_GROUP_BY]
 
     // Case objectType is a metadata
     try {
-      if (objectType === OBJ_METADATA) {
+      if (countBy) {
+        return await this.countObjectList(objectType, countBy, options)
+        // } else if (groupBy) {
+        //   return await this.groupObjectList(objectType, groupBy, options)
+      } else if (objectType === OBJ_METADATA) {
         return await this.getMetadataListAndCount(options)
       } else {
         return await this.getObjectListAndCount(objectType, options)

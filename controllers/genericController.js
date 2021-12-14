@@ -608,6 +608,7 @@ exports.searchObjects = async (req, reply) => {
       QUERY_UPDATED_AFTER,
       QUERY_UPDATED_BEFORE,
       QUERY_UNKOWN,
+      QUERY_COUNT_BY,
     ])
     const objectList = await db.searchObjects(objectType, options)
 
