@@ -690,7 +690,7 @@ exports.getSingleMetadata = async (req, reply) => {
     // return the object
     return dbObject
   } catch (err) {
-    const error = err.name === 'MongoError' ? new BadRequestError(error) : new NotFoundError(error)
+    const error = err.name === 'MongoError' ? new BadRequestError(err) : new NotFoundError(err)
     throw RudiError.treatError(mod, fun, error)
   }
 }
@@ -705,7 +705,7 @@ exports.getMetadataList = async (req, reply) => {
   try {
     return await genericController.getManyObjects(OBJ_METADATA, req, reply)
   } catch (err) {
-    const error = err.name === 'MongoError' ? new BadRequestError(error) : new NotFoundError(error)
+    const error = err.name === 'MongoError' ? new BadRequestError(err) : new NotFoundError(err)
     throw RudiError.treatError(mod, fun, error)
   }
 }

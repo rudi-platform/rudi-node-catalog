@@ -734,7 +734,7 @@ exports.getMetadataListAndCount = async (req, reply) => {
     objectList = await db.getMetadataListAndCount(options)
     return objectList
   } catch (err) {
-    const error = err.name === 'MongoError' ? new BadRequestError(error) : new NotFoundError(error)
+    const error = err.name === 'MongoError' ? new BadRequestError(err) : new NotFoundError(err)
     throw RudiError.treatError(mod, fun, error)
   }
 }

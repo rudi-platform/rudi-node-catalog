@@ -289,6 +289,7 @@ exports.CallContext = class CallContext {
 
       if (!this.getError()) this.addError(ctxMod, ctxFun, err)
       const error = this.getError()
+      log.d(mod, fun, beautify(error))
       const primeError = error.primeError || error
 
       const errMsg = `Error ${error.statusCode} (${error.name}): ${error.message}`
