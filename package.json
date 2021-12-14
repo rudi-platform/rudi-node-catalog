@@ -55,8 +55,6 @@
     "eslint-plugin-unused-imports": "^1.1.5",
     "js-beautify": "^1.14.0",
     "nodemon": "^2.0.13",
-    "oas": "^17.1.7",
-    "prettier": "^2.4.1",
-    "swagger-inline": "^5.0.2"
+    "prettier": "^2.4.1"
   }
 }
