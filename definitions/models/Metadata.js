@@ -867,5 +867,4 @@ Metadata.createSearchIndexes()
 module.exports = {
   Metadata,
   METADATA_FIELDS_TO_POPULATE,
-  SEARCHABLE_FIELDS,
 }

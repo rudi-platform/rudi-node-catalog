@@ -69,6 +69,7 @@ exports.dropCollection = async (collectionName) => {
 }
 
 const MDB_SEARCH_INDEXES = { _fts: 'text', _ftsx: 1 }
+const SEARCH_INDEX = 'searchIndex'
 
 exports.makeSearchable = async (Model, listFields) => {
   const fun = 'makeSearchable'
@@ -79,18 +80,28 @@ exports.makeSearchable = async (Model, listFields) => {
     // Preparing the 'text' (== searchable) indexes
     const searchIndexes = {}
     listFields.map((field) => (searchIndexes[field] = 'text'))
+
+    const indexOpts = {
+      default_language: 'fr',
+      name: SEARCH_INDEX,
+    }
+
     // log.d(mod, fun, utils.beautify(searchIndexes))
 
     // Dropping current text indexes if they exist
     const indexes = await collection.getIndexes()
     await Promise.all(
-      Object.entries(indexes).map(async (index, value) => {
-        if (value == MDB_SEARCH_INDEXES) await collection.dropIndex(MDB_SEARCH_INDEXES)
+      Object.entries(indexes).map(async (key, index) => {
+        // log.d(mod, fun, `${collection.name} - ${index}: ${key}`)
+        if (key == `${SEARCH_INDEX},_fts,text,_ftsx,1`) {
+          log.t(mod, fun, `Dropping search indexes for '${collection.name}'`)
+          await collection.dropIndex(SEARCH_INDEX)
+        }
       })
     )
     // (Re)creating the indexes
     log.t(mod, fun, `Creating search indexes for collection '${collection.name}'`)
-    await collection.createIndex(searchIndexes)
+    await collection.createIndex(searchIndexes, indexOpts)
   } catch (err) {
     log.w(mod, fun, `Couldn't create indexes for '${Model.collection.name}': ${err}`)
     throw RudiError.treatError(mod, fun, err)
