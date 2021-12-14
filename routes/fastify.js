@@ -5,21 +5,37 @@ const mod = 'fastify'
 // ------------------------------------------------------------------------------------------------
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
-const utils = require('../utils/jsUtils')
+const { padA1, nowEpochMs } = require('../utils/jsUtils')
+const {
+  shouldControlPrivateRequests,
+  shouldControlPublicRequests,
+} = require('../config/confSystem')
 const { initFFLogger, shouldShowErrorPile, shouldShowRoutes } = require('../config/confLogs')
+const { JWT_USER } = require('../config/confPortal')
 const log = require('../utils/logging')
-const { RudiError } = require('../utils/errors')
 
 const { STATUS_CODE, ROUTE_NAME } = require('../config/confApi')
+const { JWT_SUB, JWT_CLIENT } = require('../utils/crypto')
+
+const { RudiError } = require('../utils/errors')
 const { CallContext } = require('../definitions/constructors/callContext')
 
-const { publicRoutes, backOfficeRoutes, devRoutes, redirectRoutes } = require('./routes')
+const {
+  redirectRoutes,
+  freeRoutes,
+  publicRoutes,
+  backOfficeRoutes,
+  devRoutes,
+} = require('./routes')
+
+const { checkRudiProdPermission } = require('../controllers/tokenController')
+const { checkPortalTokenInHeader } = require('../controllers/portalController')
 
 // ------------------------------------------------------------------------------------------------
 // External dependancies
 // ------------------------------------------------------------------------------------------------
 // Require the fastify framework and instantiate it
-const fastify = require('fastify')({
+const fastifyConf = require('fastify')({
   logger: {
     level: 'warn',
     logger: initFFLogger(),
@@ -35,7 +51,7 @@ const fastify = require('fastify')({
 // ------------------------------------------------------------------------------------------------
 // Fastify hooks: errors
 // ------------------------------------------------------------------------------------------------
-fastify.addHook('onError', (request, reply, error, done) => {
+fastifyConf.addHook('onError', (request, reply, error, done) => {
   const fun = 'onError'
   log.t(mod, fun, ``)
   try {
@@ -43,7 +59,7 @@ fastify.addHook('onError', (request, reply, error, done) => {
     // log.d(mod, fun, `showErrorPile: ${shouldShowErrorPile()}`)
 
     const reqContext = CallContext.getCallContextFromReq(request)
-    // if (reqContext) log.d(mod, fun, `request: ${utils.beautify(reqContext)}`)
+    // if (reqContext) log.d(mod, fun, `request: ${beautify(reqContext)}`)
 
     if (RudiError.isRudiError(error) && shouldShowErrorPile()) RudiError.logErrorPile(error)
 
@@ -59,7 +75,7 @@ fastify.addHook('onError', (request, reply, error, done) => {
   done()
 })
 
-fastify.setErrorHandler((error, request, reply) => {
+fastifyConf.setErrorHandler((error, request, reply) => {
   const fun = 'finalErrorHandler'
   log.t(mod, fun, ``)
   try {
@@ -86,7 +102,7 @@ fastify.setErrorHandler((error, request, reply) => {
   log.t(mod, fun, 'done')
 })
 
-fastify.decorate('notFound', (req, reply) => {
+fastifyConf.decorate('notFound', (req, reply) => {
   const fun = 'notFound'
   // const ip = req.ip
 
@@ -98,22 +114,22 @@ fastify.decorate('notFound', (req, reply) => {
   const context = CallContext.getCallContextFromReq(req)
   log.w(mod, fun, `${response.message} <- ${context.apiCallMsg}`)
   log.sysNotice(`Error 404: ${response.message}`, '', CallContext.getReqContext(req))
-  // log.d(mod, fun, utils.beautify(req))
+  // log.d(mod, fun, beautify(req))
   reply.isError = true
   reply.code(404).send(response)
 })
 
-fastify.setNotFoundHandler(fastify.notFound)
+fastifyConf.setNotFoundHandler(fastifyConf.notFound)
 
 // ------------------------------------------------------------------------------------------------
 // Fastify hooks: request receive / send
 // ------------------------------------------------------------------------------------------------
-fastify.addHook('onRequest', (req, res, next) => {
+fastifyConf.addHook('onRequest', (req, res, next) => {
   const fun = 'onRequest'
   try {
     const context = new CallContext()
     log.t(mod, fun, `----- Rcv req #${context.id} -----vvv---`)
-    const now = utils.nowEpochMs()
+    const now = nowEpochMs()
 
     context.setIpsFromRequest(req)
     context.setReqDescription(req.method, req.url, req.context.config[ROUTE_NAME])
@@ -127,11 +143,11 @@ fastify.addHook('onRequest', (req, res, next) => {
   }
 })
 
-fastify.addHook('onSend', (request, reply, payload, next) => {
+fastifyConf.addHook('onSend', (request, reply, payload, next) => {
   const fun = 'onSend'
   try {
     log.t(mod, fun, ``)
-    const now = utils.nowEpochMs()
+    const now = nowEpochMs()
 
     const context = CallContext.getCallContextFromReq(request)
     context.duration = now - context.timestamp
@@ -146,37 +162,138 @@ fastify.addHook('onSend', (request, reply, payload, next) => {
 })
 
 // ------------------------------------------------------------------------------------------------
-// ROUTES
+// Exports
 // ------------------------------------------------------------------------------------------------
 
-// Loop over each public route
-redirectRoutes.forEach((pubRoute, index) => {
-  fastify.route(pubRoute)
-  if (shouldShowRoutes())
-    log.v('Redirect', 'routes', `${utils.padA1(index)}: ${pubRoute.method} ${pubRoute.url}`)
-})
-// Loop over each public route
-publicRoutes.forEach((pubRoute, index) => {
-  fastify.route(pubRoute)
-  if (shouldShowRoutes())
-    log.i('Public', 'routes', `${utils.padA1(index)}: ${pubRoute.method} ${pubRoute.url}`)
-})
+// ------------------------------------------------------------------------------------------------
+// Pre-handler functions
+// ------------------------------------------------------------------------------------------------
+/**
+ * Pre-handler for requests that need no authentification ("free routes")
+ * @param {object} req incoming request
+ * @param {object} reply reply
+ */
+async function onFreeRoute(req, reply) {
+  const fun = 'onFreeRoute'
+  try {
+    log.t(mod, fun, `${req.method} ${req.url} `)
+    const context = CallContext.getCallContextFromReq(req)
+    context.logInfo('route', fun, 'API call')
+    return
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
 
-// Loop over each backoffice route
-backOfficeRoutes.forEach((boRoute, index) => {
-  fastify.route(boRoute)
-  if (shouldShowRoutes())
-    log.v('Private', 'routes', `${utils.padA1(index)}: ${boRoute.method} ${boRoute.url}`)
-})
+/**
+ * Pre-handler for requests that need a "public" (aka portal) authentification
+ * ("public routes")
+ * @param {object} req incoming request
+ * @param {object} reply reply
+ */
+async function onPublicRoute(req, reply) {
+  const fun = 'onPublicRoute'
+  try {
+    log.t(mod, fun, `${req.method} ${req.url} `)
+    if (!shouldControlPublicRequests()) return true
 
-devRoutes.forEach((devRoute, index) => {
-  fastify.route(devRoute)
-  if (shouldShowRoutes())
-    log.d('Dev', 'routes', `${utils.padA1(index)}: ${devRoute.method} ${devRoute.url}`)
-})
+    const portalJwt = await checkPortalTokenInHeader(req, reply)
+    const jwtPayload = portalJwt[1]
+    // log.d(mod, fun, `Payload: ${beautify(jwtPayload)}`)
+
+    const context = CallContext.getCallContextFromReq(req)
+    context.clientApp = jwtPayload[JWT_SUB] || 'RUDI Portal'
+    context.reqUser = jwtPayload[JWT_USER] || jwtPayload[JWT_CLIENT]
+
+    context.logInfo('route', fun, 'API call')
+    return
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+/**
+ * Pre-handler for requests that need a "private" (aka rudi producer node)
+ * authentification ("private/backoffice routes")
+ * These requests should normally bear a user identification
+ * @param {object} req incoming request
+ * @param {object} reply reply
+ */
+async function onPrivateRoute(req, reply) {
+  const fun = 'onPrivateRoute'
+  try {
+    log.t(mod, fun, `${req.method} ${req.url} `)
+    if (!shouldControlPrivateRequests()) return true
+
+    const context = CallContext.getCallContextFromReq(req)
+
+    const { subject, clientId } = await checkRudiProdPermission(req, reply)
+
+    context.clientApp = subject
+    context.reqUser = clientId
+
+    context.logInfo('route', fun, 'API call')
+    return
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+/**
+ * Pre-handler for requests that need a "private" (aka rudi producer node)
+ * authentification ("dev routes")
+ * These requests are normally not user driven actions, but sent by an app
+ * such as the prodmanager
+ * @param {object} req incoming request
+ * @param {object} reply reply
+ */
+async function onDevRoute(req, reply) {
+  const fun = 'onDevRoute'
+  try {
+    log.t(mod, fun, `${req.method} ${req.url} `)
+    if (!shouldControlPrivateRequests()) return true
+
+    const { subject, clientId } = await checkRudiProdPermission(req, reply)
+
+    const context = CallContext.getCallContextFromReq(req)
+    context.clientApp = subject
+    context.reqUser = clientId
+
+    context.logInfo('route', fun, 'API call')
+    return
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+// ------------------------------------------------------------------------------------------------
+// ROUTES
+// ------------------------------------------------------------------------------------------------
+function declareRouteGroup(routeGroup, preHandler, routeGroupName, logLevel) {
+  try {
+    routeGroup.map((route, index) => {
+      route.preHandler = preHandler
+      fastifyConf.route(route)
+      if (shouldShowRoutes())
+        log[logLevel](routeGroupName, 'routes', `${padA1(index)}: ${route.method} ${route.url}`)
+    })
+  } catch (err) {
+    RudiError.treatError(mod, 'declareRouteGroup', err)
+  }
+}
+
+/**
+ * Pre-handler fonction assignments
+ */
+
+declareRouteGroup(redirectRoutes, onPublicRoute, 'Redirect', 'd')
+declareRouteGroup(freeRoutes, onFreeRoute, 'Free', 'v')
+declareRouteGroup(publicRoutes, onPublicRoute, 'Public', 'i')
+declareRouteGroup(backOfficeRoutes, onPrivateRoute, 'Private', 'v')
+declareRouteGroup(devRoutes, onDevRoute, 'Dev', 'd')
 
 // ------------------------------------------------------------------------------------------------
 // Exports
 // ------------------------------------------------------------------------------------------------
 
-module.exports = fastify
+module.exports = fastifyConf

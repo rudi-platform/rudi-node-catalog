@@ -9,6 +9,10 @@ const mod = 'utils'
 const { inspect } = require('util')
 const { floor, pick } = require('lodash')
 const datetime = require('date-and-time')
+
+// ------------------------------------------------------------------------------------------------
+// Internal dependancies
+// ------------------------------------------------------------------------------------------------
 const { TRACE } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
@@ -268,10 +272,10 @@ exports.displayStr = (srcMod, srcFun, msg) => {
 }
 
 exports.consoleLog = (srcMod, srcFun, msg) => {
-  console.log(this.nowLocaleFormatted(), '.debug.', this.displayStr(srcMod, srcFun, msg))
+  console.log('D', this.nowLocaleFormatted(), this.displayStr(srcMod, srcFun, msg))
 }
 
 exports.consoleErr = (srcMod, srcFun, msg) => {
   const errMsg = !msg ? undefined : msg[TRACE] || msg
-  console.error(this.nowLocaleFormatted(), '.error.', this.displayStr(srcMod, srcFun, errMsg))
+  console.error('E', this.nowLocaleFormatted(), this.displayStr(srcMod, srcFun, errMsg))
 }

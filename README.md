@@ -35,9 +35,31 @@ _See https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/ for further
 
 ---
 
-## Private API
+## Redirected routes
 
-`object`: one of [`resources`, `organizations`, `contacts`, `media`, `skos_schemes`, `skos_concepts`,
+- `GET /api`
+- `GET /api/v1`
+- `GET /resources`
+- `GET /resources/*`
+- `PUT /resources/*`
+
+## No authentification required
+
+- `GET /api/version`
+- `GET /api/admin/hash`
+- `GET /api/admin/apphash`
+- `GET /api/admin/env`
+
+## Portal authentification required
+
+- `GET /api/v1/resources`
+- `GET /api/v1/resources/:id`
+- `PUT /resources/:id/report`
+- `PUT /api/v1/resources/:id/report`
+- `GET /api/v1/resources/:id/report`
+- `GET /api/v1/resources/:id/report/:irid`
+
+## Rudi prod authentification required, action on objects
 
 - `POST /api/admin/:object`
 - `PUT /api/admin/:object`
@@ -47,6 +69,8 @@ _See https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/ for further
 - `DELETE /api/admin/:object`
 - `POST /api/admin/:object/deletion`
 - `GET /api/admin/:object/unlinked`
+- `GET /api/admin/:object/search`
+- `GET /api/admin/search`
 - `POST /api/admin/:object/:id/reports`
 - `PUT /api/admin/:object/:id/reports`
 - `GET /api/admin/:object/:id/reports`
@@ -55,7 +79,28 @@ _See https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/ for further
 - `DELETE /api/admin/:object/:id/reports/:irid`
 - `DELETE /api/admin/:object/:id/reports`
 - `POST /api/admin/:object/:id/reports/deletion`
+
+## Rudi prod authentification + app driven actions
+
+- `GET /api/admin/nv`
 - `GET /api/admin/enum`
+- `GET /api/admin/enum/:code`
+- `GET /api/admin/enum/:code/:lang`
+- `GET /api/admin/licences`
+- `GET /api/admin/licence_codes`
+- `POST /api/admin/licences/init`
+- `POST /api/admin/resources/init`
+- `GET /api/admin/id_generation`
+- `GET /api/admin/portal/token`
+- `GET /api/admin/portal/token/check`
+- `GET /api/admin/portal/resources/:id`
+- `POST /api/admin/portal/resources/:id`
+- `DELETE /api/admin/portal/resources/:id`
+- `GET /api/admin/logs`
+- `GET /api/admin/logs/:lines`
+- `GET /api/admin/db`
+- `DELETE /api/admin/db/:object`
+- `DELETE /api/admin/db`
 
 ---
 

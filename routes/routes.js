@@ -9,15 +9,7 @@ const mod = 'routes'
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
-const {
-  shouldControlPrivateRequests,
-  shouldControlPublicRequests,
-} = require('../config/confSystem')
-
 const log = require('../utils/logging')
-
-const { RudiError } = require('../utils/errors')
-const { CallContext } = require('../definitions/constructors/callContext')
 
 // ------------------------------------------------------------------------------------------------
 // Swagger documentation
@@ -38,13 +30,13 @@ const skosController = require('../controllers/skosController')
 const licenceController = require('../controllers/licenceController')
 
 // const devController = require('../controllers/testController')
-const { checkRudiProdPermission } = require('../controllers/tokenController')
 const portalController = require('../controllers/portalController')
 
 // ------------------------------------------------------------------------------------------------
 // API request constants
 // ------------------------------------------------------------------------------------------------
 const {
+  URL_PUB_API_VERSION,
   URL_PREFIX_PUBLIC,
   URL_PUB_METADATA,
   URL_PREFIX_PRIVATE,
@@ -73,14 +65,10 @@ const {
   URL_PV_APP_ENV_ACCESS,
   PARAM_THESAURUS_LANG,
   ROUTE_NAME,
-  URL_PUB_API_VERSION,
   ACT_SEARCH,
   OBJ_REPORTS,
   PARAM_OBJECT,
 } = require('../config/confApi')
-
-const { JWT_USER, JWT_CLIENT } = require('../config/confPortal')
-const { JWT_SUB } = require('../utils/crypto')
 
 // ------------------------------------------------------------------------------------------------
 // Route names
@@ -140,121 +128,12 @@ const DEV_DROP_COLLECTION = 'dev_drop_collection'
 const DEV_DROP_DB = 'dev_drop_db'
 
 // ------------------------------------------------------------------------------------------------
-// Pre-handler functions
-// ------------------------------------------------------------------------------------------------
-/**
- * TODO : create sysLog functions to
- *  - log incoming requests
- *  - log replies
- *  - log errors
- */
-async function onFreeRoute(req, reply) {
-  const fun = 'onFreeRoute'
-  try {
-    log.t(mod, fun, `${req.method} ${req.url} `)
-    const context = CallContext.getCallContextFromReq(req)
-    context.logInfo('route', fun, 'API call')
-    return
-  } catch (err) {
-    // log.w(mod, fun, err)
-    // log.sysWarn(
-    //   CallContext.createApiCallMsg(req),
-    //   'routes.free.err',
-    //   CallContext.getReqContext(req),
-    //   {
-    //     error: err,
-    //   }
-    // )
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
-
-async function onPublicRoute(req, reply) {
-  const fun = 'onPublicRoute'
-  try {
-    log.t(mod, fun, `${req.method} ${req.url} `)
-    if (!shouldControlPublicRequests()) return true
-
-    const jwtPayload = (await portalController.checkPortalTokenInHeader(req, reply))[1]
-    // log.d(mod, fun, `Payload: ${beautify(jwtPayload)}`)
-
-    const context = CallContext.getCallContextFromReq(req)
-    context.clientApp = jwtPayload[JWT_SUB] || 'RUDI Portal'
-    context.reqUser = jwtPayload[JWT_USER] || jwtPayload[JWT_CLIENT]
-
-    context.logInfo('route', fun, 'API call')
-    return
-  } catch (err) {
-    // log.w(mod, fun, err)
-    // log.sysWarn(
-    //   CallContext.createApiCallMsg(req),
-    //   'routes.pub.err',
-    //   CallContext.getReqContext(req),
-    //   {
-    //     error: err,
-    //   }
-    // )
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
-
-async function onPrivateRoute(req, reply) {
-  const fun = 'onPrivateRoute'
-  try {
-    log.t(mod, fun, `${req.method} ${req.url} `)
-    if (!shouldControlPrivateRequests()) return true
-
-    const context = CallContext.getCallContextFromReq(req)
-
-    const { subject, clientId } = await checkRudiProdPermission(req, reply)
-
-    context.clientApp = subject
-    context.reqUser = clientId
-
-    context.logInfo('route', fun, 'API call')
-    return
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
-
-async function onDevRoute(req, reply) {
-  const fun = 'onDevRoute'
-  try {
-    log.t(mod, fun, `${req.method} ${req.url} `)
-    if (!shouldControlPrivateRequests()) return true
-
-    const { subject, clientId } = await checkRudiProdPermission(req, reply)
-
-    const context = CallContext.getCallContextFromReq(req)
-    context.clientApp = subject
-    context.reqUser = clientId
-
-    context.logInfo('route', fun, 'API call')
-    return
-  } catch (err) {
-    // log.w(mod, fun, err)
-    // log.sysWarn(
-    //   CallContext.createApiCallMsg(req),
-    //   'routes.dev.err',
-    //   CallContext.getReqContext(req),
-    //   {
-    //     error: err,
-    //   }
-    // )
-    throw RudiError.treatError(mod, fun, err)
-  }
-  // log.d(mod, fun, `${beautify(req)}`)
-}
-
-// ------------------------------------------------------------------------------------------------
 // Redirected routes
 // ------------------------------------------------------------------------------------------------
 exports.redirectRoutes = [
   {
     method: 'GET',
     url: `/api`,
-    preHandler: onPublicRoute,
     config: { [ROUTE_NAME]: REDIRECT_GET_DATA },
     handler: function (req, reply) {
       log.d(mod, `redirect`, `${req.method} ${URL_PUB_METADATA}`)
@@ -264,7 +143,6 @@ exports.redirectRoutes = [
   {
     method: 'GET',
     url: URL_PREFIX_PUBLIC,
-    preHandler: onPublicRoute,
     config: { [ROUTE_NAME]: REDIRECT_GET_DATA },
     handler: function (req, reply) {
       log.d(mod, `redirect`, `${req.method} ${URL_PUB_METADATA}`)
@@ -274,7 +152,6 @@ exports.redirectRoutes = [
   {
     method: 'GET',
     url: `/${OBJ_METADATA}`,
-    preHandler: onPublicRoute,
     config: { [ROUTE_NAME]: REDIRECT_GET_DATA },
     handler: function (req, reply) {
       const newRoute = `${URL_PREFIX_PUBLIC}${req.url}`
@@ -285,7 +162,6 @@ exports.redirectRoutes = [
   {
     method: 'GET',
     url: `/${OBJ_METADATA}/*`,
-    preHandler: onPublicRoute,
     config: { [ROUTE_NAME]: REDIRECT_GET_PLUS },
     handler: function (req, reply) {
       const newRoute = `${URL_PREFIX_PUBLIC}${req.url}`
@@ -296,7 +172,6 @@ exports.redirectRoutes = [
   {
     method: 'PUT',
     url: `/${OBJ_METADATA}/*`,
-    preHandler: onPublicRoute,
     config: { [ROUTE_NAME]: REDIRECT_PUT_PLUS },
     handler: function (req, reply) {
       const newRoute = `${URL_PREFIX_PUBLIC}${req.url}`
@@ -305,8 +180,95 @@ exports.redirectRoutes = [
     },
   },
 ]
+
 // ------------------------------------------------------------------------------------------------
-// Public routes
+// Free routes (no authentification required)
+// ------------------------------------------------------------------------------------------------
+exports.freeRoutes = [
+  // ------------------------------------------------------------------------------------------------
+  // Accessing app info
+  // ------------------------------------------------------------------------------------------------
+
+  /*
+   * @oas [get] /api/version
+   * tags:
+   * - free
+   * security:
+   * - authRudi: [portal]
+   * description: 'Get current API version'
+   * responses:
+   *   '200':
+   *     description: 'The API version'
+   *     content:
+   *       'text/plain; charset=utf-8':
+   *         schema:
+   *           type: 'string'
+   *         examples:
+   *            ' ':
+   *              value: '1.2.3'
+   */
+  {
+    method: 'GET',
+    url: `${URL_PUB_API_VERSION}`,
+    handler: sysController.getApiVersion,
+    config: { [ROUTE_NAME]: DEV_GET_API_VERSION },
+  },
+  /*
+   * @oas [get] /api/admin/hash
+   * scope: public
+   * description: 'Get current git hash'
+   * responses:
+   *   '200':
+   *     description: 'The API version'
+   *     content:
+   *       'text/plain; charset=utf-8':
+   *         schema:
+   *           type: 'string'
+   *         examples:
+   *           'gitHash':
+   *              value: '0e636d4'
+   */
+  {
+    method: 'GET',
+    url: `${URL_PV_GIT_HASH_ACCESS}`,
+    handler: sysController.getGitHash,
+    config: { [ROUTE_NAME]: DEV_GET_GIT_HASH },
+  },
+  /*
+   * @oas [get] /api/admin/apphash
+   * scope: public
+   * description: 'Get current git hash from the running application'
+   * responses:
+   *   '200':
+   *     description: 'The API version'
+   *     content:
+   *       'text/plain; charset=utf-8':
+   *         schema:
+   *           type: 'string'
+   *         examples:
+   *           'appHash':
+   *              value: '0e636d4'
+   */
+  {
+    method: 'GET',
+    url: `${URL_PV_APP_HASH_ACCESS}`,
+    handler: sysController.getAppHash,
+    config: { [ROUTE_NAME]: DEV_GET_APP_HASH },
+  },
+  /*
+   * @oas [get] /api/admin/env
+   * scope: public
+   * description: 'Get environment version of the running application'
+   */
+  {
+    method: 'GET',
+    url: `${URL_PV_APP_ENV_ACCESS}`,
+    handler: sysController.getEnvironment,
+    config: { [ROUTE_NAME]: DEV_GET_APP_ENV },
+  },
+]
+// ------------------------------------------------------------------------------------------------
+// 'Public' routes (Portal authentification required)
 // ------------------------------------------------------------------------------------------------
 exports.publicRoutes = [
   // Routes accessed by RUDI Portal:
@@ -318,19 +280,38 @@ exports.publicRoutes = [
   // Generic routes for accessing any object
   // ('Metadata', 'Organizations' and 'Contacts')
   // ------------------------------------------------------------------------------------------------
-  // Get all
+  /*
+   * @oas [get] /api/v1/resources
+   * description: 'Access all metadata on the RUDI producer node'
+   * parameters:
+   *   - (query) limit {Integer:int32} The number of resources to return
+   */
   {
     method: 'GET',
     url: URL_PUB_METADATA,
-    preHandler: onPublicRoute,
     handler: genericController.getMetadataListAndCount,
     config: { [ROUTE_NAME]: PUB_GET_ALL_METADATA },
   },
-  // Get 1
+  /*
+   * @oas [get] /api/v1/resources/{metaId}
+   * description: 'Access one identified metadata'
+   * parameters:
+   *   - (path) metaId=bf4895c4-bf41-4f59-a4c7-14e1cb315d04 {String:UUIDv4} The metadata UUID
+   *   - (query) limit {Integer:int32} The maximum number of metadata in the result set
+   *      (default = 100, max = 500)
+   *   - (query) offset {Integer:int32} The number of metadata to skip before starting to collect
+   *      the result set (default = 0)
+   *   - (query) fields {String} Comma-separated properties that are kept for displaying the
+   *      elements of the result set
+   *   - (query) sort_by {String} Comma-separated properties tused to order the metadata in the
+   *      result set, ordered by decreasing priority. A minus sign before the field name means
+   *      metadata will be sorted by decreasing values over this particular field
+   *   - (query) updated_after {String:date} The date after which the listed metadata were updated
+   *   - (query) updated_before {String:date} The date before which the listed metadata were updated
+   */
   {
     method: 'GET',
     url: `${URL_PUB_METADATA}/:${PARAM_ID}`,
-    preHandler: onPublicRoute,
     handler: metadataController.getSingleMetadata,
     config: { [ROUTE_NAME]: PUB_GET_ONE_METADATA },
   },
@@ -343,7 +324,6 @@ exports.publicRoutes = [
   {
     method: 'PUT',
     url: `/${OBJ_METADATA}/:${PARAM_ID}/${ACT_REPORT}`,
-    preHandler: onPublicRoute,
     handler: reportController.addOrEditSingleReportForMetadata,
     config: { [ROUTE_NAME]: PUB_UPSERT_ONE_REPORT },
   },
@@ -352,7 +332,6 @@ exports.publicRoutes = [
   {
     method: 'PUT',
     url: `${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}`,
-    preHandler: onPublicRoute,
     handler: reportController.addOrEditSingleReportForMetadata,
     config: { [ROUTE_NAME]: PUB_UPSERT_ONE_REPORT },
   },
@@ -361,7 +340,6 @@ exports.publicRoutes = [
   {
     method: 'GET',
     url: `${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}`,
-    preHandler: onPublicRoute,
     handler: reportController.getReportListForMetadata,
     config: { [ROUTE_NAME]: PUB_GET_ALL_OBJ_REPORT },
   },
@@ -369,7 +347,6 @@ exports.publicRoutes = [
   {
     method: 'GET',
     url: `${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}/:${PARAM_REPORT_ID}`,
-    preHandler: onPublicRoute,
     handler: reportController.getSingleReportForMetadata,
     config: { [ROUTE_NAME]: PUB_GET_ONE_OBJ_REPORT },
   },
@@ -388,7 +365,6 @@ exports.backOfficeRoutes = [
   {
     method: 'POST',
     url: URL_PV_OBJECT_GENERIC,
-    preHandler: onPrivateRoute,
     handler: genericController.addSingleObject,
     config: { [ROUTE_NAME]: PRV_ADD_ONE },
 
@@ -398,7 +374,6 @@ exports.backOfficeRoutes = [
   {
     method: 'PUT',
     url: URL_PV_OBJECT_GENERIC,
-    preHandler: onPrivateRoute,
     handler: genericController.upsertSingleObject,
     config: { [ROUTE_NAME]: PRV_UPSERT_ONE },
   },
@@ -406,7 +381,6 @@ exports.backOfficeRoutes = [
   {
     method: 'GET',
     url: URL_PV_OBJECT_GENERIC,
-    preHandler: onPrivateRoute,
     handler: genericController.getObjectList,
     config: { [ROUTE_NAME]: PRV_GET_ALL },
   },
@@ -414,7 +388,6 @@ exports.backOfficeRoutes = [
   {
     method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`,
-    preHandler: onPrivateRoute,
     handler: genericController.getSingleObject,
     config: { [ROUTE_NAME]: PRV_GET_ONE },
   },
@@ -423,7 +396,6 @@ exports.backOfficeRoutes = [
   {
     method: 'DELETE',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`,
-    preHandler: onPrivateRoute,
     handler: genericController.deleteSingleObject,
     config: { [ROUTE_NAME]: PRV_DEL_ONE },
   },
@@ -431,7 +403,6 @@ exports.backOfficeRoutes = [
   {
     method: 'DELETE',
     url: URL_PV_OBJECT_GENERIC,
-    preHandler: onPrivateRoute,
     handler: genericController.deleteManyObjects,
     config: { [ROUTE_NAME]: PRV_DEL_MANY },
   },
@@ -439,7 +410,6 @@ exports.backOfficeRoutes = [
   {
     method: 'POST',
     url: `${URL_PV_OBJECT_GENERIC}/${ACT_DELETION}`,
-    preHandler: onPrivateRoute,
     handler: genericController.deleteObjectList,
     config: { [ROUTE_NAME]: PRV_DEL_LIST },
   },
@@ -448,7 +418,6 @@ exports.backOfficeRoutes = [
   {
     method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/${ACT_UNLINKED}`,
-    preHandler: onPrivateRoute,
     handler: genericController.getOrphans,
     config: { [ROUTE_NAME]: PRV_GET_ORPHANS },
   },
@@ -456,7 +425,6 @@ exports.backOfficeRoutes = [
   {
     method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/${ACT_SEARCH}`,
-    preHandler: onPrivateRoute,
     handler: genericController.searchObjects,
     config: { [ROUTE_NAME]: PRV_RCH_OBJ },
   },
@@ -464,7 +432,6 @@ exports.backOfficeRoutes = [
   {
     method: 'GET',
     url: `${URL_PREFIX_PRIVATE}/${ACT_SEARCH}`,
-    preHandler: onPrivateRoute,
     handler: genericController.getSearchableProperties,
     config: { [ROUTE_NAME]: PRV_RCH_OBJ },
   },
@@ -476,7 +443,6 @@ exports.backOfficeRoutes = [
   {
     method: 'POST',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}`,
-    preHandler: onPrivateRoute,
     handler: reportController.addSingleReportForObject,
     config: { [ROUTE_NAME]: PRV_ADD_OBJ_REPORT },
   },
@@ -485,7 +451,6 @@ exports.backOfficeRoutes = [
   {
     method: 'PUT',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}`,
-    preHandler: onPrivateRoute,
     handler: reportController.addOrEditSingleReportForObject,
     config: { [ROUTE_NAME]: PRV_UPSERT_OBJ_REPORT },
   },
@@ -494,7 +459,6 @@ exports.backOfficeRoutes = [
   {
     method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}`,
-    preHandler: onPrivateRoute,
     handler: reportController.getReportListForObject,
     config: { [ROUTE_NAME]: PRV_GET_OBJ_REPORT_LIST },
   },
@@ -502,7 +466,6 @@ exports.backOfficeRoutes = [
   {
     method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}/:${PARAM_REPORT_ID}`,
-    preHandler: onPrivateRoute,
     handler: reportController.getSingleReportForObject,
     config: { [ROUTE_NAME]: PRV_GET_ONE_OBJ_REPORT },
   },
@@ -510,7 +473,6 @@ exports.backOfficeRoutes = [
   {
     method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/${OBJ_REPORTS}`,
-    preHandler: onPrivateRoute,
     handler: reportController.getReportListForObjectType,
     config: { [ROUTE_NAME]: PRV_GET_ALL_OBJ_REPORT },
   },
@@ -519,7 +481,6 @@ exports.backOfficeRoutes = [
   {
     method: 'DELETE',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}/:${PARAM_REPORT_ID}`,
-    preHandler: onPrivateRoute,
     handler: reportController.deleteSingleReportForObject,
     config: { [ROUTE_NAME]: PRV_DEL_OBJ_REPORT },
   },
@@ -527,7 +488,6 @@ exports.backOfficeRoutes = [
   {
     method: 'DELETE',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}`,
-    preHandler: onPrivateRoute,
     handler: reportController.deleteEveryReportForObject,
     config: { [ROUTE_NAME]: PRV_DEL_ALL_OBJ_REPORT },
   },
@@ -535,7 +495,6 @@ exports.backOfficeRoutes = [
   {
     method: 'POST',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}/${ACT_DELETION}`,
-    preHandler: onPrivateRoute,
     handler: reportController.deleteManyReportForObject,
     config: { [ROUTE_NAME]: PRV_DEL_LIST_OBJ_REPORT },
   },
@@ -546,47 +505,54 @@ exports.backOfficeRoutes = [
 // ------------------------------------------------------------------------------------------------
 exports.devRoutes = [
   // ------------------------------------------------------------------------------------------------
+  // Accessing app info
+  // ------------------------------------------------------------------------------------------------
+  /**
+   * Get node and npm versions
+   */
+  {
+    method: 'GET',
+    url: `${URL_PV_NODE_VERSION_ACCESS}`,
+    handler: sysController.getNodeVersion,
+    config: { [ROUTE_NAME]: DEV_GET_NODE_VERSION },
+  },
+
+  // ------------------------------------------------------------------------------------------------
   // Accessing thesaurus
   // ------------------------------------------------------------------------------------------------
   {
     method: 'GET',
     url: `${URL_PV_THESAURUS_ACCESS}`,
-    preHandler: onDevRoute,
     handler: skosController.getEveryThesaurus,
     config: { [ROUTE_NAME]: DEV_GET_EVERY_THESAURUS },
   },
   {
     method: 'GET',
     url: `${URL_PV_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}`,
-    preHandler: onDevRoute,
     handler: skosController.getSingleThesaurus,
     config: { [ROUTE_NAME]: DEV_GET_SINGLE_THESAURUS },
   },
   {
     method: 'GET',
     url: `${URL_PV_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}/:${PARAM_THESAURUS_LANG}`,
-    preHandler: onDevRoute,
     handler: skosController.getSingleThesaurusLabels,
     config: { [ROUTE_NAME]: DEV_GET_SINGLE_THESAURUS },
   },
   {
     method: 'GET',
     url: `${URL_PV_LICENCE_ACCESS}`,
-    preHandler: onDevRoute,
     handler: licenceController.getAllLicences,
     config: { [ROUTE_NAME]: DEV_GET_ALL_LICENCES },
   },
   {
     method: 'GET',
     url: `${URL_PV_LICENCE_CODES_ACCESS}`,
-    preHandler: onDevRoute,
     handler: licenceController.getAllLicenceCodes,
     config: { [ROUTE_NAME]: DEV_GET_ALL_LICENCE_CODES },
   },
   {
     method: 'POST',
     url: `${URL_PV_LICENCE_ACCESS}/${ACT_INIT}`,
-    preHandler: onDevRoute,
     handler: licenceController.initLicences,
     config: { [ROUTE_NAME]: DEV_INIT_LICENCES },
   },
@@ -598,7 +564,6 @@ exports.devRoutes = [
   {
     method: 'POST',
     url: `${URL_PREFIX_PRIVATE}/${OBJ_METADATA}/${ACT_INIT}`,
-    preHandler: onDevRoute,
     handler: metadataController.initWithODR,
     config: { [ROUTE_NAME]: DEV_INIT_WITH_ODR },
   },
@@ -609,7 +574,6 @@ exports.devRoutes = [
   {
     method: 'GET',
     url: `${URL_PREFIX_PRIVATE}/${ACT_UUID_GEN}`,
-    preHandler: onDevRoute,
     handler: genericController.generateUUID,
     config: { [ROUTE_NAME]: DEV_GENERATE_UUID },
   },
@@ -620,7 +584,6 @@ exports.devRoutes = [
   {
     method: 'GET',
     url: `${URL_PV_PORTAL_PREFIX}/${URL_SUFFIX_TOKEN_GET}`,
-    preHandler: onDevRoute,
     handler: portalController.exposedGetPortalToken,
     config: { [ROUTE_NAME]: DEV_EXPOSED_GET_PORTAL_TOKEN },
   },
@@ -628,7 +591,6 @@ exports.devRoutes = [
   {
     method: 'GET',
     url: `${URL_PV_PORTAL_PREFIX}/${URL_SUFFIX_TOKEN_GET}/${URL_SUFFIX_TOKEN_CHECK}`,
-    preHandler: onDevRoute,
     handler: portalController.checkStoredToken,
     config: { [ROUTE_NAME]: DEV_CHECK_STORED_TOKEN },
   },
@@ -639,78 +601,20 @@ exports.devRoutes = [
   {
     method: 'GET',
     url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}/:${PARAM_ID}`,
-    preHandler: onDevRoute,
     handler: portalController.getMetadata,
     config: { [ROUTE_NAME]: DEV_GET_PORTAL_METADATA },
   },
   {
     method: 'POST',
     url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}/:${PARAM_ID}`,
-    preHandler: onDevRoute,
     handler: portalController.sendMetadata,
     config: { [ROUTE_NAME]: DEV_SEND_METADATA_TO_PORTAL },
   },
   {
     method: 'DELETE',
     url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}/:${PARAM_ID}`,
-    preHandler: onDevRoute,
     handler: portalController.deleteMetadata,
     config: { [ROUTE_NAME]: DEV_DEL_PORTAL_METADATA },
-  },
-
-  // ------------------------------------------------------------------------------------------------
-  // Accessing app info (git hash)
-  // ------------------------------------------------------------------------------------------------
-  /**
-   * Get current git hash
-   */
-  {
-    method: 'GET',
-    url: `${URL_PV_GIT_HASH_ACCESS}`,
-    preHandler: onFreeRoute,
-    handler: sysController.getGitHash,
-    config: { [ROUTE_NAME]: DEV_GET_GIT_HASH },
-  },
-  /**
-   * Get current git hash from the running application
-   */
-  {
-    method: 'GET',
-    url: `${URL_PV_APP_HASH_ACCESS}`,
-    preHandler: onFreeRoute,
-    handler: sysController.getAppHash,
-    config: { [ROUTE_NAME]: DEV_GET_APP_HASH },
-  },
-  /**
-   * Get current API version
-   */
-  {
-    method: 'GET',
-    url: `${URL_PUB_API_VERSION}`,
-    preHandler: onFreeRoute,
-    handler: sysController.getApiVersion,
-    config: { [ROUTE_NAME]: DEV_GET_API_VERSION },
-  },
-  /**
-   * Get node and npm versions
-   */
-  {
-    method: 'GET',
-    url: `${URL_PV_NODE_VERSION_ACCESS}`,
-    preHandler: onDevRoute,
-    handler: sysController.getNodeVersion,
-    config: { [ROUTE_NAME]: DEV_GET_NODE_VERSION },
-  },
-
-  /**
-   * Get this module environment
-   */
-  {
-    method: 'GET',
-    url: `${URL_PV_APP_ENV_ACCESS}`,
-    preHandler: onFreeRoute,
-    handler: sysController.getEnvironment,
-    config: { [ROUTE_NAME]: DEV_GET_APP_ENV },
   },
 
   // ------------------------------------------------------------------------------------------------
@@ -719,14 +623,12 @@ exports.devRoutes = [
   {
     method: 'GET',
     url: `${URL_PV_LOGS_ACCESS}`,
-    preHandler: onDevRoute,
     handler: getLogs,
     config: { [ROUTE_NAME]: DEV_GET_LOGS },
   },
   {
     method: 'GET',
     url: `${URL_PV_LOGS_ACCESS}/:${PARAM_LOGS_LINES}`,
-    preHandler: onDevRoute,
     handler: getLastLogLines,
     config: { [ROUTE_NAME]: DEV_GET_LAST_LOG_LINES },
   },
@@ -738,7 +640,6 @@ exports.devRoutes = [
   {
     method: 'GET',
     url: `${URL_PV_DB_ACCESS}`,
-    preHandler: onDevRoute,
     handler: dbController.getCollections,
     config: { [ROUTE_NAME]: DEV_GET_COLLECTIONS },
   },
@@ -746,7 +647,6 @@ exports.devRoutes = [
   {
     method: 'DELETE',
     url: `${URL_PV_DB_ACCESS}/:${PARAM_OBJECT}`,
-    preHandler: onDevRoute,
     handler: dbController.dropCollection,
     config: { [ROUTE_NAME]: DEV_DROP_COLLECTION },
   },
@@ -754,7 +654,6 @@ exports.devRoutes = [
   {
     method: 'DELETE',
     url: `${URL_PV_DB_ACCESS}`,
-    preHandler: onDevRoute,
     handler: dbController.dropDB,
     config: { [ROUTE_NAME]: DEV_DROP_DB },
   },
@@ -764,7 +663,6 @@ exports.devRoutes = [
   /*  {
     method: 'GET',
     url: `${URL_PREFIX_PRIVATE}/test`,
-    preHandler: onDevRoute,
     handler: devController.test,
     config: { [ROUTE_NAME]: DEV_TEST },
   }, */

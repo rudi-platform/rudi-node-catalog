@@ -13,10 +13,9 @@ const { v4 } = require('uuid')
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
 const { LOG_DATE_FORMAT } = require('../../utils/jsUtils')
-
+const { LOG_EXP } = require('../../config/confLogs')
 const { VALID_UUID, VALID_EPOCH_MS } = require('../schemaValidators')
 const { DB_CREATED_AT } = require('../../db/dbFields')
-const { LOG_EXP } = require('../../config/confLogs')
 
 // ------------------------------------------------------------------------------------------------
 // Constants

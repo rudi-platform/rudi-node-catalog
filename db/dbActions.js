@@ -44,18 +44,18 @@ exports.dropCollection = async (collectionName) => {
   try {
     const listCollections = await mongoose.connection.db.listCollections().toArray()
     // log.d(mod, fun, `listCollections: ${utils.beautify(listCollections)}`)
-    let found = false
-    const res = await Promise.all(
+    let isCollectionDropped = false
+    await Promise.all(
       listCollections.map(async (collection) => {
         if (collection.name === collectionName) {
           mongoose.connection.db.dropCollection(collectionName)
-          found = true
-          return true
+          isCollectionDropped = true
+          return isCollectionDropped
         }
-        return
+        return isCollectionDropped
       })
     )
-    if (found) {
+    if (isCollectionDropped) {
       log.d(mod, fun, `Dropped collection '${collectionName}'`)
       return true
     } else {

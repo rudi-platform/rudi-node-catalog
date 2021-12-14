@@ -140,12 +140,13 @@ winston.addColors({
 })
 
 const FORMAT_TIMESTAMP = { format: utils.LOG_DATE_FORMAT }
-const LOGS_FORMAT_PRINTF = (info) => `${info.timestamp} .${info.level}. ${info.message}`
+const LOGS_FORMAT_PRINTF = (info) =>
+  `${info.level}`.substring(0, 1).toUpperCase() + ` ${info.timestamp} ${info.message}`
 
 const formatConsoleLogs = combine(
-  colorize({ all: true }),
   timestamp(FORMAT_TIMESTAMP),
-  printf(LOGS_FORMAT_PRINTF)
+  printf(LOGS_FORMAT_PRINTF),
+  colorize({ all: true })
 )
 const formatFileLogs = combine(simple(), timestamp(FORMAT_TIMESTAMP), printf(LOGS_FORMAT_PRINTF))
 
