@@ -289,14 +289,14 @@ exports.CallContext = class CallContext {
 
       if (!this.getError()) this.addError(ctxMod, ctxFun, err)
       const error = this.getError()
-      log.d(mod, fun, beautify(error))
+      // log.d(mod, fun, beautify(errôor))
       const primeError = error.primeError || error
 
       const errMsg = `Error ${error.statusCode} (${error.name}): ${error.message}`
       const errDetails =
         `${ERR_PLACE}: '${primeError[TRACE_MOD]}.${primeError[TRACE_FUN]}', ` +
         `${ERR_ON_REQ}: '${this.formatReqDetails()}'`
-      log.d(mod, fun, errDetails)
+      // log.d(mod, fun, errDetails)
       log.sysOnError(error.statusCode, errMsg, this, errDetails)
     } catch (error) {
       // log.e(mod, fun, error)

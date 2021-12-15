@@ -378,14 +378,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{db}}/dynamicenums",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{db}}/reports",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{adminUrl}}",
 								"{{db}}",
-								"dynamicenums"
+								"reports"
 							]
 						}
 					},
@@ -2287,6 +2287,52 @@
 								"{{apiUrl}}",
 								"{{data}}",
 								"{{metaId1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[PUB] Get missing meta",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"GET missing metadata\", () => {",
+									"    pm.expect(pm.response.code).to.eql(404);",
+									"    const responseJson = pm.response.json();",
+									"    console.log(responseJson.statusCode)",
+									"    pm.expect(responseJson.statusCode).to.eq(404)",
+									"    pm.expect(responseJson.error).to.eq('Not Found')",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{{{portalTokenName}}}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/test",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"{{data}}",
+								"test"
 							]
 						}
 					},
