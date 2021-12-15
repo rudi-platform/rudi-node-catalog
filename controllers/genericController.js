@@ -629,7 +629,7 @@ exports.getSearchableProperties = (req, reply) => {
 
   const rudiObjectList = db.getRudiObjectList()
   const searchableFields = {}
-  log.d(mod, fun, `rudiObjectList: ${beautify(rudiObjectList)}`)
+  // log.d(mod, fun, `rudiObjectList: ${beautify(rudiObjectList)}`)
   Object.keys(rudiObjectList).map((objectType) => {
     try {
       searchableFields[objectType] = rudiObjectList[objectType].Model.searchableFields()

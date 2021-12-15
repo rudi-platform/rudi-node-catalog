@@ -93,10 +93,11 @@ exports.getPortalToken = async () => {
   let token, rmToken
   try {
     rmToken = await db.getLatestStoredPortalToken()
-    if (!rmToken) {
-      log.w(mod, fun, 'No token in cache')
+    if (!rmToken || rmToken.expires_in < utils.nowEpochS()) {
+      log.d(mod, fun, 'Need for a new portal token')
       rmToken = await this.getNewTokenFromPortal()
     }
+
     token = json.accessProperty(rmToken, portal.FIELD_TOKEN)
     // log.d(mod, fun, `token: ${utils.beautify(token)}`)
     await this.verifyPortalToken(token)

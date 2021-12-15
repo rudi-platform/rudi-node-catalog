@@ -705,7 +705,7 @@ exports.getMetadataList = async (req, reply) => {
   try {
     return await genericController.getManyObjects(OBJ_METADATA, req, reply)
   } catch (err) {
-    const error = err.name === 'MongoError' ? new BadRequestError(err) : new NotFoundError(err)
+    const error = err.name === 'MongoError' ? new BadRequestError(err) : new NotFoundError(error)
     throw RudiError.treatError(mod, fun, error)
   }
 }
