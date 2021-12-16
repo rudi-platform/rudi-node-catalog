@@ -12,13 +12,7 @@ const { parseKey } = require('sshpk')
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
 
-const {
-  decodeBase64url,
-  nowEpochS,
-  nowISO,
-  dateEpochSToIso,
-  beautify,
-} = require('../utils/jsUtils')
+const { decodeBase64url, nowEpochS, nowISO, dateEpochSToIso } = require('../utils/jsUtils')
 
 const log = require('../utils/logging')
 const { ROUTE_NAME } = require('../config/confApi')
@@ -119,9 +113,7 @@ exports.checkRudiProdPermission = async (req, reply) => {
     try {
       token = extractJwt(req)
     } catch (err) {
-      const error = new UnauthorizedError(
-        `Headers should include a JWT in the form "Authorization": Bearer <JWT>": ${err}`
-      )
+      const error = new UnauthorizedError(err)
       throw RudiError.treatError(mod, fun, error)
     }
 

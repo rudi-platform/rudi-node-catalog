@@ -15,8 +15,8 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"const token = pm.collectionVariables.get('pm_jwt');",
-									"",
+									"//const token = pm.collectionVariables.get('pm_jwt');",
+									"pm.collectionVariables.set('dateUpdate',time.now())",
 									"",
 									""
 								],
@@ -2423,7 +2423,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?limit=10&keywords={\"$in\":[\"population\",\"plu\"]}&temporal_spread.start_date={\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2022-05-28T23:24:51.000Z\"}&perlin=2346&resource_languages=\"fr\"",
+							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?limit=10&keywords=plu&perlin=2346&resource_languages=\"fr\"",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -2438,11 +2438,7 @@
 								},
 								{
 									"key": "keywords",
-									"value": "{\"$in\":[\"population\",\"plu\"]}"
-								},
-								{
-									"key": "temporal_spread.start_date",
-									"value": "{\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2022-05-28T23:24:51.000Z\"}"
+									"value": "plu"
 								},
 								{
 									"key": "perlin",
@@ -4399,13 +4395,22 @@
 								],
 								"type": "text/javascript"
 							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"//const dateUpdate = pm.collectionVariables.get('dateUpdate')"
+								],
+								"type": "text/javascript"
+							}
 						}
 					],
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{logs}}?limit=20&time={\"$gte\":1625757072442}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{logs}}?limit=20&updatedAfter={{dateUpdate}}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -4419,8 +4424,8 @@
 									"value": "20"
 								},
 								{
-									"key": "time",
-									"value": "{\"$gte\":1625757072442}"
+									"key": "updatedAfter",
+									"value": "{{dateUpdate}}"
 								}
 							]
 						}
@@ -4446,11 +4451,13 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
+					"const TRACE = false",
+					"const DEBUG = false",
+					"",
 					"const TOKEN_DURATION_S = 1200",
 					"const API_TOKEN_NAME = pm.variables.get('apiTokenName')",
 					"const PORTAL_TOKEN_NAME = pm.variables.get('portalTokenName')",
-					"const TRACE = false",
-					"const DEBUG = false",
+					"const AUTH = 'Authorization'",
 					"",
 					"log = {",
 					"    d: (msg) => { if (DEBUG || TRACE) console.log(msg) },",
@@ -4458,7 +4465,7 @@
 					"}",
 					"",
 					"utils = {",
-					"    getContactEmail: function (contactName) {",
+					"    getContactEmail: (contactName) => {",
 					"        return `${contactName",
 					"            .replace(/(Miss|(Ms|Mrs|Mr|Dr)\\.)\\s|'Jr\\.'/gi, '')",
 					"            .toLowerCase()",
@@ -4512,14 +4519,14 @@
 					"rand = {",
 					"    get: (randName) => pm.variables.replaceIn(randName),",
 					"",
-					"    pickInList: function (list) {",
+					"    pickInList: (list) => {",
 					"        const randomNumber = _.random(0, list.length - 1);",
 					"        return list[randomNumber];",
 					"    },",
 					"",
 					"    pick: (listName) => rand.pickInList(pm.collectionVariables.get(listName)),",
 					"",
-					"    initVal: function (field) {",
+					"    initVal: (field) => {",
 					"        const val = pm.collectionVariables.get(field);",
 					"        if (val) return val;",
 					"        const randVal = rand.get('{{$randomUUID}}');",
@@ -4527,7 +4534,7 @@
 					"        return randVal;",
 					"    },",
 					"",
-					"    getContactEmail: function (contactName) {",
+					"    getContactEmail: (contactName) => {",
 					"        return `${contactName",
 					"            .replace(/(Miss|(Ms|Mrs|Mr|Dr)\\.)\\s|'Jr\\.'/gi, '')",
 					"            .toLowerCase()",
@@ -4539,7 +4546,7 @@
 					"",
 					"secu = {",
 					"",
-					"    isTokenValid: function (tokenName) {",
+					"    isTokenValid: (tokenName) => {",
 					"        log.t('-- is ' + tokenName + ' Valid --')",
 					"        const token = pm.collectionVariables.get(tokenName)",
 					"        // console.log('typeof token: ' + typeof token)",
@@ -4563,7 +4570,7 @@
 					"        return isValid",
 					"    },",
 					"",
-					"    renewApiToken: async function (tokenName, next) {",
+					"    renewApiToken: async (tokenName, next) => {",
 					"        log.t('-- renewApiToken --')",
 					"        const reqUrl = pm.variables.get('cryptoJwtUrl') + '/forge'",
 					"        // log.d('reqUrl: ' + reqUrl)",
@@ -4586,7 +4593,11 @@
 					"        pm.sendRequest(reqNewToken, (err, res) => {",
 					"            const token = codec.streamToUtf8(res)",
 					"            // log.d('rudiProdToken : ' + token)",
-					"            pm.expect(res).to.have.property('code', 200);",
+					"            try {",
+					"                pm.expect(res).to.have.property('code', 200);",
+					"            } catch (err) {",
+					"                console.error('[renewPortalToken]: ' + err)",
+					"            }",
 					"            pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
 					"            pm.collectionVariables.set(tokenName, token)",
 					"            log.d('API token stored')",
@@ -4596,7 +4607,7 @@
 					"        })",
 					"    },",
 					"",
-					"    renewPortalToken: async function (tokenName, rudiProdToken) {",
+					"    renewPortalToken: async (tokenName, rudiProdToken) => {",
 					"        log.t('-- renewPortalToken --')",
 					"        const reqUrl = pm.variables.get('baseUrl') + '/' + pm.variables.get('adminUrl') + '/portal/token'",
 					"        // log.d('reqUrl: ' + reqUrl)",
@@ -4606,15 +4617,19 @@
 					"            method: 'GET',",
 					"            header: {",
 					"                \"Content-Type\": \"application/json\",",
-					"                \"Authorization\": 'Bearer ' + rpToken",
+					"                [AUTH]: 'Bearer ' + rpToken",
 					"            },",
 					"        }",
 					"        pm.sendRequest(reqNewToken, (err, res) => {",
-					"            pm.expect(res).to.have.property('code', 200);",
+					"            try {",
+					"                pm.expect(res).to.have.property('code', 200);",
+					"            } catch (err) {",
+					"                console.error('[renewPortalToken]: ' + err)",
+					"            }",
 					"            //log.d('renewPortalToken res: ' + JSON.stringify(res))",
 					"            const token = JSON.parse(codec.streamToUtf8(res)).access_token",
 					"            //const token = res.json()",
-					"            // log.d('Portal token: ' + token)",
+					"            log.d('Portal token: ' + token)",
 					"",
 					"            pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
 					"            pm.collectionVariables.set(tokenName, token)",
@@ -4623,7 +4638,7 @@
 					"        })",
 					"    },",
 					"",
-					"    getRudiProdToken: async function (next) {",
+					"    getRudiProdToken: async (next) => {",
 					"        log.t('-- getRudiProdToken --')",
 					"        const tokenName = API_TOKEN_NAME",
 					"        if (!secu.isTokenValid(tokenName)) await secu.renewApiToken(tokenName, next)",
@@ -4631,7 +4646,7 @@
 					"        return pm.variables.get(tokenName)",
 					"    },",
 					"",
-					"    getPortalToken: async function (apiToken) {",
+					"    getPortalToken: async (apiToken) => {",
 					"        log.t('-- getPortalToken --')",
 					"        const tokenName = PORTAL_TOKEN_NAME",
 					"        if (!secu.isTokenValid(tokenName)) await secu.renewPortalToken(tokenName, apiToken)",
@@ -4639,7 +4654,6 @@
 					"    }",
 					"",
 					"}",
-					"",
 					"",
 					"secu.getRudiProdToken(secu.getPortalToken)",
 					"log.t('Init OK')",
@@ -4744,6 +4758,10 @@
 		},
 		{
 			"key": "pm_jwt",
+			"value": ""
+		},
+		{
+			"key": "dateUpdate",
 			"value": ""
 		}
 	]

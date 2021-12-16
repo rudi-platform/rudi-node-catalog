@@ -32,6 +32,7 @@ const {
   ForbiddenError,
   NotAcceptableError,
   RudiError,
+  UnauthorizedError,
 } = require('../utils/errors')
 
 const { extractJwt, JWT_EXP, REQ_MTD } = require('../utils/crypto')
@@ -76,7 +77,8 @@ exports.checkPortalTokenInHeader = async (req, reply) => {
     return jwtInfo
     // return await this.getTokenCheckedByPortal(token)
   } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
+    const error = new UnauthorizedError(err)
+    throw RudiError.treatError(mod, fun, error)
   }
 }
 
@@ -271,7 +273,7 @@ exports.getNewTokenFromPortal = async () => {
     } else {
       const errMsg = `${utils.beautify(answer)}`
       // log.w(mod, fun, errMsg)
-      throw RudiError.createRudiHttpError(answer.status, errMsg)
+      throw RudiError.createRudiHttpError(answer.status, errMsg, mod, fun)
     }
   } catch (err) {
     if (RudiError.isRudiError(err)) {

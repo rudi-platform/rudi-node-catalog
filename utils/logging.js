@@ -116,15 +116,19 @@ exports.displaySyslog = (srcMod, srcFun, msg) => {
 // Syslog functions: system level
 // ------------------------------------------------------------------------------------------------
 function sysLog(level, msg, location, context, cid, info) {
-  if (SHOULD_SYSLOG)
-    sysLogger[level](
-      msg,
-      location,
-      context,
-      cid ? cid : context ? context.id : null,
-      info ? info : context ? context.detailsStr : null
-    )
-  else () => null
+  try {
+    if (SHOULD_SYSLOG)
+      sysLogger[level](
+        msg,
+        location,
+        context,
+        cid ? cid : context ? context.id : null,
+        info ? info : context ? context.detailsStr : null
+      )
+    else () => null
+  } catch (err) {
+    this.e(mod, 'sysLog', err)
+  }
 }
 // System-related "panic" conditions
 exports.sysEmerg = (msg, location, context, info, cid) =>

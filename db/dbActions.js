@@ -68,7 +68,7 @@ exports.dropCollection = async (collectionName) => {
   }
 }
 
-const MDB_SEARCH_INDEXES = { _fts: 'text', _ftsx: 1 }
+// const MDB_SEARCH_INDEXES = { _fts: 'text', _ftsx: 1 }
 const SEARCH_INDEX = 'searchIndex'
 
 exports.makeSearchable = async (Model, listFields) => {
@@ -91,7 +91,7 @@ exports.makeSearchable = async (Model, listFields) => {
     // Dropping current text indexes if they exist
     const indexes = await collection.getIndexes()
     await Promise.all(
-      Object.entries(indexes).map(async (key, index) => {
+      Object.entries(indexes).map(async (key) => {
         // log.d(mod, fun, `${collection.name} - ${index}: ${key}`)
         if (key == `${SEARCH_INDEX},_fts,text,_ftsx,1`) {
           log.t(mod, fun, `Dropping search indexes for '${collection.name}'`)

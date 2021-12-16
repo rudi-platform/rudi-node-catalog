@@ -1,8 +1,9 @@
 /* eslint-disable no-console */
 'use strict'
 
-const mod = 'utils'
+const mod = 'crypto'
 
+const { HEADERS, HD_AUTH, HD_AUTH_LOWER } = require('../config/headers')
 // ------------------------------------------------------------------------------------------------
 // External dependancies
 // ------------------------------------------------------------------------------------------------
@@ -41,12 +42,15 @@ exports.JWT_CLIENT = 'client_id' // https://www.rfc-editor.org/rfc/rfc6749.html#
 exports.extractJwt = (req) => {
   const fun = 'extractJwt'
   try {
-    const header = accessProperty(req, 'headers')
-    const auth = accessProperty(header, 'authorization')
+    const header = accessProperty(req, HEADERS)
+    const auth = header[HD_AUTH] || header[HD_AUTH_LOWER]
+    if (!auth)
+      throw new Error(`Headers should include a JWT in the form '${HD_AUTH}': Bearer <JWT>"`)
+
     const token = auth.substring(7)
     return token
   } catch (err) {
-    const errMsg = `${err} -> no token was found in the header`
+    const errMsg = `No token was found in the header (${err})`
     consoleErr(mod, fun, errMsg)
     throw new Error(errMsg)
   }

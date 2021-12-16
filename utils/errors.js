@@ -31,7 +31,7 @@ const ERR_ID = 'errId'
 // Custom http errors
 // ------------------------------------------------------------------------------------------------
 class RudiError extends Error {
-  constructor(message, code, name, description, errTrace) {
+  constructor(message, code, name, description, errTrace, mod, fun) {
     // const fun = 'RudiError()'
     // log.t(mod, fun, `${beautify(errTrace)}`)
     // const lastTrace = getLast(errTrace)
@@ -45,6 +45,8 @@ class RudiError extends Error {
     this.type = this.constructor.name
     this[TRACE] = errTrace || []
     this.setId()
+    this[TRACE_MOD] = mod
+    this[TRACE_FUN] = fun
   }
 
   toString() {
@@ -110,32 +112,34 @@ class RudiError extends Error {
       error[STATUS_CODE],
       error.name,
       error.error,
-      errTrace
+      errTrace,
+      ctxMod,
+      ctxFun
     )
   }
 
-  static createRudiHttpError(code, message) {
+  static createRudiHttpError(code, message, ctxMod, ctxFun) {
     const fun = 'createRudiHttpError'
     try {
       log.d(mod, fun, `Error ${code}: ${message}`)
       switch (code) {
         case 400:
-          return new BadRequestError(message)
+          return new BadRequestError(message, ctxMod, ctxFun)
         case 401:
-          return new UnauthorizedError(message)
+          return new UnauthorizedError(message, ctxMod, ctxFun)
         case 403:
-          return new ForbiddenError(message)
+          return new ForbiddenError(message, ctxMod, ctxFun)
         case 404:
-          return new NotFoundError(message)
+          return new NotFoundError(message, ctxMod, ctxFun)
         case 405:
-          return new MethodNotAllowedError(message)
+          return new MethodNotAllowedError(message, ctxMod, ctxFun)
         case 406:
-          return new NotAcceptableError(message)
+          return new NotAcceptableError(message, ctxMod, ctxFun)
         case 501:
-          return new NotImplementedError(message)
+          return new NotImplementedError(message, ctxMod, ctxFun)
         case 500:
         default:
-          return new InternalServerError(message)
+          return new InternalServerError(message, ctxMod, ctxFun)
       }
     } catch (err) {
       // consoleErr(mod, fun, err)
@@ -174,7 +178,9 @@ class RudiError extends Error {
         error[STATUS_CODE],
         error.name,
         error.error,
-        errTrace
+        errTrace,
+        ctxMod,
+        ctxFun
       )
       // log.d(mod, fun, error.isRudiError())
 
@@ -212,7 +218,9 @@ class RudiError extends Error {
         } else {
           log.t(mod, fun, `Portal error data: ${beautify(portalError)}`)
           const errMsg =
-            (portalError.response.data.path ? `Path '${portalError.response.data.path} ` : '') +
+            (portalError.response.data.path
+              ? `Path '${portalError.response.data.path} `
+              : undefined) +
             (portalError.response.data.error
               ? `${portalError.response.data.error}`
               : portalError.response.data)
@@ -258,76 +266,101 @@ class RudiError extends Error {
 }
 
 class BadRequestError extends RudiError {
-  constructor(errMessage) {
-    super(errMessage, 400, 'Bad request', 'The JSON is not valid')
+  constructor(errMessage, ctxMod, ctxFun) {
+    super(errMessage, 400, 'Bad request', 'The JSON is not valid', undefined, ctxMod, ctxFun)
   }
 }
 
 class UnauthorizedError extends RudiError {
-  constructor(errMessage) {
-    super(errMessage, 401, 'Unauthorized', 'The request requires an user authentication')
+  constructor(errMessage, ctxMod, ctxFun) {
+    super(
+      errMessage,
+      401,
+      'Unauthorized',
+      'The request requires an user authentication',
+      undefined,
+      ctxMod,
+      ctxFun
+    )
   }
 }
 
 class ForbiddenError extends RudiError {
-  constructor(errMessage) {
-    super(errMessage, 403, 'Forbidden', 'The access is not allowed')
+  constructor(errMessage, ctxMod, ctxFun) {
+    super(errMessage, 403, 'Forbidden', 'The access is not allowed', undefined, ctxMod, ctxFun)
   }
 }
 
 class NotFoundError extends RudiError {
-  constructor(errMessage) {
-    super(errMessage, 404, 'Not Found', 'The resource was not found')
+  constructor(errMessage, ctxMod, ctxFun) {
+    super(errMessage, 404, 'Not Found', 'The resource was not found', undefined, ctxMod, ctxFun)
   }
 }
 
 class ObjectNotFoundError extends NotFoundError {
-  constructor(objectType, objectId) {
-    super(`${objectNotFound(objectType, objectId)}`)
+  constructor(objectType, objectId, ctxMod, ctxFun) {
+    super(`${objectNotFound(objectType, objectId)}`, undefined, ctxMod, ctxFun)
   }
 }
 
 class MethodNotAllowedError extends RudiError {
-  constructor(errMessage) {
+  constructor(errMessage, ctxMod, ctxFun) {
     super(
       errMessage,
       405,
       'Method Not Allowed',
-      'Request method is not supported for the requested resource'
+      'Request method is not supported for the requested resource',
+      undefined,
+      ctxMod,
+      ctxFun
     )
   }
 }
 
 class NotAcceptableError extends RudiError {
-  constructor(errMessage) {
+  constructor(errMessage, ctxMod, ctxFun) {
     super(
       errMessage,
       406,
       'Not Acceptable',
-      'Headers sent in the request are not compatible with the service'
+      'Headers sent in the request are not compatible with the service',
+      undefined,
+      ctxMod,
+      ctxFun
     )
   }
 }
 
 class InternalServerError extends RudiError {
-  constructor(errMessage) {
-    super(errMessage, 500, 'Internal Server Error', 'Internal Server Error')
+  constructor(errMessage, ctxMod, ctxFun) {
+    super(
+      errMessage,
+      500,
+      'Internal Server Error',
+      'Internal Server Error',
+      undefined,
+      ctxMod,
+      ctxFun
+    )
   }
 }
 
 class ParameterExpectedError extends InternalServerError {
-  constructor(fun, param) {
-    super(`${parameterExpected(fun, param)}`)
+  constructor(fun, param, ctxMod, ctxFun) {
+    super(`${parameterExpected(fun, param)}`, ctxMod, ctxFun)
   }
 }
 
 class NotImplementedError extends RudiError {
-  constructor(errMessage) {
+  constructor(errMessage, ctxMod, ctxFun) {
     super(
       errMessage,
       501,
       'Not Implemented',
-      'The server does not support the functionality required to fulfill the request'
+      'The server does not support the functionality required to fulfill the request',
+      undefined,
+      ctxMod,
+      ctxFun
     )
   }
 }

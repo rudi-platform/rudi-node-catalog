@@ -15,10 +15,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"//const token = pm.collectionVariables.get('pm_jwt');",
-									"//console.log(token)",
-									"",
-									"",
+									"pm.collectionVariables.set('dateUpdate',time.now())",
 									""
 								],
 								"type": "text/javascript"
@@ -2435,7 +2432,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?limit=10&keywords={\"$in\":[\"population\",\"plu\"]}&temporal_spread.start_date={\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2021-05-28T23:24:51.000Z\"}&perlin=2346&resource_languages=fr&collection_tag={{stamp}}",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?limit=10&keywords=plu&perlin=2346&resource_languages=fr&collection_tag={{stamp}}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -2450,11 +2447,7 @@
 								},
 								{
 									"key": "keywords",
-									"value": "{\"$in\":[\"population\",\"plu\"]}"
-								},
-								{
-									"key": "temporal_spread.start_date",
-									"value": "{\"$gte\":\"2019-12-31T23:24:51.000Z\",\"$lte\":\"2021-05-28T23:24:51.000Z\"}"
+									"value": "plu"
 								},
 								{
 									"key": "perlin",
@@ -4462,7 +4455,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{logs}}?limit=20&sort_by=-updatedAt",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{logs}}?limit=20&sort_by=-updatedAt&updatedAfter={{dateUpdate}}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -4478,6 +4471,10 @@
 								{
 									"key": "sort_by",
 									"value": "-updatedAt"
+								},
+								{
+									"key": "updatedAfter",
+									"value": "{{dateUpdate}}"
 								}
 							]
 						}
@@ -4503,11 +4500,13 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
+					"const TRACE = false",
+					"const DEBUG = false",
+					"",
 					"const TOKEN_DURATION_S = 1200",
 					"const API_TOKEN_NAME = pm.variables.get('apiTokenName')",
 					"const PORTAL_TOKEN_NAME = pm.variables.get('portalTokenName')",
-					"const TRACE = false",
-					"const DEBUG = false",
+					"const AUTH = 'Authorization'",
 					"",
 					"log = {",
 					"    d: (msg) => { if (DEBUG || TRACE) console.log(msg) },",
@@ -4643,7 +4642,11 @@
 					"        pm.sendRequest(reqNewToken, (err, res) => {",
 					"            const token = codec.streamToUtf8(res)",
 					"            // log.d('rudiProdToken : ' + token)",
-					"            pm.expect(res).to.have.property('code', 200);",
+					"            try {",
+					"                pm.expect(res).to.have.property('code', 200);",
+					"            } catch (err) {",
+					"                console.error('[renewPortalToken]: ' + err)",
+					"            }",
 					"            pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
 					"            pm.collectionVariables.set(tokenName, token)",
 					"            log.d('API token stored')",
@@ -4663,15 +4666,19 @@
 					"            method: 'GET',",
 					"            header: {",
 					"                \"Content-Type\": \"application/json\",",
-					"                \"Authorization\": 'Bearer ' + rpToken",
+					"                authorization: 'Bearer ' + rpToken",
 					"            },",
 					"        }",
 					"        pm.sendRequest(reqNewToken, (err, res) => {",
-					"            pm.expect(res).to.have.property('code', 200);",
+					"            try {",
+					"                pm.expect(res).to.have.property('code', 200);",
+					"            } catch (err) {",
+					"                console.error('[renewPortalToken]: ' + err)",
+					"            }",
 					"            //log.d('renewPortalToken res: ' + JSON.stringify(res))",
 					"            const token = JSON.parse(codec.streamToUtf8(res)).access_token",
 					"            //const token = res.json()",
-					"            // log.d('Portal token: ' + token)",
+					"            log.d('Portal token: ' + token)",
 					"",
 					"            pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
 					"            pm.collectionVariables.set(tokenName, token)",
@@ -4696,7 +4703,6 @@
 					"    }",
 					"",
 					"}",
-					"",
 					"",
 					"secu.getRudiProdToken(secu.getPortalToken)",
 					"log.t('Init OK')",
@@ -4893,6 +4899,10 @@
 		},
 		{
 			"key": "softReport3Id",
+			"value": ""
+		},
+		{
+			"key": "dateUpdate",
 			"value": ""
 		}
 	]

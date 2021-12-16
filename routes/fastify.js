@@ -5,7 +5,7 @@ const mod = 'fastify'
 // ------------------------------------------------------------------------------------------------
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
-const { padA1, nowEpochMs } = require('../utils/jsUtils')
+const { padA1, nowEpochMs, beautify } = require('../utils/jsUtils')
 const {
   shouldControlPrivateRequests,
   shouldControlPublicRequests,
@@ -30,6 +30,7 @@ const {
 
 const { checkRudiProdPermission } = require('../controllers/tokenController')
 const { checkPortalTokenInHeader } = require('../controllers/portalController')
+const { getUrlMaxLength } = require('../utils/protection')
 
 // ------------------------------------------------------------------------------------------------
 // External dependancies
@@ -63,7 +64,11 @@ fastifyConf.addHook('onError', (request, reply, error, done) => {
 
     if (RudiError.isRudiError(error) && shouldShowErrorPile()) RudiError.logErrorPile(error)
 
-    reqContext.logErr(mod, fun, error)
+    if (!!reqContext) {
+      reqContext.logErr(mod, fun, error)
+    } else {
+      log.sysOnError(error.statusCode, '[onError] ' + beautify(error))
+    }
     reply.isError = true
   } catch (err) {
     log.e(mod, fun, err)
@@ -83,7 +88,12 @@ fastifyConf.setErrorHandler((error, request, reply) => {
     let rudiHttpError
     if (RudiError.isRudiError(error)) rudiHttpError = error
     else {
-      rudiHttpError = RudiError.createRudiHttpError(error.statusCode, error.message || error)
+      rudiHttpError = RudiError.createRudiHttpError(
+        error.statusCode,
+        error.message || error,
+        mod,
+        fun
+      )
     }
     reply.isError = true
     reply.code(rudiHttpError[STATUS_CODE]).send(rudiHttpError)
@@ -130,16 +140,28 @@ fastifyConf.addHook('onRequest', (req, res, next) => {
     const context = new CallContext()
     log.t(mod, fun, `----- Rcv req #${context.id} -----vvv---`)
     const now = nowEpochMs()
-
     context.setIpsFromRequest(req)
-    context.setReqDescription(req.method, req.url, req.context.config[ROUTE_NAME])
     context.timestamp = now
+    try {
+      CallContext.preventCodeInjection(req)
+    } catch (err) {
+      context.setReqDescription(
+        req.method,
+        req.url.substring(0, getUrlMaxLength()),
+        req.context.config[ROUTE_NAME]
+      )
+      CallContext.setAsReqContext(req, context)
+      throw err
+    }
+
+    context.setReqDescription(req.method, req.url, req.context.config[ROUTE_NAME])
     CallContext.setAsReqContext(req, context)
 
     log.t('http', fun, CallContext.createApiCallMsg(req))
     next()
   } catch (err) {
-    log.e(mod, fun, err)
+    // log.e(mod, fun, err)
+    throw RudiError.treatError(mod, fun, err)
   }
 })
 
@@ -148,13 +170,13 @@ fastifyConf.addHook('onSend', (request, reply, payload, next) => {
   try {
     log.t(mod, fun, ``)
     const now = nowEpochMs()
-
     const context = CallContext.getCallContextFromReq(request)
-    context.duration = now - context.timestamp
-    context.statusCode = reply.statusCode
-
-    if (!reply.isError) context.logInfo(mod, fun, 'API reply')
-    log.t(mod, fun, `----- Send reply #${context.id} (${context.duration} ms) -----^^^--`)
+    if (!!context) {
+      context.duration = now - context.timestamp
+      context.statusCode = reply.statusCode
+      if (!reply.isError) context.logInfo(mod, fun, 'API reply')
+      log.t(mod, fun, `----- Send reply #${context.id} (${context.duration} ms) -----^^^--`)
+    }
     next()
   } catch (err) {
     log.e(mod, fun, err)

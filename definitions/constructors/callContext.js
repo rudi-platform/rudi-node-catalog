@@ -27,6 +27,7 @@ const {
   TRACE_MOD,
   TRACE_FUN,
 } = require('../../config/confApi')
+const { protectHeaderAuth, protectHeaderUrl } = require('../../utils/protection')
 
 // ------------------------------------------------------------------------------------------------
 // Internal constants
@@ -168,6 +169,9 @@ exports.CallContext = class CallContext {
   }
   get routeName() {
     return this[OP][OP_TYPE]
+  }
+  set routeName(route) {
+    return (this[OP][OP_TYPE] = route)
   }
   get reqMethod() {
     return this[DETAILS][REQ][REQ_MTD]
@@ -367,6 +371,17 @@ exports.CallContext = class CallContext {
       req[CALL_CONTEXT] = callContext
       // {[AUTH]: callContext[AUTH],[OP]: callContext[OP],[DETAILS]: callContext[DETAILS],}
       return req
+    } catch (err) {
+      throw RudiError.treatError(mod, fun, err)
+    }
+  }
+
+  static preventCodeInjection(req) {
+    const fun = 'preventCodeInjection'
+    try {
+      log.t(mod, fun, ``)
+      protectHeaderAuth(req)
+      protectHeaderUrl(req)
     } catch (err) {
       throw RudiError.treatError(mod, fun, err)
     }
