@@ -27,7 +27,11 @@ const {
   TRACE_MOD,
   TRACE_FUN,
 } = require('../../config/confApi')
-const { protectHeaderAuth, protectHeaderUrl } = require('../../utils/protection')
+const {
+  protectHeaderAuth,
+  protectHeaderUrl,
+  protectHeaderMethod,
+} = require('../../utils/protection')
 
 // ------------------------------------------------------------------------------------------------
 // Internal constants
@@ -380,8 +384,9 @@ exports.CallContext = class CallContext {
     const fun = 'preventCodeInjection'
     try {
       log.t(mod, fun, ``)
-      protectHeaderAuth(req)
+      protectHeaderMethod(req)
       protectHeaderUrl(req)
+      protectHeaderAuth(req)
     } catch (err) {
       throw RudiError.treatError(mod, fun, err)
     }

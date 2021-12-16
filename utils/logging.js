@@ -21,6 +21,7 @@ const {
 } = require('../config/confLogs')
 const { API_METADATA_ID, API_DATA_NAME_PROPERTY } = require('../db/dbFields')
 const { makeLogInfo, LogEntry } = require('../definitions/models/LogEntry')
+const { HEADERS, HD_URL, HD_METHOD, HD_AUTH } = require('../config/headers')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
@@ -207,11 +208,11 @@ exports.logHttpAnswer = (loggedMod, loggedFun, httpAnswer) => {
     this.t(mod, fun, ``)
     // this.d(mod, fun, `${loggedMod}.${loggedFun} : ${httpAnswer}`)
     if (httpAnswer.config) {
-      const resExtract = pick(httpAnswer.config, ['method', 'headers', 'url'])
-      resExtract.url = resExtract.url ? shorten(resExtract.url, 70) : undefined
-      resExtract.headers.Authorization =
-        resExtract.headers && resExtract.headers.Authorization
-          ? shorten(resExtract.headers.Authorization, 30)
+      const resExtract = pick(httpAnswer.config, [HD_METHOD, HEADERS, HD_URL])
+      resExtract[HD_URL] = resExtract.url ? shorten(resExtract[HD_URL], 70) : undefined
+      resExtract[HEADERS][HD_AUTH] =
+        resExtract[HEADERS] && resExtract[HEADERS][HD_AUTH]
+          ? shorten(resExtract[HEADERS][HD_AUTH], 30)
           : undefined
       const redactedRes = `HTTP answer: ${beautify(resExtract)}`
       this.d(loggedMod, loggedFun, redactedRes)

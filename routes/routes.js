@@ -68,6 +68,7 @@ const {
   ACT_SEARCH,
   OBJ_REPORTS,
   PARAM_OBJECT,
+  HTTP_METHODS,
 } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
@@ -132,7 +133,7 @@ const DEV_DROP_DB = 'dev_drop_db'
 // ------------------------------------------------------------------------------------------------
 exports.redirectRoutes = [
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `/api`,
     config: { [ROUTE_NAME]: REDIRECT_GET_DATA },
     handler: function (req, reply) {
@@ -141,7 +142,7 @@ exports.redirectRoutes = [
     },
   },
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: URL_PREFIX_PUBLIC,
     config: { [ROUTE_NAME]: REDIRECT_GET_DATA },
     handler: function (req, reply) {
@@ -150,7 +151,7 @@ exports.redirectRoutes = [
     },
   },
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `/${OBJ_METADATA}`,
     config: { [ROUTE_NAME]: REDIRECT_GET_DATA },
     handler: function (req, reply) {
@@ -160,7 +161,7 @@ exports.redirectRoutes = [
     },
   },
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `/${OBJ_METADATA}/*`,
     config: { [ROUTE_NAME]: REDIRECT_GET_PLUS },
     handler: function (req, reply) {
@@ -170,7 +171,7 @@ exports.redirectRoutes = [
     },
   },
   {
-    method: 'PUT',
+    method: HTTP_METHODS.PUT,
     url: `/${OBJ_METADATA}/*`,
     config: { [ROUTE_NAME]: REDIRECT_PUT_PLUS },
     handler: function (req, reply) {
@@ -208,7 +209,7 @@ exports.freeRoutes = [
    *              value: '1.2.3'
    */
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PUB_API_VERSION}`,
     handler: sysController.getApiVersion,
     config: { [ROUTE_NAME]: DEV_GET_API_VERSION },
@@ -229,7 +230,7 @@ exports.freeRoutes = [
    *              value: '0e636d4'
    */
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PV_GIT_HASH_ACCESS}`,
     handler: sysController.getGitHash,
     config: { [ROUTE_NAME]: DEV_GET_GIT_HASH },
@@ -250,7 +251,7 @@ exports.freeRoutes = [
    *              value: '0e636d4'
    */
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PV_APP_HASH_ACCESS}`,
     handler: sysController.getAppHash,
     config: { [ROUTE_NAME]: DEV_GET_APP_HASH },
@@ -261,7 +262,7 @@ exports.freeRoutes = [
    * description: 'Get environment version of the running application'
    */
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PV_APP_ENV_ACCESS}`,
     handler: sysController.getEnvironment,
     config: { [ROUTE_NAME]: DEV_GET_APP_ENV },
@@ -287,7 +288,7 @@ exports.publicRoutes = [
    *   - (query) limit {Integer:int32} The number of resources to return
    */
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: URL_PUB_METADATA,
     handler: genericController.getMetadataListAndCount,
     config: { [ROUTE_NAME]: PUB_GET_ALL_METADATA },
@@ -310,7 +311,7 @@ exports.publicRoutes = [
    *   - (query) updated_before {String:date} The date before which the listed metadata were updated
    */
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PUB_METADATA}/:${PARAM_ID}`,
     handler: metadataController.getSingleMetadata,
     config: { [ROUTE_NAME]: PUB_GET_ONE_METADATA },
@@ -322,7 +323,7 @@ exports.publicRoutes = [
 
   // Add/edit 1 report for one object integration
   {
-    method: 'PUT',
+    method: HTTP_METHODS.PUT,
     url: `/${OBJ_METADATA}/:${PARAM_ID}/${ACT_REPORT}`,
     handler: reportController.addOrEditSingleReportForMetadata,
     config: { [ROUTE_NAME]: PUB_UPSERT_ONE_REPORT },
@@ -330,7 +331,7 @@ exports.publicRoutes = [
 
   // Add/edit 1 report for one object integration
   {
-    method: 'PUT',
+    method: HTTP_METHODS.PUT,
     url: `${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}`,
     handler: reportController.addOrEditSingleReportForMetadata,
     config: { [ROUTE_NAME]: PUB_UPSERT_ONE_REPORT },
@@ -338,14 +339,14 @@ exports.publicRoutes = [
 
   // Get all reports for one object integration
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}`,
     handler: reportController.getReportListForMetadata,
     config: { [ROUTE_NAME]: PUB_GET_ALL_OBJ_REPORT },
   },
   // Get 1 report for one object integration
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}/:${PARAM_REPORT_ID}`,
     handler: reportController.getSingleReportForMetadata,
     config: { [ROUTE_NAME]: PUB_GET_ONE_OBJ_REPORT },
@@ -363,7 +364,7 @@ exports.backOfficeRoutes = [
 
   // Add 1
   {
-    method: 'POST',
+    method: HTTP_METHODS.POST,
     url: URL_PV_OBJECT_GENERIC,
     handler: genericController.addSingleObject,
     config: { [ROUTE_NAME]: PRV_ADD_ONE },
@@ -372,21 +373,21 @@ exports.backOfficeRoutes = [
   },
   // Edit 1
   {
-    method: 'PUT',
+    method: HTTP_METHODS.PUT,
     url: URL_PV_OBJECT_GENERIC,
     handler: genericController.upsertSingleObject,
     config: { [ROUTE_NAME]: PRV_UPSERT_ONE },
   },
   // Get all
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: URL_PV_OBJECT_GENERIC,
     handler: genericController.getObjectList,
     config: { [ROUTE_NAME]: PRV_GET_ALL },
   },
   // Get 1
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`,
     handler: genericController.getSingleObject,
     config: { [ROUTE_NAME]: PRV_GET_ONE },
@@ -394,21 +395,21 @@ exports.backOfficeRoutes = [
 
   // Delete 1
   {
-    method: 'DELETE',
+    method: HTTP_METHODS.DELETE,
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`,
     handler: genericController.deleteSingleObject,
     config: { [ROUTE_NAME]: PRV_DEL_ONE },
   },
   // Delete all
   {
-    method: 'DELETE',
+    method: HTTP_METHODS.DELETE,
     url: URL_PV_OBJECT_GENERIC,
     handler: genericController.deleteManyObjects,
     config: { [ROUTE_NAME]: PRV_DEL_MANY },
   },
   // Delete many
   {
-    method: 'POST',
+    method: HTTP_METHODS.POST,
     url: `${URL_PV_OBJECT_GENERIC}/${ACT_DELETION}`,
     handler: genericController.deleteObjectList,
     config: { [ROUTE_NAME]: PRV_DEL_LIST },
@@ -416,21 +417,21 @@ exports.backOfficeRoutes = [
 
   // Access unlinked data
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PV_OBJECT_GENERIC}/${ACT_UNLINKED}`,
     handler: genericController.getOrphans,
     config: { [ROUTE_NAME]: PRV_GET_ORPHANS },
   },
   // Search object
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PV_OBJECT_GENERIC}/${ACT_SEARCH}`,
     handler: genericController.searchObjects,
     config: { [ROUTE_NAME]: PRV_RCH_OBJ },
   },
   // Get searchable fields for an object type
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PREFIX_PRIVATE}/${ACT_SEARCH}`,
     handler: genericController.getSearchableProperties,
     config: { [ROUTE_NAME]: PRV_RCH_OBJ },
@@ -441,7 +442,7 @@ exports.backOfficeRoutes = [
 
   // Add 1 integration report for an identified object
   {
-    method: 'POST',
+    method: HTTP_METHODS.POST,
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}`,
     handler: reportController.addSingleReportForObject,
     config: { [ROUTE_NAME]: PRV_ADD_OBJ_REPORT },
@@ -449,7 +450,7 @@ exports.backOfficeRoutes = [
 
   // Add/edit 1 integration report for an identified object
   {
-    method: 'PUT',
+    method: HTTP_METHODS.PUT,
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}`,
     handler: reportController.addOrEditSingleReportForObject,
     config: { [ROUTE_NAME]: PRV_UPSERT_OBJ_REPORT },
@@ -457,21 +458,21 @@ exports.backOfficeRoutes = [
 
   // Get all integration reports for an identified object
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}`,
     handler: reportController.getReportListForObject,
     config: { [ROUTE_NAME]: PRV_GET_OBJ_REPORT_LIST },
   },
   // Get 1 report for one object integration
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}/:${PARAM_REPORT_ID}`,
     handler: reportController.getSingleReportForObject,
     config: { [ROUTE_NAME]: PRV_GET_ONE_OBJ_REPORT },
   },
   // Get all integration reports for one object type
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PV_OBJECT_GENERIC}/${OBJ_REPORTS}`,
     handler: reportController.getReportListForObjectType,
     config: { [ROUTE_NAME]: PRV_GET_ALL_OBJ_REPORT },
@@ -479,21 +480,21 @@ exports.backOfficeRoutes = [
 
   // Delete 1 identified integration report for one object
   {
-    method: 'DELETE',
+    method: HTTP_METHODS.DELETE,
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}/:${PARAM_REPORT_ID}`,
     handler: reportController.deleteSingleReportForObject,
     config: { [ROUTE_NAME]: PRV_DEL_OBJ_REPORT },
   },
   // Delete all integration reports for one object
   {
-    method: 'DELETE',
+    method: HTTP_METHODS.DELETE,
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}`,
     handler: reportController.deleteEveryReportForObject,
     config: { [ROUTE_NAME]: PRV_DEL_ALL_OBJ_REPORT },
   },
   // Delete many integration reports for an identified object
   {
-    method: 'POST',
+    method: HTTP_METHODS.POST,
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}/${ACT_DELETION}`,
     handler: reportController.deleteManyReportForObject,
     config: { [ROUTE_NAME]: PRV_DEL_LIST_OBJ_REPORT },
@@ -511,7 +512,7 @@ exports.devRoutes = [
    * Get node and npm versions
    */
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PV_NODE_VERSION_ACCESS}`,
     handler: sysController.getNodeVersion,
     config: { [ROUTE_NAME]: DEV_GET_NODE_VERSION },
@@ -521,37 +522,37 @@ exports.devRoutes = [
   // Accessing thesaurus
   // ------------------------------------------------------------------------------------------------
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PV_THESAURUS_ACCESS}`,
     handler: skosController.getEveryThesaurus,
     config: { [ROUTE_NAME]: DEV_GET_EVERY_THESAURUS },
   },
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PV_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}`,
     handler: skosController.getSingleThesaurus,
     config: { [ROUTE_NAME]: DEV_GET_SINGLE_THESAURUS },
   },
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PV_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}/:${PARAM_THESAURUS_LANG}`,
     handler: skosController.getSingleThesaurusLabels,
     config: { [ROUTE_NAME]: DEV_GET_SINGLE_THESAURUS },
   },
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PV_LICENCE_ACCESS}`,
     handler: licenceController.getAllLicences,
     config: { [ROUTE_NAME]: DEV_GET_ALL_LICENCES },
   },
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PV_LICENCE_CODES_ACCESS}`,
     handler: licenceController.getAllLicenceCodes,
     config: { [ROUTE_NAME]: DEV_GET_ALL_LICENCE_CODES },
   },
   {
-    method: 'POST',
+    method: HTTP_METHODS.POST,
     url: `${URL_PV_LICENCE_ACCESS}/${ACT_INIT}`,
     handler: licenceController.initLicences,
     config: { [ROUTE_NAME]: DEV_INIT_LICENCES },
@@ -562,7 +563,7 @@ exports.devRoutes = [
   // ------------------------------------------------------------------------------------------------
   // Mass init with ODS data
   {
-    method: 'POST',
+    method: HTTP_METHODS.POST,
     url: `${URL_PREFIX_PRIVATE}/${OBJ_METADATA}/${ACT_INIT}`,
     handler: metadataController.initWithODR,
     config: { [ROUTE_NAME]: DEV_INIT_WITH_ODR },
@@ -572,7 +573,7 @@ exports.devRoutes = [
   // UUID v4 generation
   // ------------------------------------------------------------------------------------------------
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PREFIX_PRIVATE}/${ACT_UUID_GEN}`,
     handler: genericController.generateUUID,
     config: { [ROUTE_NAME]: DEV_GENERATE_UUID },
@@ -582,14 +583,14 @@ exports.devRoutes = [
   // ------------------------------------------------------------------------------------------------
   // Get a new token from the Portal
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PV_PORTAL_PREFIX}/${URL_SUFFIX_TOKEN_GET}`,
     handler: portalController.exposedGetPortalToken,
     config: { [ROUTE_NAME]: DEV_EXPOSED_GET_PORTAL_TOKEN },
   },
   // Get a token checked by the Portal
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PV_PORTAL_PREFIX}/${URL_SUFFIX_TOKEN_GET}/${URL_SUFFIX_TOKEN_CHECK}`,
     handler: portalController.checkStoredToken,
     config: { [ROUTE_NAME]: DEV_CHECK_STORED_TOKEN },
@@ -599,19 +600,19 @@ exports.devRoutes = [
   // Get/post resources from/to Portal
   // ------------------------------------------------------------------------------------------------
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}/:${PARAM_ID}`,
     handler: portalController.getMetadata,
     config: { [ROUTE_NAME]: DEV_GET_PORTAL_METADATA },
   },
   {
-    method: 'POST',
+    method: HTTP_METHODS.POST,
     url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}/:${PARAM_ID}`,
     handler: portalController.sendMetadata,
     config: { [ROUTE_NAME]: DEV_SEND_METADATA_TO_PORTAL },
   },
   {
-    method: 'DELETE',
+    method: HTTP_METHODS.DELETE,
     url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}/:${PARAM_ID}`,
     handler: portalController.deleteMetadata,
     config: { [ROUTE_NAME]: DEV_DEL_PORTAL_METADATA },
@@ -621,13 +622,13 @@ exports.devRoutes = [
   // Accessing logs
   // ------------------------------------------------------------------------------------------------
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PV_LOGS_ACCESS}`,
     handler: getLogs,
     config: { [ROUTE_NAME]: DEV_GET_LOGS },
   },
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PV_LOGS_ACCESS}/:${PARAM_LOGS_LINES}`,
     handler: getLastLogLines,
     config: { [ROUTE_NAME]: DEV_GET_LAST_LOG_LINES },
@@ -638,21 +639,21 @@ exports.devRoutes = [
   // ------------------------------------------------------------------------------------------------
   // Get all collections
   {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PV_DB_ACCESS}`,
     handler: dbController.getCollections,
     config: { [ROUTE_NAME]: DEV_GET_COLLECTIONS },
   },
   // Drop Collection
   {
-    method: 'DELETE',
+    method: HTTP_METHODS.DELETE,
     url: `${URL_PV_DB_ACCESS}/:${PARAM_OBJECT}`,
     handler: dbController.dropCollection,
     config: { [ROUTE_NAME]: DEV_DROP_COLLECTION },
   },
   // Drop DB
   {
-    method: 'DELETE',
+    method: HTTP_METHODS.DELETE,
     url: `${URL_PV_DB_ACCESS}`,
     handler: dbController.dropDB,
     config: { [ROUTE_NAME]: DEV_DROP_DB },
@@ -661,7 +662,7 @@ exports.devRoutes = [
   // Tests entry
   // ------------------------------------------------------------------------------------------------
   /*  {
-    method: 'GET',
+    method: HTTP_METHODS.GET,
     url: `${URL_PREFIX_PRIVATE}/test`,
     handler: devController.test,
     config: { [ROUTE_NAME]: DEV_TEST },

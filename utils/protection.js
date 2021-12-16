@@ -9,7 +9,7 @@ const mod = 'protect'
 // ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
-const { HEADERS, HD_AUTH, HD_URL, HD_AUTH_LOWER } = require('../config/headers')
+const { HEADERS, HD_AUTH, HD_URL, HD_AUTH_LOWER, HD_METHOD } = require('../config/headers')
 const REQ_AUTH_MAX_LENGTH = 1000
 const REQ_URL_MAX_LENGTH = 400
 
@@ -26,6 +26,7 @@ const {
 } = require('../definitions/schemaValidators')
 
 const { RudiError, BadRequestError } = require('./errors')
+const { HTTP_METHODS } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
 // Functiôons
@@ -63,6 +64,21 @@ exports.protectHeaderUrl = (req) => {
       throw new BadRequestError(`Request URL is too long (${url.length} characters)`)
     if (validateSchema(url, REGEX_URL_WRONG_CHAR))
       throw new BadRequestError(`Invalid characters detected in the URL`)
+
+    log.v(mod, fun, 'ok')
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+const httpMethods = Object.values(HTTP_METHODS)
+exports.protectHeaderMethod = (req) => {
+  const fun = 'protectHeaderUrl'
+  try {
+    log.t(mod, fun, ``)
+    const method = accessProperty(req, HD_METHOD)
+    // log.v(mod, fun, `(${url.length}) ${url}`)
+
+    if (httpMethods.indexOf(method) < 0) throw new BadRequestError(`Incorrect request method`)
 
     log.v(mod, fun, 'ok')
   } catch (err) {

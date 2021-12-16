@@ -11,7 +11,7 @@ const { omit } = require('lodash')
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
 const log = require('../../utils/logging')
-const api = require('../../config/confApi')
+const { HTTP_METHODS } = require('../../config/confApi')
 
 const { makeSearchable } = require('../../db/dbActions')
 const { RudiError } = require('../../utils/errors')
@@ -76,7 +76,7 @@ const ReportSchema = new mongoose.Schema(
     /** Method used for the integration request by the Producer */
     [API_REPORT_METHOD]: {
       type: String,
-      enum: Object.values(api.HttpMethods),
+      enum: Object.values(HTTP_METHODS),
     },
 
     /** Version number of the integration contract used for the file */
