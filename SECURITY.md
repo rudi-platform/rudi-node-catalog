@@ -4,7 +4,7 @@
 
 If there are any vulnerabilities in `RUDI producer node API`, don't hesitate to _report them_.
 
-Please email `security@aqmo.org` and describe what you've found.
+Please email `security@rudi-univ-rennes1.fr` and describe what you've found.
 
 - If you have a fix, explain or attach it.
 - In the near time, expect a reply with the required steps. Also, there may be a demand for a pull request which include the fixes.
