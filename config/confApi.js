@@ -19,7 +19,6 @@ exports.HTTP_METHODS = {
 exports.DEFAULT_LANG = 'fr'
 
 // --- "In path" parameters
-exports.PARAM_LANG = 'lang'
 exports.PARAM_OBJECT = 'object'
 exports.PARAM_ID = 'id'
 exports.PARAM_REPORT_ID = 'irid'
@@ -107,9 +106,9 @@ exports.URL_SUFFIX_APP_ENV = 'env'
 exports.URL_SUFFIX_NODE_VERSION = 'nv'
 exports.URL_LICENCE_SUFFIX = 'licences'
 
-exports.PARAM_THESAURUS_CODE = `code`
-exports.PARAM_THESAURUS_LANG = `lang`
-exports.PARAM_LOGS_LINES = `lines`
+exports.PARAM_THESAURUS_CODE = 'code'
+exports.PARAM_THESAURUS_LANG = 'lang'
+exports.PARAM_LOGS_LINES = 'lines'
 
 exports.URL_PV_PORTAL_PREFIX = `${this.URL_PREFIX_PRIVATE}/${URL_SUFFIX_PORTAL}`
 exports.URL_PV_TOKEN_ACCESS = `${this.URL_PV_PORTAL_PREFIX}/${this.URL_SUFFIX_TOKEN_GET}`

@@ -23,6 +23,7 @@ const {
   isNotEmptyArray,
   isEmptyArray,
   isNothing,
+  isArray,
 } = require('../utils/jsUtils')
 
 const db = require('../db/dbQueries')
@@ -59,6 +60,8 @@ const {
   API_COLLECTION_TAG,
   API_PURPOSE,
   API_LANGUAGES_PROPERTY,
+  API_DATA_DESCRIPTION_PROPERTY,
+  API_DATA_DETAILS_PROPERTY,
 } = require('../db/dbFields')
 
 const {
@@ -68,6 +71,7 @@ const {
   OBJ_MEDIA,
   PARAM_ID,
   ACT_INIT,
+  PARAM_THESAURUS_LANG,
 } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
@@ -398,6 +402,10 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
     }
     this.setGeography(dbReadyMetadata)
 
+    // ----- Updating Dictionary entries
+    toMDBLanguage(dbReadyMetadata, API_DATA_DETAILS_PROPERTY)
+    toMDBLanguage(dbReadyMetadata, API_DATA_DESCRIPTION_PROPERTY)
+
     // log.d(mod, fun, `dbReadyMetadata: ${beautify(dbReadyMetadata, 2)}`)
     return dbReadyMetadata
   } catch (err) {
@@ -405,6 +413,25 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
   }
 }
 
+function toMDBLanguage(metadata, field) {
+  const fun = 'toMDBLanguage'
+  try {
+    log.t(mod, fun, ``)
+    const prop = metadata[field]
+    if (!isArray(prop)) {
+      log.w(mod, fun, `Field '${field}' should be an array: ${beautify(prop)}`)
+      return
+    }
+    prop.map((entry) => {
+      log.v(mod, fun, `entry: ${beautify(entry)}`)
+      if (entry[PARAM_THESAURUS_LANG])
+        entry[PARAM_THESAURUS_LANG] = entry[PARAM_THESAURUS_LANG].substring(0, 2)
+      log.v(mod, fun, `entry: ${beautify(entry)}`)
+    })
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
 /**
  * If both 'geography.geographic_distribution' and 'geography.bounding_box' are defined,
  * do nothing (TODO: check that they are coherent)

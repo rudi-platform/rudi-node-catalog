@@ -5,7 +5,7 @@ const mod = 'metaSch'
 // External dependencies
 // ------------------------------------------------------------------------------------------------
 const mongoose = require('mongoose')
-const { omit } = require('lodash')
+const { omit, isTypedArray } = require('lodash')
 
 // eslint-disable-next-line no-unused-vars
 const GeoJSON = require('mongoose-geojson-schema')
@@ -66,7 +66,7 @@ const validObjectNotEmpty = {
 // ------------------------------------------------------------------------------------------------
 // Fields
 // ------------------------------------------------------------------------------------------------
-const { DEFAULT_LANG } = require('../../config/confApi')
+const { DEFAULT_LANG, PARAM_THESAURUS_LANG } = require('../../config/confApi')
 
 const {
   API_DATA_PRODUCER_PROPERTY,

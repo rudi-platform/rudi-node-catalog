@@ -4,6 +4,7 @@
 // External dependancies
 // ------------------------------------------------------------------------------------------------
 const mongoose = require('mongoose')
+const { PARAM_THESAURUS_LANG } = require('../../config/confApi')
 const Language = require('../thesaurus/Languages').get()
 
 // ------------------------------------------------------------------------------------------------
@@ -11,9 +12,9 @@ const Language = require('../thesaurus/Languages').get()
 // ------------------------------------------------------------------------------------------------
 const DictionaryEntry = new mongoose.Schema(
   {
-    lang: {
+    [PARAM_THESAURUS_LANG]: {
       type: String,
-      default: Language.fr_FR,
+      default: Language.fr,
       enum: Object.values(Language),
       required: true,
     },
