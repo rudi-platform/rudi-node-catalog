@@ -423,10 +423,8 @@ function toMDBLanguage(metadata, field) {
       return
     }
     prop.map((entry) => {
-      log.v(mod, fun, `entry: ${beautify(entry)}`)
       if (entry[PARAM_THESAURUS_LANG])
         entry[PARAM_THESAURUS_LANG] = entry[PARAM_THESAURUS_LANG].substring(0, 2)
-      log.v(mod, fun, `entry: ${beautify(entry)}`)
     })
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
