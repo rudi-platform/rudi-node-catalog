@@ -54,8 +54,8 @@ const fastifyConf = require('fastify')({
 // ------------------------------------------------------------------------------------------------
 fastifyConf.addHook('onError', (request, reply, error, done) => {
   const fun = 'onError'
-  log.t(mod, fun, ``)
   try {
+    log.t(mod, fun, ``)
     // log.d(mod, fun, `isRudiError: ${RudiError.isRudiError(error)}`)
     // log.d(mod, fun, `showErrorPile: ${shouldShowErrorPile()}`)
 
@@ -82,8 +82,8 @@ fastifyConf.addHook('onError', (request, reply, error, done) => {
 
 fastifyConf.setErrorHandler((error, request, reply) => {
   const fun = 'finalErrorHandler'
-  log.t(mod, fun, ``)
   try {
+    log.t(mod, fun, ``)
     // log.d(mod, fun, RudiError.isRudiError(error))
     let rudiHttpError
     if (RudiError.isRudiError(error)) rudiHttpError = error

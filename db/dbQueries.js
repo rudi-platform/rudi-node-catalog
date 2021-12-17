@@ -50,7 +50,7 @@ const {
   QUERY_GROUP_LIMIT,
   QUERY_GROUP_OFFSET,
   QUERY_SORT_BY,
-  QUERY_UNKOWN,
+  QUERY_SEARCH_TERMS,
   MAX_QUERY_LIMIT,
   DEFAULT_QUERY_LIMIT,
   DEFAULT_QUERY_OFFSET,
@@ -756,7 +756,7 @@ exports.searchObjects = async (objectType, options) => {
     // log.d(mod, fun, `options: ${utils.beautify(options)}`)
 
     // Setting the filter as a research of terms
-    const searchTermsList = getParamValue(options, QUERY_UNKOWN)
+    const searchTermsList = getParamValue(options, QUERY_SEARCH_TERMS)
     if (!utils.isArray(searchTermsList))
       throw new RudiError('Input option search terms should be an array')
 

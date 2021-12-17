@@ -30,8 +30,9 @@ exports.OBJ_ORGANIZATIONS = 'organizations'
 exports.OBJ_CONTACTS = 'contacts'
 exports.OBJ_MEDIA = 'media'
 exports.OBJ_SKOS_SCHEME = 'skos_schemes'
+exports.OBJ_SKOS_SCHEME_CAML = 'skosSchemes'
 exports.OBJ_SKOS_CONCEPT = 'skos_concepts'
-exports.OBJ_SKOS_CONCEPT = 'skos_concepts'
+exports.OBJ_SKOS_CONCEPT_CAML = 'skosConcepts'
 exports.OBJ_REPORTS = 'reports'
 exports.OBJ_LOGS = 'logs'
 
@@ -44,12 +45,16 @@ exports.QUERY_SORT_BY = 'sort_by'
 exports.QUERY_COUNT_BY = 'count_by'
 exports.QUERY_GROUP_BY = 'group_by'
 exports.QUERY_GROUP_LIMIT = 'group_limit'
+exports.QUERY_GROUP_LIMIT_CAML = 'groupLimit'
 exports.QUERY_GROUP_OFFSET = 'group_offset'
+exports.QUERY_GROUP_OFFSET_CAML = 'groupOffset'
 exports.QUERY_UPDATED_AFTER = 'updated_after'
+exports.QUERY_UPDATED_AFTER_CAML = 'updatedAfter'
 exports.QUERY_UPDATED_BEFORE = 'updated_before'
+exports.QUERY_UPDATED_BEFORE_CAML = 'updatedBefore'
 exports.QUERY_CONFIRM = 'confirm'
 
-exports.QUERY_UNKOWN = 'unkown'
+exports.QUERY_SEARCH_TERMS = 'serarchTerms'
 
 exports.DEFAULT_QUERY_LIMIT = 100
 exports.DEFAULT_QUERY_OFFSET = 0

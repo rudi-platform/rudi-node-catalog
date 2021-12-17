@@ -67,9 +67,11 @@ const {
   QUERY_CONFIRM,
   URL_PV_OBJECT_GENERIC,
   QUERY_UPDATED_AFTER,
+  QUERY_UPDATED_AFTER_CAML,
   QUERY_UPDATED_BEFORE,
+  QUERY_UPDATED_BEFORE_CAML,
   ACT_UNLINKED,
-  QUERY_UNKOWN,
+  QUERY_SEARCH_TERMS,
 } = require('../config/confApi')
 
 const {
@@ -136,7 +138,9 @@ const QUERY_RESERVED_WORDS = [
   QUERY_GROUP_LIMIT,
   QUERY_GROUP_OFFSET,
   QUERY_UPDATED_AFTER,
+  QUERY_UPDATED_AFTER_CAML,
   QUERY_UPDATED_BEFORE,
+  QUERY_UPDATED_BEFORE_CAML,
   QUERY_CONFIRM,
 ]
 
@@ -185,7 +189,7 @@ const DATA_DATES = `${API_DATA_DATES_PROPERTY}.`
 const META_DATES = `${API_METAINFO_PROPERTY}.${API_METAINFO_DATES_PROPERTY}.`
 
 // eslint-disable-next-line complexity
-exports.parseQueryParameters = async (objectType, reqUrl) => {
+exports.parseQueryParameters = async (objectType, fullUrl) => {
   const fun = 'parseQueryParameters'
   try {
     // identify object model
@@ -200,27 +204,31 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
       [QUERY_FILTER]: {},
       [QUERY_CONFIRM]: false,
       [EXT_REFS]: [],
-      [QUERY_UNKOWN]: [],
+      [QUERY_SEARCH_TERMS]: [],
     }
     const filters = []
 
     // extract request parameters
-    if (reqUrl.indexOf('?') === -1) {
+    if (fullUrl.indexOf('?') === -1) {
       // log.d(mod, fun, `No question mark in url: ${reqUrl}`)
       return returnedFilter
     }
-    const reqSearch = reqUrl.substring(reqUrl.indexOf('?'))
-    // log.d(mod, fun, `reqSearch: ${reqSearch}`)
-    const urlSearchParams = new URLSearchParams(reqSearch)
+    // const reqArgs = reqUrl.substring(reqUrl.indexOf('?'))
+    const splitUrl = fullUrl.split('?')
+    const reqUrl = splitUrl[0]
+    const reqArgs = splitUrl[1]
+    const urlSegments = reqUrl.split('/')
+    const searching = urlSegments[urlSegments.length - 1] === ACT_SEARCH
+    const urlParams = new URLSearchParams(reqArgs)
 
     // Check if parameters were actually found by URLSearchParams
-    if (urlSearchParams.keys().length < 1) {
-      log.d(mod, fun, `No parameters found after the question mark: ${urlSearchParams}`)
+    if (urlParams.keys().length < 1) {
+      log.d(mod, fun, `No parameters found after the question mark: ${urlParams}`)
       return returnedFilter
     }
     //  log.d(mod, fun, `urlSearchParams: ${urlSearchParams}`)
 
-    for (const [key, value] of urlSearchParams) {
+    for (const [key, value] of urlParams) {
       if (QUERY_RESERVED_WORDS.includes(key)) {
         // log.d(mod, fun, `Key is a reserved word: ${beautify(key)} => ${beautify(queryParameters[key])}`)
         switch (key) {
@@ -235,9 +243,11 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
             returnedFilter[key] = value
             break
           case QUERY_UPDATED_AFTER:
+          case QUERY_UPDATED_AFTER_CAML:
             filters.push({ [DB_UPDATED_AT]: { $gte: cleanDate(value) } })
             break
           case QUERY_UPDATED_BEFORE:
+          case QUERY_UPDATED_BEFORE_CAML:
             filters.push({ [DB_UPDATED_AT]: { $lte: cleanDate(value) } })
             break
           case QUERY_CONFIRM:
@@ -275,7 +285,7 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
       } else if (modelProperties.includes(key)) {
         // log.d(mod, fun, `Key is a ${objectType} property: ${beautify(key)}`)
         const val = value
-        if (!value) returnedFilter[QUERY_UNKOWN].push(key)
+        if (!value) returnedFilter[QUERY_SEARCH_TERMS].push(key)
         else {
           try {
             const obj = JSON.parse(val)
@@ -352,7 +362,7 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
           } catch (err) {
             // const errMsg = `Couldn't parse: '${beautify(value)}': ${err}}`
             // log.w(mod, fun, errMsg)
-            if (!value) returnedFilter[QUERY_UNKOWN].push(nestedField)
+            if (!value) returnedFilter[QUERY_SEARCH_TERMS].push(nestedField)
             else
               returnedFilter[EXT_REFS].push({
                 [EXT_OBJ]: nestedField,
@@ -361,9 +371,12 @@ exports.parseQueryParameters = async (objectType, reqUrl) => {
               })
           }
         } else {
-          log.w(mod, fun, `Key is not a property of ${objectType}: ${beautify(key)}`)
-          key.split(',').map((term) => returnedFilter[QUERY_UNKOWN].push(term))
-
+          if (searching) {
+            log.d(mod, fun, `Search term found: ${beautify(key)}`)
+            key.split(',').map((term) => returnedFilter[QUERY_SEARCH_TERMS].push(term))
+          } else {
+            log.w(mod, fun, `Key is not a property of ${objectType}: ${beautify(key)}`)
+          }
           // log.w(mod, fun, `Model properties: ${beautify(modelProperties)}`)
         }
       }
@@ -605,9 +618,7 @@ exports.searchObjects = async (req, reply) => {
       QUERY_SORT_BY,
       QUERY_FILTER,
       QUERY_FIELDS,
-      QUERY_UPDATED_AFTER,
-      QUERY_UPDATED_BEFORE,
-      QUERY_UNKOWN,
+      QUERY_SEARCH_TERMS,
       QUERY_COUNT_BY,
     ])
     const objectList = await db.searchObjects(objectType, options)
@@ -667,8 +678,6 @@ exports.getManyObjects = async (objectType, req) => {
         QUERY_SORT_BY,
         QUERY_FILTER,
         QUERY_FIELDS,
-        QUERY_UPDATED_AFTER,
-        QUERY_UPDATED_BEFORE,
       ])
       objectList = await db.getObjectList(objectType, options)
     } else if (groupBy) {

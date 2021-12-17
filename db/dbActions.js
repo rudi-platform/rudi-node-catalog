@@ -82,7 +82,7 @@ exports.makeSearchable = async (Model, listFields) => {
     listFields.map((field) => (searchIndexes[field] = 'text'))
 
     const indexOpts = {
-      default_language: 'fr',
+      default_language: 'french',
       name: SEARCH_INDEX,
     }
 

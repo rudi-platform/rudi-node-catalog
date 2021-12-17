@@ -59,28 +59,21 @@ exports.protectHeaderUrl = (req) => {
   try {
     log.t(mod, fun, ``)
     const url = accessProperty(req, HD_URL)
-    // log.v(mod, fun, `(${url.length}) ${url}`)
     if (url.length > REQ_URL_MAX_LENGTH)
       throw new BadRequestError(`Request URL is too long (${url.length} characters)`)
     if (validateSchema(url, REGEX_URL_WRONG_CHAR))
       throw new BadRequestError(`Invalid characters detected in the URL`)
-
-    log.v(mod, fun, 'ok')
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
 }
 const httpMethods = Object.values(HTTP_METHODS)
 exports.protectHeaderMethod = (req) => {
-  const fun = 'protectHeaderUrl'
+  const fun = 'protectHeaderMethod'
   try {
     log.t(mod, fun, ``)
     const method = accessProperty(req, HD_METHOD)
-    // log.v(mod, fun, `(${url.length}) ${url}`)
-
     if (httpMethods.indexOf(method) < 0) throw new BadRequestError(`Incorrect request method`)
-
-    log.v(mod, fun, 'ok')
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }

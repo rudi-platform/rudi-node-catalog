@@ -187,7 +187,7 @@ exports.verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
     const clientId = jwtPayload[JWT_CLIENT]
 
     // Retrieve the public key
-    log.d(mod, fun, `Retrieve the public key for '${subject}'`)
+    // log.d(mod, fun, `Retrieve the public key for '${subject}'`)
 
     const subjProfile = getProfile(subject)
     if (!subjProfile)
