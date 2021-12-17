@@ -12,6 +12,7 @@ const mongoose = require('mongoose')
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
 const { RudiError } = require('../utils/errors')
+const { PARAM_THESAURUS_LANG } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
 // Actions on DB tables
@@ -82,8 +83,9 @@ exports.makeSearchable = async (Model, listFields) => {
     listFields.map((field) => (searchIndexes[field] = 'text'))
 
     const indexOpts = {
-      default_language: 'french',
       name: SEARCH_INDEX,
+      default_language: 'french',
+      language_override: PARAM_THESAURUS_LANG,
     }
 
     // log.d(mod, fun, utils.beautify(searchIndexes))
