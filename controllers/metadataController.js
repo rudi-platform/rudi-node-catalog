@@ -72,6 +72,7 @@ const {
   PARAM_ID,
   ACT_INIT,
   PARAM_THESAURUS_LANG,
+  STATUS_CODE,
 } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
@@ -556,15 +557,20 @@ exports.newMetadata = async (rudiMetadata) => {
   } catch (err) {
     // const errMsg = `New object '${OBJ_METADATA}': ${rudiId} | Error: ${err}`
     // const error = new Error(errMsg)
+    if (err.name === 'ValidationError') err[STATUS_CODE] = 400
     throw RudiError.treatError(mod, fun, err)
   }
   // try {
-  // await dbMetadata.save()
+  //   await dbMetadata.save()
   // } catch (err) {
   //   // const errMsg = `Error while saving object '${OBJ_METADATA}' (${rudiId}): ${err}`
-  //   throw RudiError.treatError(mod, fun, err)
+  //   log.d(mod, fun, beautify(err))
+  //   log.d(mod, fun, beautify(err.name))
+  //   throw RudiError.treatError(mod, fun + ' save', err)
+  // if (err.name === 'ValidationError') throw new BadRequestError(err, mod, fun)
+  //   else throw RudiError.treatError(mod, fun + ' save', err)
   // }
-  // log.d(mod, fun, `dbMetadata: ${beautify(dbMetadata)}`)
+  log.d(mod, fun, `dbMetadata: ${beautify(dbMetadata)}`)
 
   this.sendToPortal(dbMetadata)
     .catch((err) => log.e(mod, fun, `Sending to portal failed for metadata '${rudiId}': ${err}`))
