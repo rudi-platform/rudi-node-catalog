@@ -43,6 +43,7 @@ const {
   API_FILE_STRUCTURE,
   API_FILE_ENCODING,
   API_FILE_UPDATE_STATUS,
+  API_MEDIA_TITLE,
 } = require('../../db/dbFields')
 
 const MediaTypes = {
@@ -88,6 +89,12 @@ const MediaSchema = new mongoose.Schema(
 
     /** Original name of the file */
     [API_MEDIA_NAME]: {
+      type: String,
+      // required: true,
+    },
+
+    /** Short description of the media */
+    [API_MEDIA_TITLE]: {
       type: String,
       // required: true,
     },

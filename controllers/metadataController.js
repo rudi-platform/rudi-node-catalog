@@ -178,11 +178,14 @@ exports.mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFound) 
           // log.d(mod, fun, `new Media: ${beautify(media)}`)
 
           // log.d(mod, fun, media)
-          const dbActionResult = await media.save()
-          log.d(mod, fun, `dbActionResult: ${beautify(dbActionResult)}`)
+          // const dbActionResult = await media.save()
+          // log.d(mod, fun, `dbActionResult: ${beautify(dbActionResult)}`)
+          await media.save()
 
           mediaDbId = media[DB_ID]
           // log.d(mod, fun, `newly created mediaDbId: ${beautify(mediaDbId)}`)
+        } else {
+          db.overwriteObject(OBJ_MEDIA, rudiMedia)
         }
         mediaDbIds.push(new mongoose.Types.ObjectId(mediaDbId))
         // log.d(mod, fun, `${beautify(rudiMedia)} -> ${mediaDbId} `)
@@ -402,7 +405,7 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
     }
     this.setGeography(dbReadyMetadata)
 
-    // ----- Updating Dictionary entries
+    // ----- Updating Dictionary entries (MongoDB doesn't accept all RUDI languages)
     toMDBLanguage(dbReadyMetadata, API_DATA_DETAILS_PROPERTY)
     toMDBLanguage(dbReadyMetadata, API_DATA_DESCRIPTION_PROPERTY)
 

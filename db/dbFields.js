@@ -125,6 +125,7 @@ exports.API_CONTACT_MAIL = 'email'
 // ------------------------------------------------------------------------------------------------
 exports.API_MEDIA_TYPE = 'media_type'
 exports.API_MEDIA_NAME = 'media_name'
+exports.API_MEDIA_TITLE = 'media_title'
 exports.API_MEDIA_CONNECTOR = 'connector'
 exports.API_MEDIA_INTERFACE_CONTRACT = 'interface_contract'
 
