@@ -185,7 +185,7 @@ exports.mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFound) 
           mediaDbId = media[DB_ID]
           // log.d(mod, fun, `newly created mediaDbId: ${beautify(mediaDbId)}`)
         } else {
-          // await db.overwriteObject(OBJ_MEDIA, rudiMedia) // TODO: valider ! Doit-on vraiment mettre un jour un media, ou recréer cette métadonnée ?
+          await db.overwriteObject(OBJ_MEDIA, rudiMedia) // TODO: valider ! Doit-on vraiment mettre un jour un media, ou recréer cette métadonnée ?
         }
         mediaDbIds.push(new mongoose.Types.ObjectId(mediaDbId))
         // log.d(mod, fun, `${beautify(rudiMedia)} -> ${mediaDbId} `)
