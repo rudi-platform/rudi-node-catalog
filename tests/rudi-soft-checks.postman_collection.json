@@ -4501,8 +4501,8 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
-					"const TRACE = true",
-					"const DEBUG = true",
+					"const TRACE = false",
+					"const DEBUG = false",
 					"",
 					"const TOKEN_DURATION_S = 1200",
 					"const API_TOKEN_NAME = pm.variables.get('apiTokenName')",
