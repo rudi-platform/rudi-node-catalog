@@ -26,6 +26,7 @@ const {
   LOG_MOD,
 } = require('../../db/dbFields')
 const { makeSearchable } = require('../../db/dbActions')
+const { PARAM_THESAURUS_LANG } = require('../../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
@@ -153,11 +154,30 @@ function logLineToString(logLine) {
 const LogEntry = model('LogEntry', LogEntrySchema)
 
 const SEARCHABLE_FIELDS = [LOG_MSG, LOG_LVL, LOG_USR]
+const SEARCH_INDEX = 'searchIndex'
 
 const fun = 'createSearchIndexes'
 LogEntry.createSearchIndexes = async () => {
   try {
-    await makeSearchable(LogEntry, SEARCHABLE_FIELDS)
+    const collection = LogEntry.collection
+    const searchIndexes = {}
+    SEARCHABLE_FIELDS.map((field) => (searchIndexes[field] = 'text'))
+
+    const indexOpts = {
+      name: SEARCH_INDEX,
+      default_language: 'french',
+      language_override: PARAM_THESAURUS_LANG,
+    }
+
+    // Dropping current text indexes if they exist
+    const indexes = await collection.getIndexes()
+    await Promise.all(
+      Object.entries(indexes).map(async (key) => {
+        if (key == `${SEARCH_INDEX},_fts,text,_ftsx,1`) await collection.dropIndex(SEARCH_INDEX)
+      })
+    )
+    // (Re)creating the indexes
+    await collection.createIndex(searchIndexes, indexOpts)
   } catch (err) {
     consoleErr(mod, fun, err)
   }
@@ -165,8 +185,6 @@ LogEntry.createSearchIndexes = async () => {
 LogEntry.createSearchIndexes().catch((err) => {
   throw new Error(`[mod, fun] Failed to create search indexes: ${err}`)
 })
-// .then(consoleLog(mod, fun, 'done'))
 LogEntry.collection.dropIndex({ updatedAt: 1 }).catch(() => 'nevermind')
-//log.d(mod, 'LogEntry.dropIndex', err + ' (nevermind)'))
 
 module.exports = { LogEntry, makeLogInfo, logLineToString }
