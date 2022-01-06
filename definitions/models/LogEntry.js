@@ -12,7 +12,7 @@ const { v4 } = require('uuid')
 // ------------------------------------------------------------------------------------------------
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
-const { LOG_DATE_FORMAT, consoleErr, consoleLog } = require('../../utils/jsUtils')
+const { LOG_DATE_FORMAT, consoleErr } = require('../../utils/jsUtils')
 const { LOG_EXP } = require('../../config/confLogs')
 const { VALID_UUID, VALID_EPOCH_MS } = require('../schemaValidators')
 const {

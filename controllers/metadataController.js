@@ -72,7 +72,6 @@ const {
   PARAM_ID,
   ACT_INIT,
   PARAM_THESAURUS_LANG,
-  STATUS_CODE,
 } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
