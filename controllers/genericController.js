@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 'use strict'
 
 const mod = 'genCtrl'
@@ -12,7 +11,6 @@ const mod = 'genCtrl'
 // ------------------------------------------------------------------------------------------------
 const mongoose = require('mongoose')
 const { v4: UUIDv4 } = require('uuid')
-// const url = require('url')
 const { pick } = require('lodash')
 
 // ------------------------------------------------------------------------------------------------

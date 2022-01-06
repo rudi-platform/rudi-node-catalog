@@ -158,9 +158,15 @@ exports.LOCAL_REPORT_ERROR_TYPE = 'error_type'
 exports.LOCAL_REPORT_ERROR_MSG = 'error_message'
 
 // ------------------------------------------------------------------------------------------------
-// Integration reports
+// Log entries
 // ------------------------------------------------------------------------------------------------
 exports.LOG_ID = 'entry_id'
+exports.LOG_TIME = 'time'
+exports.LOG_MSG = 'message'
+exports.LOG_LVL = 'log_level'
+exports.LOG_MOD = 'location_module'
+exports.LOG_FUN = 'location_function'
+exports.LOG_USR = 'user_address'
 
 // ------------------------------------------------------------------------------------------------
 // SKOS

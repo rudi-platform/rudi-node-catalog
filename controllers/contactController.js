@@ -11,12 +11,11 @@ const mod = 'contCtrl'
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
 const { beautify } = require('../utils/jsUtils')
-const { RudiError, InternalServerError } = require('../utils/errors')
+const { RudiError } = require('../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
-const { OBJ_CONTACTS } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
 // Data models
@@ -32,19 +31,9 @@ exports.newContact = async (contactJson) => {
   let dbContact
   try {
     dbContact = await new Contact(contactJson)
-  } catch (err) {
-    const error = new InternalServerError(
-      `New object '${OBJ_CONTACTS}': ${beautify(contactJson)} | Error: ${err}`
-    )
-    throw RudiError.treatError(mod, fun, error)
-  }
-  try {
     await dbContact.save()
   } catch (err) {
-    const error = new InternalServerError(
-      `Saving object '${OBJ_CONTACTS}': ${beautify(dbContact)} | Error: ${err}`
-    )
-    throw RudiError.treatError(mod, fun, error)
+    throw RudiError.treatError(mod, fun, err)
   }
   return dbContact
 }

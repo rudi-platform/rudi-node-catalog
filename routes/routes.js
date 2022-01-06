@@ -25,7 +25,7 @@ const reportController = require('../controllers/reportController')
 
 const dbController = require('../controllers/dbController')
 const sysController = require('../controllers/sysController')
-const { getLastLogLines, getLogs } = require('../controllers/logController')
+const { getLastLogLines, getLogs, searchLogs } = require('../controllers/logController')
 const skosController = require('../controllers/skosController')
 const licenceController = require('../controllers/licenceController')
 
@@ -44,6 +44,7 @@ const {
   URL_PV_LOGS_ACCESS,
   URL_PV_GIT_HASH_ACCESS,
   URL_PV_APP_HASH_ACCESS,
+  URL_PV_APP_ENV_ACCESS,
   URL_PV_THESAURUS_ACCESS,
   URL_PV_NODE_VERSION_ACCESS,
   URL_PV_LICENCE_ACCESS,
@@ -53,21 +54,20 @@ const {
   URL_SUFFIX_TOKEN_GET,
   URL_SUFFIX_TOKEN_CHECK,
   PARAM_ID,
+  PARAM_OBJECT,
   PARAM_REPORT_ID,
   PARAM_LOGS_LINES,
   PARAM_THESAURUS_CODE,
+  PARAM_THESAURUS_LANG,
   OBJ_METADATA,
+  OBJ_REPORTS,
   ACT_INIT,
   ACT_REPORT,
   ACT_DELETION,
   ACT_UUID_GEN,
   ACT_UNLINKED,
-  URL_PV_APP_ENV_ACCESS,
-  PARAM_THESAURUS_LANG,
-  ROUTE_NAME,
   ACT_SEARCH,
-  OBJ_REPORTS,
-  PARAM_OBJECT,
+  ROUTE_NAME,
   HTTP_METHODS,
 } = require('../config/confApi')
 
@@ -124,6 +124,7 @@ const DEV_GET_NODE_VERSION = 'dev_get_node_version'
 const DEV_GET_APP_ENV = 'dev_get_app_env'
 const DEV_GET_LOGS = 'dev_get_logs'
 const DEV_GET_LAST_LOG_LINES = 'dev_get_last_log_lines'
+const DEV_SEARCH_LOGS = 'dev_search_logs'
 const DEV_GET_COLLECTIONS = 'dev_get_collections'
 const DEV_DROP_COLLECTION = 'dev_drop_collection'
 const DEV_DROP_DB = 'dev_drop_db'
@@ -621,6 +622,7 @@ exports.devRoutes = [
   // ------------------------------------------------------------------------------------------------
   // Accessing logs
   // ------------------------------------------------------------------------------------------------
+  // Get logs
   {
     method: HTTP_METHODS.GET,
     url: `${URL_PV_LOGS_ACCESS}`,
@@ -633,7 +635,13 @@ exports.devRoutes = [
     handler: getLastLogLines,
     config: { [ROUTE_NAME]: DEV_GET_LAST_LOG_LINES },
   },
-
+  // Search logs
+  {
+    method: HTTP_METHODS.GET,
+    url: `${URL_PV_LOGS_ACCESS}/${ACT_SEARCH}`,
+    handler: searchLogs,
+    config: { [ROUTE_NAME]: DEV_SEARCH_LOGS },
+  },
   // ------------------------------------------------------------------------------------------------
   // Actions on DB
   // ------------------------------------------------------------------------------------------------

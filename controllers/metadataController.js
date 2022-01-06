@@ -106,54 +106,62 @@ const { CallContext } = require('../definitions/constructors/callContext')
 
 exports.organizationRudiToDbFormat = async (rudiProducer, shouldCreateIfNotFound) => {
   const fun = 'organizationRudiToDbFormat'
-  log.t(mod, fun, ``)
-  if (rudiProducer == null) throw new ParameterExpectedError(fun, 'rudiProducer')
+  try {
+    log.t(mod, fun, ``)
+    if (rudiProducer == null) throw new ParameterExpectedError(fun, 'rudiProducer')
 
-  let organizationDbId = await db.getOrganizationDbIdWithJson(rudiProducer)
-  // log.d(mod, fun, `organizationDbId: -> ${organizationDbId} `)
+    let organizationDbId = await db.getOrganizationDbIdWithJson(rudiProducer)
+    // log.d(mod, fun, `organizationDbId: -> ${organizationDbId} `)
 
-  if (!organizationDbId) {
-    if (!shouldCreateIfNotFound) {
-      const err = new NotFoundError(msg.organizationNotFound(rudiProducer[API_ORGANIZATION_ID]))
-      throw RudiError.treatError(mod, fun, err)
+    if (!organizationDbId) {
+      if (!shouldCreateIfNotFound) {
+        const err = new NotFoundError(msg.organizationNotFound(rudiProducer[API_ORGANIZATION_ID]))
+        throw RudiError.treatError(mod, fun, err)
+      }
+      const newOrg = await organisationController.newOrganization(rudiProducer)
+      await newOrg.save()
+      log.d(mod, fun, `new Organization: ${beautify(rudiProducer)}`)
+
+      organizationDbId = newOrg[DB_ID]
     }
-    const newOrg = await organisationController.newOrganization(rudiProducer)
-    newOrg.save()
-    log.d(mod, fun, `new Organization: ${beautify(rudiProducer)}`)
-
-    organizationDbId = newOrg[DB_ID]
+    // log.d(mod, fun, `${beautify(rudiProducer)} -> ${organizationDbId} `)
+    return new mongoose.Types.ObjectId(organizationDbId)
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
   }
-  // log.d(mod, fun, `${beautify(rudiProducer)} -> ${organizationDbId} `)
-  return new mongoose.Types.ObjectId(organizationDbId)
 }
 
 exports.contactListRudiToDbFormat = async (rudiContactList, shouldCreateIfNotFound) => {
   const fun = 'contactListRudiToDbFormat'
-  log.t(mod, fun, ``)
-  if (rudiContactList == null) throw new ParameterExpectedError(fun, 'rudiContactList')
+  try {
+    log.t(mod, fun, ``)
+    if (rudiContactList == null) throw new ParameterExpectedError(fun, 'rudiContactList')
 
-  const contactDbIds = []
-  await Promise.all(
-    rudiContactList.map(async (rudiContact) => {
-      let contactDbId
-      contactDbId = await db.getContactDbIdWithJson(rudiContact)
-      if (!contactDbId) {
-        if (!shouldCreateIfNotFound) {
-          const err = new NotFoundError(msg.contactNotFound(rudiContact[API_CONTACT_ID]))
-          throw RudiError.treatError(mod, fun, err)
+    const contactDbIds = []
+    await Promise.all(
+      rudiContactList.map(async (rudiContact) => {
+        let contactDbId
+        contactDbId = await db.getContactDbIdWithJson(rudiContact)
+        if (!contactDbId) {
+          if (!shouldCreateIfNotFound) {
+            const err = new NotFoundError(msg.contactNotFound(rudiContact[API_CONTACT_ID]))
+            throw RudiError.treatError(mod, fun, err)
+          }
+
+          const dbContact = await contactController.newContact(rudiContact)
+          dbContact.save()
+          log.d(mod, fun, `new Contact: ${beautify(rudiContact)}`)
+
+          contactDbId = dbContact[DB_ID]
         }
-
-        const dbContact = await contactController.newContact(rudiContact)
-        dbContact.save()
-        log.d(mod, fun, `new Contact: ${beautify(rudiContact)}`)
-
-        contactDbId = dbContact[DB_ID]
-      }
-      contactDbIds.push(new mongoose.Types.ObjectId(contactDbId))
-      // log.d(mod, fun, `${beautify(rudiContact)} -> ${contactDbId}`)
-    })
-  )
-  return contactDbIds
+        contactDbIds.push(new mongoose.Types.ObjectId(contactDbId))
+        // log.d(mod, fun, `${beautify(rudiContact)} -> ${contactDbId}`)
+      })
+    )
+    return contactDbIds
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
 }
 
 exports.mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFound) => {
@@ -540,109 +548,124 @@ exports.upsertMetadata = async (rudiMetadata) => {
 }
 exports.newMetadata = async (rudiMetadata) => {
   const fun = 'newMetadata'
-  log.t(mod, fun, ``)
-  // log.d(mod, fun, `incoming object: ${beautify(rudiMetadata)}`)
-  if (!rudiMetadata) throw new ParameterExpectedError(fun, 'rudiMetadata')
-
-  // Special treatment!
-  const dbReadyObject = await this.rudiToDbFormat(rudiMetadata, true)
-  // log.d(mod, fun, `dbReadyObject: ${beautify(dbReadyObject)}`)
-
-  // Special update for metadataInfo.referenceDates: update 'createdDate'
-  const rudiId = dbReadyObject[API_METADATA_ID]
-  let dbMetadata
   try {
-    dbMetadata = await new Metadata(dbReadyObject)
-    await dbMetadata.save()
+    log.t(mod, fun, ``)
+    // log.d(mod, fun, `incoming object: ${beautify(rudiMetadata)}`)
+    if (!rudiMetadata) throw new ParameterExpectedError(fun, 'rudiMetadata')
+
+    // Special treatment!
+    const dbReadyObject = await this.rudiToDbFormat(rudiMetadata, true)
+    // log.d(mod, fun, `dbReadyObject: ${beautify(dbReadyObject)}`)
+
+    // Special update for metadataInfo.referenceDates: update 'createdDate'
+    const rudiId = dbReadyObject[API_METADATA_ID]
+    let dbMetadata
+    try {
+      dbMetadata = await new Metadata(dbReadyObject)
+      await dbMetadata.save()
+    } catch (err) {
+      // const errMsg = `New object '${OBJ_METADATA}': ${rudiId} | Error: ${err}`
+      // const error = new Error(errMsg)
+      // log.d(mod, fun, beautify(err))
+      throw RudiError.treatError(mod, fun, err)
+    }
+    // try {
+    //   await dbMetadata.save()
+    // } catch (err) {
+    //   // const errMsg = `Error while saving object '${OBJ_METADATA}' (${rudiId}): ${err}`
+    //   log.d(mod, fun, beautify(err))
+    //   log.d(mod, fun, beautify(err.name))
+    //   throw RudiError.treatError(mod, fun + ' save', err)
+    // if (err.name === 'ValidationError') throw new BadRequestError(err, mod, fun)
+    //   else throw RudiError.treatError(mod, fun + ' save', err)
+    // }
+    // log.d(mod, fun, `dbMetadata: ${beautify(dbMetadata)}`)
+
+    this.sendToPortal(dbMetadata)
+      .catch((err) => log.e(mod, fun, `Sending to portal failed for metadata '${rudiId}': ${err}`))
+      .then((reply) =>
+        reply
+          ? log.i(mod, fun, `Creation request received by the portal for metadata '${rudiId}'`)
+          : log.d(mod, fun, `Not sending to portal: ${rudiId} (${dbMetadata[API_COLLECTION_TAG]})`)
+      )
+
+    return dbMetadata
+    // return this.dbMetadataToRudi(dbMetadata)
   } catch (err) {
-    // const errMsg = `New object '${OBJ_METADATA}': ${rudiId} | Error: ${err}`
-    // const error = new Error(errMsg)
-    if (err.name === 'ValidationError') err[STATUS_CODE] = 400
     throw RudiError.treatError(mod, fun, err)
   }
-  // try {
-  //   await dbMetadata.save()
-  // } catch (err) {
-  //   // const errMsg = `Error while saving object '${OBJ_METADATA}' (${rudiId}): ${err}`
-  //   log.d(mod, fun, beautify(err))
-  //   log.d(mod, fun, beautify(err.name))
-  //   throw RudiError.treatError(mod, fun + ' save', err)
-  // if (err.name === 'ValidationError') throw new BadRequestError(err, mod, fun)
-  //   else throw RudiError.treatError(mod, fun + ' save', err)
-  // }
-  log.d(mod, fun, `dbMetadata: ${beautify(dbMetadata)}`)
-
-  this.sendToPortal(dbMetadata)
-    .catch((err) => log.e(mod, fun, `Sending to portal failed for metadata '${rudiId}': ${err}`))
-    .then((reply) =>
-      reply
-        ? log.i(mod, fun, `Creation request received by the portal for metadata '${rudiId}'`)
-        : log.d(mod, fun, `Not sending to portal: ${rudiId} (${dbMetadata[API_COLLECTION_TAG]})`)
-    )
-
-  return dbMetadata
-  // return this.dbMetadataToRudi(dbMetadata)
 }
 
 // parameter incomingRudiMetadata can't be partial metadata!
 exports.overwriteMetadata = async (incomingRudiMetadata) => {
   const fun = 'overwriteMetadata'
-  log.t(mod, fun, ``)
+  try {
+    log.t(mod, fun, ``)
 
-  if (incomingRudiMetadata == null) throw new ParameterExpectedError(fun, 'incomingRudiMetadata')
-  // log.d(mod, fun, `edited metadata: ${beautify(incomingRudiMetadata)}\n`)
+    if (incomingRudiMetadata == null) throw new ParameterExpectedError(fun, 'incomingRudiMetadata')
+    // log.d(mod, fun, `edited metadata: ${beautify(incomingRudiMetadata)}\n`)
 
-  // ensure the metadata already exist
-  const rudiId = json.accessProperty(incomingRudiMetadata, API_METADATA_ID)
-  // log.d(mod, fun, `incomingRudiMetadata: ${beautify(incomingRudiMetadata)}`)
+    // ensure the metadata already exist
+    const rudiId = json.accessProperty(incomingRudiMetadata, API_METADATA_ID)
+    // log.d(mod, fun, `incomingRudiMetadata: ${beautify(incomingRudiMetadata)}`)
 
-  const dbReadyEditedMetadata = await this.rudiToDbFormat(incomingRudiMetadata, true)
-  // log.d(mod, fun, `dbReadyEditedMetadata: ${beautify(dbReadyEditedMetadata)}`)
-  const dbMetadata = await db.overwriteObject(OBJ_METADATA, dbReadyEditedMetadata)
-  // log.d(mod, fun, `dbMetadata: ${beautify(dbMetadata)}`)
-  // const reply = await dbMetadata.save()
-  // log.d(mod, fun, `reply: ${beautify(reply)}`)
-  // log.d(mod, fun, `reply: ${beautify(reply.contacts[0])}`)
+    const dbReadyEditedMetadata = await this.rudiToDbFormat(incomingRudiMetadata, true)
+    // log.d(mod, fun, `dbReadyEditedMetadata: ${beautify(dbReadyEditedMetadata)}`)
+    const dbMetadata = await db.overwriteObject(OBJ_METADATA, dbReadyEditedMetadata)
+    // log.d(mod, fun, `dbMetadata: ${beautify(dbMetadata)}`)
+    // const reply = await dbMetadata.save()
+    // log.d(mod, fun, `reply: ${beautify(reply)}`)
+    // log.d(mod, fun, `reply: ${beautify(reply.contacts[0])}`)
 
-  this.sendToPortal(dbMetadata)
-    .catch((err) => log.e(mod, fun, `Sending to portal failed for metadata '${rudiId}': ${err}`))
-    .then(() => log.i(mod, fun, `'Update request received by the portal for metadata '${rudiId}'`))
+    this.sendToPortal(dbMetadata)
+      .catch((err) => log.e(mod, fun, `Sending to portal failed for metadata '${rudiId}': ${err}`))
+      .then(() =>
+        log.i(mod, fun, `'Update request received by the portal for metadata '${rudiId}'`)
+      )
 
-  return dbMetadata
+    return dbMetadata
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
 }
 
 // parameter incomingRudiMetadata can be partial metadata
 // (obsolete)
 exports.updateMetadata = async (incomingRudiMetadata) => {
   const fun = 'updateMetadata'
-  log.t(mod, fun, ``)
+  try {
+    log.t(mod, fun, ``)
 
-  if (incomingRudiMetadata == null) throw new ParameterExpectedError(fun, 'incomingRudiMetadata')
-  // log.d(mod, fun, `edited metadata: ${beautify(incomingRudiMetadata)}\n`)
+    if (incomingRudiMetadata == null) throw new ParameterExpectedError(fun, 'incomingRudiMetadata')
+    // log.d(mod, fun, `edited metadata: ${beautify(incomingRudiMetadata)}\n`)
 
-  // ensure the metadata already exist
-  const rudiId = json.accessProperty(incomingRudiMetadata, API_METADATA_ID)
-  // // let dbMetadata = await db.getEnsuredMetadataWithRudiId(rudiId) // No => no populate please !
-  const dbMetadata = await db.getEnsuredObjectWithRudiId(OBJ_METADATA, rudiId)
-  // log.v(mod, fun, `corresponding db object: ${beautify(dbMetadata)}\n`)
+    // ensure the metadata already exist
+    const rudiId = json.accessProperty(incomingRudiMetadata, API_METADATA_ID)
+    // // let dbMetadata = await db.getEnsuredMetadataWithRudiId(rudiId) // No => no populate please !
+    const dbMetadata = await db.getEnsuredObjectWithRudiId(OBJ_METADATA, rudiId)
+    // log.v(mod, fun, `corresponding db object: ${beautify(dbMetadata)}\n`)
 
-  const dbReadyEditedMetadata = await this.rudiToDbFormat(incomingRudiMetadata)
-  // log.v(mod, fun, `dbReadyEditedMetadata: ${beautify(dbReadyEditedMetadata)}\n`)
+    const dbReadyEditedMetadata = await this.rudiToDbFormat(incomingRudiMetadata)
+    // log.v(mod, fun, `dbReadyEditedMetadata: ${beautify(dbReadyEditedMetadata)}\n`)
 
-  // Backing up existing dates ('dataset_dates' and 'metadata_info.meadatada_dates' properties)
+    // Backing up existing dates ('dataset_dates' and 'metadata_info.meadatada_dates' properties)
 
-  await metadataCustomMerge(dbMetadata, dbReadyEditedMetadata)
-  // log.d(mod, fun, `modified metadata: ${beautify(dbMetadata)}`)
+    await metadataCustomMerge(dbMetadata, dbReadyEditedMetadata)
+    // log.d(mod, fun, `modified metadata: ${beautify(dbMetadata)}`)
 
-  const reply = await dbMetadata.save()
-  // log.d(mod, fun, `metadata saved: ${beautify(reply)}`)
-  this.sendToPortal(dbMetadata)
-    .catch((err) => log.e(mod, fun, `Sending to portal failed for metadata '${rudiId}': ${err}`))
-    .then(() => log.i(mod, fun, `'Update request received by the portal for metadata '${rudiId}'`))
+    const reply = await dbMetadata.save()
+    // log.d(mod, fun, `metadata saved: ${beautify(reply)}`)
+    this.sendToPortal(dbMetadata)
+      .catch((err) => log.e(mod, fun, `Sending to portal failed for metadata '${rudiId}': ${err}`))
+      .then(() =>
+        log.i(mod, fun, `'Update request received by the portal for metadata '${rudiId}'`)
+      )
 
-  return reply
+    return reply
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
 }
-
 exports.sendToPortal = async (metadata) => {
   const fun = 'sendToPortal'
   try {

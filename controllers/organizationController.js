@@ -33,20 +33,10 @@ exports.newOrganization = async (orgJson) => {
 
   try {
     dbOrganization = await new Organization(orgJson)
-  } catch (err) {
-    const error = new Error(
-      `New object '${OBJ_ORGANIZATIONS}': ${beautify(orgJson)} | Error: ${err}`
-    )
-    throw RudiError.treatError(mod, fun, error)
-  }
-  try {
     await dbOrganization.save()
     // cache.addOrganization(dbOrganization)
   } catch (err) {
-    const error = new Error(
-      `Saving object '${OBJ_ORGANIZATIONS}': ${beautify(dbOrganization)} | Error: ${err}`
-    )
-    throw RudiError.treatError(mod, fun, error)
+    throw RudiError.treatError(mod, fun, err)
   }
   return dbOrganization
 }

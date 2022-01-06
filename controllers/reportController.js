@@ -176,8 +176,8 @@ exports.addOrEditSingleReportForObject = async (req, reply) => {
 
 exports.addOrEditSingleReport = async (objectType, req, reply) => {
   const fun = 'addOrEditSingleReport'
-  log.t(mod, fun, ``)
   try {
+    log.t(mod, fun, ``)
     // retrieve url parameters: object type, object id
     const urlObjectId = json.accessReqParam(req, PARAM_ID)
     const reportBody = fromPortalToRudiFormat(req.body)
@@ -236,7 +236,7 @@ exports.addOrEditSingleReport = async (objectType, req, reply) => {
     let dbReadyReport
     if (!dbReport) {
       // adding new report
-      log.d(mod, fun, `Adding new report`)
+      // log.d(mod, fun, `Adding new report`)
       // add new integration report
       try {
         dbReadyReport = await new Report(reportBody)

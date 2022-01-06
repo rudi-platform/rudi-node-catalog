@@ -96,35 +96,33 @@ const { ParameterExpectedError, NotFoundError, RudiError } = require('../utils/e
  */
 exports.newSkosScheme = async (rudiScheme) => {
   const fun = 'newScheme'
-  log.t(mod, fun, ``)
-
-  if (!rudiScheme) throw new ParameterExpectedError(fun, 'rudiScheme')
-
-  const topConcepts = await utils.deepClone(rudiScheme[API_SCHEME_TOPS_PROPERTY])
-
-  delete rudiScheme[API_SCHEME_TOPS_PROPERTY]
-
-  const dbReadySchemeNoRef = await new SkosScheme(rudiScheme)
-  const dbScheme = await dbReadySchemeNoRef.save()
-
-  const schemeDbId = dbScheme[DB_ID]
-
   try {
+    log.t(mod, fun, ``)
+
+    if (!rudiScheme) throw new ParameterExpectedError(fun, 'rudiScheme')
+
+    const topConcepts = await utils.deepClone(rudiScheme[API_SCHEME_TOPS_PROPERTY])
+
+    delete rudiScheme[API_SCHEME_TOPS_PROPERTY]
+
+    const dbReadySchemeNoRef = await new SkosScheme(rudiScheme)
+    const dbScheme = await dbReadySchemeNoRef.save()
+
+    const schemeDbId = dbScheme[DB_ID]
+
     if (utils.isNotEmptyArray(topConcepts)) {
       dbScheme[API_SCHEME_TOPS_PROPERTY] = await this.createConceptHierarchy(
         topConcepts,
         schemeDbId
       )
     }
+    // TODO: reinforce the associations between concepts through siblings/relative properties
+    dbScheme.save()
+
+    return await this.dbSchemeToRudi(dbScheme)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
-
-  // TODO: reinforce the associations between concepts through siblings/relative properties
-
-  dbScheme.save()
-
-  return await this.dbSchemeToRudi(dbScheme)
 }
 
 const CONCEPT_HIERARCHY_DISPLAY = `${API_SKOS_CONCEPT_ID} ${API_SKOS_CONCEPT_CODE} ${API_CONCEPT_CHILDREN_PROPERTY} -${DB_ID}`
@@ -162,86 +160,87 @@ exports.dbSchemeToRudi = async (dbScheme) => {
  */
 exports.createConceptHierarchy = async (listConcepts, schemeDbId, parentConcept) => {
   const fun = 'createConceptHierarchy'
-  // log.t(mod, fun, ``)
+  try {
+    log.t(mod, fun, ``)
+    // Check input parameters
+    if (!listConcepts) throw new ParameterExpectedError(fun, 'listConcepts')
+    if (!schemeDbId) throw new ParameterExpectedError(fun, 'schemeDbId')
 
-  // Check input parameters
-  if (!listConcepts) throw new ParameterExpectedError(fun, 'listConcepts')
-  if (!schemeDbId) throw new ParameterExpectedError(fun, 'schemeDbId')
+    // Create all concept in the list
+    const conceptDbIds = []
+    await Promise.all(
+      listConcepts.map(async (conceptJson) => {
+        let dbConcept = db.getConceptWithJson(conceptJson)
+        // log.d(mod, fun, `dbConcept: ${utils.beautify(dbConcept)}`)
 
-  // Create all concept in the list
-  const conceptDbIds = []
-  await Promise.all(
-    listConcepts.map(async (conceptJson) => {
-      let dbConcept = db.getConceptWithJson(conceptJson)
-      // log.d(mod, fun, `dbConcept: ${utils.beautify(dbConcept)}`)
+        if (utils.isNotEmptyObject(dbConcept)) {
+          // log.d(mod, fun, `Concept already created: ${utils.beautify(dbConcept[API_SKOS_CONCEPT_ID])} `)
+        } else {
+          // log.d(mod, fun, `Creating new concept: ${conceptJson[API_SKOS_CONCEPT_ID]} `)
 
-      if (utils.isNotEmptyObject(dbConcept)) {
-        // log.d(mod, fun, `Concept already created: ${utils.beautify(dbConcept[API_SKOS_CONCEPT_ID])} `)
-      } else {
-        // log.d(mod, fun, `Creating new concept: ${conceptJson[API_SKOS_CONCEPT_ID]} `)
+          // Backup reference lists
+          let conceptChildren = []
+          if (utils.isNotEmptyArray(conceptJson[API_CONCEPT_CHILDREN_PROPERTY])) {
+            conceptChildren = utils.deepClone(conceptJson[API_CONCEPT_CHILDREN_PROPERTY])
+          }
 
-        // Backup reference lists
-        let conceptChildren = []
-        if (utils.isNotEmptyArray(conceptJson[API_CONCEPT_CHILDREN_PROPERTY])) {
-          conceptChildren = utils.deepClone(conceptJson[API_CONCEPT_CHILDREN_PROPERTY])
+          // Remove references to other concepts
+          PROPERTIES_WITH_CONCEPT_REFS.forEach((propertyReferencingOtherconcepts) => {
+            delete conceptJson[propertyReferencingOtherconcepts]
+          })
+
+          // Ensure the current scheme is the one referenced in the class property
+          conceptJson[API_CONCEPT_CLASS_PROPERTY] = schemeDbId
+
+          // Create concept without references
+          // log.d(mod, fun, `Saving the new Concept`)
+          // log.d(mod, fun, `conceptJson: ${utils.beautify(conceptJson)}`)
+          dbConcept = await new SkosConcept(conceptJson)
+          await dbConcept.save()
+          // log.d(mod, fun, `=> done`)
+          const conceptDbId = dbConcept[DB_ID]
+
+          conceptDbIds.push(conceptDbId)
+
+          // Update children property
+          if (utils.isNotEmptyArray(conceptChildren)) {
+            // Create each children hierarchy
+            const childrenDbIds = await this.createConceptHierarchy(
+              conceptChildren,
+              schemeDbId,
+              conceptDbId
+            )
+            dbConcept[API_CONCEPT_CHILDREN_PROPERTY] = childrenDbIds
+          }
+
+          // log.d(mod, fun, `${utils.beautify(conceptJson)} -> ${conceptDbId}`)
         }
 
-        // Remove references to other concepts
-        PROPERTIES_WITH_CONCEPT_REFS.forEach((propertyReferencingOtherconcepts) => {
-          delete conceptJson[propertyReferencingOtherconcepts]
-        })
-
-        // Ensure the current scheme is the one referenced in the class property
-        conceptJson[API_CONCEPT_CLASS_PROPERTY] = schemeDbId
-
-        // Create concept without references
-        // log.d(mod, fun, `Saving the new Concept`)
-        // log.d(mod, fun, `conceptJson: ${utils.beautify(conceptJson)}`)
-        dbConcept = await new SkosConcept(conceptJson)
-        await dbConcept.save()
-        // log.d(mod, fun, `=> done`)
-        const conceptDbId = dbConcept[DB_ID]
-
-        conceptDbIds.push(conceptDbId)
-
-        // Update children property
-        if (utils.isNotEmptyArray(conceptChildren)) {
-          // Create each children hierarchy
-          const childrenDbIds = await this.createConceptHierarchy(
-            conceptChildren,
-            schemeDbId,
-            conceptDbId
-          )
-          dbConcept[API_CONCEPT_CHILDREN_PROPERTY] = childrenDbIds
+        // Update parents property
+        if (!parentConcept) {
+          delete dbConcept[API_CONCEPT_PARENTS_PROPERTY]
+        } else {
+          const parents = dbConcept[API_CONCEPT_PARENTS_PROPERTY]
+          // log.d(mod, fun, `Updating 'parents' property`)
+          if (!utils.isNotEmptyArray(parents)) {
+            // log.d(mod, fun, `dbConcept[API_CONCEPT_PARENTS_PROPERTY]: ${utils.beautify(dbConcept[API_CONCEPT_PARENTS_PROPERTY])}`)
+            dbConcept[API_CONCEPT_PARENTS_PROPERTY] = []
+          }
+          if (parents.indexOf(parentConcept) === -1) {
+            dbConcept[API_CONCEPT_PARENTS_PROPERTY].push(parentConcept)
+          }
         }
-
-        // log.d(mod, fun, `${utils.beautify(conceptJson)} -> ${conceptDbId}`)
-      }
-
-      // Update parents property
-      if (!parentConcept) {
-        delete dbConcept[API_CONCEPT_PARENTS_PROPERTY]
-      } else {
-        const parents = dbConcept[API_CONCEPT_PARENTS_PROPERTY]
-        // log.d(mod, fun, `Updating 'parents' property`)
-        if (!utils.isNotEmptyArray(parents)) {
-          // log.d(mod, fun, `dbConcept[API_CONCEPT_PARENTS_PROPERTY]: ${utils.beautify(dbConcept[API_CONCEPT_PARENTS_PROPERTY])}`)
-          dbConcept[API_CONCEPT_PARENTS_PROPERTY] = []
+        try {
+          await dbConcept.save()
+        } catch (err) {
+          throw RudiError.treatError(mod, fun, err)
         }
-        if (parents.indexOf(parentConcept) === -1) {
-          dbConcept[API_CONCEPT_PARENTS_PROPERTY].push(parentConcept)
-        }
-      }
-
-      try {
-        await dbConcept.save()
-      } catch (err) {
-        throw RudiError.treatError(mod, fun, err)
-      }
-    })
-  )
-
-  return conceptDbIds
+      })
+    )
+    return conceptDbIds
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -254,25 +253,29 @@ exports.createConceptHierarchy = async (listConcepts, schemeDbId, parentConcept)
  */
 exports.newSkosConcept = async (rudiConcept, inSchemeDbId) => {
   const fun = 'newConcept'
-  log.t(mod, fun, ``)
+  try {
+    log.t(mod, fun, ``)
 
-  await this.setDbScheme(rudiConcept, inSchemeDbId)
+    await this.setDbScheme(rudiConcept, inSchemeDbId)
 
-  // Scanning every property with concept references
-  await Promise.all(
-    PROPERTIES_WITH_CONCEPT_REFS.map(async (prop) => {
-      await this.setDbConceptRefs(rudiConcept, prop)
-    })
-  )
+    // Scanning every property with concept references
+    await Promise.all(
+      PROPERTIES_WITH_CONCEPT_REFS.map(async (prop) => {
+        await this.setDbConceptRefs(rudiConcept, prop)
+      })
+    )
 
-  const dbConcept = await new SkosConcept(rudiConcept)
-  // log.d(mod, fun, `dbConcept: ${utils.beautify(dbConcept)}`)
-  await dbConcept.save()
-  // log.d(mod, fun, `=> saved`)
+    const dbConcept = await new SkosConcept(rudiConcept)
+    // log.d(mod, fun, `dbConcept: ${utils.beautify(dbConcept)}`)
+    await dbConcept.save()
+    // log.d(mod, fun, `=> saved`)
 
-  const rudiReadyConcept = await this.dbConceptToRudiMinimal(dbConcept)
-  return rudiReadyConcept
-  // return dbConcept
+    const rudiReadyConcept = await this.dbConceptToRudiMinimal(dbConcept)
+    return rudiReadyConcept
+    // return dbConcept
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
 }
 
 /**

@@ -1,6 +1,6 @@
 'use strict'
 
-// const mod = 'logDb'
+const mod = 'logDb'
 // ------------------------------------------------------------------------------------------------
 // External dependancies
 // ------------------------------------------------------------------------------------------------
@@ -12,10 +12,20 @@ const { v4 } = require('uuid')
 // ------------------------------------------------------------------------------------------------
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
-const { LOG_DATE_FORMAT } = require('../../utils/jsUtils')
+const { LOG_DATE_FORMAT, consoleErr, consoleLog } = require('../../utils/jsUtils')
 const { LOG_EXP } = require('../../config/confLogs')
 const { VALID_UUID, VALID_EPOCH_MS } = require('../schemaValidators')
-const { DB_CREATED_AT } = require('../../db/dbFields')
+const {
+  DB_CREATED_AT,
+  LOG_ID,
+  LOG_TIME,
+  LOG_MSG,
+  LOG_LVL,
+  LOG_USR,
+  LOG_FUN,
+  LOG_MOD,
+} = require('../../db/dbFields')
+const { makeSearchable } = require('../../db/dbActions')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
@@ -29,7 +39,7 @@ const { DB_CREATED_AT } = require('../../db/dbFields')
 const LogEntrySchema = new Schema(
   {
     // Unique and permanent identifier for the log entry (required)
-    entry_id: {
+    [LOG_ID]: {
       type: String,
       default: v4,
       required: true,
@@ -40,7 +50,7 @@ const LogEntrySchema = new Schema(
     },
 
     // Epoch time of the event in ms
-    time: {
+    [LOG_TIME]: {
       type: Number,
       default: Date.now,
       match: VALID_EPOCH_MS,
@@ -48,28 +58,28 @@ const LogEntrySchema = new Schema(
     },
 
     // Log message
-    message: {
+    [LOG_MSG]: {
       type: String,
       required: true,
     },
 
     // log level
-    log_level: {
+    [LOG_LVL]: {
       type: String,
       required: true,
     },
 
     // Module/file where the log is coming from
-    location_module: {
+    [LOG_MOD]: {
       type: String,
     },
 
     // Function where the log is coming from
-    location_function: {
+    [LOG_FUN]: {
       type: String,
     },
 
-    user_address: {
+    [LOG_USR]: {
       type: String,
     },
   },
@@ -142,6 +152,20 @@ function logLineToString(logLine) {
 // ------------------------------------------------------------------------------------------------
 const LogEntry = model('LogEntry', LogEntrySchema)
 
+const SEARCHABLE_FIELDS = [LOG_MSG, LOG_LVL, LOG_USR]
+
+const fun = 'createSearchIndexes'
+LogEntry.createSearchIndexes = async () => {
+  try {
+    await makeSearchable(LogEntry, SEARCHABLE_FIELDS)
+  } catch (err) {
+    consoleErr(mod, fun, err)
+  }
+}
+LogEntry.createSearchIndexes().catch((err) => {
+  throw new Error(`[mod, fun] Failed to create search indexes: ${err}`)
+})
+// .then(consoleLog(mod, fun, 'done'))
 LogEntry.collection.dropIndex({ updatedAt: 1 }).catch(() => 'nevermind')
 //log.d(mod, 'LogEntry.dropIndex', err + ' (nevermind)'))
 

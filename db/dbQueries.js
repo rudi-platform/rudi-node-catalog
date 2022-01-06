@@ -55,6 +55,7 @@ const {
   DEFAULT_QUERY_LIMIT,
   DEFAULT_QUERY_OFFSET,
   QUERY_COUNT_BY,
+  STATUS_CODE,
 } = require('../config/confApi')
 
 // Fields from the JSON as definied in the API
@@ -1058,6 +1059,7 @@ exports.overwriteObject = async (objectType, updateData) => {
 
     // log.d(mod, fun, `dbObject: ${utils.beautify(dbObject)}`)
     await dbObject.save()
+
     // log.d(mod, fun, `dbObject: ${utils.beautify(dbObject)}`)
     return dbObject
   } catch (err) {

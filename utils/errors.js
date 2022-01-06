@@ -159,6 +159,7 @@ class RudiError extends Error {
       if (!error) throw new ParameterExpectedError('treatError', 'error')
       if (!ctxMod) throw new ParameterExpectedError('treatError', 'ctxMod')
       if (!ctxFun) throw new ParameterExpectedError('treatError', 'ctxFun')
+      if (error.name === 'ValidationError') error[STATUS_CODE] = 400
 
       // log.d(mod, fun, `A) ${error} -> ${beautify(error)}`)
       if (!error[TRACE]) {
