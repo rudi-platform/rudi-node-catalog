@@ -43,7 +43,10 @@ exports.dropDB = async (req, reply) => {
     // const dbActionResult = await mongoose.connection.db.dropDatabase()
     // log.d(mod, fun, 'DB dropped')
 
-    const logsCollection = 'logentries'
+    const logsCollection =
+      LogEntry && LogEntry.collection && LogEntry.collection.name
+        ? LogEntry.collection.name
+        : 'logentries'
 
     const listCollections = await mongoose.connection.db.listCollections().toArray()
     // log.d(mod, fun, `listCollections: ${utils.beautify(listCollections)}`)
@@ -98,7 +101,7 @@ exports.dropCollection = async (collectionName) => {
 // const MDB_SEARCH_INDEXES = { _fts: 'text', _ftsx: 1 }
 const SEARCH_INDEX = 'searchIndex'
 
-exports.makeSearchable = async (Model, listFields) => {
+exports.makeSearchable = async (Model) => {
   const fun = 'makeSearchable'
   try {
     log.t(mod, fun, ``)
@@ -111,7 +114,7 @@ exports.makeSearchable = async (Model, listFields) => {
     if (!collection) {
       log.d(mod, fun, `No collection for '${Model.name}`)
     }
-    listFields = Model.getSearchableFields()
+    const listFields = Model.getSearchableFields()
     if (!listFields) {
       log.d(mod, fun, `No searchable fields for '${Model.name}`)
     }

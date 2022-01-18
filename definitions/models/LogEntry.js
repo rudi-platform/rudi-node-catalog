@@ -15,6 +15,7 @@ const { v4 } = require('uuid')
 const { LOG_DATE_FORMAT, consoleErr } = require('../../utils/jsUtils')
 const { LOG_EXP } = require('../../config/confLogs')
 const { VALID_UUID, VALID_EPOCH_MS } = require('../schemaValidators')
+
 const {
   DB_CREATED_AT,
   LOG_ID,
@@ -25,7 +26,7 @@ const {
   LOG_FUN,
   LOG_MOD,
 } = require('../../db/dbFields')
-const { makeSearchable } = require('../../db/dbActions')
+
 const { PARAM_THESAURUS_LANG } = require('../../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
@@ -153,15 +154,17 @@ function logLineToString(logLine) {
 // ------------------------------------------------------------------------------------------------
 const LogEntry = model('LogEntry', LogEntrySchema)
 
-const SEARCHABLE_FIELDS = [LOG_MSG, LOG_LVL, LOG_USR]
+LogEntry.getSearchableFields = () => [LOG_MSG, LOG_LVL, LOG_USR]
 const SEARCH_INDEX = 'searchIndex'
 
 const fun = 'createSearchIndexes'
 LogEntry.createSearchIndexes = async () => {
   try {
     const collection = LogEntry.collection
+    const listFields = LogEntry.getSearchableFields()
     const searchIndexes = {}
-    SEARCHABLE_FIELDS.map((field) => (searchIndexes[field] = 'text'))
+
+    listFields.map((field) => (searchIndexes[field] = 'text'))
 
     const indexOpts = {
       name: SEARCH_INDEX,
