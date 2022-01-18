@@ -10,8 +10,15 @@ const mongoose = require('mongoose')
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
+const { beautify } = require('../utils/jsUtils')
 const log = require('../utils/logging')
 const { RudiError } = require('../utils/errors')
+
+const { LogEntry } = require('../definitions/models/LogEntry')
+
+// ------------------------------------------------------------------------------------------------
+// Constants
+// ------------------------------------------------------------------------------------------------
 const { PARAM_THESAURUS_LANG } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
@@ -31,10 +38,29 @@ exports.getCollections = async () => {
 exports.dropDB = async (req, reply) => {
   const fun = `dropDB`
   try {
+    log.t(mod, fun, ``)
     /* Drop the whole DB !!! */
-    const dbActionResult = await mongoose.connection.db.dropDatabase()
-    log.d(mod, fun, 'DB dropped')
-    return dbActionResult
+    // const dbActionResult = await mongoose.connection.db.dropDatabase()
+    // log.d(mod, fun, 'DB dropped')
+
+    const logsCollection = 'logentries'
+
+    const listCollections = await mongoose.connection.db.listCollections().toArray()
+    // log.d(mod, fun, `listCollections: ${utils.beautify(listCollections)}`)
+    log.d(mod, fun, `listCollections: ${beautify(listCollections)}`)
+
+    const collectionDropped = {}
+    await Promise.all(
+      listCollections.map(async (collection) => {
+        if (!collection) log.d(mod, fun, `Weird: ${beautify(collection)}`)
+        if (collection.name !== logsCollection) {
+          log.d(mod, fun, `dropping '${collection.name}'`)
+          mongoose.connection.db.dropCollection(collection.name)
+          collectionDropped[collection.name] = true
+        }
+      })
+    )
+    return collectionDropped
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -76,8 +102,19 @@ exports.makeSearchable = async (Model, listFields) => {
   const fun = 'makeSearchable'
   try {
     log.t(mod, fun, ``)
-    const collection = Model.collection
-
+    let collection
+    try {
+      collection = Model.collection
+    } catch (err) {
+      log.d(mod, fun, `No collection for '${Model.name}: ${err}`)
+    }
+    if (!collection) {
+      log.d(mod, fun, `No collection for '${Model.name}`)
+    }
+    listFields = Model.getSearchableFields()
+    if (!listFields) {
+      log.d(mod, fun, `No searchable fields for '${Model.name}`)
+    }
     // Preparing the 'text' (== searchable) indexes
     const searchIndexes = {}
     listFields.map((field) => (searchIndexes[field] = 'text'))
@@ -97,7 +134,7 @@ exports.makeSearchable = async (Model, listFields) => {
         // log.d(mod, fun, `${collection.name} - ${index}: ${key}`)
         if (key == `${SEARCH_INDEX},_fts,text,_ftsx,1`) {
           log.t(mod, fun, `Dropping search indexes for '${collection.name}'`)
-          await collection.dropIndex(SEARCH_INDEX)
+          collection.dropIndex(SEARCH_INDEX)
         }
       })
     )

@@ -16,10 +16,10 @@ const CODE = 'keywords'
 const INIT_VALUES = [
   'agriculture',
   'bike',
+  'car',
   'biogaz',
   'building',
   'bus',
-  'car',
   'city',
   'electricity',
   'energy_consommation',

@@ -23,14 +23,12 @@ const {
   ACT_INIT,
 } = require('../config/confApi')
 
-const { API_SKOS_CONCEPT_CODE } = require('../db/dbFields')
+const { API_SKOS_CONCEPT_CODE, LICENCE_CONCEPT_ROLE } = require('../db/dbFields')
+const { OBJ_LICENCES } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
-exports.LicenceSchemeCode = 'software_licences'
-exports.LicenceConceptRole = 'licence'
-
 const LICENCES_FILE = `../api/licences.json`
 
 // ------------------------------------------------------------------------------------------------
@@ -41,25 +39,36 @@ let LICENCE_LIST, LICENCE_CODE_LIST
 
 exports.getLicences = async () => {
   const fun = 'getLicenceList'
-  if (!LICENCE_LIST) {
-    log.d(mod, fun, `Init LICENCE_LIST`)
-    let dblicenceList = await db.getAllConceptsWithRole(this.LicenceConceptRole)
-    if (isEmptyArray(dblicenceList)) {
-      await this.initializeLicences()
-      dblicenceList = await db.getAllConceptsWithRole(this.LicenceConceptRole)
+  try {
+    log.t(mod, fun, ``)
+    if (!LICENCE_LIST) {
+      log.d(mod, fun, `Init LICENCE_LIST`)
+      let dblicenceList = await db.getAllConceptsWithRole(LICENCE_CONCEPT_ROLE)
+      if (isEmptyArray(dblicenceList)) {
+        await this.initializeLicences()
+        dblicenceList = await db.getAllConceptsWithRole(LICENCE_CONCEPT_ROLE)
+      }
+      LICENCE_LIST = await skosController.dbConceptListToRudiRecursive(dblicenceList)
     }
-    LICENCE_LIST = await skosController.dbConceptListToRudiRecursive(dblicenceList)
+    return LICENCE_LIST
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
   }
-  return LICENCE_LIST
 }
 
 exports.getLicenceCodes = async () => {
-  // const fun = `getLicenceCodes`
-  if (!LICENCE_CODE_LIST) {
-    const licenceList = await this.getLicences()
-    LICENCE_CODE_LIST = licenceList.map((obj) => obj[API_SKOS_CONCEPT_CODE])
+  const fun = `getLicenceCodes`
+  try {
+    log.t(mod, fun, ``)
+    if (!LICENCE_CODE_LIST) {
+      const licenceList = await this.getLicences()
+      const licenceCodeList = licenceList.map((obj) => obj[API_SKOS_CONCEPT_CODE])
+      LICENCE_CODE_LIST = licenceCodeList.sort()
+    }
+    return LICENCE_CODE_LIST
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
   }
-  return LICENCE_CODE_LIST
 }
 
 exports.initializeLicences = async () => {
@@ -79,11 +88,15 @@ exports.initializeLicences = async () => {
   }
 }
 
+exports.getLicenceWithCode = async (licenceCode) => {
+  return await db.searchDbIdWithJson(OBJ_LICENCES, { API_LICENCE_LABEL: licenceCode })
+}
+
 // ------------------------------------------------------------------------------------------------
 // Controller
 // ------------------------------------------------------------------------------------------------
 exports.getAllLicences = async (req, reply) => {
-  const fun = `getAlllicences`
+  const fun = `getAllLicences`
   log.t(mod, fun, `< GET ${URL_PV_LICENCE_ACCESS}`)
   // log.t(mod, fun, ``)
 
@@ -91,7 +104,7 @@ exports.getAllLicences = async (req, reply) => {
 }
 
 exports.getAllLicenceCodes = async (req, reply) => {
-  const fun = `getAlllicenceCodes`
+  const fun = `getAllLicenceCodes`
   log.t(mod, fun, `< GET ${URL_PV_LICENCE_CODES_ACCESS}`)
   // log.t(mod, fun, ``)
 

@@ -28,12 +28,13 @@ exports.OBJ_METADATA = 'resources'
 exports.OBJ_ORGANIZATIONS = 'organizations'
 exports.OBJ_CONTACTS = 'contacts'
 exports.OBJ_MEDIA = 'media'
-exports.OBJ_SKOS_SCHEME = 'skos_schemes'
-exports.OBJ_SKOS_SCHEME_CAML = 'skosSchemes'
-exports.OBJ_SKOS_CONCEPT = 'skos_concepts'
-exports.OBJ_SKOS_CONCEPT_CAML = 'skosConcepts'
+exports.OBJ_SKOS_SCHEMES = 'skos_schemes'
+exports.OBJ_SKOS_SCHEMES_CAML = 'skosSchemes'
+exports.OBJ_SKOS_CONCEPTS = 'skos_concepts'
+exports.OBJ_SKOS_CONCEPTS_CAML = 'skosConcepts'
 exports.OBJ_REPORTS = 'reports'
 exports.OBJ_LOGS = 'logs'
+exports.OBJ_LICENCES = 'licences'
 
 // --- "In query" parameters
 exports.QUERY_LIMIT = 'limit'
@@ -53,7 +54,7 @@ exports.QUERY_UPDATED_BEFORE = 'updated_before'
 exports.QUERY_UPDATED_BEFORE_CAML = 'updatedBefore'
 exports.QUERY_CONFIRM = 'confirm'
 
-exports.QUERY_SEARCH_TERMS = 'serarchTerms'
+exports.QUERY_SEARCH_TERMS = 'searchTerms'
 
 exports.DEFAULT_QUERY_LIMIT = 100
 exports.DEFAULT_QUERY_OFFSET = 0
@@ -85,8 +86,8 @@ exports.URL_OBJECTS = [
   this.OBJ_ORGANIZATIONS,
   this.OBJ_CONTACTS,
   this.OBJ_MEDIA,
-  this.OBJ_SKOS_CONCEPT,
-  this.OBJ_SKOS_SCHEME,
+  this.OBJ_SKOS_CONCEPTS,
+  this.OBJ_SKOS_SCHEMES,
   this.OBJ_REPORTS,
   this.OBJ_LOGS,
 ]
@@ -104,7 +105,7 @@ exports.URL_SUFFIX_GIT_HASH = 'hash'
 exports.URL_SUFFIX_APP_HASH = 'apphash'
 exports.URL_SUFFIX_APP_ENV = 'env'
 exports.URL_SUFFIX_NODE_VERSION = 'nv'
-exports.URL_LICENCE_SUFFIX = 'licences'
+exports.URL_LICENCE_SUFFIX = this.OBJ_LICENCES
 
 exports.PARAM_THESAURUS_CODE = 'code'
 exports.PARAM_THESAURUS_LANG = 'lang'
@@ -133,8 +134,6 @@ exports.URL_PV_LICENCE_CODES_ACCESS = `${this.URL_PREFIX_PRIVATE}/${URL_SUFFIX_L
 // ------------------------------------------------------------------------------------------------
 exports.ROUTE_NAME = 'routeName'
 
-exports.IO = 'io'
-
 // ------------------------------------------------------------------------------------------------
 // Errors trace
 // ------------------------------------------------------------------------------------------------
@@ -144,3 +143,5 @@ exports.TRACE = 'errTrace'
 exports.TRACE_MOD = 'mod'
 exports.TRACE_FUN = 'fun'
 exports.TRACE_ERR = 'err'
+
+exports.MONGO_ERROR = 'MongoServerError'

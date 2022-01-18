@@ -41,8 +41,8 @@ const {
   OBJ_ORGANIZATIONS,
   OBJ_CONTACTS,
   OBJ_MEDIA,
-  OBJ_SKOS_CONCEPT,
-  OBJ_SKOS_SCHEME,
+  OBJ_SKOS_CONCEPTS: OBJ_SKOS_CONCEPT,
+  OBJ_SKOS_SCHEMES: OBJ_SKOS_SCHEME,
   ACT_DELETION,
   ACT_SEARCH,
   PARAM_ID,
@@ -70,6 +70,7 @@ const {
   QUERY_UPDATED_BEFORE_CAML,
   ACT_UNLINKED,
   QUERY_SEARCH_TERMS,
+  MONGO_ERROR,
 } = require('../config/confApi')
 
 const {
@@ -90,21 +91,6 @@ const {
   API_START_DATE_PROPERTY,
 } = require('../db/dbFields')
 
-// ------------------------------------------------------------------------------------------------
-// Models
-// ------------------------------------------------------------------------------------------------
-/* 
-const {Organization} = require('../definitions/models/Organization')
-const {Contact} = require('../definitions/models/Contact')
-const SkosConcept = require('../definitions/models/SkosConcept')
-const SkosScheme = require('../definitions/models/SkosScheme')
-
-const { Report } = require('../definitions/models/Report')
-const { Metadata } = require('../definitions/models/Metadata')
-const { Media, MediaFile, MediaSeries } = require('../definitions/models/Media')
-
-const { LogEntry } = require('../definitions/models/LogEntry')
- */
 // ------------------------------------------------------------------------------------------------
 // Specific controllers
 // ------------------------------------------------------------------------------------------------
@@ -242,11 +228,11 @@ exports.parseQueryParameters = async (objectType, fullUrl) => {
             break
           case QUERY_UPDATED_AFTER:
           case QUERY_UPDATED_AFTER_CAML:
-            filters.push({ [DB_UPDATED_AT]: { $gte: cleanDate(value) } })
+            filters.push({ [DB_UPDATED_AT]: mongoose.trusted({ $gte: cleanDate(value) }) })
             break
           case QUERY_UPDATED_BEFORE:
           case QUERY_UPDATED_BEFORE_CAML:
-            filters.push({ [DB_UPDATED_AT]: { $lte: cleanDate(value) } })
+            filters.push({ [DB_UPDATED_AT]: mongoose.trusted({ $lte: cleanDate(value) }) })
             break
           case QUERY_CONFIRM:
             if (['false', '0', 'null', 'no'].includes(value)) break
@@ -348,7 +334,7 @@ exports.parseQueryParameters = async (objectType, fullUrl) => {
 
         if (modelProperties.includes(nestedField)) {
           try {
-            const obj = JSON.parse(value)
+            const obj = JSON.parse(value) // TODO: remove !!!
             const msg = `nestedField: ${nestedField} / nestedFieldProp: ${nestedFieldProp} / value: ${obj}`
             log.d(mod, fun, msg)
 
@@ -408,7 +394,7 @@ exports.parseQueryParameters = async (objectType, fullUrl) => {
             })
           )
 
-          filters.push({ [extObj]: { $in: ids } })
+          filters.push({ [extObj]: mongoose.trusted({ $in: ids }) })
 
           // log.d(mod, fun, `filterReturn: ${beautify(returnedFilter)}`)
         })
@@ -486,7 +472,7 @@ exports.setPublishedFlag = async (dbObject, rudiId) => {
   const fun = 'setPublishedFlag'
   log.d(mod, fun, '')
   try {
-    if (!dbObject) throw new ParameterExpectedError(fun, 'dbObject')
+    if (!dbObject) throw new ParameterExpectedError('dbObject', mod, fun)
     if (!dbObject[DB_PUBLISHED_AT]) {
       dbObject[DB_PUBLISHED_AT] = nowISO()
       await dbObject.save()
@@ -607,7 +593,7 @@ exports.searchObjects = async (req, reply) => {
       log.w(mod, fun, 'No search parameters given')
       return []
     } else {
-      // log.w(mod, fun, `Parsed parameters: ${beautify(parsedParameters)}`)
+      log.i(mod, fun, `Parsed parameters: ${beautify(parsedParameters)}`)
     }
 
     const options = pick(parsedParameters, [
@@ -637,16 +623,16 @@ exports.getSearchableProperties = (req, reply) => {
   log.t(mod, fun, ``)
 
   const rudiObjectList = db.getRudiObjectList()
-  const searchableFields = {}
+  const getSearchableFields = {}
   // log.d(mod, fun, `rudiObjectList: ${beautify(rudiObjectList)}`)
   Object.keys(rudiObjectList).map((objectType) => {
     try {
-      searchableFields[objectType] = rudiObjectList[objectType].Model.searchableFields()
+      getSearchableFields[objectType] = rudiObjectList[objectType].Model.getSearchableFields()
     } catch (err) {
       log.d(mod, fun, `${objectType}: not searchable`)
     }
   })
-  return searchableFields
+  return getSearchableFields
 }
 
 /**
@@ -741,7 +727,7 @@ exports.getMetadataListAndCount = async (req, reply) => {
     objectList = await db.getMetadataListAndCount(options)
     return objectList
   } catch (err) {
-    const error = err.name === 'MongoError' ? new BadRequestError(err) : new NotFoundError(err)
+    const error = err.name === MONGO_ERROR ? new BadRequestError(err) : new NotFoundError(err)
     throw RudiError.treatError(mod, fun, error)
   }
 }

@@ -55,6 +55,7 @@ exports.accessProperty = (jsonObject, jsonProperty) => {
  */
 exports.requireSubProperty = (obj, prop, subProp, enumProp, enumVal) => {
   const fun = 'requireSubProperty'
+
   // log.d(mod, fun, `prop: ${prop} | subProp: ${subProp} | enumVal: ${enumVal}`)
   if (utils.isNothing(obj[prop])) {
     // log.d(mod, fun, `empty obj[${prop}]: ${this.beautify(obj[prop])}`)

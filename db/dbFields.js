@@ -190,3 +190,11 @@ exports.API_CONCEPT_PARENTS_PROPERTY = 'broader_concepts'
 exports.API_CONCEPT_CHILDREN_PROPERTY = 'narrower_concepts'
 exports.API_CONCEPT_SIBLINGS_PROPERTY = 'siblings_concepts'
 exports.API_CONCEPT_RELATIVE_PROPERTY = 'relative_concepts'
+
+// Licences types
+exports.LicenceTypes = {
+  Standard: 'STANDARD',
+  Custom: 'CUSTOM',
+}
+exports.LICENCE_SCHEME_CODE = 'software_licences'
+exports.LICENCE_CONCEPT_ROLE = 'licence'

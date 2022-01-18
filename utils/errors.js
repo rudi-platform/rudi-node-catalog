@@ -31,7 +31,7 @@ const ERR_ID = 'errId'
 // Custom http errors
 // ------------------------------------------------------------------------------------------------
 class RudiError extends Error {
-  constructor(message, code, name, description, errTrace, mod, fun) {
+  constructor(message, code, name, description, errTrace, ctxMod, ctxFun) {
     // const fun = 'RudiError()'
     // log.t(mod, fun, `${beautify(errTrace)}`)
     // const lastTrace = getLast(errTrace)
@@ -45,8 +45,8 @@ class RudiError extends Error {
     this.type = this.constructor.name
     this[TRACE] = errTrace || []
     this.setId()
-    this[TRACE_MOD] = mod
-    this[TRACE_FUN] = fun
+    this[TRACE_MOD] = ctxMod
+    this[TRACE_FUN] = ctxFun
   }
 
   toString() {
@@ -156,9 +156,9 @@ class RudiError extends Error {
   static treatError(ctxMod, ctxFun, error) {
     const fun = 'treatError'
     try {
-      if (!error) throw new ParameterExpectedError('treatError', 'error')
-      if (!ctxMod) throw new ParameterExpectedError('treatError', 'ctxMod')
-      if (!ctxFun) throw new ParameterExpectedError('treatError', 'ctxFun')
+      if (!error) throw new ParameterExpectedError('error', mod, fun)
+      if (!ctxMod) throw new ParameterExpectedError('ctxMod', mod, fun)
+      if (!ctxFun) throw new ParameterExpectedError('ctxFun', mod, fun)
       if (error.name === 'ValidationError') error[STATUS_CODE] = 400
 
       // log.d(mod, fun, `A) ${error} -> ${beautify(error)}`)
@@ -347,8 +347,8 @@ class InternalServerError extends RudiError {
 }
 
 class ParameterExpectedError extends InternalServerError {
-  constructor(fun, param, ctxMod, ctxFun) {
-    super(`${parameterExpected(fun, param)}`, ctxMod, ctxFun)
+  constructor(param, ctxMod, ctxFun) {
+    super(`${parameterExpected(ctxFun, param)}`, ctxMod, ctxFun)
   }
 }
 

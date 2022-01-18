@@ -34,8 +34,6 @@ const Languages = require('../definitions/thesaurus/Languages')
 const Projections = require('../definitions/thesaurus/Projections')
 const StorageStatus = require('../definitions/thesaurus/StorageStatus')
 
-const { LicenceTypes } = require('../definitions/models/Licence')
-
 // ------------------------------------------------------------------------------------------------
 // Controllers
 // ------------------------------------------------------------------------------------------------
@@ -66,6 +64,7 @@ const {
   API_CONCEPT_CHILDREN_PROPERTY,
   API_CONCEPT_SIBLINGS_PROPERTY,
   API_CONCEPT_RELATIVE_PROPERTY,
+  LicenceTypes,
 } = require('../db/dbFields')
 
 const PROPERTIES_WITH_CONCEPT_REFS = [
@@ -80,7 +79,12 @@ const {
   PARAM_THESAURUS_CODE,
   PARAM_THESAURUS_LANG,
 } = require('../config/confApi')
-const { ParameterExpectedError, NotFoundError, RudiError } = require('../utils/errors')
+const {
+  ParameterExpectedError,
+  NotFoundError,
+  RudiError,
+  BadRequestError,
+} = require('../utils/errors')
 
 // ------------------------------------------------------------------------------------------------
 // Controllers: Scheme
@@ -99,7 +103,7 @@ exports.newSkosScheme = async (rudiScheme) => {
   try {
     log.t(mod, fun, ``)
 
-    if (!rudiScheme) throw new ParameterExpectedError(fun, 'rudiScheme')
+    if (!rudiScheme) throw new ParameterExpectedError('rudiScheme', mod, fun)
 
     const topConcepts = await utils.deepClone(rudiScheme[API_SCHEME_TOPS_PROPERTY])
 
@@ -125,7 +129,7 @@ exports.newSkosScheme = async (rudiScheme) => {
   }
 }
 
-const CONCEPT_HIERARCHY_DISPLAY = `${API_SKOS_CONCEPT_ID} ${API_SKOS_CONCEPT_CODE} ${API_CONCEPT_CHILDREN_PROPERTY} -${DB_ID}`
+const CONCEPT_HIERARCHY_DISPLAY = `${API_SKOS_CONCEPT_ID} ${API_SKOS_CONCEPT_CODE} ${API_CONCEPT_CHILDREN_PROPERTY}` // -${DB_ID}
 
 exports.dbSchemeToRudi = async (dbScheme) => {
   const fun = 'dbSchemeToRudi'
@@ -133,12 +137,13 @@ exports.dbSchemeToRudi = async (dbScheme) => {
 
   // log.d(mod, fun, `dbScheme: ${utils.beautify(dbScheme)}`)
 
-  const rudiScheme = await dbScheme
-    .populate({
+  const rudiScheme = await dbScheme.populate([
+    {
       path: API_SCHEME_TOPS_PROPERTY,
       select: CONCEPT_HIERARCHY_DISPLAY,
-    })
-    .execPopulate()
+    },
+  ])
+  // .execPopulate()
 
   rudiScheme[API_SCHEME_TOPS_PROPERTY] = await this.dbConceptListToRudiRecursive(
     rudiScheme[API_SCHEME_TOPS_PROPERTY]
@@ -163,8 +168,8 @@ exports.createConceptHierarchy = async (listConcepts, schemeDbId, parentConcept)
   try {
     log.t(mod, fun, ``)
     // Check input parameters
-    if (!listConcepts) throw new ParameterExpectedError(fun, 'listConcepts')
-    if (!schemeDbId) throw new ParameterExpectedError(fun, 'schemeDbId')
+    if (!listConcepts) throw new ParameterExpectedError('listConcepts', mod, fun)
+    if (!schemeDbId) throw new ParameterExpectedError('schemeDbId', mod, fun)
 
     // Create all concept in the list
     const conceptDbIds = []
@@ -286,150 +291,181 @@ exports.newSkosConcept = async (rudiConcept, inSchemeDbId) => {
  */
 exports.setDbScheme = async (rudiConcept, inSchemeDbId) => {
   const fun = 'setDbScheme'
-  log.t(mod, fun, ``)
+  try {
+    log.t(mod, fun, ``)
 
-  let schemeDbId
-  if (!inSchemeDbId) {
-    // Retrieveing Scheme information
-    const conceptScheme = json.accessProperty(rudiConcept, API_CONCEPT_CLASS_PROPERTY)
-    schemeDbId = rudiConcept[API_CONCEPT_CLASS_PROPERTY][DB_ID]
-    if (!schemeDbId) {
-      const schemeRudiId = json.accessProperty(conceptScheme, API_SKOS_SCHEME_ID)
-      schemeDbId = await db.getEnsuredSchemeDbIdWithRudiId(schemeRudiId)
+    let schemeDbId
+    if (!inSchemeDbId) {
+      // Retrieveing Scheme information
+      const conceptScheme = json.accessProperty(rudiConcept, API_CONCEPT_CLASS_PROPERTY)
+      schemeDbId = rudiConcept[API_CONCEPT_CLASS_PROPERTY][DB_ID]
+      if (!schemeDbId) {
+        const schemeRudiId = json.accessProperty(conceptScheme, API_SKOS_SCHEME_ID)
+        schemeDbId = await db.getEnsuredSchemeDbIdWithRudiId(schemeRudiId)
+      }
+      // log.d(mod, fun, `schemeDbId: ${schemeDbId}`)
+    } else {
+      // log.d(mod, fun, `inSchemeDbId: ${inSchemeDbId}`)
+      schemeDbId = inSchemeDbId
     }
-    // log.d(mod, fun, `schemeDbId: ${schemeDbId}`)
-  } else {
-    // log.d(mod, fun, `inSchemeDbId: ${inSchemeDbId}`)
-    schemeDbId = inSchemeDbId
+    rudiConcept[API_CONCEPT_CLASS_PROPERTY] = schemeDbId
+    return schemeDbId
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
   }
-  rudiConcept[API_CONCEPT_CLASS_PROPERTY] = schemeDbId
-  return schemeDbId
+}
+exports.getDbIdForConceptCode = async (conceptRudiId) => {
+  const fun = 'getDbIdForConceptCode'
+  try {
+    log.t(mod, fun, ``)
+    const conceptDbId = await db.getConceptDbIdWithRudiId(conceptRudiId)
+    return conceptDbId
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
 }
 
 exports.setDbConceptRefs = async (rudiConcept, prop) => {
   const fun = 'setDbConceptRefs'
-  log.t(mod, fun, ``)
+  try {
+    log.t(mod, fun, ``)
+    const listConceptsReferences = rudiConcept[prop]
 
-  const listConceptsReferences = rudiConcept[prop]
+    // log.d(mod, fun, `listConceptsReferences: ${utils.beautify(listConceptsReferences)}`)
+    if (!listConceptsReferences) return
 
-  // log.d(mod, fun, `listConceptsReferences: ${utils.beautify(listConceptsReferences)}`)
-  if (!listConceptsReferences) return
+    const listRefs = []
 
-  const listRefs = []
+    // Scanning every concept referenced
+    await Promise.all(
+      listConceptsReferences.map(async (referencedConcept) => {
+        let refConceptDbId = referencedConcept[DB_ID]
 
-  // Scanning every concept referenced
-  await Promise.all(
-    listConceptsReferences.map(async (referencedConcept) => {
-      let refConceptDbId = referencedConcept[DB_ID]
-
-      if (!refConceptDbId) {
-        // The property isn't already a DB object : let's fetch it
-        const refConceptRudiId = json.accessProperty(referencedConcept, API_SKOS_CONCEPT_ID)
-        log.d(mod, fun, `refConceptRudiId: ${refConceptRudiId}`)
-        refConceptDbId = await db.getConceptDbIdWithRudiId(refConceptRudiId)
-        log.d(mod, fun, `refConceptDbId: ${refConceptDbId}`)
-      }
-      if (!refConceptDbId) {
-        log.w(mod, fun, `Referenced concept not created: ${utils.beautify(referencedConcept)}`)
-        // TODO: throw an error here?
-      } else {
-        log.d(mod, fun, `refConceptDbId: ${refConceptDbId}`)
-        listRefs.push(refConceptDbId)
-      }
-    })
-  )
-  rudiConcept[prop] = listRefs
-  return listRefs
+        if (!refConceptDbId) {
+          // The property isn't already a DB object : let's fetch it
+          const refConceptRudiId = json.accessProperty(referencedConcept, API_SKOS_CONCEPT_ID)
+          log.d(mod, fun, `refConceptRudiId: ${refConceptRudiId}`)
+          refConceptDbId = await this.getDbIdForConceptCode(refConceptRudiId)
+          log.d(mod, fun, `refConceptDbId: ${refConceptDbId}`)
+        }
+        if (!refConceptDbId) {
+          log.w(mod, fun, `Referenced concept not created: ${utils.beautify(referencedConcept)}`)
+          // TODO: throw an error here?
+        } else {
+          log.d(mod, fun, `refConceptDbId: ${refConceptDbId}`)
+          listRefs.push(refConceptDbId)
+        }
+      })
+    )
+    rudiConcept[prop] = listRefs
+    return listRefs
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
 }
 
-const SCHEME_SHORT_DISPLAY = `${API_SKOS_SCHEME_ID} ${API_SKOS_SCHEME_CODE} -${DB_ID}`
-const CONCEPT_SHORT_DISPLAY = `${API_SKOS_CONCEPT_ID} ${API_SKOS_CONCEPT_CODE} -${DB_ID}`
+const SCHEME_SHORT_DISPLAY = `${API_SKOS_SCHEME_ID} ${API_SKOS_SCHEME_CODE}` //  -${DB_ID}
+const CONCEPT_SHORT_DISPLAY = `${API_SKOS_CONCEPT_ID} ${API_SKOS_CONCEPT_CODE}` //  -${DB_ID}
 
 exports.dbConceptToRudiMinimal = async (dbConcept) => {
   const fun = 'dbConceptToRudi'
-  log.t(mod, fun, ``)
+  try {
+    log.t(mod, fun, ``)
 
-  const rudiConcept = await dbConcept
-    .populate({
-      path: API_CONCEPT_CLASS_PROPERTY,
-      select: SCHEME_SHORT_DISPLAY,
-    })
-    .populate({
-      path: API_CONCEPT_PARENTS_PROPERTY,
-      select: CONCEPT_SHORT_DISPLAY,
-    })
-    .populate({
-      path: API_CONCEPT_CHILDREN_PROPERTY,
-      select: CONCEPT_SHORT_DISPLAY,
-    })
-    .populate({
-      path: API_CONCEPT_SIBLINGS_PROPERTY,
-      select: CONCEPT_SHORT_DISPLAY,
-    })
-    .populate({
-      path: API_CONCEPT_RELATIVE_PROPERTY,
-      select: CONCEPT_SHORT_DISPLAY,
-    })
-    .execPopulate()
+    const rudiConcept = await dbConcept.populate([
+      {
+        path: API_CONCEPT_CLASS_PROPERTY,
+        select: SCHEME_SHORT_DISPLAY,
+      },
+      {
+        path: API_CONCEPT_PARENTS_PROPERTY,
+        select: CONCEPT_SHORT_DISPLAY,
+      },
+      {
+        path: API_CONCEPT_CHILDREN_PROPERTY,
+        select: CONCEPT_SHORT_DISPLAY,
+      },
+      {
+        path: API_CONCEPT_SIBLINGS_PROPERTY,
+        select: CONCEPT_SHORT_DISPLAY,
+      },
+      {
+        path: API_CONCEPT_RELATIVE_PROPERTY,
+        select: CONCEPT_SHORT_DISPLAY,
+      },
+    ])
+    // .execPopulate()
 
-  return rudiConcept
-  // TODO: populate ref fileds ?
+    return rudiConcept
+    // TODO: populate ref fileds ?
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
 }
 
 exports.dbConceptToRudiRecursive = async (dbConcept) => {
-  // const fun = 'dbConceptToRudiRecursive'
-  // log.t(mod, fun, ``)
+  const fun = 'dbConceptToRudiRecursive'
+  try {
+    // log.t(mod, fun, ``)
 
-  // log.d(mod, fun, `dbConcept: ${utils.beautify(dbConcept)}`)
-  if (!dbConcept) return
+    // log.d(mod, fun, `dbConcept: ${utils.beautify(dbConcept)}`)
+    if (!dbConcept) return
 
-  const rudiConcept = await dbConcept
-    .populate({
-      path: API_CONCEPT_CLASS_PROPERTY,
-      select: SCHEME_SHORT_DISPLAY,
-    })
-    .populate({
-      path: API_CONCEPT_PARENTS_PROPERTY,
-      select: CONCEPT_SHORT_DISPLAY,
-    })
-    .populate({
-      path: API_CONCEPT_CHILDREN_PROPERTY,
-      select: CONCEPT_SHORT_DISPLAY,
-    })
-    .populate({
-      path: API_CONCEPT_SIBLINGS_PROPERTY,
-      select: CONCEPT_SHORT_DISPLAY,
-    })
-    .populate({
-      path: API_CONCEPT_RELATIVE_PROPERTY,
-      select: CONCEPT_SHORT_DISPLAY,
-    })
-    .execPopulate()
+    const rudiConcept = await dbConcept.populate([
+      {
+        path: API_CONCEPT_CLASS_PROPERTY,
+        select: SCHEME_SHORT_DISPLAY,
+      },
+      {
+        path: API_CONCEPT_PARENTS_PROPERTY,
+        select: CONCEPT_SHORT_DISPLAY,
+      },
+      {
+        path: API_CONCEPT_CHILDREN_PROPERTY,
+        select: CONCEPT_SHORT_DISPLAY,
+      },
+      {
+        path: API_CONCEPT_SIBLINGS_PROPERTY,
+        select: CONCEPT_SHORT_DISPLAY,
+      },
+      {
+        path: API_CONCEPT_RELATIVE_PROPERTY,
+        select: CONCEPT_SHORT_DISPLAY,
+      },
+    ])
+    // .execPopulate()
 
-  rudiConcept[API_CONCEPT_CHILDREN_PROPERTY] = await this.dbConceptListToRudiRecursive(
-    rudiConcept[API_CONCEPT_CHILDREN_PROPERTY]
-  )
-  // log.d(mod, fun, `rudiConcept: ${utils.beautify(rudiConcept)}`)
+    rudiConcept[API_CONCEPT_CHILDREN_PROPERTY] = await this.dbConceptListToRudiRecursive(
+      rudiConcept[API_CONCEPT_CHILDREN_PROPERTY]
+    )
+    // log.d(mod, fun, `rudiConcept: ${utils.beautify(rudiConcept)}`)
 
-  return rudiConcept
-  // TODO: populate ref fileds ?
+    return rudiConcept
+    // TODO: populate ref fileds ?
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
 }
 
 exports.dbConceptListToRudiRecursive = async (dbConceptList) => {
-  // const fun = 'dbConceptListToRudiRecursive'
-  // log.t(mod, fun, ``)
+  const fun = 'dbConceptListToRudiRecursive'
+  try {
+    // log.t(mod, fun, ``)
 
-  // log.d(mod, fun, `dbConceptList: ${utils.beautify(dbConceptList)}`)
-  if (!dbConceptList) return
+    // log.d(mod, fun, `dbConceptList: ${utils.beautify(dbConceptList)}`)
+    if (!dbConceptList) return
 
-  const rudiConceptList = []
-  await Promise.all(
-    dbConceptList.map(async (dbConcept) => {
-      const rudiConcept = await this.dbConceptToRudiRecursive(dbConcept)
-      rudiConceptList.push(rudiConcept)
-    })
-  )
-  return rudiConceptList
+    const rudiConceptList = []
+    await Promise.all(
+      dbConceptList.map(async (dbConcept) => {
+        const rudiConcept = await this.dbConceptToRudiRecursive(dbConcept)
+        rudiConceptList.push(rudiConcept)
+      })
+    )
+    return rudiConceptList
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -437,71 +473,90 @@ exports.dbConceptListToRudiRecursive = async (dbConceptList) => {
 // ------------------------------------------------------------------------------------------------
 
 exports.getThesaurusList = async (lang) => {
-  const keywords = await Keywords.get(lang)
-  const themes = await Themes.get(lang)
-  const licences = await await licenceController.getAllLicenceCodes()
+  const fun = 'getThesaurusList'
+  try {
+    const keywords = await Keywords.get(lang)
+    const themes = await Themes.get(lang)
+    const licences = await await licenceController.getAllLicenceCodes()
 
-  const thesauri = {
-    encodings: Encodings.get(lang),
-    filetypes: FileTypes.get(lang),
-    fileextensions: FileTypes.getExtensions(),
-    hashalgorithms: HashAlgorithms.get(lang),
-    keywords: keywords,
-    languages: Languages.get(lang),
-    licences: licences,
-    licencetypes: Object.values(LicenceTypes),
-    projections: Projections.get(lang),
-    storagestatus: StorageStatus.get(lang),
-    themes: themes,
+    const thesauri = {
+      encodings: Encodings.get(lang),
+      filetypes: FileTypes.get(lang),
+      fileextensions: FileTypes.getExtensions(),
+      hashalgorithms: HashAlgorithms.get(lang),
+      keywords: keywords,
+      languages: Languages.get(lang),
+      licences: licences,
+      licencetypes: Object.values(LicenceTypes),
+      projections: Projections.get(lang),
+      storagestatus: StorageStatus.get(lang),
+      themes: themes,
+    }
+
+    return thesauri
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
   }
-
-  return thesauri
 }
 
 exports.getThesaurus = async (thesaurusCode) => {
-  const code = thesaurusCode.toLowerCase()
+  const fun = 'getThesaurus'
+  try {
+    const code = thesaurusCode.toLowerCase()
 
-  if (code === 'keywords') return await Keywords.get()
-  if (code === 'themes') return await Themes.get()
-  if (code === 'licences') return await licenceController.getAllLicenceCodes()
+    if (code === 'keywords') return await Keywords.get()
+    if (code === 'themes') return await Themes.get()
+    if (code === 'licences') return await licenceController.getAllLicenceCodes()
 
-  switch (code) {
-    case 'encodings':
-      return Encodings.get()
-    case 'filetypes':
-      return FileTypes.get()
-    case 'fileextensions':
-      return FileTypes.getExtensions()
-    case 'hashalgorithms':
-      return HashAlgorithms.get()
-    case 'languages':
-      return Languages.get()
-    case 'projections':
-      return Projections.get()
+    switch (code) {
+      case 'encodings':
+        return Encodings.get()
+      case 'filetypes':
+        return FileTypes.get()
+      case 'fileextensions':
+        return FileTypes.getExtensions()
+      case 'hashalgorithms':
+        return HashAlgorithms.get()
+      case 'languages':
+        return Languages.get()
+      case 'projections':
+        return Projections.get()
+      default:
+        throw new BadRequestError(`This is not a valid thesaurus code: '${thesaurusCode}'`)
+    }
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
 exports.getThesaurusLabel = async (thesaurusCode, lang) => {
-  const code = thesaurusCode.toLowerCase()
+  const fun = 'getThesaurusLabel'
+  try {
+    const code = thesaurusCode.toLowerCase()
 
-  if (code === 'themes') return await Themes.getLabels(lang)
+    if (code === 'themes') return await Themes.getLabels(lang)
 
-  if (code === 'keywords') return await Keywords.get()
-  if (code === 'licences') return await licenceController.getAllLicenceCodes()
+    if (code === 'keywords') return await Keywords.get()
+    if (code === 'licences') return await licenceController.getAllLicenceCodes()
 
-  switch (code) {
-    case 'encodings':
-      return Encodings.get()
-    case 'filetypes':
-      return FileTypes.get()
-    case 'fileextensions':
-      return FileTypes.getExtensions()
-    case 'hashalgorithms':
-      return HashAlgorithms.get()
-    case 'languages':
-      return Languages.get()
-    case 'projections':
-      return Projections.get()
+    switch (code) {
+      case 'encodings':
+        return Encodings.get()
+      case 'filetypes':
+        return FileTypes.get()
+      case 'fileextensions':
+        return FileTypes.getExtensions()
+      case 'hashalgorithms':
+        return HashAlgorithms.get()
+      case 'languages':
+        return Languages.get()
+      case 'projections':
+        return Projections.get()
+      default:
+        throw new BadRequestError(`This is not a valid thesaurus code: '${thesaurusCode}'`)
+    }
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 

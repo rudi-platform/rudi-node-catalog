@@ -44,7 +44,6 @@ const ReferenceDates = require('../schemas/ReferenceDates')
 // ------------------------------------------------------------------------------------------------
 // Model definitions
 // ------------------------------------------------------------------------------------------------
-const Licence = require('./Licence')
 
 // ------------------------------------------------------------------------------------------------
 // Other controllers
@@ -115,6 +114,7 @@ const {
   API_GEO_BBOX_NORTH,
   API_GEO_GEOJSON_PROPERTY,
   API_METAINFO_VERSION_PROPERTY,
+  LicenceTypes,
 } = require('../../db/dbFields')
 
 // ------------------------------------------------------------------------------------------------
@@ -424,9 +424,32 @@ const MetadataSchema = new mongoose.Schema(
          * 'licence': Standard licence (recognized by RUDI system)
          */
         [API_LICENCE]: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Licence',
           required: true,
+          type: {
+            /** Enum to differenciate standard from custom licence */
+            [API_LICENCE_TYPE]: {
+              type: String,
+              enum: Object.values(LicenceTypes),
+              required: true,
+            },
+
+            /** Standard licence (recognized by RUDI system): label of the licence = concept code */
+            [API_LICENCE_LABEL]: {
+              type: String,
+            },
+
+            /** Custom licence: Title of the custom licence */
+            [API_LICENCE_CUSTOM_LABEL]: {
+              type: [DictionaryEntry],
+            },
+
+            /** Custom licence: Informative URL towards the custom licence */
+            [API_LICENCE_CUSTOM_URI]: {
+              type: String,
+              unique: true,
+              match: Validation.VALID_URI,
+            },
+          },
         },
 
         /** Describes how constrained is the use of the resource */
@@ -522,60 +545,61 @@ const MetadataSchema = new mongoose.Schema(
 // ------------------------------------------------------------------------------------------------
 async function checkLicence(metadata) {
   const fun = 'checkLicence'
+  try {
+    const accessCondition = json.accessProperty(metadata, API_ACCESS_CONDITION)
+    const licence = json.requireSubProperty(metadata, API_ACCESS_CONDITION, API_LICENCE)
+    const licenceType = json.requireSubProperty(accessCondition, API_LICENCE, API_LICENCE_TYPE)
 
-  const accessCondition = json.accessProperty(metadata, API_ACCESS_CONDITION)
-  // log.d(mod, fun, `accessCondition: ${utils.beautify(accessCondition)}`)
-  const licence = json.requireSubProperty(metadata, API_ACCESS_CONDITION, API_LICENCE)
-  // log.d(mod, fun, `licence: ${utils.beautify(licence)}`)
-
-  const licenceType = json.requireSubProperty(accessCondition, API_LICENCE, API_LICENCE_TYPE)
-
-  switch (licenceType) {
-    case Licence.LicenceTypes.Standard: {
-      // log.d(mod, fun, `licenceType: ${utils.beautify(licenceType)}`)
-      const licenceLabel = json.requireSubProperty(
-        accessCondition,
-        API_LICENCE,
-        API_LICENCE_LABEL,
-        API_LICENCE_TYPE,
-        Licence.LicenceTypes.Standard
-      )
-      const listLicenceCode = await licenceController.getLicenceCodes()
-      // log.d(mod, fun, `licence list: ${utils.beautify(listLicenceCode)}`)
-      if (listLicenceCode.indexOf(licenceLabel) === -1) {
-        throw new NotFoundError(
-          `Licence label '${licenceLabel}' was not found in licence list '${listLicenceCode}'`
+    switch (licenceType) {
+      case LicenceTypes.Standard: {
+        // log.d(mod, fun, `licenceType: ${utils.beautify(licenceType)}`)
+        const licenceLabel = json.requireSubProperty(
+          accessCondition,
+          API_LICENCE,
+          API_LICENCE_LABEL,
+          API_LICENCE_TYPE,
+          LicenceTypes.Standard
         )
-      } else {
-        return licenceLabel
+        const listLicenceCode = await licenceController.getLicenceCodes()
+        // log.d(mod, fun, `licence list: ${utils.beautify(listLicenceCode)}`)
+        if (listLicenceCode.indexOf(licenceLabel) === -1) {
+          throw new NotFoundError(
+            `Licence label '${licenceLabel}' was not found in licence list '${listLicenceCode}'`
+          )
+        } else {
+          return licenceLabel
+        }
+      }
+      case LicenceTypes.Custom: {
+        // log.d(mod, fun, `licenceType: ${utils.beautify(licenceType)}`)
+        json.requireSubProperty(
+          accessCondition,
+          API_LICENCE,
+          API_LICENCE_CUSTOM_LABEL,
+          API_LICENCE_TYPE,
+          LicenceTypes.Custom
+        )
+        json.requireSubProperty(
+          accessCondition,
+          API_LICENCE,
+          API_LICENCE_CUSTOM_URI,
+          API_LICENCE_TYPE,
+          LicenceTypes.Custom
+        )
+        return licence[API_LICENCE_CUSTOM_LABEL]
+      }
+      default: {
+        const errMsg = msg.incorrectValueForEnum(
+          `${API_ACCESS_CONDITION}.${API_LICENCE}.${API_LICENCE_TYPE}`,
+          licenceType
+        )
+        log.e(mod, fun, errMsg)
+        throw new BadRequestError(errMsg)
       }
     }
-    case Licence.LicenceTypes.Custom: {
-      // log.d(mod, fun, `licenceType: ${utils.beautify(licenceType)}`)
-      json.requireSubProperty(
-        accessCondition,
-        API_LICENCE,
-        API_LICENCE_CUSTOM_LABEL,
-        API_LICENCE_TYPE,
-        Licence.LicenceTypes.Custom
-      )
-      json.requireSubProperty(
-        accessCondition,
-        API_LICENCE,
-        API_LICENCE_CUSTOM_URI,
-        API_LICENCE_TYPE,
-        Licence.LicenceTypes.Custom
-      )
-      return licence[API_LICENCE_CUSTOM_LABEL]
-    }
-    default: {
-      const errMsg = msg.incorrectValueForEnum(
-        `${API_ACCESS_CONDITION}.${API_LICENCE}.${API_LICENCE_TYPE}`,
-        licenceType
-      )
-      log.e(mod, fun, errMsg)
-      throw new BadRequestError(errMsg)
-    }
+  } catch (err) {
+    log.d(mod, fun, `metadata: ${utils.beautify(metadata)}`)
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -806,7 +830,7 @@ MetadataSchema.post('save', async function (doc, next) {
   log.t(mod, fun, ``)
 
   try {
-    await this.populate(POPULATE_OPTS).execPopulate()
+    await this.populate(POPULATE_OPTS) //.execPopulate()
     next()
   } catch (err) {
     next(err)
@@ -822,7 +846,7 @@ MetadataSchema.post('find', async function (docs, next) {
   try {
     for (let doc of docs) {
       // if (doc.isPublic)
-      await doc.populate(POPULATE_OPTS).execPopulate()
+      await doc.populate(POPULATE_OPTS) //.execPopulate()
     }
   } catch (err) {
     next(err)
@@ -838,19 +862,18 @@ const Metadata = mongoose.model('Metadata', MetadataSchema)
 
 // Making fields searchable
 
-const SEARCHABLE_FIELDS = [
+Metadata.getSearchableFields = () => [
   API_METADATA_ID,
   API_METADATA_LOCAL_ID,
   API_DATA_NAME_PROPERTY,
   `${API_DATA_DETAILS_PROPERTY}.text`,
   `${API_DATA_DESCRIPTION_PROPERTY}.text`,
 ]
-Metadata.searchableFields = () => SEARCHABLE_FIELDS
 
 const fun = 'createSearchIndexes'
 Metadata.createSearchIndexes = async () => {
   try {
-    await makeSearchable(Metadata, SEARCHABLE_FIELDS)
+    await makeSearchable(Metadata)
   } catch (err) {
     RudiError.treatError(mod, fun, err)
   }

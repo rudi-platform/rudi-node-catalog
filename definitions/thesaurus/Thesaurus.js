@@ -86,7 +86,7 @@ module.exports = class Thesaurus {
         throw new MethodNotAllowedError(errMsg)
       }
       if (lang) return this.getLabels(lang)
-      return this.#currentValues
+      return this.#currentValues.sort()
     } catch (err) {
       throw RudiError.treatError(mod, fun, err)
     }

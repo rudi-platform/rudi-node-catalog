@@ -288,22 +288,21 @@ SeriesSchema.methods.toJSON = function () {
 // Models definition
 // ------------------------------------------------------------------------------------------------
 const Media = mongoose.model('Media', MediaSchema)
-const MediaFile = Media.discriminator(MediaTypes.File, FileSchema)
-const MediaSeries = Media.discriminator(MediaTypes.Series, SeriesSchema)
+const MediaFile = Media.discriminator(MediaTypes.File, FileSchema, { clone: false })
+const MediaSeries = Media.discriminator(MediaTypes.Series, SeriesSchema, { clone: false })
 
-const SEARCHABLE_FIELDS = [
+Media.getSearchableFields = () => [
   API_MEDIA_ID,
   API_MEDIA_TYPE,
   API_MEDIA_NAME,
   API_FILE_TYPE,
   API_FILE_UPDATE_STATUS,
 ]
-Media.searchableFields = () => SEARCHABLE_FIELDS
 
 const fun = 'createSearchIndexes'
 Media.createSearchIndexes = async () => {
   try {
-    await makeSearchable(Media, SEARCHABLE_FIELDS)
+    await makeSearchable(Media)
   } catch (err) {
     RudiError.treatError(mod, fun, err)
   }

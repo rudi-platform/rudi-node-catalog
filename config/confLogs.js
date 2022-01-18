@@ -62,7 +62,7 @@ checkOption('Backup syslogs in file', SHOULD_SYSLOG_IN_FILE)
 const LOG_SECTION = 'logging'
 
 const LOG_LVL = sys.getIniValue(LOG_SECTION, 'log_level', 'debug')
-utils.consoleLog(mod, '', `Log level set to '${LOG_LVL}'`)
+utils.consoleLog(mod, '', `Log level set to '${LOG_LVL.toUpperCase()}'`)
 
 const LOG_DIR = sys.getIniValue(LOG_SECTION, 'log_dir')
 const LOG_FILE = sys.getIniValue(LOG_SECTION, 'log_file')

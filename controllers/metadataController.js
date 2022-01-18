@@ -62,6 +62,7 @@ const {
   API_LANGUAGES_PROPERTY,
   API_DATA_DESCRIPTION_PROPERTY,
   API_DATA_DETAILS_PROPERTY,
+  API_ACCESS_CONDITION,
 } = require('../db/dbFields')
 
 const {
@@ -72,6 +73,7 @@ const {
   PARAM_ID,
   ACT_INIT,
   PARAM_THESAURUS_LANG,
+  MONGO_ERROR,
 } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
@@ -107,7 +109,7 @@ exports.organizationRudiToDbFormat = async (rudiProducer, shouldCreateIfNotFound
   const fun = 'organizationRudiToDbFormat'
   try {
     log.t(mod, fun, ``)
-    if (rudiProducer == null) throw new ParameterExpectedError(fun, 'rudiProducer')
+    if (rudiProducer == null) throw new ParameterExpectedError('rudiProducer', mod, fun)
 
     let organizationDbId = await db.getOrganizationDbIdWithJson(rudiProducer)
     // log.d(mod, fun, `organizationDbId: -> ${organizationDbId} `)
@@ -134,7 +136,7 @@ exports.contactListRudiToDbFormat = async (rudiContactList, shouldCreateIfNotFou
   const fun = 'contactListRudiToDbFormat'
   try {
     log.t(mod, fun, ``)
-    if (rudiContactList == null) throw new ParameterExpectedError(fun, 'rudiContactList')
+    if (rudiContactList == null) throw new ParameterExpectedError('rudiContactList', mod, fun)
 
     const contactDbIds = []
     await Promise.all(
@@ -165,10 +167,10 @@ exports.contactListRudiToDbFormat = async (rudiContactList, shouldCreateIfNotFou
 
 exports.mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFound) => {
   const fun = 'mediaListRudiToDbFormat'
-  log.t(mod, fun, ``)
   try {
+    log.t(mod, fun, ``)
     // log.d(mod, fun, `rudiMediaList: ${beautify(rudiMediaList)}`)
-    if (rudiMediaList == null) throw new ParameterExpectedError(fun, 'rudiMediaList')
+    if (rudiMediaList == null) throw new ParameterExpectedError('rudiMediaList', mod, fun)
 
     const mediaDbIds = []
     await Promise.all(
@@ -244,7 +246,7 @@ async function metadataCustomMerge(dbMetadata, dbReadyModMetadata) {
 exports.organizationDbToRudiFormat = async (producerDbId) => {
   const fun = 'organizationDbToRudiFormat'
   log.t(mod, fun, ``)
-  if (producerDbId == null) throw new ParameterExpectedError(fun, 'producerDbId')
+  if (producerDbId == null) throw new ParameterExpectedError('producerDbId', mod, fun)
 
   const dbOrganization = await db.getEnsuredOrganizationWithDbId(producerDbId)
   log.d(mod, fun, `dbOrganization -> ${beautify(dbOrganization)}`)
@@ -257,7 +259,7 @@ exports.contactListDbToRudiFormat = async (contactsDbIds) => {
   const fun = 'contactListDbToRudiFormat'
   log.t(mod, fun, ``)
   log.d(mod, fun, `contactsDbIds: ${beautify(contactsDbIds)}`)
-  if (contactsDbIds == null) throw new ParameterExpectedError(fun, 'contactsDbIds')
+  if (contactsDbIds == null) throw new ParameterExpectedError('contactsDbIds', mod, fun)
 
   const contacts = []
   await Promise.all(
@@ -276,7 +278,7 @@ exports.mediaListDbToRudiFormat = async (mediaDbIds) => {
   const fun = 'mediaListDbToRudiFormat'
   log.t(mod, fun, ``)
   log.d(mod, fun, `mediaDbIds: ${beautify(mediaDbIds)}`)
-  if (!mediaDbIds) throw new ParameterExpectedError(fun, 'mediaDbIds')
+  if (!mediaDbIds) throw new ParameterExpectedError('mediaDbIds', mod, fun)
 
   const mediaList = []
   await Promise.all(
@@ -550,7 +552,7 @@ exports.newMetadata = async (rudiMetadata) => {
   try {
     log.t(mod, fun, ``)
     // log.d(mod, fun, `incoming object: ${beautify(rudiMetadata)}`)
-    if (!rudiMetadata) throw new ParameterExpectedError(fun, 'rudiMetadata')
+    if (!rudiMetadata) throw new ParameterExpectedError('rudiMetadata', mod, fun)
 
     // Special treatment!
     const dbReadyObject = await this.rudiToDbFormat(rudiMetadata, true)
@@ -558,9 +560,11 @@ exports.newMetadata = async (rudiMetadata) => {
 
     // Special update for metadataInfo.referenceDates: update 'createdDate'
     const rudiId = dbReadyObject[API_METADATA_ID]
+    log.i(mod, fun, `dbReadyObject: ${beautify(dbReadyObject[API_ACCESS_CONDITION])}`)
     let dbMetadata
     try {
       dbMetadata = await new Metadata(dbReadyObject)
+      log.v(mod, fun, `dbMetadata: ${beautify(dbMetadata[API_ACCESS_CONDITION])}`)
       await dbMetadata.save()
     } catch (err) {
       // const errMsg = `New object '${OBJ_METADATA}': ${rudiId} | Error: ${err}`
@@ -601,7 +605,8 @@ exports.overwriteMetadata = async (incomingRudiMetadata) => {
   try {
     log.t(mod, fun, ``)
 
-    if (incomingRudiMetadata == null) throw new ParameterExpectedError(fun, 'incomingRudiMetadata')
+    if (incomingRudiMetadata == null)
+      throw new ParameterExpectedError('incomingRudiMetadata', mod, fun)
     // log.d(mod, fun, `edited metadata: ${beautify(incomingRudiMetadata)}\n`)
 
     // ensure the metadata already exist
@@ -635,7 +640,8 @@ exports.updateMetadata = async (incomingRudiMetadata) => {
   try {
     log.t(mod, fun, ``)
 
-    if (incomingRudiMetadata == null) throw new ParameterExpectedError(fun, 'incomingRudiMetadata')
+    if (incomingRudiMetadata == null)
+      throw new ParameterExpectedError('incomingRudiMetadata', mod, fun)
     // log.d(mod, fun, `edited metadata: ${beautify(incomingRudiMetadata)}\n`)
 
     // ensure the metadata already exist
@@ -746,7 +752,7 @@ exports.getSingleMetadata = async (req, reply) => {
     // return the object
     return dbObject
   } catch (err) {
-    const error = err.name === 'MongoError' ? new BadRequestError(err) : new NotFoundError(err)
+    const error = err.name === MONGO_ERROR ? new BadRequestError(err) : new NotFoundError(err)
     throw RudiError.treatError(mod, fun, error)
   }
 }
@@ -761,7 +767,7 @@ exports.getMetadataList = async (req, reply) => {
   try {
     return await genericController.getManyObjects(OBJ_METADATA, req, reply)
   } catch (err) {
-    const error = err.name === 'MongoError' ? new BadRequestError(err) : new NotFoundError(error)
+    const error = err.name === MONGO_ERROR ? new BadRequestError(err) : new NotFoundError(error)
     throw RudiError.treatError(mod, fun, error)
   }
 }

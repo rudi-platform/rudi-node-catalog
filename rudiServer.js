@@ -37,13 +37,13 @@ const { RudiError } = require('./utils/errors')
 // ------------------------------------------------------------------------------------------------
 
 // Setting flags to avoid deprecation warnings
-mongoose.set('useFindAndModify', false)
+// mongoose.set('useFindAndModify', false)
 
-const mongoConnectOptions = {
-  useUnifiedTopology: true,
-  useCreateIndex: true,
-  useNewUrlParser: true,
-}
+// const mongoConnectOptions = {
+// useUnifiedTopology: true,
+// useCreateIndex: true,
+// useNewUrlParser: true,
+// }
 
 const logSeparatorConf =
   '---------------------------------------------------------------[Conf OK]--'
@@ -55,7 +55,7 @@ log
 
 log.i(mod, 'mongo', `Connecting to [${sys.getDbUrl()}]`)
 mongoose
-  .connect(sys.getDbUrl(), mongoConnectOptions)
+  .connect(sys.getDbUrl())
   .then(() => {
     log.i(mod, 'mongo', `MongoDB connected`)
     const appVer = sysController.getAppHash()

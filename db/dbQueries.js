@@ -38,11 +38,11 @@ const {
   OBJ_ORGANIZATIONS,
   OBJ_CONTACTS,
   OBJ_MEDIA,
-  OBJ_SKOS_SCHEME,
-  OBJ_SKOS_CONCEPT,
+  OBJ_SKOS_SCHEMES,
+  OBJ_SKOS_CONCEPTS,
   OBJ_REPORTS,
   OBJ_LOGS,
-  URL_LICENCE_SUFFIX,
+  OBJ_LICENCES,
   QUERY_LIMIT,
   QUERY_OFFSET,
   QUERY_FILTER,
@@ -55,7 +55,7 @@ const {
   DEFAULT_QUERY_LIMIT,
   DEFAULT_QUERY_OFFSET,
   QUERY_COUNT_BY,
-  STATUS_CODE,
+  MONGO_ERROR,
 } = require('../config/confApi')
 
 // Fields from the JSON as definied in the API
@@ -116,11 +116,11 @@ const RUDI_OBJECTS = {
   [OBJ_ORGANIZATIONS]: { [OBJ_MODEL]: Organization, [OBJ_ID]: API_ORGANIZATION_ID },
   [OBJ_CONTACTS]: { [OBJ_MODEL]: Contact, [OBJ_ID]: API_CONTACT_ID },
   [OBJ_MEDIA]: { [OBJ_MODEL]: Media, [OBJ_ID]: API_MEDIA_ID },
-  [OBJ_SKOS_SCHEME]: { [OBJ_MODEL]: SkosScheme, [OBJ_ID]: API_SKOS_SCHEME_ID },
-  [OBJ_SKOS_CONCEPT]: { [OBJ_MODEL]: SkosConcept, [OBJ_ID]: API_SKOS_CONCEPT_ID },
+  [OBJ_SKOS_SCHEMES]: { [OBJ_MODEL]: SkosScheme, [OBJ_ID]: API_SKOS_SCHEME_ID },
+  [OBJ_SKOS_CONCEPTS]: { [OBJ_MODEL]: SkosConcept, [OBJ_ID]: API_SKOS_CONCEPT_ID },
   [OBJ_REPORTS]: { [OBJ_MODEL]: Report, [OBJ_ID]: API_REPORT_ID },
   [OBJ_LOGS]: { [OBJ_MODEL]: LogEntry, [OBJ_ID]: LOG_ID },
-  [URL_LICENCE_SUFFIX]: { [OBJ_MODEL]: SkosConcept, [OBJ_ID]: API_SKOS_CONCEPT_ID },
+  [OBJ_LICENCES]: { [OBJ_MODEL]: SkosConcept, [OBJ_ID]: API_SKOS_CONCEPT_ID },
 }
 
 exports.getRudiObjectList = () => RUDI_OBJECTS
@@ -170,7 +170,7 @@ exports.getSearchableFields = (objectType) => {
     const Model = this.getObjectModel(objectType)
 
     try {
-      return Model.searchableFields()
+      return Model.getSearchableFields()
     } catch (err) {
       throw NotImplementedError(`Object '${objectType}' is not searchable yet.`)
     }
@@ -241,12 +241,14 @@ exports.getMetadataFieldsWithObjectType = (objectType) => {
 
 function getPopulateOptions(objectType) {
   if (objectType === OBJ_METADATA) {
-    return {
-      path: METADATA_FIELDS_TO_POPULATE,
-      select: SKIP_FIELDS,
-    }
+    return [
+      {
+        path: METADATA_FIELDS_TO_POPULATE,
+        select: SKIP_FIELDS,
+      },
+    ]
   } else {
-    return SKIP_FIELDS
+    return []
   }
 }
 
@@ -273,13 +275,13 @@ exports.isProperty = (Model, prop) => {
 exports.cleanLicences = async () => {
   const fun = `cleanLicences`
 
-  const CONCEPTS_COLLECTION_NAME = 'skosconcepts'
-  const SCHEMES_COLLECTION_NAME = 'skosschemes'
+  // const CONCEPTS_COLLECTION_NAME = 'skosconcepts'
+  // const SCHEMES_COLLECTION_NAME = 'skosschemes'
 
   try {
     // TODO: target only licences hierarchy!
-    await dropCollection(CONCEPTS_COLLECTION_NAME)
-    await dropCollection(SCHEMES_COLLECTION_NAME)
+    await dropCollection(SkosConcept.collection.name)
+    await dropCollection(SkosScheme.collection.name)
   } catch (err) {
     // log.w(mod, fun, err)
     throw RudiError.treatError(mod, fun, err)
@@ -296,6 +298,8 @@ exports.getObject = async (objectType, filter) => {
   try {
     const Model = this.getObjectModel(objectType)
     const populateOpts = getPopulateOptions(objectType)
+
+    // log.d(mod, fun, `populateOpts: ${utils.beautify(populateOpts)}`)
 
     if (utils.isEmptyArray(populateOpts)) {
       const obj = await Model.findOne(filter)
@@ -322,7 +326,7 @@ exports.getObjectWithRudiId = async (objectType, rudiId) => {
   const fun = `getObjectWithRudiId`
   // // log.t(mod, fun, ``)
   try {
-    if (!rudiId) throw new ParameterExpectedError(fun, PARAM_ID) // TODO xxxx   treatError(mod, fun, err)
+    if (!rudiId) throw new ParameterExpectedError(PARAM_ID, mod, fun) // TODO xxxx   treatError(mod, fun, err, mod, fun)
 
     const idField = this.getObjectIdField(objectType)
     const filter = { [idField]: rudiId }
@@ -337,7 +341,7 @@ exports.getEnsuredObjectWithRudiId = async (objectType, rudiId) => {
   const fun = `getEnsuredObjectWithRudiId`
   // log.t(mod, fun, ``)
   try {
-    if (!rudiId) throw new ParameterExpectedError(fun, PARAM_ID)
+    if (!rudiId) throw new ParameterExpectedError(PARAM_ID, mod, fun)
     const dbObject = await this.getObjectWithRudiId(objectType, rudiId)
     if (!dbObject) throw new ObjectNotFoundError(objectType, rudiId)
     return dbObject
@@ -353,6 +357,17 @@ exports.getObjectWithJson = async (objectType, rudiObject) => {
     const idField = this.getObjectIdField(objectType)
     const rudiId = json.accessProperty(rudiObject, idField)
     return await this.getObjectWithRudiId(objectType, rudiId)
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+exports.searchDbIdWithJson = async (objectType, rudiObject) => {
+  const fun = `searchObjectWithJson`
+  try {
+    log.t(mod, fun, ``)
+    const Model = this.getObjectModel(objectType)
+    return await Model.findOne(rudiObject)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -534,7 +549,7 @@ exports.getObjectWithField = async (Model, fieldName, fieldValue, populateFields
   const fun = `getObjectWithField`
   // // log.t(mod, fun, ``)
   try {
-    if (!fieldName) throw new ParameterExpectedError(fun, 'field name')
+    if (!fieldName) throw new ParameterExpectedError('field name', mod, fun)
 
     const filter = {
       [fieldName]: fieldValue
@@ -749,7 +764,7 @@ exports.getMetadataListAndCount = async (options) => {
   }
 }
 
-const MDB_ERR_NO_INDEX = 'Error 500 (MongoError): text index required for $text query'
+const MDB_ERR_NO_INDEX = `Error 500 (${MONGO_ERROR}): text index required for $text query`
 exports.searchObjects = async (objectType, options) => {
   const fun = 'searchObjects'
   try {
@@ -1253,7 +1268,7 @@ exports.deleteMetadata = async (metadataRudiId) => {
   // log.t(mod, fun, ``)
 
   // Checking the id parameter
-  if (!metadataRudiId) throw new ParameterExpectedError(fun, API_METADATA_ID)
+  if (!metadataRudiId) throw new ParameterExpectedError(API_METADATA_ID, mod, fun)
 
   // Checking that the metadata already exists
   if (!(await this.doesObjectExistWithRudiId(OBJ_METADATA, metadataRudiId)))
@@ -1356,7 +1371,7 @@ exports.deleteOrganization = async (organizationRudiId) => {
 
   // Checking the id parameter
   if (!organizationRudiId) {
-    throw new ParameterExpectedError(fun, API_ORGANIZATION_ID)
+    throw new ParameterExpectedError(API_ORGANIZATION_ID, mod, fun)
   }
 
   // Checking that the organization already exists
@@ -1449,7 +1464,7 @@ exports.deleteContact = async (contactRudiId) => {
   // log.t(mod, fun, ``)
 
   // Checking the id parameter
-  if (!contactRudiId) throw new ParameterExpectedError(fun, API_CONTACT_ID)
+  if (!contactRudiId) throw new ParameterExpectedError(API_CONTACT_ID, mod, fun)
 
   // Checking that the contact already exists
   await this.getEnsuredContactWithRudiId(contactRudiId)
@@ -1494,37 +1509,37 @@ exports.getEnsuredMediaWithDbId = async (mediaDbId) => {
 exports.getSchemeDbIdWithJson = async (schemeJson) => {
   // const fun = `getSchemeDbIdWithJson`
   // log.t(mod, fun, ``)
-  return await this.getDbIdWithJson(OBJ_SKOS_SCHEME, schemeJson)
+  return await this.getDbIdWithJson(OBJ_SKOS_SCHEMES, schemeJson)
 }
 
 exports.getSchemeDbIdWithRudiId = async (schemeRudiId) => {
   // const fun = `getSchemeDbIdWithRudiId`
   // log.t(mod, fun, ``)
-  return await this.getDbIdWithRudiId(OBJ_SKOS_SCHEME, schemeRudiId)
+  return await this.getDbIdWithRudiId(OBJ_SKOS_SCHEMES, schemeRudiId)
 }
 
 exports.getEnsuredSchemeDbIdWithRudiId = async (schemeRudiId) => {
   // const fun = `getEnsuredSchemeDbIdWithRudiId`
   // log.t(mod, fun, ``)
-  return await this.getEnsuredDbIdWithRudiId(OBJ_SKOS_SCHEME, schemeRudiId)
+  return await this.getEnsuredDbIdWithRudiId(OBJ_SKOS_SCHEMES, schemeRudiId)
 }
 
 exports.getSchemeRudiIdWithDbId = async (schemeDbId) => {
   // const fun = `getEnsuredSchemeDbIdWithRudiId`
   // log.t(mod, fun, ``)
-  return await this.getObjectPropertiesWithDbId(OBJ_SKOS_SCHEME, schemeDbId, [API_SKOS_SCHEME_ID])
+  return await this.getObjectPropertiesWithDbId(OBJ_SKOS_SCHEMES, schemeDbId, [API_SKOS_SCHEME_ID])
 }
 
 exports.getSchemeWithDbId = async (schemeDbId) => {
   // const fun = `getSchemeWithDbId`
   // log.t(mod, fun, ``)
-  return await this.getObjectWithDbId(OBJ_SKOS_SCHEME, schemeDbId)
+  return await this.getObjectWithDbId(OBJ_SKOS_SCHEMES, schemeDbId)
 }
 
 exports.getEnsuredSchemeWithDbId = async (schemeDbId) => {
   // const fun = `getSchemeJsonIdWithDbId`
   // log.t(mod, fun, ``)
-  return await this.getEnsuredObjectWithDbId(OBJ_SKOS_SCHEME, schemeDbId)
+  return await this.getEnsuredObjectWithDbId(OBJ_SKOS_SCHEMES, schemeDbId)
 }
 /*
 exports.getEnsuredSchemeWithCode = async (schemeCode) => {
@@ -1546,25 +1561,25 @@ exports.getConceptWithDbId = async (conceptDbId) => {
 exports.getConceptRudiIdWithDbId = async (conceptDbId) => {
   // const fun = `getConceptRudiIdWithDbId`
   // log.t(mod, fun, ``)
-  return await this.getObjectPropertiesWithDbId(OBJ_SKOS_CONCEPT, conceptDbId)
+  return await this.getObjectPropertiesWithDbId(OBJ_SKOS_CONCEPTS, conceptDbId)
 }
 
 exports.getConceptWithJson = async (conceptJson) => {
   // const fun = `getConceptWithJson`
   // // log.t(mod, fun, ``)
-  return await this.getObjectWithJson(OBJ_SKOS_CONCEPT, conceptJson)
+  return await this.getObjectWithJson(OBJ_SKOS_CONCEPTS, conceptJson)
 }
 
 exports.getConceptDbIdWithJson = async (conceptJson) => {
   // const fun = `getConceptDbIdWithJson`
   // log.t(mod, fun, ``)
-  return await this.getDbIdWithJson(OBJ_SKOS_CONCEPT, conceptJson)
+  return await this.getDbIdWithJson(OBJ_SKOS_CONCEPTS, conceptJson)
 }
 
 exports.getConceptDbIdWithRudiId = async (conceptRudiId) => {
   // const fun = `getConceptDbIdWithRudiId`
   // log.t(mod, fun, ``)
-  return await this.getDbIdWithRudiId(OBJ_SKOS_CONCEPT, conceptRudiId)
+  return await this.getDbIdWithRudiId(OBJ_SKOS_CONCEPTS, conceptRudiId)
 }
 
 exports.getAllConcepts = async () => {
@@ -1576,23 +1591,30 @@ exports.getAllConcepts = async () => {
 }
 
 exports.getAllConceptsFromScheme = async (schemeCode) => {
-  // const fun = `getAllConceptsFromScheme`
-  // log.t(mod, fun, ``)
+  const fun = `getAllConceptsFromScheme`
+  try {
+    log.t(mod, fun, ``)
 
-  const conceptList = await SkosConcept.find({
-    [API_SKOS_SCHEME_CODE]: schemeCode,
-  })
-  return conceptList
+    const conceptList = await SkosConcept.find({
+      [API_SKOS_SCHEME_CODE]: schemeCode,
+    })
+    return conceptList
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
 }
 
 exports.getAllConceptsWithRole = async (conceptRole) => {
-  // const fun = `getAllConceptsWithRole`
-  // log.t(mod, fun, ``)
-
-  const conceptList = await SkosConcept.find({
-    [API_SKOS_CONCEPT_ROLE]: conceptRole,
-  })
-  return conceptList
+  const fun = `getAllConceptsWithRole`
+  try {
+    log.t(mod, fun, ``)
+    const conceptList = await SkosConcept.find({
+      [API_SKOS_CONCEPT_ROLE]: conceptRole,
+    })
+    return conceptList
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
 }
 
 // ----------------------------------------
