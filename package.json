@@ -24,7 +24,7 @@
   ],
   "author": "Olivier Martineau <olivier.martineau@irisa.fr>",
   "homepage": "https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER",
-  "license": "GPL-3.0",
+  "license": "EUPL-1.2",
   "dependencies": {
     "axios": "^0.24.0",
     "date-and-time": "^2.1.0",
