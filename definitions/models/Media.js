@@ -128,9 +128,8 @@ MediaSchema.pre('save', function (next) {
   const fun = 'pre save hook'
   // log.t(mod, fun, ``)
   try {
-    if (this[API_MEDIA_TYPE] === MediaTypes.File && !isNotEmptyObject(this[API_FILE_CHECKSUM])) {
+    if (this[API_MEDIA_TYPE] === MediaTypes.File && !isNotEmptyObject(this[API_FILE_CHECKSUM]))
       throw new BadRequestError(missingField(API_FILE_CHECKSUM))
-    }
 
     if (!!this[API_MEDIA_NAME]) {
       const nameBefore = this[API_MEDIA_NAME]
@@ -171,14 +170,15 @@ const FileSchema = new mongoose.Schema(
         algo: {
           type: String,
           enum: Object.values(HashAlgorithms),
-          require: true,
+          required: true,
         },
         hash: {
           type: String,
-          require: true,
+          required: true,
         },
       },
-      require: true,
+      required: true,
+      _id: false,
     },
 
     // Link towards the resource that describes the structure of the data

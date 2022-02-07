@@ -109,7 +109,7 @@ _See https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/ for further
 Configuration files can be found in the **"0-ini" directory**.
 
 - `0-ini/conf_default.ini`: default configuration and use examples
-- `0-ini/conf_custom.ini`: user configuration, to be created.
+- `0-ini/conf_custom.ini`: user configuration, to be created (if defined, the value of the path variable `RUDI_API_USER_CONF` is taken as the full path of the custom INI file)
 
 **`Security` section**
 When the flag `should_control_private_requests` is true, JWT from incoming requests are controlled.

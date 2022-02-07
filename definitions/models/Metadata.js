@@ -401,6 +401,7 @@ const MetadataSchema = new mongoose.Schema(
     [API_ACCESS_CONDITION]: {
       required: true,
       validate: validObjectNotEmpty,
+      _id: false,
       type: {
         /** Restriction level for the resource */
         confidentiality: {
@@ -425,6 +426,7 @@ const MetadataSchema = new mongoose.Schema(
          */
         [API_LICENCE]: {
           required: true,
+          _id: false,
           type: {
             /** Enum to differenciate standard from custom licence */
             [API_LICENCE_TYPE]: {
@@ -455,11 +457,13 @@ const MetadataSchema = new mongoose.Schema(
         /** Describes how constrained is the use of the resource */
         usage_constraint: {
           type: [DictionaryEntry],
+          default: undefined,
         },
 
         /** Information that MUST be cited every time the data is used */
         bibliographical_reference: {
           type: [DictionaryEntry],
+          default: undefined,
         },
 
         /**
@@ -468,14 +472,17 @@ const MetadataSchema = new mongoose.Schema(
          */
         mandatory_mention: {
           type: [DictionaryEntry],
+          default: undefined,
         },
 
         access_constraint: {
           type: [DictionaryEntry],
+          default: undefined,
         },
 
         other_constraints: {
           type: [DictionaryEntry],
+          default: undefined,
         },
       },
     },
@@ -546,6 +553,7 @@ const MetadataSchema = new mongoose.Schema(
 async function checkLicence(metadata) {
   const fun = 'checkLicence'
   try {
+    log.t(mod, fun, ``)
     const accessCondition = json.accessProperty(metadata, API_ACCESS_CONDITION)
     const licence = json.requireSubProperty(metadata, API_ACCESS_CONDITION, API_LICENCE)
     const licenceType = json.requireSubProperty(accessCondition, API_LICENCE, API_LICENCE_TYPE)
@@ -567,6 +575,13 @@ async function checkLicence(metadata) {
             `Licence label '${licenceLabel}' was not found in licence list '${listLicenceCode}'`
           )
         } else {
+          log.i(
+            mod,
+            fun,
+            utils.beautify(metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_CUSTOM_LABEL])
+          )
+          metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_CUSTOM_LABEL] = undefined
+          // delete metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_CUSTOM_LABEL]
           return licenceLabel
         }
       }
