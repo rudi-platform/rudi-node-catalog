@@ -63,6 +63,8 @@ const {
   API_DATA_DESCRIPTION_PROPERTY,
   API_DATA_DETAILS_PROPERTY,
   API_ACCESS_CONDITION,
+  DB_CREATED_AT,
+  DB_UPDATED_AT,
 } = require('../db/dbFields')
 
 const {
@@ -419,13 +421,23 @@ exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
     toMDBLanguage(dbReadyMetadata, API_DATA_DETAILS_PROPERTY)
     toMDBLanguage(dbReadyMetadata, API_DATA_DESCRIPTION_PROPERTY)
 
+    stripTimestamps(dbReadyMetadata)
     // log.d(mod, fun, `dbReadyMetadata: ${beautify(dbReadyMetadata, 2)}`)
     return dbReadyMetadata
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
 }
-
+function stripTimestamps(metadata) {
+  const fun = 'stripTimestamps'
+  try {
+    log.t(mod, fun, ``)
+    metadata[DB_CREATED_AT] = undefined
+    metadata[DB_UPDATED_AT] = undefined
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
 function toMDBLanguage(metadata, field) {
   const fun = 'toMDBLanguage'
   try {

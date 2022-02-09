@@ -25,6 +25,7 @@ const {
   LOG_USR,
   LOG_FUN,
   LOG_MOD,
+  DB_UPDATED_AT,
 } = require('../../db/dbFields')
 
 const { PARAM_THESAURUS_LANG } = require('../../config/confApi')
@@ -104,7 +105,7 @@ const LogEntrySchema = new Schema(
   }
 )
 
-LogEntrySchema.index({ updatedAt: 1 }, { expires: LOG_EXP })
+LogEntrySchema.index({ [DB_UPDATED_AT]: 1 }, { expires: LOG_EXP })
 
 // LogEntrySchema.virtual('time').get(() => this.createdAt.getTime())
 
@@ -188,6 +189,6 @@ LogEntry.createSearchIndexes = async () => {
 LogEntry.createSearchIndexes().catch((err) => {
   throw new Error(`[mod, fun] Failed to create search indexes: ${err}`)
 })
-LogEntry.collection.dropIndex({ updatedAt: 1 }).catch(() => 'nevermind')
+LogEntry.collection.dropIndex({ [DB_UPDATED_AT]: 1 }).catch(() => 'nevermind')
 
 module.exports = { LogEntry, makeLogInfo, logLineToString }

@@ -29,6 +29,7 @@ const {
   API_CONTACT_ROLE,
   API_CONTACT_NAME,
   API_ORGANIZATION_NAME,
+  DB_CREATED_AT,
 } = require('../../db/dbFields')
 
 // ------------------------------------------------------------------------------------------------
@@ -77,12 +78,16 @@ const ContactSchema = new mongoose.Schema(
     [DB_PUBLISHED_AT]: {
       type: Date,
     },
+    /** Creation date, made immutable  */
+    [DB_CREATED_AT]: {
+      type: Date,
+      immutable: true,
+    },
   },
   {
-    timestamps: true,
     id: false,
+    timestamps: true,
     // optimisticConcurrency: true,
-    // strict: true,
   }
 )
 
@@ -92,6 +97,7 @@ const ContactSchema = new mongoose.Schema(
 
 // ----- toJSON cleanup
 ContactSchema.methods.toJSON = function () {
+  // return this.toObject()
   return omit(this.toObject(), FIELDS_TO_SKIP)
 }
 

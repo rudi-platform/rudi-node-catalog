@@ -37,4 +37,5 @@ exports.DOI = {
   sparse: true, // accept empty values as non-duplicates
   lowercase: true,
   match: validation.VALID_DOI,
+  default: undefined,
 }

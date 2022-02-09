@@ -105,6 +105,8 @@ const {
   API_METADATA_ID,
   API_DATA_NAME_PROPERTY,
   API_METADATA_LOCAL_ID,
+  DB_CREATED_AT,
+  DB_UPDATED_AT,
   DB_PUBLISHED_AT,
   API_DATA_DETAILS_PROPERTY,
   API_DATA_DESCRIPTION_PROPERTY,
@@ -399,9 +401,9 @@ const MetadataSchema = new mongoose.Schema(
      * economical model. Default is open licence.
      */
     [API_ACCESS_CONDITION]: {
+      _id: false,
       required: true,
       validate: validObjectNotEmpty,
-      _id: false,
       type: {
         /** Restriction level for the resource */
         confidentiality: {
@@ -438,18 +440,28 @@ const MetadataSchema = new mongoose.Schema(
             /** Standard licence (recognized by RUDI system): label of the licence = concept code */
             [API_LICENCE_LABEL]: {
               type: String,
+              default: undefined,
             },
 
             /** Custom licence: Title of the custom licence */
             [API_LICENCE_CUSTOM_LABEL]: {
               type: [DictionaryEntry],
+              default: undefined,
             },
 
             /** Custom licence: Informative URL towards the custom licence */
             [API_LICENCE_CUSTOM_URI]: {
               type: String,
-              unique: true,
               match: Validation.VALID_URI,
+              index: {
+                unique: true,
+                // accept empty values as non-duplicates
+                partialFilterExpression: {
+                  [API_LICENCE_CUSTOM_URI]: {
+                    $type: 'string',
+                  },
+                },
+              },
             },
           },
         },
@@ -528,10 +540,16 @@ const MetadataSchema = new mongoose.Schema(
     [DB_PUBLISHED_AT]: {
       type: Date,
     },
+    /** Creation date, made immutable  */
+    [DB_CREATED_AT]: {
+      type: Date,
+      immutable: true,
+    },
   },
   {
-    timestamps: true,
     id: false,
+    strict: true,
+    timestamps: true,
     optimisticConcurrency: true,
     useNestedStrict: true,
     toObject: {
@@ -575,11 +593,6 @@ async function checkLicence(metadata) {
             `Licence label '${licenceLabel}' was not found in licence list '${listLicenceCode}'`
           )
         } else {
-          log.i(
-            mod,
-            fun,
-            utils.beautify(metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_CUSTOM_LABEL])
-          )
           metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_CUSTOM_LABEL] = undefined
           // delete metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_CUSTOM_LABEL]
           return licenceLabel
@@ -769,12 +782,12 @@ MetadataSchema.methods.toJSON = function () {
 MetadataSchema.virtual(
   `${API_METAINFO_PROPERTY}.${API_METAINFO_DATES_PROPERTY}.${API_DATES_CREATED_PROPERTY}`
 ).get(function () {
-  return this.createdAt
+  return this[DB_CREATED_AT]
 })
 MetadataSchema.virtual(
   `${API_METAINFO_PROPERTY}.${API_METAINFO_DATES_PROPERTY}.${API_DATES_EDITED_PROPERTY}`
 ).get(function () {
-  return this.updatedAt
+  return this[DB_UPDATED_AT]
 })
 MetadataSchema.virtual(
   `${API_METAINFO_PROPERTY}.${API_METAINFO_DATES_PROPERTY}.${API_DATES_PUBLISHED_PROPERTY}`

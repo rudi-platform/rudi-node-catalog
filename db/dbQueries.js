@@ -61,6 +61,7 @@ const {
 // Fields from the JSON as definied in the API
 const {
   DB_ID,
+  DB_CREATED_AT,
   API_METADATA_ID,
   API_ORGANIZATION_ID,
   API_CONTACT_ID,
@@ -1058,18 +1059,17 @@ exports.overwriteObject = async (objectType, updateData) => {
     const { Model, idField } = this.getObjectAccesses(objectType)
     const rudiId = json.accessProperty(updateData, idField)
     const filter = { [idField]: rudiId }
-    const updateOpts = { new: true, overwrite: true, upsert: true }
+    const updateOpts = {
+      new: true, // returns the updated document
+      overwrite: true,
+      upsert: true, // creates the document if it wasn't found
+    }
 
-    // const populateOptions = getPopulateOptions(objectType)
-    // let dbObject
-    // if (utils.isEmptyArray(populateOptions)) {
-    //   dbObject = await Model.findOneAndUpdate(filter, updateData, updateOpts)
-    // } else {
-    //   dbObject = await Model.findOneAndUpdate(filter, updateData, updateOpts).populate(
-    //     populateOptions
-    //   )
-    // }
-
+    const existingObject = await Model.findOne(filter)
+    if (!!existingObject) {
+      // document exists in DB, we preserve the creation date
+      updateData[DB_CREATED_AT] = existingObject[DB_CREATED_AT]
+    }
     const dbObject = await Model.findOneAndUpdate(filter, updateData, updateOpts)
 
     // log.d(mod, fun, `dbObject: ${utils.beautify(dbObject)}`)
@@ -1152,8 +1152,6 @@ exports.deleteManyWithRudiIds = async (objectType, rudiIdList) => {
   if (!Array.isArray(rudiIdList)) {
     log.i(mod, fun, msg.parameterExpected(fun, 'rudiIdList'))
     return {
-      n: 0,
-      ok: 0,
       deletedCount: 0,
     }
   }
