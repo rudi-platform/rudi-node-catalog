@@ -430,17 +430,17 @@ exports.verifyPortalToken = (accessToken) => {
     const jwtPortalUser = jwtPayload[portal.JWT_USER]
     if (!jwtPortalUser && jwtPayload[REQ_MTD])
       throw new ForbiddenError(`Using a RUDI internal JWT to access a Portal route is incorrect.`)
-
-    // log.d(mod, fun, `JWT Portal payload: ${utils.beautify(jwtPayload)}`)
-    // log.d(mod, fun, `JWT Portal user: ${jwtPortalUser}`)
-    if (jwtPortalUser !== login) {
-      // log.w(mod, fun, `Portal JWT: incorrect user: ${jwtPortalUser}`)
-      log.e(`Portal JWT: incorrect user: ${jwtPortalUser}, token=${accessToken}`)
-      // throw new ForbiddenError(`Portal JWT: incorrect user`)
-    }
-    // if (jwtPayload[portal.JWT_CLIENT] !== login)
-    //   throw new ForbiddenError('Portal JWT: incorrect client')
-
+    /*
+      // log.d(mod, fun, `JWT Portal payload: ${utils.beautify(jwtPayload)}`)
+      // log.d(mod, fun, `JWT Portal user: ${jwtPortalUser}`)
+      if (jwtPortalUser !== login) {
+        // log.w(mod, fun, `Portal JWT: incorrect user: ${jwtPortalUser}`)
+        log.e(`Portal JWT: incorrect user: ${jwtPortalUser}, token=${accessToken}`)
+        // throw new ForbiddenError(`Portal JWT: incorrect user`)
+      }
+      // if (jwtPayload[portal.JWT_CLIENT] !== login)
+      //   throw new ForbiddenError('Portal JWT: incorrect client')
+    */
     if (jwtPayload[JWT_EXP] < utils.nowEpochS())
       throw new ForbiddenError(
         `Portal JWT expired: ` +
