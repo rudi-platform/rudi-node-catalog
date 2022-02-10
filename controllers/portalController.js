@@ -36,7 +36,7 @@ const {
 } = require('../utils/errors')
 
 const { extractJwt, JWT_EXP, REQ_MTD } = require('../utils/crypto')
-const { API_METAINFO_VERSION_PROPERTY } = require('../db/dbFields')
+const { API_METAINFO_VERSION_PROPERTY, API_METAINFO_PROPERTY } = require('../db/dbFields')
 // const { createHmac } = require('crypto')
 
 // ------------------------------------------------------------------------------------------------
@@ -483,7 +483,7 @@ exports.postMetadataToPortal = async (metadataId) => {
     }
     const metadataClean = utils.deepClone(metadata)
 
-    metadataClean[API_METAINFO_VERSION_PROPERTY] = api.API_VERSION
+    metadataClean[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = api.API_VERSION
 
     // delete metadataClean[API_GEOGRAPHY_PROPERTY][API_GEO_GEOJSON_PROPERTY] //
     // metadataClean[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = 'v1'

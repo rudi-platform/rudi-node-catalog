@@ -9,7 +9,8 @@ const mod = 'sysCtrl'
 // ------------------------------------------------------------------------------------------------
 // External dependancies
 // ------------------------------------------------------------------------------------------------
-const prcs = require('child_process')
+const { execSync } = require('child_process')
+const { readFileSync } = require('fs')
 
 const mongoose = require('mongoose')
 
@@ -73,12 +74,12 @@ exports.getNodeVersion = async () => {
   const fun = 'getNodeVersion'
   try {
     // log.d(mod, fun, ` GET ${URL_PV_NODE_VERSION_ACCESS}`)
-    const nodeVersion = prcs.execSync('node -v')
-    const npmVersion = prcs.execSync('npm -v')
+    const nodeVersion = execSync('node -v')
+    const npmVersion = execSync('npm -v')
 
     let mongooseVersion = 'n/a'
     try {
-      mongooseVersion = prcs.execSync('npm view mongoose version')
+      mongooseVersion = execSync('npm view mongoose version')
     } catch (err) {
       log.w(mod, fun, `Command 'npm view mongoose version' failed: ${err}`)
     }
@@ -111,6 +112,29 @@ async function getMongDbVersion() {
     let mongoInfo = await admin.buildInfo()
     // log.d(mod, fun, `Mongo : ${mongoInfo.version}`)
     return mongoInfo.version
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+const DAY_IN_S = 24 * 60 * 60
+const MONTH_IN_S = 30 * DAY_IN_S
+const MONTH_IN_MS = MONTH_IN_S * 1000
+
+exports.serveFavicon = (req, res) => {
+  const fun = 'serveFavicon'
+  try {
+    const favicon = readFileSync('./img/rudi_favicon.png') // read file
+    // const favicon = new Buffer.from(
+    //   'AAABAAEAEBAQAAAAAAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA/4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEREQAAAAAAEAAAEAAAAAEAAAABAAAAEAAAAAAQAAAQAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAEAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAA//8AAP//AAD8HwAA++8AAPf3AADv+wAA7/sAAP//AAD//wAA+98AAP//AAD//wAA//8AAP//AAD//wAA',
+    //   'base64'
+    // )
+    res.header('Content-Length', favicon.length)
+    res.header('Content-Type', 'image/png')
+    res.header('Cache-Control', `public, max-age=${MONTH_IN_S}`) // expiers after a month
+    res.header('Expires', new Date(Date.now() + MONTH_IN_MS).toUTCString())
+    res.statusCode = 200
+    res.send(favicon)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }

@@ -79,6 +79,7 @@ const REDIRECT_GET_DATA = 'redir_pub_metadata'
 const REDIRECT_GET_PLUS = 'redir_pub_metadata'
 const REDIRECT_PUT_PLUS = 'redir_pub_metadata'
 
+const PUB_GET_FAVICON = 'pub_get_favicon'
 const PUB_GET_ALL_METADATA = 'pub_get_all_metadata'
 const PUB_GET_ONE_METADATA = 'pub_get_one_metadata'
 const PUB_UPSERT_ONE_REPORT = 'pub_upsert_one_report'
@@ -190,6 +191,12 @@ exports.freeRoutes = [
   // ------------------------------------------------------------------------------------------------
   // Accessing app info
   // ------------------------------------------------------------------------------------------------
+  {
+    method: HTTP_METHODS.GET,
+    url: `/favicon.png`,
+    handler: sysController.serveFavicon,
+    config: { [ROUTE_NAME]: PUB_GET_FAVICON },
+  },
 
   /*
    * @oas [get] /api/version
