@@ -686,6 +686,7 @@ exports.updateMetadata = async (incomingRudiMetadata) => {
 exports.sendToPortal = async (metadata) => {
   const fun = 'sendToPortal'
   try {
+    // If 'collection_tag' property is set, we don't send the metadata to the Portal
     const metadataId = metadata[API_METADATA_ID]
     const collectionTag = metadata[API_COLLECTION_TAG]
     if (collectionTag) {

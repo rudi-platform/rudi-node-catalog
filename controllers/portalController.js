@@ -36,6 +36,7 @@ const {
 } = require('../utils/errors')
 
 const { extractJwt, JWT_EXP, REQ_MTD } = require('../utils/crypto')
+const { API_METAINFO_VERSION_PROPERTY } = require('../db/dbFields')
 // const { createHmac } = require('crypto')
 
 // ------------------------------------------------------------------------------------------------
@@ -426,11 +427,11 @@ exports.verifyPortalToken = (accessToken) => {
     // Check JWT body
     const jwtPayload = JSON.parse(utils.decodeBase64url(jwtPayloadBase64))
 
-    const login = portal.getCredentials()[0]
     const jwtPortalUser = jwtPayload[portal.JWT_USER]
     if (!jwtPortalUser && jwtPayload[REQ_MTD])
       throw new ForbiddenError(`Using a RUDI internal JWT to access a Portal route is incorrect.`)
     /*
+      // const login = portal.getCredentials()[0]
       // log.d(mod, fun, `JWT Portal payload: ${utils.beautify(jwtPayload)}`)
       // log.d(mod, fun, `JWT Portal user: ${jwtPortalUser}`)
       if (jwtPortalUser !== login) {
@@ -481,6 +482,8 @@ exports.postMetadataToPortal = async (metadataId) => {
       throw new NotFoundError(errMsg)
     }
     const metadataClean = utils.deepClone(metadata)
+
+    metadataClean[API_METAINFO_VERSION_PROPERTY] = api.API_VERSION
 
     // delete metadataClean[API_GEOGRAPHY_PROPERTY][API_GEO_GEOJSON_PROPERTY] //
     // metadataClean[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = 'v1'
