@@ -613,8 +613,8 @@ function getParamValue(options, param, defaultVal, maxVal) {
 
 exports.getObjectList = async (objectType, options) => {
   const fun = `getObjectList`
-  // log.t(mod, fun, ``)
   try {
+    log.t(mod, fun, ``)
     //--- Parameters
     // Identify object type characteristics
     const Model = this.getObjectModel(objectType)
@@ -838,10 +838,9 @@ exports.searchObjects = async (objectType, options) => {
  */
 exports.groupObjectList = async (objectType, unionField, options) => {
   const fun = `groupObjectList`
-  // log.t(mod, fun, ``)
-  log.d(mod, fun, `options: ${options}`)
 
   try {
+    log.t(mod, fun, `options: ${options}`)
     //--- Parameters
     // Identify object type characteristics
     const Model = this.getObjectModel(objectType)
@@ -966,9 +965,9 @@ exports.groupObjectList = async (objectType, unionField, options) => {
 
 exports.countObjectList = async (objectType, unionField, options) => {
   const fun = `countObjectList`
-  // log.t(mod, fun, ``)
 
   try {
+    log.t(mod, fun, `unionField: ${unionField}, options: ${utils.beautify(options)}`)
     //--- Parameters
     // Identify object type characteristics
     const Model = this.getObjectModel(objectType)

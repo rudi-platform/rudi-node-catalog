@@ -210,11 +210,7 @@ const MetadataSchema = new mongoose.Schema(
 
     /** 'keywords': List of tags that can be used to retrieve the data */
     [API_KEYWORDS_PROPERTY]: {
-      type: [
-        {
-          type: String,
-        },
-      ],
+      type: [String],
       required: true,
       validate: validArrayNotNull,
     },

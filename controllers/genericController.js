@@ -89,6 +89,7 @@ const {
   API_PERIOD_PROPERTY,
   API_END_DATE_PROPERTY,
   API_START_DATE_PROPERTY,
+  API_KEYWORDS_PROPERTY,
 } = require('../db/dbFields')
 
 // ------------------------------------------------------------------------------------------------
@@ -176,6 +177,7 @@ const META_DATES = `${API_METAINFO_PROPERTY}.${API_METAINFO_DATES_PROPERTY}.`
 exports.parseQueryParameters = async (objectType, fullUrl) => {
   const fun = 'parseQueryParameters'
   try {
+    log.t(mod, fun, ``)
     // identify object model
     const Model = db.getObjectModel(objectType)
     const modelProperties = db.getModelPropertyNames(Model)
@@ -268,9 +270,12 @@ exports.parseQueryParameters = async (objectType, fullUrl) => {
         }
       } else if (modelProperties.includes(key)) {
         // log.d(mod, fun, `Key is a ${objectType} property: ${beautify(key)}`)
+        // log.d(mod, fun, `Corresponding value: ${value}`)
         const val = value
-        if (!value) returnedFilter[QUERY_SEARCH_TERMS].push(key)
-        else {
+        if (!value) {
+          // log.d(mod, fun, 'searching this term')
+          returnedFilter[QUERY_SEARCH_TERMS].push(key)
+        } else {
           try {
             const obj = JSON.parse(val)
             log.d(mod, fun, `parsed String: ${beautify(obj)}`)
@@ -321,6 +326,9 @@ exports.parseQueryParameters = async (objectType, fullUrl) => {
               case `${API_PERIOD_PROPERTY}.${API_START_DATE_PROPERTY}`:
               case `${API_PERIOD_PROPERTY}.${API_END_DATE_PROPERTY}`:
                 filters.push({ [key]: cleanDate(val) })
+                break
+              case `${API_KEYWORDS_PROPERTY}`:
+                filters.push({ [key]: { $in: val.split(',') } })
                 break
               default:
                 filters.push({ [key]: val })
@@ -641,6 +649,7 @@ exports.getSearchableProperties = (req, reply) => {
 exports.getManyObjects = async (objectType, req) => {
   const fun = 'getManyObjects'
   try {
+    log.t(mod, fun, ``)
     let parsedParameters
     try {
       parsedParameters = await this.parseQueryParameters(objectType, req.url)
