@@ -80,11 +80,13 @@ const REDIRECT_GET_PLUS = 'redir_pub_metadata'
 const REDIRECT_PUT_PLUS = 'redir_pub_metadata'
 
 const PUB_GET_FAVICON = 'pub_get_favicon'
+const PUB_GET_API_VERSION = 'pub_get_api_version'
 const PUB_GET_ALL_METADATA = 'pub_get_all_metadata'
 const PUB_GET_ONE_METADATA = 'pub_get_one_metadata'
-const PUB_UPSERT_ONE_REPORT = 'pub_upsert_one_report'
-const PUB_GET_ALL_OBJ_REPORT = 'pub_get_all_obj_report'
-const PUB_GET_ONE_OBJ_REPORT = 'pub_get_one_obj_report'
+
+const PORTAL_UPSERT_ONE_REPORT = 'portal_upsert_one_report'
+const PORTAL_GET_ALL_OBJ_REPORT = 'portal_get_all_obj_report'
+const PORTAL_GET_ONE_OBJ_REPORT = 'portal_get_one_obj_report'
 
 const PRV_ADD_ONE = 'prv_add_one'
 const PRV_UPSERT_ONE = 'prv_upsert_one'
@@ -120,7 +122,6 @@ const DEV_SEND_METADATA_TO_PORTAL = 'dev_send_metadata_to_portal'
 const DEV_DEL_PORTAL_METADATA = 'dev_del_portal_metadata'
 const DEV_GET_GIT_HASH = 'dev_get_git_hash'
 const DEV_GET_APP_HASH = 'dev_get_app_hash'
-const DEV_GET_API_VERSION = 'dev_get_api_version'
 const DEV_GET_NODE_VERSION = 'dev_get_node_version'
 const DEV_GET_APP_ENV = 'dev_get_app_env'
 const DEV_GET_LOGS = 'dev_get_logs'
@@ -131,63 +132,9 @@ const DEV_DROP_COLLECTION = 'dev_drop_collection'
 const DEV_DROP_DB = 'dev_drop_db'
 
 // ------------------------------------------------------------------------------------------------
-// Redirected routes
-// ------------------------------------------------------------------------------------------------
-exports.redirectRoutes = [
-  {
-    method: HTTP_METHODS.GET,
-    url: `/api`,
-    config: { [ROUTE_NAME]: REDIRECT_GET_DATA },
-    handler: function (req, reply) {
-      log.d(mod, `redirect`, `${req.method} ${URL_PUB_METADATA}`)
-      reply.redirect(URL_PUB_METADATA)
-    },
-  },
-  {
-    method: HTTP_METHODS.GET,
-    url: URL_PREFIX_PUBLIC,
-    config: { [ROUTE_NAME]: REDIRECT_GET_DATA },
-    handler: function (req, reply) {
-      log.d(mod, `redirect`, `${req.method} ${URL_PUB_METADATA}`)
-      reply.redirect(URL_PUB_METADATA)
-    },
-  },
-  {
-    method: HTTP_METHODS.GET,
-    url: `/${OBJ_METADATA}`,
-    config: { [ROUTE_NAME]: REDIRECT_GET_DATA },
-    handler: function (req, reply) {
-      const newRoute = `${URL_PREFIX_PUBLIC}${req.url}`
-      log.d(mod, `redirect`, `${req.method} ${newRoute}`)
-      reply.redirect(308, newRoute)
-    },
-  },
-  {
-    method: HTTP_METHODS.GET,
-    url: `/${OBJ_METADATA}/*`,
-    config: { [ROUTE_NAME]: REDIRECT_GET_PLUS },
-    handler: function (req, reply) {
-      const newRoute = `${URL_PREFIX_PUBLIC}${req.url}`
-      log.d(mod, `redirect`, `${req.method} ${newRoute}`)
-      reply.redirect(308, newRoute)
-    },
-  },
-  {
-    method: HTTP_METHODS.PUT,
-    url: `/${OBJ_METADATA}/*`,
-    config: { [ROUTE_NAME]: REDIRECT_PUT_PLUS },
-    handler: function (req, reply) {
-      const newRoute = `${URL_PREFIX_PUBLIC}${req.url}`
-      log.d(mod, `redirect`, `${req.method} ${newRoute}`)
-      reply.redirect(308, newRoute)
-    },
-  },
-]
-
-// ------------------------------------------------------------------------------------------------
 // Free routes (no authentification required)
 // ------------------------------------------------------------------------------------------------
-exports.freeRoutes = [
+exports.publicRoutes = [
   // ------------------------------------------------------------------------------------------------
   // Accessing app info
   // ------------------------------------------------------------------------------------------------
@@ -196,6 +143,45 @@ exports.freeRoutes = [
     url: `/favicon.png`,
     handler: sysController.serveFavicon,
     config: { [ROUTE_NAME]: PUB_GET_FAVICON },
+  },
+
+  // ------------------------------------------------------------------------------------------------
+  // Generic routes for accessing metadata
+  // ------------------------------------------------------------------------------------------------
+  /*
+   * @oas [get] /api/v1/resources
+   * description: 'Access all metadata on the RUDI producer node'
+   * parameters:
+   *   - (query) limit {Integer:int32} The number of resources to return
+   */
+  {
+    method: HTTP_METHODS.GET,
+    url: URL_PUB_METADATA,
+    handler: genericController.getMetadataListAndCount,
+    config: { [ROUTE_NAME]: PUB_GET_ALL_METADATA },
+  },
+  /*
+   * @oas [get] /api/v1/resources/{metaId}
+   * description: 'Access one identified metadata'
+   * parameters:
+   *   - (path) metaId=bf4895c4-bf41-4f59-a4c7-14e1cb315d04 {String:UUIDv4} The metadata UUID
+   *   - (query) limit {Integer:int32} The maximum number of metadata in the result set
+   *      (default = 100, max = 500)
+   *   - (query) offset {Integer:int32} The number of metadata to skip before starting to collect
+   *      the result set (default = 0)
+   *   - (query) fields {String} Comma-separated properties that are kept for displaying the
+   *      elements of the result set
+   *   - (query) sort_by {String} Comma-separated properties tused to order the metadata in the
+   *      result set, ordered by decreasing priority. A minus sign before the field name means
+   *      metadata will be sorted by decreasing values over this particular field
+   *   - (query) updated_after {String:date} The date after which the listed metadata were updated
+   *   - (query) updated_before {String:date} The date before which the listed metadata were updated
+   */
+  {
+    method: HTTP_METHODS.GET,
+    url: `${URL_PUB_METADATA}/:${PARAM_ID}`,
+    handler: metadataController.getSingleMetadata,
+    config: { [ROUTE_NAME]: PUB_GET_ONE_METADATA },
   },
 
   /*
@@ -220,7 +206,7 @@ exports.freeRoutes = [
     method: HTTP_METHODS.GET,
     url: `${URL_PUB_API_VERSION}`,
     handler: sysController.getApiVersion,
-    config: { [ROUTE_NAME]: DEV_GET_API_VERSION },
+    config: { [ROUTE_NAME]: PUB_GET_API_VERSION },
   },
   /*
    * @oas [get] /api/admin/hash
@@ -275,55 +261,58 @@ exports.freeRoutes = [
     handler: sysController.getEnvironment,
     config: { [ROUTE_NAME]: DEV_GET_APP_ENV },
   },
+
+  // redirection: GET /api -> GET /api/v1/resources
+  {
+    method: HTTP_METHODS.GET,
+    url: `/api`,
+    config: { [ROUTE_NAME]: REDIRECT_GET_DATA },
+    handler: function (req, reply) {
+      log.d(mod, `redirect`, `${req.method} ${URL_PUB_METADATA}`)
+      reply.redirect(URL_PUB_METADATA)
+    },
+  },
+  // redirection: GET /api/v1 -> GET /api/v1/resources
+  {
+    method: HTTP_METHODS.GET,
+    url: '/api/v1',
+    config: { [ROUTE_NAME]: REDIRECT_GET_DATA },
+    handler: function (req, reply) {
+      log.d(mod, `redirect`, `${req.method} ${URL_PUB_METADATA}`)
+      reply.redirect(URL_PUB_METADATA)
+    },
+  },
+  // redirection: GET /resources -> GET /api/v1/resources
+  {
+    method: HTTP_METHODS.GET,
+    url: `/${OBJ_METADATA}`,
+    config: { [ROUTE_NAME]: REDIRECT_GET_DATA },
+    handler: function (req, reply) {
+      const newRoute = `${URL_PREFIX_PUBLIC}${req.url}`
+      log.d(mod, `redirect`, `${req.method} ${newRoute}`)
+      reply.redirect(308, newRoute)
+    },
+  },
+  // redirection: GET /resources/:id -> GET /api/v1/resources/:id
+  {
+    method: HTTP_METHODS.GET,
+    url: `/${OBJ_METADATA}/:${PARAM_ID}`,
+    config: { [ROUTE_NAME]: REDIRECT_GET_DATA },
+    handler: function (req, reply) {
+      const newRoute = `${URL_PREFIX_PUBLIC}${req.url}`
+      log.d(mod, `redirect`, `${req.method} ${newRoute}`)
+      reply.redirect(308, newRoute)
+    },
+  },
 ]
 // ------------------------------------------------------------------------------------------------
 // 'Public' routes (Portal authentification required)
 // ------------------------------------------------------------------------------------------------
-exports.publicRoutes = [
+exports.portalRoutes = [
   // Routes accessed by RUDI Portal:
-  // /resources POST/PUT/GET
-  // /resources/{id} GET/DELETE
+  // /resources GET
+  // /resources/{id} GET
   // /resources/{id}/report PUT
-
-  // ------------------------------------------------------------------------------------------------
-  // Generic routes for accessing any object
-  // ('Metadata', 'Organizations' and 'Contacts')
-  // ------------------------------------------------------------------------------------------------
-  /*
-   * @oas [get] /api/v1/resources
-   * description: 'Access all metadata on the RUDI producer node'
-   * parameters:
-   *   - (query) limit {Integer:int32} The number of resources to return
-   */
-  {
-    method: HTTP_METHODS.GET,
-    url: URL_PUB_METADATA,
-    handler: genericController.getMetadataListAndCount,
-    config: { [ROUTE_NAME]: PUB_GET_ALL_METADATA },
-  },
-  /*
-   * @oas [get] /api/v1/resources/{metaId}
-   * description: 'Access one identified metadata'
-   * parameters:
-   *   - (path) metaId=bf4895c4-bf41-4f59-a4c7-14e1cb315d04 {String:UUIDv4} The metadata UUID
-   *   - (query) limit {Integer:int32} The maximum number of metadata in the result set
-   *      (default = 100, max = 500)
-   *   - (query) offset {Integer:int32} The number of metadata to skip before starting to collect
-   *      the result set (default = 0)
-   *   - (query) fields {String} Comma-separated properties that are kept for displaying the
-   *      elements of the result set
-   *   - (query) sort_by {String} Comma-separated properties tused to order the metadata in the
-   *      result set, ordered by decreasing priority. A minus sign before the field name means
-   *      metadata will be sorted by decreasing values over this particular field
-   *   - (query) updated_after {String:date} The date after which the listed metadata were updated
-   *   - (query) updated_before {String:date} The date before which the listed metadata were updated
-   */
-  {
-    method: HTTP_METHODS.GET,
-    url: `${URL_PUB_METADATA}/:${PARAM_ID}`,
-    handler: metadataController.getSingleMetadata,
-    config: { [ROUTE_NAME]: PUB_GET_ONE_METADATA },
-  },
 
   // ------------------------------------------------------------------------------------------------
   // Integration reports for one particular object
@@ -334,7 +323,7 @@ exports.publicRoutes = [
     method: HTTP_METHODS.PUT,
     url: `/${OBJ_METADATA}/:${PARAM_ID}/${ACT_REPORT}`,
     handler: reportController.addOrEditSingleReportForMetadata,
-    config: { [ROUTE_NAME]: PUB_UPSERT_ONE_REPORT },
+    config: { [ROUTE_NAME]: PORTAL_UPSERT_ONE_REPORT },
   },
 
   // Add/edit 1 report for one object integration
@@ -342,7 +331,7 @@ exports.publicRoutes = [
     method: HTTP_METHODS.PUT,
     url: `${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}`,
     handler: reportController.addOrEditSingleReportForMetadata,
-    config: { [ROUTE_NAME]: PUB_UPSERT_ONE_REPORT },
+    config: { [ROUTE_NAME]: PORTAL_UPSERT_ONE_REPORT },
   },
 
   // Get all reports for one object integration
@@ -350,14 +339,37 @@ exports.publicRoutes = [
     method: HTTP_METHODS.GET,
     url: `${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}`,
     handler: reportController.getReportListForMetadata,
-    config: { [ROUTE_NAME]: PUB_GET_ALL_OBJ_REPORT },
+    config: { [ROUTE_NAME]: PORTAL_GET_ALL_OBJ_REPORT },
   },
   // Get 1 report for one object integration
   {
     method: HTTP_METHODS.GET,
     url: `${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}/:${PARAM_REPORT_ID}`,
     handler: reportController.getSingleReportForMetadata,
-    config: { [ROUTE_NAME]: PUB_GET_ONE_OBJ_REPORT },
+    config: { [ROUTE_NAME]: PORTAL_GET_ONE_OBJ_REPORT },
+  },
+
+  // Redirection for getting integration reports
+  {
+    method: HTTP_METHODS.GET,
+    url: `/${OBJ_METADATA}/:${PARAM_ID}/*`,
+    config: { [ROUTE_NAME]: REDIRECT_GET_PLUS },
+    handler: function (req, reply) {
+      const newRoute = `${URL_PREFIX_PUBLIC}${req.url}`
+      log.d(mod, `redirect`, `${req.method} ${newRoute}`)
+      reply.redirect(308, newRoute)
+    },
+  },
+  // Redirection for adding an integration report
+  {
+    method: HTTP_METHODS.PUT,
+    url: `/${OBJ_METADATA}/*`,
+    config: { [ROUTE_NAME]: REDIRECT_PUT_PLUS },
+    handler: function (req, reply) {
+      const newRoute = `${URL_PREFIX_PUBLIC}${req.url}`
+      log.d(mod, `redirect`, `${req.method} ${newRoute}`)
+      reply.redirect(308, newRoute)
+    },
   },
 ]
 

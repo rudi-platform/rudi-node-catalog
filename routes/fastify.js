@@ -22,8 +22,8 @@ const { CallContext } = require('../definitions/constructors/callContext')
 
 const {
   redirectRoutes,
-  freeRoutes,
   publicRoutes,
+  portalRoutes,
   backOfficeRoutes,
   devRoutes,
 } = require('./routes')
@@ -195,13 +195,28 @@ fastifyConf.addHook('onSend', (request, reply, payload, next) => {
  * @param {object} req incoming request
  * @param {object} reply reply
  */
-async function onFreeRoute(req, reply) {
-  const fun = 'onFreeRoute'
+async function onPublicRoute(req, reply) {
+  const fun = 'onPublicRoute'
   try {
     log.t(mod, fun, `${req.method} ${req.url} `)
     const context = CallContext.getCallContextFromReq(req)
-    context.logInfo('route', fun, 'API call')
-    return
+
+    try {
+      // Checking the token, if it exists, to retrieve the user info
+      const portalJwt = await checkPortalTokenInHeader(req, reply)
+      const jwtPayload = portalJwt[1]
+      // log.d(mod, fun, `Payload: ${beautify(jwtPayload)}`)
+
+      const context = CallContext.getCallContextFromReq(req)
+      context.clientApp = jwtPayload[JWT_SUB] || 'RUDI Portal'
+      context.reqUser = jwtPayload[JWT_USER] || jwtPayload[JWT_CLIENT]
+    } catch (er) {
+      // It's OK to have no token
+      log.t(mod, fun, `Token-less call to ${req.method} ${req.url} `)
+    } finally {
+      context.logInfo('route', fun, 'API call')
+      return true
+    }
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -213,12 +228,13 @@ async function onFreeRoute(req, reply) {
  * @param {object} req incoming request
  * @param {object} reply reply
  */
-async function onPublicRoute(req, reply) {
-  const fun = 'onPublicRoute'
+async function onPortalRoute(req, reply) {
+  const fun = 'onPortalRoute'
   try {
     log.t(mod, fun, `${req.method} ${req.url} `)
     if (!shouldControlPublicRequests()) return true
 
+    // If incoming request has no token, raise an error
     const portalJwt = await checkPortalTokenInHeader(req, reply)
     const jwtPayload = portalJwt[1]
     // log.d(mod, fun, `Payload: ${beautify(jwtPayload)}`)
@@ -228,7 +244,7 @@ async function onPublicRoute(req, reply) {
     context.reqUser = jwtPayload[JWT_USER] || jwtPayload[JWT_CLIENT]
 
     context.logInfo('route', fun, 'API call')
-    return
+    return true
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -308,11 +324,11 @@ function declareRouteGroup(routeGroup, preHandler, routeGroupName, logLevel) {
  * Pre-handler fonction assignments
  */
 
-declareRouteGroup(redirectRoutes, onPublicRoute, 'Redirect', 'd')
-declareRouteGroup(freeRoutes, onFreeRoute, 'Free', 'v')
+// declareRouteGroup(redirectRoutes, onPortalRoute, 'Redirect', 'd')
 declareRouteGroup(publicRoutes, onPublicRoute, 'Public', 'i')
-declareRouteGroup(backOfficeRoutes, onPrivateRoute, 'Private', 'v')
-declareRouteGroup(devRoutes, onDevRoute, 'Dev', 'd')
+declareRouteGroup(portalRoutes, onPortalRoute, 'Portal', 'v')
+declareRouteGroup(backOfficeRoutes, onPrivateRoute, 'Private', 'd')
+declareRouteGroup(devRoutes, onDevRoute, 'Dev', 'v')
 
 // ------------------------------------------------------------------------------------------------
 // Exports
