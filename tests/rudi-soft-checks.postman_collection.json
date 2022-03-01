@@ -3059,6 +3059,94 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Send metadata list to portal",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Send metadata list to portal\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = codec.streamToString(pm.response)",
+									"    pm.expect(res).to.eq(\"Sending metadata to portal\")",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\"{{metaId2}}\"]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/portal/{{data}}/send",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"portal",
+								"{{data}}",
+								"send"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send all metadata to portal",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Send all metadata to portal\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = codec.streamToString(pm.response)",
+									"    pm.expect(res).to.eq(\"Sending metadata to portal\")",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\"{{metaId2}}\"]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/portal/{{data}}/send",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"portal",
+								"{{data}}",
+								"send"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -4562,37 +4650,15 @@
 					"    t: (msg) => { if (TRACE) console.log(msg) }",
 					"}",
 					"",
-					"utils = {",
-					"    getContactEmail: (contactName) => {",
-					"        return `${contactName",
-					"            .replace(/(Miss|(Ms|Mrs|Mr|Dr)\\.)\\s|'Jr\\.'/gi, '')",
-					"            .toLowerCase()",
-					"            .replace(/\\s+|\\.\\./g, '.')",
-					"            .replace(/^\\.+|\\.+$|\\'+/g, '')",
-					"            }@irisa.fr`;",
-					"    },",
-					"};",
-					"",
 					"time = {",
-					"    now: () => {",
-					"        return new Date().toISOString()",
-					"    },",
-					"",
-					"    nowEpochS: () => {",
-					"        return _.floor(new Date().getTime() / 1000)",
-					"    },",
-					"",
-					"    timezone: () => {",
-					"        return new Date().getTimezoneOffset()",
-					"    },",
+					"    now: () => new Date().toISOString(),",
+					"    nowEpochS: () => _.floor(new Date().getTime() / 1000),",
+					"    timezone: () => new Date().getTimezoneOffset(),",
 					"}",
 					"codec = {",
-					"    fromBase64: (data) => {",
-					"        log.t('-- fromBase64 --')",
-					"        const decodedStr = Buffer.from(data, 'base64').toString('utf-8');",
-					"        log.d('decodedStr: ' + decodedStr)",
-					"        return decodedStr",
-					"    },",
+					"    streamToString: (data) => data.stream.toString('utf8'),",
+					"",
+					"    fromBase64: (data) => Buffer.from(data, 'base64').toString('utf-8'),",
 					"",
 					"    fromBase64Url: (base64UrlStr) => {",
 					"        log.t('-- base64UrlStr --')",
@@ -4617,10 +4683,7 @@
 					"rand = {",
 					"    get: (randName) => pm.collectionVariables.replaceIn(randName),",
 					"",
-					"    pickInList: (list) => {",
-					"        const randomNumber = _.random(0, list.length - 1);",
-					"        return list[randomNumber];",
-					"    },",
+					"    pickInList: (list) => list[_.random(0, list.length - 1)],",
 					"",
 					"    pick: (listName) => rand.pickInList(pm.collectionVariables.get(listName)),",
 					"",
@@ -4632,14 +4695,12 @@
 					"        return randVal;",
 					"    },",
 					"",
-					"    getContactEmail: (contactName) => {",
-					"        return `${contactName",
-					"            .replace(/(Miss|(Ms|Mrs|Mr|Dr)\\.)\\s|'Jr\\.'/gi, '')",
-					"            .toLowerCase()",
-					"            .replace(/\\s+|\\.\\./g, '.')",
-					"            .replace(/^\\.+|\\.+$|\\'+/g, '')",
-					"            }@irisa.fr`;",
-					"    },",
+					"    getContactEmail: (contactName) => `${contactName",
+					"        .replace(/(Miss|(Ms|Mrs|Mr|Dr)\\.)\\s|'Jr\\.'/gi, '')",
+					"        .toLowerCase()",
+					"        .replace(/\\s+|\\.\\./g, '.')",
+					"        .replace(/^\\.+|\\.+$|\\'+/g, '')",
+					"        }@irisa.fr`,",
 					"};",
 					"",
 					"secu = {",
@@ -4689,14 +4750,12 @@
 					"            }",
 					"        }",
 					"        pm.sendRequest(reqNewToken, (err, res) => {",
-					"            if (err) throw new Error('Error while fetching a new API token: ' + JSON.stringify(err))",
-					"",
 					"            const token = codec.streamToUtf8(res)",
 					"            // log.d('rudiProdToken : ' + token)",
 					"            try {",
 					"                pm.expect(res).to.have.property('code', 200);",
 					"            } catch (err) {",
-					"                console.error('[renewApiToken]: ' + err)",
+					"                console.error('[renewPortalToken]: ' + err)",
 					"            }",
 					"            pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
 					"            pm.collectionVariables.set(tokenName, token)",
@@ -4705,7 +4764,6 @@
 					"            next(token)",
 					"            //return token",
 					"        })",
-					"",
 					"    },",
 					"",
 					"    renewPortalToken: async (tokenName, rudiProdToken) => {",
@@ -4718,11 +4776,10 @@
 					"            method: 'GET',",
 					"            header: {",
 					"                \"Content-Type\": \"application/json\",",
-					"                authorization: 'Bearer ' + rpToken",
+					"                [AUTH]: 'Bearer ' + rpToken",
 					"            },",
 					"        }",
 					"        pm.sendRequest(reqNewToken, (err, res) => {",
-					"            if (err) throw new Error('Error while fetching a new portal token: ' + err)",
 					"            try {",
 					"                pm.expect(res).to.have.property('code', 200);",
 					"            } catch (err) {",
@@ -4743,7 +4800,6 @@
 					"    getRudiProdToken: async (next) => {",
 					"        log.t('-- getRudiProdToken --')",
 					"        const tokenName = API_TOKEN_NAME",
-					"        if (!tokenName) throw new Error(`Rudi prod token name can't be found`)",
 					"        if (!secu.isTokenValid(tokenName)) await secu.renewApiToken(tokenName, next)",
 					"        else next(pm.variables.get(tokenName))",
 					"        return pm.variables.get(tokenName)",
@@ -4752,11 +4808,10 @@
 					"    getPortalToken: async (apiToken) => {",
 					"        log.t('-- getPortalToken --')",
 					"        const tokenName = PORTAL_TOKEN_NAME",
-					"        if (!tokenName) throw new Error(`Portal token name can't be found`)",
-					"        log.d('Portal token name: ' + tokenName)",
 					"        if (!secu.isTokenValid(tokenName)) await secu.renewPortalToken(tokenName, apiToken)",
 					"        return pm.variables.get(tokenName)",
 					"    }",
+					"",
 					"}",
 					"",
 					"secu.getRudiProdToken(secu.getPortalToken)",
