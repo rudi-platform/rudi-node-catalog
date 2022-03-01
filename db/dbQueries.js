@@ -56,6 +56,8 @@ const {
   DEFAULT_QUERY_OFFSET,
   QUERY_COUNT_BY,
   MONGO_ERROR,
+  COUNT_LABEL,
+  LIST_LABEL,
 } = require('../config/confApi')
 
 // Fields from the JSON as definied in the API
@@ -678,6 +680,7 @@ exports.getObjectListAndCount = async (objectType, options) => {
   const fun = `getObjectListAndCount`
   try {
     log.t(mod, fun, ``)
+    // log.t(mod, fun, `objectType: '${objectType}', options: ${utils.beautify(options)}`)
 
     //--- Parameters
     // Identify object type characteristics
@@ -686,11 +689,11 @@ exports.getObjectListAndCount = async (objectType, options) => {
     // Extract options
     const limit = getParamValue(options, QUERY_LIMIT, DEFAULT_QUERY_LIMIT, MAX_QUERY_LIMIT)
     const offset = getParamValue(options, QUERY_OFFSET, DEFAULT_QUERY_OFFSET)
-    const filter = getParamValue(options, QUERY_FILTER)
+    const filter = getParamValue(options, QUERY_FILTER, {})
     const fieldsToKeep = getParamValue(options, QUERY_FIELDS)
     const sortByFields = getParamValue(options, QUERY_SORT_BY)
 
-    // log.d(mod, fun, `options: ${utils.beautify(options)}`)
+    log.d(mod, fun, `options: ${utils.beautify(options)}`)
 
     // log.d(mod, fun, `filter: ${utils.beautify(filter)}`)
 
@@ -707,10 +710,9 @@ exports.getObjectListAndCount = async (objectType, options) => {
     }
     sortOptions[DB_ID] = 1 // Default sort to get consistent offset/limit results
 
-    //--- Aggregation
-    const COUNT_LABEL = 'total'
-    const LIST_LABEL = 'items'
+    // log.d(mod, fun, `sortOptions: ${utils.beautify(sortOptions)}`)
 
+    //--- Aggregation
     let aggregateOptions = [
       { $match: filter },
       {
@@ -720,6 +722,7 @@ exports.getObjectListAndCount = async (objectType, options) => {
         },
       },
     ]
+    log.d(mod, fun, `aggregateOptions: ${utils.beautify(aggregateOptions)}`)
 
     const result = await Model.aggregate(aggregateOptions).exec()
 

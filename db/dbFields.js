@@ -92,6 +92,55 @@ exports.API_DATES_PUBLISHED_PROPERTY = 'published'
 exports.API_DATES_VALIDATED_PROPERTY = 'validated'
 exports.API_DATES_DELETED_PROPERTY = 'deleted'
 
+exports.getCreatedDate = (metadata) => {
+  if (metadata[this.DB_CREATED_AT]) return metadata[this.DB_CREATED_AT]
+  if (
+    metadata[this.API_METAINFO_PROPERTY] &&
+    metadata[this.API_METAINFO_PROPERTY][this.API_METAINFO_DATES_PROPERTY]
+  )
+    return metadata[this.API_METAINFO_PROPERTY][this.API_METAINFO_DATES_PROPERTY][
+      this.API_DATES_CREATED_PROPERTY
+    ]
+  throw new Error(`Not found: '${this.API_DATES_CREATED_PROPERTY}`)
+}
+
+exports.getUpdatedDate = (metadata) => {
+  if (metadata[this.DB_UPDATED_AT]) return metadata[this.DB_UPDATED_AT]
+  if (
+    metadata[this.API_METAINFO_PROPERTY] &&
+    metadata[this.API_METAINFO_PROPERTY][this.API_METAINFO_DATES_PROPERTY]
+  )
+    return metadata[this.API_METAINFO_PROPERTY][this.API_METAINFO_DATES_PROPERTY][
+      this.API_DATES_EDITED_PROPERTY
+    ]
+  throw new Error(`Not found: '${this.API_DATES_EDITED_PROPERTY}`)
+}
+
+exports.getPublishedDate = (metadata) => {
+  if (metadata[this.DB_PUBLISHED_AT]) return metadata[this.DB_PUBLISHED_AT]
+  if (
+    metadata[this.API_METAINFO_PROPERTY] &&
+    metadata[this.API_METAINFO_PROPERTY][this.API_METAINFO_DATES_PROPERTY]
+  )
+    return metadata[this.API_METAINFO_PROPERTY][this.API_METAINFO_DATES_PROPERTY][
+      this.API_DATES_PUBLISHED_PROPERTY
+    ]
+  throw new Error(`Not found: '${this.API_DATES_PUBLISHED_PROPERTY}`)
+}
+
+exports.setPublishedDate = (metadata, datePublished) => {
+  if (metadata[this.DB_PUBLISHED_AT]) metadata[this.DB_PUBLISHED_AT] = datePublished
+  if (
+    metadata[this.API_METAINFO_PROPERTY] &&
+    metadata[this.API_METAINFO_PROPERTY][this.API_METAINFO_DATES_PROPERTY]
+  ) {
+    metadata[this.API_METAINFO_PROPERTY][this.API_METAINFO_DATES_PROPERTY][
+      this.API_DATES_PUBLISHED_PROPERTY
+    ] = datePublished
+    return metadata
+  } else throw new Error(`Not found: '${this.API_DATES_PUBLISHED_PROPERTY}`)
+}
+
 // ------------------------------------------------------------------------------------------------
 // Specific fields
 // ------------------------------------------------------------------------------------------------

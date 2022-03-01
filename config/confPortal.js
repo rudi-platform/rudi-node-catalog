@@ -115,8 +115,8 @@ const API_SEND_URL = getPortalIniValue(PORTAL_SECTION, 'put_url')
 
 exports.getPortalMetaUrl = (id) =>
   !id
-    ? `${API_PORTAL_URL}/${API_GET_URL}`
-    : `${API_PORTAL_URL}/${API_GET_URL.replace(/{{id}}/, id)}`
+    ? `${API_PORTAL_URL}/${API_GET_URL.replace('/{{id}}', '')}`
+    : `${API_PORTAL_URL}/${API_GET_URL.replace('{{id}}', id)}`
 
 exports.postPortalMetaUrl = (id) =>
   !id ? `${API_PORTAL_URL}/${API_SEND_URL}` : `${API_PORTAL_URL}/${API_SEND_URL}/${id}`

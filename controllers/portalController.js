@@ -8,6 +8,7 @@ const mod = 'portalCtrl'
 // ------------------------------------------------------------------------------------------------
 const { readFileSync } = require('fs')
 const { parseKey } = require('sshpk')
+const axios = require('axios')
 
 // ------------------------------------------------------------------------------------------------
 // Internal dependancies
@@ -18,7 +19,14 @@ const api = require('../config/confApi')
 const utils = require('../utils/jsUtils')
 const json = require('../utils/jsonAccess')
 
-const { httpGet, httpPost, httpDelete, directPost, directGet } = require('../utils/httpReq')
+const {
+  httpGet,
+  httpPost,
+  httpDelete,
+  directPost,
+  directGet,
+  httpPut,
+} = require('../utils/httpReq')
 
 const portal = require('../config/confPortal')
 
@@ -36,7 +44,12 @@ const {
 } = require('../utils/errors')
 
 const { extractJwt, JWT_EXP, REQ_MTD } = require('../utils/crypto')
-const { API_METAINFO_VERSION_PROPERTY, API_METAINFO_PROPERTY } = require('../db/dbFields')
+const {
+  API_METAINFO_VERSION_PROPERTY,
+  API_METAINFO_PROPERTY,
+  API_COLLECTION_TAG,
+  getUpdatedDate,
+} = require('../db/dbFields')
 // const { createHmac } = require('crypto')
 
 // ------------------------------------------------------------------------------------------------
@@ -162,9 +175,10 @@ exports.sendMetadata = async (req, reply) => {
   try {
     let metadataId = req.params[api.PARAM_ID]
     log.d(mod, fun, `metadataId: ${metadataId}`)
-    if (metadataId && !validate.isUUID(metadataId)) metadataId = null
+    if (!metadataId || !validate.isUUID(metadataId))
+      throw new BadRequestError('Parameter is not a valid UUID v4')
 
-    return await this.postMetadataToPortal(metadataId)
+    return await this.sendMetadataToPortal(metadataId)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -468,12 +482,12 @@ exports.verifyPortalToken = (accessToken) => {
 // ------------------------------------------------------------------------------------------------
 // Portal calls: metadata
 // ------------------------------------------------------------------------------------------------
-
-exports.postMetadataToPortal = async (metadataId) => {
-  const fun = 'postMetadataToPortal'
-  log.t(mod, fun, ``)
+exports.sendMetadataToPortal = async (metadataId) => {
+  const fun = 'sendMetadataToPortal'
   try {
+    log.t(mod, fun, ``)
     if (!metadataId) throw new NotImplementedError('Not yet implemented')
+    if (!validate.isUUID(metadataId)) throw new BadRequestError('Bad formatted UUID')
 
     const metadata = await db.getEnsuredObjectWithRudiId(api.OBJ_METADATA, metadataId)
     if (!metadata) {
@@ -481,17 +495,41 @@ exports.postMetadataToPortal = async (metadataId) => {
       log.w(mod, fun, errMsg)
       throw new NotFoundError(errMsg)
     }
+    const collectionTag = metadata[API_COLLECTION_TAG]
+    if (collectionTag) {
+      log.d(mod, fun, `Not sending to portal: ${metadataId} (${collectionTag})`)
+      return
+    }
     const metadataClean = utils.deepClone(metadata)
 
     metadataClean[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = api.API_VERSION
 
-    // delete metadataClean[API_GEOGRAPHY_PROPERTY][API_GEO_GEOJSON_PROPERTY] //
-    // metadataClean[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = 'v1'
+    const sendPortalUrl = portal.postPortalMetaUrl()
+    const portalToken = await this.getPortalToken()
+    const reqOpts = {
+      headers: {
+        'User-Agent': 'Rudi-Producer',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${portalToken}`,
+      },
+    }
+    try {
+      log.d(mod, fun, `Checking if the metadata is on the portal`)
+      const answer = await axios.get(portal.getPortalMetaUrl(metadataId), reqOpts)
+      const portalMetadata = answer.data
 
-    const token = await this.getPortalToken()
-    const reply = await httpPost(portal.postPortalMetaUrl(), metadataClean, token)
+      if (getUpdatedDate(portalMetadata) < getUpdatedDate(metadataClean)) {
+        log.d(mod, fun, `Metadata is on the portal and older: updating '${metadataId}'`)
+        return httpPut(sendPortalUrl, metadataClean, portalToken)
+      } else {
+        log.d(mod, fun, `Metadata is on the portal and same: not updating '${metadataId}'`)
+      }
+    } catch (err) {
+      log.e(mod, fun, err)
+      log.d(mod, fun, `Metadata is not on the portal: sending '${metadataId}'`)
+      return httpPost(sendPortalUrl, metadataClean, portalToken)
+    }
     // log.d(mod, fun, `reply: ${utils.beautify(reply)}`)
-    return reply
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -501,12 +539,10 @@ exports.getMetadataFromPortal = async (metadataId) => {
   const fun = 'getMetadataFromPortal'
   log.t(mod, fun, ``)
   try {
-    if (!metadataId) throw new NotImplementedError('Not yet implemented on Portal side') // Can't get the resouces list yet.
-
     const token = await this.getPortalToken()
-    const reply = await httpGet(portal.getPortalMetaUrl(metadataId), token)
 
-    return reply
+    if (!metadataId) return httpGet(portal.getPortalMetaUrl(), token)
+    else return httpGet(portal.getPortalMetaUrl(metadataId), token)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }

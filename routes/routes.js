@@ -69,6 +69,7 @@ const {
   ACT_SEARCH,
   ROUTE_NAME,
   HTTP_METHODS,
+  ACT_SEND,
 } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
@@ -119,6 +120,7 @@ const DEV_EXPOSED_GET_PORTAL_TOKEN = 'dev_exposed_get_portal_token'
 const DEV_CHECK_STORED_TOKEN = 'dev_check_stored_token'
 const DEV_GET_PORTAL_METADATA = 'dev_get_portal_metadata'
 const DEV_SEND_METADATA_TO_PORTAL = 'dev_send_metadata_to_portal'
+const DEV_SEND_MANY_METADATA_TO_PORTAL = 'dev_send_many_metadata_to_portal'
 const DEV_DEL_PORTAL_METADATA = 'dev_del_portal_metadata'
 const DEV_GET_GIT_HASH = 'dev_get_git_hash'
 const DEV_GET_APP_HASH = 'dev_get_app_hash'
@@ -630,6 +632,12 @@ exports.devRoutes = [
     url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}/:${PARAM_ID}`,
     handler: portalController.sendMetadata,
     config: { [ROUTE_NAME]: DEV_SEND_METADATA_TO_PORTAL },
+  },
+  {
+    method: HTTP_METHODS.POST,
+    url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}/${ACT_SEND}`,
+    handler: metadataController.sendManyMetadataToPortal,
+    config: { [ROUTE_NAME]: DEV_SEND_MANY_METADATA_TO_PORTAL },
   },
   {
     method: HTTP_METHODS.DELETE,

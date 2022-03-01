@@ -79,31 +79,12 @@ exports.getWithOpts = async (options, authorizationToken) => {
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
-  // log.d(mod, fun, `destUrl: ${destUrl}`)
-  // log.d(mod, fun, `options: ${utils.beautify(options)}`)
-  /*
-    const reqOpts = {
-      hostname: options.hostname,
-      port: options.port,
-      path: `/${options.path}`,
-      method: 'GET',
-      headers: {
-        'User-Agent': 'Rudi-Producer',
-        'Content-Type': 'application/json'
-      }
-    }
-    if (authorizationToken) reqOpts.headers.Authorization = `Bearer ${authorizationToken}`
-
-    log.d(mod, fun, `options: ${utils.beautify(reqOpts)}`)
-
-    return await doHttpRequest(reqOpts, options.protocol)
-     */
 }
 
 exports.httpPost = async (destUrl, dataToSend, authorizationToken) => {
   const fun = 'httpPost'
-  log.t(mod, fun, ``)
   try {
+    log.t(mod, fun, ``)
     const reqOpts = {
       headers: {
         'User-Agent': 'Rudi-Producer',
@@ -119,27 +100,43 @@ exports.httpPost = async (destUrl, dataToSend, authorizationToken) => {
   } catch (err) {
     throw RudiError.treatCommunicationError(mod, fun, err)
   }
-  /*
-  const options = {
-    hostname: sendOptions.hostname,
-    port: sendOptions.port,
-    path: sendOptions.path,
-    method: 'POST',
-    headers: {
-      'User-Agent': 'Rudi-Producer',
-      'Content-Type': 'application/json',
-      'Content-Length': data.length
-    }
-  }
-  if (authorizationToken) options.headers.Authorization = `Bearer ${authorizationToken}`
-
-  return await doHttpRequest(options, sendOptions.protocol, data)
-    */
 }
 
-// const sslAgent = new https.Agent({
-//   rejectUnauthorized: false,
-// })
+exports.httpPut = async (destUrl, dataToSend, authorizationToken) => {
+  const fun = 'httpPut'
+  try {
+    log.t(mod, fun, ``)
+    const reqOpts = {
+      headers: {
+        'User-Agent': 'Rudi-Producer',
+        'Content-Type': 'application/json',
+      },
+    }
+    if (authorizationToken) reqOpts.headers.Authorization = `Bearer ${authorizationToken}`
+
+    const answer = await this.directPut(destUrl, dataToSend, reqOpts)
+
+    log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
+    return answer.data
+  } catch (err) {
+    throw RudiError.treatCommunicationError(mod, fun, err)
+  }
+}
+
+exports.directGet = async (destUrl, reqOpts) => {
+  const fun = 'directGet'
+  log.t(mod, fun, ``)
+  // log.d(mod, fun, `destUrl: ${destUrl}`)
+  // if (reqOpts) reqOpts.httpsAgent = sslAgent
+  // else reqOpts = { httpsAgent: sslAgent }
+  try {
+    const answer = await axios.get(destUrl, reqOpts)
+    log.logHttpAnswer(mod, fun, answer)
+    return answer
+  } catch (err) {
+    throw RudiError.treatCommunicationError(mod, fun, err)
+  }
+}
 
 exports.directPost = async (destUrl, dataToSend, reqOpts) => {
   const fun = 'directPost'
@@ -157,17 +154,18 @@ exports.directPost = async (destUrl, dataToSend, reqOpts) => {
   }
 }
 
-exports.directGet = async (destUrl, reqOpts) => {
-  const fun = 'directGet'
+exports.directPut = async (destUrl, dataToSend, reqOpts) => {
+  const fun = 'directPut'
   log.t(mod, fun, ``)
-  // log.d(mod, fun, `destUrl: ${destUrl}`)
+  // log.d(mod, fun, `${destUrl}`)
   // if (reqOpts) reqOpts.httpsAgent = sslAgent
   // else reqOpts = { httpsAgent: sslAgent }
   try {
-    const answer = await axios.get(destUrl, reqOpts)
+    const answer = await axios.put(destUrl, dataToSend, reqOpts)
     log.logHttpAnswer(mod, fun, answer)
     return answer
   } catch (err) {
+    // log.w(mod, fun, utils.beautify(err) || err)
     throw RudiError.treatCommunicationError(mod, fun, err)
   }
 }

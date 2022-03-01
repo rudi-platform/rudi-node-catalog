@@ -4615,7 +4615,7 @@
 					"};",
 					"",
 					"rand = {",
-					"    get: (randName) => pm.variables.replaceIn(randName),",
+					"    get: (randName) => pm.collectionVariables.replaceIn(randName),",
 					"",
 					"    pickInList: (list) => {",
 					"        const randomNumber = _.random(0, list.length - 1);",

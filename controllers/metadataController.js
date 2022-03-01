@@ -76,6 +76,10 @@ const {
   ACT_INIT,
   PARAM_THESAURUS_LANG,
   MONGO_ERROR,
+  QUERY_FIELDS,
+  COUNT_LABEL,
+  LIST_LABEL,
+  QUERY_LIMIT,
 } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
@@ -683,6 +687,54 @@ exports.updateMetadata = async (incomingRudiMetadata) => {
     throw RudiError.treatError(mod, fun, err)
   }
 }
+
+exports.sendManyMetadataToPortal = async (req, res) => {
+  const fun = 'sendAllMetadataToPortal'
+  try {
+    log.t(mod, fun, ``)
+    const listIds = req.body
+
+    if (!!listIds && !isArray(listIds)) {
+      throw new BadRequestError(
+        'The body of the request should be empty (to send every metadata) or a list of ids',
+        mod,
+        fun
+      )
+    }
+
+    if (!listIds || isEmptyArray(listIds)) {
+      log.d(mod, fun, 'Getting the list of metadata ids')
+      let metadataListAndCount = await db.getObjectListAndCount(OBJ_METADATA, {
+        [QUERY_FIELDS]: [API_METADATA_ID],
+      })
+      const metadataCount = metadataListAndCount[COUNT_LABEL]
+      let metadataList = metadataListAndCount[LIST_LABEL]
+      const currentCount = metadataList ? metadataList.length : 0
+
+      if (currentCount < metadataCount) {
+        log.d(mod, fun, 'Getting the whole list of metadata ids')
+        metadataListAndCount = await db.getObjectListAndCount(OBJ_METADATA, {
+          [QUERY_FIELDS]: [API_METADATA_ID],
+          [QUERY_LIMIT]: metadataCount,
+        })
+        metadataList = metadataListAndCount[LIST_LABEL]
+      }
+      for (const meta of metadataList) {
+        const id = meta[API_METADATA_ID]
+        portalController.sendMetadataToPortal(id)
+      }
+    } else {
+      // We have a list of ids
+      for (const id of listIds) {
+        portalController.sendMetadataToPortal(id)
+      }
+    }
+    return 'Sending metadata to portal'
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
 exports.sendToPortal = async (metadata) => {
   const fun = 'sendToPortal'
   try {
@@ -695,7 +747,7 @@ exports.sendToPortal = async (metadata) => {
       return
     }
 
-    return await portalController.postMetadataToPortal(metadataId)
+    return await portalController.sendMetadataToPortal(metadataId)
     log.v(mod, fun, `Sent to portal: ${metadataId}`)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)

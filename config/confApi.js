@@ -56,6 +56,9 @@ exports.QUERY_CONFIRM = 'confirm'
 
 exports.QUERY_SEARCH_TERMS = 'searchTerms'
 
+exports.COUNT_LABEL = 'total'
+exports.LIST_LABEL = 'items'
+
 exports.DEFAULT_QUERY_LIMIT = 100
 exports.DEFAULT_QUERY_OFFSET = 0
 
@@ -76,6 +79,7 @@ exports.ACT_DELETION = 'deletion'
 exports.ACT_UNLINKED = 'unlinked'
 exports.ACT_REPORT = 'report'
 exports.ACT_SEARCH = 'search'
+exports.ACT_SEND = 'send'
 
 // ------------------------------------------------------------------------------------------------
 // DB actions
