@@ -13,9 +13,12 @@ const { parameterExpected } = require('../../utils/msg')
 // Custom schema definition
 // ------------------------------------------------------------------------------------------------
 
-// MIME types : https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
+// Common MIME types: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
+// Complete list: https://www.iana.org/assignments/media-types/media-types.xhtml
 
-const FileTypes = [
+exports.MIME_YAML = 'application/x-yaml'
+
+exports.FileTypes = [
   'application/epub+zip', // (.epub)
   'application/geo+json', // (.geojson)
   'application/graphql',
@@ -43,6 +46,7 @@ const FileTypes = [
   'application/x-tar', //(.tar)
   'application/x-www-form-urlencoded',
   'application/xml', // (.xml)
+  this.MIME_YAML, // (.yaml)
   'application/zip', // (.zip)
   'application/zstd', // (.zst)
   'audio/aac', // (.aac)
@@ -148,8 +152,8 @@ exports.Extensions = {
   wmv: 'video/x-ms-wmv',
   xls: 'application/vnd.ms-excel',
   xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  xml: 'application/xml',
-  // xml: 'text/xml',
+  xml: 'text/xml',
+  yaml: this.MIME_YAML,
   zip: 'application/zip',
   zst: 'application/zstd',
 }
@@ -157,7 +161,7 @@ exports.Extensions = {
 // ------------------------------------------------------------------------------------------------
 // Getter / setter
 // ------------------------------------------------------------------------------------------------
-let Thesaurus = FileTypes
+let Thesaurus = this.FileTypes
 
 exports.initialize = (arg) => {
   if (arg) Thesaurus = []

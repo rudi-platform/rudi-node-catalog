@@ -688,7 +688,7 @@ exports.updateMetadata = async (incomingRudiMetadata) => {
   }
 }
 
-exports.sendManyMetadataToPortal = async (req, res) => {
+exports.sendManyMetadataToPortal = async (req) => {
   const fun = 'sendAllMetadataToPortal'
   try {
     log.t(mod, fun, ``)

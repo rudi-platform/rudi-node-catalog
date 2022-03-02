@@ -2303,7 +2303,7 @@
 									"pm.test(\"GET missing metadata\", () => {",
 									"    pm.expect(pm.response.code).to.eql(404);",
 									"    const responseJson = pm.response.json();",
-									"    console.log(responseJson.statusCode)",
+									"    //console.log(responseJson.statusCode)",
 									"    pm.expect(responseJson.statusCode).to.eq(404)",
 									"    pm.expect(responseJson.error).to.eq('Not Found')",
 									"});"

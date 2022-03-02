@@ -11,6 +11,23 @@ const { parseKey } = require('sshpk')
 const axios = require('axios')
 
 // ------------------------------------------------------------------------------------------------
+// Constants
+// ------------------------------------------------------------------------------------------------
+const { extractJwt, JWT_EXP, REQ_MTD } = require('../utils/crypto')
+const {
+  API_METAINFO_VERSION_PROPERTY,
+  API_METAINFO_PROPERTY,
+  API_COLLECTION_TAG,
+  getUpdatedDate,
+  API_MEDIA_PROPERTY,
+  API_MEDIA_TYPE,
+  API_FILE_TYPE,
+} = require('../db/dbFields')
+
+const { MediaTypes } = require('../definitions/models/Media')
+const { MIME_YAML } = require('../definitions/thesaurus/FileTypes')
+
+// ------------------------------------------------------------------------------------------------
 // Internal dependancies
 // ------------------------------------------------------------------------------------------------
 const db = require('../db/dbQueries')
@@ -42,15 +59,6 @@ const {
   RudiError,
   UnauthorizedError,
 } = require('../utils/errors')
-
-const { extractJwt, JWT_EXP, REQ_MTD } = require('../utils/crypto')
-const {
-  API_METAINFO_VERSION_PROPERTY,
-  API_METAINFO_PROPERTY,
-  API_COLLECTION_TAG,
-  getUpdatedDate,
-} = require('../db/dbFields')
-// const { createHmac } = require('crypto')
 
 // ------------------------------------------------------------------------------------------------
 // Token manager
@@ -486,24 +494,40 @@ exports.sendMetadataToPortal = async (metadataId) => {
   const fun = 'sendMetadataToPortal'
   try {
     log.t(mod, fun, ``)
+
+    //--- Check input param
     if (!metadataId) throw new NotImplementedError('Not yet implemented')
     if (!validate.isUUID(metadataId)) throw new BadRequestError('Bad formatted UUID')
 
+    //--- Get local metadata from ID
     const metadata = await db.getEnsuredObjectWithRudiId(api.OBJ_METADATA, metadataId)
     if (!metadata) {
       const errMsg = `No data found locally for id '${metadataId}'`
       log.w(mod, fun, errMsg)
       throw new NotFoundError(errMsg)
     }
+
+    //--- If 'collection_tag' is set (ie for tests), metadata is not sent
     const collectionTag = metadata[API_COLLECTION_TAG]
     if (collectionTag) {
       log.d(mod, fun, `Not sending to portal: ${metadataId} (${collectionTag})`)
       return
     }
+
+    //--- Ensuring compatibility with portal
     const metadataClean = utils.deepClone(metadata)
-
+    // API version
     metadataClean[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = api.API_VERSION
+    // MIME type: YAML
+    metadataClean[API_MEDIA_PROPERTY].map((media) => {
+      if (media[API_MEDIA_TYPE] == MediaTypes.File && media[API_FILE_TYPE] == MIME_YAML) {
+        media[API_FILE_TYPE] = 'text/plain'
+      }
+    })
 
+    // log.d(mod, fun, utils.beautify(metadataClean))
+
+    //--- Sending to portal
     const sendPortalUrl = portal.postPortalMetaUrl()
     const portalToken = await this.getPortalToken()
     const reqOpts = {
