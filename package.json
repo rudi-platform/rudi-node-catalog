@@ -26,6 +26,7 @@
   "homepage": "https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER",
   "license": "EUPL-1.2",
   "dependencies": {
+    "@aqmo.org/rudi_logger": "^1.1.1",
     "axios": "^0.24.0",
     "date-and-time": "^2.1.0",
     "fastify": "^3.22.0",
@@ -36,7 +37,6 @@
     "mongoose-int32": "^0.6.0",
     "nanoid": "^3.1.32",
     "read-last-lines": "^1.8.0",
-    "rudilogger": "git+https://deployment:V77s-5gnZM6PR_ihMRsN@gitlab.aqmo.org/rudidev/rudilogger.git#shared",
     "sanitize-filename": "^1.6.3",
     "sshpk": "^1.17.0",
     "uuid": "^8.3.2",

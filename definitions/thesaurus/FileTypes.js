@@ -46,7 +46,7 @@ exports.FileTypes = [
   'application/x-tar', //(.tar)
   'application/x-www-form-urlencoded',
   'application/xml', // (.xml)
-  this.MIME_YAML, // (.yaml)
+  this.MIME_YAML, // (.yaml, .yml)
   'application/zip', // (.zip)
   'application/zstd', // (.zst)
   'audio/aac', // (.aac)
@@ -154,6 +154,7 @@ exports.Extensions = {
   xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   xml: 'text/xml',
   yaml: this.MIME_YAML,
+  yml: this.MIME_YAML,
   zip: 'application/zip',
   zst: 'application/zstd',
 }
