@@ -2,10 +2,10 @@
   "name": "rudi-prod-api",
   "version": "1.2.3",
   "private": "true",
-  "description": "RUDI proxi for producer nodes",
-  "main": "rudiServer.js",
+  "description": "API for RUDI producer node",
+  "main": "./rudiServer.js",
   "scripts": {
-    "prestart": "npm config set @aqmo.org:registry https://gitlab.aqmo.org/api/v4/projects/59/packages/npm/ && npm install",
+    "prestart": "npm install",
     "start": "node ./rudiServer.js",
     "extstart": "nodemon -e js,ini --exec \"npm run rudiapp\"",
     "rudiapp": "npm install && node rudiServer.js",
@@ -18,7 +18,9 @@
     }
   },
   "keywords": [
+    "api",
     "rudi",
+    "rudi-producer",
     "metadata",
     "open-data"
   ],
