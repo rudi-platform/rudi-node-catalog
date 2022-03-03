@@ -576,11 +576,11 @@ exports.newMetadata = async (rudiMetadata) => {
 
     // Special update for metadataInfo.referenceDates: update 'createdDate'
     const rudiId = dbReadyObject[API_METADATA_ID]
-    log.i(mod, fun, `dbReadyObject: ${beautify(dbReadyObject[API_ACCESS_CONDITION])}`)
+    log.i(mod, fun, `dbReadyObject: ${beautify(dbReadyObject[API_METADATA_ID])}`)
     let dbMetadata
     try {
       dbMetadata = await new Metadata(dbReadyObject)
-      log.v(mod, fun, `dbMetadata: ${beautify(dbMetadata[API_ACCESS_CONDITION])}`)
+      log.v(mod, fun, `dbMetadata: ${beautify(dbMetadata[API_METADATA_ID])}`)
       await dbMetadata.save()
     } catch (err) {
       // const errMsg = `New object '${OBJ_METADATA}': ${rudiId} | Error: ${err}`
@@ -639,9 +639,9 @@ exports.overwriteMetadata = async (incomingRudiMetadata) => {
 
     this.sendToPortal(dbMetadata)
       .catch((err) => log.e(mod, fun, `Sending to portal failed for metadata '${rudiId}': ${err}`))
-      .then(() =>
-        log.i(mod, fun, `'Update request received by the portal for metadata '${rudiId}'`)
-      )
+      .then((res) => {
+        if (res) log.i(mod, fun, `'Update request received by the portal for metadata '${rudiId}'`)
+      })
 
     return dbMetadata
   } catch (err) {
@@ -771,27 +771,29 @@ exports.initWithODR = async (req, reply) => {
 
     await Promise.all(
       initProd.map(async (prod) => {
-        await organisationController.newOrganization(prod)
+        if (!(await db.getOrganizationWithJson(prod)))
+          await organisationController.newOrganization(prod)
       })
     )
 
     await Promise.all(
       initCont.map(async (cont) => {
-        await contactController.newContact(cont)
+        if (!(await db.getContactWithJson(cont))) await contactController.newContact(cont)
       })
     )
 
     Promise.all(
       initData.map(async (metadata) => {
-        log.d(mod, fun, beautify(metadata))
-        await this.upsertMetadata(metadata)
-        return true
+        log.d(mod, fun, metadata[API_METADATA_ID])
+        return this.upsertMetadata(metadata)
       })
-    ).catch((err) => {
-      log.e(mod, fun, err)
-      const context = CallContext.getCallContextFromReq(req)
-      context.logErr(mod, fun, err)
-    })
+    )
+      .catch((err) => {
+        log.e(mod, fun, err)
+        const context = CallContext.getCallContextFromReq(req)
+        context.logErr(mod, fun, err)
+      })
+      .then(() => log.d(mod, fun, '--- Mass initialization done ---'))
     return 'Initialization initiated'
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)

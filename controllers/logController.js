@@ -60,18 +60,18 @@ exports.getLogs = async (req, reply) => {
   }
 }
 
-exports.getLastLogLines = async (req, reply) => {
-  const fun = 'getLastLogLines'
-  try {
-    log.d(mod, fun, `GET ${URL_PV_LOGS_ACCESS}/:${PARAM_LOGS_LINES}`)
+// exports.getLastLogLines = async (req, reply) => {
+//   const fun = 'getLastLogLines'
+//   try {
+//     log.d(mod, fun, `GET ${URL_PV_LOGS_ACCESS}/:${PARAM_LOGS_LINES}`)
 
-    const nbLines = req.params[PARAM_LOGS_LINES] || req.params[QUERY_LIMIT] || NB_LOG_LINES_DEFAULT
-    const logs = readLastLines.read(LOG_FILE, nbLines)
-    return logs
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
+//     const nbLines = req.params[PARAM_LOGS_LINES] || req.params[QUERY_LIMIT] || NB_LOG_LINES_DEFAULT
+//     const logs = readLastLines.read(LOG_FILE, nbLines)
+//     return logs
+//   } catch (err) {
+//     throw RudiError.treatError(mod, fun, err)
+//   }
+// }
 
 exports.searchLogs = async (req, reply) => {
   const fun = 'searchObjects'

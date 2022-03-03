@@ -6,7 +6,7 @@
   "main": "./rudiServer.js",
   "scripts": {
     "prestart": "npm install",
-    "start": "node ./rudiServer.js",
+    "start": "nodemon ./rudiServer.js",
     "extstart": "nodemon -e js,ini --exec \"npm run rudiapp\"",
     "rudiapp": "npm install && node rudiServer.js",
     "devstart": "./node_modules/nodemon/bin/nodemon.js ./rudiServer.js",
@@ -55,6 +55,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-unused-imports": "^1.1.5",
     "nodemon": "^2.0.13",
-    "prettier": "^2.4.1"
+    "prettier": "^2.4.1",
+    "unix-dgram": "^2.0.4"
   }
 }

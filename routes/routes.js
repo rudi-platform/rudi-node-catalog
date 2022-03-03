@@ -25,7 +25,7 @@ const reportController = require('../controllers/reportController')
 
 const dbController = require('../controllers/dbController')
 const sysController = require('../controllers/sysController')
-const { getLastLogLines, getLogs, searchLogs } = require('../controllers/logController')
+const { getLogs, searchLogs } = require('../controllers/logController')
 const skosController = require('../controllers/skosController')
 const licenceController = require('../controllers/licenceController')
 
@@ -65,7 +65,6 @@ const {
   ACT_REPORT,
   ACT_DELETION,
   ACT_UUID_GEN,
-  ACT_UNLINKED,
   ACT_SEARCH,
   ROUTE_NAME,
   HTTP_METHODS,
@@ -438,12 +437,12 @@ exports.backOfficeRoutes = [
   },
 
   // Access unlinked data
-  {
-    method: HTTP_METHODS.GET,
-    url: `${URL_PV_OBJECT_GENERIC}/${ACT_UNLINKED}`,
-    handler: genericController.getOrphans,
-    config: { [ROUTE_NAME]: PRV_GET_ORPHANS },
-  },
+  // {
+  //   method: HTTP_METHODS.GET,
+  //   url: `${URL_PV_OBJECT_GENERIC}/${ACT_UNLINKED}`,
+  //   handler: genericController.getOrphans,
+  //   config: { [ROUTE_NAME]: PRV_GET_ORPHANS },
+  // },
   // Search object
   {
     method: HTTP_METHODS.GET,
@@ -622,6 +621,12 @@ exports.devRoutes = [
   // Get/post resources from/to Portal
   // ------------------------------------------------------------------------------------------------
   {
+    method: HTTP_METHODS.POST,
+    url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}/${ACT_SEND}`,
+    handler: metadataController.sendManyMetadataToPortal,
+    config: { [ROUTE_NAME]: DEV_SEND_MANY_METADATA_TO_PORTAL },
+  },
+  {
     method: HTTP_METHODS.GET,
     url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}/:${PARAM_ID}`,
     handler: portalController.getMetadata,
@@ -632,12 +637,6 @@ exports.devRoutes = [
     url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}/:${PARAM_ID}`,
     handler: portalController.sendMetadata,
     config: { [ROUTE_NAME]: DEV_SEND_METADATA_TO_PORTAL },
-  },
-  {
-    method: HTTP_METHODS.POST,
-    url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}/${ACT_SEND}`,
-    handler: metadataController.sendManyMetadataToPortal,
-    config: { [ROUTE_NAME]: DEV_SEND_MANY_METADATA_TO_PORTAL },
   },
   {
     method: HTTP_METHODS.DELETE,
@@ -656,12 +655,12 @@ exports.devRoutes = [
     handler: getLogs,
     config: { [ROUTE_NAME]: DEV_GET_LOGS },
   },
-  {
-    method: HTTP_METHODS.GET,
-    url: `${URL_PV_LOGS_ACCESS}/:${PARAM_LOGS_LINES}`,
-    handler: getLastLogLines,
-    config: { [ROUTE_NAME]: DEV_GET_LAST_LOG_LINES },
-  },
+  // {
+  //   method: HTTP_METHODS.GET,
+  //   url: `${URL_PV_LOGS_ACCESS}/:${PARAM_LOGS_LINES}`,
+  //   handler: getLastLogLines,
+  //   config: { [ROUTE_NAME]: DEV_GET_LAST_LOG_LINES },
+  // },
   // Search logs
   {
     method: HTTP_METHODS.GET,
