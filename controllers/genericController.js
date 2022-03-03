@@ -71,6 +71,11 @@ const {
   ACT_UNLINKED,
   QUERY_SEARCH_TERMS,
   MONGO_ERROR,
+  QUERY_COUNT_BY_CAML,
+  QUERY_GROUP_BY_CAML,
+  QUERY_SORT_BY_CAML,
+  QUERY_GROUP_LIMIT_CAML,
+  QUERY_GROUP_OFFSET_CAML,
 } = require('../config/confApi')
 
 const {
@@ -221,11 +226,15 @@ exports.parseQueryParameters = async (objectType, fullUrl) => {
           case QUERY_LIMIT:
           case QUERY_OFFSET:
           case QUERY_GROUP_LIMIT:
+          case QUERY_GROUP_LIMIT_CAML:
           case QUERY_GROUP_OFFSET:
+          case QUERY_GROUP_OFFSET_CAML:
             returnedFilter[key] = parseInt(value)
             break
           case QUERY_GROUP_BY:
+          case QUERY_GROUP_BY_CAML:
           case QUERY_COUNT_BY:
+          case QUERY_COUNT_BY_CAML:
             returnedFilter[key] = value
             break
           case QUERY_UPDATED_AFTER:
@@ -244,6 +253,7 @@ exports.parseQueryParameters = async (objectType, fullUrl) => {
             returnedFilter[key] = value.split(',').map((field) => field.trim())
             break
           case QUERY_SORT_BY:
+          case QUERY_SORT_BY_CAML:
             returnedFilter[key] = value.split(',').map((field) => {
               let trimmedField = field.trim()
               let minus = ''

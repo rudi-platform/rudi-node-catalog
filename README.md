@@ -31,17 +31,16 @@ _See https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/ for further
 
 **Use example:**
 
-> GET https://data-rudi.aqmo.org/api/v1/resources?limit=10&fields=global_id,resource_title,updatedAt&updated_after=2021-07-02&updated_before=2021-07-14T13:25:32.758Z
+> GET https://data-rudi.aqmo.org/api/v1/resources?limit=10&fields=global_id,resource_title&updated_after=2021-07
 
 ---
 
 ## Redirected routes
 
-- `GET /api`
-- `GET /api/v1`
-- `GET /resources`
-- `GET /resources/*`
-- `PUT /resources/*`
+- `GET /api` -> `GET /api/v1/resources`
+- `GET /api/v1` -> `GET /api/v1/resources`
+- `GET /resources` -> `GET /api/v1/resources`
+- `GET /resources/*` -> `GET /api/v1/resources/*`
 
 ## No authentification required
 
@@ -49,11 +48,12 @@ _See https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/ for further
 - `GET /api/admin/hash`
 - `GET /api/admin/apphash`
 - `GET /api/admin/env`
+- `GET /api/v1/resources`
+- `GET /api/v1/resources/:id`
 
 ## Portal authentification required
 
-- `GET /api/v1/resources`
-- `GET /api/v1/resources/:id`
+- `PUT /resources/*`-> `PUT /api/v1/resources/*`
 - `PUT /resources/:id/report`
 - `PUT /api/v1/resources/:id/report`
 - `GET /api/v1/resources/:id/report`
@@ -96,8 +96,10 @@ _See https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/ for further
 - `GET /api/admin/portal/resources/:id`
 - `POST /api/admin/portal/resources/:id`
 - `DELETE /api/admin/portal/resources/:id`
+- `POST /api/admin/portal/resources/send`
 - `GET /api/admin/logs`
 - `GET /api/admin/logs/:lines`
+- `GET /api/admin/logs/search`
 - `GET /api/admin/db`
 - `DELETE /api/admin/db/:object`
 - `DELETE /api/admin/db`
