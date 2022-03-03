@@ -56,7 +56,6 @@ const {
   PARAM_ID,
   PARAM_OBJECT,
   PARAM_REPORT_ID,
-  PARAM_LOGS_LINES,
   PARAM_THESAURUS_CODE,
   PARAM_THESAURUS_LANG,
   OBJ_METADATA,
@@ -97,7 +96,6 @@ const PRV_DEL_MANY = 'prv_del_many'
 const PRV_DEL_LIST = 'prv_del_list'
 
 const PRV_RCH_OBJ = 'prv_rch_obj'
-const PRV_GET_ORPHANS = 'prv_get_orphans'
 
 const PRV_ADD_OBJ_REPORT = 'prv_add_obj_report'
 const PRV_UPSERT_OBJ_REPORT = 'prv_upsert_obj_report'
@@ -126,7 +124,6 @@ const DEV_GET_APP_HASH = 'dev_get_app_hash'
 const DEV_GET_NODE_VERSION = 'dev_get_node_version'
 const DEV_GET_APP_ENV = 'dev_get_app_env'
 const DEV_GET_LOGS = 'dev_get_logs'
-const DEV_GET_LAST_LOG_LINES = 'dev_get_last_log_lines'
 const DEV_SEARCH_LOGS = 'dev_search_logs'
 const DEV_GET_COLLECTIONS = 'dev_get_collections'
 const DEV_DROP_COLLECTION = 'dev_drop_collection'

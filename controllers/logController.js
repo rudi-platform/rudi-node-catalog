@@ -4,20 +4,13 @@ const mod = 'logCtrl'
 // ------------------------------------------------------------------------------------------------
 // External dependencies
 // ------------------------------------------------------------------------------------------------
-const readLastLines = require('read-last-lines')
+const { pick } = require('lodash')
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependencies
+// Constants
 // ------------------------------------------------------------------------------------------------
-const sys = require('../config/confSystem')
-const log = require('../utils/logging')
-
-const { getLogEntries, searchObjects } = require('../db/dbQueries')
-const { parseQueryParameters } = require('./genericController')
-
 const {
   URL_PV_LOGS_ACCESS,
-  PARAM_LOGS_LINES,
   QUERY_LIMIT,
   QUERY_OFFSET,
   OBJ_LOGS,
@@ -28,17 +21,21 @@ const {
   QUERY_COUNT_BY,
   ACT_SEARCH,
 } = require('../config/confApi')
-const { pick } = require('lodash')
+
+// ------------------------------------------------------------------------------------------------
+// Internal dependencies
+// ------------------------------------------------------------------------------------------------
+const log = require('../utils/logging')
 const { RudiError } = require('../utils/errors')
 const { isEmptyArray } = require('../utils/jsUtils')
+
+const { getLogEntries, searchObjects } = require('../db/dbQueries')
+const { parseQueryParameters } = require('./genericController')
 
 // ------------------------------------------------------------------------------------------------
 // Logs API access
 // ------------------------------------------------------------------------------------------------
-const NB_LOG_LINES_DEFAULT = 100
-const LOG_FILE = `${sys.LOG_DIR}/${sys.SYMLINK_NAME}`
 
-// obsolete
 exports.getLogs = async (req, reply) => {
   const fun = 'getLogs'
   try {
@@ -59,19 +56,6 @@ exports.getLogs = async (req, reply) => {
     throw RudiError.treatError(mod, fun, err)
   }
 }
-
-// exports.getLastLogLines = async (req, reply) => {
-//   const fun = 'getLastLogLines'
-//   try {
-//     log.d(mod, fun, `GET ${URL_PV_LOGS_ACCESS}/:${PARAM_LOGS_LINES}`)
-
-//     const nbLines = req.params[PARAM_LOGS_LINES] || req.params[QUERY_LIMIT] || NB_LOG_LINES_DEFAULT
-//     const logs = readLastLines.read(LOG_FILE, nbLines)
-//     return logs
-//   } catch (err) {
-//     throw RudiError.treatError(mod, fun, err)
-//   }
-// }
 
 exports.searchLogs = async (req, reply) => {
   const fun = 'searchObjects'
