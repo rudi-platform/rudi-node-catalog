@@ -54,7 +54,6 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-unused-imports": "^1.1.5",
     "nodemon": "^2.0.13",
-    "prettier": "^2.4.1",
-    "unix-dgram": "^2.0.4"
+    "prettier": "^2.4.1"
   }
 }
