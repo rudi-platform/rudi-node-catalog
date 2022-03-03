@@ -10,7 +10,7 @@ const { existsSync, mkdirSync } = require('fs')
 const winston = require('winston')
 require('winston-daily-rotate-file')
 // require('winston-syslog').Syslog
-const rudiLogger = require('rudilogger')
+const rudiLogger = require('@aqmo.org/rudi_logger')
 
 const { combine, timestamp, printf, colorize, simple } = winston.format
 const syslogLevels = winston.config.syslog.levels
