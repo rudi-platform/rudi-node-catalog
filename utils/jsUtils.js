@@ -208,7 +208,7 @@ exports.filterOnValue = async (obj, predicate) => {
 // ------------------------------------------------------------------------------------------------
 exports.isEmpty = (prop) => {
   const strProp = JSON.stringify(prop)
-  return prop === '' || prop === '{}' || prop === '[]' || strProp === '{}' || strProp === '[]'
+  return prop == '' || prop == '{}' || prop == '[]' || strProp == '{}' || strProp == '[]'
 }
 
 /* 

@@ -78,7 +78,7 @@ exports.requireSubProperty = (obj, prop, subProp, enumProp, enumVal) => {
   } else {
     // Enum conditional check: if prop is defined and enumProp is set to enumVal, subProp must be defined !
     if (objProp[enumProp] === enumVal) {
-      // log.d(mod, fun, `obj.${prop}.${enumProp} == ${enumVal}`)
+      // log.d(mod, fun, `obj.${prop}.${enumProp} === ${enumVal}`)
       if (utils.isNothing(objProp[subProp])) {
         const errMsg = msg.subPropNeededWhenPropSetToEnum(prop, subProp, enumProp, enumVal)
         // log.e(mod, fun, errMsg)
@@ -90,7 +90,7 @@ exports.requireSubProperty = (obj, prop, subProp, enumProp, enumVal) => {
       log.d(
         mod,
         fun,
-        `obj.${prop}.${enumProp} == ${this.beautify(objProp[enumProp])} != ${enumVal}`
+        `obj.${prop}.${enumProp} === ${this.beautify(objProp[enumProp])} != ${enumVal}`
       )
     }
   }

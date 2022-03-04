@@ -177,7 +177,7 @@ LogEntry.createSearchIndexes = async () => {
     const indexes = await collection.getIndexes()
     await Promise.all(
       Object.entries(indexes).map(async (key) => {
-        if (key == `${SEARCH_INDEX},_fts,text,_ftsx,1`) await collection.dropIndex(SEARCH_INDEX)
+        if (key === `${SEARCH_INDEX},_fts,text,_ftsx,1`) await collection.dropIndex(SEARCH_INDEX)
       })
     )
     // (Re)creating the indexes

@@ -113,12 +113,13 @@ exports.makeSearchable = async (Model) => {
     }
     if (!collection) {
       log.d(mod, fun, `No collection for '${Model.name}`)
+      return
     }
     const listFields = Model.getSearchableFields()
     if (!listFields) {
       log.d(mod, fun, `No searchable fields for '${Model.name}`)
     }
-    // Preparing the 'text' (== searchable) indexes
+    // Preparing the 'text' (=== searchable) indexes
     const searchIndexes = {}
     listFields.map((field) => (searchIndexes[field] = 'text'))
 
@@ -131,16 +132,21 @@ exports.makeSearchable = async (Model) => {
     // log.d(mod, fun, utils.beautify(searchIndexes))
 
     // Dropping current text indexes if they exist
-    const indexes = await collection.getIndexes()
-    await Promise.all(
-      Object.entries(indexes).map(async (key) => {
-        // log.d(mod, fun, `${collection.name} - ${index}: ${key}`)
-        if (key == `${SEARCH_INDEX},_fts,text,_ftsx,1`) {
-          log.t(mod, fun, `Dropping search indexes for '${collection.name}'`)
-          collection.dropIndex(SEARCH_INDEX)
-        }
-      })
-    )
+    try {
+      const indexes = await collection.getIndexes()
+      await Promise.all(
+        Object.entries(indexes).map(async (key) => {
+          // log.d(mod, fun, `${collection.name} - ${index}: ${key}`)
+          if (key === `${SEARCH_INDEX},_fts,text,_ftsx,1`) {
+            log.t(mod, fun, `Dropping search indexes for '${collection.name}'`)
+            collection.dropIndex(SEARCH_INDEX)
+          }
+        })
+      )
+    } catch (er) {
+      if (er.codeName === 'NamespaceNotFound') log.v(mod, fun, 'Not dropping inexistant indexes')
+      else log.w(mod, fun, er) // throw er?
+    }
     // (Re)creating the indexes
     log.t(mod, fun, `Creating search indexes for collection '${collection.name}'`)
     await collection.createIndex(searchIndexes, indexOpts)

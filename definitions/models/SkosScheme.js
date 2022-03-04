@@ -49,7 +49,7 @@ const SkosSchemeSchema = new mongoose.Schema(
 
     /**
      * Short abstract code / simple name for the concept scheme
-     * == <#CONCEPT_LABEL> a skos:Concept
+     * === <#CONCEPT_LABEL> a skos:Concept
      */
     scheme_code: {
       type: String,

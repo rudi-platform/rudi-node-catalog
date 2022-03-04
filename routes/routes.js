@@ -206,59 +206,6 @@ exports.publicRoutes = [
     handler: sysController.getApiVersion,
     config: { [ROUTE_NAME]: PUB_GET_API_VERSION },
   },
-  /*
-   * @oas [get] /api/admin/hash
-   * scope: public
-   * description: 'Get current git hash'
-   * responses:
-   *   '200':
-   *     description: 'The API version'
-   *     content:
-   *       'text/plain; charset=utf-8':
-   *         schema:
-   *           type: 'string'
-   *         examples:
-   *           'gitHash':
-   *              value: '0e636d4'
-   */
-  {
-    method: HTTP_METHODS.GET,
-    url: `${URL_PV_GIT_HASH_ACCESS}`,
-    handler: sysController.getGitHash,
-    config: { [ROUTE_NAME]: DEV_GET_GIT_HASH },
-  },
-  /*
-   * @oas [get] /api/admin/apphash
-   * scope: public
-   * description: 'Get current git hash from the running application'
-   * responses:
-   *   '200':
-   *     description: 'The API version'
-   *     content:
-   *       'text/plain; charset=utf-8':
-   *         schema:
-   *           type: 'string'
-   *         examples:
-   *           'appHash':
-   *              value: '0e636d4'
-   */
-  {
-    method: HTTP_METHODS.GET,
-    url: `${URL_PV_APP_HASH_ACCESS}`,
-    handler: sysController.getAppHash,
-    config: { [ROUTE_NAME]: DEV_GET_APP_HASH },
-  },
-  /*
-   * @oas [get] /api/admin/env
-   * scope: public
-   * description: 'Get environment version of the running application'
-   */
-  {
-    method: HTTP_METHODS.GET,
-    url: `${URL_PV_APP_ENV_ACCESS}`,
-    handler: sysController.getEnvironment,
-    config: { [ROUTE_NAME]: DEV_GET_APP_ENV },
-  },
 
   // redirection: GET /api -> GET /api/v1/resources
   {
@@ -374,6 +321,64 @@ exports.portalRoutes = [
 // ------------------------------------------------------------------------------------------------
 // Private routes
 // ------------------------------------------------------------------------------------------------
+/**
+ * Routes that don't need a JWT check (to be accessed by internal programs)
+ */
+exports.unrestrictedPrivateRoutes = [
+  /*
+   * @oas [get] /api/admin/hash
+   * scope: public
+   * description: 'Get current git hash'
+   * responses:
+   *   '200':
+   *     description: 'The API version'
+   *     content:
+   *       'text/plain; charset=utf-8':
+   *         schema:
+   *           type: 'string'
+   *         examples:
+   *           'gitHash':
+   *              value: '0e636d4'
+   */
+  {
+    method: HTTP_METHODS.GET,
+    url: `${URL_PV_GIT_HASH_ACCESS}`,
+    handler: sysController.getGitHash,
+    config: { [ROUTE_NAME]: DEV_GET_GIT_HASH },
+  },
+  /*
+   * @oas [get] /api/admin/apphash
+   * scope: public
+   * description: 'Get current git hash from the running application'
+   * responses:
+   *   '200':
+   *     description: 'The API version'
+   *     content:
+   *       'text/plain; charset=utf-8':
+   *         schema:
+   *           type: 'string'
+   *         examples:
+   *           'appHash':
+   *              value: '0e636d4'
+   */
+  {
+    method: HTTP_METHODS.GET,
+    url: `${URL_PV_APP_HASH_ACCESS}`,
+    handler: sysController.getAppHash,
+    config: { [ROUTE_NAME]: DEV_GET_APP_HASH },
+  },
+  /*
+   * @oas [get] /api/admin/env
+   * scope: public
+   * description: 'Get environment version of the running application'
+   */
+  {
+    method: HTTP_METHODS.GET,
+    url: `${URL_PV_APP_ENV_ACCESS}`,
+    handler: sysController.getEnvironment,
+    config: { [ROUTE_NAME]: DEV_GET_APP_ENV },
+  },
+]
 exports.backOfficeRoutes = [
   // ------------------------------------------------------------------------------------------------
   // Generic routes for accessing any object

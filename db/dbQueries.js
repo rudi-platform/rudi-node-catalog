@@ -222,7 +222,7 @@ exports.getMetadataFieldsWithObjectType = (objectType) => {
   const fun = 'getMetadataFieldsWithObjectType'
   assertIsString(fun, objectType)
 
-  if (objectType == OBJ_METADATA) return null
+  if (objectType === OBJ_METADATA) return null
 
   switch (objectType) {
     case OBJ_ORGANIZATIONS:
@@ -769,6 +769,7 @@ exports.getMetadataListAndCount = async (options) => {
 }
 
 const MDB_ERR_NO_INDEX = `Error 500 (${MONGO_ERROR}): text index required for $text query`
+const MDB_ERR_MSG_NO_INDEX = `text index required for $text query`
 exports.searchObjects = async (objectType, options) => {
   const fun = 'searchObjects'
   try {
@@ -796,24 +797,26 @@ exports.searchObjects = async (objectType, options) => {
         return await this.getObjectListAndCount(objectType, options)
       }
     } catch (err) {
-      if (err == MDB_ERR_NO_INDEX) {
+      // log.v(mod, fun, utils.beautify(err.message.substring(0, MDB_ERR_MSG_NO_INDEX.length)))
+      if (err.message?.substring(0, MDB_ERR_MSG_NO_INDEX.length) === MDB_ERR_MSG_NO_INDEX) {
         log.v(mod, fun, `No search index: let's recreate them`)
         const Model = this.getObjectModel(objectType)
         try {
           await Model.createSearchIndexes()
-        } catch (err) {
-          if (err == 'TypeError: Model.createSearchIndexes is not a function')
+        } catch (er) {
+          log.v(mod, fun, utils.beautify(er.message))
+          if (er == 'TypeError: Model.createSearchIndexes is not a function')
             throw new NotImplementedError(`Searching '${objectType}' is not yet implemented`)
 
           log.w(
             mod,
             fun,
-            `Couldn't create indexes for collection '${Model.collection.name}': ${err}`
+            `Couldn't create indexes for collection '${Model.collection.name}': ${er}`
           )
           throw new RudiError(`Couldn't create indexes`)
         }
         return await this.searchObjects(objectType, options)
-      } else if (`${err}`.substring(0, MDB_ERR_NO_INDEX.length) == MDB_ERR_NO_INDEX) {
+      } else if (`${err}`.substring(0, MDB_ERR_NO_INDEX.length) === MDB_ERR_NO_INDEX) {
         log.w(mod, fun, err)
         return { total: 0, items: [] }
       } else {
@@ -1149,7 +1152,7 @@ exports.deleteManyWithRudiIds = async (objectType, rudiIdList) => {
   // log.d(mod, fun, `conditions: ${conditions}`)
 
   // TODO: to be consolidated!
-  // if (typeof (conditions) == 'string')
+  // if (typeof (conditions) === 'string')
 
   if (!Array.isArray(rudiIdList)) {
     log.i(mod, fun, msg.parameterExpected(fun, 'rudiIdList'))

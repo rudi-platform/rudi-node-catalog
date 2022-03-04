@@ -520,7 +520,7 @@ exports.sendMetadataToPortal = async (metadataId) => {
     metadataClean[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = api.API_VERSION
     // MIME type: YAML
     metadataClean[API_MEDIA_PROPERTY].map((media) => {
-      if (media[API_MEDIA_TYPE] == MediaTypes.File && media[API_FILE_TYPE] == MIME_YAML) {
+      if (media[API_MEDIA_TYPE] === MediaTypes.File && media[API_FILE_TYPE] === MIME_YAML) {
         media[API_FILE_TYPE] = 'text/plain'
       }
     })

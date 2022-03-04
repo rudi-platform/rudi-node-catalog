@@ -28,7 +28,7 @@
   "homepage": "https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER",
   "license": "EUPL-1.2",
   "dependencies": {
-    "@aqmo.org/rudi_logger": "^1.1.1",
+    "@aqmo.org/rudi_logger": "^1.1.2",
     "axios": "^0.24.0",
     "date-and-time": "^2.2.1",
     "fastify": "^3.27.2",

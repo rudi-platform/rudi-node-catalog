@@ -322,7 +322,7 @@ exports.initFFLogger = () => {
 // exports.sysLogger = winston.createLogger(syslogOpts)
 function getRudiLoggerOptions() {
   var facility = 20
-  if (SYSLOG_FACILITY.substr(0, 5) == 'local') {
+  if (SYSLOG_FACILITY.substr(0, 5) === 'local') {
     facility = 16 + Number(SYSLOG_FACILITY.substr(5, 1))
   }
   var transports = 2

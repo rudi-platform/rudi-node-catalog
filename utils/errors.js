@@ -213,7 +213,7 @@ class RudiError extends Error {
           portalError.response.data.label
         )
       } else if (portalError.response && portalError.response.data) {
-        if (portalError.response.data.status == 401) {
+        if (portalError.response.data.status === 401) {
           log.d(mod, fun, `Portal error 401`)
           error = new UnauthorizedError('Credentials used for Portal are incorrect')
         } else {

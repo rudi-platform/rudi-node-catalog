@@ -49,13 +49,13 @@ const SkosConceptSchema = new mongoose.Schema(
 
     /**
      * Unique and permanent identifier for the concept in RUDI system (required)
-     * == skos:notation
+     * === skos:notation
      */
     concept_id: ids.UUIDv4,
 
     /**
      * Short abstract code / simple name for the concept
-     * == <#CONCEPT_LABEL> a skos:Concept
+     * === <#CONCEPT_LABEL> a skos:Concept
      */
     concept_code: {
       type: String,

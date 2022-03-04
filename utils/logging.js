@@ -239,7 +239,7 @@ exports.logMetadata = (metadata) => {
 exports.addLogEntry = async (logLvl, loc_module, loc_function, msg) => {
   const fun = 'addLogEntry'
   try {
-    if (!msg || msg === '') msg = '<-'
+    if (!msg || msg == '') msg = '<-'
     // utils.consoleLog(mod, fun, ``)
     const logInfo = makeLogInfo(logLvl, loc_module, loc_function, msg)
     const logEntry = await new LogEntry(logInfo)

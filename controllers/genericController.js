@@ -146,7 +146,7 @@ function cleanDate(inputDate) {
   if (cleanValue.match(new RegExp(/^[0-9]{13}$/))) return new Date(parseInt(cleanValue))
   try {
     const cleanDate = new Date(cleanValue)
-    if (cleanDate == 'Invalid Date')
+    if (cleanDate === 'Invalid Date')
       throw new BadRequestError(`Invalid date: '${inputDate} / ${cleanValue}'`)
     log.d(mod, fun, `clean date: ${cleanDate.toISOString()}`)
     return cleanDate
@@ -163,7 +163,7 @@ function cleanDateOperations(inputDateOperations) {
   for (const [operator, value] of Object.entries(inputDateOperations)) {
     // if (isObject(value)) { // case with
     //   for (const [op, val] of Object.entries(value)) {
-    //     if (op == '$and' || op == '$or') {
+    //     if (op === '$and' || op === '$or') {
     //       operations[op] = val.map(expr => )
     //     } else {
     //       log.w(mod, fun, `Operator '${op}' not recognized for dates comparisons`)

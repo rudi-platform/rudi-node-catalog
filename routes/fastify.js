@@ -26,6 +26,7 @@ const {
   portalRoutes,
   backOfficeRoutes,
   devRoutes,
+  unrestrictedPrivateRoutes,
 } = require('./routes')
 
 const { checkRudiProdPermission } = require('../controllers/tokenController')
@@ -263,10 +264,9 @@ async function onPrivateRoute(req, reply) {
     log.t(mod, fun, `${req.method} ${req.url} `)
     if (!shouldControlPrivateRequests()) return true
 
-    const context = CallContext.getCallContextFromReq(req)
-
     const { subject, clientId } = await checkRudiProdPermission(req, reply)
 
+    const context = CallContext.getCallContextFromReq(req)
     context.clientApp = subject
     context.reqUser = clientId
 
@@ -278,27 +278,31 @@ async function onPrivateRoute(req, reply) {
 }
 
 /**
- * Pre-handler for requests that need a "private" (aka rudi producer node)
- * authentification ("dev routes")
+ * Pre-handler for private requests that don't need an
+ * authentification ("unrestricted private routes")
  * These requests are normally not user driven actions, but sent by an app
  * such as the prodmanager
  * @param {object} req incoming request
  * @param {object} reply reply
  */
-async function onDevRoute(req, reply) {
-  const fun = 'onDevRoute'
+async function onUnrestrictedPrivateRoute(req, reply) {
+  const fun = 'onUnrestrictedPrivateRoute'
   try {
     log.t(mod, fun, `${req.method} ${req.url} `)
-    if (!shouldControlPrivateRequests()) return true
-
-    const { subject, clientId } = await checkRudiProdPermission(req, reply)
-
     const context = CallContext.getCallContextFromReq(req)
-    context.clientApp = subject
-    context.reqUser = clientId
 
-    context.logInfo('route', fun, 'API call')
-    return
+    try {
+      const { subject, clientId } = await checkRudiProdPermission(req, reply)
+
+      context.clientApp = subject
+      context.reqUser = clientId
+    } catch (er) {
+      // It's OK to have no token
+      log.t(mod, fun, `Token-less call to ${req.method} ${req.url} `)
+    } finally {
+      context.logInfo('route', fun, 'API call')
+      return true
+    }
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -327,8 +331,9 @@ function declareRouteGroup(routeGroup, preHandler, routeGroupName, logLevel) {
 // declareRouteGroup(redirectRoutes, onPortalRoute, 'Redirect', 'd')
 declareRouteGroup(publicRoutes, onPublicRoute, 'Public', 'i')
 declareRouteGroup(portalRoutes, onPortalRoute, 'Portal', 'v')
+declareRouteGroup(unrestrictedPrivateRoutes, onUnrestrictedPrivateRoute, 'Unrestricted', 'i')
 declareRouteGroup(backOfficeRoutes, onPrivateRoute, 'Private', 'd')
-declareRouteGroup(devRoutes, onDevRoute, 'Dev', 'v')
+declareRouteGroup(devRoutes, onPrivateRoute, 'Dev', 'v')
 
 // ------------------------------------------------------------------------------------------------
 // Exports

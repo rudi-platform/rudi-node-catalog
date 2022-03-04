@@ -114,7 +114,7 @@ exports.organizationRudiToDbFormat = async (rudiProducer, shouldCreateIfNotFound
   const fun = 'organizationRudiToDbFormat'
   try {
     log.t(mod, fun, ``)
-    if (rudiProducer == null) throw new ParameterExpectedError('rudiProducer', mod, fun)
+    if (!rudiProducer) throw new ParameterExpectedError('rudiProducer', mod, fun)
 
     let organizationDbId = await db.getOrganizationDbIdWithJson(rudiProducer)
     // log.d(mod, fun, `organizationDbId: -> ${organizationDbId} `)
@@ -141,7 +141,7 @@ exports.contactListRudiToDbFormat = async (rudiContactList, shouldCreateIfNotFou
   const fun = 'contactListRudiToDbFormat'
   try {
     log.t(mod, fun, ``)
-    if (rudiContactList == null) throw new ParameterExpectedError('rudiContactList', mod, fun)
+    if (!rudiContactList) throw new ParameterExpectedError('rudiContactList', mod, fun)
 
     const contactDbIds = []
     await Promise.all(
@@ -175,7 +175,7 @@ exports.mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFound) 
   try {
     log.t(mod, fun, ``)
     // log.d(mod, fun, `rudiMediaList: ${beautify(rudiMediaList)}`)
-    if (rudiMediaList == null) throw new ParameterExpectedError('rudiMediaList', mod, fun)
+    if (!rudiMediaList) throw new ParameterExpectedError('rudiMediaList', mod, fun)
 
     const mediaDbIds = []
     await Promise.all(
@@ -251,7 +251,7 @@ async function metadataCustomMerge(dbMetadata, dbReadyModMetadata) {
 exports.organizationDbToRudiFormat = async (producerDbId) => {
   const fun = 'organizationDbToRudiFormat'
   log.t(mod, fun, ``)
-  if (producerDbId == null) throw new ParameterExpectedError('producerDbId', mod, fun)
+  if (!producerDbId) throw new ParameterExpectedError('producerDbId', mod, fun)
 
   const dbOrganization = await db.getEnsuredOrganizationWithDbId(producerDbId)
   log.d(mod, fun, `dbOrganization -> ${beautify(dbOrganization)}`)
@@ -264,7 +264,7 @@ exports.contactListDbToRudiFormat = async (contactsDbIds) => {
   const fun = 'contactListDbToRudiFormat'
   log.t(mod, fun, ``)
   log.d(mod, fun, `contactsDbIds: ${beautify(contactsDbIds)}`)
-  if (contactsDbIds == null) throw new ParameterExpectedError('contactsDbIds', mod, fun)
+  if (!contactsDbIds) throw new ParameterExpectedError('contactsDbIds', mod, fun)
 
   const contacts = []
   await Promise.all(
@@ -310,7 +310,7 @@ const SHOULD_CREATE_IF_NOT_FOUND = true
  * Format a RUDI Metadata document (JSON):
  * @param rudiMetadata: the RUDI Metadata JSON object
  * @param shouldBeStrict: if required fields presence should be ensured (e.g. true for creation, false for update)
- * @param shouldClone: if original metadata should be cloned (== no more a db object)
+ * @param shouldClone: if original metadata should be cloned (=== no more a db object)
  */
 exports.rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
   const fun = 'rudiToDbFormat'
@@ -620,8 +620,7 @@ exports.overwriteMetadata = async (incomingRudiMetadata) => {
   try {
     log.t(mod, fun, ``)
 
-    if (incomingRudiMetadata == null)
-      throw new ParameterExpectedError('incomingRudiMetadata', mod, fun)
+    if (!incomingRudiMetadata) throw new ParameterExpectedError('incomingRudiMetadata', mod, fun)
     // log.d(mod, fun, `edited metadata: ${beautify(incomingRudiMetadata)}\n`)
 
     // ensure the metadata already exist
@@ -655,8 +654,7 @@ exports.updateMetadata = async (incomingRudiMetadata) => {
   try {
     log.t(mod, fun, ``)
 
-    if (incomingRudiMetadata == null)
-      throw new ParameterExpectedError('incomingRudiMetadata', mod, fun)
+    if (!incomingRudiMetadata) throw new ParameterExpectedError('incomingRudiMetadata', mod, fun)
     // log.d(mod, fun, `edited metadata: ${beautify(incomingRudiMetadata)}\n`)
 
     // ensure the metadata already exist
