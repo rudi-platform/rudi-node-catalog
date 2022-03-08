@@ -10,7 +10,7 @@ const mod = 'metaCtrl'
 // External dependancies
 // ------------------------------------------------------------------------------------------------
 const mongoose = require('mongoose')
-const { mergeWith } = require('lodash')
+const { mergeWith, pick } = require('lodash')
 
 // ------------------------------------------------------------------------------------------------
 // Internal dependancies
@@ -79,6 +79,11 @@ const {
   COUNT_LABEL,
   LIST_LABEL,
   QUERY_LIMIT,
+  QUERY_OFFSET,
+  QUERY_SORT_BY,
+  QUERY_FILTER,
+  QUERY_SEARCH_TERMS,
+  QUERY_COUNT_BY,
 } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
@@ -746,6 +751,47 @@ exports.sendToPortal = async (metadata) => {
 
     return await portalController.sendMetadataToPortal(metadataId)
     log.v(mod, fun, `Sent to portal: ${metadataId}`)
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+exports.searchMetadata = async (req, reply) => {
+  const fun = 'searchMetadata'
+  try {
+    let parsedParameters
+    try {
+      parsedParameters = await genericController.parseQueryParameters(OBJ_METADATA, req.url)
+    } catch (err) {
+      log.w(mod, fun, err)
+      return []
+    }
+
+    // If there w
+    if (isEmptyArray(parsedParameters)) {
+      log.w(mod, fun, 'No search parameters given')
+      return []
+    } else {
+      log.i(mod, fun, `Parsed parameters: ${beautify(parsedParameters)}`)
+    }
+
+    const options = pick(parsedParameters, [
+      QUERY_LIMIT,
+      QUERY_OFFSET,
+      QUERY_SORT_BY,
+      QUERY_FILTER,
+      QUERY_FIELDS,
+      QUERY_SEARCH_TERMS,
+      QUERY_COUNT_BY,
+    ])
+    const objectList = await db.searchObjects(OBJ_METADATA, options)
+
+    // return the object
+
+    // const context = CallContext.getCallContextFromReq(req)
+    // if (context) context.addObjId(objectType, objectId)
+
+    return objectList
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }

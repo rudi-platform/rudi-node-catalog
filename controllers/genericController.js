@@ -30,6 +30,26 @@ const {
   isEmptyArray,
 } = require('../utils/jsUtils')
 
+const {
+  NotFoundError,
+  ForbiddenError,
+  ObjectNotFoundError,
+  BadRequestError,
+  ParameterExpectedError,
+  RudiError,
+} = require('../utils/errors')
+
+const { CallContext } = require('../definitions/constructors/callContext')
+
+// ------------------------------------------------------------------------------------------------
+// Specific controllers
+// ------------------------------------------------------------------------------------------------
+const { newMetadata, overwriteMetadata } = require('../controllers/metadataController')
+const { newOrganization } = require('../controllers/organizationController')
+const { newContact } = require('../controllers/contactController')
+const { newSkosConcept, newSkosScheme } = require('./skosController')
+const { deletePortalMetadata } = require('./portalController')
+
 // ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
@@ -41,8 +61,8 @@ const {
   OBJ_ORGANIZATIONS,
   OBJ_CONTACTS,
   OBJ_MEDIA,
-  OBJ_SKOS_CONCEPTS: OBJ_SKOS_CONCEPT,
-  OBJ_SKOS_SCHEMES: OBJ_SKOS_SCHEME,
+  OBJ_SKOS_CONCEPTS,
+  OBJ_SKOS_SCHEMES,
   ACT_DELETION,
   ACT_SEARCH,
   PARAM_ID,
@@ -97,27 +117,6 @@ const {
   API_KEYWORDS_PROPERTY,
 } = require('../db/dbFields')
 
-// ------------------------------------------------------------------------------------------------
-// Specific controllers
-// ------------------------------------------------------------------------------------------------
-const metadataController = require('../controllers/metadataController')
-const organizationController = require('../controllers/organizationController')
-const contactController = require('../controllers/contactController')
-const skosController = require('./skosController')
-const { deletePortalMetadata } = require('./portalController')
-const {
-  NotFoundError,
-  ForbiddenError,
-  ObjectNotFoundError,
-  BadRequestError,
-  ParameterExpectedError,
-  RudiError,
-} = require('../utils/errors')
-const { CallContext } = require('../definitions/constructors/callContext')
-
-// ------------------------------------------------------------------------------------------------
-// Specific object type helper functions
-// ------------------------------------------------------------------------------------------------
 const QUERY_RESERVED_WORDS = [
   QUERY_LIMIT,
   QUERY_OFFSET,
@@ -138,6 +137,10 @@ const EXT_REFS = 'external_references' // External references needing aggregatio
 const EXT_OBJ = 'refObj'
 const EXT_OBJ_PROP = 'refObjProp'
 const EXT_OBJ_VAL = 'refObjVal'
+
+// ------------------------------------------------------------------------------------------------
+// Specific object type helper functions
+// ------------------------------------------------------------------------------------------------
 
 function cleanDate(inputDate) {
   const fun = 'cleanDate'
@@ -453,16 +456,16 @@ async function newObject(objectType, objectData) {
 
     switch (objectType) {
       case OBJ_METADATA:
-        return await metadataController.newMetadata(objectData)
+        return await newMetadata(objectData)
       case OBJ_ORGANIZATIONS:
-        return await organizationController.newOrganization(objectData)
+        return await newOrganization(objectData)
       case OBJ_CONTACTS:
-        return await contactController.newContact(objectData)
-      case OBJ_SKOS_CONCEPT:
-        return await skosController.newSkosConcept(objectData)
-      case OBJ_SKOS_SCHEME:
+        return await newContact(objectData)
+      case OBJ_SKOS_CONCEPTS:
+        return await newSkosConcept(objectData)
+      case OBJ_SKOS_SCHEMES:
         // Custom creation to create the children scheme concepts
-        return await skosController.newSkosScheme(objectData)
+        return await newSkosScheme(objectData)
       default:
         throw new NotFoundError(msg.objectTypeNotFound(objectType))
     }
@@ -775,7 +778,7 @@ exports.updateSingleObject = async (req, reply) => {
 
     if (objectType === OBJ_METADATA) {
       if (context) context.addMetaId(rudiId)
-      return await metadataController.overwriteMetadata(updateData)
+      return await overwriteMetadata(updateData)
     } else {
       if (context) context.addObjId(objectType, rudiId)
       return await db.overwriteObject(objectType, updateData)
@@ -812,7 +815,7 @@ exports.upsertSingleObject = async (req, reply) => {
     } else {
       if (objectType === OBJ_METADATA) {
         if (context) context.addMetaId(rudiId)
-        return await metadataController.overwriteMetadata(updateData)
+        return await overwriteMetadata(updateData)
       } else {
         if (context) context.addObjId(objectType, rudiId)
         return await db.overwriteObject(objectType, updateData)

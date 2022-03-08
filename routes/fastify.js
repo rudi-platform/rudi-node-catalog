@@ -21,7 +21,6 @@ const { RudiError } = require('../utils/errors')
 const { CallContext } = require('../definitions/constructors/callContext')
 
 const {
-  redirectRoutes,
   publicRoutes,
   portalRoutes,
   backOfficeRoutes,

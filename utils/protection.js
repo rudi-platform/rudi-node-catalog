@@ -11,7 +11,7 @@ const mod = 'protect'
 // ------------------------------------------------------------------------------------------------
 const { HEADERS, HD_AUTH, HD_URL, HD_AUTH_LOWER, HD_METHOD } = require('../config/headers')
 const REQ_AUTH_MAX_LENGTH = 1000
-const REQ_URL_MAX_LENGTH = 400
+const REQ_URL_MAX_LENGTH = 200
 
 exports.getUrlMaxLength = () => REQ_URL_MAX_LENGTH
 // ------------------------------------------------------------------------------------------------

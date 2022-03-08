@@ -5,10 +5,13 @@
 These routes are accessible from the internet, and especially the Portal:
 
 - `GET /api/v1/resources`
-  - returns a JSON with a property `total` that gives the total number of elements on the producer node and a property `items` that lists a portion of the total set
-  - can be used of the optional parameters bellow can refine such request
+  - Returns a JSON with a property `total` that gives the total number of elements on the producer node and a property `items` that lists a portion of the total set
+  - Can be used of the optional parameters bellow can refine such request
 - `GET /api/v1/resources/:id`
-  - returns the metadata for the identified resource
+  - Returns the metadata for the identified resource
+- `GET /api/v1/resources/search`
+  - Returns the list of objects the fields of which contains the terms given as parameters
+  - Ex: `GET /api/admin/resources/search?velo` will give all the metadata for which the term `velo` or `vélo` can be found in the fields `resource_title`, `synopsis` or `summary`
 
 ### Redirected routes
 

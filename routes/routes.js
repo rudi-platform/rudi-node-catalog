@@ -82,6 +82,7 @@ const PUB_GET_FAVICON = 'pub_get_favicon'
 const PUB_GET_API_VERSION = 'pub_get_api_version'
 const PUB_GET_ALL_METADATA = 'pub_get_all_metadata'
 const PUB_GET_ONE_METADATA = 'pub_get_one_metadata'
+const PUB_RCH_OBJ = 'pub_rch_obj'
 
 const PORTAL_UPSERT_ONE_REPORT = 'portal_upsert_one_report'
 const PORTAL_GET_ALL_OBJ_REPORT = 'portal_get_all_obj_report'
@@ -182,6 +183,15 @@ exports.publicRoutes = [
     config: { [ROUTE_NAME]: PUB_GET_ONE_METADATA },
   },
 
+  /**
+   * Search objects
+   */
+  {
+    method: HTTP_METHODS.GET,
+    url: `${URL_PUB_METADATA}/${ACT_SEARCH}`,
+    handler: metadataController.searchMetadata,
+    config: { [ROUTE_NAME]: PUB_RCH_OBJ },
+  },
   /*
    * @oas [get] /api/version
    * tags:
