@@ -2049,12 +2049,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?limit=10",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?limit=10",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"{{adminUrl}}",
 								"{{data}}"
 							],
 							"query": [
