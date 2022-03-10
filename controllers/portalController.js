@@ -6,7 +6,6 @@ const mod = 'portalCtrl'
 // ------------------------------------------------------------------------------------------------
 // External dependancies
 // ------------------------------------------------------------------------------------------------
-const { readFileSync } = require('fs')
 const { parseKey } = require('sshpk')
 const axios = require('axios')
 
