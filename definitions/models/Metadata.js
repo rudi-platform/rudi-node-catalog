@@ -656,12 +656,18 @@ async function checkThesaurus(metadata) {
     // log.d(mod, fun, `keywords: ${utils.beautify(keywords)}`)
 
     await Promise.all(
-      keywords.map((keyword) => {
+      keywords.map((keyword, index) => {
         // log.d(mod, fun, `keyword: ${keyword}`)
         Keywords.isValid(keyword, true)
           .then((resolve) => {
-            if (resolve) return true
-            else throw new BadRequestError(msg.incorrectVal(API_KEYWORDS_PROPERTY, keyword))
+            if (resolve) {
+              if (keyword !== keyword.trim()) {
+                metadata[API_KEYWORDS_PROPERTY][index] = keyword.trim()
+              }
+              return true
+            } else {
+              throw new BadRequestError(msg.incorrectVal(API_KEYWORDS_PROPERTY, keyword))
+            }
           })
           .catch((err) => {
             // log.w(mod, fun, err)

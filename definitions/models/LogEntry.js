@@ -41,7 +41,7 @@ const { PARAM_THESAURUS_LANG } = require('../../config/confApi')
 // ------------------------------------------------------------------------------------------------
 const LogEntrySchema = new Schema(
   {
-    // Unique and permanent identifier for the log entry (required)
+    /** Unique and permanent identifier for the log entry (required) */
     [LOG_ID]: {
       type: String,
       default: v4,
@@ -52,36 +52,38 @@ const LogEntrySchema = new Schema(
       match: VALID_UUID,
     },
 
-    // Epoch time of the event in ms
+    /** Epoch time of the event in ms */
     [LOG_TIME]: {
       type: Number,
       default: Date.now,
+      required: true,
       match: VALID_EPOCH_MS,
       index: true,
     },
 
-    // Log message
+    /** Message that describes the event */
     [LOG_MSG]: {
       type: String,
       required: true,
     },
 
-    // log level
+    /** Log level */
     [LOG_LVL]: {
       type: String,
       required: true,
     },
 
-    // Module/file where the log is coming from
+    /** Module/file the log is coming from */
     [LOG_MOD]: {
       type: String,
     },
 
-    // Function where the log is coming from
+    /** Function the log is coming from */
     [LOG_FUN]: {
       type: String,
     },
 
+    /** User identified for the request */
     [LOG_USR]: {
       type: String,
     },

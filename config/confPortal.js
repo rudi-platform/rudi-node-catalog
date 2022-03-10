@@ -110,6 +110,7 @@ exports.shouldControlExtRequest = () => SHOULD_CONTROL_EXT_REQUESTS
 
 // ----- API
 const API_PORTAL_URL = getPortalIniValue(PORTAL_SECTION, 'portal_url')
+
 const API_GET_URL = getPortalIniValue(PORTAL_SECTION, 'get_url')
 const API_SEND_URL = getPortalIniValue(PORTAL_SECTION, 'put_url')
 
