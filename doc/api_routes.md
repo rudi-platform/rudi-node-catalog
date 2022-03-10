@@ -2,6 +2,8 @@
 
 ## Public routes in RUDI Producer node API (no authentification required)
 
+See the [OpenAPI description](https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER).
+
 These routes are accessible from the internet, and especially the Portal:
 
 - `GET /api/v1/resources`
@@ -63,6 +65,8 @@ https://data-rudi.aqmo.org/api/v1/resources?limit=10&fields=global_id,resource_t
 `GET` routes can be used with optional parameters and filters described above for public routes.
 
 ## Rudi prod authentification required, action on objects
+
+See the [OpenAPI description](https://app.swaggerhub.com/apis/OlivierMartineau/RudiProducer-PrivateAPI).
 
 - `POST /api/admin/:object`
   - Create object ( = resources | organization | contact | report)
