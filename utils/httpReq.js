@@ -41,7 +41,7 @@ exports.httpGet = async (destUrl, authorizationToken) => {
     if (authorizationToken) reqOpts.headers.Authorization = `Bearer ${authorizationToken}`
 
     const answer = await this.directGet(destUrl, reqOpts)
-    log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
+    // log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
     return answer.data
   } catch (err) {
     throw RudiError.treatCommunicationError(mod, fun, err)

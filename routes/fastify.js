@@ -206,13 +206,17 @@ async function onPublicRoute(req, reply) {
       const portalJwt = await checkPortalTokenInHeader(req, reply)
       const jwtPayload = portalJwt[1]
       // log.d(mod, fun, `Payload: ${beautify(jwtPayload)}`)
-
-      const context = CallContext.getCallContextFromReq(req)
       context.clientApp = jwtPayload[JWT_SUB] || 'RUDI Portal'
       context.reqUser = jwtPayload[JWT_USER] || jwtPayload[JWT_CLIENT]
     } catch (er) {
-      // It's OK to have no token
-      log.t(mod, fun, `Token-less call to ${req.method} ${req.url} `)
+      try {
+        const { subject, clientId } = await checkRudiProdPermission(req, reply)
+        context.clientApp = subject
+        context.reqUser = clientId
+      } catch {
+        // It's OK to have no token
+        log.t(mod, fun, `Token-less call to ${req.method} ${req.url} `)
+      }
     } finally {
       context.logInfo('route', fun, 'API call')
       return true

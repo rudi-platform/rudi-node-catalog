@@ -208,30 +208,39 @@ exports.deleteMetadata = async (req, reply) => {
 // ------------------------------------------------------------------------------------------------
 // Portal calls: GET public key
 // ------------------------------------------------------------------------------------------------
-
+let cachedPortalPubKey
 // ----- GET Portal public key
-exports.getPortalPublicKey = () => {
+exports.getPortalPublicKey = async () => {
   const fun = 'getPortalPublicKey'
-  log.t(mod, fun, ``)
+  try {
+    log.t(mod, fun, ``)
+    if (cachedPortalPubKey) return cachedPortalPubKey
 
-  const publicKeyObj = this.PUBLIC_KEY_URL ? httpGet(this.PUBLIC_KEY_URL) : null
-  const publicKey = publicKeyObj ? publicKeyObj.value : null
+    const publicKeyUrl = portal.getPortalPubKeyUrl()
+    log.d(mod, fun, 'publicKeyUrl: ' + publicKeyUrl)
 
-  log.d(mod, fun, `publicKey: ${publicKey}`)
+    const publicKeyObj = await httpGet(publicKeyUrl)
+    // log.d(mod, fun, 'publicKeyObj: ' + publicKeyObj)
+    const publicKey = publicKeyObj ? publicKeyObj.value : null
+    // log.d(mod, fun, 'publicKey: ' + publicKey)
+
+    cachedPortalPubKey = publicKey
+    return cachedPortalPubKey
+    log.d(mod, fun, `publicKey: ${publicKey}`)
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
 }
 
 // ------------------------------------------------------------------------------------------------
 // Portal calls: token
 // ------------------------------------------------------------------------------------------------
-
 exports.getNewTokenFromPortal = async () => {
   const fun = 'getNewTokenFromPortal'
   log.t(mod, fun, ``)
   try {
     const [usr, pwdb64] = portal.getCredentials()
     const portalAuthUrl = portal.getAuthUrl()
-    log.d(mod, fun, `portal URL: ${portalAuthUrl}`)
-
     // LM -- the password is now provided in base64
     const pwd = utils.decodeBase64(pwdb64)
     // log.d(mod, fun, `pwdb64: ${pwdb64}`)
@@ -282,7 +291,7 @@ exports.getNewTokenFromPortal = async () => {
 
       // log.d(mod, fun, `portalToken: ${utils.beautify(portalToken)}`)
 
-      const jwtBody = this.verifyPortalToken(jwToken)[1]
+      const jwtBody = (await this.verifyPortalToken(jwToken))[1]
       portalToken[JWT_EXP] = jwtBody[JWT_EXP]
       log.d(
         mod,
@@ -312,8 +321,8 @@ exports.getNewTokenFromPortal = async () => {
 
 exports.getTokenCheckedByPortal = async (token) => {
   const fun = 'getTokenCheckedByPortal'
-  log.t(mod, fun, ``)
   try {
+    log.t(mod, fun, ``)
     if (!token) throw new BadRequestError('No token to check!')
     const portalUrl = portal.getCheckAuthUrl()
 
@@ -388,22 +397,21 @@ jwtBody = {
     }
   }
  */
-exports.checkSignatureWithPubKey = (accessToken) => {
+exports.checkSignatureWithPubKey = async (accessToken) => {
   const fun = 'checkSignatureWithPubKey'
-  log.t(mod, fun, ``)
-
   try {
+    log.t(mod, fun, ``)
+
     if (!accessToken) throw new BadRequestError('No token = no signature to check!')
     const [jwtHeaderBase64url, jwtPayloadBase64url, jwtSignatureBase64url] = accessToken.split('.')
 
     // Retrieve the public key
     let pubKeyPem
     try {
-      pubKeyPem = readFileSync(portal.getPubKeyFile(), 'ascii')
+      pubKeyPem = await this.getPortalPublicKey()
     } catch (err) {
-      throw new InternalServerError(`The file with the Portal public key can't be accessed: ${err}`)
+      throw new InternalServerError(`Couldn't retrieve online portal public key: ${err}`)
     }
-
     let sslKey
     try {
       sslKey = parseKey(pubKeyPem)
@@ -435,7 +443,7 @@ exports.checkSignatureWithPubKey = (accessToken) => {
   }
 }
 
-exports.verifyPortalToken = (accessToken) => {
+exports.verifyPortalToken = async (accessToken) => {
   const fun = 'verifyPortalToken'
   log.t(mod, fun, ``)
 
@@ -474,7 +482,7 @@ exports.verifyPortalToken = (accessToken) => {
     // log.d(mod, fun, `jwtPayload: ${utils.beautify(jwtPayload)}`)
 
     // Check JWT signature
-    if (!this.checkSignatureWithPubKey(accessToken))
+    if (!(await this.checkSignatureWithPubKey(accessToken)))
       throw new ForbiddenError('Portal JWT signature is not valid')
 
     // log.d(mod, fun, `jwtHeader: ${utils.beautify(jwtHeader)}`)
@@ -494,6 +502,7 @@ exports.sendMetadataToPortal = async (metadataId) => {
   const fun = 'sendMetadataToPortal'
   try {
     log.t(mod, fun, ``)
+    if (portal.isPortalConnectionDisabled()) return
 
     //--- Check input param
     if (!metadataId) throw new NotImplementedError('Not yet implemented')

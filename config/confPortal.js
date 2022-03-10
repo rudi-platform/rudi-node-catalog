@@ -81,17 +81,9 @@ const AUTH_GET = getPortalIniValue(PORTAL_SECTION, 'auth_get')
 const AUTH_CHK = getPortalIniValue(PORTAL_SECTION, 'auth_chk')
 const PUB_KEY_URL = getPortalIniValue(PORTAL_SECTION, 'auth_pub')
 
-const PUB_KEY_FILE = getPortalIniValue(
-  PORTAL_SECTION,
-  'path_portal_pub',
-  undefined,
-  PORTAL_CUSTOM_CONF_FILE
-)
-
 exports.getAuthUrl = () => `${AUTH_URL}/${AUTH_GET}`
 exports.getCheckAuthUrl = () => `${AUTH_URL}/${AUTH_CHK}`
-exports.getAuthPub = () => `${AUTH_URL}/${PUB_KEY_URL}`
-exports.getPubKeyFile = () => PUB_KEY_FILE
+exports.getPortalPubKeyUrl = () => `${AUTH_URL}/${PUB_KEY_URL}`
 
 // ----- Creds
 const isPwdClear = getPortalIniValue(PORTAL_SECTION, 'is_pwd_clear')
@@ -109,10 +101,13 @@ exports.getCredentials = () => [LOGIN, PASSW_B64]
 exports.shouldControlExtRequest = () => SHOULD_CONTROL_EXT_REQUESTS
 
 // ----- API
-const API_PORTAL_URL = getPortalIniValue(PORTAL_SECTION, 'portal_url')
+const API_PORTAL_URL = getPortalIniValue(PORTAL_SECTION, 'portal_url', false)
+exports.isPortalConnectionDisabled = () => {
+  return !API_PORTAL_URL
+}
 
-const API_GET_URL = getPortalIniValue(PORTAL_SECTION, 'get_url')
-const API_SEND_URL = getPortalIniValue(PORTAL_SECTION, 'put_url')
+const API_GET_URL = getPortalIniValue(PORTAL_SECTION, 'get_url', '')
+const API_SEND_URL = getPortalIniValue(PORTAL_SECTION, 'put_url', '')
 
 exports.getPortalMetaUrl = (id) =>
   !id
@@ -141,7 +136,7 @@ exports.apiGetOptions = (id) => {
     protocol: API_GET_PROTOCOL,
     hostname: API_GET_HOST,
     port: API_GET_PORT,
-    path: API_GET_PATH.replace(/{{id}}/, id),
+    path: API_GET_PATH?.replace(/{{id}}/, id),
   }
 }
 

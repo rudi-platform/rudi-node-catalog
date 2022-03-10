@@ -110,6 +110,7 @@ const {
   RudiError,
 } = require('../utils/errors')
 const { CallContext } = require('../definitions/constructors/callContext')
+const { isPortalConnectionDisabled } = require('../config/confPortal')
 
 // ------------------------------------------------------------------------------------------------
 // Atomic treatments of properties: RUDI -> DB
@@ -740,6 +741,8 @@ exports.sendManyMetadataToPortal = async (req) => {
 exports.sendToPortal = async (metadata) => {
   const fun = 'sendToPortal'
   try {
+    if (isPortalConnectionDisabled()) return
+
     // If 'collection_tag' property is set, we don't send the metadata to the Portal
     const metadataId = metadata[API_METADATA_ID]
     const collectionTag = metadata[API_COLLECTION_TAG]

@@ -114,7 +114,7 @@ const DEV_GET_ALL_LICENCE_CODES = 'dev_get_all_licence_codes'
 const DEV_INIT_LICENCES = 'dev_init_licences'
 const DEV_INIT_WITH_ODR = 'dev_init_with_odr'
 const DEV_GENERATE_UUID = 'dev_generate_uuid'
-const DEV_EXPOSED_GET_PORTAL_TOKEN = 'dev_exposed_get_portal_token'
+const DEV_GET_PORTAL_TOKEN = 'dev_get_portal_token'
 const DEV_CHECK_STORED_TOKEN = 'dev_check_stored_token'
 const DEV_GET_PORTAL_METADATA = 'dev_get_portal_metadata'
 const DEV_SEND_METADATA_TO_PORTAL = 'dev_send_metadata_to_portal'
@@ -619,7 +619,7 @@ exports.devRoutes = [
     method: HTTP_METHODS.GET,
     url: `${URL_PV_PORTAL_PREFIX}/${URL_SUFFIX_TOKEN_GET}`,
     handler: portalController.exposedGetPortalToken,
-    config: { [ROUTE_NAME]: DEV_EXPOSED_GET_PORTAL_TOKEN },
+    config: { [ROUTE_NAME]: DEV_GET_PORTAL_TOKEN },
   },
   // Get a token checked by the Portal
   {
