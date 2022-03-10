@@ -57,93 +57,6 @@ paths:
   #=============================================================================
   # Private API: access to RUDI objects
   #=============================================================================
-  '/api/admin/{object}/{id}':
-    summary: Access a designated RUDI object
-    parameters:
-      - name: 'object'
-        description: >
-          A RUDI Object:
-          - resources (metadata)
-          - organizations (data/metadata producer/provider)
-          - contacts
-          - media (file, or stream)
-          - logs
-        in: path
-        required: true
-        schema:
-          type: string
-          enum:
-            [
-              'resources',
-              'organizations',
-              'contacts',
-              'media',
-              'reports',
-              'logs',
-              'skos_schemes',
-              'skos_concepts',
-            ]
-      - name: 'id'
-        description: Unique id of the resource
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-    'get':
-      tags:
-        - RudiObject
-      description: Returns a designated RUDI object
-      operationId: getSingleObject
-      security:
-        - authRudi: [backadmin]
-      responses:
-        '200':
-          description: a designated RUDI object
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RudiObject'
-        '400':
-          $ref: '#/components/responses/Error400BadRequest'
-        '401':
-          $ref: '#/components/responses/Error401Unauthorized'
-        '403':
-          $ref: '#/components/responses/Error403Forbidden'
-        '404':
-          $ref: '#/components/responses/Error404NotFound'
-        '500':
-          $ref: '#/components/responses/Error500InternalServerError'
-        '503':
-          $ref: '#/components/responses/Error503ServiceUnavailable'
-    'delete':
-      tags:
-        - RudiObject
-      description: Delete a designated RUDI object
-      operationId: deleteSingleObject
-      security:
-        - authRudi: [backadmin]
-      responses:
-        '200':
-          description: the designated RUDI object
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RudiObject'
-        '400':
-          $ref: '#/components/responses/Error400BadRequest'
-        '401':
-          $ref: '#/components/responses/Error401Unauthorized'
-        '403':
-          $ref: '#/components/responses/Error403Forbidden'
-        '404':
-          $ref: '#/components/responses/Error404NotFound'
-        '500':
-          $ref: '#/components/responses/Error500InternalServerError'
-        '503':
-          $ref: '#/components/responses/Error503ServiceUnavailable'
-
-  #=============================================================================
   '/api/admin/{object}':
     summary: Access a list of RUDI object of a designated type
     parameters:
@@ -172,7 +85,8 @@ paths:
             ]
     'get':
       summary: Access a list of RUDI object of a designated type
-      description: Returns an array of RUDI objects of a designated type
+      description: Returns an array of RUDI objects of a designated type. The
+        notation '?a_field=value' can be used in the url to filter the results
       tags:
         - RudiObject
       operationId: getObjectList
@@ -252,6 +166,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RudiObject'
+      responses:
+        '200':
+          description: a designated RUDI object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RudiObject'
+
     #=============================================================================
     #'/api/admin/{object}':
     'put':
@@ -267,28 +189,60 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RudiObject'
+      responses:
+        '200':
+          description: a designated RUDI object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RudiObject'
+
     #=============================================================================
     #'/api/admin/{object}':
     'delete':
       summary: Delete every RUDI object of a designated type
-      description: Delete every RUDI object of a designated type
+      description: Delete every RUDI object of a designated type.
+        The notation '?a_field=value' can be used in the url to only delete the
+        objects that match the filter
       tags:
         - RudiObject
       operationId: deleteManyObjects
       security:
         - authRudi: [backadmin]
-
+      parameters:
+        - name: 'updated_after'
+          description: ISO date after which the elements of the result set were updated
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Date'
+        - name: 'updated_before'
+          description: ISO date before which the elements of the result set were updated
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Date'
+      responses:
+        '200':
+          description: (Possibly partial) list or RUDI objects
+          content:
+            application/json:
+              schema:
+                type: 'object'
+                properties:
+                  'acknowledged':
+                    description: true if the request was successfully treated
+                    type: boolean
+                  'deletedCount':
+                    description: number of elements deleted
+                    type: integer
   #=============================================================================
   '/api/admin/{object}/deletion':
     parameters:
       - name: 'object'
         description: >
-          A RUDI Object:
-          - resources (metadata)
-          - organizations (data/metadata producer/provider)
-          - contacts
-          - media (file, or stream)
-          - logs
+          A RUDI Object: resources (metadata), organizations (data/metadata
+          producer/provider), contacts, media (file, or stream)...
         in: path
         required: true
         schema:
@@ -321,29 +275,181 @@ paths:
                 description: identifiers of the RUDI objects to delete
                 type: string
                 format: uuid
+      responses:
+        '200':
+          description: (Possibly partial) list or RUDI objects
+          content:
+            application/json:
+              schema:
+                type: 'object'
+                properties:
+                  'acknowledged':
+                    description: true if the request was successfully treated
+                    type: boolean
+                  'deletedCount':
+                    description: number of elements deleted
+                    type: integer
+  #=============================================================================
+  '/api/admin/{object}/{id}':
+    summary: Access a designated RUDI object
+    parameters:
+      - name: 'object'
+        description: >
+          A RUDI Object:
+          - resources (metadata)
+          - organizations (data/metadata producer/provider)
+          - contacts
+          - media (file, or stream)
+          - logs
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+            [
+              'resources',
+              'organizations',
+              'contacts',
+              'media',
+              'reports',
+              'logs',
+              'skos_schemes',
+              'skos_concepts',
+            ]
+      - name: 'id'
+        description: Unique id of the resource
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    'get':
+      tags:
+        - RudiObject
+      description: Returns a designated RUDI object
+      operationId: getSingleObject
+      security:
+        - authRudi: [backadmin]
+      responses:
+        '200':
+          description: a designated RUDI object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RudiObject'
+        '400':
+          $ref: '#/components/responses/Error400BadRequest'
+        '401':
+          $ref: '#/components/responses/Error401Unauthorized'
+        '403':
+          $ref: '#/components/responses/Error403Forbidden'
+        '404':
+          $ref: '#/components/responses/Error404NotFound'
+        '500':
+          $ref: '#/components/responses/Error500InternalServerError'
+        '503':
+          $ref: '#/components/responses/Error503ServiceUnavailable'
+    #=============================================================================
+    #'/api/admin/{object}/{id}':
+    'delete':
+      tags:
+        - RudiObject
+      description: Delete a designated RUDI object
+      operationId: deleteSingleObject
+      security:
+        - authRudi: [backadmin]
+      responses:
+        '200':
+          description: the designated RUDI object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RudiObject'
+        '400':
+          $ref: '#/components/responses/Error400BadRequest'
+        '401':
+          $ref: '#/components/responses/Error401Unauthorized'
+        '403':
+          $ref: '#/components/responses/Error403Forbidden'
+        '404':
+          $ref: '#/components/responses/Error404NotFound'
+        '500':
+          $ref: '#/components/responses/Error500InternalServerError'
+        '503':
+          $ref: '#/components/responses/Error503ServiceUnavailable'
 
   #=============================================================================
   '/api/admin/search':
     summary: Gives for each RUDI object the fields that are searched through the
       quick search
     description: Gives for each RUDI object the fields that are searched through
-      the quick search
+      the quick search. The notation '?a_field=value' can be used in the url to
+      filter the results
     'get':
       tags:
         - RudiObject
-      operationId: deleteObjectList
+      operationId: searchObjects
       security:
         - authRudi: [backadmin]
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                description: identifiers of the RUDI objects to delete
-                type: string
-                format: uuid
-
+      parameters:
+        - name: 'limit'
+          description: Maximum number of elements in the result set
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 100 # default value for this parmater
+            maximum: 500 # implicit max limit for this parameter
+          example: 100
+        - name: 'offset'
+          description: Number of elements to skip before starting to collect the result set
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+            minimum: 0
+          example: 1
+        - name: 'sort_by'
+          description: Comma-separated properties used to order the elements in the result
+            set. First property gets the priority over the second one and so on.
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: 'fields'
+          description: Comma-separated properties that are kept for displaying the elements
+            of the result set
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: 'updated_after'
+          description: ISO date after which the elements of the result set were updated
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Date'
+        - name: 'updated_before'
+          description: ISO date before which the elements of the result set were updated
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Date'
+      responses:
+        '200':
+          description: List or RUDI objects
+          content:
+            application/json:
+              schema:
+                description: >
+                  list of RUDI objects that match the filter, possibly partial
+                  (navigation is offered with limit / offset parameters)
+                type: array
+                items:
+                  $ref: '#/components/schemas/RudiObject'
 #•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
 components:
   #=============================================================================
