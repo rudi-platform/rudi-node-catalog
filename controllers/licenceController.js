@@ -29,7 +29,7 @@ const { OBJ_LICENCES } = require('../config/confApi')
 // ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
-const LICENCES_FILE = `../api/licences.json`
+const LICENCES_SCHEME = require('../doc/api/licences.json')
 
 // ------------------------------------------------------------------------------------------------
 // Controller
@@ -77,7 +77,7 @@ exports.initializeLicences = async () => {
     await db.cleanLicences()
     LICENCE_CODE_LIST = null
     log.d(mod, fun, `Licences initialized`)
-    const licenceStr = JSON.stringify(require(LICENCES_FILE))
+    const licenceStr = JSON.stringify(LICENCES_SCHEME)
     const licenceData = JSON.parse(licenceStr.replace(/\{\{\w+\}\}/g, () => uuid.v4()))
     // log.d(mod, fun, licenceData)
     const reply = await skosController.newSkosScheme(licenceData)
