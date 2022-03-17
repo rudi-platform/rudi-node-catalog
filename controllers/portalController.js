@@ -557,7 +557,7 @@ exports.sendMetadataToPortal = async (metadataId) => {
         log.d(mod, fun, `Metadata is on the portal and same: not updating '${metadataId}'`)
       }
     } catch (err) {
-      log.e(mod, fun, err)
+      log.v(mod, fun, err)
       log.d(mod, fun, `Metadata is not on the portal: sending '${metadataId}'`)
       return httpPost(sendPortalUrl, metadataClean, portalToken)
     }
