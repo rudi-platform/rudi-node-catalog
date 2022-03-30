@@ -7,7 +7,7 @@ const mod = 'contCtrl'
  */
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependancies
+// Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
 const { beautify } = require('../utils/jsUtils')

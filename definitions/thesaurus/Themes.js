@@ -12,7 +12,8 @@ const Thesaurus = require('./Thesaurus')
 // Dynamic enum init
 // ------------------------------------------------------------------------------------------------
 
-/*   farming: "Agriculture",
+/*   
+  farming: "Agriculture",
   biota: "Biote",
   biota: "Biote",
   boundaries: "Limites",
@@ -75,18 +76,18 @@ const INIT_VALUES = {
   society: { fr: 'Social', en: 'Society' },
 }
 
-const themes = new Thesaurus(CODE, Object.keys(INIT_VALUES), INIT_VALUES)
+const Themes = new Thesaurus(CODE, INIT_VALUES)
 
 const fun = `init ${CODE}`
 // log.t(mod, fun, ``)
 
 ;(async () => {
   try {
-    await themes.init()
+    await Themes.init()
     // log.d(mod, fun, `ok`)
   } catch (err) {
     log.w(mod, fun, `Init failed: ${err}`)
   }
 })()
 
-module.exports = themes
+module.exports = Themes

@@ -3,7 +3,7 @@
 const mod = 'main'
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependancies
+// Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const utils = require('./utils/jsUtils')
 const sys = require('./config/confSystem')
@@ -20,7 +20,7 @@ const sysController = require('./controllers/sysController')
 RegExp.prototype.toJSON = RegExp.prototype.toString
 
 // ------------------------------------------------------------------------------------------------
-// External dependancies / init
+// External dependencies / init
 // ------------------------------------------------------------------------------------------------
 // Require external modules
 const mongoose = require('mongoose')

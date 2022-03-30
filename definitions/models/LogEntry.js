@@ -2,7 +2,7 @@
 
 const mod = 'logDb'
 // ------------------------------------------------------------------------------------------------
-// External dependancies
+// External dependencies
 // ------------------------------------------------------------------------------------------------
 const { Schema, model } = require('mongoose')
 const datetime = require('date-and-time')
@@ -10,7 +10,7 @@ const { v4 } = require('uuid')
 // const { omit } = require('lodash')
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependancies
+// Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const { LOG_DATE_FORMAT, consoleErr } = require('../../utils/jsUtils')
 const { LOG_EXP } = require('../../config/confLogs')
@@ -26,9 +26,8 @@ const {
   LOG_FUN,
   LOG_MOD,
   DB_UPDATED_AT,
+  DICT_LANG,
 } = require('../../db/dbFields')
-
-const { PARAM_THESAURUS_LANG } = require('../../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
@@ -172,7 +171,7 @@ LogEntry.createSearchIndexes = async () => {
     const indexOpts = {
       name: SEARCH_INDEX,
       default_language: 'french',
-      language_override: PARAM_THESAURUS_LANG,
+      language_override: DICT_LANG,
     }
 
     // Dropping current text indexes if they exist

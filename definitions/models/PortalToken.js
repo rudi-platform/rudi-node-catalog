@@ -1,7 +1,7 @@
 'use strict'
 
 // ------------------------------------------------------------------------------------------------
-// External dependancies
+// External dependencies
 // ------------------------------------------------------------------------------------------------
 const mongoose = require('mongoose')
 const { omit } = require('lodash')
@@ -9,7 +9,7 @@ const { omit } = require('lodash')
 const Int32 = require('mongoose-int32').loadType(mongoose)
 
 // ------------------------------------------------------------------------------------------------
-// Inbternal dependancies
+// Inbternal dependencies
 // ------------------------------------------------------------------------------------------------
 const Ids = require('../schemas/Identifiers')
 

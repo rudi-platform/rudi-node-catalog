@@ -3,7 +3,7 @@ const mod = 'json'
 
 const { BadRequestError } = require('./errors')
 // ------------------------------------------------------------------------------------------------
-// Internal dependancies
+// Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const utils = require('./jsUtils')
 const log = require('./logging')

@@ -1,10 +1,14 @@
 'use strict'
 
 // ------------------------------------------------------------------------------------------------
-// External dependancies
+// External dependencies
 // ------------------------------------------------------------------------------------------------
 const mongoose = require('mongoose')
-const { PARAM_THESAURUS_LANG } = require('../../config/confApi')
+const { DICT_LANG, DICT_TEXT } = require('../../db/dbFields')
+
+// ------------------------------------------------------------------------------------------------
+// Internal dependencies
+// ------------------------------------------------------------------------------------------------
 const Language = require('../thesaurus/Languages').get()
 
 // ------------------------------------------------------------------------------------------------
@@ -12,14 +16,14 @@ const Language = require('../thesaurus/Languages').get()
 // ------------------------------------------------------------------------------------------------
 const DictionaryEntry = new mongoose.Schema(
   {
-    [PARAM_THESAURUS_LANG]: {
+    [DICT_LANG]: {
       type: String,
       default: Language.fr,
       enum: Object.values(Language),
       required: true,
     },
-    text: {
-      type: String,
+    [DICT_TEXT]: {
+      type: String, // Only one entry per language!
       required: true,
     },
   },
@@ -28,7 +32,4 @@ const DictionaryEntry = new mongoose.Schema(
   }
 )
 
-// ------------------------------------------------------------------------------------------------
-// Exports
-// ------------------------------------------------------------------------------------------------
 module.exports = DictionaryEntry

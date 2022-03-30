@@ -5,11 +5,11 @@ const mod = 'crypto'
 
 const { HEADERS, HD_AUTH, HD_AUTH_LOWER } = require('../config/headers')
 // ------------------------------------------------------------------------------------------------
-// External dependancies
+// External dependencies
 // ------------------------------------------------------------------------------------------------
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependancies
+// Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const { accessProperty } = require('./jsonAccess')
 const { consoleErr } = require('./jsUtils')

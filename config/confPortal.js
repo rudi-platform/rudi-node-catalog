@@ -86,12 +86,17 @@ exports.getCheckAuthUrl = () => `${AUTH_URL}/${AUTH_CHK}`
 exports.getPortalPubKeyUrl = () => `${AUTH_URL}/${PUB_KEY_URL}`
 
 // ----- Creds
-const isPwdClear = getPortalIniValue(PORTAL_SECTION, 'is_pwd_clear')
+const isPwdB64 = getPortalIniValue(PORTAL_SECTION, 'is_pwd_b64')
 const LOGIN = getPortalIniValue(PORTAL_SECTION, 'login')
 const READ_PASSW = getPortalIniValue(PORTAL_SECTION, 'passw')
 // utils.consoleLog(mod, 'readPortalConf',`READ_PASSW: ${READ_PASSW}` )
-const PASSW_B64 = isPwdClear ? utils.toBase64(READ_PASSW) : READ_PASSW
-// utils.consoleLog(mod, 'readPortalConf',`PASSW_B64: ${PASSW_B64}` )
+const PASSW_B64 =
+  isPwdB64 === 1 ||
+  `${isPwdB64}`.toLocaleLowerCase() === 'true' ||
+  `${isPwdB64}`.toLocaleLowerCase() === 'yes'
+    ? READ_PASSW
+    : utils.toBase64(READ_PASSW)
+// utils.consoleLog(mod, 'readPortalConf', `PASSW_B64: ${PASSW_B64}`)
 const SHOULD_CONTROL_EXT_REQUESTS = getPortalIniValue(
   PORTAL_SECTION,
   'should_control_public_requests'

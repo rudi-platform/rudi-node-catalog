@@ -3,7 +3,7 @@
 const mod = 'dbAct'
 
 // ------------------------------------------------------------------------------------------------
-// External dependancies
+// External dependencies
 // ------------------------------------------------------------------------------------------------
 const mongoose = require('mongoose')
 
@@ -13,13 +13,12 @@ const mongoose = require('mongoose')
 const { beautify } = require('../utils/jsUtils')
 const log = require('../utils/logging')
 const { RudiError } = require('../utils/errors')
-
 const { LogEntry } = require('../definitions/models/LogEntry')
 
 // ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
-const { PARAM_THESAURUS_LANG } = require('../config/confApi')
+const { DICT_LANG } = require('./dbFields')
 
 // ------------------------------------------------------------------------------------------------
 // Actions on DB tables
@@ -104,12 +103,13 @@ const SEARCH_INDEX = 'searchIndex'
 exports.makeSearchable = async (Model) => {
   const fun = 'makeSearchable'
   try {
-    log.t(mod, fun, ``)
+    // log.t(mod, fun, ``)
     let collection
     try {
       collection = Model.collection
     } catch (err) {
       log.d(mod, fun, `No collection for '${Model.name}: ${err}`)
+      return
     }
     if (!collection) {
       log.d(mod, fun, `No collection for '${Model.name}`)
@@ -117,7 +117,24 @@ exports.makeSearchable = async (Model) => {
     }
     const listFields = Model.getSearchableFields()
     if (!listFields) {
-      log.d(mod, fun, `No searchable fields for '${Model.name}`)
+      log.d(mod, fun, `No searchable fields for '${collection.name}`)
+      return
+    }
+
+    log.d(mod, fun, `Searchable fields for ${collection.name}: ${listFields}`)
+
+    // Dropping current text indexes if they exist
+    try {
+      const indexes = collection.getIndexes()
+      if (!!indexes[SEARCH_INDEX]) {
+        const val = indexes[SEARCH_INDEX]
+        log.d(mod, fun, `Search already exists: ${collection.name} - ${val}`)
+        // log.t(mod, fun, `Dropping search indexes for '${collection.name}'`)
+        // await collection.dropIndex(SEARCH_INDEX)
+      }
+    } catch (er) {
+      if (er.codeName === 'NamespaceNotFound') log.v(mod, fun, 'Not dropping inexistant indexes')
+      else log.w(mod, fun, er) // throw er?
     }
     // Preparing the 'text' (=== searchable) indexes
     const searchIndexes = {}
@@ -126,30 +143,22 @@ exports.makeSearchable = async (Model) => {
     const indexOpts = {
       name: SEARCH_INDEX,
       default_language: 'french',
-      language_override: PARAM_THESAURUS_LANG,
+      language_override: DICT_LANG,
     }
 
-    // log.d(mod, fun, utils.beautify(searchIndexes))
-
-    // Dropping current text indexes if they exist
-    try {
-      const indexes = await collection.getIndexes()
-      await Promise.all(
-        Object.entries(indexes).map(async (key) => {
-          // log.d(mod, fun, `${collection.name} - ${index}: ${key}`)
-          if (key === `${SEARCH_INDEX},_fts,text,_ftsx,1`) {
-            log.t(mod, fun, `Dropping search indexes for '${collection.name}'`)
-            collection.dropIndex(SEARCH_INDEX)
-          }
-        })
-      )
-    } catch (er) {
-      if (er.codeName === 'NamespaceNotFound') log.v(mod, fun, 'Not dropping inexistant indexes')
-      else log.w(mod, fun, er) // throw er?
-    }
     // (Re)creating the indexes
-    log.t(mod, fun, `Creating search indexes for collection '${collection.name}'`)
-    await collection.createIndex(searchIndexes, indexOpts)
+    // log.t(mod, fun, `Creating search indexes for collection '${collection.name}'}`)
+    await collection
+      .createIndex(searchIndexes, indexOpts)
+      .then(
+        log.t(
+          mod,
+          fun,
+          `Created ${collection.name} indexes: ${
+            (await collection.getIndexes())[SEARCH_INDEX] ? 'ok' : 'KO!!'
+          }`
+        )
+      )
   } catch (err) {
     log.w(mod, fun, `Couldn't create indexes for '${Model.collection.name}': ${err}`)
     throw RudiError.treatError(mod, fun, err)

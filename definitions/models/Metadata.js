@@ -117,6 +117,7 @@ const {
   API_GEO_GEOJSON_PROPERTY,
   API_METAINFO_VERSION_PROPERTY,
   LicenceTypes,
+  DICT_TEXT,
 } = require('../../db/dbFields')
 
 // ------------------------------------------------------------------------------------------------
@@ -896,8 +897,8 @@ Metadata.getSearchableFields = () => [
   API_METADATA_ID,
   API_METADATA_LOCAL_ID,
   API_DATA_NAME_PROPERTY,
-  `${API_DATA_DETAILS_PROPERTY}.text`,
-  `${API_DATA_DESCRIPTION_PROPERTY}.text`,
+  `${API_DATA_DETAILS_PROPERTY}.${DICT_TEXT}`,
+  `${API_DATA_DESCRIPTION_PROPERTY}.${DICT_TEXT}`,
 ]
 
 const fun = 'createSearchIndexes'
@@ -905,7 +906,7 @@ Metadata.createSearchIndexes = async () => {
   try {
     await makeSearchable(Metadata)
   } catch (err) {
-    RudiError.treatError(mod, fun, err)
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 Metadata.createSearchIndexes()

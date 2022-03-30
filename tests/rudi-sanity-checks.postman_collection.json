@@ -381,14 +381,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{db}}/reports",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{db}}/dynamicenums",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{adminUrl}}",
 								"{{db}}",
-								"reports"
+								"dynamicenums"
 							]
 						}
 					},
@@ -492,148 +492,6 @@
 		{
 			"name": "02. Init lists",
 			"item": [
-				{
-					"name": "Get keywords",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Keywords received\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    pm.expect(responseJson.length).to.gt(0)",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/enum/Keywords",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{adminUrl}}",
-								"enum",
-								"Keywords"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get enum labels",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Enum labels received\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    pm.expect(Object.keys(responseJson).length).to.gt(0)",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/enum?lang=fr",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{adminUrl}}",
-								"enum"
-							],
-							"query": [
-								{
-									"key": "lang",
-									"value": "fr"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get themes",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Themes received\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    pm.expect(responseJson.length).to.gt(0)",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/enum/Themes",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{adminUrl}}",
-								"enum",
-								"Themes"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get theme labels",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Theme labels received\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    pm.expect(Object.keys(responseJson).length).to.gt(0)",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/enum/themes/fr",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"{{adminUrl}}",
-								"enum",
-								"themes",
-								"fr"
-							]
-						}
-					},
-					"response": []
-				},
 				{
 					"name": "Init licenses",
 					"event": [
@@ -771,6 +629,47 @@
 					"response": []
 				},
 				{
+					"name": "Get every thesaurus values",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Every thesaurus values received\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    const listEnums = Object.keys(responseJson);",
+									"    pm.expect(listEnums.length).to.eq(11);",
+									"    pm.expect(typeof responseJson.themes[0]).to.eq('string')",
+									"",
+									"    pm.collectionVariables.set('keywords', responseJson.keywords);",
+									"    pm.collectionVariables.set('themes', responseJson.themes);",
+									"    pm.collectionVariables.set('sanityLicence', responseJson.licences[1])",
+									"    pm.collectionVariables.set('licences', responseJson.licences)",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/enum",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"enum"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get thesaurus fr labels",
 					"event": [
 						{
@@ -784,6 +683,8 @@
 									"    pm.expect(listEnums.length).to.eq(11);",
 									"    pm.expect(Object.keys(responseJson.fileextensions).length).to.gt(0)",
 									"    pm.expect(responseJson.fileextensions.aac).to.eq(\"audio/aac\")",
+									"    const themeKeys = Object.keys(responseJson.themes)",
+									"    pm.expect(typeof responseJson.themes[themeKeys[0]]).to.eq('string')",
 									"});"
 								],
 								"type": "text/javascript"
@@ -813,21 +714,17 @@
 					"response": []
 				},
 				{
-					"name": "Get every thesaurus values",
+					"name": "Get keywords",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Every thesaurus values received\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    const listEnums = Object.keys(responseJson);",
-									"    pm.expect(listEnums.length).to.eq(11);",
-									"",
-									"    pm.collectionVariables.set('keywords', responseJson['keywords']);",
-									"    pm.collectionVariables.set('themes', responseJson['themes']);",
-									"    pm.collectionVariables.set('sanityLicence', responseJson['licences'][1])",
+									"pm.test(\"Keywords received\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200)",
+									"    const responseJson = pm.response.json()",
+									"    pm.expect(responseJson.length).to.gt(0)",
+									"    pm.expect(typeof responseJson[0]).to.eq('string')",
 									"});"
 								],
 								"type": "text/javascript"
@@ -838,13 +735,93 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/enum",
+							"raw": "{{baseUrl}}/{{adminUrl}}/enum/Keywords",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{adminUrl}}",
-								"enum"
+								"enum",
+								"Keywords"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get themes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Themes received\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.length).to.gt(0)",
+									"    pm.expect(typeof responseJson[0]).to.eq('string')",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/enum/Themes/?lang=fr",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"enum",
+								"Themes",
+								""
+							],
+							"query": [
+								{
+									"key": "lang",
+									"value": "fr"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get theme labels",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Theme labels received\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    const keys = Object.keys(responseJson)",
+									"    pm.expect(keys.length).to.gt(0)",
+									"    pm.expect(typeof responseJson[keys[0]]).to.eq('string')",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/enum/themes/fr",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"enum",
+								"themes",
+								"fr"
 							]
 						}
 					},
@@ -2062,6 +2039,41 @@
 									"key": "limit",
 									"value": "10"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Themes values in data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Theme labels received\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(Object.keys(responseJson).length).to.gt(0)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/enum/themes/init",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"enum",
+								"themes",
+								"init"
 							]
 						}
 					},
@@ -4626,9 +4638,9 @@
 					"    timezone: () => new Date().getTimezoneOffset(),",
 					"}",
 					"codec = {",
-					"    streamToString: (data) => data.stream.toString('utf8'),",
+					"    streamToString: (data) => data?.stream?.toString('utf8'),",
 					"",
-					"    fromBase64: (data) => Buffer.from(data, 'base64').toString('utf-8'),",
+					"    fromBase64: (data) => Buffer.from(data, 'base64')?.toString('utf-8'),",
 					"",
 					"    fromBase64Url: (base64UrlStr) => {",
 					"        log.t('-- base64UrlStr --')",
@@ -4646,7 +4658,7 @@
 					"        return codec.fromBase64(base64Str);",
 					"    },",
 					"",
-					"    streamToUtf8: (data) => data.stream.toString('utf8')",
+					"    streamToUtf8: (data) => data?.stream?.toString('utf8')",
 					"",
 					"};",
 					"",
@@ -4719,21 +4731,24 @@
 					"                })",
 					"            }",
 					"        }",
-					"        pm.sendRequest(reqNewToken, (err, res) => {",
-					"            const token = codec.streamToUtf8(res)",
-					"            // log.d('rudiProdToken : ' + token)",
-					"            try {",
-					"                pm.expect(res).to.have.property('code', 200);",
-					"            } catch (err) {",
-					"                console.error('[renewPortalToken]: ' + err)",
-					"            }",
-					"            pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
-					"            pm.collectionVariables.set(tokenName, token)",
-					"            log.d('API token stored')",
+					"        try {",
+					"            pm.sendRequest(reqNewToken, (err, res) => {",
+					"                const token = codec.streamToUtf8(res)",
+					"                // log.d('rudiProdToken : ' + token)",
+					"                try {",
+					"                    pm.expect(res).to.have.property('code', 200);",
+					"                } catch (err) {",
+					"                    console.error('[renewPortalToken]: ' + err)",
+					"                    throw new Error('Crypto module should be running')",
+					"                }",
+					"                pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
+					"                pm.collectionVariables.set(tokenName, token)",
+					"                log.d('API token stored')",
 					"",
-					"            next(token)",
-					"            //return token",
-					"        })",
+					"                next(token)",
+					"                //return token",
+					"            })",
+					"        } catch (err) { throw new Error('Crypto module not started') }",
 					"    },",
 					"",
 					"    renewPortalToken: async (tokenName, rudiProdToken) => {",
@@ -4899,6 +4914,14 @@
 		},
 		{
 			"key": "portalToken",
+			"value": ""
+		},
+		{
+			"key": "rudiProdToken",
+			"value": ""
+		},
+		{
+			"key": "licences",
 			"value": ""
 		}
 	]

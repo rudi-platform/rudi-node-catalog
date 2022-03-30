@@ -7,14 +7,14 @@ const mod = 'genCtrl'
  */
 
 // ------------------------------------------------------------------------------------------------
-// External dependancies
+// External dependencies
 // ------------------------------------------------------------------------------------------------
 const mongoose = require('mongoose')
 const { v4: UUIDv4 } = require('uuid')
 const { pick } = require('lodash')
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependancies
+// Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
@@ -47,7 +47,7 @@ const { CallContext } = require('../definitions/constructors/callContext')
 const { newMetadata, overwriteMetadata } = require('../controllers/metadataController')
 const { newOrganization } = require('../controllers/organizationController')
 const { newContact } = require('../controllers/contactController')
-const { newSkosConcept, newSkosScheme } = require('./skosController')
+const { newSkosConcept, newSkosScheme, widenSearch } = require('./skosController')
 const { deletePortalMetadata } = require('./portalController')
 
 // ------------------------------------------------------------------------------------------------
@@ -626,6 +626,7 @@ exports.searchObjects = async (req, reply) => {
       QUERY_SEARCH_TERMS,
       QUERY_COUNT_BY,
     ])
+    // options[QUERY_SEARCH_TERMS] = await widenSearch(options[QUERY_SEARCH_TERMS])
     const objectList = await db.searchObjects(objectType, options)
 
     // return the object

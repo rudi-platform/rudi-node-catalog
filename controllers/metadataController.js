@@ -7,13 +7,13 @@ const mod = 'metaCtrl'
  */
 
 // ------------------------------------------------------------------------------------------------
-// External dependancies
+// External dependencies
 // ------------------------------------------------------------------------------------------------
 const mongoose = require('mongoose')
 const { mergeWith, pick } = require('lodash')
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependancies
+// Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
 const msg = require('../utils/msg')
@@ -23,7 +23,6 @@ const {
   isNotEmptyArray,
   isEmptyArray,
   isNothing,
-  isArray,
 } = require('../utils/jsUtils')
 
 const db = require('../db/dbQueries')
@@ -64,6 +63,7 @@ const {
   API_DATA_DETAILS_PROPERTY,
   DB_CREATED_AT,
   DB_UPDATED_AT,
+  DICT_LANG,
 } = require('../db/dbFields')
 
 const {
@@ -73,7 +73,6 @@ const {
   OBJ_MEDIA,
   PARAM_ID,
   ACT_INIT,
-  PARAM_THESAURUS_LANG,
   MONGO_ERROR,
   QUERY_FIELDS,
   COUNT_LABEL,
@@ -111,6 +110,7 @@ const {
 } = require('../utils/errors')
 const { CallContext } = require('../definitions/constructors/callContext')
 const { isPortalConnectionDisabled } = require('../config/confPortal')
+const Themes = require('../definitions/thesaurus/Themes')
 
 // ------------------------------------------------------------------------------------------------
 // Atomic treatments of properties: RUDI -> DB
@@ -452,13 +452,12 @@ function toMDBLanguage(metadata, field) {
   try {
     log.t(mod, fun, ``)
     const prop = metadata[field]
-    if (!isArray(prop)) {
+    if (!Array.isArray(prop)) {
       log.w(mod, fun, `Field '${field}' should be an array: ${beautify(prop)}`)
       return
     }
     prop.map((entry) => {
-      if (entry[PARAM_THESAURUS_LANG])
-        entry[PARAM_THESAURUS_LANG] = entry[PARAM_THESAURUS_LANG].substring(0, 2)
+      if (entry[DICT_LANG]) entry[DICT_LANG] = entry[DICT_LANG].substring(0, 2)
     })
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -697,7 +696,7 @@ exports.sendManyMetadataToPortal = async (req) => {
     log.t(mod, fun, ``)
     const listIds = req.body
 
-    if (!!listIds && !isArray(listIds)) {
+    if (!!listIds && !Array.isArray(listIds)) {
       throw new BadRequestError(
         'The body of the request should be empty (to send every metadata) or a list of ids',
         mod,
@@ -876,9 +875,31 @@ exports.getSingleMetadata = async (req, reply) => {
  */
 exports.getMetadataList = async (req, reply) => {
   const fun = 'getMetadataList'
-  log.t(mod, fun, `< GET ${URL_PUB_METADATA}`)
   try {
+    log.t(mod, fun, `< GET ${URL_PUB_METADATA}`)
     return await genericController.getManyObjects(OBJ_METADATA, req, reply)
+  } catch (err) {
+    const error = err.name === MONGO_ERROR ? new BadRequestError(err) : new NotFoundError(error)
+    throw RudiError.treatError(mod, fun, error)
+  }
+}
+
+/**
+ * Reinit themes with stored data values for this field
+ */
+exports.initThemes = async (req, reply) => {
+  const fun = 'initThemes'
+  try {
+    log.t(mod, fun, ``)
+    const valuesInStoredData = await db.listThemesInMetadata()
+    log.d(mod, fun, beautify(valuesInStoredData))
+    await Promise.all(
+      valuesInStoredData.map((val) => {
+        log.d(mod, fun, val)
+        Themes.isValid(val, true)
+      })
+    )
+    return valuesInStoredData
   } catch (err) {
     const error = err.name === MONGO_ERROR ? new BadRequestError(err) : new NotFoundError(error)
     throw RudiError.treatError(mod, fun, error)

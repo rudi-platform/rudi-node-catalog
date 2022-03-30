@@ -2,7 +2,7 @@
 
 const mod = 'mediaSch'
 // ------------------------------------------------------------------------------------------------
-// External dependancies
+// External dependencies
 // ------------------------------------------------------------------------------------------------
 const mongoose = require('mongoose')
 const Int32 = require('mongoose-int32')
@@ -10,7 +10,7 @@ const { omit } = require('lodash')
 const sanitize = require('sanitize-filename')
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependancies
+// Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const log = require('../../utils/logging')
 const { isNotEmptyObject } = require('../../utils/jsUtils')

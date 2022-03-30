@@ -141,6 +141,15 @@ const appMsg = `App '${APP_NAME}' listening on: ${this.getHost()}`
 utils.consoleLog(mod, 'init', appMsg)
 utils.consoleLog(mod, 'init', `DB: ${DB_URL}`)
 
+// ----- SKOSMOS section
+const SKOSMOS_SECTION = 'skosmos'
+const skosmosConfFile = this.getIniValue(SKOSMOS_SECTION, 'skosmos_conf')
+const SKOSMOS_CONF = skosmosConfFile ? fa.readIniFile(skosmosConfFile) : undefined
+exports.getSkosmosConf = (prop) => {
+  if (!SKOSMOS_CONF) return
+  return prop ? SKOSMOS_CONF[prop] : SKOSMOS_CONF
+}
+
 // ------------------------------------------------------------------------------------------------
 // App ID
 // ------------------------------------------------------------------------------------------------

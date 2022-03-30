@@ -4,7 +4,7 @@
 const mod = 'portalCtrl'
 
 // ------------------------------------------------------------------------------------------------
-// External dependancies
+// External dependencies
 // ------------------------------------------------------------------------------------------------
 const { parseKey } = require('sshpk')
 const axios = require('axios')
@@ -27,7 +27,7 @@ const { MediaTypes } = require('../definitions/models/Media')
 const { MIME_YAML } = require('../definitions/thesaurus/FileTypes')
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependancies
+// Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const db = require('../db/dbQueries')
 const log = require('../utils/logging')
