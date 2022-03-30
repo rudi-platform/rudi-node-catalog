@@ -7,16 +7,17 @@ const mod = 'skosCtrl'
  */
 
 // ------------------------------------------------------------------------------------------------
-// External dependancies
+// External dependencies
 // ------------------------------------------------------------------------------------------------
-
+const axios = require('axios')
 // ------------------------------------------------------------------------------------------------
-// Internal dependancies
+// Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
 
 const json = require('../utils/jsonAccess')
 const utils = require('../utils/jsUtils')
+const { getSkosmosConf } = require('../config/confSystem')
 
 const db = require('../db/dbQueries')
 
@@ -619,6 +620,66 @@ exports.getSingleThesaurusLabels = async (req, reply) => {
       )
     return thesaurus
   } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+// ------------------------------------------------------------------------------------------------
+// SKOSMOS server calls
+// ------------------------------------------------------------------------------------------------
+
+exports.widenSearch = async (searchTerms) => {
+  const fun = 'widenSearch'
+  try {
+    log.t(mod, fun, ``)
+    if (!searchTerms || !getSkosmosConf()) return searchTerms
+
+    const widenedSearchTerms = await Promise.all(
+      searchTerms.map((term) => {
+        return this.askSkosmos(term)
+      })
+    )
+
+    return widenedSearchTerms
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+let SKOSMOS_URL, SKOSMOS_AUTH // cache
+
+exports.askSkosmos = async (term) => {
+  const fun = 'askSkosmos'
+  try {
+    log.t(mod, fun, `term: ${term}`)
+    if (!term) return term
+
+    if (!SKOSMOS_URL) SKOSMOS_URL = getSkosmosConf('url')
+    if (!SKOSMOS_AUTH) {
+      const skosmosUsr = getSkosmosConf('usr')
+      const skosmosPwd = getSkosmosConf('pwd')
+      SKOSMOS_AUTH = {
+        headers: {
+          Authorization: `Basic ${utils.toBase64(skosmosUsr + ':' + skosmosPwd)}`,
+        },
+      }
+    }
+    const reqUrl = `${SKOSMOS_URL}/search?query=${term}`
+    // log.d(mod, fun, 'reqUrl: ' + reqUrl)
+    // log.d(mod, fun, 'auth: ' + utils.beautify(SKOSMOS_AUTH))
+    try {
+      const reply = await axios.get(reqUrl, SKOSMOS_AUTH)
+      log.d(mod, fun, 'reply: ' + utils.beautify(reply))
+      log.d(mod, fun, 'status: ' + reply.status)
+      log.d(mod, fun, 'data: ' + utils.beautify(reply.data))
+      log.d(mod, fun, 'results: ' + utils.beautify(reply.data?.results))
+      return reply.data.results
+    } catch (e) {
+      log.e(mod, fun, e)
+      throw e
+    }
+  } catch (err) {
+    log.e(mod, fun, err)
     throw RudiError.treatError(mod, fun, err)
   }
 }

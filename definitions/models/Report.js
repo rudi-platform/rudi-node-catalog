@@ -2,13 +2,13 @@
 
 const mod = 'reportSch'
 // ------------------------------------------------------------------------------------------------
-// External dependancies
+// External dependencies
 // ------------------------------------------------------------------------------------------------
 const mongoose = require('mongoose')
 const { omit } = require('lodash')
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependancies
+// Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const log = require('../../utils/logging')
 const { HTTP_METHODS } = require('../../config/confApi')

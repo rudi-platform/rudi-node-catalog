@@ -7,7 +7,7 @@ const mod = 'sysCtrl'
  */
 
 // ------------------------------------------------------------------------------------------------
-// External dependancies
+// External dependencies
 // ------------------------------------------------------------------------------------------------
 const { execSync } = require('child_process')
 const { readFileSync } = require('fs')
@@ -15,7 +15,7 @@ const { readFileSync } = require('fs')
 const mongoose = require('mongoose')
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependancies
+// Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
 const utils = require('../utils/jsUtils')

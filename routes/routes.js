@@ -129,6 +129,7 @@ const DEV_SEARCH_LOGS = 'dev_search_logs'
 const DEV_GET_COLLECTIONS = 'dev_get_collections'
 const DEV_DROP_COLLECTION = 'dev_drop_collection'
 const DEV_DROP_DB = 'dev_drop_db'
+const DEV_INIT_THEMES = 'dev_init_themes'
 
 // ------------------------------------------------------------------------------------------------
 // Free routes (no authentification required)
@@ -572,6 +573,14 @@ exports.devRoutes = [
     handler: skosController.getSingleThesaurusLabels,
     config: { [ROUTE_NAME]: DEV_GET_SINGLE_THESAURUS },
   },
+  /** Init themes with values in stored data */
+  {
+    method: HTTP_METHODS.GET,
+    url: `${URL_PV_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}/${ACT_INIT}`,
+    handler: metadataController.initThemes,
+    config: { [ROUTE_NAME]: DEV_INIT_THEMES },
+  },
+
   {
     method: HTTP_METHODS.GET,
     url: `${URL_PV_LICENCE_ACCESS}`,
@@ -683,21 +692,21 @@ exports.devRoutes = [
   // ------------------------------------------------------------------------------------------------
   // Actions on DB
   // ------------------------------------------------------------------------------------------------
-  // Get all collections
+  /** Get all collections */
   {
     method: HTTP_METHODS.GET,
     url: `${URL_PV_DB_ACCESS}`,
     handler: dbController.getCollections,
     config: { [ROUTE_NAME]: DEV_GET_COLLECTIONS },
   },
-  // Drop Collection
+  /** Drop Collection */
   {
     method: HTTP_METHODS.DELETE,
     url: `${URL_PV_DB_ACCESS}/:${PARAM_OBJECT}`,
     handler: dbController.dropCollection,
     config: { [ROUTE_NAME]: DEV_DROP_COLLECTION },
   },
-  // Drop DB
+  /** Drop DB */
   {
     method: HTTP_METHODS.DELETE,
     url: `${URL_PV_DB_ACCESS}`,

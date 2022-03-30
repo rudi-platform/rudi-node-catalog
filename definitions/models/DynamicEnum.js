@@ -2,26 +2,41 @@
 // const mod = 'DynEnumSch'
 
 // ------------------------------------------------------------------------------------------------
-// External dependancies
+// External dependencies
 // ------------------------------------------------------------------------------------------------
 const mongoose = require('mongoose')
 const { omit } = require('lodash')
+
+// ------------------------------------------------------------------------------------------------
+// Internal dependencies
+// ------------------------------------------------------------------------------------------------
 const { FIELDS_TO_SKIP } = require('../../db/dbFields')
+const DictionaryEntry = require('../schemas/Dictiogit naryEntry')
 
 // ------------------------------------------------------------------------------------------------
 // Custom schema definition
 // ------------------------------------------------------------------------------------------------
+exports.ENUM_CODE = 'code'
+exports.ENUM_VALUES = 'values'
+
+exports.ENUM_KEY = 'key'
+exports.ENUM_LABELS = 'labels'
+exports.ENUM_LABELLED_VALUES = 'labelledValues'
+
 const DynamicEnumSchema = new mongoose.Schema(
   {
-    code: {
+    [this.ENUM_CODE]: {
       type: String,
       unique: true,
       index: true,
       required: true,
     },
-    values: {
+    [this.ENUM_VALUES]: {
       type: [String],
-      required: true,
+    },
+    [this.ENUM_LABELLED_VALUES]: {
+      [this.ENUM_KEY]: String,
+      [this.ENUM_LABELS]: [DictionaryEntry],
     },
   },
   {
@@ -52,4 +67,4 @@ DynamicEnumSchema.methods.toJSON = function () {
 // ------------------------------------------------------------------------------------------------
 // Exports
 // ------------------------------------------------------------------------------------------------
-module.exports = mongoose.model('DynamicEnum', DynamicEnumSchema)
+exports.DynamicEnum = mongoose.model('DynamicEnum', DynamicEnumSchema)

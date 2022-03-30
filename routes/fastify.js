@@ -3,7 +3,7 @@
 const mod = 'fastify'
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependancies
+// Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const { padA1, nowEpochMs, beautify } = require('../utils/jsUtils')
 const {
@@ -33,7 +33,7 @@ const { checkPortalTokenInHeader } = require('../controllers/portalController')
 const { getUrlMaxLength } = require('../utils/protection')
 
 // ------------------------------------------------------------------------------------------------
-// External dependancies
+// External dependencies
 // ------------------------------------------------------------------------------------------------
 // Require the fastify framework and instantiate it
 const fastifyConf = require('fastify')({

@@ -7,7 +7,7 @@ const mod = 'orgCtrl'
  */
 
 // ------------------------------------------------------------------------------------------------
-// External dependancies
+// External dependencies
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
 const { beautify } = require('../utils/jsUtils')

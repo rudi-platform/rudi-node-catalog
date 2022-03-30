@@ -2,13 +2,13 @@
 
 const mod = 'orgSch'
 // ------------------------------------------------------------------------------------------------
-// External dependancies
+// External dependencies
 // ------------------------------------------------------------------------------------------------
 const mongoose = require('mongoose')
 const { omit } = require('lodash')
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependancies
+// Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const log = require('../../utils/logging')
 const ids = require('../schemas/Identifiers')

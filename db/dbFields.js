@@ -240,6 +240,10 @@ exports.API_CONCEPT_CHILDREN_PROPERTY = 'narrower_concepts'
 exports.API_CONCEPT_SIBLINGS_PROPERTY = 'siblings_concepts'
 exports.API_CONCEPT_RELATIVE_PROPERTY = 'relative_concepts'
 
+// Thesaurus: dictionary entries
+exports.DICT_LANG = 'lang'
+exports.DICT_TEXT = 'text'
+
 // Licences types
 exports.LicenceTypes = {
   Standard: 'STANDARD',

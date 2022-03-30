@@ -6,7 +6,7 @@ const mod = 'db'
  */
 
 // ------------------------------------------------------------------------------------------------
-// External dependancies
+// External dependencies
 // ------------------------------------------------------------------------------------------------
 const mongoose = require('mongoose')
 const { omit, pick } = require('lodash')
@@ -81,6 +81,7 @@ const {
   FIELDS_TO_SKIP,
   API_MEDIA_PROPERTY,
   LOG_ID,
+  API_THEME_PROPERTY,
 } = require('./dbFields')
 
 const { JWT_EXP } = require('../utils/crypto')
@@ -100,6 +101,10 @@ const { Metadata, METADATA_FIELDS_TO_POPULATE } = require('../definitions/models
 
 const { Report } = require('../definitions/models/Report')
 const { LogEntry, logLineToString } = require('../definitions/models/LogEntry')
+
+// ------------------------------------------------------------------------------------------------
+// Other internal dependencies
+// ------------------------------------------------------------------------------------------------
 const { dropCollection } = require('./dbActions')
 
 // ------------------------------------------------------------------------------------------------
@@ -258,6 +263,19 @@ function getPopulateOptions(objectType) {
 function getPopulateFields(objectType) {
   if (objectType !== OBJ_METADATA) return []
   return METADATA_FIELDS_TO_POPULATE
+}
+
+exports.listThemesInMetadata = async () => {
+  const fun = 'listThemesInMetadata'
+  try {
+    log.t(mod, fun, ``)
+    const listVals = await Metadata.distinct(API_THEME_PROPERTY)
+    log.d(mod, fun, utils.beautify(listVals))
+
+    return listVals
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -778,8 +796,10 @@ exports.searchObjects = async (objectType, options) => {
 
     // Setting the filter as a research of terms
     const searchTermsList = getParamValue(options, QUERY_SEARCH_TERMS)
-    if (!utils.isArray(searchTermsList))
+    if (!Array.isArray(searchTermsList))
       throw new RudiError('Input option search terms should be an array')
+
+    log.d(mod, fun, `searching: ${searchTermsList}`)
 
     options[QUERY_FILTER].$text = { $search: searchTermsList.join(' ') }
     const countBy = options[QUERY_COUNT_BY]

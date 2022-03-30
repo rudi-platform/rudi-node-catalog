@@ -3,7 +3,7 @@
 const mod = 'msg'
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependancies
+// Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
 const utils = require('../utils/jsUtils')

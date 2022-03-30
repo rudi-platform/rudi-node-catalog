@@ -4,14 +4,14 @@
 const mod = 'utils'
 
 // ------------------------------------------------------------------------------------------------
-// External dependancies
+// External dependencies
 // ------------------------------------------------------------------------------------------------
 const { inspect } = require('util')
 const { floor, pick } = require('lodash')
 const datetime = require('date-and-time')
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependancies
+// Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const { TRACE } = require('../config/confApi')
 
@@ -139,9 +139,10 @@ exports.getLast = (array) => (Array.isArray(array) ? array[array.length - 1] : n
 // ------------------------------------------------------------------------------------------------
 // Objects
 // ------------------------------------------------------------------------------------------------
-exports.isObject = (obj) => Object.keys(obj).length > 0
+exports.isObject = (obj) => Object.prototype.toString.call(obj) === '[object Object]'
+//Object.keys(obj).length > 0
 exports.isEmptyObject = (obj) =>
-  !this.isString(obj) && !this.isArray(obj) && Object.keys(obj).length === 0
+  !this.isString(obj) && !Array.isArray(obj) && Object.keys(obj).length === 0
 exports.isNotEmptyObject = (obj) => obj && Object.keys(obj).length > 0
 
 exports.NOT_FOUND = '!_not_found_!'
@@ -157,7 +158,7 @@ exports.quietAccess = (obj, prop) => {
 /** !! TODO: treat object arrays! */
 exports.getPaths = async (root, parentKeyName) => {
   // if obj has no keys, abort
-  if (this.isString(root) || this.isArray(root) || Object.keys(root).length === 0) {
+  if (this.isString(root) || Array.isArray(root) || Object.keys(root).length === 0) {
     return []
   }
   const keys = Object.keys(root)

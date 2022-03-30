@@ -2,13 +2,13 @@
 
 const mod = 'contSch'
 // ------------------------------------------------------------------------------------------------
-// External dependancies
+// External dependencies
 // ------------------------------------------------------------------------------------------------
 const mongoose = require('mongoose')
 const { omit } = require('lodash')
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependancies
+// Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const log = require('../../utils/logging')
 const ids = require('../schemas/Identifiers')
@@ -118,6 +118,7 @@ Contact.createSearchIndexes = async () => {
   try {
     await makeSearchable(Contact)
   } catch (err) {
+    log.w(mod, fun, err)
     RudiError.treatError(mod, fun, err)
   }
 }

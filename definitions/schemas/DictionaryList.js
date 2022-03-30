@@ -1,9 +1,14 @@
 'use strict'
 
 // ------------------------------------------------------------------------------------------------
-// External dependancies
+// External dependencies
 // ------------------------------------------------------------------------------------------------
 const mongoose = require('mongoose')
+const { DICT_LANG, DICT_TEXT } = require('../../db/dbFields')
+
+// ------------------------------------------------------------------------------------------------
+// Internal dependencies
+// ------------------------------------------------------------------------------------------------
 const Language = require('../thesaurus/Languages').get()
 
 // ------------------------------------------------------------------------------------------------
@@ -11,14 +16,14 @@ const Language = require('../thesaurus/Languages').get()
 // ------------------------------------------------------------------------------------------------
 const DictionaryList = new mongoose.Schema(
   {
-    lang: {
+    [DICT_LANG]: {
       type: String,
-      default: Language.fr_FR,
+      default: Language.fr,
       enum: Object.values(Language),
       required: true,
     },
-    text: {
-      type: [String],
+    [DICT_TEXT]: {
+      type: [String], // THE difference with DictionaryEntry: we can have several labels per langauge here !
       required: true,
     },
   },
