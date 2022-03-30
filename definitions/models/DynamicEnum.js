@@ -11,7 +11,7 @@ const { omit } = require('lodash')
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const { FIELDS_TO_SKIP } = require('../../db/dbFields')
-const DictionaryEntry = require('../schemas/Dictiogit naryEntry')
+const DictionaryEntry = require('../schemas/DictionaryEntry')
 
 // ------------------------------------------------------------------------------------------------
 // Custom schema definition

@@ -17,7 +17,7 @@ const log = require('../utils/logging')
 
 const json = require('../utils/jsonAccess')
 const utils = require('../utils/jsUtils')
-const { getSkosmosConf } = require('../config/confSystem')
+// const { getSkosmosConf } = require('../config/confSystem')
 
 const db = require('../db/dbQueries')
 
@@ -627,7 +627,7 @@ exports.getSingleThesaurusLabels = async (req, reply) => {
 // ------------------------------------------------------------------------------------------------
 // SKOSMOS server calls
 // ------------------------------------------------------------------------------------------------
-
+/*
 exports.widenSearch = async (searchTerms) => {
   const fun = 'widenSearch'
   try {
@@ -683,3 +683,4 @@ exports.askSkosmos = async (term) => {
     throw RudiError.treatError(mod, fun, err)
   }
 }
+*/
