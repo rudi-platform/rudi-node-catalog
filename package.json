@@ -9,7 +9,7 @@
     "start": "nodemon ./rudiServer.js",
     "extstart": "nodemon -e js,ini --exec \"npm run rudiapp\"",
     "rudiapp": "npm install && node rudiServer.js",
-    "devstart": "./node_modules/nodemon/bin/nodemon.js ./rudiServer.js",
+    "devstart": "nvm use; nvm install; nodemon ./rudiServer.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint \"**/*.js\""
   },
