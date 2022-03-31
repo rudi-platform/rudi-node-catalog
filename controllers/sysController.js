@@ -73,7 +73,7 @@ exports.getEnvironment = () => {
 exports.getNodeVersion = async () => {
   const fun = 'getNodeVersion'
   try {
-    // log.d(mod, fun, ` GET ${URL_PV_NODE_VERSION_ACCESS}`)
+    // log.d(mod, fun, ` GET ${URL_PV_NODE_VERSION_ACCESS}`) 
     const nodeVersion = execSync('node -v')
     const npmVersion = execSync('npm -v')
 
