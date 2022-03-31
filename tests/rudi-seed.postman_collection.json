@@ -63,14 +63,15 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/enum/Themes",
+							"raw": "{{baseUrl}}/{{adminUrl}}/enum/Themes/",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"{{adminUrl}}",
 								"enum",
-								"Themes"
+								"Themes",
+								""
 							]
 						}
 					},
@@ -86,7 +87,7 @@
 									"pm.test(\"All licence codes retrieved\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
-									"    pm.collectionVariables.set('seedLicence', responseJson[1])",
+									"    pm.collectionVariables.set('licences', responseJson)",
 									"});",
 									""
 								],
@@ -137,7 +138,7 @@
 									"",
 									"pm.collectionVariables.set('seedContact1Id', rand.get('{{$randomUUID}}'))",
 									"pm.collectionVariables.set('seedContact1Name', contactName)",
-									"pm.collectionVariables.set('seedContact1Email', utils.getContactEmail(contactName))",
+									"pm.collectionVariables.set('seedContact1Email', rand.getContactEmail(contactName))",
 									""
 								],
 								"type": "text/javascript"
@@ -149,7 +150,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"contact_id\": \"{{seedContact1Id}}\",\n    \"contact_name\": \"{{seedContact1Name}}\",\n    \"email\": \"{{seedContact1Email}}\"\n}",
+							"raw": "{\n    \"contact_id\": \"{{seedContact1Id}}\",\n    \"contact_name\": \"{{seedContact1Name}}\",\n    \"email\": \"{{seedContact1Email}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -191,7 +192,7 @@
 									"",
 									"pm.collectionVariables.set('seedContact2Id', rand.get('{{$randomUUID}}'))",
 									"pm.collectionVariables.set('seedContact2Name', contactName)",
-									"pm.collectionVariables.set('seedContact2Email', utils.getContactEmail(contactName))",
+									"pm.collectionVariables.set('seedContact2Email', rand.getContactEmail(contactName))",
 									""
 								],
 								"type": "text/javascript"
@@ -203,7 +204,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"contact_id\": \"{{seedContact2Id}}\",\n    \"contact_name\": \"{{seedContact2Name}}\",\n    \"email\": \"{{seedContact2Email}}\"\n}",
+							"raw": "{\n    \"contact_id\": \"{{seedContact2Id}}\",\n    \"contact_name\": \"{{seedContact2Name}}\",\n    \"email\": \"{{seedContact2Email}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -245,7 +246,7 @@
 									"",
 									"pm.collectionVariables.set('seedContact3Id', rand.get('{{$randomUUID}}'))",
 									"pm.collectionVariables.set('seedContact3Name', contactName)",
-									"pm.collectionVariables.set('seedContact3Email', utils.getContactEmail(contactName))",
+									"pm.collectionVariables.set('seedContact3Email', rand.getContactEmail(contactName))",
 									""
 								],
 								"type": "text/javascript"
@@ -257,7 +258,59 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"contact_id\": \"{{seedContact3Id}}\",\n    \"contact_name\": \"{{seedContact3Name}}\",\n    \"email\": \"{{seedContact3Email}}\"\n}",
+							"raw": "{\n    \"contact_id\": \"{{seedContact3Id}}\",\n    \"contact_name\": \"{{seedContact3Name}}\",\n    \"email\": \"{{seedContact3Email}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{cont}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get contacts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get contacts\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"organization_id\": \"{{seedOrg2Id}}\",\n    \"organization_name\": \"{{seedOrg2Name}}\",\n    \"organization_address\": \"{{seedOrg2Address}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -310,7 +363,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"organization_id\": \"{{seedOrg1Id}}\",\n    \"organization_name\": \"{{seedOrg1Name}}\",\n    \"organization_address\": \"{{seedOrg1Address}}\"\n}",
+							"raw": "{\n    \"organization_id\": \"{{seedOrg1Id}}\",\n    \"organization_name\": \"{{seedOrg1Name}}\",\n    \"organization_address\": \"{{seedOrg1Address}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -363,7 +416,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"organization_id\": \"{{seedOrg2Id}}\",\n    \"organization_name\": \"{{seedOrg2Name}}\",\n    \"organization_address\": \"{{seedOrg2Address}}\"\n}",
+							"raw": "{\n    \"organization_id\": \"{{seedOrg2Id}}\",\n    \"organization_name\": \"{{seedOrg2Name}}\",\n    \"organization_address\": \"{{seedOrg2Address}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -464,51 +517,61 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
+									"log.t('Init: metadId')",
 									"pm.collectionVariables.set('seedLastMetaId', rand.get('{{$randomUUID}}'))",
 									"",
 									"//————— Thesauri",
+									"log.t('Init: Thesauri')",
 									"pm.collectionVariables.set('randomTheme', rand.pick('themes'));",
 									"pm.collectionVariables.set('randomKeyword1', rand.pick('keywords'));",
 									"pm.collectionVariables.set('randomKeyword2', rand.pick('keywords'));",
 									"pm.collectionVariables.set('randomLicence', rand.pick('licences'));",
 									"",
 									"//————— Producer",
+									"log.t('Init: Producer')",
 									"const orgs = [",
-									"    pm.collectionVariables.get('seedOrg1Id'), ",
+									"    pm.collectionVariables.get('seedOrg1Id'),",
 									"    pm.collectionVariables.get('seedOrg2Id')]",
-									"const randomOrgId = rand.pickInList(orgs)",
-									"pm.collectionVariables.set('randomOrg', randomOrgId);",
-									"const randomOrgId2 = rand.pickInList(orgs)",
-									"pm.collectionVariables.set('randomMetaInfoOrg', randomOrgId2);",
+									"",
+									"pm.collectionVariables.set('randomOrg', rand.pickInList(orgs));",
+									"pm.collectionVariables.set('randomMetaInfoOrg', rand.pickInList(orgs));",
+									"",
+									"log.d('randomOrg: ' + pm.collectionVariables.get('randomOrg'))",
+									"log.d('randomMetaInfoOrg: ' + pm.collectionVariables.get('randomMetaInfoOrg'))",
 									"",
 									"//————— Contact 1",
-									"const contacts = [ ",
-									"    pm.collectionVariables.get('seedContact1Id'), ",
-									"    pm.collectionVariables.get('seedContact2Id'), ",
+									"log.t('Init: Contact 1')",
+									"",
+									"const contacts = [",
+									"    pm.collectionVariables.get('seedContact1Id'),",
+									"    pm.collectionVariables.get('seedContact2Id'),",
 									"    pm.collectionVariables.get('seedContact3Id')];",
 									"//console.log(`contacts: ${contacts}`)",
 									"",
 									"",
 									"const randomContId1 = rand.pickInList(contacts)",
-									"//console.log(`randomContId1: ${randomContId1}`)",
-									"",
 									"pm.collectionVariables.set('randomContact1', randomContId1);",
 									"",
+									"console.log(`randomContId1: ${randomContId1}`)",
+									"",
 									"//————— Contact 2",
+									"log.t('Init: Contact 2')",
 									"const contactsLeft = contacts",
-									"    .filter(function(value, index, arr){ return value != randomContId1 });",
+									"    .filter(function (value, index, arr) { return value != randomContId1 });",
 									"",
 									"const randomContId2 = rand.pickInList(contactsLeft)",
-									"//console.log(`randomContId2: ${randomContId2}`)",
-									"",
 									"pm.collectionVariables.set('randomContact2', randomContId2);",
 									"pm.collectionVariables.set('randomContact3', rand.pickInList(contacts));",
 									"",
+									"console.log(`randomContact2: ${randomContId2}`)",
+									"console.log(`randomContact3: ${pm.collectionVariables.get('randomContact3')}`)",
+									"",
 									"//————— Media id",
+									"log.t('Init: Media')",
 									"pm.collectionVariables.set('seedMediaId', rand.get('{{$randomUUID}}'))",
 									"",
-									"",
 									"//————— Description",
+									"log.t('Init: Descriptions')",
 									"pm.collectionVariables.set('randomTitle', rand.get('{{$randomCatchPhrase}}'));",
 									"pm.collectionVariables.set('randomSynopsis', `${rand.get('{{$randomProductAdjective}}')} ${rand.get('{{$randomBs}}')}`);",
 									"pm.collectionVariables.set('randomSummary', `${rand.get('{{$randomPhrase}}')} ${rand.get('{{$randomPhrase}}')} ${rand.get('{{$randomLoremParagraph}}')}`);",
@@ -524,7 +587,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"global_id\": \"{{seedLastMetaId}}\",\n    \"resource_title\": \"{{randomTitle}}\",\n    \"collection_tag\": \"{{stamp}}\",\n    \"purpose\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{stamp}}\"\n        }\n    ],\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{randomSynopsis}}\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{randomSummary}}\"\n        }\n    ],\n    \"theme\": \"{{randomTheme}}\",\n    \"keywords\": [\n        \"{{randomKeyword1}}\",\n        \"{{randomKeyword2}}\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": 1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": -48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"{{$randomDatePast}}\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{randomOrg}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{randomContact1}}\"\n        },\n        {\n            \"contact_id\": \"{{randomContact2}}\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_provider\": {\n            \"organization_id\": \"{{randomMetaInfoOrg}}\"\n        },\n        \"metadata_contacts\": [\n            {\n                \"contact_id\": \"{{randomContact3}}\"\n            }\n        ]\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{$randomDateRecent}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"licence_label\": \"{{seedLicence}}\"\n        },\n        \"confidentiality\": {\n            \"restricted_access\": false,\n            \"gdpr_sensitive\": false\n        }\n    },\n    \"available_formats\": [\n        {\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{seedMediaId}}\",\n            \"media_name\": \"{{randomTitle}}.json\",\n            \"connector\": {\n                \"url\": \"https://shared-rudi.aqmo.org/media/{{seedMediaId}}\"\n            },\n            \"file_type\": \"application/json\",\n            \"file_size\": 59016,\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"4c9ee0f14e835927a1bbafde0eb89fb3\"\n            }\n        }\n    ]\n}",
+							"raw": "{\n    \"global_id\": \"{{seedLastMetaId}}\",\n    \"resource_title\": \"{{randomTitle}}\",\n    \"collection_tag\": \"{{stamp}}\",\n    \"purpose\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{stamp}}\"\n        }\n    ],\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{randomSynopsis}}\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{randomSummary}}\"\n        }\n    ],\n    \"theme\": \"{{randomTheme}}\",\n    \"keywords\": [\n        \"{{randomKeyword1}}\",\n        \"{{randomKeyword2}}\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": 1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": -48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"{{$randomDatePast}}\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{randomOrg}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{randomContact1}}\"\n        },\n        {\n            \"contact_id\": \"{{randomContact2}}\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_provider\": {\n            \"organization_id\": \"{{randomMetaInfoOrg}}\"\n        },\n        \"metadata_contacts\": [\n            {\n                \"contact_id\": \"{{randomContact3}}\"\n            }\n        ]\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{$randomDateRecent}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"licence_label\": \"{{randomLicence}}\"\n        },\n        \"confidentiality\": {\n            \"restricted_access\": false,\n            \"gdpr_sensitive\": false\n        }\n    },\n    \"available_formats\": [\n        {\n            \"media_type\": \"FILE\",\n            \"media_id\": \"{{seedMediaId}}\",\n            \"media_name\": \"{{randomTitle}}.json\",\n            \"connector\": {\n                \"url\": \"https://shared-rudi.aqmo.org/media/{{seedMediaId}}\"\n            },\n            \"file_type\": \"application/json\",\n            \"file_size\": 59016,\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"4c9ee0f14e835927a1bbafde0eb89fb3\"\n            },\n            \"collection_tag\": \"{{stamp}}\"\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1152,6 +1215,246 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Clean",
+			"item": [
+				{
+					"name": "Delete previous test metadata",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const stamp = pm.collectionVariables.get('stamp')",
+									"pm.test(`Delete metadata with '${stamp}' stamp`, () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    \"{{softMeta1Id}}\",\n    \"{{softMeta2Id}}\"\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?collection_tag={{stamp}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{data}}"
+							],
+							"query": [
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete previous test contacts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const stamp = pm.collectionVariables.get('stamp')",
+									"pm.test(`Delete contacts with '${stamp}' stamp`, () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    \"{{softMeta1Id}}\",\n    \"{{softMeta2Id}}\"\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}?collection_tag={{stamp}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{cont}}"
+							],
+							"query": [
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete previous test orgs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const stamp = pm.collectionVariables.get('stamp')",
+									"pm.test(`Delete orgs with '${stamp}' stamp`, () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    \"{{softMeta1Id}}\",\n    \"{{softMeta2Id}}\"\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}?collection_tag={{stamp}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{org}}"
+							],
+							"query": [
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete previous test media",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const stamp = pm.collectionVariables.get('stamp')",
+									"pm.test(`Delete media with '${stamp}' stamp`, () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    \"{{softMeta1Id}}\",\n    \"{{softMeta2Id}}\"\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{media}}?collection_tag={{stamp}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{media}}"
+							],
+							"query": [
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete previous test reports",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const stamp = pm.collectionVariables.get('stamp')",
+									"pm.test(`Delete reports with '${stamp}' stamp`, () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    \"{{softMeta1Id}}\",\n    \"{{softMeta2Id}}\"\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{reports}}?collection_tag={{stamp}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"{{reports}}"
+							],
+							"query": [
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"auth": {
@@ -1159,7 +1462,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "{{pm_jwt}}",
+				"value": "{{{{apiTokenName}}}}",
 				"type": "string"
 			}
 		]
@@ -1170,73 +1473,57 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
-					"const TOKEN_DURATION_S = 1200",
-					"const API_TOKEN_NAME = 'pm_jwt'",
-					"const PORTAL_TOKEN_NAME = 'portal_jwt'",
-					"const TRACE = false",
-					"const DEBUG = false",
+					"const TRACE = true",
+					"const DEBUG = true",
 					"",
-					"utils = {",
-					"    getContactEmail: function (contactName) {",
-					"        return `${contactName",
-					"            .replace(/(Miss|(Ms|Mrs|Mr|Dr)\\.)\\s|'Jr\\.'/gi, '')",
-					"            .toLowerCase()",
-					"            .replace(/\\s+|\\.\\./g, '.')",
-					"            .replace(/^\\.+|\\.+$|\\'+/g, '')",
-					"            }@irisa.fr`;",
-					"    },",
-					"};",
+					"const TOKEN_DURATION_S = 1200",
+					"const API_TOKEN_NAME = pm.variables.get('apiTokenName')",
+					"const PORTAL_TOKEN_NAME = pm.variables.get('portalTokenName')",
+					"const AUTH = 'Authorization'",
+					"",
+					"log = {",
+					"    d: (msg) => { if (DEBUG || TRACE) console.log(msg) },",
+					"    t: (msg) => { if (TRACE) console.log(msg) }",
+					"}",
 					"",
 					"time = {",
-					"    now: function () {",
-					"        return new Date().toISOString()",
-					"    },",
-					"",
-					"    nowEpochS: function () {",
-					"        return _.floor(new Date().getTime() / 1000)",
-					"    },",
-					"",
-					"    timezone: function () {",
-					"        return new Date().getTimezoneOffset()",
-					"    },",
+					"    now: () => new Date().toISOString(),",
+					"    nowEpochS: () => _.floor(new Date().getTime() / 1000),",
+					"    timezone: () => new Date().getTimezoneOffset(),",
 					"}",
 					"codec = {",
-					"    fromBase64: function (data) {",
-					"        return Buffer.from(data, 'base64').toString('utf-8');",
-					"    },",
+					"    streamToString: (data) => data?.stream?.toString('utf8'),",
 					"",
-					"    fromBase64Url: function (base64Url) {",
-					"        const padded = (base64Url.Length % 4 == 0)",
-					"            ? base64Url",
-					"            : base64Url + \"====\".substring(base64Url.Length % 4);",
+					"    fromBase64: (data) => Buffer.from(data, 'base64')?.toString('utf-8'),",
 					"",
-					"        const base64 = padded",
+					"    fromBase64Url: (base64UrlStr) => {",
+					"        log.t('-- base64UrlStr --')",
+					"        if (!base64UrlStr) return ''",
+					"        //        log.d('base64UrlStr: ' + base64UrlStr)",
+					"        //        log.d('base64UrlStr.length: ' + base64UrlStr.length)",
+					"        const paddedStr = (base64UrlStr.length % 4 == 0)",
+					"            ? base64UrlStr",
+					"            : base64UrlStr + \"====\".substring(base64UrlStr.length % 4);",
+					"        // log.d('paddedStr: ' + paddedStr)",
+					"        const base64Str = paddedStr",
 					"            .replace(\"_\", \"/\")",
 					"            .replace(\"-\", \"+\");",
-					"",
-					"        return this.fromBase64(base64);",
+					"        // log.d('base64Str: ' + base64Str)",
+					"        return codec.fromBase64(base64Str);",
 					"    },",
 					"",
-					"    streamToUtf8: function (data) {",
-					"        return data.stream.toString('utf8')",
-					"    }",
+					"    streamToUtf8: (data) => data?.stream?.toString('utf8')",
+					"",
 					"};",
 					"",
 					"rand = {",
-					"    get: function (randName) {",
-					"        return pm.variables.replaceIn(randName);",
-					"    },",
+					"    get: (randName) => pm.collectionVariables.replaceIn(randName),",
 					"",
-					"    pickInList: function (list) {",
-					"        const randomNumber = _.random(0, list.length - 1);",
-					"        return list[randomNumber];",
-					"    },",
+					"    pickInList: (list) => list[_.random(0, list.length - 1)],",
 					"",
-					"    pick: function (listName) {",
-					"        return this.pickInList(pm.collectionVariables.get(listName));",
-					"    },",
+					"    pick: (listName) => rand.pickInList(pm.collectionVariables.get(listName)),",
 					"",
-					"    initVal: function (field) {",
+					"    initVal: (field) => {",
 					"        const val = pm.collectionVariables.get(field);",
 					"        if (val) return val;",
 					"        const randVal = rand.get('{{$randomUUID}}');",
@@ -1244,42 +1531,44 @@
 					"        return randVal;",
 					"    },",
 					"",
-					"    getContactEmail: function (contactName) {",
-					"        return `${contactName",
-					"            .replace(/(Miss|(Ms|Mrs|Mr|Dr)\\.)\\s|'Jr\\.'/gi, '')",
-					"            .toLowerCase()",
-					"            .replace(/\\s+|\\.\\./g, '.')",
-					"            .replace(/^\\.+|\\.+$|\\'+/g, '')",
-					"            }@irisa.fr`;",
-					"    },",
+					"    getContactEmail: (contactName) => `${contactName",
+					"        .replace(/(Miss|(Ms|Mrs|Mr|Dr)\\.)\\s|'Jr\\.'/gi, '')",
+					"        .toLowerCase()",
+					"        .replace(/\\s+|\\.\\./g, '.')",
+					"        .replace(/^\\.+|\\.+$|\\'+/g, '')",
+					"        }@irisa.fr`,",
 					"};",
 					"",
 					"secu = {",
 					"",
-					"    isTokenValid: function (tokenName) {",
-					"        if (TRACE) console.log('-- is ' + tokenName + ' Valid --')",
+					"    isTokenValid: (tokenName) => {",
+					"        log.t('-- is ' + tokenName + ' Valid --')",
 					"        const token = pm.collectionVariables.get(tokenName)",
 					"        // console.log('typeof token: ' + typeof token)",
 					"        if (!token || typeof token !== 'string') {",
-					"            if (DEBUG) console.log('Token ' + tokenName + ' is invalid: ' + JSON.stringify(token))",
+					"            log.d('Token ' + tokenName + ' is invalid: ' + JSON.stringify(token))",
 					"            return false",
 					"        }",
-					"        // console.log('jwt: ' + JSON.stringify(token))",
+					"        // log.d('splitting token: ' + token)",
 					"        const jwtBodyEncoded = token.split('.')[1]",
+					"        // log.d('split token: ' + jwtBodyEncoded)",
+					"",
 					"        const jwtBody = JSON.parse(codec.fromBase64Url(jwtBodyEncoded))",
+					"        // log.d('decoded body: ' + jwtBody)",
 					"        if (!jwtBody.exp) {",
-					"            if (DEBUG) console.log('No expiration time was found')",
+					"            log.d('No expiration time was found')",
 					"            return false",
 					"        }",
+					"        // log.d('is token valid?')",
 					"        const isValid = jwtBody.exp > time.nowEpochS()",
-					"        if (DEBUG) console.log(tokenName + ' is ' + (isValid ? '' : 'not ') + 'valid')",
+					"        // log.d(tokenName + ' is ' + (isValid ? '' : 'not ') + 'valid')",
 					"        return isValid",
 					"    },",
 					"",
-					"    renewApiToken: async function (tokenName, next) {",
-					"        if (TRACE) console.log('-- renewApiToken --')",
+					"    renewApiToken: async (tokenName, next) => {",
+					"        log.t('-- renewApiToken --')",
 					"        const reqUrl = pm.variables.get('cryptoJwtUrl') + '/forge'",
-					"        if (DEBUG) console.log('reqUrl: ' + reqUrl)",
+					"        // log.d('reqUrl: ' + reqUrl)",
 					"        const reqNewToken = {",
 					"            url: reqUrl,",
 					"            method: 'POST',",
@@ -1296,56 +1585,67 @@
 					"                })",
 					"            }",
 					"        }",
-					"        pm.sendRequest(reqNewToken, (err, res) => {",
-					"            const token = codec.streamToUtf8(res)",
-					"            if (DEBUG) console.log('rudiProdToken : ' + token)",
-					"            pm.expect(res).to.have.property('code', 200);",
-					"            pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
-					"            pm.collectionVariables.set(tokenName, token)",
-					"            if (DEBUG) console.log('API token stored')",
+					"        try {",
+					"            pm.sendRequest(reqNewToken, (err, res) => {",
+					"                const token = codec.streamToUtf8(res)",
+					"                // log.d('rudiProdToken : ' + token)",
+					"                try {",
+					"                    pm.expect(res).to.have.property('code', 200);",
+					"                } catch (err) {",
+					"                    console.error('[renewPortalToken]: ' + err)",
+					"                    throw new Error('Crypto module should be running')",
+					"                }",
+					"                pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
+					"                pm.collectionVariables.set(tokenName, token)",
+					"                log.d('API token stored')",
 					"",
-					"            next(token)",
-					"            //return token",
-					"        })",
+					"                next(token)",
+					"                //return token",
+					"            })",
+					"        } catch (err) { throw new Error('Crypto module not started') }",
 					"    },",
 					"",
-					"    renewPortalToken: async function (tokenName, rudiProdToken) {",
-					"        if (TRACE) console.log('-- renewPortalToken --')",
+					"    renewPortalToken: async (tokenName, rudiProdToken) => {",
+					"        log.t('-- renewPortalToken --')",
 					"        const reqUrl = pm.variables.get('baseUrl') + '/' + pm.variables.get('adminUrl') + '/portal/token'",
-					"        // if (DEBUG) console.log('reqUrl: ' + reqUrl)",
+					"        log.d('reqUrl: ' + reqUrl)",
 					"        const rpToken = rudiProdToken",
 					"        const reqNewToken = {",
 					"            url: reqUrl,",
 					"            method: 'GET',",
 					"            header: {",
 					"                \"Content-Type\": \"application/json\",",
-					"                \"Authorization\": 'Bearer ' + rpToken",
+					"                [AUTH]: 'Bearer ' + rpToken",
 					"            },",
 					"        }",
 					"        pm.sendRequest(reqNewToken, (err, res) => {",
-					"            pm.expect(res).to.have.property('code', 200);",
-					"            //if (DEBUG) console.log('renewPortalToken res: ' + JSON.stringify(res))",
+					"            try {",
+					"                pm.expect(res).to.have.property('code', 200);",
+					"            } catch (err) {",
+					"                console.error('[renewPortalToken]: ' + err)",
+					"            }",
+					"            //log.d('renewPortalToken res: ' + JSON.stringify(res))",
 					"            const token = JSON.parse(codec.streamToUtf8(res)).access_token",
 					"            //const token = res.json()",
-					"            if (DEBUG) console.log('Portal token: ' + token)",
+					"            log.d('Portal token: ' + token)",
 					"",
 					"            pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
 					"            pm.collectionVariables.set(tokenName, token)",
-					"            if (DEBUG) console.log('Portal token stored')",
+					"            log.d('Portal token stored')",
 					"",
 					"        })",
 					"    },",
 					"",
-					"    getRudiProdToken: async function (next) {",
-					"        if (TRACE) console.log('-- getRudiProdToken --')",
+					"    getRudiProdToken: async (next) => {",
+					"        log.t('-- getRudiProdToken --')",
 					"        const tokenName = API_TOKEN_NAME",
 					"        if (!secu.isTokenValid(tokenName)) await secu.renewApiToken(tokenName, next)",
 					"        else next(pm.variables.get(tokenName))",
 					"        return pm.variables.get(tokenName)",
 					"    },",
 					"",
-					"    getPortalToken: async function (apiToken) {",
-					"        if (TRACE) console.log('-- getPortalToken --')",
+					"    getPortalToken: async (apiToken) => {",
+					"        log.t('-- getPortalToken --')",
 					"        const tokenName = PORTAL_TOKEN_NAME",
 					"        if (!secu.isTokenValid(tokenName)) await secu.renewPortalToken(tokenName, apiToken)",
 					"        return pm.variables.get(tokenName)",
@@ -1353,8 +1653,8 @@
 					"",
 					"}",
 					"",
-					"",
 					"secu.getRudiProdToken(secu.getPortalToken)",
+					"log.t('Init OK')",
 					""
 				]
 			}
@@ -1375,6 +1675,14 @@
 			"value": "rudi-seed"
 		},
 		{
+			"key": "apiJwt",
+			"value": ""
+		},
+		{
+			"key": "portalJwt",
+			"value": ""
+		},
+		{
 			"key": "keywords",
 			"value": ""
 		},
@@ -1384,70 +1692,6 @@
 		},
 		{
 			"key": "licences",
-			"value": ""
-		},
-		{
-			"key": "randomTheme",
-			"value": ""
-		},
-		{
-			"key": "randomKeyword1",
-			"value": ""
-		},
-		{
-			"key": "randomKeyword2",
-			"value": ""
-		},
-		{
-			"key": "randomLicence",
-			"value": ""
-		},
-		{
-			"key": "randomOrg",
-			"value": ""
-		},
-		{
-			"key": "randomContact1",
-			"value": ""
-		},
-		{
-			"key": "randomContact2",
-			"value": ""
-		},
-		{
-			"key": "randomSummary",
-			"value": ""
-		},
-		{
-			"key": "randomSynopsis",
-			"value": ""
-		},
-		{
-			"key": "randomTitle",
-			"value": ""
-		},
-		{
-			"key": "seedOrg1Id",
-			"value": ""
-		},
-		{
-			"key": "seedOrg1Name",
-			"value": ""
-		},
-		{
-			"key": "seedOrg1Address",
-			"value": ""
-		},
-		{
-			"key": "seedOrg2Id",
-			"value": ""
-		},
-		{
-			"key": "seedOrg2Name",
-			"value": ""
-		},
-		{
-			"key": "seedOrg2Address",
 			"value": ""
 		},
 		{
@@ -1487,11 +1731,27 @@
 			"value": ""
 		},
 		{
-			"key": "randomOrgId",
+			"key": "seedOrg1Id",
 			"value": ""
 		},
 		{
-			"key": "randomMetaId",
+			"key": "seedOrg1Name",
+			"value": ""
+		},
+		{
+			"key": "seedOrg1Address",
+			"value": ""
+		},
+		{
+			"key": "seedOrg2Id",
+			"value": ""
+		},
+		{
+			"key": "seedOrg2Name",
+			"value": ""
+		},
+		{
+			"key": "seedOrg2Address",
 			"value": ""
 		},
 		{
@@ -1499,7 +1759,35 @@
 			"value": ""
 		},
 		{
+			"key": "randomTheme",
+			"value": ""
+		},
+		{
+			"key": "randomKeyword1",
+			"value": ""
+		},
+		{
+			"key": "randomKeyword2",
+			"value": ""
+		},
+		{
+			"key": "randomLicence",
+			"value": ""
+		},
+		{
+			"key": "randomOrg",
+			"value": ""
+		},
+		{
 			"key": "randomMetaInfoOrg",
+			"value": ""
+		},
+		{
+			"key": "randomContact1",
+			"value": ""
+		},
+		{
+			"key": "randomContact2",
 			"value": ""
 		},
 		{
@@ -1511,19 +1799,15 @@
 			"value": ""
 		},
 		{
-			"key": "seedLicence",
+			"key": "randomTitle",
 			"value": ""
 		},
 		{
-			"key": "exp",
+			"key": "randomSynopsis",
 			"value": ""
 		},
 		{
-			"key": "pm_jwt",
-			"value": ""
-		},
-		{
-			"key": "portal_jwt",
+			"key": "randomSummary",
 			"value": ""
 		}
 	]
