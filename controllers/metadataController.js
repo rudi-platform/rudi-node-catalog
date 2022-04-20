@@ -721,15 +721,13 @@ exports.sendManyMetadataToPortal = async (req) => {
         })
         metadataList = metadataListAndCount[LIST_LABEL]
       }
-      for (const meta of metadataList) {
-        const id = meta[API_METADATA_ID]
-        portalController.sendMetadataToPortal(id)
-      }
+      await Promise.all(
+        metadataList.map((meta) => {
+          portalController.sendMetadataToPortal(meta[API_METADATA_ID])
+        })
+      )
     } else {
-      // We have a list of ids
-      for (const id of listIds) {
-        portalController.sendMetadataToPortal(id)
-      }
+      await Promise.all(listIds.map((id) => portalController.sendMetadataToPortal(id)))
     }
     return 'Sending metadata to portal'
   } catch (err) {
