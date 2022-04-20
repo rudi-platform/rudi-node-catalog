@@ -113,6 +113,6 @@ exports.getAllLicenceCodes = async (req, reply) => {
 
 exports.initLicences = async (req, reply) => {
   const fun = `initLicences`
-  log.t(mod, fun, `< POST ${URL_PV_LICENCE_ACCESS}/${ACT_INIT}`)
+  log.t(mod, fun, `< ${req.method} ${req.url}`)
   return await this.initializeLicences()
 }

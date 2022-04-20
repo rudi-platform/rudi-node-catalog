@@ -1,7 +1,6 @@
 'use strict'
 
 const mod = 'sysConf'
-
 // ------------------------------------------------------------------------------------------------
 // External dependecies
 // ------------------------------------------------------------------------------------------------
@@ -11,14 +10,30 @@ const mod = 'sysConf'
 // ------------------------------------------------------------------------------------------------
 const fa = require('../utils/fileActions')
 const utils = require('../utils/jsUtils')
-const { TRACE, TRACE_MOD, TRACE_FUN, TRACE_ERR } = require('./confApi')
-
 utils.separateLogs()
+
+// ------------------------------------------------------------------------------------------------
+// Constants
+// ------------------------------------------------------------------------------------------------
+const { CLI_CONF_PATH, getCliOptions, getAppOptions } = require('./appOptions')
+const { TRACE, TRACE_MOD, TRACE_FUN, TRACE_ERR } = require('./confApi')
 
 // ------------------------------------------------------------------------------------------------
 // Constants: local ini file configuration settings
 // ------------------------------------------------------------------------------------------------
 let CURRENT_APP_HASH
+
+// ------------------------------------------------------------------------------------------------
+// Display app options
+// ------------------------------------------------------------------------------------------------
+const appOptions = getAppOptions()
+if (utils.isNotEmptyObject(appOptions))
+  utils.consoleLog(mod, 'commandLineOptions', utils.beautify(appOptions))
+
+// ------------------------------------------------------------------------------------------------
+// Extract environment variables
+// ------------------------------------------------------------------------------------------------
+const RUDI_API_USER_ENV = process.env.RUDI_API_USER_CONF
 
 // ------------------------------------------------------------------------------------------------
 // Constants
@@ -28,8 +43,7 @@ let CURRENT_APP_HASH
 // - directory
 const INI_DIR = './0-ini'
 // - user conf path
-const RUDI_API_USER_ENV = process.env.RUDI_API_USER_CONF
-const USER_CONF_FILE = RUDI_API_USER_ENV || `${INI_DIR}/conf_custom.ini`
+const USER_CONF_FILE = getAppOptions('conf') || `${INI_DIR}/conf_custom.ini`
 // utils.consoleLog(mod, 'init', USER_CONF_FILE)
 // - default conf path
 const DEFT_CONF_FILE = `${INI_DIR}/conf_default.ini`
@@ -43,7 +57,11 @@ const DEFT_CONF_FILE = `${INI_DIR}/conf_default.ini`
 const getUserConf = () => {
   const fun = 'getUserConf'
   try {
-    utils.consoleLog(mod, fun, `Conf file: ${RUDI_API_USER_ENV ? 'env' : 'ini'}`)
+    utils.consoleLog(
+      mod,
+      fun,
+      appOptions[CLI_CONF_PATH] ? 'cli' : `Conf file: ${RUDI_API_USER_ENV ? 'env' : 'ini'}`
+    )
     return fa.readIniFile(USER_CONF_FILE)
   } catch (err) {
     utils.consoleErr(mod, fun, err)

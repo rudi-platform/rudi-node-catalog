@@ -151,7 +151,7 @@ function cleanDate(inputDate) {
     const cleanDate = new Date(cleanValue)
     if (cleanDate === 'Invalid Date')
       throw new BadRequestError(`Invalid date: '${inputDate} / ${cleanValue}'`)
-    log.d(mod, fun, `clean date: ${cleanDate.toISOString()}`)
+    // log.d(mod, fun, `clean date: ${cleanDate.toISOString()}`)
     return cleanDate
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)

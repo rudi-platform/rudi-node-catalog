@@ -977,7 +977,12 @@
 							"script": {
 								"exec": [
 									"pm.collectionVariables.set('softOrg2Id', rand.get('{{$randomUUID}}'))",
-									"pm.collectionVariables.set('softOrg2Name', rand.get('{{$randomCompanyName}}'))",
+									"let newCompanyName = rand.get('{{$randomCompanyName}}')",
+									"let previousCompanyName = pm.collectionVariables.get('softOrg1Name')",
+									"while (newCompanyName == previousCompanyName) {",
+									"    newCompanyName = rand.get('{{$randomCompanyName}}')",
+									"}",
+									"pm.collectionVariables.set('softOrg2Name', newCompanyName)",
 									"const orgAddress = `${rand.get('{{$randomStreetAddress}}')}, ${rand.get('{{$randomCity}}')}`",
 									"pm.collectionVariables.set('softOrg2Address', orgAddress)",
 									""
@@ -4948,6 +4953,10 @@
 			"value": ""
 		},
 		{
+			"key": "dateUpdate",
+			"value": ""
+		},
+		{
 			"key": "gitHash",
 			"value": ""
 		},
@@ -5113,25 +5122,6 @@
 		},
 		{
 			"key": "softReport3Id",
-			"value": ""
-		},
-		{
-			"key": "dateUpdate",
-			"value": ""
-		},
-		{
-			"key": "apiToken",
-			"value": ""
-		},
-		{
-			"key": "portalToken",
-			"value": ""
-		},
-		{
-			"key": "rudiProdToken",
-			"value": ""
-		},
-		{
 			"value": ""
 		}
 	]
