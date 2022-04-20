@@ -10,7 +10,7 @@ const mod = 'sysConf'
 // ------------------------------------------------------------------------------------------------
 const fa = require('../utils/fileActions')
 const utils = require('../utils/jsUtils')
-utils.separateLogs()
+// utils.separateLogs()
 
 // ------------------------------------------------------------------------------------------------
 // Constants
