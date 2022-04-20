@@ -6,40 +6,42 @@
 // ------------------------------------------------------------------------------------------------
 // App options: environment variables
 // ------------------------------------------------------------------------------------------------
-exports.NODE_ENV = 'NODE_ENV'
-exports.RUDI_API_ENV = 'RUDI_API_ENV'
-exports.RUDI_API_GIT_REV = 'RUDI_API_GIT_REV'
-exports.RUDI_API_USER_CONF = 'RUDI_API_USER_CONF'
-exports.RUDI_API_PORTAL_CONF = 'RUDI_API_PORTAL_CONF'
+exports.OPT_GIT_HASH = 'hash'
+
+exports.OPT_NODE_ENV = 'nodeEnv'
+exports.OPT_APP_ENV = 'appEnv'
+
+exports.OPT_USER_CONF = 'conf'
+exports.OPT_PORTAL_CONF = 'portalConf'
 
 // ------------------------------------------------------------------------------------------------
 // App options
 // ------------------------------------------------------------------------------------------------
 exports.OPTIONS = {
-  id: {
+  [this.OPT_GIT_HASH]: {
     text: 'Git hash',
     cli: '--hash',
-    env: this.RUDI_API_GIT_REV,
+    env: 'RUDI_API_GIT_REV',
   },
-  node_env: {
+  [this.OPT_NODE_ENV]: {
     text: 'Node environment: production | development',
-    env: this.NODE_ENV,
+    env: 'NODE_ENV',
     cli: '--node_env',
   },
-  app_env: {
+  [this.OPT_APP_ENV]: {
     text: 'Module environment type: production | release | shared | test',
     cli: '--app_env',
-    env: this.RUDI_API_ENV,
+    env: 'RUDI_API_ENV',
   },
-  conf: {
+  [this.OPT_USER_CONF]: {
     text: 'User conf file',
     cli: '--conf',
-    env: this.RUDI_API_USER_CONF,
+    env: 'RUDI_API_USER_CONF',
   },
-  portal_conf: {
+  [this.OPT_PORTAL_CONF]: {
     text: 'Portal conf file',
     cli: '--portal_conf',
-    env: this.RUDI_API_PORTAL_CONF,
+    env: 'RUDI_API_PORTAL_CONF',
   },
 }
 
@@ -91,4 +93,17 @@ console.log('--------------------------------------------------------------')
 // portal_conf: CLI_OPTIONS.portal_conf || process.env[this.RUDI_API_USER_CONF],
 // }
 
-exports.getAppOptions = (opt) => (opt ? appOptionsValues[opt] : appOptionsValues)
+exports.getAppOptions = (opt, altValue) =>
+  opt ? appOptionsValues[opt] || altValue : appOptionsValues
+
+exports.getGitHash = () => {
+  try {
+    return (
+      this.getAppOptions(this.OPT_GIT_HASH) ||
+      `${require('child_process').execSync('git rev-parse --short HEAD')}`.trim()
+    )
+  } catch (err) {
+    console.error(err)
+    throw err
+  }
+}

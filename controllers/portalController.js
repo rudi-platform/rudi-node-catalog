@@ -505,7 +505,7 @@ exports.sendMetadataToPortal = async (metadataId) => {
 
     //--- Check input param
     if (!metadataId) throw new NotImplementedError('Not yet implemented')
-    if (!validate.isUUID(metadataId)) throw new BadRequestError('Bad formatted UUID')
+    if (!validate.isUUID(metadataId)) throw new BadRequestError(`Bad formatted UUID: ${metadataId}`)
 
     //--- Get local metadata from ID
     const metadata = await db.getEnsuredObjectWithRudiId(api.OBJ_METADATA, metadataId)

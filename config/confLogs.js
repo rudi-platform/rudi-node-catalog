@@ -28,6 +28,7 @@ Object.assign(
 // ------------------------------------------------------------------------------------------------
 const utils = require('../utils/jsUtils')
 const sys = require('../config/confSystem')
+const { getGitHash, getAppOptions, OPT_NODE_ENV } = require('./appOptions')
 
 // ------------------------------------------------------------------------------------------------
 // Reading conf file
@@ -241,7 +242,7 @@ exports.initFFLogger = () => {
     levels: syslogLevels,
     // format: format.combine(format.splat(), format.json()),
     defaultMeta: {
-      service: sys.getAppName() + '_' + (process.env.NODE_ENV || 'dev'),
+      service: sys.getAppName() + '_' + (getAppOptions(OPT_NODE_ENV) || 'dev'),
     },
     transports: [logOutputs.ffError],
   })
@@ -354,6 +355,6 @@ function getRudiLoggerOptions() {
 
 exports.sysLogger = new rudiLogger.RudiLogger(
   sys.getAppName(),
-  sys.getGitHash(),
+  getGitHash(),
   getRudiLoggerOptions()
 )

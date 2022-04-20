@@ -19,8 +19,9 @@ const mongoose = require('mongoose')
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
 const utils = require('../utils/jsUtils')
+const { getGitHash, getAppOptions, OPT_APP_ENV } = require('../config/appOptions')
+const { getAppHash } = require('../config/confSystem')
 const { RudiError } = require('../utils/errors')
-const { getGitHash, getAppHash } = require('../config/confSystem')
 const { API_VERSION } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
@@ -61,8 +62,9 @@ exports.ENV_RELEASE = 'release'
 exports.getEnvironment = () => {
   const fun = 'getEnvironment'
   try {
-    log.t(mod, fun, process.env.RUDI_API_ENV)
-    const env = process.env.RUDI_API_ENV ? process.env.RUDI_API_ENV : utils.NOT_FOUND
+    log.t(mod, fun, getAppOptions(OPT_APP_ENV))
+    const appEnv = getAppOptions(OPT_APP_ENV)
+    const env = appEnv || utils.NOT_FOUND
     return env
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)

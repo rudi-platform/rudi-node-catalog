@@ -15,7 +15,7 @@ const utils = require('../utils/jsUtils')
 // ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
-const { CLI_CONF_PATH, getCliOptions, getAppOptions } = require('./appOptions')
+const { CLI_CONF_PATH, getAppOptions, getGitHash } = require('./appOptions')
 const { TRACE, TRACE_MOD, TRACE_FUN, TRACE_ERR } = require('./confApi')
 
 // ------------------------------------------------------------------------------------------------
@@ -27,8 +27,8 @@ let CURRENT_APP_HASH
 // Display app options
 // ------------------------------------------------------------------------------------------------
 const appOptions = getAppOptions()
-if (utils.isNotEmptyObject(appOptions))
-  utils.consoleLog(mod, 'commandLineOptions', utils.beautify(appOptions))
+// if (utils.isNotEmptyObject(appOptions))
+//   utils.consoleLog(mod, 'commandLineOptions', utils.beautify(appOptions))
 
 // ------------------------------------------------------------------------------------------------
 // Extract environment variables
@@ -172,30 +172,11 @@ utils.consoleLog(mod, 'init', `DB: ${DB_URL}`)
 // App ID
 // ------------------------------------------------------------------------------------------------
 
-exports.getGitHash = () => {
-  const fun = 'getGitHash'
-  // log.t(mod, fun, ``)
-  // log.d(mod, fun, ` GET ${URL_PV_GIT_HASH_ACCESS}`)
-  try {
-    let hashId = process.env.RUDI_API_GIT_REV
-
-    if (!hashId) {
-      hashId = require('child_process').execSync('git rev-parse --short HEAD')
-      // log.d(mod, fun, utils.beautify(process.env))
-    }
-    return `${hashId}`.trim()
-  } catch (err) {
-    const error = new Error(`No git hash: ${err}`)
-    error[TRACE] = [{ [TRACE_MOD]: mod, [TRACE_FUN]: fun, [TRACE_ERR]: err }]
-    throw error
-  }
-}
-
 /** @returns the git hash of the last time the app was launched */
 exports.getAppHash = () => {
   const fun = 'getCurrentAppId'
   try {
-    if (!CURRENT_APP_HASH) CURRENT_APP_HASH = this.getGitHash()
+    if (!CURRENT_APP_HASH) CURRENT_APP_HASH = getGitHash()
     return CURRENT_APP_HASH
   } catch (err) {
     const error = new Error(`No git hash: ${err}`)
