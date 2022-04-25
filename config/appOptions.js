@@ -18,11 +18,6 @@ exports.OPT_PORTAL_CONF = 'portalConf'
 // App options
 // ------------------------------------------------------------------------------------------------
 exports.OPTIONS = {
-  [this.OPT_GIT_HASH]: {
-    text: 'Git hash',
-    cli: '--hash',
-    env: 'RUDI_API_GIT_REV',
-  },
   [this.OPT_NODE_ENV]: {
     text: 'Node environment: production | development',
     env: 'NODE_ENV',
@@ -32,6 +27,11 @@ exports.OPTIONS = {
     text: 'Module environment type: production | release | shared | test',
     cli: '--app_env',
     env: 'RUDI_API_ENV',
+  },
+  [this.OPT_GIT_HASH]: {
+    text: 'Git hash',
+    cli: '--hash',
+    env: 'RUDI_API_GIT_REV',
   },
   [this.OPT_USER_CONF]: {
     text: 'User conf file',

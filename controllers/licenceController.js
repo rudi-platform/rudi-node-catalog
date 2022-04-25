@@ -17,13 +17,7 @@ const skosController = require('./skosController')
 
 const { InternalServerError, RudiError } = require('../utils/errors')
 
-const {
-  URL_PV_LICENCE_ACCESS,
-  URL_PV_LICENCE_CODES_ACCESS,
-  ACT_INIT,
-} = require('../config/confApi')
-
-const { API_SKOS_CONCEPT_CODE, LICENCE_CONCEPT_ROLE } = require('../db/dbFields')
+const { API_SKOS_CONCEPT_CODE, LICENCE_CONCEPT_ROLE, API_LICENCE_LABEL } = require('../db/dbFields')
 const { OBJ_LICENCES } = require('../config/confApi')
 
 // ------------------------------------------------------------------------------------------------
@@ -89,7 +83,7 @@ exports.initializeLicences = async () => {
 }
 
 exports.getLicenceWithCode = async (licenceCode) => {
-  return await db.searchDbIdWithJson(OBJ_LICENCES, { API_LICENCE_LABEL: licenceCode })
+  return await db.searchDbIdWithJson(OBJ_LICENCES, { [API_LICENCE_LABEL]: licenceCode })
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -97,7 +91,7 @@ exports.getLicenceWithCode = async (licenceCode) => {
 // ------------------------------------------------------------------------------------------------
 exports.getAllLicences = async (req, reply) => {
   const fun = `getAllLicences`
-  log.t(mod, fun, `< GET ${URL_PV_LICENCE_ACCESS}`)
+  log.t(mod, fun, `< ${req?.method} ${req?.url}`)
   // log.t(mod, fun, ``)
 
   return await this.getLicences()
@@ -105,7 +99,7 @@ exports.getAllLicences = async (req, reply) => {
 
 exports.getAllLicenceCodes = async (req, reply) => {
   const fun = `getAllLicenceCodes`
-  log.t(mod, fun, `< GET ${URL_PV_LICENCE_CODES_ACCESS}`)
+  log.t(mod, fun, `< ${req?.method} ${req?.url}`)
   // log.t(mod, fun, ``)
 
   return await this.getLicenceCodes()
@@ -113,6 +107,6 @@ exports.getAllLicenceCodes = async (req, reply) => {
 
 exports.initLicences = async (req, reply) => {
   const fun = `initLicences`
-  log.t(mod, fun, `< ${req.method} ${req.url}`)
+  log.t(mod, fun, `< ${req?.method} ${req?.url}`)
   return await this.initializeLicences()
 }

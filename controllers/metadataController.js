@@ -552,8 +552,8 @@ exports.setGeography = (metadata) => {
 // ------------------------------------------------------------------------------------------------
 exports.upsertMetadata = async (rudiMetadata) => {
   const fun = 'upsertMetadata'
-  log.t(mod, fun, ``)
   try {
+    log.t(mod, fun, ``)
     const rudiId = json.accessProperty(rudiMetadata, API_METADATA_ID)
     const existsMetadata = await db.doesObjectExistWithRudiId(OBJ_METADATA, rudiId)
 
@@ -759,6 +759,8 @@ exports.sendToPortal = async (metadata) => {
 exports.searchMetadata = async (req, reply) => {
   const fun = 'searchMetadata'
   try {
+    log.t(mod, fun, ``)
+
     let parsedParameters
     try {
       parsedParameters = await genericController.parseQueryParameters(OBJ_METADATA, req.url)
@@ -800,7 +802,7 @@ exports.searchMetadata = async (req, reply) => {
 exports.initWithODR = async (req, reply) => {
   const fun = 'massInit'
   try {
-    log.v(mod, fun, `> ${URL_PREFIX_PUBLIC}/${OBJ_METADATA}/${ACT_INIT}`)
+    log.t(mod, fun, `> ${URL_PREFIX_PUBLIC}/${OBJ_METADATA}/${ACT_INIT}`)
 
     // await db.dropDB()
 
@@ -808,7 +810,7 @@ exports.initWithODR = async (req, reply) => {
     const initCont = require(`../data/datarennes_cont.json`)
     const initData = require(`../data/datarennes_meta.json`)
 
-    await licenceController.initLicences()
+    await licenceController.initializeLicences()
     // Themes.init('reset')
     // Keywords.init('reset')
 
