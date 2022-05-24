@@ -4355,7 +4355,7 @@
 							"script": {
 								"exec": [
 									"const stamp = pm.collectionVariables.get('stamp')",
-									"pm.test(`Delete metadata with '${stamp}' stamp`, () => {",
+									"pm.test(`Delete orgs with '${stamp}' stamp`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    // pm.expect(responseJson.n).to.eq(1);",
@@ -4406,7 +4406,7 @@
 							"script": {
 								"exec": [
 									"const stamp = pm.collectionVariables.get('stamp')",
-									"pm.test(`Delete metadata with '${stamp}' stamp`, () => {",
+									"pm.test(`Delete contacts with '${stamp}' stamp`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    // pm.expect(responseJson.n).to.eq(2);",
@@ -4457,7 +4457,7 @@
 							"script": {
 								"exec": [
 									"const stamp = pm.collectionVariables.get('stamp')",
-									"pm.test(`Delete metadata with '${stamp}' stamp`, () => {",
+									"pm.test(`Delete media with '${stamp}' stamp`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    // pm.expect(responseJson.n).to.eq(2);",
@@ -4851,7 +4851,7 @@
 					"                try {",
 					"                    pm.expect(res).to.have.property('code', 200);",
 					"                } catch (err) {",
-					"                    console.error('[renewPortalToken]: ' + err)",
+					"                    console.error('[renewApiToken]: ' + err)",
 					"                    throw new Error('Crypto module should be running')",
 					"                }",
 					"                pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",

@@ -30,6 +30,7 @@ const {
   API_CONTACT_NAME,
   API_ORGANIZATION_NAME,
   DB_CREATED_AT,
+  API_CONTACT_SUMMARY,
 } = require('../../db/dbFields')
 
 // ------------------------------------------------------------------------------------------------
@@ -54,6 +55,11 @@ const ContactSchema = new mongoose.Schema(
 
     /** Updated status of the contact person */
     [API_CONTACT_ROLE]: {
+      type: String,
+    },
+
+    /** Description of the contact person */
+    [API_CONTACT_SUMMARY]: {
       type: String,
     },
 

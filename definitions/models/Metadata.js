@@ -118,7 +118,12 @@ const {
   API_METAINFO_VERSION_PROPERTY,
   LicenceTypes,
   DICT_TEXT,
+  API_METAINFO_SOURCE_PROPERTY,
+  API_MEDIA_TYPE,
+  API_FILE_MIME,
 } = require('../../db/dbFields')
+const { MediaTypes } = require('./Media')
+const { FileTypes, MIME_YAML_ALT, MIME_YAML } = require('../thesaurus/FileTypes')
 
 // ------------------------------------------------------------------------------------------------
 // Fields with specific treatments
@@ -531,6 +536,12 @@ const MetadataSchema = new mongoose.Schema(
         ],
         default: undefined,
       },
+
+      /** 'metadata_source': Places where the metadata was created */
+      [API_METAINFO_SOURCE_PROPERTY]: {
+        type: String,
+        match: Validation.VALID_URI,
+      },
     },
 
     /** 'publishedAt': Date when the resource has been successfully integrated on Rudi Portal for the first time */
@@ -627,7 +638,21 @@ async function checkLicence(metadata) {
     throw RudiError.treatError(mod, fun, err)
   }
 }
+async function checkFileTypes(metadata) {
+  const medias = metadata[API_MEDIA_PROPERTY]
+  medias.map((media) => {
+    if (media[API_MEDIA_TYPE] !== MediaTypes.File) return
 
+    const [mimeType, encrypted] = /^(.*?)(\+crypt)?$/.exec(media[API_FILE_MIME])
+    // Backward compatibility for harvesters
+    if (mimeType === MIME_YAML_ALT) {
+      media[API_FILE_MIME] = MIME_YAML + encrypted
+      return true
+    }
+    if (FileTypes.indexOf(mimeType) == -1)
+      throw new BadRequestError(`Unrecognized MIME type: '${mimeType}'`)
+  })
+}
 async function checkThesaurus(metadata) {
   const fun = 'checkThesaurus'
   // if (metadata.init) log.d(mod, fun, `init`)
@@ -847,6 +872,7 @@ MetadataSchema.pre('save', async function (next) {
 
     await checkThesaurus(metadata)
 
+    await checkFileTypes(metadata)
     // await checkMedia(metadata)
   } catch (err) {
     err.message = err.message + ` (metadata ${this[API_METADATA_ID]})`

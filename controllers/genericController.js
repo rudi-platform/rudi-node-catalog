@@ -47,7 +47,7 @@ const { CallContext } = require('../definitions/constructors/callContext')
 const { newMetadata, overwriteMetadata } = require('../controllers/metadataController')
 const { newOrganization } = require('../controllers/organizationController')
 const { newContact } = require('../controllers/contactController')
-const { newSkosConcept, newSkosScheme, widenSearch } = require('./skosController')
+const { newSkosConcept, newSkosScheme } = require('./skosController')
 const { deletePortalMetadata } = require('./portalController')
 
 // ------------------------------------------------------------------------------------------------
@@ -921,9 +921,9 @@ exports.deleteManyObjects = async (req, reply) => {
     if (isEmptyObject(filter)) {
       if (confirmation) return await db.deleteAll(objectType)
       else {
-        const msg = `use confirm=true as a parameter to confirm the deletion of all ${objectType}`
+        const msg = `Use confirm=true as a parameter to confirm the deletion of all ${objectType}`
         log.w(mod, fun, msg)
-        return msg
+        throw new BadRequestError(msg, mod, fun)
       }
     }
     // TODO: retrieve the metadata ids, DELETE on portal side with

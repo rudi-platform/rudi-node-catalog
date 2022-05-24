@@ -47,6 +47,9 @@
 #       - 'contact_summary' (description of the Contact)
 #   - Added 'metadata_info.metadata_source': URI of the initial metadata
 #   - Connector can now be described with 'connector_parameters' property
+#   - Added 'expires' to the Dates to signal a date after which the data /
+#     metadata may not be available or relevant anymore
+#   - Added MediaTypes '+crypt' for encrypted files
 #
 #•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
 openapi: 3.0.0
@@ -590,6 +593,10 @@ components:
                   description: >
                     True if the dataset embeds personal data
                   type: boolean
+                'encrypted':
+                  description: >
+                    True if the dataset is encrypted
+                  type: boolean
             #......................
             'licence':
               $ref: '#/components/schemas/Licence'
@@ -1115,7 +1122,7 @@ components:
         - 'application/vnd.oasis.opendocument.text' # (.odt)
         - 'application/vnd.openxmlformats-officedocument.presentationml.presentation' # (.pptx)
         - 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' # (.xlsx)
-        - 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' # (.docx)'
+        - 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' # (.docx)
         - 'application/x-www-form-urlencoded'
         - 'application/xml'
         - 'application/zip' # (.zip)
@@ -1136,6 +1143,43 @@ components:
         - 'text/php' # (.php)
         - 'text/plain' # (.txt)
         - 'text/xml' # (.xml)
+        - 'text/x-yaml' # (.yaml | .yml)
+        - 'application/x-executable+crypt' # Unconventionnal MIME types for encypted files
+        - 'application/graphql+crypt'
+        - 'application/javascript+crypt' # (.js)
+        - 'application/json+crypt' # (.json)
+        - 'application/ld+json+crypt'
+        - 'application/msword+crypt' # (.doc)
+        - 'application/pdf+crypt' # (.pdf)
+        - 'application/sql+crypt'
+        - 'application/vnd.api+json+crypt'
+        - 'application/vnd.ms-excel+crypt' # (.xls)
+        - 'application/vnd.ms-powerpoint+crypt' # (.ppt)
+        - 'application/vnd.oasis.opendocument.text+crypt' # (.odt)
+        - 'application/vnd.openxmlformats-officedocument.presentationml.presentation+crypt' # (.pptx)
+        - 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet+crypt' # (.xlsx)
+        - 'application/vnd.openxmlformats-officedocument.wordprocessingml.document+crypt' # (.docx)
+        - 'application/x-www-form-urlencoded+crypt'
+        - 'application/xml+crypt'
+        - 'application/zip+crypt' # (.zip)
+        - 'application/zstd+crypt' # (.zst)
+        - 'audio/mpeg+crypt' # (.mpeg | .mpg)
+        - 'audio/ogg+crypt' # (.ogg)
+        - 'image/gif+crypt' # (.gif)
+        - 'image/apng+crypt'
+        - 'image/flif+crypt'
+        - 'image/webp+crypt'
+        - 'image/x-mng+crypt'
+        - 'image/jpeg+crypt' # (.jpeg)
+        - 'image/png+crypt' # (.png)
+        - 'multipart/form-data+crypt'
+        - 'text/css+crypt' # (.css)
+        - 'text/csv+crypt' # (.csv)
+        - 'text/html+crypt' # (.html | .htm)
+        - 'text/php+crypt' # (.php)
+        - 'text/plain+crypt' # (.txt)
+        - 'text/xml+crypt' # (.xml)
+        - 'text/x-yaml+crypt' # (.yaml | .yml)
 
     #---------------------------------------------------------------------------
     'FileExtension':
@@ -1202,6 +1246,8 @@ components:
         'updated':
           $ref: '#/components/schemas/Date'
         'deleted':
+          $ref: '#/components/schemas/Date'
+        'expires':
           $ref: '#/components/schemas/Date'
 
     #---------------------------------------------------------------------------

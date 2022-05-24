@@ -16,7 +16,8 @@ const { parameterExpected } = require('../../utils/msg')
 // Common MIME types: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
 // Complete list: https://www.iana.org/assignments/media-types/media-types.xhtml
 
-exports.MIME_YAML = 'application/x-yaml'
+exports.MIME_YAML = 'text/x-yaml'
+exports.MIME_YAML_ALT = 'application/x-yaml'
 
 exports.FileTypes = [
   'application/epub+zip', // (.epub)
@@ -63,7 +64,7 @@ exports.FileTypes = [
   'image/gif', // (.gif)
   'image/jpeg', // (.jpg, .jpeg)
   'image/png', // (.png)
-  'image/tiff', // (.tif, .tiff)
+  'image/tiff', // (.tif | .tiff)
   'image/vnd.microsoft.icon', // (.ico)
   'image/webp', // (.webp)
   'image/x-mng', // (.mng)

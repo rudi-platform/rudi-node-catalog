@@ -18,13 +18,7 @@ const {
   API_METAINFO_PROPERTY,
   API_COLLECTION_TAG,
   getUpdatedDate,
-  API_MEDIA_PROPERTY,
-  API_MEDIA_TYPE,
-  API_FILE_TYPE,
 } = require('../db/dbFields')
-
-const { MediaTypes } = require('../definitions/models/Media')
-const { MIME_YAML } = require('../definitions/thesaurus/FileTypes')
 
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
@@ -220,7 +214,7 @@ exports.getPortalPublicKey = async () => {
 
     const publicKeyObj = await httpGet(publicKeyUrl)
     // log.d(mod, fun, 'publicKeyObj: ' + publicKeyObj)
-    const publicKey = publicKeyObj ? publicKeyObj.value : null
+    const publicKey = publicKeyObj?.value
     // log.d(mod, fun, 'publicKey: ' + publicKey)
 
     cachedPortalPubKey = publicKey
@@ -527,11 +521,11 @@ exports.sendMetadataToPortal = async (metadataId) => {
     // API version
     metadataClean[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = api.API_VERSION
     // MIME type: YAML
-    metadataClean[API_MEDIA_PROPERTY].map((media) => {
-      if (media[API_MEDIA_TYPE] === MediaTypes.File && media[API_FILE_TYPE] === MIME_YAML) {
-        media[API_FILE_TYPE] = 'text/plain'
-      }
-    })
+    // metadataClean[API_MEDIA_PROPERTY].map((media) => {
+    //   if (media[API_MEDIA_TYPE] === MediaTypes.File && media[API_FILE_TYPE] === MIME_YAML) {
+    //     media[API_FILE_TYPE] = 'text/plain'
+    //   }
+    // })
 
     // log.d(mod, fun, utils.beautify(metadataClean))
 

@@ -53,6 +53,7 @@ exports.API_METAINFO_PROPERTY = 'metadata_info'
 exports.API_METAINFO_PROVIDER_PROPERTY = 'metadata_provider'
 exports.API_METAINFO_CONTACTS_PROPERTY = 'metadata_contacts'
 exports.API_METAINFO_DATES_PROPERTY = 'metadata_dates'
+exports.API_METAINFO_SOURCE_PROPERTY = 'metadata_source'
 exports.API_METAINFO_VERSION_PROPERTY = 'api_version'
 
 // ------------------------------------------------------------------------------------------------
@@ -161,12 +162,16 @@ exports.API_LANGUAGES_PROPERTY = 'resource_languages'
 // ------------------------------------------------------------------------------------------------
 exports.API_ORGANIZATION_NAME = 'organization_name'
 exports.API_ORGANIZATION_ADDRESS = 'organization_address'
+exports.API_ORGANIZATION_COORDINATES = 'organization_coordinates'
+exports.API_ORGANIZATION_CAPTION = 'organization_caption'
+exports.API_ORGANIZATION_SUMMARY = 'organization_summary'
 
 // ------------------------------------------------------------------------------------------------
 // Contact properties
 // ------------------------------------------------------------------------------------------------
 exports.API_CONTACT_NAME = 'contact_name'
 exports.API_CONTACT_ROLE = 'role'
+exports.API_CONTACT_SUMMARY = 'contact_summary'
 exports.API_CONTACT_MAIL = 'email'
 
 // ------------------------------------------------------------------------------------------------
@@ -174,11 +179,14 @@ exports.API_CONTACT_MAIL = 'email'
 // ------------------------------------------------------------------------------------------------
 exports.API_MEDIA_TYPE = 'media_type'
 exports.API_MEDIA_NAME = 'media_name'
-exports.API_MEDIA_TITLE = 'media_title'
+exports.API_MEDIA_CAPTION = 'media_caption'
+exports.API_MEDIA_DATES = 'media_dates'
 exports.API_MEDIA_CONNECTOR = 'connector'
 exports.API_MEDIA_INTERFACE_CONTRACT = 'interface_contract'
+exports.API_MEDIA_CONNECTOR_PARAMS = 'connector_parameters'
+exports.API_MEDIA_URL_VISUAL = 'media_visual'
 
-exports.API_FILE_TYPE = 'file_type'
+exports.API_FILE_MIME = 'file_type'
 exports.API_FILE_SIZE = 'file_size'
 exports.API_FILE_CHECKSUM = 'checksum'
 exports.API_FILE_STRUCTURE = 'file_structure'

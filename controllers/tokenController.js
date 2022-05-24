@@ -205,9 +205,9 @@ exports.verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
     } catch (err) {
       throw new Error(`Wrong configuration, public key cannot be read at '${keyFile}': ${err}`)
     }
-    let sslKey
+    let sshKey
     try {
-      sslKey = parseKey(pubKeyPem)
+      sshKey = parseKey(pubKeyPem)
     } catch (err) {
       throw new Error(`Wrong configuration, public key cannot be parsed from '${keyFile}': ${err}`)
     }
@@ -216,7 +216,7 @@ exports.verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
     // Check the signature
     // log.d(mod, fun, `Check the signature: ${beautify(sslKey)}`)
 
-    const verifier = sslKey.createVerify(hashAlgo)
+    const verifier = sshKey.createVerify(hashAlgo)
     verifier.update(`${jwtHeaderBase64url}.${jwtPayloadBase64url}`)
     const signatureIsValid = verifier.verify(jwtSignatureBase64url, 'base64url')
     if (!signatureIsValid) throw new ForbiddenError('Signature is not valid')

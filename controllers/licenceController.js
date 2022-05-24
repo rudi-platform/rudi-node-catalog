@@ -83,7 +83,7 @@ exports.initializeLicences = async () => {
 }
 
 exports.getLicenceWithCode = async (licenceCode) => {
-  return await db.searchDbIdWithJson(OBJ_LICENCES, { [API_LICENCE_LABEL]: licenceCode })
+  return await db.Searchdbidwithjson(OBJ_LICENCES, { [API_LICENCE_LABEL]: licenceCode })
 }
 
 // ------------------------------------------------------------------------------------------------

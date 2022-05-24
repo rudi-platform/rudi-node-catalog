@@ -37,18 +37,23 @@ const {
   API_MEDIA_NAME,
   API_MEDIA_CONNECTOR,
   API_MEDIA_INTERFACE_CONTRACT,
-  API_FILE_TYPE,
+  API_FILE_MIME: API_FILE_TYPE,
   API_FILE_SIZE,
   API_FILE_CHECKSUM,
   API_FILE_STRUCTURE,
   API_FILE_ENCODING,
   API_FILE_UPDATE_STATUS,
-  API_MEDIA_TITLE,
+  API_MEDIA_CONNECTOR_PARAMS,
+  API_MEDIA_CAPTION,
+  API_MEDIA_DATES,
+  API_MEDIA_URL_VISUAL,
 } = require('../../db/dbFields')
+const ReferenceDatesSchema = require('../schemas/ReferenceDates')
 
 const MediaTypes = {
   File: 'FILE',
   Series: 'SERIES',
+  Service: 'SERVICE',
 }
 
 const UpdateStatus = [
@@ -59,7 +64,16 @@ const UpdateStatus = [
 ]
 
 const InterfaceContract = {
-  DWNLD: 'dwnl',
+  Dwnld: 'dwnl',
+}
+
+const ValueTypes = {
+  String: 'STRING',
+  Boolean: 'BOOLEAN',
+  Date: 'DATE',
+  Long: 'LONG',
+  Double: 'DOUBLE',
+  Enum: 'ENUM',
 }
 
 const commonSchemaOptions = {
@@ -94,9 +108,19 @@ const MediaSchema = new mongoose.Schema(
     },
 
     /** Short description of the media */
-    [API_MEDIA_TITLE]: {
+    [API_MEDIA_CAPTION]: {
       type: String,
-      // required: true,
+    },
+
+    /** Time of the creation / last update of the Media */
+    [API_MEDIA_DATES]: {
+      type: ReferenceDatesSchema,
+    },
+
+    /** Link towards a (low-fidelity) visualization of the Media */
+    [API_MEDIA_URL_VISUAL]: {
+      type: String,
+      match: Validation.VALID_URI,
     },
 
     /** Updated name of the service, or possibly the person */
@@ -111,7 +135,22 @@ const MediaSchema = new mongoose.Schema(
       [API_MEDIA_INTERFACE_CONTRACT]: {
         type: String,
         required: true,
-        default: InterfaceContract.DWNLD,
+        default: InterfaceContract.Dwnld,
+      },
+
+      // Optional connector parameters
+      [API_MEDIA_CONNECTOR_PARAMS]: {
+        type: {
+          key: String,
+          value: String,
+          type: {
+            type: String,
+            enum: Object.values(ValueTypes),
+          },
+          usage: String,
+          accepted_values: [mongoose.Mixed],
+        },
+        required: false,
       },
     },
 
@@ -270,6 +309,10 @@ const SeriesSchema = new mongoose.Schema(
 )
 
 // ------------------------------------------------------------------------------------------------
+// MediaService schema definition
+// ------------------------------------------------------------------------------------------------
+const ServiceSchema = new mongoose.Schema({}, commonSchemaOptions)
+// ------------------------------------------------------------------------------------------------
 // Schema refinements
 // ------------------------------------------------------------------------------------------------
 
@@ -283,6 +326,9 @@ FileSchema.methods.toJSON = function () {
 SeriesSchema.methods.toJSON = function () {
   return omit(this.toObject(), FIELDS_TO_SKIP)
 }
+ServiceSchema.methods.toJSON = function () {
+  return omit(this.toObject(), FIELDS_TO_SKIP)
+}
 
 // ------------------------------------------------------------------------------------------------
 // Models definition
@@ -290,6 +336,7 @@ SeriesSchema.methods.toJSON = function () {
 const Media = mongoose.model('Media', MediaSchema)
 const MediaFile = Media.discriminator(MediaTypes.File, FileSchema, { clone: false })
 const MediaSeries = Media.discriminator(MediaTypes.Series, SeriesSchema, { clone: false })
+const MediaService = Media.discriminator(MediaTypes.Service, ServiceSchema, { clone: false })
 
 Media.getSearchableFields = () => [
   API_MEDIA_ID,
@@ -320,6 +367,7 @@ module.exports = {
   Media,
   MediaFile,
   MediaSeries,
+  MediaService,
   MediaTypes,
   InterfaceContract,
 }

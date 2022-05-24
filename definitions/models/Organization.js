@@ -25,7 +25,11 @@ const {
   API_COLLECTION_TAG,
   API_ORGANIZATION_NAME,
   API_ORGANIZATION_ADDRESS,
+  API_ORGANIZATION_COORDINATES,
+  API_ORGANIZATION_CAPTION,
+  API_ORGANIZATION_SUMMARY,
 } = require('../../db/dbFields')
+const { GpsCoordinates } = require('../schemas/GpsCoordinates')
 
 // ------------------------------------------------------------------------------------------------
 // Custom schema definition
@@ -44,9 +48,24 @@ const OrganizationSchema = new mongoose.Schema(
       required: true,
     },
 
+    /** Explicit/complete name for an acronym, or alternative name of the organization */
+    [API_ORGANIZATION_CAPTION]: {
+      type: String,
+    },
+
+    /** Description of the organization */
+    [API_ORGANIZATION_SUMMARY]: {
+      type: String,
+    },
+
     /** Updated offical postal address of the organization */
     [API_ORGANIZATION_ADDRESS]: {
       type: String,
+    },
+
+    /** 2D GPS coordinates of the organization (EPSG:4326/WGS 84) */
+    [API_ORGANIZATION_COORDINATES]: {
+      type: GpsCoordinates,
     },
 
     /** Tag for identifying a collection of resources */

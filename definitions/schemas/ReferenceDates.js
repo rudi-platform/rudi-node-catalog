@@ -14,13 +14,16 @@ const ReferenceDatesSchema = new mongoose.Schema(
       type: Date,
       required: [true, `Creation date is required`],
     },
+    updated: {
+      type: Date,
+    },
     validated: {
       type: Date,
     },
     published: {
       type: Date,
     },
-    updated: {
+    expires: {
       type: Date,
     },
     deleted: {
