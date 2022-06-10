@@ -58,6 +58,10 @@ const {
   MONGO_ERROR,
   COUNT_LABEL,
   LIST_LABEL,
+  OBJ_SKOS_CONCEPTS_CAML,
+  OBJ_SKOS_SCHEMES_CAML,
+  OBJ_PUB_KEYS,
+  OBJ_PUB_KEYS_CAML,
 } = require('../config/confApi')
 
 // Fields from the JSON as definied in the API
@@ -82,6 +86,7 @@ const {
   API_MEDIA_PROPERTY,
   LOG_ID,
   API_THEME_PROPERTY,
+  API_PUB_NAME,
 } = require('./dbFields')
 
 const { JWT_EXP } = require('../utils/crypto')
@@ -106,6 +111,7 @@ const { LogEntry, logLineToString } = require('../definitions/models/LogEntry')
 // Other internal dependencies
 // ------------------------------------------------------------------------------------------------
 const { dropCollection } = require('./dbActions')
+const PublicKey = require('../definitions/models/PublicKey')
 
 // ------------------------------------------------------------------------------------------------
 // Properties with special treatments
@@ -125,7 +131,11 @@ const RUDI_OBJECTS = {
   [OBJ_CONTACTS]: { [OBJ_MODEL]: Contact, [OBJ_ID]: API_CONTACT_ID },
   [OBJ_MEDIA]: { [OBJ_MODEL]: Media, [OBJ_ID]: API_MEDIA_ID },
   [OBJ_SKOS_SCHEMES]: { [OBJ_MODEL]: SkosScheme, [OBJ_ID]: API_SKOS_SCHEME_ID },
+  [OBJ_SKOS_SCHEMES_CAML]: { [OBJ_MODEL]: SkosScheme, [OBJ_ID]: API_SKOS_SCHEME_ID },
   [OBJ_SKOS_CONCEPTS]: { [OBJ_MODEL]: SkosConcept, [OBJ_ID]: API_SKOS_CONCEPT_ID },
+  [OBJ_SKOS_CONCEPTS_CAML]: { [OBJ_MODEL]: SkosConcept, [OBJ_ID]: API_SKOS_CONCEPT_ID },
+  [OBJ_PUB_KEYS]: { [OBJ_MODEL]: PublicKey, [OBJ_ID]: API_PUB_NAME },
+  [OBJ_PUB_KEYS_CAML]: { [OBJ_MODEL]: PublicKey, [OBJ_ID]: API_PUB_NAME },
   [OBJ_REPORTS]: { [OBJ_MODEL]: Report, [OBJ_ID]: API_REPORT_ID },
   [OBJ_LOGS]: { [OBJ_MODEL]: LogEntry, [OBJ_ID]: LOG_ID },
   [OBJ_LICENCES]: { [OBJ_MODEL]: SkosConcept, [OBJ_ID]: API_SKOS_CONCEPT_ID },
@@ -1121,7 +1131,8 @@ exports.getOrphans = async (objectType) => {
     log.d(mod, fun, errMsg)
     throw new NotImplementedError(errMsg)
   }
-  const [Model, listMetadataFields] = this.getMetadataFieldsWithObjectType(objectType)
+  // const [Model, listMetadataFields] = this.getMetadataFieldsWithObjectType(objectType)
+  const Model = this.getObjectModel(objectType)
   // const idField = this.getObjectIdField(objectType)
   //
   // for (const field in listMetadataFields)
@@ -1215,7 +1226,7 @@ exports.deleteManyWithFilter = async (objectType, conditions) => {
     throw RudiError.treatError(mod, fun, err)
   }
 }
-
+/* 
 function changeConditionsIntoRegex(conditions) {
   const fun = `changeConditionsIntoRegex`
 
@@ -1232,7 +1243,7 @@ function changeConditionsIntoRegex(conditions) {
 
   return { $match: { $and: regexConditions } }
 }
-
+ */
 // ------------------------------------------------------------------------------------------------
 // Specific functions
 // ------------------------------------------------------------------------------------------------
@@ -1643,11 +1654,11 @@ exports.getAllConceptsWithRole = async (conceptRole) => {
 // ----------------------------------------
 // - Filters
 // ----------------------------------------
-exports.findNotReferencedInMetadata = (objectType) => {
+/* exports.findNotReferencedInMetadata = (objectType) => {
   // const fun = `findNotReferencedInMetadata`
   // log.t(mod, fun, ``)
 }
-
+ */
 exports.isReferencedInMetadata = async (objectType, rudiId) => {
   const fun = `isReferencedInMetadata`
   log.d(mod, fun, `${objectType}: ${rudiId}`)

@@ -21,6 +21,7 @@ exports.DEFAULT_LANG = 'fr'
 // --- "In path" parameters
 exports.PARAM_OBJECT = 'object'
 exports.PARAM_ID = 'id'
+exports.PARAM_PROP = 'prop'
 exports.PARAM_REPORT_ID = 'irid'
 
 // --- "Objects" parameters
@@ -35,6 +36,8 @@ exports.OBJ_SKOS_CONCEPTS_CAML = 'skosConcepts'
 exports.OBJ_REPORTS = 'reports'
 exports.OBJ_LOGS = 'logs'
 exports.OBJ_LICENCES = 'licences'
+exports.OBJ_PUB_KEYS = 'pub_keys'
+exports.OBJ_PUB_KEYS_CAML = 'pubKeys'
 
 // --- "In query" parameters
 exports.QUERY_LIMIT = 'limit'
@@ -85,16 +88,26 @@ exports.ACT_SEARCH = 'search'
 exports.ACT_SEND = 'send'
 
 // ------------------------------------------------------------------------------------------------
+// Body parameters
+// ------------------------------------------------------------------------------------------------
+exports.BODY_PUB_KEY_URL = 'url'
+exports.BODY_PUB_KEY_NAME = 'name'
+exports.BODY_PUB_KEY_PROP = 'prop'
+
+// ------------------------------------------------------------------------------------------------
 // DB actions
 // ------------------------------------------------------------------------------------------------
-
 exports.URL_OBJECTS = [
   this.OBJ_METADATA,
   this.OBJ_ORGANIZATIONS,
   this.OBJ_CONTACTS,
   this.OBJ_MEDIA,
   this.OBJ_SKOS_CONCEPTS,
+  this.OBJ_SKOS_CONCEPTS_CAML,
   this.OBJ_SKOS_SCHEMES,
+  this.OBJ_SKOS_SCHEMES_CAML,
+  this.OBJ_PUB_KEYS,
+  this.OBJ_PUB_KEYS_CAML,
   this.OBJ_REPORTS,
   this.OBJ_LOGS,
 ]
@@ -106,6 +119,8 @@ const URL_SUFFIX_DB = 'db'
 const URL_SUFFIX_THESAURUS = 'enum'
 const URL_SUFFIX_LICENCE_CODES = 'licence_codes'
 
+exports.URL_SUFFIX_AUTH = 'auth'
+exports.URL_SUFFIX_PUB_KEY = 'pub'
 exports.URL_SUFFIX_TOKEN_GET = 'token'
 exports.URL_SUFFIX_TOKEN_CHECK = 'check'
 exports.URL_SUFFIX_GIT_HASH = 'hash'

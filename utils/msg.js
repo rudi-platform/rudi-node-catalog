@@ -220,11 +220,11 @@ exports.objectAlreadyExists = (objectType, id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `An object of type '${objectType}' already exists for id: ${id} `
+      return `An object of type '${objectType}' already exists for id: '${id}'`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Un objet de type '${objectType}' existe déjà pour l'identifiant : ${id} `
+      return `Un objet de type '${objectType}' existe déjà pour l'identifiant : '${id}'`
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -235,11 +235,11 @@ exports.objectAdded = (objectType, id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `New object of type '${objectType}' added with id: ${id} `
+      return `New object of type '${objectType}' added with id: '${id}'`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Objet de type '${objectType}' créé avec l'identifiant : ${id} `
+      return `Objet de type '${objectType}' créé avec l'identifiant : '${id}'`
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -250,11 +250,11 @@ exports.objectNotDeletedBecauseUsed = (objectType, id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `The object of type '${objectType}' couldn't be deleted. Its identifier is referenced in a metadata: ${id} `
+      return `The object of type '${objectType}' couldn't be deleted. Its identifier is referenced in a metadata: '${id}'`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `L'objet de type '${objectType}' n'a pas pu être supprimé. Son identifiant est référencé dans une métadonnée : ${id} `
+      return `L'objet de type '${objectType}' n'a pas pu être supprimé. Son identifiant est référencé dans une métadonnée : '${id}'`
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -268,11 +268,11 @@ exports.metadataAlreadyExists = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `A metadata already exists for id: ${id} `
+      return `A metadata already exists for id: '${id}'`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Une metadonnée existe déjà pour l'identifiant : ${id} `
+      return `Une metadonnée existe déjà pour l'identifiant : '${id}'`
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -283,11 +283,11 @@ exports.metadataAdded = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `New metadata added with id: ${id} `
+      return `New metadata added with id: '${id}'`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Metadonnée ajoutée avec l'identifiant : ${id} `
+      return `Metadonnée ajoutée avec l'identifiant : '${id}'`
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -298,11 +298,11 @@ exports.metadataUpdated = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Metadata updated for id: ${id} `
+      return `Metadata updated for id: '${id}'`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Metadonée mise à jour pour l'identifiant : ${id} `
+      return `Metadonée mise à jour pour l'identifiant : '${id}'`
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -313,11 +313,11 @@ exports.metadataFound = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `A metadata was found with id: ${id} `
+      return `A metadata was found with id: '${id}'`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Une metadonnée a été trouvée avec l'identifiant : ${id} `
+      return `Une metadonnée a été trouvée avec l'identifiant : '${id}'`
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -328,11 +328,11 @@ exports.metadataNotFound = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `No metadata was found with id: ${id} `
+      return `No metadata was found with id: '${id}'`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Aucune metadonnée trouvée avec l'identifiant : ${id} `
+      return `Aucune metadonnée trouvée avec l'identifiant : '${id}'`
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -343,11 +343,11 @@ exports.metadataDeleted = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Metadata deleted for id: ${id} `
+      return `Metadata deleted for id: '${id}'`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Métadonnée supprimée pour l'identifiant : ${id} `
+      return `Métadonnée supprimée pour l'identifiant : '${id}'`
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -394,11 +394,11 @@ exports.organizationAdded = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `New organization added with id: ${id} `
+      return `New organization added with id: '${id}'`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Organisation créée avec l'identifiant : ${id} `
+      return `Organisation créée avec l'identifiant : '${id}'`
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -408,11 +408,11 @@ exports.organizationAlreadyExists = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `An organization already exists for id: ${id} `
+      return `An organization already exists for id: ${id}`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Une organisation existe déjà pour l'identifiant : ${id} `
+      return `Une organisation existe déjà pour l'identifiant : '${id}'`
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -423,11 +423,11 @@ exports.organizationUpdated = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Organization updated for id: ${id} `
+      return `Organization updated for id: '${id}'`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Organisation mise à jour pour l'identifiant : ${id} `
+      return `Organisation mise à jour pour l'identifiant : '${id}'`
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -438,11 +438,11 @@ exports.organizationDeleted = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Organization deleted for id: ${id} `
+      return `Organization deleted for id: '${id}'`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Organisation supprimée pour l'identifiant : ${id} `
+      return `Organisation supprimée pour l'identifiant : '${id}'`
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -453,11 +453,11 @@ exports.organizationNotFound = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `No organization was found with id: ${id} `
+      return `No organization was found with id: '${id}'`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Aucune organisation trouvée avec l'identifiant : ${id} `
+      return `Aucune organisation trouvée avec l'identifiant : '${id}'`
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -471,11 +471,11 @@ exports.contactAdded = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `New contact added with id: ${id} `
+      return `New contact added with id: '${id}'`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Contact créé avec l'identifiant : ${id} `
+      return `Contact créé avec l'identifiant : '${id}'`
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -486,11 +486,11 @@ exports.contactAlreadyExists = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `A contact already exists for id: ${id} `
+      return `A contact already exists for id: '${id}'`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Un contact existe déjà pour l'identifiant : ${id} `
+      return `Un contact existe déjà pour l'identifiant : '${id}'`
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -501,11 +501,11 @@ exports.contactUpdated = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Contact updated for id: ${id} `
+      return `Contact updated for id: '${id}'`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Contact mis à jour pour l'identifiant : ${id} `
+      return `Contact mis à jour pour l'identifiant : '${id}'`
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -516,11 +516,11 @@ exports.contactDeleted = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Contact deleted for id: ${id} `
+      return `Contact deleted for id: '${id}'`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Contact supprimé pour l'identifiant : ${id} `
+      return `Contact supprimé pour l'identifiant : '${id}'`
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -530,11 +530,11 @@ exports.contactNotFound = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `No contact was found with id: ${id} `
+      return `No contact was found with id: '${id}'`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Aucun contact trouvé avec l'identifiant : ${id} `
+      return `Aucun contact trouvé avec l'identifiant : '${id}'`
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -548,11 +548,11 @@ exports.reportAdded = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `New report added with id: ${id} `
+      return `New report added with id: '${id}'`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Rapport créé avec l'identifiant : ${id} `
+      return `Rapport créé avec l'identifiant : '${id}'`
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -563,11 +563,11 @@ exports.reportAlreadyExists = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `A report already exists for id: ${id} `
+      return `A report already exists for id: '${id}'`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Un rapport existe déjà pour l'identifiant : ${id} `
+      return `Un rapport existe déjà pour l'identifiant : '${id}'`
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -578,11 +578,11 @@ exports.reportUpdated = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Report updated for id: ${id} `
+      return `Report updated for id: '${id}'`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Rapport mis à jour pour l'identifiant : ${id} `
+      return `Rapport mis à jour pour l'identifiant : '${id}'`
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -593,11 +593,11 @@ exports.reportDeleted = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `Report deleted for id: ${id} `
+      return `Report deleted for id: '${id}'`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Rapport supprimé pour l'identifiant : ${id} `
+      return `Rapport supprimé pour l'identifiant : '${id}'`
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }
@@ -607,11 +607,11 @@ exports.reportNotFound = (id) => {
     case 'en':
     case 'en-GB':
     case 'en-US':
-      return `No report was found with id: ${id} `
+      return `No report was found with id: '${id}'`
     case 'fr':
     case 'fr-FR':
     case 'fr-BE':
-      return `Aucun rapport trouvé avec l'identifiant : ${id} `
+      return `Aucun rapport trouvé avec l'identifiant : '${id}'`
     default:
       return `${DEFAULT_MSG}: ${getLanguage()}`
   }

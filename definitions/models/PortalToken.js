@@ -9,7 +9,7 @@ const { omit } = require('lodash')
 const Int32 = require('mongoose-int32').loadType(mongoose)
 
 // ------------------------------------------------------------------------------------------------
-// Inbternal dependencies
+// Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const Ids = require('../schemas/Identifiers')
 

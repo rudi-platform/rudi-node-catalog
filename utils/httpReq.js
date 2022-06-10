@@ -14,7 +14,7 @@ const axios = require('axios')
 // ------------------------------------------------------------------------------------------------
 const log = require('./logging')
 const utils = require('./jsUtils')
-const { RudiError } = require('./errors')
+const { RudiError, BadRequestError } = require('./errors')
 
 // ------------------------------------------------------------------------------------------------
 // Functions: header treatments
@@ -22,6 +22,33 @@ const { RudiError } = require('./errors')
 exports.getHeaderRedirectUrls = (req) => {
   if (!req.headers) return
   return req.headers['x-forwarded-for'] || req.headers['X-Forwarded-For']
+}
+
+// ------------------------------------------------------------------------------------------------
+// Functions: extracting URL parameters (after the quote sign)
+// ------------------------------------------------------------------------------------------------
+exports.getUrlParameters = (reqUrl) => {
+  const fun = 'getUrlParameters'
+  try {
+    log.t(mod, fun, ``)
+    const splitUrl = reqUrl.split('?')
+    if ((splitUrl.length = 1 || !splitUrl[1])) return // No parameters found
+    if (splitUrl.length > 2)
+      throw new BadRequestError('Wrong URL, quote character used several times')
+
+    const extractedUrlParameters = []
+    const urlParameterSections = splitUrl[1].split('&')
+    urlParameterSections.map((paramSection) => {
+      const keyVal = paramSection.split('=')
+      if (keyVal.length === 0) return // Empty section
+      if (keyVal.length === 1 && !!keyVal[0]) extractedUrlParameters.push(keyVal)
+      if (keyVal.length === 2) extractedUrlParameters.push({ [keyVal[0]]: keyVal[1] })
+      if (keyVal.length === 3) return // Badly formed section
+    })
+    return extractedUrlParameters
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
 }
 
 // ------------------------------------------------------------------------------------------------

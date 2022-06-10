@@ -48,6 +48,8 @@ const { newMetadata, overwriteMetadata } = require('../controllers/metadataContr
 const { newOrganization } = require('../controllers/organizationController')
 const { newContact } = require('../controllers/contactController')
 const { newSkosConcept, newSkosScheme } = require('./skosController')
+const { newPublicKey, overwritePubKey } = require('./publicKeyController')
+
 const { deletePortalMetadata } = require('./portalController')
 
 // ------------------------------------------------------------------------------------------------
@@ -55,82 +57,91 @@ const { deletePortalMetadata } = require('./portalController')
 // ------------------------------------------------------------------------------------------------
 
 const {
-  URL_PUB_METADATA,
-
-  OBJ_METADATA,
-  OBJ_ORGANIZATIONS,
-  OBJ_CONTACTS,
-  OBJ_MEDIA,
-  OBJ_SKOS_CONCEPTS,
-  OBJ_SKOS_SCHEMES,
   ACT_DELETION,
   ACT_SEARCH,
-  PARAM_ID,
-  PARAM_OBJECT,
+  ACT_UNLINKED,
 
-  QUERY_FIELDS,
-  QUERY_LIMIT,
-  QUERY_OFFSET,
-
-  QUERY_FILTER,
-  QUERY_SORT_BY,
-  QUERY_COUNT_BY,
-  QUERY_GROUP_BY,
-  QUERY_GROUP_LIMIT,
-  QUERY_GROUP_OFFSET,
   DEFAULT_QUERY_LIMIT,
   DEFAULT_QUERY_OFFSET,
 
-  URL_OBJECTS,
-  QUERY_CONFIRM,
-  URL_PV_OBJECT_GENERIC,
-  QUERY_UPDATED_AFTER,
-  QUERY_UPDATED_AFTER_CAML,
-  QUERY_UPDATED_BEFORE,
-  QUERY_UPDATED_BEFORE_CAML,
-  ACT_UNLINKED,
-  QUERY_SEARCH_TERMS,
   MONGO_ERROR,
+
+  OBJ_CONTACTS,
+  OBJ_MEDIA,
+  OBJ_METADATA,
+  OBJ_ORGANIZATIONS,
+  OBJ_SKOS_CONCEPTS,
+  OBJ_SKOS_SCHEMES,
+
+  PARAM_ID,
+  PARAM_OBJECT,
+
+  QUERY_CONFIRM,
   QUERY_COUNT_BY_CAML,
+  QUERY_COUNT_BY,
+  QUERY_FIELDS,
+  QUERY_FILTER,
   QUERY_GROUP_BY_CAML,
-  QUERY_SORT_BY_CAML,
+  QUERY_GROUP_BY,
   QUERY_GROUP_LIMIT_CAML,
+  QUERY_GROUP_LIMIT,
   QUERY_GROUP_OFFSET_CAML,
+  QUERY_GROUP_OFFSET,
+  QUERY_LIMIT,
+  QUERY_OFFSET,
+  QUERY_SEARCH_TERMS,
+  QUERY_SORT_BY_CAML,
+  QUERY_SORT_BY,
+  QUERY_UPDATED_AFTER_CAML,
+  QUERY_UPDATED_AFTER,
+  QUERY_UPDATED_BEFORE_CAML,
+  QUERY_UPDATED_BEFORE,
+
+  URL_OBJECTS,
+  URL_PUB_METADATA,
+  URL_PV_OBJECT_GENERIC,
+
+  OBJ_SKOS_CONCEPTS_CAML,
+  OBJ_SKOS_SCHEMES_CAML,
+  OBJ_PUB_KEYS,
+  OBJ_PUB_KEYS_CAML,
+  PARAM_PROP,
 } = require('../config/confApi')
 
 const {
-  DB_PUBLISHED_AT,
-  DB_ID,
-  API_METAINFO_PROPERTY,
-  API_METAINFO_DATES_PROPERTY,
-  API_DATES_CREATED_PROPERTY,
-  API_DATES_EDITED_PROPERTY,
-  DB_UPDATED_AT,
-  API_DATES_PUBLISHED_PROPERTY,
-  DB_CREATED_AT,
   API_DATA_DATES_PROPERTY,
-  API_DATES_VALIDATED_PROPERTY,
+  API_DATES_CREATED_PROPERTY,
   API_DATES_DELETED_PROPERTY,
-  API_PERIOD_PROPERTY,
+  API_DATES_EDITED_PROPERTY,
+  API_DATES_PUBLISHED_PROPERTY,
+  API_DATES_VALIDATED_PROPERTY,
   API_END_DATE_PROPERTY,
-  API_START_DATE_PROPERTY,
   API_KEYWORDS_PROPERTY,
+  API_METAINFO_DATES_PROPERTY,
+  API_METAINFO_PROPERTY,
+  API_PERIOD_PROPERTY,
+  API_START_DATE_PROPERTY,
+
+  DB_CREATED_AT,
+  DB_ID,
+  DB_PUBLISHED_AT,
+  DB_UPDATED_AT,
 } = require('../db/dbFields')
 
 const QUERY_RESERVED_WORDS = [
-  QUERY_LIMIT,
-  QUERY_OFFSET,
-  QUERY_FIELDS,
-  QUERY_SORT_BY,
+  QUERY_CONFIRM,
   QUERY_COUNT_BY,
+  QUERY_FIELDS,
   QUERY_GROUP_BY,
   QUERY_GROUP_LIMIT,
   QUERY_GROUP_OFFSET,
-  QUERY_UPDATED_AFTER,
+  QUERY_LIMIT,
+  QUERY_OFFSET,
+  QUERY_SORT_BY,
   QUERY_UPDATED_AFTER_CAML,
-  QUERY_UPDATED_BEFORE,
+  QUERY_UPDATED_AFTER,
   QUERY_UPDATED_BEFORE_CAML,
-  QUERY_CONFIRM,
+  QUERY_UPDATED_BEFORE,
 ]
 
 const EXT_REFS = 'external_references' // External references needing aggregation
@@ -462,10 +473,15 @@ async function newObject(objectType, objectData) {
       case OBJ_CONTACTS:
         return await newContact(objectData)
       case OBJ_SKOS_CONCEPTS:
+      case OBJ_SKOS_CONCEPTS_CAML:
         return await newSkosConcept(objectData)
       case OBJ_SKOS_SCHEMES:
+      case OBJ_SKOS_SCHEMES_CAML:
         // Custom creation to create the children scheme concepts
         return await newSkosScheme(objectData)
+      case OBJ_PUB_KEYS:
+      case OBJ_PUB_KEYS_CAML:
+        return await newPublicKey(objectData)
       default:
         throw new NotFoundError(msg.objectTypeNotFound(objectType))
     }
@@ -554,11 +570,12 @@ exports.addSingleObject = async (req, reply) => {
  */
 exports.getSingleObject = async (req, reply) => {
   const fun = 'getSingleObject'
-  log.t(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`)
   try {
+    log.t(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`)
     // retrieve url parameters: object type, object id
     const objectType = getObjectParam(req)
     const objectId = json.accessReqParam(req, PARAM_ID)
+    const objectProp = req.params[PARAM_PROP] // Could be null
 
     // ensure the object exists
     const dbObject = await db.getEnsuredObjectWithRudiId(objectType, objectId)
@@ -567,7 +584,7 @@ exports.getSingleObject = async (req, reply) => {
     const context = CallContext.getCallContextFromReq(req)
     if (context) context.addObjId(objectType, objectId)
 
-    return dbObject
+    return objectProp ? dbObject[objectProp] : dbObject
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -579,8 +596,8 @@ exports.getSingleObject = async (req, reply) => {
  */
 exports.getObjectList = async (req, reply) => {
   const fun = 'getObjectList'
-  log.t(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}`)
   try {
+    log.t(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}`)
     // retrieve url parameter: object type
     const objectType = getObjectParam(req)
 
@@ -755,9 +772,20 @@ exports.getMetadataListAndCount = async (req, reply) => {
   }
 }
 
+exports.getManyPubKeys = async (req, reply) => {
+  const fun = 'getPubKeys'
+  try {
+    log.t(mod, fun, ``)
+    return await this.getManyObjects(OBJ_PUB_KEYS, req)
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
 /**
  * Update an existing object (obsolete)
  * => PUT /{object}
+ *  (obsolete)
  */
 exports.updateSingleObject = async (req, reply) => {
   const fun = 'updateSingleObject'
@@ -817,6 +845,9 @@ exports.upsertSingleObject = async (req, reply) => {
       if (objectType === OBJ_METADATA) {
         if (context) context.addMetaId(rudiId)
         return await overwriteMetadata(updateData)
+      } else if (objectType === OBJ_PUB_KEYS) {
+        if (context) context.addObjId(objectType, rudiId)
+        return await overwritePubKey(updateData)
       } else {
         if (context) context.addObjId(objectType, rudiId)
         return await db.overwriteObject(objectType, updateData)

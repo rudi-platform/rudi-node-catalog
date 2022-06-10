@@ -134,7 +134,10 @@ const LISTENING_PORT = this.getIniValue(SERVER_SECTION, 'listening_port')
 exports.getAppName = () => APP_NAME
 exports.getServerAddress = () => LISTENING_ADDR
 exports.getServerPort = () => LISTENING_PORT
-exports.getHost = () => `http://${LISTENING_ADDR}:${LISTENING_PORT}`
+exports.getHost = (suffix) =>
+  suffix
+    ? `http://${LISTENING_ADDR}:${LISTENING_PORT}${suffix}`
+    : `http://${LISTENING_ADDR}:${LISTENING_PORT}`
 
 // ----- DB section
 const DB_SECTION = 'database'

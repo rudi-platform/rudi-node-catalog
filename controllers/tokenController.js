@@ -13,12 +13,20 @@ const { parseKey } = require('sshpk')
 // ------------------------------------------------------------------------------------------------
 
 const { decodeBase64url, nowEpochS, nowISO, dateEpochSToIso } = require('../utils/jsUtils')
+const { accessProperty } = require('../utils/jsonAccess')
 
 const log = require('../utils/logging')
-const { ROUTE_NAME } = require('../config/confApi')
+
 const { getProfile } = require('../config/confSystem')
 const { ForbiddenError, UnauthorizedError, RudiError } = require('../utils/errors')
-const { accessProperty } = require('../utils/jsonAccess')
+
+// ------------------------------------------------------------------------------------------------
+// Constants
+// ------------------------------------------------------------------------------------------------
+const PUB_KEY = 'pub_key'
+const SUB_ACL = 'routes'
+const REQ_ROUTE_ALL = 'all'
+
 const {
   extractJwt,
   JWT_ALG,
@@ -28,15 +36,7 @@ const {
   REQ_MTD,
   REQ_URL,
 } = require('../utils/crypto')
-
-// ------------------------------------------------------------------------------------------------
-// Constants
-// ------------------------------------------------------------------------------------------------
-
-const PUB_KEY = 'pub_key'
-const SUB_ACL = 'routes'
-const REQ_ROUTE_ALL = 'all'
-
+const { ROUTE_NAME } = require('../config/confApi')
 // ------------------------------------------------------------------------------------------------
 // Controllers
 // ------------------------------------------------------------------------------------------------

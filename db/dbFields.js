@@ -193,6 +193,17 @@ exports.API_FILE_STRUCTURE = 'file_structure'
 exports.API_FILE_ENCODING = 'file_encoding'
 exports.API_FILE_UPDATE_STATUS = 'update_status'
 
+// ------------------------------------------------------------------------------------------------
+// Public key properties
+// ------------------------------------------------------------------------------------------------
+exports.API_PUB_ID = 'name'
+exports.API_PUB_NAME = 'name'
+exports.API_PUB_URL = 'url'
+exports.API_PUB_PROP = 'prop'
+exports.API_PUB_PEM = 'pem'
+exports.API_PUB_KEY = 'key'
+exports.API_PUB_TYPE = 'type'
+
 //=================================================================================================
 
 // ------------------------------------------------------------------------------------------------

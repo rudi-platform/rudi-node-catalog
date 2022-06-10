@@ -23,9 +23,12 @@ const { Organization } = require('../definitions/models/Organization')
 const { RudiError } = require('../utils/errors')
 // const cache = require('../db/dbCache')
 
+// ------------------------------------------------------------------------------------------------
+// Functions
+// ------------------------------------------------------------------------------------------------
 exports.newOrganization = async (orgJson) => {
   const fun = 'newOrganization'
-  log.d(mod, fun, `${beautify(orgJson)}`)
+  log.t(mod, fun, beautify(orgJson))
 
   let dbOrganization
 

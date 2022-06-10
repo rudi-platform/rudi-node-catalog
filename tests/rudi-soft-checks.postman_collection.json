@@ -2,7 +2,8 @@
 	"info": {
 		"_postman_id": "eeb8c2b3-7c12-4a10-9504-706ec732fa5b",
 		"name": "rudi-soft-checks",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13557783"
 	},
 	"item": [
 		{
@@ -4663,6 +4664,959 @@
 			]
 		},
 		{
+			"name": "08. Public keys",
+			"item": [
+				{
+					"name": "CLEAN previous tests",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Deleting all public keys\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    pm.expect(res.acknowledged).to.be.true",
+									"    pm.expect(res.deletedCount).to.gte(0)",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"api key\",\n    \"url\": \"http://127.0.0.1:3003/api/admin/pubKeys/52d8ae34-5b34-482f-9a80-645d63f3ba0b\", \n    \"id\": \"52d8ae34-5b34-482f-9a80-645d63f3ba0b\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/pubKeys?collection_tag={{stamp}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"pubKeys"
+							],
+							"query": [
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ADD public key: PEM, no URL ⇒ OK",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Throwing an error when creating a public key without name\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const pubKey = pm.response.json()",
+									"    pm.expect(pubKey.name).to.be.not.null",
+									"    pm.expect(pubKey.url).to.be.not.null",
+									"    pm.expect(pubKey.pem).to.be.not.null",
+									"    pm.expect(pubKey.type).to.be.not.null",
+									"    pm.expect(pubKey.collection_tag).to.eql(pm.collectionVariables.get('stamp'))",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const name = 'pubKeyName'",
+									"const val = rand.randomize(name)",
+									"console.log(pm.collectionVariables.set(name,val))",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{pubKeyName}}\",\n    \"pem\": \"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBQ/tgB/vCQxkgSlzztRAmE4dNsOo1HzLXcqTOtDIhi rudi_prod_manager\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"pub_keys"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ADD public key: PEM, no URL ⇒ OK Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Throwing an error when creating a public key without name\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const pubKey = pm.response.json()",
+									"    pm.expect(pubKey.name).to.be.not.null",
+									"    pm.expect(pubKey.url).to.be.not.null",
+									"    pm.expect(pubKey.pem).to.be.not.null",
+									"    pm.expect(pubKey.type).to.be.not.null",
+									"    pm.expect(pubKey.collection_tag).to.eql(pm.collectionVariables.get('stamp'))",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{pubKeyName}}\",\n    \"pem\": \"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBQ/tgB/vCQxkgSlzztRAmE4dNsOo1HzLXcqTOtDIhi prod_manager\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"pub_keys"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ADD public key: PEM, no URL ⇒ OK",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Throwing an error when creating a public key without name\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const pubKey = pm.response.json()",
+									"    pm.expect(pubKey.name).to.be.not.null",
+									"    pm.expect(pubKey.url).to.be.not.null",
+									"    pm.expect(pubKey.pem).to.be.not.null",
+									"    pm.expect(pubKey.type).to.be.not.null",
+									"    pm.expect(pubKey.collection_tag).to.eql(pm.collectionVariables.get('stamp'))",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const name = 'pubKeyName'",
+									"const val = rand.randomize(name)",
+									"console.log(pm.collectionVariables.set(name,val))",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{pubKeyName}}\",\n    \"pem\": \"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBQ/tgB/vCQxkgSlzztRAmE4dNsOo1HzLXcqTOtDIhi rudi_prod_manager\",\n    \"collection_tag\":\"{{stamp}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"pub_keys"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET public keys (admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys?collection_tag={{stamp}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"pub_keys"
+							],
+							"query": [
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET a public key (admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Getting a public key\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const pubKey = pm.response.json()",
+									"    pm.expect(pubKey.pem).to.be.not.undefined",
+									"    pm.expect(pubKey.type).to.be.not.undefined",
+									"    pm.expect(pubKey.name).to.be.not.undefined",
+									"    pm.expect(pubKey.url).to.be.not.undefined",
+									"    pm.expect(pubKey.collection_tag).to.be.not.undefined",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/pubKeys/{{pubKeyName}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"pubKeys",
+								"{{pubKeyName}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET a public key (public)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Getting a public key\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const pubKey = pm.response.json()",
+									"    pm.expect(pubKey.url).to.be.not.undefined",
+									"    pm.expect(pubKey.pem).to.be.not.undefined",
+									"    pm.expect(pubKey.key).to.be.not.undefined",
+									"    pm.expect(pubKey.type).to.be.not.undefined",
+									"    pm.expect(pubKey.name).to.be.undefined",
+									"    pm.expect(pubKey.collection_tag).to.be.undefined",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/pub_keys/{{pubKeyName}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"pub_keys",
+								"{{pubKeyName}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET a public key PEM (admin API)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Getting a public key property\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const pem = pm.response.stream.toString('utf8');",
+									"    pm.expect(pem).to.be.not.null",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys/{{pubKeyName}}/pem",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"pub_keys",
+								"{{pubKeyName}}",
+								"pem"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET a public key PEM (public)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Getting a public key property\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const pem = pm.response.stream.toString('utf8');",
+									"    pm.expect(pem).to.be.not.null",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/pub_keys/{{pubKeyName}}/pem",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"pub_keys",
+								"{{pubKeyName}}",
+								"pem"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DEL identified public key",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Deleting a public key\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const pubKey = pm.response.json()",
+									"    pm.expect(pubKey.name).to.be.not.null",
+									"    pm.expect(pubKey.url).to.be.not.null",
+									"    pm.expect(pubKey.pem).to.be.not.null",
+									"    pm.expect(pubKey.type).to.be.not.null",
+									"    pm.expect(pubKey.collection_tag).to.eql(pm.collectionVariables.get('stamp'))",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"api key\",\n    \"url\": \"http://127.0.0.1:3003/api/admin/pubKeys/52d8ae34-5b34-482f-9a80-645d63f3ba0b\", \n    \"id\": \"52d8ae34-5b34-482f-9a80-645d63f3ba0b\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys/{{pubKeyName}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"pub_keys",
+								"{{pubKeyName}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DEL all pub keys",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Deleting all public keys\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    pm.expect(res.acknowledged).to.be.true",
+									"    pm.expect(res.deletedCount).to.gt(0)",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"api key\",\n    \"url\": \"http://127.0.0.1:3003/api/admin/pubKeys/52d8ae34-5b34-482f-9a80-645d63f3ba0b\", \n    \"id\": \"52d8ae34-5b34-482f-9a80-645d63f3ba0b\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/pubKeys?collection_tag={{stamp}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"pubKeys"
+							],
+							"query": [
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ERR: bad name",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Throwing an error when creating a public key with a wrong name\", () => {",
+									"    pm.expect(pm.response.code).to.eql(400);",
+									"    const error = pm.response.json()",
+									"    pm.expect(error.message).to.eql(\"The 'name' property of the public key should only contain letters, numbers as well as minus and underscore signs\")",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{pubKeyName}}€%©\",\n    \"pem\": \"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBQ/tgB/vCQxkgSlzztRAmE4dNsOo1HzLXcqTOtDIhi rudi_prod_manager\",\n    \"collection_tag\":\"{{stamp}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"pub_keys"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ERR: URL doesn't exist",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Creating a public key\", () => {",
+									"    pm.expect(pm.response.code).to.eql(404);",
+									"    const error = pm.response.json()",
+									"    pm.expect(error.message.substring(0,34)).to.eql(\"Couldn't reach the public key URL:\")",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const name = 'pubKeyName'",
+									"const val = rand.randomize(name)",
+									"console.log(pm.collectionVariables.set(name,val))",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{pubKeyName}}\",\n    \"url\": \"{{baseUrl}}/{{apiUrl}}/pub_keys/{{pubKeyName}}\",\n    \"pem\": \"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBQ/tgB/vCQxkgSlzztRAmE4dNsOo1HzLXcqTOtDIhi rudi_prod_manager\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"pub_keys"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ERR no name",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Throwing an error when creating a public key without name\", () => {",
+									"    pm.expect(pm.response.code).to.eql(400);",
+									"    const res = pm.response.json()",
+									"    pm.expect(res.statusCode).to.eql(400)",
+									"    pm.expect(res.message.substring(0, 54)).to.eq(\"La propriété 'name' doit être définie pour l'object : \")",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"url\": \"http://127.0.0.1:3003/api/admin/pub_keys/52d8ae34-5b34-482f-9a80-645d63f3ba0b\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"pub_keys"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ADD public key: PEM, no URL ⇒ OK",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Throwing an error when creating a public key without name\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const pubKey = pm.response.json()",
+									"    pm.expect(pubKey.name).to.be.not.null",
+									"    pm.expect(pubKey.url).to.be.not.null",
+									"    pm.expect(pubKey.pem).to.be.not.null",
+									"    pm.expect(pubKey.type).to.be.not.null",
+									"    pm.expect(pubKey.collection_tag).to.eql(pm.collectionVariables.get('stamp'))",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const name = 'pubKeyName'",
+									"const val = rand.randomize(name)",
+									"console.log(pm.collectionVariables.set(name,val))",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{pubKeyName}}\",\n    \"pem\": \"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBQ/tgB/vCQxkgSlzztRAmE4dNsOo1HzLXcqTOtDIhi rudi_prod_manager\",\n    \"collection_tag\":\"{{stamp}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"pub_keys"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ADD public key: no PEM, good URL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Creating a public key\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const pubKey = pm.response.json()",
+									"    pm.expect(pubKey.name).to.be.not.null",
+									"    pm.expect(pubKey.url).to.be.not.null",
+									"    pm.expect(pubKey.pem).to.be.not.null",
+									"    pm.expect(pubKey.type).to.be.not.null",
+									"    pm.expect(pubKey.collection_tag).to.eql(pm.collectionVariables.get('stamp'))",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"locadqzaezdl\",\n    \"url\": \"http://127.0.0.1:3003/api/v1/pub_keys/{{pubKeyName}}/pem\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"pub_keys"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ADD public key: no URL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Creating a public key without providing a URL\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const pubKey = pm.response.json()",
+									"    pm.expect(pubKey.name).to.be.not.null",
+									"    pm.expect(pubKey.url).to.be.not.null",
+									"    pm.expect(pubKey.pem).to.be.not.null",
+									"    pm.expect(pubKey.type).to.be.not.null",
+									"    pm.expect(pubKey.collection_tag).to.eql(pm.collectionVariables.get('stamp'))",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"locazzszsddl\",\n    \"pem\": \"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBQ/tgB/vCQxkgSlzztRAmE4dNsOo1HzLXcqTOtDIhi rudi_prod_manager\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"pub_keys"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ADD public key: Portal",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Creating a public key without providing a URL\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const pubKey = pm.response.json()",
+									"    pm.expect(pubKey.name).to.be.eq(pm.collectionVariables.get('portalKeyName').toLowerCase())",
+									"    pm.expect(pubKey.url).to.be.not.null",
+									"    pm.expect(pubKey.pem).to.be.not.null",
+									"    pm.expect(pubKey.type).to.be.not.null",
+									"    pm.expect(pubKey.collection_tag).to.eql(pm.collectionVariables.get('stamp'))",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set('portalKeyName',`portal-${pm.collectionVariables.get('stamp')}`)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{portalKeyName}}\",\n    \"url\": \"{{portalBaseUrl}}/oauth/token_key\",\n    \"prop\": \"value\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"pub_keys"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET portal public key val",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Getting a public key property\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const pem = pm.response.stream.toString('utf8');",
+									"    pm.expect(pem).to.be.not.null",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/pub_keys/{{portalKeyName}}/key",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"pub_keys",
+								"{{portalKeyName}}",
+								"key"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DEL all pub keys",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Deleting all public keys\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    pm.expect(res.acknowledged).to.be.true",
+									"    pm.expect(res.deletedCount).to.gt(0)",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"api key\",\n    \"url\": \"http://127.0.0.1:3003/api/admin/pubKeys/52d8ae34-5b34-482f-9a80-645d63f3ba0b\", \n    \"id\": \"52d8ae34-5b34-482f-9a80-645d63f3ba0b\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminUrl}}/pubKeys?collection_tag={{stamp}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminUrl}}",
+								"pubKeys"
+							],
+							"query": [
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Admin",
 			"item": [
 				{
@@ -4778,6 +5732,8 @@
 					"rand = {",
 					"    get: (randName) => pm.collectionVariables.replaceIn(randName),",
 					"",
+					"    uuid: () => rand.get('{{$randomUUID}}'),",
+					"",
 					"    pickInList: (list) => list[_.random(0, list.length - 1)],",
 					"",
 					"    pick: (listName) => rand.pickInList(pm.collectionVariables.get(listName)),",
@@ -4796,6 +5752,13 @@
 					"        .replace(/\\s+|\\.\\./g, '.')",
 					"        .replace(/^\\.+|\\.+$|\\'+/g, '')",
 					"        }@irisa.fr`,",
+					"",
+					"    randomize: (field) => {",
+					"        const randVal = rand.uuid();",
+					"        pm.collectionVariables.set(field, randVal);",
+					"        return randVal;",
+					"    },",
+					"",
 					"};",
 					"",
 					"secu = {",
@@ -4851,7 +5814,7 @@
 					"                try {",
 					"                    pm.expect(res).to.have.property('code', 200);",
 					"                } catch (err) {",
-					"                    console.error('[renewApiToken]: ' + err)",
+					"                    console.error('[renewPortalToken]: ' + err)",
 					"                    throw new Error('Crypto module should be running')",
 					"                }",
 					"                pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
@@ -4931,7 +5894,7 @@
 	"variable": [
 		{
 			"key": "stamp",
-			"value": "softChecks"
+			"value": "soft-checks"
 		},
 		{
 			"key": "apiJwt",
@@ -5123,6 +6086,14 @@
 		},
 		{
 			"key": "apiToken",
+			"value": ""
+		},
+		{
+			"key": "pubKeyName",
+			"value": ""
+		},
+		{
+			"key": "portalKeyName",
 			"value": ""
 		}
 	]

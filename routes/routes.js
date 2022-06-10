@@ -26,6 +26,7 @@ const reportController = require('../controllers/reportController')
 const dbController = require('../controllers/dbController')
 const sysController = require('../controllers/sysController')
 const { getLogs, searchLogs } = require('../controllers/logController')
+
 const skosController = require('../controllers/skosController')
 const licenceController = require('../controllers/licenceController')
 
@@ -36,39 +37,47 @@ const portalController = require('../controllers/portalController')
 // API request constants
 // ------------------------------------------------------------------------------------------------
 const {
-  URL_PUB_API_VERSION,
-  URL_PREFIX_PUBLIC,
-  URL_PUB_METADATA,
-  URL_PREFIX_PRIVATE,
-  URL_PV_DB_ACCESS,
-  URL_PV_LOGS_ACCESS,
-  URL_PV_GIT_HASH_ACCESS,
-  URL_PV_APP_HASH_ACCESS,
-  URL_PV_APP_ENV_ACCESS,
-  URL_PV_THESAURUS_ACCESS,
-  URL_PV_NODE_VERSION_ACCESS,
-  URL_PV_LICENCE_ACCESS,
-  URL_PV_LICENCE_CODES_ACCESS,
-  URL_PV_PORTAL_PREFIX,
-  URL_PV_OBJECT_GENERIC,
-  URL_SUFFIX_TOKEN_GET,
-  URL_SUFFIX_TOKEN_CHECK,
+  ACT_DELETION,
+  ACT_INIT,
+  ACT_REPORT,
+  ACT_SEARCH,
+  ACT_SEND,
+  ACT_UUID_GEN,
+
+  HTTP_METHODS,
+
+  OBJ_METADATA,
+  OBJ_PUB_KEYS,
+  OBJ_REPORTS,
+
   PARAM_ID,
   PARAM_OBJECT,
+  PARAM_PROP,
   PARAM_REPORT_ID,
   PARAM_THESAURUS_CODE,
   PARAM_THESAURUS_LANG,
-  OBJ_METADATA,
-  OBJ_REPORTS,
-  ACT_INIT,
-  ACT_REPORT,
-  ACT_DELETION,
-  ACT_UUID_GEN,
-  ACT_SEARCH,
+
   ROUTE_NAME,
-  HTTP_METHODS,
-  ACT_SEND,
+
+  URL_PREFIX_PRIVATE,
+  URL_PREFIX_PUBLIC,
+  URL_PUB_API_VERSION,
+  URL_PUB_METADATA,
+  URL_PV_APP_ENV_ACCESS,
+  URL_PV_APP_HASH_ACCESS,
+  URL_PV_DB_ACCESS,
+  URL_PV_GIT_HASH_ACCESS,
+  URL_PV_LICENCE_ACCESS,
+  URL_PV_LICENCE_CODES_ACCESS,
+  URL_PV_LOGS_ACCESS,
+  URL_PV_NODE_VERSION_ACCESS,
+  URL_PV_OBJECT_GENERIC,
+  URL_PV_PORTAL_PREFIX,
+  URL_PV_THESAURUS_ACCESS,
+  URL_SUFFIX_TOKEN_CHECK,
+  URL_SUFFIX_TOKEN_GET,
 } = require('../config/confApi')
+const { getSinglePubKey } = require('../controllers/publicKeyController')
 
 // ------------------------------------------------------------------------------------------------
 // Route names
@@ -83,6 +92,10 @@ const PUB_GET_API_VERSION = 'pub_get_api_version'
 const PUB_GET_ALL_METADATA = 'pub_get_all_metadata'
 const PUB_GET_ONE_METADATA = 'pub_get_one_metadata'
 const PUB_RCH_OBJ = 'pub_rch_obj'
+
+const PUB_GET_ALL_PUB_KEYS = 'pub_get_all_pub_keys'
+const PUB_GET_ONE_PUB_KEY = 'pub_get_one_pub_key'
+const PUB_GET_ONE_PUB_KEY_PROP = 'pub_get_one_pub_key_prop'
 
 const PORTAL_UPSERT_ONE_REPORT = 'portal_upsert_one_report'
 const PORTAL_GET_ALL_OBJ_REPORT = 'portal_get_all_obj_report'
@@ -260,6 +273,25 @@ exports.publicRoutes = [
       reply.redirect(308, newRoute)
     },
   },
+
+  {
+    method: HTTP_METHODS.GET,
+    url: `${URL_PREFIX_PUBLIC}/${OBJ_PUB_KEYS}`,
+    handler: genericController.getManyPubKeys,
+    config: { [ROUTE_NAME]: PUB_GET_ALL_PUB_KEYS },
+  },
+  {
+    method: HTTP_METHODS.GET,
+    url: `${URL_PREFIX_PUBLIC}/${OBJ_PUB_KEYS}/:${PARAM_ID}`,
+    handler: getSinglePubKey,
+    config: { [ROUTE_NAME]: PUB_GET_ONE_PUB_KEY },
+  },
+  {
+    method: HTTP_METHODS.GET,
+    url: `${URL_PREFIX_PUBLIC}/${OBJ_PUB_KEYS}/:${PARAM_ID}/:${PARAM_PROP}`,
+    handler: getSinglePubKey,
+    config: { [ROUTE_NAME]: PUB_GET_ONE_PUB_KEY_PROP },
+  },
 ]
 // ------------------------------------------------------------------------------------------------
 // 'Public' routes (Portal authentification required)
@@ -423,6 +455,13 @@ exports.backOfficeRoutes = [
   {
     method: HTTP_METHODS.GET,
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`,
+    handler: genericController.getSingleObject,
+    config: { [ROUTE_NAME]: PRV_GET_ONE },
+  },
+  // Get 1
+  {
+    method: HTTP_METHODS.GET,
+    url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/:${PARAM_PROP}`,
     handler: genericController.getSingleObject,
     config: { [ROUTE_NAME]: PRV_GET_ONE },
   },
