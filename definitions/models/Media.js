@@ -346,19 +346,14 @@ Media.getSearchableFields = () => [
   API_FILE_UPDATE_STATUS,
 ]
 
-const fun = 'createSearchIndexes'
-Media.createSearchIndexes = async () => {
+Media.initialize = async () => {
+  const fun = 'initMedia'
   try {
     await makeSearchable(Media)
   } catch (err) {
     RudiError.treatError(mod, fun, err)
   }
 }
-Media.createSearchIndexes()
-  .catch((err) => {
-    throw RudiError.treatError(mod, fun, `Failed to create search indexes: ${err}`)
-  })
-  .then(log.t(mod, fun, 'done'))
 
 // ------------------------------------------------------------------------------------------------
 // Exports

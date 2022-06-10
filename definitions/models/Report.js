@@ -109,7 +109,6 @@ const ReportSchema = new mongoose.Schema(
         {
           [API_REPORT_ERROR_CODE]: {
             type: String,
-            // type: Int32,
             // min: 0,
             required: true,
           },
@@ -170,18 +169,17 @@ Report.getSearchableFields = () => [
   `${LOCAL_REPORT_ERROR}.${LOCAL_REPORT_ERROR_MSG}`,
 ]
 
-const fun = 'createSearchIndexes'
-Report.createSearchIndexes = async () => {
+Report.initialize = async () => {
+  const fun = 'initReport'
   try {
     await makeSearchable(Report)
+    log.d(mod, fun, `Indexes created`)
   } catch (err) {
     RudiError.treatError(mod, fun, err)
   }
 }
-Report.createSearchIndexes()
-  .catch((err) => {
-    throw RudiError.treatError(mod, fun, `Failed to create search indexes: ${err}`)
-  })
-  .then(log.t(mod, fun, 'done'))
 
+// ------------------------------------------------------------------------------------------------
+// Exports
+// ------------------------------------------------------------------------------------------------
 module.exports = { Report, IntegrationStatus }

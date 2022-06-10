@@ -110,20 +110,15 @@ const Organization = mongoose.model('Organization', OrganizationSchema)
 
 Organization.getSearchableFields = () => [API_ORGANIZATION_ID, API_ORGANIZATION_NAME]
 
-const fun = 'createSearchIndexes'
-Organization.createSearchIndexes = async () => {
+Organization.initialize = async () => {
+  const fun = 'initOrganization'
   try {
     await makeSearchable(Organization)
+    log.d(mod, fun, `Indexes created`)
   } catch (err) {
     RudiError.treatError(mod, fun, err)
   }
 }
-Organization.createSearchIndexes()
-  .catch((err) => {
-    throw RudiError.treatError(mod, fun, `Failed to create search indexes: ${err}`)
-  })
-  .then(log.t(mod, fun, 'done'))
-
 // ------------------------------------------------------------------------------------------------
 // Exports
 // ------------------------------------------------------------------------------------------------

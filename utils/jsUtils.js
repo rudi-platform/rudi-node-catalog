@@ -256,11 +256,19 @@ exports.deepClone = (jsonObject) => {
 // ------------------------------------------------------------------------------------------------
 // Basic logging
 // ------------------------------------------------------------------------------------------------
-exports.separateLogs = (insertStr) => {
-  const logSeparator = !insertStr
-    ? `--------------------------------------------------------------------------`
-    : `---------------------------------------------------------------[${insertStr}]--`
-  console.log(this.nowLocaleFormatted(), logSeparator)
+
+const BASE_LINE = `================================================================================`
+
+exports.separateLogs = (insertStr, shouldDisplayDate) => {
+  const dateStr = shouldDisplayDate ? `${this.nowLocaleFormatted()} ` : ''
+  const inputStr = insertStr ? `[ ${insertStr} ]==` : ''
+  const eatenCharacters = dateStr.length + inputStr.length
+
+  const line = BASE_LINE.substring(eatenCharacters)
+
+  const logSeparator = `${dateStr}${line}${inputStr}`
+
+  console.log('\nD ' + logSeparator)
   return logSeparator
 }
 

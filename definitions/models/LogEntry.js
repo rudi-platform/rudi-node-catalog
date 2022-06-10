@@ -12,7 +12,7 @@ const { v4 } = require('uuid')
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
-const { LOG_DATE_FORMAT, consoleErr } = require('../../utils/jsUtils')
+const { LOG_DATE_FORMAT, consoleErr, consoleLog } = require('../../utils/jsUtils')
 const { LOG_EXP } = require('../../config/confLogs')
 const { VALID_UUID, VALID_EPOCH_MS } = require('../schemaValidators')
 
@@ -159,8 +159,8 @@ const LogEntry = model('LogEntry', LogEntrySchema)
 LogEntry.getSearchableFields = () => [LOG_MSG, LOG_LVL, LOG_USR]
 const SEARCH_INDEX = 'searchIndex'
 
-const fun = 'createSearchIndexes'
-LogEntry.createSearchIndexes = async () => {
+LogEntry.initialize = async () => {
+  const fun = 'initLogEntry'
   try {
     const collection = LogEntry.collection
     const listFields = LogEntry.getSearchableFields()
@@ -183,13 +183,14 @@ LogEntry.createSearchIndexes = async () => {
     )
     // (Re)creating the indexes
     await collection.createIndex(searchIndexes, indexOpts)
+
+    consoleLog(mod, fun, `Indexes created`)
   } catch (err) {
     consoleErr(mod, fun, err)
   }
 }
-LogEntry.createSearchIndexes().catch((err) => {
-  throw new Error(`[mod, fun] Failed to create search indexes: ${err}`)
-})
-LogEntry.collection.dropIndex({ [DB_UPDATED_AT]: 1 }).catch(() => 'nevermind')
 
+// ------------------------------------------------------------------------------------------------
+// Exports
+// ------------------------------------------------------------------------------------------------
 module.exports = { LogEntry, makeLogInfo, logLineToString }

@@ -36,7 +36,7 @@ const {
 // ------------------------------------------------------------------------------------------------
 // Internal constants
 // ------------------------------------------------------------------------------------------------
-
+const ACTIVATE_LOG = false
 /**
  * This class makes it possible to add to the request received by node a context that will be
  * helpful to create syslog lines.
@@ -101,7 +101,7 @@ exports.CallContext = class CallContext {
       const msg = `${authDetails ? beautify(authDetails) : ''}, ${
         opDetails ? beautify(opDetails) : ''
       }, ${rawDetails ? beautify(rawDetails) : ''}`
-      log.t(mod, fun, msg)
+      if (ACTIVATE_LOG) log.t(mod, fun, msg)
 
       this[AUTH] = !authDetails ? {} : authDetails
       this[OP] = !opDetails ? {} : opDetails
@@ -117,8 +117,9 @@ exports.CallContext = class CallContext {
   // ------------------------------------------------------------------------------------------------
 
   set ips(ipArray) {
-    log.t(mod, 'setIps', ``)
-    if (!Array.isArray(ipArray)) throw new RudiError(`Context IPs can only be set as an array`)
+    if (ACTIVATE_LOG) log.t(mod, 'setIps', ``)
+    if (!Array.isArray(ipArray))
+      throw new RudiError(`Context IPs can only be set as an array`, mod, 'setIps')
     this[AUTH][REQ_IPS] = ipArray
   }
   get ips() {
@@ -126,12 +127,12 @@ exports.CallContext = class CallContext {
   }
 
   setIpsFromRequest(req) {
-    log.t(mod, 'setIpsFromRequest', ``)
+    if (ACTIVATE_LOG) log.t(mod, 'setIpsFromRequest', ``)
     this.ips = CallContext.extractIpAndRedirections(req)
   }
 
   set clientApp(clientApp) {
-    log.t(mod, 'setClientApp', ``)
+    if (ACTIVATE_LOG) log.t(mod, 'setClientApp', ``)
     this[AUTH][REQ_APP] = clientApp
   }
   get clientApp() {
@@ -139,7 +140,7 @@ exports.CallContext = class CallContext {
   }
 
   set reqUser(userId) {
-    log.t(mod, 'setUser', ``)
+    if (ACTIVATE_LOG) log.t(mod, 'setUser', ``)
     this[AUTH][REQ_USR] = userId
   }
   get reqUser() {
@@ -147,7 +148,7 @@ exports.CallContext = class CallContext {
   }
 
   setAuth(ips, clientApp, userId) {
-    log.t(mod, 'setAuth', ``)
+    if (ACTIVATE_LOG) log.t(mod, 'setAuth', ``)
     this.ips = Array.isArray(ips) ? ips : [ips]
     if (clientApp) this.clientApp = clientApp
     if (userId) this.reqUser = userId
@@ -165,7 +166,7 @@ exports.CallContext = class CallContext {
   addReportId = (id) => this.addObjId(`${OBJ_REPORTS}:${id}`)
 
   setReqDescription(reqMethod, reqUrl, routeName) {
-    log.t(mod, 'setReqDescription', ``)
+    if (ACTIVATE_LOG) log.t(mod, 'setReqDescription', ``)
     if (!this[DETAILS][REQ]) this[DETAILS][REQ] = {}
     this[DETAILS][REQ][REQ_MTD] = reqMethod
     this[DETAILS][REQ][REQ_URL] = reqUrl
@@ -209,7 +210,7 @@ exports.CallContext = class CallContext {
 
   get apiCallMsg() {
     const fun = 'apiCallMsg'
-    log.t(mod, fun, ``)
+    if (ACTIVATE_LOG) log.t(mod, fun, ``)
     try {
       return (
         this.reqDetailsMsg +
@@ -225,7 +226,7 @@ exports.CallContext = class CallContext {
 
   get reqDetailsMsg() {
     const fun = 'reqDetailsMsg'
-    log.t(mod, fun, ``)
+    if (ACTIVATE_LOG) log.t(mod, fun, ``)
     try {
       return `${this.reqMethod} ${this.reqUrl} (${this.routeName})`
     } catch (err) {
@@ -264,8 +265,8 @@ exports.CallContext = class CallContext {
     try {
       log.t(mod, fun, ``)
       if (RudiError.isRudiError(error)) {
-        // log.t(mod, fun, `rudi error`)
-        // log.t(mod, fun, `this[DETAILS]: ${this[DETAILS]}`)
+        if (ACTIVATE_LOG) log.t(mod, fun, `rudi error`)
+        if (ACTIVATE_LOG) log.t(mod, fun, `this[DETAILS]: ${this[DETAILS]}`)
         if (!this[DETAILS][ERROR]) this[DETAILS][ERROR] = error
         else {
           {
@@ -274,7 +275,7 @@ exports.CallContext = class CallContext {
           }
         }
       } else {
-        // log.t(mod, fun, `not rudi error`)
+        if (ACTIVATE_LOG) log.t(mod, fun, `not rudi error`)
         const rudiError = RudiError.treatError(ctxMod, ctxFun, error)
         this.addError(ctxMod, ctxFun, rudiError)
       }
@@ -331,7 +332,7 @@ exports.CallContext = class CallContext {
   }
 
   get context() {
-    log.t(mod, 'getContext', ``)
+    if (ACTIVATE_LOG) log.t(mod, 'getContext', ``)
     return { [AUTH]: this[AUTH], [OP]: this[OP], [DETAILS]: this[DETAILS] }
   }
 
@@ -347,7 +348,7 @@ exports.CallContext = class CallContext {
   static getCallContextFromReq(req) {
     const fun = 'getCallContextFromReq'
     try {
-      // log.t(mod, fun, ``)
+      if (ACTIVATE_LOG) log.t(mod, fun, ``)
       const reqContext = CallContext.getReqContext(req)
       if (!reqContext) return undefined
 
@@ -370,7 +371,7 @@ exports.CallContext = class CallContext {
     const fun = 'setAsReqContext'
 
     try {
-      // log.t(mod, fun, ``)
+      if (ACTIVATE_LOG) log.t(mod, fun, ``)
       if (req[CALL_CONTEXT]) throw new Error('Call context already set')
       req[CALL_CONTEXT] = callContext
       // {[AUTH]: callContext[AUTH],[OP]: callContext[OP],[DETAILS]: callContext[DETAILS],}
@@ -383,7 +384,7 @@ exports.CallContext = class CallContext {
   static preventCodeInjection(req) {
     const fun = 'preventCodeInjection'
     try {
-      log.t(mod, fun, ``)
+      if (ACTIVATE_LOG) log.t(mod, fun, ``)
       protectHeaderMethod(req)
       protectHeaderUrl(req)
       protectHeaderAuth(req)
@@ -401,7 +402,7 @@ exports.CallContext = class CallContext {
     const fun = 'getReqContext'
 
     try {
-      // log.t(mod, fun, ``)
+      if (ACTIVATE_LOG) log.t(mod, fun, ``)
       const context = req[CALL_CONTEXT]
       if (!context) return undefined
       return context
@@ -444,17 +445,17 @@ exports.CallContext = class CallContext {
 
   static createApiCallMsg(req) {
     const fun = 'createApiCallMsg'
-    log.t(mod, fun, ``)
     try {
+      if (ACTIVATE_LOG) log.t(mod, fun, ``)
       const context = CallContext.getCallContextFromReq(req)
       if (!context) {
-        log.t(mod, fun, 'No context set yet')
+        if (ACTIVATE_LOG) log.t(mod, fun, 'No context set yet')
         return (
           `${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})` +
           ` <- ${CallContext.createIpsMsg(req)}`
         )
       } else {
-        log.t(mod, fun, 'A context was found')
+        if (ACTIVATE_LOG) log.t(mod, fun, 'A context was found')
         return context.apiCallMsg
       }
     } catch (err) {

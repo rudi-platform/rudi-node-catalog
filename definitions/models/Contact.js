@@ -119,19 +119,19 @@ Contact.getSearchableFields = () => [
   API_CONTACT_MAIL,
 ]
 
-const fun = 'createSearchIndexes'
-Contact.createSearchIndexes = async () => {
+Contact.initialize = async () => {
+  const fun = 'initContact'
   try {
+    log.t(mod, fun, ``)
     await makeSearchable(Contact)
+    log.d(mod, fun, `Indexes created`)
   } catch (err) {
     log.w(mod, fun, err)
     RudiError.treatError(mod, fun, err)
   }
 }
-Contact.createSearchIndexes()
-  .catch((err) => {
-    throw RudiError.treatError(mod, fun, `Failed to create search indexes: ${err}`)
-  })
-  .then(log.t(mod, fun, 'done'))
 
+// ------------------------------------------------------------------------------------------------
+// Exports
+// ------------------------------------------------------------------------------------------------
 module.exports = { Contact }

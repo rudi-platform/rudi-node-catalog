@@ -927,19 +927,15 @@ Metadata.getSearchableFields = () => [
   `${API_DATA_DESCRIPTION_PROPERTY}.${DICT_TEXT}`,
 ]
 
-const fun = 'createSearchIndexes'
-Metadata.createSearchIndexes = async () => {
+Metadata.initialize = async () => {
+  const fun = 'initMetadata'
   try {
     await makeSearchable(Metadata)
+    log.d(mod, fun, `Indexes created`)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
 }
-Metadata.createSearchIndexes()
-  .catch((err) => {
-    throw RudiError.treatError(mod, fun, `Failed to create search indexes: ${err}`)
-  })
-  .then(log.t(mod, fun, 'done'))
 
 // ------------------------------------------------------------------------------------------------
 // Exports

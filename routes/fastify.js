@@ -138,7 +138,7 @@ fastifyConf.addHook('onRequest', (req, res, next) => {
   const fun = 'onRequest'
   try {
     const context = new CallContext()
-    log.t(mod, fun, `----- Rcv req #${context.id} -----vvv---`)
+    log.v(mod, fun, `----- Rcv req #${context.id} -----vvv---`)
     const now = nowEpochMs()
     context.setIpsFromRequest(req)
     context.timestamp = now
@@ -168,14 +168,14 @@ fastifyConf.addHook('onRequest', (req, res, next) => {
 fastifyConf.addHook('onSend', (request, reply, payload, next) => {
   const fun = 'onSend'
   try {
-    log.t(mod, fun, ``)
+    // log.t(mod, fun, ``)
     const now = nowEpochMs()
     const context = CallContext.getCallContextFromReq(request)
     if (!!context) {
       context.duration = now - context.timestamp
       context.statusCode = reply.statusCode
       if (!reply.isError) context.logInfo(mod, fun, 'API reply')
-      log.t(mod, fun, `----- Send reply #${context.id} (${context.duration} ms) -----^^^--`)
+      log.v(mod, fun, `----- Send reply #${context.id} (${context.duration} ms) -----^^^--`)
     }
     next()
   } catch (err) {

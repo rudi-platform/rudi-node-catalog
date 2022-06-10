@@ -9,6 +9,8 @@ const mod = 'protect'
 // ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
+const ACTIVATE_LOG = false
+
 const { HEADERS, HD_AUTH, HD_URL, HD_AUTH_LOWER, HD_METHOD } = require('../config/headers')
 const REQ_AUTH_MAX_LENGTH = 1000
 const REQ_URL_MAX_LENGTH = 200
@@ -39,7 +41,7 @@ const { HTTP_METHODS } = require('../config/confApi')
 exports.protectHeaderAuth = (req) => {
   const fun = 'protectHeaderAuth'
   try {
-    log.t(mod, fun, ``)
+    if (ACTIVATE_LOG) log.t(mod, fun, ``)
     const header = accessProperty(req, HEADERS)
     const auth = header[HD_AUTH] || header[HD_AUTH_LOWER]
     if (!auth) return
@@ -57,7 +59,7 @@ exports.protectHeaderAuth = (req) => {
 exports.protectHeaderUrl = (req) => {
   const fun = 'protectHeaderUrl'
   try {
-    log.t(mod, fun, ``)
+    if (ACTIVATE_LOG) log.t(mod, fun, ``)
     const url = accessProperty(req, HD_URL)
     if (url.length > REQ_URL_MAX_LENGTH)
       throw new BadRequestError(`Request URL is too long (${url.length} characters)`)
@@ -71,7 +73,7 @@ const httpMethods = Object.values(HTTP_METHODS)
 exports.protectHeaderMethod = (req) => {
   const fun = 'protectHeaderMethod'
   try {
-    log.t(mod, fun, ``)
+    if (ACTIVATE_LOG) log.t(mod, fun, ``)
     const method = accessProperty(req, HD_METHOD)
     if (httpMethods.indexOf(method) < 0) throw new BadRequestError(`Incorrect request method`)
   } catch (err) {

@@ -9,7 +9,7 @@ const mod = 'sysConf'
 // Internal dependecies
 // ------------------------------------------------------------------------------------------------
 const fa = require('../utils/fileActions')
-const utils = require('../utils/jsUtils')
+const { consoleLog, consoleErr, quietAccess, NOT_FOUND } = require('../utils/jsUtils')
 // utils.separateLogs()
 
 // ------------------------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ let CURRENT_APP_HASH
 // ------------------------------------------------------------------------------------------------
 const appOptions = getAppOptions()
 // if (utils.isNotEmptyObject(appOptions))
-//   utils.consoleLog(mod, 'commandLineOptions', utils.beautify(appOptions))
+//   consoleLog(mod, 'commandLineOptions', utils.beautify(appOptions))
 
 // ------------------------------------------------------------------------------------------------
 // Extract environment variables
@@ -44,7 +44,7 @@ const RUDI_API_USER_ENV = process.env.RUDI_API_USER_CONF
 const INI_DIR = './0-ini'
 // - user conf path
 const USER_CONF_FILE = getAppOptions('conf') || `${INI_DIR}/conf_custom.ini`
-// utils.consoleLog(mod, 'init', USER_CONF_FILE)
+// consoleLog(mod, 'init', USER_CONF_FILE)
 // - default conf path
 const DEFT_CONF_FILE = `${INI_DIR}/conf_default.ini`
 
@@ -57,14 +57,14 @@ const DEFT_CONF_FILE = `${INI_DIR}/conf_default.ini`
 const getUserConf = () => {
   const fun = 'getUserConf'
   try {
-    utils.consoleLog(
+    consoleLog(
       mod,
       fun,
       appOptions[CLI_CONF_PATH] ? 'cli' : `Conf file: ${RUDI_API_USER_ENV ? 'env' : 'ini'}`
     )
     return fa.readIniFile(USER_CONF_FILE)
   } catch (err) {
-    utils.consoleErr(mod, fun, err)
+    consoleErr(mod, fun, err)
     throw err
   }
 }
@@ -72,7 +72,7 @@ const getLocalConf = () => {
   try {
     return fa.readIniFile(DEFT_CONF_FILE)
   } catch (err) {
-    utils.consoleErr(mod, 'getLocalConf', err)
+    consoleErr(mod, 'getLocalConf', err)
     throw err
   }
 }
@@ -93,14 +93,14 @@ exports.getIniValue = (section, field, defaultVal, customConf, defaultConf) => {
     const userConf = customConf ? customConf : USER_CONF
     const localConf = defaultConf ? defaultConf : LOCAL_CONF
 
-    const userValue = utils.quietAccess(userConf[section], field)
-    const localValue = utils.quietAccess(localConf[section], field)
+    const userValue = quietAccess(userConf[section], field)
+    const localValue = quietAccess(localConf[section], field)
 
-    if (userValue != utils.NOT_FOUND) return userValue
-    if (localValue != utils.NOT_FOUND) return localValue
-    return typeof defaultVal === 'undefined' ? utils.NOT_FOUND : defaultVal
+    if (userValue != NOT_FOUND) return userValue
+    if (localValue != NOT_FOUND) return localValue
+    return typeof defaultVal === 'undefined' ? NOT_FOUND : defaultVal
   } catch (err) {
-    utils.consoleErr(mod, 'getIniValue', err)
+    consoleErr(mod, 'getIniValue', err)
     throw err
   }
 }
@@ -159,8 +159,8 @@ exports.getProfile = (subject) => PROFILES[subject]
 
 // const now = utils.nowLocaleFormatted()
 const appMsg = `App '${APP_NAME}' listening on: ${this.getHost()}`
-utils.consoleLog(mod, 'init', appMsg)
-utils.consoleLog(mod, 'init', `DB: ${DB_URL}`)
+consoleLog(mod, 'init', appMsg)
+consoleLog(mod, 'init', `DB: ${DB_URL}`)
 
 // ----- SKOSMOS section
 // const SKOSMOS_SECTION = 'skosmos'

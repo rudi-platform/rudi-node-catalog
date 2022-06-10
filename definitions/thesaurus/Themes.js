@@ -78,16 +78,4 @@ const INIT_VALUES = {
 
 const Themes = new Thesaurus(CODE, INIT_VALUES)
 
-const fun = `init ${CODE}`
-// log.t(mod, fun, ``)
-
-;(async () => {
-  try {
-    await Themes.init()
-    // log.d(mod, fun, `ok`)
-  } catch (err) {
-    log.w(mod, fun, `Init failed: ${err}`)
-  }
-})()
-
 module.exports = Themes

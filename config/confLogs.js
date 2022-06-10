@@ -1,6 +1,7 @@
 'use strict'
 
-const mod = 'confLogger'
+const mod = 'logConf'
+const fun = 'init'
 
 // ------------------------------------------------------------------------------------------------
 // External dependencies
@@ -26,7 +27,7 @@ Object.assign(
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
-const utils = require('../utils/jsUtils')
+const { consoleLog, consoleErr, LOG_DATE_FORMAT } = require('../utils/jsUtils')
 const sys = require('../config/confSystem')
 const { getGitHash, getAppOptions, OPT_NODE_ENV } = require('./appOptions')
 
@@ -50,7 +51,7 @@ exports.shouldShowErrorPile = () => SHOULD_SHOW_ERROR_PILE
 exports.shouldShowRoutes = () => SHOULD_SHOW_ROUTES
 
 // Log feedback
-const checkOption = (msg, flag) => utils.consoleLog(mod, '', `[${flag ? 'x' : ' '}] ${msg}`)
+const checkOption = (msg, flag) => consoleLog(mod, fun, `[${flag ? 'x' : ' '}] ${msg}`)
 checkOption('Should log on console', this.SHOULD_LOG_CONSOLE)
 checkOption('Control private requests', sys.shouldControlPrivateRequests())
 checkOption('Control public requests', sys.shouldControlPublicRequests())
@@ -63,7 +64,7 @@ checkOption('Backup syslogs in file', SHOULD_SYSLOG_IN_FILE)
 const LOG_SECTION = 'logging'
 
 const LOG_LVL = sys.getIniValue(LOG_SECTION, 'log_level', 'debug')
-utils.consoleLog(mod, '', `Log level set to '${LOG_LVL.toUpperCase()}'`)
+consoleLog(mod, fun, `Log level set to '${LOG_LVL.toUpperCase()}'`)
 
 const LOG_DIR = sys.getIniValue(LOG_SECTION, 'log_dir')
 const LOG_FILE = sys.getIniValue(LOG_SECTION, 'log_file')
@@ -92,12 +93,12 @@ if (SHOULD_FILELOG) {
     // first check if directory already exists
     if (!existsSync(LOG_DIR)) {
       mkdirSync(LOG_DIR, { recursive: true })
-      utils.consoleLog(mod, '', 'Log directory has been created')
+      consoleLog(mod, fun, 'Log directory has been created')
     } else {
-      utils.consoleLog(mod, '', 'Log directory exists')
+      consoleLog(mod, fun, 'Log directory exists')
     }
   } catch (err) {
-    utils.consoleErr(mod, '', `Log directory creation failed: ${err}`)
+    consoleErr(mod, fun, `Log directory creation failed: ${err}`)
     throw err
   }
 }
@@ -107,12 +108,12 @@ if (SHOULD_SYSLOG_IN_FILE) {
     // first check if directory already exists
     if (!existsSync(SYSLOG_DIR)) {
       mkdirSync(SYSLOG_DIR, { recursive: true })
-      utils.consoleLog(mod, '', 'Syslog directory has been created.')
+      consoleLog(mod, fun, 'Syslog directory has been created.')
     } else {
-      utils.consoleLog(mod, '', 'Syslog directory exists.')
+      consoleLog(mod, fun, 'Syslog directory exists.')
     }
   } catch (err) {
-    utils.consoleErr(mod, '', `Log directory creation failed: ${err}`)
+    consoleErr(mod, fun, `Log directory creation failed: ${err}`)
     throw err
   }
 }
@@ -140,7 +141,7 @@ winston.addColors({
   debug: 'cyan',
 })
 
-const FORMAT_TIMESTAMP = { format: utils.LOG_DATE_FORMAT }
+const FORMAT_TIMESTAMP = { format: LOG_DATE_FORMAT }
 const LOGS_FORMAT_PRINTF = (info) =>
   `${info.level}`.substring(0, 1).toUpperCase() + ` ${info.timestamp} ${info.message}`
 
@@ -251,7 +252,7 @@ exports.initFFLogger = () => {
   const ffLogger = winston.loggers.get(FF_LOGGER)
 
   process.on('uncaughtException', (err) => {
-    utils.consoleErr(mod, fun, `UncaughtException processing: ${err}`)
+    consoleErr(mod, fun, `UncaughtException processing: ${err}`)
   })
 
   // PINO like, we link winston.containers to use only one instance of logger

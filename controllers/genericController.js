@@ -55,7 +55,6 @@ const { deletePortalMetadata } = require('./portalController')
 // ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
-
 const {
   ACT_DELETION,
   ACT_SEARCH,
@@ -155,6 +154,7 @@ const EXT_OBJ_VAL = 'refObjVal'
 
 function cleanDate(inputDate) {
   const fun = 'cleanDate'
+
   const cleanValue = inputDate.replace(/[\'\"\`]/g, '')
   if (cleanValue.match(new RegExp(/^[0-9]{10}$/))) return new Date(parseInt(cleanValue * 1000))
   if (cleanValue.match(new RegExp(/^[0-9]{13}$/))) return new Date(parseInt(cleanValue))
@@ -171,7 +171,7 @@ function cleanDate(inputDate) {
 
 function cleanDateOperations(inputDateOperations) {
   const fun = 'cleanDateOperation'
-  log.d(mod, fun, `inputDateOperations: ${beautify(inputDateOperations)}`)
+  log.t(mod, fun, `inputDateOperations: ${beautify(inputDateOperations)}`)
 
   const operations = {}
   for (const [operator, value] of Object.entries(inputDateOperations)) {

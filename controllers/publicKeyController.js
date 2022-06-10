@@ -23,7 +23,7 @@ const {
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
-const { beautify } = require('../utils/jsUtils')
+// const { beautify } = require('../utils/jsUtils')
 const { httpGet } = require('../utils/httpReq')
 
 const { RudiError, BadRequestError, NotFoundError } = require('../utils/errors')
@@ -56,9 +56,9 @@ const checkKeyPem = (keyPem) => {
   const fun = 'checkKeyPem'
   try {
     log.t(mod, fun, ``)
-    log.v(mod, fun, keyPem)
+    // log.v(mod, fun, keyPem)
     const key = parseKey(keyPem)
-    log.v(mod, fun, key)
+    // log.v(mod, fun, key)
     return key
   } catch (err) {
     throw new BadRequestError(
@@ -106,9 +106,11 @@ const normalizeKeyData = async (pubKeyJson) => {
         // Get the key at the (public) URL
         response = await httpGet(pubKeyJson[API_PUB_URL])
       } catch (err) {
-        throw new NotFoundError(`Couldn't reach the public key URL: ${pubKeyJson[API_PUB_URL]}`)
+        throw new NotFoundError(
+          `Couldn't reach the public key URL: ${pubKeyJson[API_PUB_URL]}: ${err}`
+        )
       }
-      log.i(mod, fun, `response: ${beautify(response)}`)
+      // log.i(mod, fun, `response: ${beautify(response)}`)
 
       const keyPem = pubKeyJson[API_PUB_PROP] ? response[pubKeyJson[API_PUB_PROP]] : response
       const key = checkKeyPem(keyPem)

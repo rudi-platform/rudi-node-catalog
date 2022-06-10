@@ -110,7 +110,7 @@ const { LogEntry, logLineToString } = require('../definitions/models/LogEntry')
 // ------------------------------------------------------------------------------------------------
 // Other internal dependencies
 // ------------------------------------------------------------------------------------------------
-const { dropCollection } = require('./dbActions')
+const { dropCollection, makeSearchable } = require('./dbActions')
 const PublicKey = require('../definitions/models/PublicKey')
 
 // ------------------------------------------------------------------------------------------------
@@ -832,10 +832,10 @@ exports.searchObjects = async (objectType, options) => {
         log.v(mod, fun, `No search index: let's recreate them`)
         const Model = this.getObjectModel(objectType)
         try {
-          await Model.createSearchIndexes()
+          await makeSearchable(Model)
         } catch (er) {
           log.v(mod, fun, utils.beautify(er.message))
-          if (er == 'TypeError: Model.createSearchIndexes is not a function')
+          if (er == `TypeError: Model can't be made searchable`)
             throw new NotImplementedError(`Searching '${objectType}' is not yet implemented`)
 
           log.w(

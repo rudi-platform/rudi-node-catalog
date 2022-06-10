@@ -115,13 +115,17 @@ exports.makeSearchable = async (Model) => {
       log.d(mod, fun, `No collection for '${Model.name}`)
       return
     }
-    const listFields = Model.getSearchableFields()
-    if (!listFields) {
+    let searchableFields
+    try {
+      searchableFields = Model.getSearchableFields()
+      if (!searchableFields) throw Error()
+    } catch (err) {
+      // => searchableFields is undefined or method Model.getSearchableFields() doesn't exist
       log.d(mod, fun, `No searchable fields for '${collection.name}`)
       return
     }
 
-    log.d(mod, fun, `Searchable fields for ${collection.name}: ${listFields}`)
+    log.d(mod, fun, `Searchable fields for ${collection.name}: ${searchableFields}`)
 
     // Dropping current text indexes if they exist
     try {
@@ -138,7 +142,7 @@ exports.makeSearchable = async (Model) => {
     }
     // Preparing the 'text' (=== searchable) indexes
     const searchIndexes = {}
-    listFields.map((field) => (searchIndexes[field] = 'text'))
+    searchableFields.map((field) => (searchIndexes[field] = 'text'))
 
     const indexOpts = {
       name: SEARCH_INDEX,

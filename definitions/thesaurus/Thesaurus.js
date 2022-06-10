@@ -68,7 +68,7 @@ module.exports = class Thesaurus {
    * If no DB values are found, object initValues are used
    * @param {*} shouldReset If true, values are reset
    */
-  init = async (shouldReset) => {
+  initialize = async (shouldReset) => {
     const fun = 'init'
     try {
       log.t(mod, fun, `Thesaurus: ${this.#code}`)
@@ -93,7 +93,7 @@ module.exports = class Thesaurus {
       }
 
       this.#isInit = true
-      // log.d(mod, fun, `Thesaurus initialized: ${this.#code}: ${beautify(this.#currentValues)}`)
+      log.d(mod, fun, `Thesaurus initialized: ${this.#code}`) // : ${beautify(this.#currentValues)}
     } catch (err) {
       throw RudiError.treatError(mod, fun, err)
     }
