@@ -4837,6 +4837,30 @@
 					"response": []
 				},
 				{
+					"name": "GET all public keys (public)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{apiUrl}}/pub_keys?collection_tag={{stamp}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{apiUrl}}",
+								"pub_keys"
+							],
+							"query": [
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "GET a public key (public)",
 					"event": [
 						{
@@ -5582,7 +5606,9 @@
 					"const TOKEN_DURATION_S = 1200",
 					"const API_TOKEN_NAME = pm.variables.get('apiTokenName')",
 					"const PORTAL_TOKEN_NAME = pm.variables.get('portalTokenName')",
-					"const AUTH = 'Authorization'",
+					"",
+					"const BASE_URL = pm.variables.get('baseUrl')",
+					"const ADMIN_URL = BASE_URL + '/' + pm.variables.get('adminUrl')",
 					"",
 					"log = {",
 					"    d: (msg) => { if (DEBUG || TRACE) console.log(msg) },",
@@ -5719,22 +5745,22 @@
 					"",
 					"    renewPortalToken: async (tokenName, rudiProdToken) => {",
 					"        log.t('-- renewPortalToken --')",
-					"        const reqUrl = pm.variables.get('baseUrl') + '/' + pm.variables.get('adminUrl') + '/portal/token'",
+					"        const reqUrl = ADMIN_URL + '/portal/token'",
 					"        // log.d('reqUrl: ' + reqUrl)",
-					"        const rpToken = rudiProdToken",
 					"        const reqNewToken = {",
 					"            url: reqUrl,",
 					"            method: 'GET',",
 					"            header: {",
-					"                \"Content-Type\": \"application/json\",",
-					"                [AUTH]: 'Bearer ' + rpToken",
+					"                'Content-Type': \"application/json\",",
+					"                'Authorization': 'Bearer ' + rudiProdToken",
 					"            },",
 					"        }",
 					"        pm.sendRequest(reqNewToken, (err, res) => {",
 					"            try {",
 					"                pm.expect(res).to.have.property('code', 200);",
-					"            } catch (err) {",
+					"            } catch (error) {",
 					"                console.error('[renewPortalToken]: ' + err)",
+					"                console.error('[renewPortalToken]: ' + error)",
 					"            }",
 					"            //log.d('renewPortalToken res: ' + JSON.stringify(res))",
 					"            const token = JSON.parse(codec.streamToUtf8(res)).access_token",

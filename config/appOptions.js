@@ -14,6 +14,9 @@ exports.OPT_APP_ENV = 'appEnv'
 exports.OPT_USER_CONF = 'conf'
 exports.OPT_PORTAL_CONF = 'portalConf'
 
+exports.OPT_SERVER_URL = 'apiUrl'
+
+exports.ENV_USER_CONF = 'RUDI_API_USER_CONF'
 // -------------------------------------------------------------------------------------------------
 // App options
 // -------------------------------------------------------------------------------------------------
@@ -36,12 +39,17 @@ exports.OPTIONS = {
   [this.OPT_USER_CONF]: {
     text: 'User conf file',
     cli: '--conf',
-    env: 'RUDI_API_USER_CONF',
+    env: this.ENV_USER_CONF,
   },
   [this.OPT_PORTAL_CONF]: {
     text: 'Portal conf file',
     cli: '--portal_conf',
     env: 'RUDI_API_PORTAL_CONF',
+  },
+  [this.OPT_SERVER_URL]: {
+    text: 'API server URL',
+    cli: '--url',
+    env: 'RUDI_API_URL',
   },
 }
 
