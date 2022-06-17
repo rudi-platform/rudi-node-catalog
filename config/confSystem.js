@@ -15,7 +15,13 @@ const { consoleLog, consoleErr, quietAccess, NOT_FOUND } = require('../utils/jsU
 // ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
-const { CLI_CONF_PATH, getAppOptions, getGitHash } = require('./appOptions')
+const {
+  getAppOptions,
+  getGitHash,
+  OPT_USER_CONF,
+  ENV_USER_CONF,
+  OPT_SERVER_URL,
+} = require('./appOptions')
 const { TRACE, TRACE_MOD, TRACE_FUN, TRACE_ERR } = require('./confApi')
 
 // ------------------------------------------------------------------------------------------------
@@ -26,14 +32,13 @@ let CURRENT_APP_HASH
 // ------------------------------------------------------------------------------------------------
 // Display app options
 // ------------------------------------------------------------------------------------------------
-const appOptions = getAppOptions()
 // if (utils.isNotEmptyObject(appOptions))
 //   consoleLog(mod, 'commandLineOptions', utils.beautify(appOptions))
 
 // ------------------------------------------------------------------------------------------------
 // Extract environment variables
 // ------------------------------------------------------------------------------------------------
-const RUDI_API_USER_ENV = process.env.RUDI_API_USER_CONF
+const RUDI_API_USER_ENV = process.env[ENV_USER_CONF]
 
 // ------------------------------------------------------------------------------------------------
 // Constants
@@ -43,7 +48,7 @@ const RUDI_API_USER_ENV = process.env.RUDI_API_USER_CONF
 // - directory
 const INI_DIR = './0-ini'
 // - user conf path
-const USER_CONF_FILE = getAppOptions('conf') || `${INI_DIR}/conf_custom.ini`
+const USER_CONF_FILE = getAppOptions(OPT_USER_CONF) || `${INI_DIR}/conf_custom.ini`
 // consoleLog(mod, 'init', USER_CONF_FILE)
 // - default conf path
 const DEFT_CONF_FILE = `${INI_DIR}/conf_default.ini`
@@ -60,7 +65,7 @@ const getUserConf = () => {
     consoleLog(
       mod,
       fun,
-      appOptions[CLI_CONF_PATH] ? 'cli' : `Conf file: ${RUDI_API_USER_ENV ? 'env' : 'ini'}`
+      getAppOptions(OPT_USER_CONF) ? 'cli' : `Conf file: ${RUDI_API_USER_ENV ? 'env' : 'ini'}`
     )
     return fa.readIniFile(USER_CONF_FILE)
   } catch (err) {
@@ -131,13 +136,15 @@ const APP_NAME = this.getIniValue(SERVER_SECTION, 'app_name', 'rudiprod.api')
 const LISTENING_ADDR = this.getIniValue(SERVER_SECTION, 'listening_address')
 const LISTENING_PORT = this.getIniValue(SERVER_SECTION, 'listening_port')
 
+const apiUrl = getAppOptions(OPT_SERVER_URL) || this.getIniValue(SERVER_SECTION, 'server_url')
+const API_URL = apiUrl.endsWith('/') ? apiUrl.slice(0, -1) : apiUrl
+
 exports.getAppName = () => APP_NAME
 exports.getServerAddress = () => LISTENING_ADDR
 exports.getServerPort = () => LISTENING_PORT
-exports.getHost = (suffix) =>
-  suffix
-    ? `http://${LISTENING_ADDR}:${LISTENING_PORT}${suffix}`
-    : `http://${LISTENING_ADDR}:${LISTENING_PORT}`
+exports.getHost = (suffix) => `http://${LISTENING_ADDR}:${LISTENING_PORT}${suffix ? suffix : ''}`
+
+exports.getApiUrl = (suffix) => `${API_URL}${suffix ? suffix : ''}`
 
 // ----- DB section
 const DB_SECTION = 'database'

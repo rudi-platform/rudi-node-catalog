@@ -28,7 +28,7 @@ const { httpGet } = require('../utils/httpReq')
 
 const { RudiError, BadRequestError, NotFoundError } = require('../utils/errors')
 const PublicKey = require('../definitions/models/PublicKey')
-const { getHost } = require('../config/confSystem')
+const { getApiUrl } = require('../config/confSystem')
 const { OBJ_PUB_KEYS, URL_PREFIX_PUBLIC, PARAM_ID, PARAM_PROP } = require('../config/confApi')
 const { accessReqParam } = require('../utils/jsonAccess')
 const { CallContext } = require('../definitions/constructors/callContext')
@@ -96,9 +96,9 @@ const normalizeKeyData = async (pubKeyJson) => {
       pubKeyJson[API_PUB_KEY] = `${key}`
       // As the URL was not provided, we provide the URL at which the public key will be available
       // on the producer node
-      pubKeyJson[API_PUB_URL] =
-        `${getHost(URL_PREFIX_PUBLIC)}/${OBJ_PUB_KEYS}/` +
-        `${pubKeyJson[API_PUB_NAME]}/${API_PUB_PEM}`
+      pubKeyJson[API_PUB_URL] = getApiUrl(
+        `${URL_PREFIX_PUBLIC}/${OBJ_PUB_KEYS}/${pubKeyJson[API_PUB_NAME]}/${API_PUB_PEM}`
+      )
     } else {
       // We have an URL
       let response
@@ -122,7 +122,7 @@ const normalizeKeyData = async (pubKeyJson) => {
             `\n${pubKeyJson[API_PUB_PEM]} !== ${keyPem}`
         )
 
-      pubKeyJson[API_PUB_KEY] = `${key}`.replace('(unnamed)', `(${pubKeyJson[API_PUB_NAME]})`)
+      pubKeyJson[API_PUB_KEY] = `${key}`.replace(' (unnamed)', ` (${pubKeyJson[API_PUB_NAME]})`)
 
       if (key.type) pubKeyJson[API_PUB_TYPE] = key.type
     }
