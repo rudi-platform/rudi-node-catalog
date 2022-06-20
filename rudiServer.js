@@ -13,7 +13,7 @@ utils.separateLogs('Loading conf', true) ///////////////////////////////////////
 const sys = require('./config/confSystem')
 
 // 3. Log conf
-const logConf = require('./config/confLogs')
+require('./config/confLogs')
 
 // 4. Anything, now
 const api = require('./config/confApi')
