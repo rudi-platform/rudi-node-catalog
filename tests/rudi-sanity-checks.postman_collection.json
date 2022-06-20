@@ -4572,7 +4572,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"api key\",\n    \"url\": \"http://127.0.0.1:3003/api/admin/pubKeys/52d8ae34-5b34-482f-9a80-645d63f3ba0b\", \n    \"id\": \"52d8ae34-5b34-482f-9a80-645d63f3ba0b\"\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4623,7 +4623,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.collectionVariables.set('pubKeyName',rand.randomize(name))",
+									"pm.collectionVariables.set('pubKeyName',rand.randomize('pubKeyName'))",
 									""
 								],
 								"type": "text/javascript"
@@ -4736,7 +4736,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.collectionVariables.set('pubKeyName',rand.randomize(name))",
+									"pm.collectionVariables.set('pubKeyName',rand.randomize('pubKeyName'))",
 									""
 								],
 								"type": "text/javascript"
@@ -4820,6 +4820,20 @@
 				},
 				{
 					"name": "GET all public keys (admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Getting every public key\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -4890,13 +4904,16 @@
 								"exec": [
 									"pm.test(\"Getting every public key\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const pubKey = pm.response.json()",
-									"    pm.expect(pubKey.pem).to.be.not.undefined",
-									"    pm.expect(pubKey.type).to.be.not.undefined",
-									"    pm.expect(pubKey.name).to.be.not.undefined",
-									"    pm.expect(pubKey.url).to.be.not.undefined",
-									"    pm.expect(pubKey.collection_tag).to.be.not.undefined",
 									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
 									""
 								],
 								"type": "text/javascript"
@@ -5070,7 +5087,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"api key\",\n    \"url\": \"http://127.0.0.1:3003/api/admin/pubKeys/52d8ae34-5b34-482f-9a80-645d63f3ba0b\", \n    \"id\": \"52d8ae34-5b34-482f-9a80-645d63f3ba0b\"\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -5115,7 +5132,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"api key\",\n    \"url\": \"http://127.0.0.1:3003/api/admin/pubKeys/52d8ae34-5b34-482f-9a80-645d63f3ba0b\", \n    \"id\": \"52d8ae34-5b34-482f-9a80-645d63f3ba0b\"\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -5322,7 +5339,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.collectionVariables.set('pubKeyName',rand.randomize(name))",
+									"pm.collectionVariables.set('pubKeyName',rand.randomize('pubKeyName'))",
 									""
 								],
 								"type": "text/javascript"
@@ -5567,7 +5584,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"api key\",\n    \"url\": \"http://127.0.0.1:3003/api/admin/pubKeys/52d8ae34-5b34-482f-9a80-645d63f3ba0b\", \n    \"id\": \"52d8ae34-5b34-482f-9a80-645d63f3ba0b\"\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
