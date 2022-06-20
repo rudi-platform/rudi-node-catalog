@@ -2800,7 +2800,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?count_by=producer",
+							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?count_by=producer&collection_tag={{stamp}}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -2812,6 +2812,10 @@
 								{
 									"key": "count_by",
 									"value": "producer"
+								},
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
 								}
 							]
 						}
@@ -4985,7 +4989,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Throwing an error when creating a public key without name\", () => {",
+									"pm.test(\"Get all public keys from admin path\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"});",
 									""
