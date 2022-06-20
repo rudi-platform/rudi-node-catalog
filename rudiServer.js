@@ -5,12 +5,17 @@ const mod = 'main'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
+// 1. Utils
 const utils = require('./utils/jsUtils')
-
 utils.separateLogs('Loading conf', true) ///////////////////////////////////////////////////////////
-const sys = require('./config/confSystem')
-require('./config/confLogs')
 
+// 2. Sys conf
+const sys = require('./config/confSystem')
+
+// 3. Log conf
+const logConf = require('./config/confLogs')
+
+// 4. Anything, now
 const api = require('./config/confApi')
 
 // -------------------------------------------------------------------------------------------------

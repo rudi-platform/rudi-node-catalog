@@ -71,6 +71,7 @@ class RudiError extends Error {
   }
 
   addTrace(ctxMod, ctxFun, ctxErr) {
+    if (!this[TRACE]) this[TRACE] = []
     this[TRACE].push({ [TRACE_MOD]: ctxMod, [TRACE_FUN]: ctxFun, [TRACE_ERR]: ctxErr })
   }
   get primeError() {
