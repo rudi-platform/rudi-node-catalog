@@ -1,7 +1,7 @@
 {
   "name": "rudi-prod-api",
   "version": "1.2.3",
-  "private": "true",
+  "private": false,
   "description": "API for RUDI producer node",
   "main": "./rudiServer.js",
   "scripts": {
@@ -25,7 +25,7 @@
     "metadata",
     "open-data"
   ],
-  "author": "Olivier Martineau <olivier.martineau@irisa.fr>",
+  "author": "Olivier Martineau <community@rudi-univ-rennes1.fr>",
   "homepage": "https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER",
   "license": "EUPL-1.2",
   "dependencies": {

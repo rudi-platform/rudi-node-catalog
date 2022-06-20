@@ -3,13 +3,13 @@
 _This module offers a RESTful interface to access the RUDI metadata publically exposed on the RUDI Producer node.
 It also makes it possible to upload metadata from another module such as the Producer node manager (https://gitlab.aqmo.org/rudidev/rudi-console-proxy)_
 
-##### Author: Olivier Martineau (olivier.martineau@irisa.fr)
+##### Author: Olivier Martineau (community@rudi-univ-rennes1.fr)
 
 ---
 
 ## List of features
 
-The Media driver provides :
+The API module provides :
 
 - A definition of the RUDI metadata that is compatible with the definition (https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER)
 - A public API for fetching metadata

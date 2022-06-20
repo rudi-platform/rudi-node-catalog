@@ -1,6 +1,6 @@
 'use strict'
 
-const mod = 'jwtCtrl'
+const mod = 'keyCtrl'
 
 // ------------------------------------------------------------------------------------------------
 // External dependencies
@@ -106,6 +106,7 @@ const normalizeKeyData = async (pubKeyJson) => {
         // Get the key at the (public) URL
         response = await httpGet(pubKeyJson[API_PUB_URL])
       } catch (err) {
+        throw RudiError.treatError(mod, fun, err)
         throw new NotFoundError(
           `Couldn't reach the public key URL: ${pubKeyJson[API_PUB_URL]}: ${err}`
         )
