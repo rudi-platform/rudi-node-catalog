@@ -69,7 +69,9 @@ class RudiError extends Error {
   get id() {
     return this[ERR_ID]
   }
-
+  get code() {
+    return this[STATUS_CODE]
+  }
   addTrace(ctxMod, ctxFun, ctxErr) {
     if (!this[TRACE]) this[TRACE] = []
     this[TRACE].push({ [TRACE_MOD]: ctxMod, [TRACE_FUN]: ctxFun, [TRACE_ERR]: ctxErr })
@@ -177,7 +179,7 @@ class RudiError extends Error {
 
       const transmittedError = new RudiError(
         error.message || error,
-        error[STATUS_CODE],
+        error[STATUS_CODE] || error.code,
         error.name,
         error.error,
         errTrace,
@@ -195,71 +197,74 @@ class RudiError extends Error {
   }
 
   // eslint-disable-next-line complexity
-  static treatCommunicationError(ctxMod, ctxFun, portalError) {
+  static treatCommunicationError(ctxMod, ctxFun, comError, errPrefix) {
     const fun = 'treatCommunicationError'
     log.t(mod, fun, ``)
 
     let error
     try {
-      if (
-        portalError.response &&
-        portalError.response.data &&
-        portalError.response.data.label &&
-        portalError.response.data.code
-      ) {
-        log.d(mod, fun, `portal error code: ${beautify(portalError.response.data.code)}`)
-        log.d(mod, fun, `portal error msg: ${beautify(portalError.response.data.label)}`)
-        error = RudiError.createRudiHttpError(
-          portalError.response.data.code,
-          portalError.response.data.label
-        )
-      } else if (portalError.response && portalError.response.data) {
-        if (portalError.response.data.status === 401) {
-          log.d(mod, fun, `Portal error 401`)
-          error = new UnauthorizedError('Credentials used for Portal are incorrect')
+      const errFlag = `${errPrefix ? errPrefix + ' ' : ''}`
+
+      if (comError.code && comError.data?.message) {
+        log.t(mod, fun, beautify(comError.data?.message))
+        return RudiError.createRudiHttpError(comError.code, comError.data?.message)
+      }
+      if (comError.code && comError.message) {
+        log.t(mod, fun, beautify(comError))
+        return RudiError.createRudiHttpError(comError.code, comError.message)
+      }
+
+      const errCode =
+        comError.code || comError.response?.data?.code || comError.response?.data?.status
+
+      if (comError.response?.data?.label) {
+        const errLabel = comError.response.data.label
+        log.d(mod, fun, `${errFlag}error code: ${beautify(errCode)}`)
+        log.d(mod, fun, `${errFlag}error msg: ${beautify(errLabel)}`)
+        error = RudiError.createRudiHttpError(errCode, errLabel)
+      } else if (comError.response?.data) {
+        const errData = comError.response.data
+        if (errCode === 401) {
+          log.d(mod, fun, `${errFlag}error 401`)
+          error = new UnauthorizedError('Credentials are incorrect')
         } else {
-          log.t(mod, fun, `Portal error data: ${beautify(portalError)}`)
-          const errMsg =
-            (portalError.response.data.path
-              ? `Path '${portalError.response.data.path} `
-              : undefined) +
-            (portalError.response.data.error
-              ? `${portalError.response.data.error}`
-              : portalError.response.data)
-          log.t(mod, fun, `Portal error msg: ${errMsg}`)
-          error = RudiError.createRudiHttpError(
-            portalError.response.data.status ? portalError.response.data.status : 500,
-            errMsg
-          )
+          log.t(mod, fun, `${errFlag}error data: ${beautify(comError)}`)
+          const errMsg = (errData.path ? `Path '${errData.path} ` : '') + (errData.error || errData)
+          log.t(mod, fun, `${errFlag}error msg: ${errMsg}`)
+          error = RudiError.createRudiHttpError(errCode ? errCode : 500, errMsg)
         }
-      } else if (portalError.message) {
-        if (portalError.message === 'Request failed with status code 401') {
-          log.t(mod, fun, `Portal error message 401: ${beautify(portalError)}`)
-          error = new UnauthorizedError(portalError.message)
-        } else if (portalError.message === 'Request failed with status code 403') {
-          log.t(mod, fun, `Portal error message 403: ${beautify(portalError)}`)
-          error = new ForbiddenError(portalError.message)
+      } else if (comError.message) {
+        const errMsg = comError.message
+        if (errMsg === 'Request failed with status code 401') {
+          log.t(mod, fun, `${errFlag}error message 401: ${beautify(comError)}`)
+          error = new UnauthorizedError(errMsg)
+        } else if (errMsg === 'Request failed with status code 403') {
+          log.t(mod, fun, `${errFlag}error message 403: ${beautify(comError)}`)
+          error = new ForbiddenError(errMsg)
+        } else if (errMsg === 'Request failed with status code 404') {
+          log.t(mod, fun, `${errFlag}error message 404: ${beautify(comError)}`)
+          error = new NotFoundError(errMsg)
         } else {
-          log.t(mod, fun, `Portal error message: ${beautify(portalError)}`)
-          error = new RudiError(portalError.message)
+          log.t(mod, fun, `${errFlag}error message: ${beautify(comError)}`)
+          error = new RudiError(errMsg)
         }
       } else {
-        if (portalError.response) {
-          log.t(mod, fun, `Portal error response: ${beautify(portalError)}`)
-          error = new RudiError(portalError.response)
+        if (comError.response) {
+          log.t(mod, fun, `${errFlag}error response: ${beautify(comError)}`)
+          error = new RudiError(comError.response)
         } else {
-          log.t(mod, fun, `Portal error: ${beautify(portalError)}`)
-          if (portalError === 'Error 401: Request failed with status code 401') {
-            error = new UnauthorizedError(portalError)
-          } else if (portalError === 'Error 403: Request failed with status code 401') {
-            error = new ForbiddenError(portalError)
+          log.t(mod, fun, `${errFlag}error: ${beautify(comError)}`)
+          if (comError === 'Error 401: Request failed with status code 401') {
+            error = new UnauthorizedError(comError)
+          } else if (comError === 'Error 403: Request failed with status code 401') {
+            error = new ForbiddenError(comError)
           } else {
-            error = new RudiError(portalError)
+            error = new RudiError(comError)
           }
         }
       }
       log.d(mod, fun, beautify(error))
-      error.addTrace(ctxMod, ctxFun, portalError)
+      error.addTrace(ctxMod, ctxFun, comError)
       return error
     } catch (err) {
       throw RudiError.treatError(mod, fun, err)
@@ -301,7 +306,7 @@ class NotFoundError extends RudiError {
 
 class ObjectNotFoundError extends NotFoundError {
   constructor(objectType, objectId, ctxMod, ctxFun) {
-    super(`${objectNotFound(objectType, objectId)}`, undefined, ctxMod, ctxFun)
+    super(`${objectNotFound(objectType, objectId)}`, ctxMod, ctxFun)
   }
 }
 
