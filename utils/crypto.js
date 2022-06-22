@@ -40,7 +40,7 @@ exports.JWT_CLIENT = 'client_id' // https://www.rfc-editor.org/rfc/rfc6749.html#
 // ------------------------------------------------------------------------------------------------
 
 exports.extractJwt = (req) => {
-  const fun = 'extractJwt'
+  // const fun = 'extractJwt'
   try {
     const header = accessProperty(req, HEADERS)
     const auth = header[HD_AUTH] || header[HD_AUTH_LOWER]
@@ -51,7 +51,7 @@ exports.extractJwt = (req) => {
     return token
   } catch (err) {
     const errMsg = `No token was found in the header (${err})`
-    consoleErr(mod, fun, errMsg)
+    // consoleErr(mod, fun, errMsg)
     throw new Error(errMsg)
   }
 }

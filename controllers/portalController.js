@@ -83,7 +83,7 @@ exports.exposedGetPortalToken = async (req, reply) => {
   }
 }
 
-exports.checkPortalTokenInHeader = async (req, reply) => {
+exports.checkPortalTokenInHeader = async (req, isCheckSilent) => {
   const fun = 'checkPortalTokenInHeader'
   log.t(mod, fun, ``)
   try {
@@ -92,6 +92,7 @@ exports.checkPortalTokenInHeader = async (req, reply) => {
     return jwtInfo
     // return await this.getTokenCheckedByPortal(token)
   } catch (err) {
+    if (isCheckSilent) throw err
     const error = new UnauthorizedError(err)
     throw RudiError.treatError(mod, fun, error)
   }

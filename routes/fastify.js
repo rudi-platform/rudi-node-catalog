@@ -203,14 +203,14 @@ async function onPublicRoute(req, reply) {
 
     try {
       // Checking the token, if it exists, to retrieve the user info
-      const portalJwt = await checkPortalTokenInHeader(req, reply)
+      const portalJwt = await checkPortalTokenInHeader(req, true)
       const jwtPayload = portalJwt[1]
       // log.d(mod, fun, `Payload: ${beautify(jwtPayload)}`)
       context.clientApp = jwtPayload[JWT_SUB] || 'RUDI Portal'
       context.reqUser = jwtPayload[JWT_USER] || jwtPayload[JWT_CLIENT]
     } catch (er) {
       try {
-        const { subject, clientId } = await checkRudiProdPermission(req, reply)
+        const { subject, clientId } = await checkRudiProdPermission(req, true)
         context.clientApp = subject
         context.reqUser = clientId
       } catch {
@@ -239,7 +239,7 @@ async function onPortalRoute(req, reply) {
     if (!shouldControlPublicRequests()) return true
 
     // If incoming request has no token, raise an error
-    const portalJwt = await checkPortalTokenInHeader(req, reply)
+    const portalJwt = await checkPortalTokenInHeader(req, false)
     const jwtPayload = portalJwt[1]
     // log.d(mod, fun, `Payload: ${beautify(jwtPayload)}`)
 
@@ -267,7 +267,7 @@ async function onPrivateRoute(req, reply) {
     log.t(mod, fun, `${req.method} ${req.url} `)
     if (!shouldControlPrivateRequests()) return true
 
-    const { subject, clientId } = await checkRudiProdPermission(req, reply)
+    const { subject, clientId } = await checkRudiProdPermission(req, false)
 
     const context = CallContext.getCallContextFromReq(req)
     context.clientApp = subject
@@ -295,7 +295,7 @@ async function onUnrestrictedPrivateRoute(req, reply) {
     const context = CallContext.getCallContextFromReq(req)
 
     try {
-      const { subject, clientId } = await checkRudiProdPermission(req, reply)
+      const { subject, clientId } = await checkRudiProdPermission(req, true)
 
       context.clientApp = subject
       context.reqUser = clientId
