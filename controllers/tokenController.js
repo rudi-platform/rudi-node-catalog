@@ -105,7 +105,7 @@ exports.getHashAlgo = (algo) => {
   }
 }
 
-exports.checkRudiProdPermission = async (req, isCheckSilent) => {
+exports.checkRudiProdPermission = async (req, isCheckOptional) => {
   const fun = 'checkRudiProdPermission'
   log.t(mod, fun, ``)
   try {
@@ -113,7 +113,7 @@ exports.checkRudiProdPermission = async (req, isCheckSilent) => {
     try {
       token = extractJwt(req)
     } catch (err) {
-      if (isCheckSilent) throw err
+      if (isCheckOptional) throw err
       const error = new UnauthorizedError(err)
       throw RudiError.treatError(mod, fun, error)
     }
