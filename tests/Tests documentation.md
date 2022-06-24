@@ -1,5 +1,10 @@
 # Postman tests: the documentation
 
+## Prerequisites
+
+To run the tests, you'll most likely need the `rudi-crypto` module to be running in the same environment as where the tests are run (possibly on your machine).
+You'll also need a private key to be present on every environment you wish to test, and the API module to be configured to accept this key as a new profile. This is explicited in the "Setting up Postman / Newman tests for other environments" part.
+
 ## Tests description
 
 The tests of each collection are usually meant to be executed sequentially.
@@ -7,8 +12,8 @@ For instance, organization and contact-related tests have to be executed before 
 
 | Test collection name                         | Description                                                                                                                                                                                    |
 | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `rudi-sanity-checks.postman_collection.json` | This test collection is meant to be used with `test` environment only. It executes some deep checks that are not suitable for running environments.                                            |
 | `rudi-soft-checks.postman_collection.json`   | These non-intrusive tests can be executed on every environment, including production environment. Every object created by the test is tagged with a stamp and removed at the end of the tests. |
+| `rudi-sanity-checks.postman_collection.json` | This test collection is meant to be used with `test` environment only. It executes some deep checks that are not suitable for running environments.                                            |
 
 ## Environment variable collections for tests
 
