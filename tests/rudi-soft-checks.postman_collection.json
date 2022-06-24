@@ -68,12 +68,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/env",
+							"raw": "{{apiUrl}}/api/admin/env",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"env"
 							]
 						}
@@ -103,12 +104,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/hash",
+							"raw": "{{apiUrl}}/api/admin/hash",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"hash"
 							]
 						}
@@ -142,12 +144,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/apphash",
+							"raw": "{{apiUrl}}/api/admin/apphash",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"apphash"
 							]
 						}
@@ -179,9 +182,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/version",
+							"raw": "{{apiUrl}}/api/version",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
 								"api",
@@ -220,12 +223,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/nv",
+							"raw": "{{apiUrl}}/api/admin/nv",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"nv"
 							]
 						}
@@ -253,12 +257,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/id_generation",
+							"raw": "{{apiUrl}}/api/admin/id_generation",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"id_generation"
 							]
 						}
@@ -286,12 +291,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/db/",
+							"raw": "{{apiUrl}}/api/admin/db/",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"db",
 								""
 							]
@@ -333,13 +339,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/resources?collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							],
 							"query": [
 								{
@@ -380,13 +387,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}?collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/contacts?collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{cont}}"
+								"api",
+								"admin",
+								"contacts"
 							],
 							"query": [
 								{
@@ -427,13 +435,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}?collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/organizations?collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{org}}"
+								"api",
+								"admin",
+								"organizations"
 							],
 							"query": [
 								{
@@ -474,13 +483,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{media}}?collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/media?collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{media}}"
+								"api",
+								"admin",
+								"media"
 							],
 							"query": [
 								{
@@ -521,13 +531,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{reports}}?collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/resources?collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{reports}}"
+								"api",
+								"admin",
+								"resources"
 							],
 							"query": [
 								{
@@ -547,7 +558,7 @@
 							"script": {
 								"exec": [
 									"const stamp = pm.collectionVariables.get('stamp')",
-									"pm.test(`Delete reports with '${stamp}' stamp`, () => {",
+									"pm.test(`Delete public keys with '${stamp}' stamp`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"});"
 								],
@@ -568,12 +579,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys?collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/pub_keys?collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"pub_keys"
 							],
 							"query": [
@@ -625,12 +637,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/licences/",
+							"raw": "{{apiUrl}}/api/admin/licences/",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"licences",
 								""
 							]
@@ -672,12 +685,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/licence_codes",
+							"raw": "{{apiUrl}}/api/admin/licence_codes",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"licence_codes"
 							]
 						}
@@ -712,12 +726,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/enum",
+							"raw": "{{apiUrl}}/api/admin/enum",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"enum"
 							]
 						}
@@ -750,12 +765,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/enum?lang=fr",
+							"raw": "{{apiUrl}}/api/admin/enum?lang=fr",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"enum"
 							],
 							"query": [
@@ -790,12 +806,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/enum/Languages",
+							"raw": "{{apiUrl}}/api/admin/enum/Languages",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"enum",
 								"Languages"
 							]
@@ -825,12 +842,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/enum/Keywords",
+							"raw": "{{apiUrl}}/api/admin/enum/Keywords",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"enum",
 								"Keywords"
 							]
@@ -860,12 +878,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/enum/Themes",
+							"raw": "{{apiUrl}}/api/admin/enum/Themes",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"enum",
 								"Themes"
 							]
@@ -896,12 +915,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/enum/Themes/fr",
+							"raw": "{{apiUrl}}/api/admin/enum/Themes/fr",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"enum",
 								"Themes",
 								"fr"
@@ -931,12 +951,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/search",
+							"raw": "{{apiUrl}}/api/admin/search",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"search"
 							]
 						}
@@ -992,13 +1013,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}",
+							"raw": "{{apiUrl}}/api/admin/organizations",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{org}}"
+								"api",
+								"admin",
+								"organizations"
 							]
 						}
 					},
@@ -1053,13 +1075,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}",
+							"raw": "{{apiUrl}}/api/admin/organizations",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{org}}"
+								"api",
+								"admin",
+								"organizations"
 							]
 						}
 					},
@@ -1112,13 +1135,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}",
+							"raw": "{{apiUrl}}/api/admin/organizations",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{org}}"
+								"api",
+								"admin",
+								"organizations"
 							]
 						}
 					},
@@ -1147,13 +1171,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}/{{softOrg2Id}}",
+							"raw": "{{apiUrl}}/api/admin/organizations/{{softOrg2Id}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{org}}",
+								"api",
+								"admin",
+								"organizations",
 								"{{softOrg2Id}}"
 							]
 						}
@@ -1181,13 +1206,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}?collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/organizations?collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{org}}"
+								"api",
+								"admin",
+								"organizations"
 							],
 							"query": [
 								{
@@ -1220,13 +1246,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}/search?{{softOrg1Name}}&collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/organizations/search?{{softOrg1Name}}&collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{org}}",
+								"api",
+								"admin",
+								"organizations",
 								"search"
 							],
 							"query": [
@@ -1293,13 +1320,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}",
+							"raw": "{{apiUrl}}/api/admin/contacts",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{cont}}"
+								"api",
+								"admin",
+								"contacts"
 							]
 						}
 					},
@@ -1350,13 +1378,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}",
+							"raw": "{{apiUrl}}/api/admin/contacts",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{cont}}"
+								"api",
+								"admin",
+								"contacts"
 							]
 						}
 					},
@@ -1407,13 +1436,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}",
+							"raw": "{{apiUrl}}/api/admin/contacts",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{cont}}"
+								"api",
+								"admin",
+								"contacts"
 							]
 						}
 					},
@@ -1468,13 +1498,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}",
+							"raw": "{{apiUrl}}/api/admin/contacts",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{cont}}"
+								"api",
+								"admin",
+								"contacts"
 							]
 						}
 					},
@@ -1502,13 +1533,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}/{{softContact1Id}}",
+							"raw": "{{apiUrl}}/api/admin/contacts/{{softContact1Id}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{cont}}",
+								"api",
+								"admin",
+								"contacts",
 								"{{softContact1Id}}"
 							]
 						}
@@ -1538,13 +1570,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}",
+							"raw": "{{apiUrl}}/api/admin/contacts",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{cont}}"
+								"api",
+								"admin",
+								"contacts"
 							]
 						}
 					},
@@ -1571,13 +1604,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}/search?{{softContact2Name}}&collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/contacts/search?{{softContact2Name}}&collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{cont}}",
+								"api",
+								"admin",
+								"contacts",
 								"search"
 							],
 							"query": [
@@ -1704,13 +1738,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
+							"raw": "{{apiUrl}}/api/admin/resources",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							]
 						}
 					},
@@ -1760,13 +1795,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
+							"raw": "{{apiUrl}}/api/admin/resources",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							]
 						}
 					},
@@ -1813,13 +1849,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
+							"raw": "{{apiUrl}}/api/admin/resources",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							]
 						}
 					},
@@ -1867,13 +1904,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
+							"raw": "{{apiUrl}}/api/admin/resources",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							]
 						}
 					},
@@ -1922,13 +1960,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
+							"raw": "{{apiUrl}}/api/admin/resources",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							]
 						}
 					},
@@ -1978,13 +2017,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
+							"raw": "{{apiUrl}}/api/admin/resources",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							]
 						}
 					},
@@ -2034,13 +2074,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
+							"raw": "{{apiUrl}}/api/admin/resources",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							]
 						}
 					},
@@ -2090,13 +2131,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
+							"raw": "{{apiUrl}}/api/admin/resources",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							]
 						}
 					},
@@ -2146,13 +2188,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
+							"raw": "{{apiUrl}}/api/admin/resources",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							]
 						}
 					},
@@ -2202,13 +2245,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
+							"raw": "{{apiUrl}}/api/admin/resources",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							]
 						}
 					},
@@ -2260,13 +2304,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
+							"raw": "{{apiUrl}}/api/admin/resources",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							]
 						}
 					},
@@ -2295,12 +2340,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/enum/Themes/init",
+							"raw": "{{apiUrl}}/api/admin/enum/Themes/init",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"enum",
 								"Themes",
 								"init"
@@ -2341,13 +2387,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?limit=50&sort_by=-createdAt&fields=resource_title,global_id,createdAt,collection_tag&collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/v1/resources?limit=50&sort_by=-createdAt&fields=resource_title,global_id,createdAt,collection_tag&collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
-								"{{data}}"
+								"api",
+								"v1",
+								"resources"
 							],
 							"query": [
 								{
@@ -2393,13 +2440,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?sort_by=-createdAt&collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/v1/resources?sort_by=-createdAt&collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
-								"{{data}}"
+								"api",
+								"v1",
+								"resources"
 							],
 							"query": [
 								{
@@ -2448,13 +2496,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/?sort_by=-createdAt&collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/v1/resources/?sort_by=-createdAt&collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
-								"{{data}}",
+								"api",
+								"v1",
+								"resources",
 								""
 							],
 							"query": [
@@ -2492,13 +2541,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}/search?\"local 33\"&collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/resources/search?\"local 33\"&collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}",
+								"api",
+								"admin",
+								"resources",
 								"search"
 							],
 							"query": [
@@ -2536,13 +2586,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/search?\"local 33\"&collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/v1/resources/search?\"local 33\"&collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
-								"{{data}}",
+								"api",
+								"v1",
+								"resources",
 								"search"
 							],
 							"query": [
@@ -2580,13 +2631,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?limit=10&keywords=plu&perlin=2346&resource_languages=fr&collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/resources?limit=10&keywords=plu&perlin=2346&resource_languages=fr&collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							],
 							"query": [
 								{
@@ -2635,13 +2687,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?count_by=metadata_info.api_version",
+							"raw": "{{apiUrl}}/api/admin/resources?count_by=metadata_info.api_version",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							],
 							"query": [
 								{
@@ -2674,13 +2727,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?group_by=metadata_info.api_version&limit=3",
+							"raw": "{{apiUrl}}/api/admin/resources?group_by=metadata_info.api_version&limit=3",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							],
 							"query": [
 								{
@@ -2715,13 +2769,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?count_by=metadata_info.metadata_provider",
+							"raw": "{{apiUrl}}/api/admin/resources?count_by=metadata_info.metadata_provider",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							],
 							"query": [
 								{
@@ -2752,13 +2807,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?count_by=metadata_info.metadata_contacts",
+							"raw": "{{apiUrl}}/api/admin/resources?count_by=metadata_info.metadata_contacts",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							],
 							"query": [
 								{
@@ -2785,7 +2841,7 @@
 									"    // console.log(`orgId: ${orgId}`)",
 									"    responseJson.map((res) => {",
 									"        // console.log(`res.producer.organization_id: ${res.producer.organization_id}`)",
-									"        if(res.producer.organization_id == orgId) {",
+									"        if(res.producer?.organization_id == orgId) {",
 									"            // console.log(res.count)",
 									"            pm.collectionVariables.set('countWithOrg1', res.count)",
 									"        }",
@@ -2800,13 +2856,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?count_by=producer&collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/resources?count_by=producer&collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							],
 							"query": [
 								{
@@ -2857,13 +2914,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?producer.organization_id=\"{{softOrg1Id}}\"&fields=global_id,resource_title&collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/v1/resources?producer.organization_id=\"{{softOrg1Id}}\"&fields=global_id,resource_title&collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
-								"{{data}}"
+								"api",
+								"v1",
+								"resources"
 							],
 							"query": [
 								{
@@ -2920,13 +2978,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?group_by=producer&collection_tag={{stamp}}&limit=3&group_limit=4",
+							"raw": "{{apiUrl}}/api/admin/resources?group_by=producer&collection_tag={{stamp}}&limit=3&group_limit=4",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							],
 							"query": [
 								{
@@ -2996,13 +3055,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
+							"raw": "{{apiUrl}}/api/admin/resources",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							],
 							"query": [
 								{
@@ -3057,13 +3117,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{softMeta1Id}}",
+							"raw": "{{apiUrl}}/api/v1/resources/{{softMeta1Id}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
-								"{{data}}",
+								"api",
+								"v1",
+								"resources",
 								"{{softMeta1Id}}"
 							]
 						}
@@ -3103,13 +3164,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/test",
+							"raw": "{{apiUrl}}/api/v1/resources/test",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
-								"{{data}}",
+								"api",
+								"v1",
+								"resources",
 								"test"
 							]
 						}
@@ -3146,13 +3208,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}/{{softMeta2Id}}",
+							"raw": "{{apiUrl}}/api/admin/resources/{{softMeta2Id}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}",
+								"api",
+								"admin",
+								"resources",
 								"{{softMeta2Id}}"
 							]
 						}
@@ -3189,14 +3252,15 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/portal/{{data}}/send",
+							"raw": "{{apiUrl}}/api/admin/portal/resources/send",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"portal",
-								"{{data}}",
+								"resources",
 								"send"
 							]
 						}
@@ -3233,14 +3297,15 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/portal/{{data}}/send",
+							"raw": "{{apiUrl}}/api/admin/portal/resources/send",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"portal",
-								"{{data}}",
+								"resources",
 								"send"
 							]
 						}
@@ -3307,14 +3372,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{data}}/{{softMeta1Id}}/{{report}}",
+							"raw": "{{apiUrl}}/resources/{{softMeta1Id}}/report",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{data}}",
+								"resources",
 								"{{softMeta1Id}}",
-								"{{report}}"
+								"report"
 							]
 						}
 					},
@@ -3375,14 +3440,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{data}}/{{softMeta1Id}}/{{report}}",
+							"raw": "{{apiUrl}}/resources/{{softMeta1Id}}/report",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{data}}",
+								"resources",
 								"{{softMeta1Id}}",
-								"{{report}}"
+								"report"
 							]
 						}
 					},
@@ -3445,14 +3510,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{data}}/{{unkownMetaId}}/{{report}}",
+							"raw": "{{apiUrl}}/resources/{{unkownMetaId}}/report",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{data}}",
+								"resources",
 								"{{unkownMetaId}}",
-								"{{report}}"
+								"report"
 							]
 						}
 					},
@@ -3501,15 +3566,16 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{softMeta1Id}}/{{report}}",
+							"raw": "{{apiUrl}}/api/v1/resources/{{softMeta1Id}}/report",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
-								"{{data}}",
+								"api",
+								"v1",
+								"resources",
 								"{{softMeta1Id}}",
-								"{{report}}"
+								"report"
 							]
 						}
 					},
@@ -3552,15 +3618,16 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}/{{softMeta1Id}}/{{reports}}",
+							"raw": "{{apiUrl}}/api/admin/resources/{{softMeta1Id}}/reports",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}",
+								"api",
+								"admin",
+								"resources",
 								"{{softMeta1Id}}",
-								"{{reports}}"
+								"reports"
 							]
 						}
 					},
@@ -3616,15 +3683,16 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}/{{softMeta1Id}}/{{report}}/{{softReport2Id}}",
+							"raw": "{{apiUrl}}/api/v1/resources/{{softMeta1Id}}/report/{{softReport2Id}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
-								"{{data}}",
+								"api",
+								"v1",
+								"resources",
 								"{{softMeta1Id}}",
-								"{{report}}",
+								"report",
 								"{{softReport2Id}}"
 							]
 						}
@@ -3659,13 +3727,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{reports}}/{{softReport2Id}}",
+							"raw": "{{apiUrl}}/api/admin/reports/{{softReport2Id}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{reports}}",
+								"api",
+								"admin",
+								"reports",
 								"{{softReport2Id}}"
 							]
 						}
@@ -3705,13 +3774,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{reports}}?collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/reports?collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{reports}}"
+								"api",
+								"admin",
+								"reports"
 							],
 							"query": [
 								{
@@ -3756,13 +3826,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{reports}}?sort_by=-updatedAt",
+							"raw": "{{apiUrl}}/api/admin/reports?sort_by=-updatedAt",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{reports}}"
+								"api",
+								"admin",
+								"reports"
 							],
 							"query": [
 								{
@@ -3798,13 +3869,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}/{{softOrg1Id}}",
+							"raw": "{{apiUrl}}/api/admin/organizations/{{softOrg1Id}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{org}}",
+								"api",
+								"admin",
+								"organizations",
 								"{{softOrg1Id}}"
 							]
 						}
@@ -3830,13 +3902,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}/{{softContact1Id}}",
+							"raw": "{{apiUrl}}/api/admin/contacts/{{softContact1Id}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{cont}}",
+								"api",
+								"admin",
+								"contacts",
 								"{{softContact1Id}}"
 							]
 						}
@@ -3875,14 +3948,15 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{reports}}/{{deletion}}",
+							"raw": "{{apiUrl}}/api/admin/reports/deletion",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{reports}}",
-								"{{deletion}}"
+								"api",
+								"admin",
+								"reports",
+								"deletion"
 							]
 						}
 					},
@@ -3920,14 +3994,15 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}/{{deletion}}",
+							"raw": "{{apiUrl}}/api/admin/resources/deletion",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}",
-								"{{deletion}}"
+								"api",
+								"admin",
+								"resources",
+								"deletion"
 							]
 						}
 					},
@@ -3965,13 +4040,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/{{data}}?collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/v1/resources?collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
-								"{{data}}"
+								"api",
+								"v1",
+								"resources"
 							],
 							"query": [
 								{
@@ -4024,13 +4100,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
+							"raw": "{{apiUrl}}/api/admin/resources",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							]
 						}
 					},
@@ -4058,13 +4135,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}/{{softMeta1Id}}",
+							"raw": "{{apiUrl}}/api/admin/resources/{{softMeta1Id}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}",
+								"api",
+								"admin",
+								"resources",
 								"{{softMeta1Id}}"
 							]
 						}
@@ -4103,14 +4181,15 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{media}}/{{deletion}}",
+							"raw": "{{apiUrl}}/api/admin/media/deletion",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{media}}",
-								"{{deletion}}"
+								"api",
+								"admin",
+								"media",
+								"deletion"
 							]
 						}
 					},
@@ -4148,14 +4227,15 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}/{{deletion}}",
+							"raw": "{{apiUrl}}/api/admin/organizations/deletion",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{org}}",
-								"{{deletion}}"
+								"api",
+								"admin",
+								"organizations",
+								"deletion"
 							]
 						}
 					},
@@ -4193,14 +4273,15 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}/{{deletion}}",
+							"raw": "{{apiUrl}}/api/admin/contacts/deletion",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{cont}}",
-								"{{deletion}}"
+								"api",
+								"admin",
+								"contacts",
+								"deletion"
 							]
 						}
 					},
@@ -4228,13 +4309,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?count_by=collection_tag&collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/resources?count_by=collection_tag&collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							],
 							"query": [
 								{
@@ -4291,13 +4373,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}",
+							"raw": "{{apiUrl}}/api/admin/resources",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							]
 						}
 					},
@@ -4325,13 +4408,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/resources?collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							],
 							"query": [
 								{
@@ -4376,13 +4460,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/resources?collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							],
 							"query": [
 								{
@@ -4427,13 +4512,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}?collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/organizations?collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{org}}"
+								"api",
+								"admin",
+								"organizations"
 							],
 							"query": [
 								{
@@ -4478,13 +4564,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}?collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/contacts?collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{cont}}"
+								"api",
+								"admin",
+								"contacts"
 							],
 							"query": [
 								{
@@ -4529,13 +4616,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{media}}?collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/media?collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{media}}"
+								"api",
+								"admin",
+								"media"
 							],
 							"query": [
 								{
@@ -4569,13 +4657,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{data}}?collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/resources?collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{data}}"
+								"api",
+								"admin",
+								"resources"
 							],
 							"query": [
 								{
@@ -4609,13 +4698,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{cont}}?collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/contacts?collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{cont}}"
+								"api",
+								"admin",
+								"contacts"
 							],
 							"query": [
 								{
@@ -4649,13 +4739,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{org}}?collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/organizations?collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{org}}"
+								"api",
+								"admin",
+								"organizations"
 							],
 							"query": [
 								{
@@ -4689,13 +4780,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{reports}}?collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/reports?collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{reports}}"
+								"api",
+								"admin",
+								"reports"
 							],
 							"query": [
 								{
@@ -4744,12 +4836,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/pubKeys?collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/pubKeys?collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"pubKeys"
 							],
 							"query": [
@@ -4807,12 +4900,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys",
+							"raw": "{{apiUrl}}/api/admin/pub_keys",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"pub_keys"
 							]
 						}
@@ -4863,12 +4957,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys",
+							"raw": "{{apiUrl}}/api/admin/pub_keys",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"pub_keys"
 							]
 						}
@@ -4920,12 +5015,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys",
+							"raw": "{{apiUrl}}/api/admin/pub_keys",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"pub_keys"
 							]
 						}
@@ -4970,12 +5066,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys",
+							"raw": "{{apiUrl}}/api/admin/pub_keys",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"pub_keys"
 							]
 						}
@@ -5002,12 +5099,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys?collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/pub_keys?collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"pub_keys"
 							],
 							"query": [
@@ -5046,12 +5144,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/pubKeys/{{pubKeyName}}",
+							"raw": "{{apiUrl}}/api/admin/pubKeys/{{pubKeyName}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"pubKeys",
 								"{{pubKeyName}}"
 							]
@@ -5089,12 +5188,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/pub_keys/{{pubKeyName}}",
+							"raw": "{{apiUrl}}/api/v1/pub_keys/{{pubKeyName}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"api",
+								"v1",
 								"pub_keys",
 								"{{pubKeyName}}"
 							]
@@ -5122,12 +5222,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys?collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/pub_keys?collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"pub_keys"
 							],
 							"query": [
@@ -5162,12 +5263,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys/{{pubKeyName}}/pem",
+							"raw": "{{apiUrl}}/api/admin/pub_keys/{{pubKeyName}}/pem",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"pub_keys",
 								"{{pubKeyName}}",
 								"pem"
@@ -5198,12 +5300,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/pub_keys/{{pubKeyName}}/pem",
+							"raw": "{{apiUrl}}/api/v1/pub_keys/{{pubKeyName}}/pem",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"api",
+								"v1",
 								"pub_keys",
 								"{{pubKeyName}}",
 								"pem"
@@ -5247,12 +5350,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys/{{pubKeyName}}",
+							"raw": "{{apiUrl}}/api/admin/pub_keys/{{pubKeyName}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"pub_keys",
 								"{{pubKeyName}}"
 							]
@@ -5292,12 +5396,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/pubKeys?collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/pubKeys?collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"pubKeys"
 							],
 							"query": [
@@ -5350,12 +5455,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys",
+							"raw": "{{apiUrl}}/api/admin/pub_keys",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"pub_keys"
 							]
 						}
@@ -5397,7 +5503,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"{{pubKeyName}}\",\n    \"url\": \"{{baseUrl}}/{{apiUrl}}/pub_keys/{{pubKeyName}}xx\",\n    \"pem\": \"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBQ/tgB/vCQxkgSlzztRAmE4dNsOo1HzLXcqTOtDIhi rudi_prod_manager\"\n}",
+							"raw": "{\n    \"name\": \"{{pubKeyName}}\",\n    \"url\": \"{{apiUrl}}/api/v1/pub_keys/{{pubKeyName}}xx\",\n    \"pem\": \"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBQ/tgB/vCQxkgSlzztRAmE4dNsOo1HzLXcqTOtDIhi rudi_prod_manager\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -5405,12 +5511,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys",
+							"raw": "{{apiUrl}}/api/admin/pub_keys",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"pub_keys"
 							]
 						}
@@ -5440,7 +5547,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"url\": \"{{baseUrl}}/{{adminUrl}}/pub_keys/52d8ae34-5b34-482f-9a80-645d63f3ba0b\"\n}",
+							"raw": "{\n    \"url\": \"{{apiUrl}}/api/admin/pub_keys/52d8ae34-5b34-482f-9a80-645d63f3ba0b\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -5448,12 +5555,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys",
+							"raw": "{{apiUrl}}/api/admin/pub_keys",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"pub_keys"
 							]
 						}
@@ -5507,12 +5615,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys",
+							"raw": "{{apiUrl}}/api/admin/pub_keys",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"pub_keys"
 							]
 						}
@@ -5554,12 +5663,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys",
+							"raw": "{{apiUrl}}/api/admin/pub_keys",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"pub_keys"
 							]
 						}
@@ -5601,12 +5711,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys",
+							"raw": "{{apiUrl}}/api/admin/pub_keys",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"pub_keys"
 							]
 						}
@@ -5657,12 +5768,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/pub_keys",
+							"raw": "{{apiUrl}}/api/admin/pub_keys",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"pub_keys"
 							]
 						}
@@ -5694,12 +5806,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{apiUrl}}/pub_keys/portal-{{stamp}}",
+							"raw": "{{apiUrl}}/api/v1/pub_keys/portal-{{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{apiUrl}}",
+								"api",
+								"v1",
 								"pub_keys",
 								"portal-{{stamp}}"
 							]
@@ -5739,12 +5852,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/pubKeys?collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/pubKeys?collection_tag={{stamp}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
+								"api",
+								"admin",
 								"pubKeys"
 							],
 							"query": [
@@ -5784,13 +5898,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/{{adminUrl}}/{{logs}}?limit=20&sort_by=-updatedAt&updatedAfter={{dateUpdate}}",
+							"raw": "{{apiUrl}}/api/admin/logs?limit=20&sort_by=-updatedAt&updatedAfter={{dateUpdate}}",
 							"host": [
-								"{{baseUrl}}"
+								"{{apiUrl}}"
 							],
 							"path": [
-								"{{adminUrl}}",
-								"{{logs}}"
+								"api",
+								"admin",
+								"logs"
 							],
 							"query": [
 								{
@@ -5833,16 +5948,22 @@
 					"const DEBUG = false",
 					"",
 					"const TOKEN_DURATION_S = 1200",
+					"",
+					"if (!pm.variables.get('apiTokenName')) pm.variables.set('apiTokenName','apiJwt')",
+					"",
 					"const API_TOKEN_NAME = pm.variables.get('apiTokenName')",
 					"const PORTAL_TOKEN_NAME = pm.variables.get('portalTokenName')",
 					"",
-					"const BASE_URL = pm.variables.get('baseUrl')",
-					"const ADMIN_URL = BASE_URL + '/' + pm.variables.get('adminUrl')",
+					"const ADMIN_URL = pm.variables.get('apiUrl') + '/api/admin'",
 					"",
 					"log = {",
 					"    d: (msg) => { if (DEBUG || TRACE) console.log(msg) },",
 					"    t: (msg) => { if (TRACE) console.log(msg) }",
 					"}",
+					"",
+					"log.t('API_TOKEN_NAME: ' + API_TOKEN_NAME)",
+					"log.t('PORTAL_TOKEN_NAME: ' + PORTAL_TOKEN_NAME)",
+					"log.t('ADMIN_URL: ' + ADMIN_URL)",
 					"",
 					"time = {",
 					"    now: () => new Date().toISOString(),",
@@ -5899,9 +6020,9 @@
 					"        }@irisa.fr`,",
 					"",
 					"    randomize: (field) => {",
-					"        const randVal = rand.uuid()",
-					"        pm.collectionVariables.set(field, randVal)",
-					"        return randVal",
+					"        const randVal = rand.uuid();",
+					"        pm.collectionVariables.set(field, randVal);",
+					"        return randVal;",
 					"    },",
 					"",
 					"};",
@@ -5954,13 +6075,14 @@
 					"        }",
 					"        try {",
 					"            pm.sendRequest(reqNewToken, (err, res) => {",
+					"                if (err) throw err",
 					"                const token = codec.streamToUtf8(res)",
 					"                // log.d('rudiProdToken : ' + token)",
 					"                try {",
 					"                    pm.expect(res).to.have.property('code', 200);",
 					"                } catch (err) {",
-					"                    console.error('[renewPortalToken]: ' + err)",
-					"                    throw new Error('Crypto module should be running')",
+					"                    console.error('[renewApiToken]: ' + err)",
+					"                    throw new Error('[renewApiToken]: ' + err)",
 					"                }",
 					"                pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
 					"                pm.collectionVariables.set(tokenName, token)",
@@ -5985,11 +6107,12 @@
 					"            },",
 					"        }",
 					"        pm.sendRequest(reqNewToken, (err, res) => {",
+					"            if (err) throw err",
 					"            try {",
 					"                pm.expect(res).to.have.property('code', 200);",
 					"            } catch (error) {",
-					"                console.error('[renewPortalToken]: ' + err)",
 					"                console.error('[renewPortalToken]: ' + error)",
+					"                throw new Error('[renewPortalToken]: ' + error)",
 					"            }",
 					"            //log.d('renewPortalToken res: ' + JSON.stringify(res))",
 					"            const token = JSON.parse(codec.streamToUtf8(res)).access_token",
@@ -6007,21 +6130,22 @@
 					"        log.t('-- getRudiProdToken --')",
 					"        const tokenName = API_TOKEN_NAME",
 					"        if (!secu.isTokenValid(tokenName)) await secu.renewApiToken(tokenName, next)",
-					"        else if (next) next(pm.variables.get(tokenName))",
-					"        return pm.variables.get(tokenName)",
+					"        else if (next) next(pm.collectionVariables.get(tokenName))",
+					"        log.t('API token stored')",
+					"        return pm.collectionVariables.get(tokenName)",
 					"    },",
 					"",
 					"    getPortalToken: async (apiToken) => {",
 					"        log.t('-- getPortalToken --')",
 					"        const tokenName = PORTAL_TOKEN_NAME",
 					"        if (!secu.isTokenValid(tokenName)) await secu.renewPortalToken(tokenName, apiToken)",
-					"        return pm.variables.get(tokenName)",
+					"        log.t('Portal token stored')",
+					"        return pm.collectionVariables.get(tokenName)",
 					"    }",
 					"",
 					"}",
 					"",
 					"secu.getRudiProdToken(secu.getPortalToken)",
-					"log.t('Init OK')",
 					""
 				]
 			}
@@ -6040,206 +6164,6 @@
 		{
 			"key": "stamp",
 			"value": "soft-checks"
-		},
-		{
-			"key": "apiJwt",
-			"value": ""
-		},
-		{
-			"key": "portalJwt",
-			"value": ""
-		},
-		{
-			"key": "dateUpdate",
-			"value": ""
-		},
-		{
-			"key": "gitHash",
-			"value": ""
-		},
-		{
-			"key": "apiVersion",
-			"value": ""
-		},
-		{
-			"key": "keywords",
-			"value": ""
-		},
-		{
-			"key": "themes",
-			"value": ""
-		},
-		{
-			"key": "sanityLicence",
-			"value": ""
-		},
-		{
-			"key": "licences",
-			"value": ""
-		},
-		{
-			"key": "softOrg1Id",
-			"value": ""
-		},
-		{
-			"key": "softOrg1Name",
-			"value": ""
-		},
-		{
-			"key": "softOrg1Address",
-			"value": ""
-		},
-		{
-			"key": "softOrg2Id",
-			"value": ""
-		},
-		{
-			"key": "softOrg2Name",
-			"value": ""
-		},
-		{
-			"key": "softOrg2Address",
-			"value": ""
-		},
-		{
-			"key": "softContact1Id",
-			"value": ""
-		},
-		{
-			"key": "softContact1Name",
-			"value": ""
-		},
-		{
-			"key": "softContact1Email",
-			"value": ""
-		},
-		{
-			"key": "softContact2Id",
-			"value": ""
-		},
-		{
-			"key": "softContact2Name",
-			"value": ""
-		},
-		{
-			"key": "softContact2Email",
-			"value": ""
-		},
-		{
-			"key": "softContact3Id",
-			"value": ""
-		},
-		{
-			"key": "softContact3Name",
-			"value": ""
-		},
-		{
-			"key": "softContact3Email",
-			"value": ""
-		},
-		{
-			"key": "now",
-			"value": ""
-		},
-		{
-			"key": "softMeta1Id",
-			"value": ""
-		},
-		{
-			"key": "softMedia1Id",
-			"value": ""
-		},
-		{
-			"key": "randomTheme",
-			"value": ""
-		},
-		{
-			"key": "randomKeyword1",
-			"value": ""
-		},
-		{
-			"key": "randomKeyword2",
-			"value": ""
-		},
-		{
-			"key": "softLicence",
-			"value": ""
-		},
-		{
-			"key": "randomOrgId",
-			"value": ""
-		},
-		{
-			"key": "randomContact1",
-			"value": ""
-		},
-		{
-			"key": "randomContact2",
-			"value": ""
-		},
-		{
-			"key": "randomTitle",
-			"value": ""
-		},
-		{
-			"key": "randomSynopsis",
-			"value": ""
-		},
-		{
-			"key": "randomSummary",
-			"value": ""
-		},
-		{
-			"key": "softMeta2Id",
-			"value": ""
-		},
-		{
-			"key": "mediaId2",
-			"value": ""
-		},
-		{
-			"key": "softMedia2Id",
-			"value": ""
-		},
-		{
-			"key": "countWithOrg1",
-			"value": ""
-		},
-		{
-			"key": "softReport1Id",
-			"value": ""
-		},
-		{
-			"key": "softReport2Id",
-			"value": ""
-		},
-		{
-			"key": "unkownMetaId",
-			"value": ""
-		},
-		{
-			"key": "softReport3Id",
-			"value": ""
-		},
-		{
-			"key": "rudiProdToken",
-			"value": ""
-		},
-		{
-			"key": "portalToken",
-			"value": ""
-		},
-		{
-			"key": "apiToken",
-			"value": ""
-		},
-		{
-			"key": "pubKeyName",
-			"value": ""
-		},
-		{
-			"key": "portalKeyName",
-			"value": ""
 		}
 	]
 }
