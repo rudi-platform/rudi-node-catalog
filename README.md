@@ -151,4 +151,4 @@ In this section,
 
 ## Test files
 
-In `tests/env-rudi-*.postman_environment.json` the value for the key `cryptoJwtUrl` should be replaced with the valid address of the client/crypto module
+In `tests/env-rudi-*.postman_environment.json` the value for the key `cryptoJwtUrl` should be replaced with the valid address of the client/crypto module. See [Tests documentation.md](tests/Tests_documentation.md) for further details
