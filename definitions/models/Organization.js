@@ -49,34 +49,22 @@ const OrganizationSchema = new mongoose.Schema(
     },
 
     /** Explicit/complete name for an acronym, or alternative name of the organization */
-    [API_ORGANIZATION_CAPTION]: {
-      type: String,
-    },
+    [API_ORGANIZATION_CAPTION]: String,
 
     /** Description of the organization */
-    [API_ORGANIZATION_SUMMARY]: {
-      type: String,
-    },
+    [API_ORGANIZATION_SUMMARY]: String,
 
     /** Updated offical postal address of the organization */
-    [API_ORGANIZATION_ADDRESS]: {
-      type: String,
-    },
+    [API_ORGANIZATION_ADDRESS]: String,
 
     /** 2D GPS coordinates of the organization (EPSG:4326/WGS 84) */
-    [API_ORGANIZATION_COORDINATES]: {
-      type: GpsCoordinates,
-    },
+    [API_ORGANIZATION_COORDINATES]: GpsCoordinates,
 
     /** Tag for identifying a collection of resources */
-    [API_COLLECTION_TAG]: {
-      type: String,
-    },
+    [API_COLLECTION_TAG]: String,
 
     /** Time when this organization was succesfully published on RUDI portal */
-    [DB_PUBLISHED_AT]: {
-      type: Date,
-    },
+    [DB_PUBLISHED_AT]: Date,
   },
   {
     // Adds mongoose fields 'updatedAt' and 'createdAt'

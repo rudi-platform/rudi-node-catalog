@@ -37,7 +37,7 @@ const {
   API_MEDIA_NAME,
   API_MEDIA_CONNECTOR,
   API_MEDIA_INTERFACE_CONTRACT,
-  API_FILE_MIME: API_FILE_TYPE,
+  API_FILE_MIME,
   API_FILE_SIZE,
   API_FILE_CHECKSUM,
   API_FILE_STRUCTURE,
@@ -49,6 +49,7 @@ const {
   API_MEDIA_URL_VISUAL,
 } = require('../../db/dbFields')
 const ReferenceDatesSchema = require('../schemas/ReferenceDates')
+const { ConnectorParameter } = require('../schemas/ConnectorParameters')
 
 const MediaTypes = {
   File: 'FILE',
@@ -65,15 +66,6 @@ const UpdateStatus = [
 
 const InterfaceContract = {
   Dwnld: 'dwnl',
-}
-
-const ValueTypes = {
-  String: 'STRING',
-  Boolean: 'BOOLEAN',
-  Date: 'DATE',
-  Long: 'LONG',
-  Double: 'DOUBLE',
-  Enum: 'ENUM',
 }
 
 const commonSchemaOptions = {
@@ -140,17 +132,9 @@ const MediaSchema = new mongoose.Schema(
 
       // Optional connector parameters
       [API_MEDIA_CONNECTOR_PARAMS]: {
-        type: {
-          key: String,
-          value: String,
-          type: {
-            type: String,
-            enum: Object.values(ValueTypes),
-          },
-          usage: String,
-          accepted_values: [mongoose.Mixed],
-        },
-        required: false,
+        type: [ConnectorParameter],
+        _id: false,
+        default: undefined,
       },
     },
 
@@ -191,7 +175,7 @@ MediaSchema.pre('save', function (next) {
 const FileSchema = new mongoose.Schema(
   {
     // Native format of the resource
-    [API_FILE_TYPE]: {
+    [API_FILE_MIME]: {
       type: String,
       enum: Object.values(FileTypes),
       required: true,
@@ -342,7 +326,7 @@ Media.getSearchableFields = () => [
   API_MEDIA_ID,
   API_MEDIA_TYPE,
   API_MEDIA_NAME,
-  API_FILE_TYPE,
+  API_FILE_MIME,
   API_FILE_UPDATE_STATUS,
 ]
 

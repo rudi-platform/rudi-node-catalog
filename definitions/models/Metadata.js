@@ -78,7 +78,7 @@ const {
   API_LICENCE_CUSTOM_LABEL,
   API_LICENCE_CUSTOM_URI,
 
-  API_GEOGRAPHY_PROPERTY,
+  API_GEOGRAPHY,
   API_GEO_BBOX_PROPERTY,
   API_GEO_PROJECTION_PROPERTY,
   API_PERIOD_PROPERTY,
@@ -87,11 +87,14 @@ const {
   API_METAINFO_PROPERTY,
   API_METAINFO_CONTACTS_PROPERTY,
   API_METAINFO_PROVIDER_PROPERTY,
-  API_METAINFO_DATES_PROPERTY,
+  API_METAINFO_DATES,
 
-  API_DATES_CREATED_PROPERTY,
-  API_DATES_EDITED_PROPERTY,
-  API_DATES_PUBLISHED_PROPERTY,
+  API_DATES_CREATED,
+  API_DATES_EDITED,
+  API_DATES_PUBLISHED,
+  API_DATES_VALIDATED,
+  API_DATES_EXPIRES,
+  API_DATES_DELETED,
 
   API_MEDIA_PROPERTY,
 
@@ -124,6 +127,7 @@ const {
 } = require('../../db/dbFields')
 const { MediaTypes } = require('./Media')
 const { FileTypes, MIME_YAML_ALT, MIME_YAML } = require('../thesaurus/FileTypes')
+const { Longitude, Latitude } = require('../schemas/GpsCoordinates')
 
 // ------------------------------------------------------------------------------------------------
 // Fields with specific treatments
@@ -297,7 +301,7 @@ const MetadataSchema = new mongoose.Schema(
      * 'geography': Geographic distribution of the data.
      * Particularly relevant in the case of located sensors.
      */
-    [API_GEOGRAPHY_PROPERTY]: {
+    [API_GEOGRAPHY]: {
       /**
        * 'bounding_box': Geographic distribution of the data as a rectangle.
        * The 4 parameters are given as decimal as described in the norm ISO 6709
@@ -306,30 +310,14 @@ const MetadataSchema = new mongoose.Schema(
         type: Object,
         // Custom validation in pre-save hook: required if 'geography' is defined !
 
-        /** 'west_longitude': Westernmost latitude given as a decimal number */
-        [API_GEO_BBOX_WEST]: {
-          type: Number,
-          min: -180,
-          max: 180,
-        },
-        /* 'east_longitude': Easternmost latitude given as a decimal number */
-        [API_GEO_BBOX_EAST]: {
-          type: Number,
-          min: -180,
-          max: 180,
-        },
+        /** 'west_longitude': Westernmost longitude given as a decimal number */
+        [API_GEO_BBOX_WEST]: Longitude,
+        /* 'east_longitude': Easternmost longitude given as a decimal number */
+        [API_GEO_BBOX_EAST]: Longitude,
         /** 'south_latitude': Southernmost latitude given as a decimal number */
-        [API_GEO_BBOX_SOUTH]: {
-          type: Number,
-          min: -90,
-          max: 90,
-        },
+        [API_GEO_BBOX_SOUTH]: Latitude,
         /** 'north_latitude': Northernmost latitude given as a decimal number */
-        [API_GEO_BBOX_NORTH]: {
-          type: Number,
-          min: -90,
-          max: 90,
-        },
+        [API_GEO_BBOX_NORTH]: Latitude,
       },
 
       /**
@@ -511,13 +499,10 @@ const MetadataSchema = new mongoose.Schema(
       },
 
       /** 'metadata_dates': Dates of the actions performed on the metadata (creation, publishing, update...) */
-      [API_METAINFO_DATES_PROPERTY]: {
-        validated: {
-          type: Date,
-        },
-        deleted: {
-          type: Date,
-        },
+      [API_METAINFO_DATES]: {
+        [API_DATES_VALIDATED]: Date,
+        [API_DATES_DELETED]: Date,
+        [API_DATES_EXPIRES]: Date,
       },
 
       /** 'metadata_provider': Description of the organization that produced the metadata */
@@ -639,24 +624,31 @@ async function checkLicence(metadata) {
   }
 }
 async function checkFileTypes(metadata) {
-  const medias = metadata[API_MEDIA_PROPERTY]
-  medias.map((media) => {
-    if (media[API_MEDIA_TYPE] !== MediaTypes.File) return
+  const fun = 'checkFileTypes'
+  try {
+    log.t(mod, fun, ``)
+    const medias = metadata[API_MEDIA_PROPERTY]
+    medias.map((media) => {
+      if (media[API_MEDIA_TYPE] !== MediaTypes.File) return
 
-    const [mimeType, encrypted] = /^(.*?)(\+crypt)?$/.exec(media[API_FILE_MIME])
-    // Backward compatibility for harvesters
-    if (mimeType === MIME_YAML_ALT) {
-      media[API_FILE_MIME] = MIME_YAML + encrypted
-      return true
-    }
-    if (FileTypes.indexOf(mimeType) == -1)
-      throw new BadRequestError(`Unrecognized MIME type: '${mimeType}'`)
-  })
+      const [mimeType, encrypted] = /^(.*?)(\+crypt)?$/.exec(media[API_FILE_MIME])
+      // Backward compatibility for harvesters
+      if (mimeType === MIME_YAML_ALT) {
+        media[API_FILE_MIME] = MIME_YAML + encrypted
+        return true
+      }
+      if (FileTypes.indexOf(mimeType) == -1)
+        throw new BadRequestError(`Unrecognized MIME type: '${mimeType}'`)
+    })
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
 }
 async function checkThesaurus(metadata) {
   const fun = 'checkThesaurus'
   // if (metadata.init) log.d(mod, fun, `init`)
   try {
+    log.t(mod, fun, ``)
     const shouldInit = metadata[API_COLLECTION_TAG] === 'init'
     const dataTheme = metadata[API_THEME_PROPERTY]
     // const themes = Themes.get()
@@ -679,11 +671,11 @@ async function checkThesaurus(metadata) {
     }
 
     const keywords = metadata[API_KEYWORDS_PROPERTY]
-    // log.d(mod, fun, `keywords: ${utils.beautify(keywords)}`)
+    // log.t(mod, fun, `keywords: ${utils.beautify(keywords)}`)
 
     await Promise.all(
       keywords.map((keyword, index) => {
-        // log.d(mod, fun, `keyword: ${keyword}`)
+        // log.t(mod, fun, `keyword: ${keyword}`)
         Keywords.isValid(keyword, true)
           .then((resolve) => {
             if (resolve) {
@@ -702,6 +694,7 @@ async function checkThesaurus(metadata) {
       })
     )
 
+    // log.t(mod, fun, `languages`)
     const languages = metadata[API_LANGUAGES_PROPERTY]
     if (languages) {
       const langStr = utils.beautify(languages)
@@ -721,20 +714,24 @@ async function checkThesaurus(metadata) {
       }
     }
 
-    const geography = metadata[API_GEOGRAPHY_PROPERTY]
+    // log.t(mod, fun, `geography`)
+    const geography = metadata[API_GEOGRAPHY]
     if (geography) {
       const projection = geography[API_GEO_PROJECTION_PROPERTY]
       if (projection) {
-        if (!Projections.isValid(projection, shouldInit))
+        if (projection === 'WGS 84') geography[API_GEO_PROJECTION_PROPERTY] = 'WGS 84 (EPSG:4326)'
+        else if (!Projections.isValid(projection, shouldInit))
           throw new BadRequestError(
-            msg.incorrectVal(`${API_GEOGRAPHY_PROPERTY}.${API_GEO_PROJECTION_PROPERTY}`, projection)
+            msg.incorrectVal(`${API_GEOGRAPHY}.${API_GEO_PROJECTION_PROPERTY}`, projection)
           )
       }
     }
 
+    // log.t(mod, fun, `storage status`)
     if (!StorageStatus.isValid(metadata.storage_status, shouldInit)) {
       throw new BadRequestError(msg.incorrectVal('storage_status', metadata.storage_status))
     }
+    return true
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -761,9 +758,19 @@ async function checkThesaurus(metadata) {
   }
 */
 
-function toDate(dateStr) {
+function toEpoch(dateStr) {
   try {
-    return new Date(dateStr)
+    return new Date(dateStr).getTime()
+  } catch (err) {
+    throw new BadRequestError(
+      `This is not a date: '${dateStr}' (metadata ${this[API_METADATA_ID]})`
+    )
+  }
+}
+
+function toISOString(dateStr) {
+  try {
+    return new Date(dateStr).toISOString()
   } catch (err) {
     throw new BadRequestError(
       `This is not a date: '${dateStr}' (metadata ${this[API_METADATA_ID]})`
@@ -773,8 +780,8 @@ function toDate(dateStr) {
 
 function checkDates(datesObj, firstDateProp, secondDateProp, shouldInitialize) {
   const fun = 'checkDates'
-  // log.t(mod, fun, ``)
   try {
+    log.t(mod, fun, ``)
     if (!datesObj) return
 
     if (!datesObj[secondDateProp]) {
@@ -783,14 +790,21 @@ function checkDates(datesObj, firstDateProp, secondDateProp, shouldInitialize) {
       return
     }
 
-    const date1 = toDate(datesObj[firstDateProp])
-    const date2 = toDate(datesObj[secondDateProp])
+    const date1 = toEpoch(datesObj[firstDateProp])
+    const date2 = toEpoch(datesObj[secondDateProp])
 
+    log.d(
+      mod,
+      fun,
+      `${firstDateProp}: ${toISOString(date1)} ${
+        date1 <= date2 ? '<=' : '>'
+      } ${secondDateProp}: ${toISOString(date2)}`
+    )
     if (date1 <= date2) return true
 
     throw new BadRequestError(
-      `Date '${secondDateProp}' = '${date2.toISOString()}' should be subsequent ` +
-        `to '${firstDateProp}' = '${date1.toISOString()}' `
+      `Date '${secondDateProp}' = '${toISOString(date2)}' should be subsequent ` +
+        `to '${firstDateProp}' = '${toISOString(date1)}' `
     )
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -807,66 +821,58 @@ MetadataSchema.methods.toJSON = function () {
 }
 
 // ----- Virtuals
-MetadataSchema.virtual(
-  `${API_METAINFO_PROPERTY}.${API_METAINFO_DATES_PROPERTY}.${API_DATES_CREATED_PROPERTY}`
-).get(function () {
-  return this[DB_CREATED_AT]
-})
-MetadataSchema.virtual(
-  `${API_METAINFO_PROPERTY}.${API_METAINFO_DATES_PROPERTY}.${API_DATES_EDITED_PROPERTY}`
-).get(function () {
-  return this[DB_UPDATED_AT]
-})
-MetadataSchema.virtual(
-  `${API_METAINFO_PROPERTY}.${API_METAINFO_DATES_PROPERTY}.${API_DATES_PUBLISHED_PROPERTY}`
-).get(function () {
-  return this[DB_PUBLISHED_AT]
-})
+MetadataSchema.virtual(`${API_METAINFO_PROPERTY}.${API_METAINFO_DATES}.${API_DATES_CREATED}`).get(
+  function () {
+    return this[DB_CREATED_AT]
+  }
+)
+MetadataSchema.virtual(`${API_METAINFO_PROPERTY}.${API_METAINFO_DATES}.${API_DATES_EDITED}`).get(
+  function () {
+    return this[DB_UPDATED_AT]
+  }
+)
+MetadataSchema.virtual(`${API_METAINFO_PROPERTY}.${API_METAINFO_DATES}.${API_DATES_PUBLISHED}`).get(
+  function () {
+    return this[DB_PUBLISHED_AT]
+  }
+)
 
 MetadataSchema.pre('save', async function (next) {
-  // const fun = 'pre save hook'
-  // log.t(mod, fun, ``)
-  const metadata = this
+  const fun = 'pre save hook'
 
   try {
+    log.t(mod, fun, ``)
+    const metadata = this
     // If 'geography' field is defined, the field 'geography.bbox' is required
-    if (json.requireSubProperty(metadata, API_GEOGRAPHY_PROPERTY, API_GEO_BBOX_PROPERTY)) {
-      if (utils.isNothing(metadata[API_GEOGRAPHY_PROPERTY][API_GEO_PROJECTION_PROPERTY])) {
+    if (json.requireSubProperty(metadata, API_GEOGRAPHY, API_GEO_BBOX_PROPERTY)) {
+      if (utils.isNothing(metadata[API_GEOGRAPHY][API_GEO_PROJECTION_PROPERTY])) {
         // If 'geography' field is defined, but 'geography.projection' is not, it is initialized to the defaul value.
-        metadata[API_GEOGRAPHY_PROPERTY][API_GEO_PROJECTION_PROPERTY] = 'WGS 84'
+        metadata[API_GEOGRAPHY][API_GEO_PROJECTION_PROPERTY] = 'WGS 84'
       }
     }
 
     // If 'temporal_spread' is defined, the field 'start_date' should be defined
     json.requireSubProperty(metadata, API_PERIOD_PROPERTY, API_START_DATE_PROPERTY)
 
-    try {
-      checkDates(metadata[API_PERIOD_PROPERTY], API_START_DATE_PROPERTY, API_END_DATE_PROPERTY)
-    } catch (err) {
-      metadata[API_PERIOD_PROPERTY][API_START_DATE_PROPERTY] =
-        metadata[API_PERIOD_PROPERTY][API_END_DATE_PROPERTY]
-    }
-    try {
-      checkDates(
-        metadata[API_DATA_DATES_PROPERTY],
-        API_DATES_CREATED_PROPERTY,
-        API_DATES_EDITED_PROPERTY,
-        true // If 'dataset_dates.updated' is not defined, it is initialized with 'dataset_dates.created'
-      )
-    } catch (err) {
-      metadata[API_DATA_DATES_PROPERTY][API_DATES_CREATED_PROPERTY] =
-        metadata[API_DATA_DATES_PROPERTY][API_DATES_EDITED_PROPERTY]
-    }
-    try {
-      checkDates(
-        metadata[API_DATA_DATES_PROPERTY],
-        API_DATES_CREATED_PROPERTY,
-        API_DATES_PUBLISHED_PROPERTY
-      )
-    } catch (err) {
-      metadata[API_DATA_DATES_PROPERTY][API_DATES_PUBLISHED_PROPERTY] =
-        metadata[API_DATA_DATES_PROPERTY][API_DATES_CREATED_PROPERTY]
-    }
+    checkDates(metadata[API_PERIOD_PROPERTY], API_START_DATE_PROPERTY, API_END_DATE_PROPERTY)
+
+    checkDates(
+      metadata[API_DATA_DATES_PROPERTY],
+      API_DATES_CREATED,
+      API_DATES_EDITED,
+      true // If 'dataset_dates.updated' is not defined, it is initialized with 'dataset_dates.created'
+    )
+
+    checkDates(metadata[API_DATA_DATES_PROPERTY], API_DATES_CREATED, API_DATES_PUBLISHED)
+    checkDates(metadata[API_DATA_DATES_PROPERTY], API_DATES_CREATED, API_DATES_VALIDATED)
+    checkDates(metadata[API_DATA_DATES_PROPERTY], API_DATES_CREATED, API_DATES_EXPIRES)
+
+    checkDates(
+      metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES],
+      API_DATES_CREATED,
+      API_DATES_EXPIRES
+    )
+
     // Checking 'licence' field
     await checkLicence(metadata)
 
@@ -874,7 +880,9 @@ MetadataSchema.pre('save', async function (next) {
 
     await checkFileTypes(metadata)
     // await checkMedia(metadata)
+    log.t(mod, fun, `pre save checks OK`)
   } catch (err) {
+    log.t(mod, fun, `pre save checks KO`)
     err.message = err.message + ` (metadata ${this[API_METADATA_ID]})`
     next(err)
   }

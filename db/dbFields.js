@@ -52,14 +52,14 @@ exports.API_MEDIA_PROPERTY = 'available_formats'
 exports.API_METAINFO_PROPERTY = 'metadata_info'
 exports.API_METAINFO_PROVIDER_PROPERTY = 'metadata_provider'
 exports.API_METAINFO_CONTACTS_PROPERTY = 'metadata_contacts'
-exports.API_METAINFO_DATES_PROPERTY = 'metadata_dates'
+exports.API_METAINFO_DATES = 'metadata_dates'
 exports.API_METAINFO_SOURCE_PROPERTY = 'metadata_source'
 exports.API_METAINFO_VERSION_PROPERTY = 'api_version'
 
 // ------------------------------------------------------------------------------------------------
 // Metadata properties: geospatial
 // ------------------------------------------------------------------------------------------------
-exports.API_GEOGRAPHY_PROPERTY = 'geography'
+exports.API_GEOGRAPHY = 'geography'
 
 exports.API_GEO_BBOX_PROPERTY = 'bounding_box'
 exports.API_GEO_BBOX_WEST = 'west_longitude'
@@ -87,59 +87,53 @@ exports.API_LICENCE_CUSTOM_URI = 'custom_licence_uri'
 // ------------------------------------------------------------------------------------------------
 // Dates
 // ------------------------------------------------------------------------------------------------
-exports.API_DATES_CREATED_PROPERTY = 'created'
-exports.API_DATES_EDITED_PROPERTY = 'updated'
-exports.API_DATES_PUBLISHED_PROPERTY = 'published'
-exports.API_DATES_VALIDATED_PROPERTY = 'validated'
-exports.API_DATES_DELETED_PROPERTY = 'deleted'
+exports.API_DATES_CREATED = 'created'
+exports.API_DATES_EDITED = 'updated'
+exports.API_DATES_PUBLISHED = 'published'
+exports.API_DATES_VALIDATED = 'validated'
+exports.API_DATES_DELETED = 'deleted'
+exports.API_DATES_EXPIRES = 'expires'
 
 exports.getCreatedDate = (metadata) => {
   if (metadata[this.DB_CREATED_AT]) return metadata[this.DB_CREATED_AT]
   if (
     metadata[this.API_METAINFO_PROPERTY] &&
-    metadata[this.API_METAINFO_PROPERTY][this.API_METAINFO_DATES_PROPERTY]
+    metadata[this.API_METAINFO_PROPERTY][this.API_METAINFO_DATES]
   )
-    return metadata[this.API_METAINFO_PROPERTY][this.API_METAINFO_DATES_PROPERTY][
-      this.API_DATES_CREATED_PROPERTY
-    ]
-  throw new Error(`Not found: '${this.API_DATES_CREATED_PROPERTY}`)
+    return metadata[this.API_METAINFO_PROPERTY][this.API_METAINFO_DATES][this.API_DATES_CREATED]
+  throw new Error(`Not found: '${this.API_DATES_CREATED}`)
 }
 
 exports.getUpdatedDate = (metadata) => {
   if (metadata[this.DB_UPDATED_AT]) return metadata[this.DB_UPDATED_AT]
   if (
     metadata[this.API_METAINFO_PROPERTY] &&
-    metadata[this.API_METAINFO_PROPERTY][this.API_METAINFO_DATES_PROPERTY]
+    metadata[this.API_METAINFO_PROPERTY][this.API_METAINFO_DATES]
   )
-    return metadata[this.API_METAINFO_PROPERTY][this.API_METAINFO_DATES_PROPERTY][
-      this.API_DATES_EDITED_PROPERTY
-    ]
-  throw new Error(`Not found: '${this.API_DATES_EDITED_PROPERTY}`)
+    return metadata[this.API_METAINFO_PROPERTY][this.API_METAINFO_DATES][this.API_DATES_EDITED]
+  throw new Error(`Not found: '${this.API_DATES_EDITED}`)
 }
 
 exports.getPublishedDate = (metadata) => {
   if (metadata[this.DB_PUBLISHED_AT]) return metadata[this.DB_PUBLISHED_AT]
   if (
     metadata[this.API_METAINFO_PROPERTY] &&
-    metadata[this.API_METAINFO_PROPERTY][this.API_METAINFO_DATES_PROPERTY]
+    metadata[this.API_METAINFO_PROPERTY][this.API_METAINFO_DATES]
   )
-    return metadata[this.API_METAINFO_PROPERTY][this.API_METAINFO_DATES_PROPERTY][
-      this.API_DATES_PUBLISHED_PROPERTY
-    ]
-  throw new Error(`Not found: '${this.API_DATES_PUBLISHED_PROPERTY}`)
+    return metadata[this.API_METAINFO_PROPERTY][this.API_METAINFO_DATES][this.API_DATES_PUBLISHED]
+  throw new Error(`Not found: '${this.API_DATES_PUBLISHED}`)
 }
 
 exports.setPublishedDate = (metadata, datePublished) => {
   if (metadata[this.DB_PUBLISHED_AT]) metadata[this.DB_PUBLISHED_AT] = datePublished
   if (
     metadata[this.API_METAINFO_PROPERTY] &&
-    metadata[this.API_METAINFO_PROPERTY][this.API_METAINFO_DATES_PROPERTY]
+    metadata[this.API_METAINFO_PROPERTY][this.API_METAINFO_DATES]
   ) {
-    metadata[this.API_METAINFO_PROPERTY][this.API_METAINFO_DATES_PROPERTY][
-      this.API_DATES_PUBLISHED_PROPERTY
-    ] = datePublished
+    metadata[this.API_METAINFO_PROPERTY][this.API_METAINFO_DATES][this.API_DATES_PUBLISHED] =
+      datePublished
     return metadata
-  } else throw new Error(`Not found: '${this.API_DATES_PUBLISHED_PROPERTY}`)
+  } else throw new Error(`Not found: '${this.API_DATES_PUBLISHED}`)
 }
 
 // ------------------------------------------------------------------------------------------------

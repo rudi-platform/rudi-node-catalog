@@ -22,4 +22,5 @@ exports.Longitude = {
 exports.GpsCoordinates = {
   latitude: this.Latitude,
   longitude: this.Longitude,
+  _id: false,
 }

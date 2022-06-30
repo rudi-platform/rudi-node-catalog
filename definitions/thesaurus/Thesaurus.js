@@ -214,7 +214,7 @@ module.exports = class Thesaurus {
   isValid = async (val, shouldInit) => {
     const fun = 'isValid'
     try {
-      log.t(mod, fun, ``)
+      log.t(this.#code, fun, `val: ${val}`)
 
       if (!this.#isInit) throw new MethodNotAllowedError('Init first')
 

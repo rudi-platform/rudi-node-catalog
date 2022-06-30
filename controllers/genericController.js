@@ -109,14 +109,16 @@ const {
 
 const {
   API_DATA_DATES_PROPERTY,
-  API_DATES_CREATED_PROPERTY,
-  API_DATES_DELETED_PROPERTY,
-  API_DATES_EDITED_PROPERTY,
-  API_DATES_PUBLISHED_PROPERTY,
-  API_DATES_VALIDATED_PROPERTY,
+  API_DATES_CREATED,
+  API_DATES_EDITED,
+  API_DATES_VALIDATED,
+  API_DATES_PUBLISHED,
+  API_DATES_EXPIRES,
+  API_DATES_DELETED,
+
   API_END_DATE_PROPERTY,
   API_KEYWORDS_PROPERTY,
-  API_METAINFO_DATES_PROPERTY,
+  API_METAINFO_DATES,
   API_METAINFO_PROPERTY,
   API_PERIOD_PROPERTY,
   API_START_DATE_PROPERTY,
@@ -190,7 +192,7 @@ function cleanDateOperations(inputDateOperations) {
   return operations
 }
 const DATA_DATES = `${API_DATA_DATES_PROPERTY}.`
-const META_DATES = `${API_METAINFO_PROPERTY}.${API_METAINFO_DATES_PROPERTY}.`
+const META_DATES = `${API_METAINFO_PROPERTY}.${API_METAINFO_DATES}.`
 
 // eslint-disable-next-line complexity
 exports.parseQueryParameters = async (objectType, fullUrl) => {
@@ -278,11 +280,11 @@ exports.parseQueryParameters = async (objectType, fullUrl) => {
               }
               // Dealing with virtual fields
               switch (absoluteField) {
-                case `${META_DATES}${API_DATES_CREATED_PROPERTY}`:
+                case `${META_DATES}${API_DATES_CREATED}`:
                   return `${minus}${DB_CREATED_AT}`
-                case `${META_DATES}${API_DATES_EDITED_PROPERTY}`:
+                case `${META_DATES}${API_DATES_EDITED}`:
                   return `${minus}${DB_UPDATED_AT}`
-                case `${META_DATES}${API_DATES_PUBLISHED_PROPERTY}`:
+                case `${META_DATES}${API_DATES_PUBLISHED}`:
                   return `${minus}${DB_PUBLISHED_AT}`
                 default:
                   return trimmedField
@@ -309,17 +311,17 @@ exports.parseQueryParameters = async (objectType, fullUrl) => {
               case `${DB_UPDATED_AT}`:
               case `${DB_PUBLISHED_AT}`:
 
-              case `${DATA_DATES}${API_DATES_CREATED_PROPERTY}`:
-              case `${DATA_DATES}${API_DATES_EDITED_PROPERTY}`:
-              case `${DATA_DATES}${API_DATES_PUBLISHED_PROPERTY}`:
-              case `${DATA_DATES}${API_DATES_VALIDATED_PROPERTY}`:
-              case `${DATA_DATES}${API_DATES_DELETED_PROPERTY}`:
+              case `${DATA_DATES}${API_DATES_CREATED}`:
+              case `${DATA_DATES}${API_DATES_EDITED}`:
+              case `${DATA_DATES}${API_DATES_PUBLISHED}`:
+              case `${DATA_DATES}${API_DATES_VALIDATED}`:
+              case `${DATA_DATES}${API_DATES_DELETED}`:
 
-              case `${META_DATES}${API_DATES_CREATED_PROPERTY}`:
-              case `${META_DATES}${API_DATES_EDITED_PROPERTY}`:
-              case `${META_DATES}${API_DATES_PUBLISHED_PROPERTY}`:
-              case `${META_DATES}${API_DATES_VALIDATED_PROPERTY}`:
-              case `${META_DATES}${API_DATES_DELETED_PROPERTY}`:
+              case `${META_DATES}${API_DATES_CREATED}`:
+              case `${META_DATES}${API_DATES_EDITED}`:
+              case `${META_DATES}${API_DATES_PUBLISHED}`:
+              case `${META_DATES}${API_DATES_VALIDATED}`:
+              case `${META_DATES}${API_DATES_DELETED}`:
 
               case `${API_PERIOD_PROPERTY}.${API_START_DATE_PROPERTY}`:
               case `${API_PERIOD_PROPERTY}.${API_END_DATE_PROPERTY}`:
@@ -335,17 +337,19 @@ exports.parseQueryParameters = async (objectType, fullUrl) => {
               case `${DB_UPDATED_AT}`:
               case `${DB_PUBLISHED_AT}`:
 
-              case `${DATA_DATES}${API_DATES_CREATED_PROPERTY}`:
-              case `${DATA_DATES}${API_DATES_EDITED_PROPERTY}`:
-              case `${DATA_DATES}${API_DATES_PUBLISHED_PROPERTY}`:
-              case `${DATA_DATES}${API_DATES_VALIDATED_PROPERTY}`:
-              case `${DATA_DATES}${API_DATES_DELETED_PROPERTY}`:
+              case `${DATA_DATES}${API_DATES_CREATED}`:
+              case `${DATA_DATES}${API_DATES_EDITED}`:
+              case `${DATA_DATES}${API_DATES_PUBLISHED}`:
+              case `${DATA_DATES}${API_DATES_VALIDATED}`:
+              case `${DATA_DATES}${API_DATES_DELETED}`:
+              case `${DATA_DATES}${API_DATES_EXPIRES}`:
 
-              case `${META_DATES}${API_DATES_CREATED_PROPERTY}`:
-              case `${META_DATES}${API_DATES_EDITED_PROPERTY}`:
-              case `${META_DATES}${API_DATES_PUBLISHED_PROPERTY}`:
-              case `${META_DATES}${API_DATES_VALIDATED_PROPERTY}`:
-              case `${META_DATES}${API_DATES_DELETED_PROPERTY}`:
+              case `${META_DATES}${API_DATES_CREATED}`:
+              case `${META_DATES}${API_DATES_EDITED}`:
+              case `${META_DATES}${API_DATES_PUBLISHED}`:
+              case `${META_DATES}${API_DATES_VALIDATED}`:
+              case `${META_DATES}${API_DATES_DELETED}`:
+              case `${META_DATES}${API_DATES_EXPIRES}`:
 
               case `${API_PERIOD_PROPERTY}.${API_START_DATE_PROPERTY}`:
               case `${API_PERIOD_PROPERTY}.${API_END_DATE_PROPERTY}`:
