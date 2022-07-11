@@ -1,0 +1,57 @@
+const mod = 'hashThes'
+
+import { BadRequestError, RudiError } from '../../utils/errors.mjs'
+import { logW } from '../../utils/logging.mjs'
+// ------------------------------------------------------------------------------------------------
+// Internal dependencies
+// ------------------------------------------------------------------------------------------------
+import { parameterExpected } from '../../utils/msg.mjs'
+
+// ------------------------------------------------------------------------------------------------
+// Custom schema definition
+// ------------------------------------------------------------------------------------------------
+
+// Method for computing the integrity hash of the data
+const HashAlgorithms = ['MD5', 'SHA-256', 'SHA-512']
+
+// ------------------------------------------------------------------------------------------------
+// Getter / setter
+// ------------------------------------------------------------------------------------------------
+let Thesaurus = HashAlgorithms
+
+export const initialize = (arg) => {
+  if (arg) Thesaurus = []
+}
+
+export const get = (prop) => {
+  return prop ? Thesaurus[prop] : Thesaurus
+}
+
+export const set = (newValue) => {
+  const fun = 'set'
+  try {
+    if (!newValue) {
+      const errMsg = parameterExpected(fun, 'newValue')
+      logW(mod, fun, errMsg)
+      throw new BadRequestError(errMsg)
+    }
+    newValue = `${newValue}`.trim()
+    if (Thesaurus.indexOf(newValue) === -1) Thesaurus.push(newValue)
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+export const isValid = (value, shouldInit) => {
+  const fun = 'isValid'
+  if (!value) {
+    logW(mod, fun, parameterExpected(fun, 'value'))
+    return false
+  }
+  const isIn = Thesaurus.indexOf(value) > -1
+  if (!isIn && shouldInit) {
+    this.set(value)
+    return true
+  }
+  return isIn
+}

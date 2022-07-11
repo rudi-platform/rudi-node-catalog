@@ -19,9 +19,9 @@ log = {
     t: (msg) => { if (TRACE) console.log(msg) }
 }
 
-log.t('API_TOKEN_NAME: ' + API_TOKEN_NAME)
-log.t('PORTAL_TOKEN_NAME: ' + PORTAL_TOKEN_NAME)
-log.t('ADMIN_URL: ' + ADMIN_URL)
+logT('API_TOKEN_NAME: ' + API_TOKEN_NAME)
+logT('PORTAL_TOKEN_NAME: ' + PORTAL_TOKEN_NAME)
+logT('ADMIN_URL: ' + ADMIN_URL)
 
 time = {
     now: () => new Date().toISOString(),
@@ -34,18 +34,18 @@ codec = {
     fromBase64: (data) => Buffer.from(data, 'base64')?.toString('utf-8'),
 
     fromBase64Url: (base64UrlStr) => {
-        log.t('-- base64UrlStr --')
+        logT('-- base64UrlStr --')
         if (!base64UrlStr) return ''
-        //        log.d('base64UrlStr: ' + base64UrlStr)
-        //        log.d('base64UrlStr.length: ' + base64UrlStr.length)
+        //        logD('base64UrlStr: ' + base64UrlStr)
+        //        logD('base64UrlStr.length: ' + base64UrlStr.length)
         const paddedStr = (base64UrlStr.length % 4 == 0)
             ? base64UrlStr
             : base64UrlStr + "====".substring(base64UrlStr.length % 4);
-        // log.d('paddedStr: ' + paddedStr)
+        // logD('paddedStr: ' + paddedStr)
         const base64Str = paddedStr
             .replace("_", "/")
             .replace("-", "+");
-        // log.d('base64Str: ' + base64Str)
+        // logD('base64Str: ' + base64Str)
         return codec.fromBase64(base64Str);
     },
 
@@ -88,33 +88,33 @@ rand = {
 secu = {
 
     isTokenValid: (tokenName) => {
-        log.t('-- is ' + tokenName + ' Valid --')
+        logT('-- is ' + tokenName + ' Valid --')
         const token = pm.collectionVariables.get(tokenName)
         // console.log('typeof token: ' + typeof token)
         if (!token || typeof token !== 'string') {
-            log.d('Token ' + tokenName + ' is invalid: ' + JSON.stringify(token))
+            logD('Token ' + tokenName + ' is invalid: ' + JSON.stringify(token))
             return false
         }
-        // log.d('splitting token: ' + token)
+        // logD('splitting token: ' + token)
         const jwtBodyEncoded = token.split('.')[1]
-        // log.d('split token: ' + jwtBodyEncoded)
+        // logD('split token: ' + jwtBodyEncoded)
 
         const jwtBody = JSON.parse(codec.fromBase64Url(jwtBodyEncoded))
-        // log.d('decoded body: ' + jwtBody)
+        // logD('decoded body: ' + jwtBody)
         if (!jwtBody.exp) {
-            log.d('No expiration time was found')
+            logD('No expiration time was found')
             return false
         }
-        // log.d('is token valid?')
+        // logD('is token valid?')
         const isValid = jwtBody.exp > time.nowEpochS()
-        // log.d(tokenName + ' is ' + (isValid ? '' : 'not ') + 'valid')
+        // logD(tokenName + ' is ' + (isValid ? '' : 'not ') + 'valid')
         return isValid
     },
 
     renewApiToken: async (tokenName, next) => {
-        log.t('-- renewApiToken --')
+        logT('-- renewApiToken --')
         const reqUrl = pm.variables.get('cryptoJwtUrl') + '/forge'
-        // log.d('reqUrl: ' + reqUrl)
+        // logD('reqUrl: ' + reqUrl)
         const reqNewToken = {
             url: reqUrl,
             method: 'POST',
@@ -137,7 +137,7 @@ secu = {
                 throw ('Crypto module most likely not running')
             }
             const token = codec.streamToUtf8(res)
-            // log.d('rudiProdToken : ' + token)
+            // logD('rudiProdToken : ' + token)
             try {
                 pm.expect(res).to.have.property('code', 200);
             } catch (err) {
@@ -146,7 +146,7 @@ secu = {
             }
             pm.expect(token).to.match(/^\w+\.\w+\.[\w\-=]+$/)
             pm.collectionVariables.set(tokenName, token)
-            log.d('API token stored')
+            logD('API token stored')
 
             if (next) next(token)
             //return token
@@ -154,9 +154,9 @@ secu = {
     },
 
     renewPortalToken: async (tokenName, rudiProdToken) => {
-        log.t('-- renewPortalToken --')
+        logT('-- renewPortalToken --')
         const reqUrl = ADMIN_URL + '/portal/token'
-        // log.d('reqUrl: ' + reqUrl)
+        // logD('reqUrl: ' + reqUrl)
         const reqNewToken = {
             url: reqUrl,
             method: 'GET',
@@ -173,32 +173,32 @@ secu = {
                 console.error('[renewPortalToken]: ' + error)
                 throw new Error('[renewPortalToken]: ' + error)
             }
-            //log.d('renewPortalToken res: ' + JSON.stringify(res))
+            //logD('renewPortalToken res: ' + JSON.stringify(res))
             const token = JSON.parse(codec.streamToUtf8(res)).access_token
             //const token = res.json()
-            log.d('Portal token: ' + token)
+            logD('Portal token: ' + token)
 
             pm.expect(token).to.match(/^\w+\.\w+\.[\w\-=]+$/)
             pm.collectionVariables.set(tokenName, token)
-            log.d('Portal token stored')
+            logD('Portal token stored')
 
         })
     },
 
     getRudiProdToken: async (next) => {
-        log.t('-- getRudiProdToken --')
+        logT('-- getRudiProdToken --')
         const tokenName = API_TOKEN_NAME
         if (!secu.isTokenValid(tokenName)) await secu.renewApiToken(tokenName, next)
         else if (next) next(pm.collectionVariables.get(tokenName))
-        log.t('API token stored')
+        logT('API token stored')
         return pm.collectionVariables.get(tokenName)
     },
 
     getPortalToken: async (apiToken) => {
-        log.t('-- getPortalToken --')
+        logT('-- getPortalToken --')
         const tokenName = PORTAL_TOKEN_NAME
         if (!secu.isTokenValid(tokenName)) await secu.renewPortalToken(tokenName, apiToken)
-        log.t('Portal token stored')
+        logT('Portal token stored')
         return pm.collectionVariables.get(tokenName)
     }
 
