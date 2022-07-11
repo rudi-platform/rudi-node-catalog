@@ -41,6 +41,7 @@ const {
   ACT_INIT,
   ACT_REPORT,
   ACT_SEARCH,
+  ACT_EXT_SEARCH,
   ACT_SEND,
   ACT_UUID_GEN,
 
@@ -76,6 +77,7 @@ const {
   URL_PV_THESAURUS_ACCESS,
   URL_SUFFIX_TOKEN_CHECK,
   URL_SUFFIX_TOKEN_GET,
+  ROUTE_OPT,
 } = require('../config/confApi')
 const { getSinglePubKey } = require('../controllers/publicKeyController')
 
@@ -501,6 +503,13 @@ exports.backOfficeRoutes = [
     url: `${URL_PV_OBJECT_GENERIC}/${ACT_SEARCH}`,
     handler: genericController.searchObjects,
     config: { [ROUTE_NAME]: PRV_RCH_OBJ },
+  },
+  // Extended search on object
+  {
+    method: HTTP_METHODS.GET,
+    url: `${URL_PV_OBJECT_GENERIC}/${ACT_EXT_SEARCH}`,
+    handler: genericController.searchObjects,
+    config: { [ROUTE_NAME]: PRV_RCH_OBJ, [ROUTE_OPT]: ACT_EXT_SEARCH },
   },
   // Get searchable fields for an object type
   {

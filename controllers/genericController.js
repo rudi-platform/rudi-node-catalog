@@ -47,7 +47,7 @@ const { CallContext } = require('../definitions/constructors/callContext')
 const { newMetadata, overwriteMetadata } = require('../controllers/metadataController')
 const { newOrganization } = require('../controllers/organizationController')
 const { newContact } = require('../controllers/contactController')
-const { newSkosConcept, newSkosScheme } = require('./skosController')
+const { newSkosConcept, newSkosScheme, widenSearch } = require('./skosController')
 const { newPublicKey, overwritePubKey } = require('./publicKeyController')
 
 const { deletePortalMetadata } = require('./portalController')
@@ -105,6 +105,8 @@ const {
   OBJ_PUB_KEYS,
   OBJ_PUB_KEYS_CAML,
   PARAM_PROP,
+  ACT_EXT_SEARCH,
+  ROUTE_OPT,
 } = require('../config/confApi')
 
 const {
@@ -225,7 +227,8 @@ exports.parseQueryParameters = async (objectType, fullUrl) => {
     const reqUrl = splitUrl[0]
     const reqArgs = splitUrl[1]
     const urlSegments = reqUrl.split('/')
-    const searching = urlSegments[urlSegments.length - 1] === ACT_SEARCH
+    const lastSegment = urlSegments[urlSegments.length - 1]
+    const searching = lastSegment === ACT_SEARCH || lastSegment === ACT_EXT_SEARCH
     const urlParams = new URLSearchParams(reqArgs)
 
     // Check if parameters were actually found by URLSearchParams
@@ -617,10 +620,12 @@ exports.getObjectList = async (req, reply) => {
  */
 exports.searchObjects = async (req, reply) => {
   const fun = 'searchObjects'
-  log.t(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}/${ACT_SEARCH}`)
   try {
+    log.t(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}/${ACT_SEARCH}`)
     // retrieve url parameters: object type, object id
     const objectType = getObjectParam(req)
+    const opt = req.context?.config ? req.context.config[ROUTE_OPT] : undefined
+    log.d(mod, fun, `opt: ${beautify(opt)}`)
 
     let parsedParameters
     try {
@@ -647,7 +652,12 @@ exports.searchObjects = async (req, reply) => {
       QUERY_SEARCH_TERMS,
       QUERY_COUNT_BY,
     ])
-    // options[QUERY_SEARCH_TERMS] = await widenSearch(options[QUERY_SEARCH_TERMS])
+
+    if (opt === ACT_EXT_SEARCH) {
+      const extendedSearchTerms = await widenSearch(options[QUERY_SEARCH_TERMS])
+      log.d(mod, fun, `extendedSearchTerms: ${extendedSearchTerms}`)
+      options[QUERY_SEARCH_TERMS].push(extendedSearchTerms)
+    }
     const objectList = await db.searchObjects(objectType, options)
 
     // return the object

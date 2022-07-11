@@ -181,7 +181,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RudiObject'
-    #=============================================================================
+    #===========================================================================
     #'/api/admin/{rudi_object}':
     'post':
       summary: Create a RUDI object of a designated type
@@ -204,7 +204,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RudiObject'
 
-    #=============================================================================
+    #===========================================================================
     #'/api/admin/{rudi_object}':
     'put':
       summary: Update (or create) a RUDI object of a designated type
@@ -227,7 +227,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RudiObject'
 
-    #=============================================================================
+    #===========================================================================
     #'/api/admin/{rudi_object}':
     'delete':
       summary: Delete every RUDI object of a designated type
@@ -438,7 +438,7 @@ paths:
           $ref: '#/components/responses/Error500InternalServerError'
         '503':
           $ref: '#/components/responses/Error503ServiceUnavailable'
-    #=============================================================================
+    #===========================================================================
     #'/api/admin/{rudi_object}/{id}':
     'delete':
       tags:
@@ -568,9 +568,9 @@ paths:
           application/json:
             schema:
               description: If no array is provided in the request body, every
-                metadata is sent to the Portal. Use an array of uuid to get a set of
-                metadata to get sent to the portal. Metadata with a non-null
-                'collection_tag' property will not be sent.
+                metadata is sent to the Portal. Use an array of uuid to get a
+                set of metadata to get sent to the portal. Metadata with a
+                non-null 'collection_tag' property will not be sent.
               type: array
               items:
                 description: The 'global_id' of a metadata
@@ -629,7 +629,7 @@ paths:
       responses:
         '200':
           description: The report has been received.
-    #=============================================================================
+    #===========================================================================
     #'/api/admin/resources/{id}/reports':
     'get':
       description: List reports all the Portal integration reports for the identified resource
@@ -767,7 +767,8 @@ paths:
         - authRudi: [backoffice]
       responses:
         '200':
-          description: Object each key of which is an enum name, and the corresponding value the list of accepted values for this enum
+          description: Object each key of which is an enum name, and the
+            corresponding value the list of accepted values for this enum.
           content:
             application/json:
               schema:
@@ -954,7 +955,7 @@ components:
 
         - access_condition
 
-        - PublicAPI_info
+        - metadata_info
 
       properties:
         #—•—•—•—•—•—•—•—•—•—•—•—•—•
@@ -963,7 +964,6 @@ components:
         'global_id':
           type: string
           format: uuid
-
         #——————————————————————————
         'local_id':
           description: Identifier in the data producer system
@@ -972,7 +972,6 @@ components:
           # - pattern for avoiding spaces and unusal characters?
           # - max lenght?
           example: '2020.11-Laennec-AQMO-air quality sensors measures'
-
         #——————————————————————————
         'doi':
           $ref: '#/components/schemas/DOI'
@@ -986,7 +985,6 @@ components:
           maxLength: 150
           example: "Données de capteurs de la qualité de l'air, novembre 2020, Laënnec"
         # !DICO!
-
         #——————————————————————————
         'synopsis':
           description: Short description for the whole dataset
@@ -996,7 +994,6 @@ components:
           minItems: 1
           # TODO: size ≤ 150
         # !DICO!
-
         #——————————————————————————
         'summary':
           description: More precise description for the whole dataset
@@ -1013,7 +1010,6 @@ components:
         'theme':
           $ref: '#/components/schemas/Theme'
         # !SKOS!
-
         #——————————————————————————
         'keywords':
           description: List of tags that can be used to retrieve the data
@@ -1027,7 +1023,6 @@ components:
         #——————————————————————————
         'producer':
           $ref: '#/components/schemas/Organization'
-
         #——————————————————————————
         'contacts':
           description: Address to ask details on the dataset and its production
@@ -1054,7 +1049,6 @@ components:
           items:
             $ref: '#/components/schemas/Language'
           default: [fr]
-
         #——————————————————————————
         'temporal_spread':
           description: >
@@ -1073,7 +1067,6 @@ components:
             #......................
             'end_date':
               $ref: '#/components/schemas/Date'
-
         #——————————————————————————
         'geography':
           description: Geographic localisation of the data
@@ -1115,23 +1108,21 @@ components:
                   minimum: -180
                   maximum: 180
             #......................
-            # Global geographic distribution of the data expressed in 'EPSG:4326/WGS 84'
-            # projection"
+            # Global geographic distribution of the data expressed in
+            # 'EPSG:4326/WGS 84' projection
             'geographic_distribution':
               $ref: 'https://app.swaggerhub.com/apis/OlivierMartineau/GeoJSON/1.0.1'
-
             #......................
             'projection':
               description: Cartographic projection used in the data.
                 EPSG codes highly recommended.
               type: string
-              default: 'WGS 84'
+              default: 'WGS 84 (EPSG:4326)'
               example:
                 'WGS 84 (EPSG:4326)'
                 # 'RGF93/Lambert-93 (EPSG:2154)'
                 # 'RGF93/CC48 (EPSG:3948)'
               #TODO: 'Projection' thesaurus
-
         #——————————————————————————
         'dataset_size':
           description: Indicative total size of the data
@@ -1145,14 +1136,12 @@ components:
             'number_of_fields':
               type: integer
               minimum: 0
-
         #——————————————————————————
         'dataset_dates':
           allOf:
+            - $ref: '#/components/schemas/ReferenceDates'
             - description: Dates of the actions performed on the data (creation, publishing, update, deletion...)
               type: object
-            - $ref: '#/components/schemas/ReferenceDates'
-
         #——————————————————————————
         'storage_status':
           description: >-
@@ -1257,9 +1246,9 @@ components:
             #......................
             'metadata_provider':
               allOf:
+                - $ref: '#/components/schemas/Organization'
                 - description: Description of the organization that produced the metadata
                   type: object
-                - $ref: '#/components/schemas/Organization'
             #......................
             'metadata_contacts':
               description: Addresses to get further information on the metadata
@@ -1270,7 +1259,7 @@ components:
             'metadata_source':
               description: URI of the initial metadata
               type: string
-              format: URI
+              format: uri
 
     #---------------------------------------------------------------------------
     'Organization': # Organization
@@ -1306,8 +1295,16 @@ components:
         #——————————————————————————
         'organization_coordinates':
           description: GPS coordinates in EPSG:4326/WGS 84 coordinates
-          type: string
-
+          type: object
+          properties:
+            'latitude':
+              type: number
+              minimum: -90
+              maximum: 90
+            'longitude':
+              type: number
+              minimum: -180
+              maximum: 180
     #---------------------------------------------------------------------------
     'Contact':
       description: Address to get further information on the resource
@@ -1348,7 +1345,6 @@ components:
           type: string
           format: email
           #TODO: RGPD compliant!
-
     #---------------------------------------------------------------------------
     'Licence':
       description: Abstract object from which standard and custom licences inherit
@@ -1366,7 +1362,6 @@ components:
         mapping:
           'STANDARD': '#/components/schemas/LicenceStandard'
           'CUSTOM': '#/components/schemas/LicenceCustom'
-
     #---------------------------------------------------------------------------
     'LicenceStandard':
       allOf:
@@ -1380,8 +1375,7 @@ components:
               description: Value of the field SkosConcept.concept_code
               type: string
               format: skosConceptCode
-
-      #---------------------------------------------------------------------------
+    #---------------------------------------------------------------------------
     'LicenceCustom':
       allOf:
         - $ref: '#/components/schemas/Licence'
@@ -1399,7 +1393,7 @@ components:
             'custom_licence_uri':
               description: URL towards the custom licence
               type: string
-              format: URI
+              format: uri
 
     #---------------------------------------------------------------------------
     'Media':
@@ -1431,12 +1425,12 @@ components:
         'media_visual':
           description: Link towards a (low-fidelity) visualization of the Media
           type: string
-          format: URI
+          format: uri
         #——————————————————————————
         'media_dates':
           allOf:
-            - description: Time of the creation / last update of the Media
             - $ref: '#/components/schemas/ReferenceDates'
+            - description: Time of the creation / last update of the Media
         #——————————————————————————
         'connector':
           $ref: '#/components/schemas/Connector'
@@ -1458,7 +1452,7 @@ components:
             'api_documentation_url':
               description: Link towards the resource that describes the structure of the API
               type: string
-              format: URI
+              format: uri
 
     #---------------------------------------------------------------------------
     'MediaFile':
@@ -1475,14 +1469,12 @@ components:
             'file_type':
               # File type (determined automatically)
               $ref: '#/components/schemas/MediaType'
-
             #——————————————————————————
             'file_size':
               description: >
                 Size of the file, in bytes 
                 (determined automatically)
               type: integer
-
             #——————————————————————————
             'checksum':
               description: Hash that makes it possible to check the a file intergrity
@@ -1496,16 +1488,14 @@ components:
                   $ref: '#/components/schemas/HashAlgorithm'
                 'hash':
                   type: string
-
             #——————————————————————————
             'file_structure':
               description: >
                 Link towards the resource that describes the structure of the data
                 (language, norm, data structure, JSON schema, OpenAPI, etc.)
               type: string
-              format: URI
+              format: uri
               #'URI definition - https://tools.ietf.org/html/rfc2396'
-
             #——————————————————————————
             'file_encoding':
               description: Source encoding of the data
@@ -1529,19 +1519,16 @@ components:
                 in milliseconds.
               type: integer
               minimum: 0
-
             #——————————————————————————
             'period':
               description: Theorical delay between the production of two records, in milliseconds.
               type: integer
               minimum: 0
-
             #——————————————————————————
             'current_number_of_records':
               description: Actual number of records
               type: integer
               minimum: 0
-
             #——————————————————————————
             'current_size':
               description: Actual size of the data, in bytes (refreshed automatically)
@@ -1576,7 +1563,7 @@ components:
         #——————————————————————————
         'url':
           type: string
-          format: URI
+          format: uri
         #——————————————————————————
         'interface_contract':
           description: Link towards the interface contract defined with RUDI Portal
@@ -1644,17 +1631,17 @@ components:
         #——————————————————————————
         'submission_date':
           allOf:
+            - $ref: '#/components/schemas/Date'
             - description: >
                 Date when the integration request was submitted by the 
                 Producer node
               type: string
-            - $ref: '#/components/schemas/Date'
         #——————————————————————————
         'treatment_date':
           allOf:
+            - $ref: '#/components/schemas/Date'
             - description: Date when the integration request was processed by the Portal
               type: string
-            - $ref: '#/components/schemas/Date'
         #——————————————————————————
         'method':
           description: Method used by the Producer node for the integration request
@@ -1705,7 +1692,7 @@ components:
             Accessible URL where the public key can be found. 
             If no PEM has been supplied, the URL is required!
           type: string
-          format: URI
+          format: uri
         #——————————————————————————
         'prop':
           description: >
@@ -2027,43 +2014,43 @@ components:
         # Identification
         #——————————————————————————
         'concept_id':
-          description: 'ID of the SKOS concept'
+          description: ID of the SKOS concept
           type: string
           format: uuid
         #——————————————————————————
         'concept_code':
-          description: 'Short abstract code that identifies uniquely the concept'
+          description: Short abstract code that identifies uniquely the concept
           type: string
           minLength: 2
           maxLength: 30
         #——————————————————————————
         'concept_uri':
-          description: 'Web page that document the SKOS concept'
+          description: Web page that document the SKOS concept
           type: string
           format: uri
         #——————————————————————————
         'concept_icon':
-          description: 'URI towards a graphical resource that describes the concept'
+          description: URI towards a graphical resource that describes the concept
           type: string
           format: uri
         #—•—•—•—•—•—•—•—•—•—•—•—•—•
         # Labels
         #——————————————————————————
         'pref_label':
-          description: 'Preferred lexical label for the resource, one for each language'
+          description: Preferred lexical label for the resource, one for each language
           type: array
           items:
             $ref: '#/components/schemas/DictionaryEntry'
           minItems: 1
         #——————————————————————————
         'alt_labels':
-          description: 'List of alternative labels (in each language)'
+          description: List of alternative labels (in each language)
           type: array
           items:
             $ref: '#/components/schemas/DictionaryList'
         #——————————————————————————
         'hidden_labels':
-          description: 'List of alternative orthographs for the label (in each language)'
+          description: List of alternative orthographs for the label (in each language)
           type: array
           items:
             $ref: '#/components/schemas/DictionaryList'
@@ -2072,10 +2059,10 @@ components:
         #——————————————————————————
         'of_scheme':
           allOf:
+            - $ref: '#/components/schemas/SkosScheme'
             - description: >
                 Reference to the constrained vocabulary, thesaurus or classification scheme
               type: object
-            - $ref: '#/components/schemas/SkosScheme'
         #——————————————————————————
         'concept_role':
           description: >
@@ -2156,40 +2143,7 @@ components:
       type: string
       pattern: '^[a-z]{2}(-[A-Z]{2})?$'
       enum:
-        [
-          'cs-CZ',
-          'da-DK',
-          'de-CH',
-          'de-DE',
-          'en-GB',
-          'en-US',
-          'el-GR',
-          'es-ES',
-          'fr-FR',
-          'hu-HU',
-          'it-IT',
-          'no-NO',
-          'pl-PL',
-          'pt-PT',
-          'ro-RO',
-          'ru-RU',
-          'sk-SK',
-          'cs',
-          'da',
-          'de',
-          'en',
-          'el',
-          'es',
-          'fr',
-          'hu',
-          'it',
-          'no',
-          'pl',
-          'pt',
-          'ro',
-          'ru',
-          'sk',
-        ]
+        ['cs', 'da', 'de', 'en', 'el', 'es', 'fr', 'hu', 'it', 'no', 'pl', 'pt', 'ro', 'ru', 'sk']
 
       # norm: https://www.rfc-editor.org/rfc/bcp/bcp47.txt
       # source for enum: https://app.swaggerhub.com/apis/nologo/thesaurus/1.0.0#/default/get_thesaurus_v1

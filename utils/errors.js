@@ -125,7 +125,7 @@ class RudiError extends Error {
     const fun = 'createRudiHttpError'
     try {
       log.d(mod, fun, `Error ${code}: ${message}`)
-      switch (code) {
+      switch (parseInt(code)) {
         case 400:
           return new BadRequestError(message, ctxMod, ctxFun)
         case 401:
@@ -204,24 +204,34 @@ class RudiError extends Error {
     let error
     try {
       const errFlag = `${errPrefix ? errPrefix + ' ' : ''}`
+      // log.d(mod, fun, `message: ${comError.message}`)
+      // log.d(mod, fun, `name: ${comError.name}`)
+      // log.d(mod, fun, `config: ${beautify(comError.config)}`)
+      // log.d(mod, fun, `status: ${JSON.parse(JSON.stringify(comError)).status}`)
+      // log.d(mod, fun, JSON.parse(JSON.stringify(comError)).status)
+      // log.d(mod, fun, `data: ${beautify(comError.response?.data)}`)
 
-      if (comError.code && comError.data?.message) {
-        log.t(mod, fun, beautify(comError.data?.message))
-        return RudiError.createRudiHttpError(comError.code, comError.data?.message)
-      }
-      if (comError.code && comError.message) {
-        log.t(mod, fun, beautify(comError))
-        return RudiError.createRudiHttpError(comError.code, comError.message)
-      }
+      const errCode = parseInt(
+        comError.status ||
+          comError.code ||
+          comError.statusCode ||
+          comError.response?.status ||
+          comError.response?.data?.code ||
+          comError.response?.data?.status ||
+          JSON.parse(JSON.stringify(comError)).status
+      )
 
-      const errCode =
-        comError.code || comError.response?.data?.code || comError.response?.data?.status
+      // log.d(mod, fun, `${errFlag}error code: ${errCode}`)
 
-      if (comError.response?.data?.label) {
-        const errLabel = comError.response.data.label
-        log.d(mod, fun, `${errFlag}error code: ${beautify(errCode)}`)
-        log.d(mod, fun, `${errFlag}error msg: ${beautify(errLabel)}`)
-        error = RudiError.createRudiHttpError(errCode, errLabel)
+      const errMessage = `${
+        comError.message || comError.data?.message || comError.response?.data?.label
+      }`
+
+      log.w(mod, fun, beautify(comError))
+
+      if (errCode && errMessage) {
+        log.t(mod, fun, beautify(errMessage))
+        return RudiError.createRudiHttpError(errCode, errMessage)
       } else if (comError.response?.data) {
         const errData = comError.response.data
         if (errCode === 401) {
@@ -235,7 +245,10 @@ class RudiError extends Error {
         }
       } else if (comError.message) {
         const errMsg = comError.message
-        if (errMsg === 'Request failed with status code 401') {
+        if (errMsg === 'Request failed with status code 400') {
+          log.t(mod, fun, `${errFlag}error message 400: ${beautify(comError)}`)
+          error = new BadRequestError(errMsg)
+        } else if (errMsg === 'Request failed with status code 401') {
           log.t(mod, fun, `${errFlag}error message 401: ${beautify(comError)}`)
           error = new UnauthorizedError(errMsg)
         } else if (errMsg === 'Request failed with status code 403') {
@@ -254,7 +267,9 @@ class RudiError extends Error {
           error = new RudiError(comError.response)
         } else {
           log.t(mod, fun, `${errFlag}error: ${beautify(comError)}`)
-          if (comError === 'Error 401: Request failed with status code 401') {
+          if (comError === 'Error 400: Request failed with status code 400') {
+            error = new BadRequestError(comError)
+          } else if (comError === 'Error 401: Request failed with status code 401') {
             error = new UnauthorizedError(comError)
           } else if (comError === 'Error 403: Request failed with status code 401') {
             error = new ForbiddenError(comError)
@@ -274,7 +289,15 @@ class RudiError extends Error {
 
 class BadRequestError extends RudiError {
   constructor(errMessage, ctxMod, ctxFun) {
-    super(errMessage, 400, 'Bad request', 'The JSON is not valid', undefined, ctxMod, ctxFun)
+    super(
+      errMessage,
+      400,
+      'Bad request',
+      'The JSON (or the request) is not valid',
+      undefined,
+      ctxMod,
+      ctxFun
+    )
   }
 }
 

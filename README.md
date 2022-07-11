@@ -147,6 +147,28 @@ In this section,
 - `iat` (issued at): date of the generation of the token in Epoch seconds
 - `client_id`: an identifier for the logged user requesting the resource
 
+### Example CURL requests:
+
+- `$USR`: login that has been transmitted to communicate with the token server
+- `$PWD`: password that has been transmitted to communicate with the token server
+- `$DATE`: Epoch date in seconds, e.g. now+1200 to get a token that is valid for 20mn
+- `$SUB`: The value set for the robot/harvester in the file `rudi_proxy.ini` for `token_server_subject` and associated to a private key (e.g. `rudi_token`)
+- `$MTD`: HTTP method for the request to the API (`GET` | `POST` | `PUT` | `DELETE`)
+- `$URL`: URL of the request to the API (e.g.: `/api/admin/resources``)
+- `$CID`: client ID, the way you wish identify the sender of the request (e.g. 'PostmanRobot')
+- `$NODE`: URL of the producer node (e.g.: `https://rm.fenix.rudi-univ-rennes1.fr`)
+
+```sh
+# Create a token
+JWT=`curl -X POST --user $USR:$PWD -H 'Content-Type: application/json' -d "{\"exp\":$DATE,\"sub\":\"$SUB\",\"req_mtd\":\"$MTD\",\"req_url\":\"$URL\",\"client_id\":\"$CID\"}" $NODE/crypto/jwt/forge`
+
+# Check a token
+curl -X POST --user $USR:$PWD -H 'Content-Type: application/json' -d "\"$JWT\"" $NODE/crypto/jwt/check
+
+# Send the request to the API
+curl -X $MTD -H "Authorization: Bearer $JWT" ${NODE}${URL}
+```
+
 ---
 
 ## Test files

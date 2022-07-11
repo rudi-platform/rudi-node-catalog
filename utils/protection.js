@@ -25,6 +25,7 @@ const {
   validateSchema,
   REGEX_JWT_AUTH,
   REGEX_URL_WRONG_CHAR,
+  REGEX_BASIC_AUTH,
 } = require('../definitions/schemaValidators')
 
 const { RudiError, BadRequestError } = require('./errors')
@@ -49,8 +50,10 @@ exports.protectHeaderAuth = (req) => {
       throw new BadRequestError(
         `The length of the token in request headers exceeds ${REQ_AUTH_MAX_LENGTH} characters (found ${auth.length})`
       )
-    if (!validateSchema(auth, REGEX_JWT_AUTH))
-      throw new BadRequestError(`The token in headers does not respect JWT schema`)
+    if (!validateSchema(auth, REGEX_JWT_AUTH) && validateSchema(auth, REGEX_BASIC_AUTH))
+      throw new BadRequestError(
+        `The token in headers does not respect JWT schema nor usr/pwd authentification`
+      )
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }

@@ -80,10 +80,23 @@ exports.VALID_API_VERSION = [
 ]
 
 // ------------------------------------------------------------------------------------------------
+// Base 64
+// ------------------------------------------------------------------------------------------------
+const base64RegexStrict = (charSet) =>
+  new RegExp(`${charSet}(${charSet}{4})*(${charSet}{3}|${charSet}{2}=|${charSet}==|===)`)
+
+exports.REGEX_B64_STRICT = base64RegexStrict('[a-zA-Z\\d+\\/]')
+exports.REGEX_B64URL_STRICT = base64RegexStrict('[\\w-]')
+
+exports.REGEX_B64_NO_PADDING = '[a-zA-Z\\d+\\/]+'
+exports.REGEX_B64URL_STRICT = base64RegexStrict('[\\w-]')
+
+// ------------------------------------------------------------------------------------------------
 // JSON Web Token
 // ------------------------------------------------------------------------------------------------
-exports.REGEX_JWT_ENCODED = /^[\w-]+\.[\w-]+\.[=\w-]+$/
-exports.REGEX_JWT_AUTH = /^Bearer [\w-]+\.[\w-]+\.[=\w-]+$/
+exports.REGEX_JWT_ENCODED = /^[\w-]+\.[\w-]+\.([\w-]+={,3})$/
+exports.REGEX_JWT_AUTH = /^Bearer [\w-]+\.[\w-]+\.[\w-]+={,3}$/
+exports.REGEX_BASIC_AUTH = /^Basic [\w-]+={,3}$/
 
 // ------------------------------------------------------------------------------------------------
 // Request protection

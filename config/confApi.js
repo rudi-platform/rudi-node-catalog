@@ -85,6 +85,7 @@ exports.ACT_DELETION = 'deletion'
 exports.ACT_UNLINKED = 'unlinked'
 exports.ACT_REPORT = 'report'
 exports.ACT_SEARCH = 'search'
+exports.ACT_EXT_SEARCH = 'ext_search'
 exports.ACT_SEND = 'send'
 
 // ------------------------------------------------------------------------------------------------
@@ -155,6 +156,7 @@ exports.URL_PV_LICENCE_CODES_ACCESS = `${this.URL_PREFIX_PRIVATE}/${URL_SUFFIX_L
 // Syslog places
 // ------------------------------------------------------------------------------------------------
 exports.ROUTE_NAME = 'routeName'
+exports.ROUTE_OPT = 'routeOpt'
 
 // ------------------------------------------------------------------------------------------------
 // Errors trace

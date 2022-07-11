@@ -9,17 +9,25 @@ const mod = 'skosCtrl'
 // ------------------------------------------------------------------------------------------------
 // External dependencies
 // ------------------------------------------------------------------------------------------------
-// const axios = require('axios')
+
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
 const log = require('../utils/logging')
 
 const json = require('../utils/jsonAccess')
-const utils = require('../utils/jsUtils')
-// const { getSkosmosConf } = require('../config/confSystem')
+const {
+  beautify,
+  isNotEmptyArray,
+  isNotEmptyObject,
+  deepClone,
+  toPaddedBase64Url,
+} = require('../utils/jsUtils')
+const { getSkosmosConf } = require('../config/confSystem')
 
 const db = require('../db/dbQueries')
+
+const { directGet } = require('../utils/httpReq')
 
 // log.d(mod, 'init', 'Schemas, Models and definitions')
 const Themes = require('../definitions/thesaurus/Themes')
@@ -79,6 +87,7 @@ const {
   URL_PV_THESAURUS_ACCESS,
   PARAM_THESAURUS_CODE,
   PARAM_THESAURUS_LANG,
+  API_VERSION,
 } = require('../config/confApi')
 const {
   ParameterExpectedError,
@@ -106,7 +115,7 @@ exports.newSkosScheme = async (rudiScheme) => {
 
     if (!rudiScheme) throw new ParameterExpectedError('rudiScheme', mod, fun)
 
-    const topConcepts = await utils.deepClone(rudiScheme[API_SCHEME_TOPS_PROPERTY])
+    const topConcepts = await deepClone(rudiScheme[API_SCHEME_TOPS_PROPERTY])
 
     delete rudiScheme[API_SCHEME_TOPS_PROPERTY]
 
@@ -115,7 +124,7 @@ exports.newSkosScheme = async (rudiScheme) => {
 
     const schemeDbId = dbScheme[DB_ID]
 
-    if (utils.isNotEmptyArray(topConcepts)) {
+    if (isNotEmptyArray(topConcepts)) {
       dbScheme[API_SCHEME_TOPS_PROPERTY] = await this.createConceptHierarchy(
         topConcepts,
         schemeDbId
@@ -136,7 +145,7 @@ exports.dbSchemeToRudi = async (dbScheme) => {
   const fun = 'dbSchemeToRudi'
   log.t(mod, fun, ``)
 
-  // log.d(mod, fun, `dbScheme: ${utils.beautify(dbScheme)}`)
+  // log.d(mod, fun, `dbScheme: ${beautify(dbScheme)}`)
 
   const rudiScheme = await dbScheme.populate([
     {
@@ -177,17 +186,17 @@ exports.createConceptHierarchy = async (listConcepts, schemeDbId, parentConcept)
     await Promise.all(
       listConcepts.map(async (conceptJson) => {
         let dbConcept = db.getConceptWithJson(conceptJson)
-        // log.d(mod, fun, `dbConcept: ${utils.beautify(dbConcept)}`)
+        log.d(mod, fun, `dbConcept: ${beautify(dbConcept)}`)
 
-        if (utils.isNotEmptyObject(dbConcept)) {
-          // log.d(mod, fun, `Concept already created: ${utils.beautify(dbConcept[API_SKOS_CONCEPT_ID])} `)
+        if (isNotEmptyObject(dbConcept)) {
+          // log.d(mod, fun, `Concept already created: ${beautify(dbConcept[API_SKOS_CONCEPT_ID])} `)
         } else {
           // log.d(mod, fun, `Creating new concept: ${conceptJson[API_SKOS_CONCEPT_ID]} `)
 
           // Backup reference lists
           let conceptChildren = []
-          if (utils.isNotEmptyArray(conceptJson[API_CONCEPT_CHILDREN_PROPERTY])) {
-            conceptChildren = utils.deepClone(conceptJson[API_CONCEPT_CHILDREN_PROPERTY])
+          if (isNotEmptyArray(conceptJson[API_CONCEPT_CHILDREN_PROPERTY])) {
+            conceptChildren = deepClone(conceptJson[API_CONCEPT_CHILDREN_PROPERTY])
           }
 
           // Remove references to other concepts
@@ -200,7 +209,7 @@ exports.createConceptHierarchy = async (listConcepts, schemeDbId, parentConcept)
 
           // Create concept without references
           // log.d(mod, fun, `Saving the new Concept`)
-          // log.d(mod, fun, `conceptJson: ${utils.beautify(conceptJson)}`)
+          // log.d(mod, fun, `conceptJson: ${beautify(conceptJson)}`)
           dbConcept = await new SkosConcept(conceptJson)
           await dbConcept.save()
           // log.d(mod, fun, `=> done`)
@@ -209,7 +218,7 @@ exports.createConceptHierarchy = async (listConcepts, schemeDbId, parentConcept)
           conceptDbIds.push(conceptDbId)
 
           // Update children property
-          if (utils.isNotEmptyArray(conceptChildren)) {
+          if (isNotEmptyArray(conceptChildren)) {
             // Create each children hierarchy
             const childrenDbIds = await this.createConceptHierarchy(
               conceptChildren,
@@ -219,7 +228,7 @@ exports.createConceptHierarchy = async (listConcepts, schemeDbId, parentConcept)
             dbConcept[API_CONCEPT_CHILDREN_PROPERTY] = childrenDbIds
           }
 
-          // log.d(mod, fun, `${utils.beautify(conceptJson)} -> ${conceptDbId}`)
+          // log.d(mod, fun, `${beautify(conceptJson)} -> ${conceptDbId}`)
         }
 
         // Update parents property
@@ -228,8 +237,8 @@ exports.createConceptHierarchy = async (listConcepts, schemeDbId, parentConcept)
         } else {
           const parents = dbConcept[API_CONCEPT_PARENTS_PROPERTY]
           // log.d(mod, fun, `Updating 'parents' property`)
-          if (!utils.isNotEmptyArray(parents)) {
-            // log.d(mod, fun, `dbConcept[API_CONCEPT_PARENTS_PROPERTY]: ${utils.beautify(dbConcept[API_CONCEPT_PARENTS_PROPERTY])}`)
+          if (!isNotEmptyArray(parents)) {
+            // log.d(mod, fun, `dbConcept[API_CONCEPT_PARENTS_PROPERTY]: ${beautify(dbConcept[API_CONCEPT_PARENTS_PROPERTY])}`)
             dbConcept[API_CONCEPT_PARENTS_PROPERTY] = []
           }
           if (parents.indexOf(parentConcept) === -1) {
@@ -272,7 +281,7 @@ exports.newSkosConcept = async (rudiConcept, inSchemeDbId) => {
     )
 
     const dbConcept = await new SkosConcept(rudiConcept)
-    // log.d(mod, fun, `dbConcept: ${utils.beautify(dbConcept)}`)
+    // log.d(mod, fun, `dbConcept: ${beautify(dbConcept)}`)
     await dbConcept.save()
     // log.d(mod, fun, `=> saved`)
 
@@ -332,7 +341,7 @@ exports.setDbConceptRefs = async (rudiConcept, prop) => {
     log.t(mod, fun, ``)
     const listConceptsReferences = rudiConcept[prop]
 
-    // log.d(mod, fun, `listConceptsReferences: ${utils.beautify(listConceptsReferences)}`)
+    // log.d(mod, fun, `listConceptsReferences: ${beautify(listConceptsReferences)}`)
     if (!listConceptsReferences) return
 
     const listRefs = []
@@ -350,7 +359,7 @@ exports.setDbConceptRefs = async (rudiConcept, prop) => {
           log.d(mod, fun, `refConceptDbId: ${refConceptDbId}`)
         }
         if (!refConceptDbId) {
-          log.w(mod, fun, `Referenced concept not created: ${utils.beautify(referencedConcept)}`)
+          log.w(mod, fun, `Referenced concept not created: ${beautify(referencedConcept)}`)
           // TODO: throw an error here?
         } else {
           log.d(mod, fun, `refConceptDbId: ${refConceptDbId}`)
@@ -409,7 +418,7 @@ exports.dbConceptToRudiRecursive = async (dbConcept) => {
   try {
     // log.t(mod, fun, ``)
 
-    // log.d(mod, fun, `dbConcept: ${utils.beautify(dbConcept)}`)
+    // log.d(mod, fun, `dbConcept: ${beautify(dbConcept)}`)
     if (!dbConcept) return
 
     const rudiConcept = await dbConcept.populate([
@@ -439,7 +448,7 @@ exports.dbConceptToRudiRecursive = async (dbConcept) => {
     rudiConcept[API_CONCEPT_CHILDREN_PROPERTY] = await this.dbConceptListToRudiRecursive(
       rudiConcept[API_CONCEPT_CHILDREN_PROPERTY]
     )
-    // log.d(mod, fun, `rudiConcept: ${utils.beautify(rudiConcept)}`)
+    // log.d(mod, fun, `rudiConcept: ${beautify(rudiConcept)}`)
 
     return rudiConcept
     // TODO: populate ref fileds ?
@@ -453,7 +462,7 @@ exports.dbConceptListToRudiRecursive = async (dbConceptList) => {
   try {
     // log.t(mod, fun, ``)
 
-    // log.d(mod, fun, `dbConceptList: ${utils.beautify(dbConceptList)}`)
+    // log.d(mod, fun, `dbConceptList: ${beautify(dbConceptList)}`)
     if (!dbConceptList) return
 
     const rudiConceptList = []
@@ -592,7 +601,7 @@ exports.getSingleThesaurus = async (req, reply) => {
     const thesaurus = await this.getThesaurus(thesaurusCode)
     if (!thesaurus)
       throw new NotFoundError(
-        `Thesaurus not found for such required code: ${utils.beautify(thesaurusCode)}`
+        `Thesaurus not found for such required code: ${beautify(thesaurusCode)}`
       )
     return thesaurus
   } catch (err) {
@@ -616,7 +625,7 @@ exports.getSingleThesaurusLabels = async (req, reply) => {
     const thesaurus = await this.getThesaurusLabel(thesaurusCode, thesaurusLang)
     if (!thesaurus)
       throw new NotFoundError(
-        `Thesaurus not found for such required code: ${utils.beautify(thesaurusCode)}`
+        `Thesaurus not found for such required code: ${beautify(thesaurusCode)}`
       )
     return thesaurus
   } catch (err) {
@@ -627,60 +636,84 @@ exports.getSingleThesaurusLabels = async (req, reply) => {
 // ------------------------------------------------------------------------------------------------
 // SKOSMOS server calls
 // ------------------------------------------------------------------------------------------------
-/*
+
 exports.widenSearch = async (searchTerms) => {
   const fun = 'widenSearch'
   try {
     log.t(mod, fun, ``)
     if (!searchTerms || !getSkosmosConf()) return searchTerms
 
-    const widenedSearchTerms = await Promise.all(
-      searchTerms.map((term) => {
-        return this.askSkosmos(term)
-      })
-    )
-
+    const widenedSearchTerms = await Promise.all(searchTerms.map((term) => this.askSkosmos(term)))
+    log.d(mod, fun, `widened search terms: ${beautify(widenedSearchTerms)}`)
     return widenedSearchTerms
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
 }
 
+// export NODE_TLS_REJECT_UNAUTHORIZED=0;
 let SKOSMOS_URL, SKOSMOS_AUTH // cache
-
-exports.askSkosmos = async (term) => {
+/**
+ *
+ * @param {String} term A term to look for in SKOSMOS server vocabularies
+ * @returns List of neighbor terms to expand the search
+ */
+exports.askSkosmos = async (term, lang = 'fr', vocabulary) => {
   const fun = 'askSkosmos'
   try {
     log.t(mod, fun, `term: ${term}`)
-    if (!term) return term
 
-    if (!SKOSMOS_URL) SKOSMOS_URL = getSkosmosConf('url')
+    if (!SKOSMOS_URL) {
+      SKOSMOS_URL = getSkosmosConf('url')
+    }
+    // const reqUrl = 'http://127.0.0.1:3030/api/v1/resources'
+    const reqUrl = `${SKOSMOS_URL}/search?clang=${lang}${
+      vocabulary ? '&vocab=' + vocabulary : ''
+    }&query=${term}`
+
     if (!SKOSMOS_AUTH) {
-      const skosmosUsr = getSkosmosConf('usr')
-      const skosmosPwd = getSkosmosConf('pwd')
+      // const skosmosUsr = getSkosmosConf('usr')
+      // const skosmosPwd = getSkosmosConf('pwd')
+      // const basicAuth = toPaddedBase64Url(skosmosUsr + ':' + skosmosPwd)
+      // log.d(mod, fun, 'skosmosUsr: ' + skosmosUsr)
+      // log.d(mod, fun, 'skosmosPwd: ' + skosmosPwd)
+      // log.d(mod, fun, 'encodedAuth: ' + encodedAuth)
+
+      // SKOSMOS_AUTH = {
+      //   headers: {
+      //     'User-Agent': `RudiProd/${API_VERSION}`,
+      //     Authorization: `Basic ${basicAuth}`,
+      //   },
+      // }
       SKOSMOS_AUTH = {
-        headers: {
-          Authorization: `Basic ${utils.toBase64(skosmosUsr + ':' + skosmosPwd)}`,
+        auth: {
+          username: getSkosmosConf('usr'),
+          password: getSkosmosConf('pwd'),
         },
       }
     }
-    const reqUrl = `${SKOSMOS_URL}/search?query=${term}`
+
     // log.d(mod, fun, 'reqUrl: ' + reqUrl)
-    // log.d(mod, fun, 'auth: ' + utils.beautify(SKOSMOS_AUTH))
+    // log.d(mod, fun, 'auth: ' + beautify(SKOSMOS_AUTH))
     try {
-      const reply = await axios.get(reqUrl, SKOSMOS_AUTH)
-      log.d(mod, fun, 'reply: ' + utils.beautify(reply))
+      const reply = await directGet(reqUrl, SKOSMOS_AUTH)
+      // log.d(mod, fun, 'reply: ' + beautify(reply))
       log.d(mod, fun, 'status: ' + reply.status)
-      log.d(mod, fun, 'data: ' + utils.beautify(reply.data))
-      log.d(mod, fun, 'results: ' + utils.beautify(reply.data?.results))
-      return reply.data.results
+      // log.d(mod, fun, 'data: ' + beautify(reply.data))
+      // log.d(mod, fun, 'results: ' + beautify(reply.data?.results))
+      const labels = []
+      reply.data?.results?.map((result) => {
+        labels.push(result.prefLabel)
+        labels.push(result.altLabel)
+      })
+      return labels
     } catch (e) {
+      log.e(mod, fun, 'COMMUNICATION ERROR!')
       log.e(mod, fun, e)
-      throw e
+      throw RudiError.treatCommunicationError(mod, fun, e)
     }
   } catch (err) {
     log.e(mod, fun, err)
     throw RudiError.treatError(mod, fun, err)
   }
 }
-*/

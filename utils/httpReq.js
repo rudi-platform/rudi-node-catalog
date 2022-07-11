@@ -7,13 +7,16 @@ const mod = 'http'
 // ------------------------------------------------------------------------------------------------
 // const https = require('https')
 // const http = require('http')
+// import { curlirize } from 'axios-curlirize'
 const axios = require('axios')
+// curlirize(axios)
 
 // ------------------------------------------------------------------------------------------------
 // Internal dependecies
 // ------------------------------------------------------------------------------------------------
 const log = require('./logging')
-const utils = require('./jsUtils')
+const { beautify } = require('./jsUtils')
+
 const { RudiError, BadRequestError } = require('./errors')
 
 // ------------------------------------------------------------------------------------------------
@@ -68,7 +71,7 @@ exports.httpGet = async (destUrl, authorizationToken) => {
     if (authorizationToken) reqOpts.headers.Authorization = `Bearer ${authorizationToken}`
 
     const answer = await this.directGet(destUrl, reqOpts)
-    // log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
+    // log.d(mod, fun, `answer: ${beautify(answer.data)}`)
     return answer.data
   } catch (err) {
     throw RudiError.treatCommunicationError(mod, fun, err)
@@ -89,7 +92,7 @@ exports.httpDelete = async (destUrl, authorizationToken) => {
     if (authorizationToken) reqOpts.headers.Authorization = `Bearer ${authorizationToken}`
 
     const answer = await axios.delete(destUrl, reqOpts)
-    log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
+    log.d(mod, fun, `answer: ${beautify(answer.data)}`)
     return answer.data
   } catch (err) {
     throw RudiError.treatCommunicationError(mod, fun, err)
@@ -122,7 +125,7 @@ exports.httpPost = async (destUrl, dataToSend, authorizationToken) => {
 
     const answer = await this.directPost(destUrl, dataToSend, reqOpts)
 
-    log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
+    log.d(mod, fun, `answer: ${beautify(answer.data)}`)
     return answer.data
   } catch (err) {
     throw RudiError.treatCommunicationError(mod, fun, err)
@@ -143,7 +146,7 @@ exports.httpPut = async (destUrl, dataToSend, authorizationToken) => {
 
     const answer = await this.directPut(destUrl, dataToSend, reqOpts)
 
-    log.d(mod, fun, `answer: ${utils.beautify(answer.data)}`)
+    log.d(mod, fun, `answer: ${beautify(answer.data)}`)
     return answer.data
   } catch (err) {
     throw RudiError.treatCommunicationError(mod, fun, err)
@@ -152,12 +155,15 @@ exports.httpPut = async (destUrl, dataToSend, authorizationToken) => {
 
 exports.directGet = async (destUrl, reqOpts) => {
   const fun = 'directGet'
-  log.t(mod, fun, ``)
-  // log.d(mod, fun, `destUrl: ${destUrl}`)
-  // if (reqOpts) reqOpts.httpsAgent = sslAgent
-  // else reqOpts = { httpsAgent: sslAgent }
   try {
+    log.t(mod, fun, ``)
+    log.d(mod, fun, `destUrl: ${destUrl}`)
+    log.d(mod, fun, `reqOpts: ${beautify(reqOpts)}`)
+    // if (reqOpts) reqOpts.httpsAgent = sslAgent
+    // else reqOpts = { httpsAgent: sslAgent }
+    log.d(mod, fun, 'right before')
     const answer = await axios.get(destUrl, reqOpts)
+    log.d(mod, fun, 'right after')
     log.logHttpAnswer(mod, fun, answer)
     return answer
   } catch (err) {
@@ -176,7 +182,7 @@ exports.directPost = async (destUrl, dataToSend, reqOpts) => {
     log.logHttpAnswer(mod, fun, answer)
     return answer
   } catch (err) {
-    // log.w(mod, fun, utils.beautify(err) || err)
+    // log.w(mod, fun, beautify(err) || err)
     throw RudiError.treatCommunicationError(mod, fun, err)
   }
 }
@@ -192,7 +198,7 @@ exports.directPut = async (destUrl, dataToSend, reqOpts) => {
     log.logHttpAnswer(mod, fun, answer)
     return answer
   } catch (err) {
-    // log.w(mod, fun, utils.beautify(err) || err)
+    // log.w(mod, fun, beautify(err) || err)
     throw RudiError.treatCommunicationError(mod, fun, err)
   }
 }
@@ -203,7 +209,7 @@ exports.directPut = async (destUrl, dataToSend, reqOpts) => {
 
   const httpProtocol = protocol === PROTOCOL.HTTP ? http : https
   // options.agent = new httpProtocol.Agent({rejectUnauthorized: false})
-  log.d(mod, fun, `options: ${utils.beautify(options)}`)
+  log.d(mod, fun, `options: ${beautify(options)}`)
 
   return new Promise((resolve, reject) => {
     const req = httpProtocol.request(options, (res) => {
@@ -215,7 +221,7 @@ exports.directPut = async (destUrl, dataToSend, reqOpts) => {
       let body = []
 
       res.on('data', (chunk) => {
-        // log.d(mod, fun, `chunk: ${utils.beautify(chunk)}`)
+        // log.d(mod, fun, `chunk: ${beautify(chunk)}`)
         body.push(chunk)
       })
 
@@ -231,7 +237,7 @@ exports.directPut = async (destUrl, dataToSend, reqOpts) => {
     })
 
     req.on('error', (err) => {
-      log.w(mod, fun, `${err.stack} - ${utils.beautify(err)}`)
+      log.w(mod, fun, `${err.stack} - ${beautify(err)}`)
       reject(err)
     })
 

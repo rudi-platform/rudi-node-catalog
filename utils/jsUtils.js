@@ -18,11 +18,12 @@ const { TRACE } = require('../config/confApi')
 // ------------------------------------------------------------------------------------------------
 // String
 // ------------------------------------------------------------------------------------------------
+exports.padWithEqualSignBase4 = (str) => this.pad(str, 4, '=')
 exports.toBase64 = (str) => this.convertEncoding(str, 'utf-8', 'base64')
 exports.toBase64Url = (str) => this.convertEncoding(str, 'utf-8', 'base64url')
+exports.toPaddedBase64Url = (str) => this.padWithEqualSignBase4(this.toBase64Url(str))
 exports.decodeBase64 = (data) => this.convertEncoding(data, 'base64', 'utf-8')
 exports.decodeBase64url = (data) => this.convertEncoding(data, 'base64url', 'utf-8')
-exports.padWithEqualSignBase4 = (str) => this.pad(str, 4, '=')
 
 exports.convertEncoding = (data, fromEncoding, toEncoding) => {
   const fun = 'convertEncoding'
@@ -35,19 +36,31 @@ exports.convertEncoding = (data, fromEncoding, toEncoding) => {
     throw err
   }
 }
+
+/**
+ * Adds a sign at the end of a string so that the padded string has a length that is a multiple of a given base.
+ * @param {String} str The input string
+ * @param {Number} base The number the length of the padded string must be a multiple of
+ * @param {String} padSign The character used for the padding
+ * @returns
+ */
 exports.pad = (str, base, padSign) => {
   const fun = 'pad'
   // this.consoleLog(mod, fun, `base = ${base}, sign = '${padSign}'`)
   try {
-    padSign = padSign && padSign.length > 1 ? padSign[0] : ''
+    padSign = padSign?.substring(0, 1)
     const modulo = str.length % base
-    // this.consoleLog(`modulo = ${modulo}`)
-    let paddedStr = str
-    for (let i = modulo; i > 0; i--) {
-      paddedStr = paddedStr + padSign
+
+    // this.consoleLog(mod, fun, `str.length: ${str.length}`)
+    // this.consoleLog(mod, fun, `modulo: ${modulo}`)
+    if (modulo === 0) return str
+
+    let padding = padSign
+    for (let i = modulo; i > base; i++) {
+      padding = `${padding}${padSign}`
     }
-    // this.consoleLog(mod, fun, paddedStr)
-    return paddedStr
+    // this.consoleLog(mod, fun, `padding: ${padding}`)
+    return `${str}${padding}`
   } catch (err) {
     this.consoleErr(mod, fun, err)
     throw err
