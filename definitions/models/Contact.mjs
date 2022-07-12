@@ -8,15 +8,6 @@ import _ from 'lodash'
 const { omit } = _
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependencies
-// ------------------------------------------------------------------------------------------------
-import { UUIDv4 } from '../schemas/Identifiers.mjs'
-import { VALID_EMAIL } from '../schemaValidators.mjs'
-
-import { RudiError } from '../../utils/errors.mjs'
-import { makeSearchable } from '../../db/dbActions.mjs'
-
-// ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
 import {
@@ -31,7 +22,17 @@ import {
   DB_CREATED_AT,
   API_CONTACT_SUMMARY,
 } from '../../db/dbFields.mjs'
+
+// ------------------------------------------------------------------------------------------------
+// Internal dependencies
+// ------------------------------------------------------------------------------------------------
+import { VALID_EMAIL } from '../schemaValidators.mjs'
+import { UUIDv4 } from '../schemas/Identifiers.mjs'
+
 import { logD, logT, logW } from '../../utils/logging.mjs'
+import { RudiError } from '../../utils/errors.mjs'
+import { makeSearchable } from '../../db/dbActions.mjs'
+
 // ------------------------------------------------------------------------------------------------
 // Custom schema definition
 // ------------------------------------------------------------------------------------------------

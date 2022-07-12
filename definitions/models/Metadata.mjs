@@ -13,45 +13,6 @@ import mongooseInt32 from 'mongoose-int32'
 const Int32 = mongooseInt32.loadType(mongoose)
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependencies
-// ------------------------------------------------------------------------------------------------
-import { beautify, isNotEmptyArray, isNotEmptyObject, isNothing } from '../../utils/jsUtils.mjs'
-import { logD, logE, logT } from '../../utils/logging.mjs'
-import { incorrectVal, incorrectValueForEnum } from '../../utils/msg.mjs'
-import { accessProperty, requireSubProperty } from '../../utils/jsonAccess.mjs'
-
-import { NotFoundError, BadRequestError, RudiError } from '../../utils/errors.mjs'
-import { makeSearchable } from '../../db/dbActions.mjs'
-
-// ------------------------------------------------------------------------------------------------
-// Thesaurus definiitons
-// ------------------------------------------------------------------------------------------------
-// logD(mod, 'init', 'Schemas, Models and definitions')
-import Keywords from '../thesaurus/Keywords.mjs'
-import Themes from '../thesaurus/Themes.mjs'
-
-import { isValid as isLanguageValid } from '../thesaurus/Languages.mjs'
-import { isValid as isProjectionValid } from '../thesaurus/Projections.mjs'
-import { isValid as isStorageStatusValid } from '../thesaurus/StorageStatus.mjs'
-// ------------------------------------------------------------------------------------------------
-// Schema definitions
-// ------------------------------------------------------------------------------------------------
-import { DOI, UUIDv4 } from '../schemas/Identifiers.mjs'
-
-import { DictionaryEntry } from '../schemas/DictionaryEntry.mjs'
-import ReferenceDates from '../schemas/ReferenceDates.mjs'
-
-// ------------------------------------------------------------------------------------------------
-// Model definitions
-// ------------------------------------------------------------------------------------------------
-import { MediaTypes } from './Media.mjs'
-
-// ------------------------------------------------------------------------------------------------
-// Other controllers
-// ------------------------------------------------------------------------------------------------
-import { getLicenceCodes } from '../../controllers/licenceController.mjs'
-
-// ------------------------------------------------------------------------------------------------
 // Fields
 // ------------------------------------------------------------------------------------------------
 import { DEFAULT_LANG } from '../../config/confApi.mjs'
@@ -125,6 +86,44 @@ const validObjectNotEmpty = {
   validator: isNotEmptyObject,
   message: `'{PATH}' property should not be empty`,
 }
+
+// ------------------------------------------------------------------------------------------------
+// Internal dependencies
+// ------------------------------------------------------------------------------------------------
+import { beautify, isNotEmptyArray, isNotEmptyObject, isNothing } from '../../utils/jsUtils.mjs'
+import { logD, logE, logT } from '../../utils/logging.mjs'
+import { incorrectVal, incorrectValueForEnum } from '../../utils/msg.mjs'
+import { NotFoundError, BadRequestError, RudiError } from '../../utils/errors.mjs'
+import { accessProperty, requireSubProperty } from '../../utils/jsonAccess.mjs'
+import { makeSearchable } from '../../db/dbActions.mjs'
+
+// ------------------------------------------------------------------------------------------------
+// Thesaurus definiitons
+// ------------------------------------------------------------------------------------------------
+// logD(mod, 'init', 'Schemas, Models and definitions')
+import Keywords from '../thesaurus/Keywords.mjs'
+import Themes from '../thesaurus/Themes.mjs'
+
+import { isValid as isLanguageValid } from '../thesaurus/Languages.mjs'
+import { isValid as isProjectionValid } from '../thesaurus/Projections.mjs'
+import { isValid as isStorageStatusValid } from '../thesaurus/StorageStatus.mjs'
+// ------------------------------------------------------------------------------------------------
+// Schema definitions
+// ------------------------------------------------------------------------------------------------
+import { DOI, UUIDv4 } from '../schemas/Identifiers.mjs'
+
+import { DictionaryEntry } from '../schemas/DictionaryEntry.mjs'
+import ReferenceDates from '../schemas/ReferenceDates.mjs'
+
+// ------------------------------------------------------------------------------------------------
+// Model definitions
+// ------------------------------------------------------------------------------------------------
+import { MediaTypes } from './Media.mjs'
+
+// ------------------------------------------------------------------------------------------------
+// Other controllers
+// ------------------------------------------------------------------------------------------------
+import { get as getLicenceCodes } from '../../definitions/thesaurus/LicenceCodes.mjs'
 
 // ------------------------------------------------------------------------------------------------
 // Fields with specific treatments

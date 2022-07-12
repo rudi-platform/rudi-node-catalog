@@ -476,16 +476,16 @@ export const getThesaurusList = async (lang) => {
     const licences = await await getAllLicenceCodes()
 
     const thesauri = {
-      encodings: getEncodings(lang),
-      filetypes: getFileTypes(lang),
+      encodings: getEncodings(),
+      filetypes: getFileTypes(),
       fileextensions: getExtensions(),
-      hashalgorithms: getHashAlgorithms(lang),
+      hashalgorithms: getHashAlgorithms(),
       keywords: keywords,
-      languages: getLanguages(lang),
+      languages: getLanguages(),
       licences: licences,
       licencetypes: Object.values(LicenceTypes),
-      projections: getProjections(lang),
-      storagestatus: getStorageStatus(lang),
+      projections: getProjections(),
+      storagestatus: getStorageStatus(),
       themes: themes,
     }
 

@@ -9,6 +9,13 @@ import _ from 'lodash'
 const { omit } = _
 
 // ------------------------------------------------------------------------------------------------
+// Constants
+// ------------------------------------------------------------------------------------------------
+import { FIELDS_TO_SKIP } from '../../db/dbFields.mjs'
+import { VALID_URI } from '../schemaValidators.mjs'
+import { UUIDv4 } from '../schemas/Identifiers.mjs'
+
+// ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
 import { isNotEmptyArray } from '../../utils/jsUtils.mjs'
@@ -16,10 +23,7 @@ import { isNotEmptyArray } from '../../utils/jsUtils.mjs'
 // ------------------------------------------------------------------------------------------------
 // Other custom schema definitions
 // ------------------------------------------------------------------------------------------------
-import { UUIDv4 } from '../schemas/Identifiers.mjs'
 import DictionaryEntry from '../schemas/DictionaryEntry.mjs'
-import { FIELDS_TO_SKIP } from '../../db/dbFields.mjs'
-import { VALID_URI } from '../schemaValidators.mjs'
 
 // ------------------------------------------------------------------------------------------------
 // Constants

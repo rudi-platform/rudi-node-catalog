@@ -3,6 +3,8 @@ const mod = 'main'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
+import { API_VERSION } from './config/confApi.mjs'
+
 // 1. Utils
 import { separateLogs, beautify, consoleErr, consoleLog } from './utils/jsUtils.mjs'
 separateLogs('Loading conf', true) ///////////////////////////////////////////////////////////
@@ -14,7 +16,6 @@ import { getAppName, getDbUrl, getServerAddress, getServerPort } from './config/
 import './config/confLogs.mjs'
 
 // 4. Anything, now
-import { API_VERSION } from './config/confApi.mjs'
 
 // -------------------------------------------------------------------------------------------------
 // Prerequisites

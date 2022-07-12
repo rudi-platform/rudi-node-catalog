@@ -8,14 +8,6 @@ import _ from 'lodash'
 const { omit } = _
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependencies
-// ------------------------------------------------------------------------------------------------
-import { UUIDv4 } from '../schemas/Identifiers.mjs'
-import { RudiError } from '../../utils/errors.mjs'
-import { makeSearchable } from '../../db/dbActions.mjs'
-import { GpsCoordinates } from '../schemas/GpsCoordinates.mjs'
-
-// ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
 import {
@@ -29,7 +21,15 @@ import {
   API_ORGANIZATION_CAPTION,
   API_ORGANIZATION_SUMMARY,
 } from '../../db/dbFields.mjs'
-// import { GpsCoordinates } from '../schemas/GpsCoordinates'
+
+// ------------------------------------------------------------------------------------------------
+// Internal dependencies
+// ------------------------------------------------------------------------------------------------
+import { GpsCoordinates } from '../schemas/GpsCoordinates.mjs'
+import { UUIDv4 } from '../schemas/Identifiers.mjs'
+import { logD } from '../../utils/logging.mjs'
+import { RudiError } from '../../utils/errors.mjs'
+import { makeSearchable } from '../../db/dbActions.mjs'
 
 // ------------------------------------------------------------------------------------------------
 // Custom schema definition

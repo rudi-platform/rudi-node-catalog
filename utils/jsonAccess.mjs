@@ -1,12 +1,12 @@
 const mod = 'json'
 
-import { BadRequestError } from './errors.mjs'
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
 
 import { beautify, isNothing } from './jsUtils.mjs'
 import { logD } from './logging.mjs'
+import { BadRequestError } from './errors.mjs'
 import {
   missingObjectProperty,
   missingRequestParameter,
@@ -26,6 +26,7 @@ import {
  * @throws request parameter is missing
  */
 export const accessReqParam = (req, param) => {
+  if (!req) throw new BadRequestError('Input parameter "req" should be an incoming http request')
   const value = req.params[param]
   if (!value) throw new BadRequestError(`${missingRequestParameter(req, param)}`)
   return value

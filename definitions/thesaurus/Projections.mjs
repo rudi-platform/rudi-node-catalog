@@ -4,8 +4,8 @@ const mod = 'projThes'
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
 import { logW } from '../../utils/logging.mjs'
-import { BadRequestError, RudiError } from '../../utils/errors.mjs'
 import { parameterExpected } from '../../utils/msg.mjs'
+import { BadRequestError, RudiError } from '../../utils/errors.mjs'
 
 // ------------------------------------------------------------------------------------------------
 // Custom schema definition
@@ -26,7 +26,7 @@ export const initialize = (arg) => {
 }
 
 export const get = (lang) => {
-  return lang?Thesaurus[lang]:Thesaurus
+  return lang ? Thesaurus[lang] : Thesaurus
 }
 
 export const set = (newValue) => {

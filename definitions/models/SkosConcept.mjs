@@ -9,13 +9,17 @@ import _ from 'lodash'
 const { omit } = _
 
 // ------------------------------------------------------------------------------------------------
+// Constants
+// ------------------------------------------------------------------------------------------------
+import { FIELDS_TO_SKIP } from '../../db/dbFields.mjs'
+
+// ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
 import { isNotEmptyArray } from '../../utils/jsUtils.mjs'
 
 import { UUIDv4 } from '../schemas/Identifiers.mjs'
 import { VALID_URI } from '../schemaValidators.mjs'
-import { FIELDS_TO_SKIP } from '../../db/dbFields.mjs'
 
 // ------------------------------------------------------------------------------------------------
 // Other custom schema definitions

@@ -10,16 +10,8 @@ import datetime from 'date-and-time'
 import { v4 } from 'uuid'
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependencies
-// ------------------------------------------------------------------------------------------------
-import { LOG_DATE_FORMAT, consoleErr, consoleLog } from '../../utils/jsUtils.mjs'
-import { LOG_EXP } from '../../config/confLogs.mjs'
-
-// ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
-import { VALID_UUID, VALID_EPOCH_MS } from '../schemaValidators.mjs'
-
 import {
   DB_CREATED_AT,
   LOG_ID,
@@ -32,6 +24,14 @@ import {
   DB_UPDATED_AT,
   DICT_LANG,
 } from '../../db/dbFields.mjs'
+
+import { VALID_UUID, VALID_EPOCH_MS } from '../schemaValidators.mjs'
+
+// ------------------------------------------------------------------------------------------------
+// Internal dependencies
+// ------------------------------------------------------------------------------------------------
+import { LOG_DATE_FORMAT, consoleErr, consoleLog } from '../../utils/jsUtils.mjs'
+import { LOG_EXP } from '../../config/confLogs.mjs'
 
 // const dayS = 60 * 60 * 24
 // const logExpirationTime = 100 // 7 * dayS

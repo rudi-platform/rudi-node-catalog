@@ -1,11 +1,11 @@
 const mod = 'hashThes'
 
-import { BadRequestError, RudiError } from '../../utils/errors.mjs'
-import { logW } from '../../utils/logging.mjs'
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
+import { BadRequestError, RudiError } from '../../utils/errors.mjs'
 import { parameterExpected } from '../../utils/msg.mjs'
+import { logW } from '../../utils/logging.mjs'
 
 // ------------------------------------------------------------------------------------------------
 // Custom schema definition

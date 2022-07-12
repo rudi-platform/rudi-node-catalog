@@ -1,11 +1,22 @@
 const mod = 'thsrClass'
 
 // ------------------------------------------------------------------------------------------------
+// Constants
+// ------------------------------------------------------------------------------------------------
+import { DICT_LANG, DICT_TEXT } from '../../db/dbFields.mjs'
+
+// ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
 import { isObject, isString, beautify } from '../../utils/jsUtils.mjs'
 import { logD, logT, logW } from '../../utils/logging.mjs'
 import { parameterExpected } from '../../utils/msg.mjs'
+import {
+  MethodNotAllowedError,
+  BadRequestError,
+  NotFoundError,
+  RudiError,
+} from '../../utils/errors.mjs'
 
 import {
   DynamicEnum,
@@ -15,16 +26,6 @@ import {
   ENUM_LABELLED_VALUES,
   ENUM_VALUES,
 } from '../models/DynamicEnum.mjs'
-import {
-  MethodNotAllowedError,
-  BadRequestError,
-  NotFoundError,
-  RudiError,
-} from '../../utils/errors.mjs'
-// ------------------------------------------------------------------------------------------------
-// Constants
-// ------------------------------------------------------------------------------------------------
-import { DICT_LANG, DICT_TEXT } from '../../db/dbFields.mjs'
 
 // ------------------------------------------------------------------------------------------------
 // Thesaurus class

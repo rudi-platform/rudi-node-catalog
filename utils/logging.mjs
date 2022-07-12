@@ -8,21 +8,25 @@ import _ from 'lodash'
 const { pick } = _
 
 // ------------------------------------------------------------------------------------------------
+// Constants
+// ------------------------------------------------------------------------------------------------
+import { API_METADATA_ID, API_DATA_NAME_PROPERTY } from '../db/dbFields.mjs'
+import { HEADERS, HD_URL, HD_METHOD, HD_AUTH } from '../config/headers.mjs'
+
+// ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
 import { displayStr, logWhere, beautify, shorten, consoleErr } from './jsUtils.mjs'
 
 import {
-  logger,
+  wConsoleLogger as wLogger,
   sysLogger,
   getLogLevel,
   SHOULD_SYSLOG,
   SHOULD_LOG_CONSOLE,
 } from '../config/confLogs.mjs'
 
-import { API_METADATA_ID, API_DATA_NAME_PROPERTY } from '../db/dbFields.mjs'
 import { makeLogInfo, LogEntry } from '../definitions/models/LogEntry.mjs'
-import { HEADERS, HD_URL, HD_METHOD, HD_AUTH } from '../config/headers.mjs'
 
 // ------------------------------------------------------------------------------------------------
 // Constants
@@ -89,23 +93,24 @@ const Colors = {
 // ------------------------------------------------------------------------------------------------
 // Logging functions
 // ------------------------------------------------------------------------------------------------
-const log = (logLevel, srcMod, srcFun, msg) => {
+export const logLine = (logLevel, srcMod, srcFun, msg) => {
   try {
-    if (SHOULD_LOG_CONSOLE) logger[logLevel](displayStr(srcMod, srcFun, msg))
+    if (SHOULD_LOG_CONSOLE)
+      wLogger.log({ level: logLevel, message: displayStr(srcMod, srcFun, msg) })
     // console.log(displayStr(srcMod, srcFun, msg))
     addLogEntry(logLevel, srcMod, srcFun, msg)
   } catch (e) {
     consoleErr(e)
   }
 }
-export const logE = (srcMod, srcFun, msg) => log('error', srcMod, srcFun, msg)
-export const logW = (srcMod, srcFun, msg) => log('warn', srcMod, srcFun, msg)
-export const logI = (srcMod, srcFun, msg) => log('info', srcMod, srcFun, msg)
-export const logV = (srcMod, srcFun, msg) => log('verbose', srcMod, srcFun, msg)
-export const logD = (srcMod, srcFun, msg) => log('debug', srcMod, srcFun, msg)
+export const logE = (srcMod, srcFun, msg) => logLine('error', srcMod, srcFun, msg)
+export const logW = (srcMod, srcFun, msg) => logLine('warn', srcMod, srcFun, msg)
+export const logI = (srcMod, srcFun, msg) => logLine('info', srcMod, srcFun, msg)
+export const logV = (srcMod, srcFun, msg) => logLine('verbose', srcMod, srcFun, msg)
+export const logD = (srcMod, srcFun, msg) => logLine('debug', srcMod, srcFun, msg)
 
 export const logT = (srcMod, srcFun, msg) =>
-  getLogLevel() === ERR_LEVEL_TRACE ? log('debug', srcMod, srcFun, msg) : () => null
+  getLogLevel() === ERR_LEVEL_TRACE ? logLine('debug', srcMod, srcFun, msg) : () => null
 
 // ------------------------------------------------------------------------------------------------
 // Syslog functions

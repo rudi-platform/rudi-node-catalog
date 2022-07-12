@@ -11,36 +11,6 @@ import mongoose from 'mongoose'
 
 import _ from 'lodash'
 const { omit, pick } = _
-
-// ------------------------------------------------------------------------------------------------
-// Internal dependencies
-// ------------------------------------------------------------------------------------------------
-import { logD, logI, logMetadata, logT, logV, logW } from '../utils/logging.mjs'
-import {
-  contactDeleted,
-  contactUpdated,
-  metadataNotFound,
-  missingObjectProperty,
-  objectNotFound,
-  objectTypeNotFound,
-  organizationDeleted,
-  organizationNotFound,
-  organizationUpdated,
-  parameterExpected,
-  parameterTypeExpected,
-} from '../utils/msg.mjs'
-
-import { accessProperty } from '../utils/jsonAccess.mjs'
-import { beautify, deepClone, isEmptyArray, listPick } from '../utils/jsUtils.mjs'
-
-import {
-  ParameterExpectedError,
-  NotFoundError,
-  ObjectNotFoundError,
-  NotImplementedError,
-  BadRequestError,
-  RudiError,
-} from '../utils/errors.mjs'
 // ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
@@ -102,6 +72,36 @@ import {
 } from './dbFields.mjs'
 
 // ------------------------------------------------------------------------------------------------
+// Internal dependencies
+// ------------------------------------------------------------------------------------------------
+import { beautify, deepClone, isEmptyArray, listPick } from '../utils/jsUtils.mjs'
+import { logD, logI, logMetadata, logT, logV, logW } from '../utils/logging.mjs'
+import {
+  contactDeleted,
+  contactUpdated,
+  metadataNotFound,
+  missingObjectProperty,
+  objectNotFound,
+  objectTypeNotFound,
+  organizationDeleted,
+  organizationNotFound,
+  organizationUpdated,
+  parameterExpected,
+  parameterTypeExpected,
+} from '../utils/msg.mjs'
+
+import { accessProperty } from '../utils/jsonAccess.mjs'
+
+import {
+  ParameterExpectedError,
+  NotFoundError,
+  ObjectNotFoundError,
+  NotImplementedError,
+  BadRequestError,
+  RudiError,
+} from '../utils/errors.mjs'
+
+// ------------------------------------------------------------------------------------------------
 // Data models
 // ------------------------------------------------------------------------------------------------
 import SkosScheme from '../definitions/models/SkosScheme.mjs'
@@ -114,17 +114,14 @@ import { Contact } from '../definitions/models/Contact.mjs'
 import { Media } from '../definitions/models/Media.mjs'
 
 import { Metadata, METADATA_FIELDS_TO_POPULATE } from '../definitions/models/Metadata.mjs'
-import('../definitions/models/Metadata.mjs').then((METADATA_FIELDS_TO_POPULATE) =>
-  logD(mod, 'ok', METADATA_FIELDS_TO_POPULATE)
-)
 
 import { Report } from '../definitions/models/Report.mjs'
+import { PublicKey } from '../definitions/models/PublicKey.mjs'
 
 // ------------------------------------------------------------------------------------------------
 // Other internal dependencies
 // ------------------------------------------------------------------------------------------------
 import { dropCollection, makeSearchable } from './dbActions.mjs'
-import PublicKey from '../definitions/models/PublicKey.mjs'
 
 // ------------------------------------------------------------------------------------------------
 // Properties with special treatments

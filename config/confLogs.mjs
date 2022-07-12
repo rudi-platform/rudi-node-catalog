@@ -25,6 +25,7 @@ Object.assign(
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
+import { getGitHash, getAppOptions, OPT_NODE_ENV } from './appOptions.mjs'
 import { consoleLog, consoleErr, LOG_DATE_FORMAT } from '../utils/jsUtils.mjs'
 import {
   getAppName,
@@ -32,7 +33,6 @@ import {
   shouldControlPrivateRequests,
   shouldControlPublicRequests,
 } from './confSystem.mjs'
-import { getGitHash, getAppOptions, OPT_NODE_ENV } from './appOptions.mjs'
 
 // ------------------------------------------------------------------------------------------------
 // Reading conf file
@@ -231,7 +231,7 @@ if (SHOULD_FILELOG) {
   // )
 }
 
-export const logger = winston.createLogger(loggerOpts)
+export const wConsoleLogger = winston.createLogger(loggerOpts)
 
 // ------------------------------------------------------------------------------------------------
 // Winston logger creation : logger for errors caught only on Fastify level (should be obsolete)

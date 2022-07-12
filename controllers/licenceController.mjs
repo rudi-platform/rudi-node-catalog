@@ -4,30 +4,34 @@ const mod = 'licenceCtrl'
 // External dependencies
 // ------------------------------------------------------------------------------------------------
 import { v4 as uuid } from 'uuid'
-import { readFileSync } from 'fs'
+// ------------------------------------------------------------------------------------------------
+// Constants
+// ------------------------------------------------------------------------------------------------
+import { OBJ_LICENCES } from '../config/confApi.mjs'
+import { API_SKOS_CONCEPT_CODE, LICENCE_CONCEPT_ROLE, API_LICENCE_LABEL } from '../db/dbFields.mjs'
 
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
 import { isEmptyArray } from '../utils/jsUtils.mjs'
 import { logD, logT } from '../utils/logging.mjs'
-import { cleanLicences, getAllConceptsWithRole, searchDbIdWithJson } from '../db/dbQueries.mjs'
-import { dbConceptListToRudiRecursive, newSkosScheme } from './skosController.mjs'
-
 import { InternalServerError, RudiError } from '../utils/errors.mjs'
+import { dbConceptListToRudiRecursive, newSkosScheme } from './skosController.mjs'
+import { cleanLicences, getAllConceptsWithRole, searchDbIdWithJson } from '../db/dbQueries.mjs'
 
-import { API_SKOS_CONCEPT_CODE, LICENCE_CONCEPT_ROLE, API_LICENCE_LABEL } from '../db/dbFields.mjs'
-import { OBJ_LICENCES } from '../config/confApi.mjs'
+import {
+  get as getLicenceCodeList,
+  setAll as setLicenceCodes,
+  initialize as initLicenceCodes,
+} from '../definitions/thesaurus/LicenceCodes.mjs'
 
-// ------------------------------------------------------------------------------------------------
-// Constants
-// ------------------------------------------------------------------------------------------------
+import licenceScheme from '../doc/api/licences.js'
 
 // ------------------------------------------------------------------------------------------------
 // Controller
 // ------------------------------------------------------------------------------------------------
 // Cache for licences
-let LICENCE_LIST, LICENCE_CODE_LIST
+let LICENCE_LIST
 
 export const getLicences = async () => {
   const fun = 'getLicenceList'
@@ -52,12 +56,12 @@ export const getLicenceCodes = async () => {
   const fun = `getLicenceCodes`
   try {
     logT(mod, fun, ``)
-    if (!LICENCE_CODE_LIST) {
+    if (getLicenceCodeList().length === 0) {
       const licenceList = await getLicences()
       const licenceCodeList = licenceList.map((obj) => obj[API_SKOS_CONCEPT_CODE])
-      LICENCE_CODE_LIST = licenceCodeList.sort()
+      setLicenceCodes(licenceCodeList.sort())
     }
-    return LICENCE_CODE_LIST
+    return getLicenceCodeList()
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -67,14 +71,17 @@ export const initializeLicences = async () => {
   const fun = 'initializeLicences'
   try {
     await cleanLicences()
-    LICENCE_CODE_LIST = null
-    logD(mod, fun, `Licences initialized`)
-    const licenceStr = JSON.stringify(readFileSync('../doc/api/licences.json'))
+    initLicenceCodes()
+    logD(mod, fun, `Licences erased`)
+    const licenceStr = JSON.stringify(licenceScheme)
     const licenceData = JSON.parse(licenceStr.replace(/\{\{\w+\}\}/g, () => uuid()))
-    // logD(mod, fun, licenceData)
     const reply = await newSkosScheme(licenceData)
     if (!reply) throw new InternalServerError(`Licence integration failed`)
-    return await getLicenceCodes()
+
+    const newLicenceCodeList = await getLicenceCodes()
+    setLicenceCodes(newLicenceCodeList.sort())
+    logD(mod, fun, `Licences initialized`)
+    return getLicenceCodeList()
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }

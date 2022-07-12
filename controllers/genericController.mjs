@@ -14,49 +14,6 @@ import _ from 'lodash'
 const { pick } = _
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependencies
-// ------------------------------------------------------------------------------------------------
-import { logD, logE, logI, logMetadata, logT, logW } from '../utils/logging.mjs'
-import {
-  objectAdded,
-  objectAlreadyExists,
-  objectNotDeletedBecauseUsed,
-  objectTypeNotFound,
-} from '../utils/msg.mjs'
-
-import { accessProperty, accessReqParam } from '../utils/jsonAccess.mjs'
-
-import {
-  beautify,
-  nowISO,
-  isNotEmptyArray,
-  isEmptyObject,
-  isEmptyArray,
-} from '../utils/jsUtils.mjs'
-
-import {
-  NotFoundError,
-  ForbiddenError,
-  ObjectNotFoundError,
-  BadRequestError,
-  ParameterExpectedError,
-  RudiError,
-} from '../utils/errors.mjs'
-
-import { CallContext } from '../definitions/constructors/callContext.mjs'
-
-// ------------------------------------------------------------------------------------------------
-// Specific controllers
-// ------------------------------------------------------------------------------------------------
-import { newMetadata, overwriteMetadata } from './metadataController.mjs'
-import { newOrganization } from './organizationController.mjs'
-import { newContact } from './contactController.mjs'
-import { newSkosConcept, newSkosScheme, widenSearch } from './skosController.mjs'
-import { newPublicKey, overwritePubKey } from './publicKeyController.mjs'
-
-import { deletePortalMetadata } from './portalController.mjs'
-
-// ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
 import {
@@ -137,11 +94,13 @@ import {
   getModelPropertyNames,
   getNestedObject,
   getObjectIdField,
+  getObjectList as getDbObjectList,
   getObjectModel,
   getRudiObjectList,
   groupObjectList,
   isReferencedInMetadata,
   overwriteObject,
+  searchObjects as searchDbObjects,
 } from '../db/dbQueries.mjs'
 
 const QUERY_RESERVED_WORDS = [
@@ -164,6 +123,49 @@ const EXT_REFS = 'external_references' // External references needing aggregatio
 const EXT_OBJ = 'refObj'
 const EXT_OBJ_PROP = 'refObjProp'
 const EXT_OBJ_VAL = 'refObjVal'
+
+// ------------------------------------------------------------------------------------------------
+// Internal dependencies
+// ------------------------------------------------------------------------------------------------
+import { logD, logE, logI, logMetadata, logT, logW } from '../utils/logging.mjs'
+import {
+  objectAdded,
+  objectAlreadyExists,
+  objectNotDeletedBecauseUsed,
+  objectTypeNotFound,
+} from '../utils/msg.mjs'
+
+import { accessProperty, accessReqParam } from '../utils/jsonAccess.mjs'
+
+import {
+  beautify,
+  nowISO,
+  isNotEmptyArray,
+  isEmptyObject,
+  isEmptyArray,
+} from '../utils/jsUtils.mjs'
+
+import {
+  NotFoundError,
+  ForbiddenError,
+  ObjectNotFoundError,
+  BadRequestError,
+  ParameterExpectedError,
+  RudiError,
+} from '../utils/errors.mjs'
+
+import { CallContext } from '../definitions/constructors/callContext.mjs'
+
+// ------------------------------------------------------------------------------------------------
+// Specific controllers
+// ------------------------------------------------------------------------------------------------
+import { newMetadata, overwriteMetadata } from './metadataController.mjs'
+import { newOrganization } from './organizationController.mjs'
+import { newContact } from './contactController.mjs'
+import { newSkosConcept, newSkosScheme, widenSearch } from './skosController.mjs'
+import { newPublicKey, overwritePubKey } from './publicKeyController.mjs'
+
+import { deletePortalMetadata } from './portalController.mjs'
 
 // ------------------------------------------------------------------------------------------------
 // Specific object type helper functions
@@ -462,19 +464,23 @@ export const parseQueryParameters = async (objectType, fullUrl) => {
 
 function getObjectParam(req) {
   const fun = 'getObjectParam'
-  const objectType = accessReqParam(req, PARAM_OBJECT)
   try {
-    checkIsUrlObject(objectType)
+    const objectType = accessReqParam(req, PARAM_OBJECT)
+    try {
+      checkIsUrlObject(objectType)
+    } catch (err) {
+      const error = new NotFoundError(`Route '${req.method} ${req.url}' not found `)
+      throw RudiError.treatError(mod, fun, error)
+    }
+    return objectType
   } catch (err) {
-    const error = new NotFoundError(`Route '${req.method} ${req.url}' not found `)
-    throw RudiError.treatError(mod, fun, error)
+    throw RudiError.treatError(mod, fun, err)
   }
-  return objectType
 }
 
 function checkIsUrlObject(objectType) {
-  // const fun = 'checkIsUrlObject'
-  // logD(mod, fun, beautify(URL_OBJECTS))
+  const fun = 'checkIsUrlObject'
+  logT(mod, fun, beautify(URL_OBJECTS))
   if (URL_OBJECTS.indexOf(objectType) === -1)
     throw new NotFoundError(objectTypeNotFound(objectType))
 }
@@ -619,6 +625,7 @@ export const getObjectList = async (req, reply) => {
   try {
     logT(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}`)
     // retrieve url parameter: object type
+    // logD(mod, fun, beautify(req))
     const objectType = getObjectParam(req)
 
     return await getManyObjects(objectType, req, reply)
@@ -671,7 +678,7 @@ export const searchObjects = async (req, reply) => {
       logD(mod, fun, `extendedSearchTerms: ${extendedSearchTerms}`)
       options[QUERY_SEARCH_TERMS].push(extendedSearchTerms)
     }
-    const objectList = await searchObjects(objectType, options)
+    const objectList = await searchDbObjects(objectType, options)
 
     // return the object
 
@@ -730,7 +737,7 @@ export const getManyObjects = async (objectType, req) => {
         QUERY_FILTER,
         QUERY_FIELDS,
       ])
-      objectList = await getObjectList(objectType, options)
+      objectList = await getDbObjectList(objectType, options)
     } else if (groupBy) {
       if (countBy) {
         const msg = `'${QUERY_GROUP_BY}' parameter found, '${QUERY_COUNT_BY}' is redondant and ignored`

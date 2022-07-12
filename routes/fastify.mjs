@@ -1,15 +1,29 @@
 const mod = 'fastify'
 
 // ------------------------------------------------------------------------------------------------
+// Constants
+// ------------------------------------------------------------------------------------------------
+import { STATUS_CODE, ROUTE_NAME } from '../config/confApi.mjs'
+
+// ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
 import { padA1, nowEpochMs, beautify } from '../utils/jsUtils.mjs'
 import { shouldControlPrivateRequests, shouldControlPublicRequests } from '../config/confSystem.mjs'
 import { initFFLogger, shouldShowErrorPile, shouldShowRoutes } from '../config/confLogs.mjs'
 import { JWT_USER } from '../config/confPortal.mjs'
-import { logE, logT, logV, logW, sysCrit, sysNotice, sysOnError } from '../utils/logging.mjs'
 
-import { STATUS_CODE, ROUTE_NAME } from '../config/confApi.mjs'
+import {
+  logLine,
+  logE,
+  logT,
+  logV,
+  logW,
+  sysCrit,
+  sysNotice,
+  sysOnError,
+} from '../utils/logging.mjs'
+
 import { JWT_SUB, JWT_CLIENT } from '../utils/crypto.mjs'
 
 import { RudiError } from '../utils/errors.mjs'
@@ -22,6 +36,7 @@ import {
   devRoutes,
   unrestrictedPrivateRoutes,
 } from './routes.mjs'
+
 import { checkRudiProdPermission } from '../controllers/tokenController.mjs'
 import { checkPortalTokenInHeader } from '../controllers/portalController.mjs'
 import { getUrlMaxLength } from '../utils/protection.mjs'
@@ -315,7 +330,7 @@ function declareRouteGroup(routeGroup, preHandler, routeGroupName, logLevel) {
       route.preHandler = preHandler
       fastifyConf.route(route)
       if (shouldShowRoutes())
-        log[logLevel](routeGroupName, 'routes', `${padA1(index)}: ${route.method} ${route.url}`)
+        logLine(logLevel, routeGroupName, 'routes', `${padA1(index)}: ${route.method} ${route.url}`)
     })
   } catch (err) {
     RudiError.treatError(mod, 'declareRouteGroup', err)
@@ -327,9 +342,11 @@ function declareRouteGroup(routeGroup, preHandler, routeGroupName, logLevel) {
  */
 export const declareRoutes = () => {
   // declareRouteGroup(redirectRoutes, onPortalRoute, 'Redirect', 'd')
-  declareRouteGroup(publicRoutes, onPublicRoute, 'Public', 'i')
-  declareRouteGroup(portalRoutes, onPortalRoute, 'Portal', 'v')
-  declareRouteGroup(unrestrictedPrivateRoutes, onUnrestrictedPrivateRoute, 'Unrestricted', 'i')
-  declareRouteGroup(backOfficeRoutes, onPrivateRoute, 'Private', 'd')
-  declareRouteGroup(devRoutes, onPrivateRoute, 'Dev', 'v')
+  declareRouteGroup(publicRoutes, onPublicRoute, 'Public', 'info')
+  declareRouteGroup(portalRoutes, onPortalRoute, 'Portal', 'verbose')
+  declareRouteGroup(unrestrictedPrivateRoutes, onUnrestrictedPrivateRoute, 'Unrestricted', 'info')
+  declareRouteGroup(backOfficeRoutes, onPrivateRoute, 'Private', 'debug')
+  declareRouteGroup(devRoutes, onPrivateRoute, 'Dev', 'verbose')
 }
+
+declareRoutes()

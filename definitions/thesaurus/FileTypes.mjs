@@ -1,11 +1,11 @@
-const mod = 'ftypThes'
+const mod = 'fTypThes'
 
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
 import { logW } from '../../utils/logging.mjs'
-import { BadRequestError, RudiError } from '../../utils/errors.mjs'
 import { parameterExpected } from '../../utils/msg.mjs'
+import { BadRequestError, RudiError } from '../../utils/errors.mjs'
 
 // ------------------------------------------------------------------------------------------------
 // Custom schema definition

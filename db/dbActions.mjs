@@ -4,19 +4,20 @@ const mod = 'dbAct'
 // External dependencies
 // ------------------------------------------------------------------------------------------------
 import mongoose from 'mongoose'
-
-// ------------------------------------------------------------------------------------------------
-// Internal dependencies
-// ------------------------------------------------------------------------------------------------
-import { beautify } from '../utils/jsUtils.mjs'
-import { RudiError } from '../utils/errors.mjs'
-import { LogEntry } from '../definitions/models/LogEntry.mjs'
+const { connection } = mongoose
 
 // ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
 import { DICT_LANG } from './dbFields.mjs'
+
+// ------------------------------------------------------------------------------------------------
+// Internal dependencies
+// ------------------------------------------------------------------------------------------------
+import { beautify } from '../utils/jsUtils.mjs'
+import { LogEntry } from '../definitions/models/LogEntry.mjs'
 import { logD, logT, logV, logW } from '../utils/logging.mjs'
+import { RudiError } from '../utils/errors.mjs'
 
 // ------------------------------------------------------------------------------------------------
 // Actions on DB tables
@@ -24,7 +25,7 @@ import { logD, logT, logV, logW } from '../utils/logging.mjs'
 export const getCollections = async () => {
   const fun = `getCollections`
   try {
-    const collections = await mongoose.connection.listCollections().toArray()
+    const collections = await connection.db.listCollections().toArray()
     collections.map((collection) => collection.name)
     return collections
   } catch (err) {
@@ -37,7 +38,7 @@ export const dropDB = async (req, reply) => {
   try {
     logT(mod, fun, ``)
     /* Drop the whole DB !!! */
-    // const dbActionResult = await mongoose.connection.dropDatabase()
+    // const dbActionResult = await connection.db.dropDatabase()
     // logD(mod, fun, 'DB dropped')
 
     const logsCollection =
@@ -45,7 +46,7 @@ export const dropDB = async (req, reply) => {
         ? LogEntry.collection.name
         : 'logentries'
 
-    const listCollections = await mongoose.connection.listCollections().toArray()
+    const listCollections = await connection.db.listCollections().toArray()
     // logD(mod, fun, `listCollections: ${utils.beautify(listCollections)}`)
     logD(mod, fun, `listCollections: ${beautify(listCollections)}`)
 
@@ -55,7 +56,7 @@ export const dropDB = async (req, reply) => {
         if (!collection) logD(mod, fun, `Weird: ${beautify(collection)}`)
         if (collection.name !== logsCollection) {
           logD(mod, fun, `dropping '${collection.name}'`)
-          mongoose.connection.dropCollection(collection.name)
+          connection.db.dropCollection(collection.name)
           collectionDropped[collection.name] = true
         }
       })
@@ -69,13 +70,13 @@ export const dropDB = async (req, reply) => {
 export const dropCollection = async (collectionName) => {
   const fun = `dropCollection`
   try {
-    const listCollections = await mongoose.connection.listCollections().toArray()
+    const listCollections = await connection.db.listCollections().toArray()
     // logD(mod, fun, `listCollections: ${utils.beautify(listCollections)}`)
     let isCollectionDropped = false
     await Promise.all(
       listCollections.map(async (collection) => {
         if (collection.name === collectionName) {
-          mongoose.connection.dropCollection(collectionName)
+          connection.db.dropCollection(collectionName)
           isCollectionDropped = true
           return isCollectionDropped
         }

@@ -6,20 +6,20 @@ const mod = 'custErr'
 import { nanoid } from 'nanoid'
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependencies
-// ------------------------------------------------------------------------------------------------
-import { beautify } from './jsUtils.mjs'
-import { objectNotFound, parameterExpected } from './msg.mjs'
-
-// ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
-import { TRACE, STATUS_CODE, TRACE_MOD, TRACE_FUN, TRACE_ERR } from '../config/confApi.mjs'
-import { logD, logT, logW } from './logging.mjs'
-
 const DEFAULT_MESSAGE = 'Rudi producer node - API Server Error'
 const IS_RUDI_ERROR = 'is_rudi_error'
 const ERR_ID = 'errId'
+
+import { TRACE, STATUS_CODE, TRACE_MOD, TRACE_FUN, TRACE_ERR } from '../config/confApi.mjs'
+
+// ------------------------------------------------------------------------------------------------
+// Internal dependencies
+// ------------------------------------------------------------------------------------------------
+import { beautify } from './jsUtils.mjs'
+import { logD, logT, logW } from './logging.mjs'
+import { objectNotFound, parameterExpected } from './msg.mjs'
 
 // ------------------------------------------------------------------------------------------------
 // Helper functions

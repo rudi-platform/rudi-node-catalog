@@ -4,13 +4,6 @@ const mod = 'sysConf'
 // ------------------------------------------------------------------------------------------------
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependecies
-// ------------------------------------------------------------------------------------------------
-import { readIniFile } from '../utils/fileActions.mjs'
-import { consoleLog, consoleErr, quietAccess, NOT_FOUND } from '../utils/jsUtils.mjs'
-// utils.separateLogs()
-
-// ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
 import {
@@ -21,6 +14,13 @@ import {
   OPT_SERVER_URL,
 } from './appOptions.mjs'
 import { TRACE, TRACE_MOD, TRACE_FUN, TRACE_ERR } from './confApi.mjs'
+
+// ------------------------------------------------------------------------------------------------
+// Internal dependecies
+// ------------------------------------------------------------------------------------------------
+import { consoleLog, consoleErr, quietAccess, NOT_FOUND } from '../utils/jsUtils.mjs'
+import { readIniFile } from '../utils/fileActions.mjs'
+// utils.separateLogs()
 
 // ------------------------------------------------------------------------------------------------
 // Constants: local ini file configuration settings

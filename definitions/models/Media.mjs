@@ -13,27 +13,6 @@ import _ from 'lodash'
 const { omit } = _
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependencies
-// ------------------------------------------------------------------------------------------------
-import { isNotEmptyObject } from '../../utils/jsUtils.mjs'
-import { logD, logW } from '../../utils/logging.mjs'
-import { missingField } from '../../utils/msg.mjs'
-
-import { BadRequestError, RudiError } from '../../utils/errors.mjs'
-import { makeSearchable } from '../../db/dbActions.mjs'
-
-import { UUIDv4 } from '../schemas/Identifiers.mjs'
-
-import { get as getEncodings } from '../thesaurus/Encodings.mjs'
-
-import { get as getFileTypes } from '../thesaurus/FileTypes.mjs'
-import { get as getHashAlgorithms } from '../thesaurus/HashAlgorithms.mjs'
-
-import ReferenceDatesSchema from '../schemas/ReferenceDates.mjs'
-import { ConnectorParameter } from '../schemas/ConnectorParameters.mjs'
-import { VALID_URI } from '../schemaValidators.mjs'
-
-// ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
 import {
@@ -55,13 +34,35 @@ import {
   API_MEDIA_DATES,
   API_MEDIA_URL_VISUAL,
 } from '../../db/dbFields.mjs'
+
+// ------------------------------------------------------------------------------------------------
+// Internal dependencies
+// ------------------------------------------------------------------------------------------------
+import ReferenceDatesSchema from '../schemas/ReferenceDates.mjs'
+import { ConnectorParameter } from '../schemas/ConnectorParameters.mjs'
+
+import { VALID_URI } from '../schemaValidators.mjs'
+import { UUIDv4 } from '../schemas/Identifiers.mjs'
+import { isNotEmptyObject } from '../../utils/jsUtils.mjs'
+import { logD, logW } from '../../utils/logging.mjs'
+import { missingField } from '../../utils/msg.mjs'
+import { BadRequestError, RudiError } from '../../utils/errors.mjs'
+import { makeSearchable } from '../../db/dbActions.mjs'
+
+import { get as getEncodings } from '../thesaurus/Encodings.mjs'
+import { get as getFileTypes } from '../thesaurus/FileTypes.mjs'
+import { get as getHashAlgorithms } from '../thesaurus/HashAlgorithms.mjs'
+
+// ------------------------------------------------------------------------------------------------
+// Media constants
+// ------------------------------------------------------------------------------------------------
 export const MediaTypes = {
   File: 'FILE',
   Series: 'SERIES',
   Service: 'SERVICE',
 }
 
-const UpdateStatus = [
+export const UpdateStatus = [
   'modified', // the data is in the process of being created but still incomplete
   'updated', // the data is up to date
   'historical', // ancient data that has been updated

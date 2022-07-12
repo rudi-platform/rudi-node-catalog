@@ -1,6 +1,4 @@
-import { logW } from '../utils/logging.mjs'
-
-const mod = 'valid'
+// const mod = 'valid'
 
 // ------------------------------------------------------------------------------------------------
 // Internal dependecies
@@ -14,7 +12,7 @@ const mod = 'valid'
 // Generic functions
 // ------------------------------------------------------------------------------------------------
 export const validateSchema = (schemaStr, regExPattern) => {
-  return schemaStr.match(new RegExp(regExPattern))
+  return !!schemaStr.match(new RegExp(regExPattern))
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -38,15 +36,8 @@ export const VALID_EPOCH_S = [EPOCH_S, `'{VALUE}' is not a valid Epoch time in s
 export const REGEX_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 export const VALID_UUID = [REGEX_UUID, `'{VALUE}' is not a valid UUID v4`]
 
-export const isUUID = (id) => {
-  const fun = 'isUUID'
-  try {
-    return validateSchema(id, REGEX_UUID)
-  } catch (err) {
-    logW(mod, fun, err)
-    return false
-  }
-}
+export const isUUID = (id) => validateSchema(id, REGEX_UUID)
+
 // ------------------------------------------------------------------------------------------------
 // DOI
 // ------------------------------------------------------------------------------------------------
