@@ -78,6 +78,9 @@ exports.API_END_DATE_PROPERTY = 'end_date'
 // Metadata properties: access condition / licence
 // ------------------------------------------------------------------------------------------------
 exports.API_ACCESS_CONDITION = 'access_condition'
+exports.API_CONFIDENTIALITY = 'confidentiality'
+exports.API_RESTRICTED_ACCESS = 'restricted_access'
+
 exports.API_LICENCE = 'licence'
 exports.API_LICENCE_TYPE = 'licence_type'
 exports.API_LICENCE_LABEL = 'licence_label'

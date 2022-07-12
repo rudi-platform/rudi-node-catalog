@@ -124,6 +124,8 @@ const {
   API_METAINFO_SOURCE_PROPERTY,
   API_MEDIA_TYPE,
   API_FILE_MIME,
+  API_CONFIDENTIALITY,
+  API_RESTRICTED_ACCESS,
 } = require('../../db/dbFields')
 const { MediaTypes } = require('./Media')
 const { FileTypes, MIME_YAML_ALT, MIME_YAML } = require('../thesaurus/FileTypes')
@@ -396,13 +398,13 @@ const MetadataSchema = new mongoose.Schema(
       validate: validObjectNotEmpty,
       type: {
         /** Restriction level for the resource */
-        confidentiality: {
+        [API_CONFIDENTIALITY]: {
           /**
            * If the dataset has a restricted access, this string is the name of
            * the target ('s public key)
            * Empty for open data
            * */
-          restricted_access: {
+          [API_RESTRICTED_ACCESS]: {
             type: String,
             default: undefined,
           },
