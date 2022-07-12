@@ -34,8 +34,7 @@
 #
 # [1.3.0]
 #   - Added 'MediaService' type of Media, to be able to serve geoserver files
-#     or other AIP/webservices. A link towards the API documentation can be
-#     indicated in the 'api_documentation_url' property.
+#     or other API/webservices
 #   - Added to 'Media' the following properties:
 #       - 'media_caption' (description),
 #       - 'media_dates' (dates of the creation / last update of the Media),
@@ -51,6 +50,7 @@
 #   - Added 'expires' to the Dates to signal a date after which the data /
 #     metadata may not be available or relevant anymore
 #   - Added MediaTypes '+crypt' for encrypted files
+#   - Added a new MIME type 'text/x-yaml' for .yaml / .yml files
 #
 #•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
 openapi: 3.0.0
@@ -61,7 +61,7 @@ info:
   termsOfService: 'no'
   contact:
     name: Olivier Martineau
-    email: community@rudi-univ-rennes1.fr
+    email: 'community@rudi-univ-rennes1.fr'
   license:
     name: EUPL 1.2
     url: https://eupl.eu/1.2/fr
@@ -527,7 +527,7 @@ components:
               description: Cartographic projection used in the data.
                 EPSG codes highly recommended.
               type: string
-              default: 'WGS 84'
+              default: 'WGS 84 (EPSG:4326)'
               example:
                 'WGS 84 (EPSG:4326)'
                 # 'RGF93/Lambert-93 (EPSG:2154)'
@@ -551,9 +551,9 @@ components:
         #——————————————————————————
         'dataset_dates':
           allOf:
+            - $ref: '#/components/schemas/ReferenceDates'
             - description: Dates of the actions performed on the data (creation, publishing, update, deletion...)
               type: object
-            - $ref: '#/components/schemas/ReferenceDates'
 
         #——————————————————————————
         'storage_status':
@@ -593,10 +593,6 @@ components:
                 'gdpr_sensitive':
                   description: >
                     True if the dataset embeds personal data
-                  type: boolean
-                'encrypted':
-                  description: >
-                    True if the dataset is encrypted
                   type: boolean
             #......................
             'licence':
@@ -663,9 +659,9 @@ components:
             #......................
             'metadata_provider':
               allOf:
+                - $ref: '#/components/schemas/Organization'
                 - description: Description of the organization that produced the metadata
                   type: object
-                - $ref: '#/components/schemas/Organization'
             #......................
             'metadata_contacts':
               description: Addresses to get further information on the metadata
@@ -676,7 +672,7 @@ components:
             'metadata_source':
               description: URI of the initial metadata
               type: string
-              format: URI
+              format: uri
 
     #---------------------------------------------------------------------------
     'Organization': # Organization
@@ -703,7 +699,16 @@ components:
         #——————————————————————————
         'organization_coordinates':
           description: GPS coordinates in EPSG:4326/WGS 84 coordinates
-          type: string
+          type: object
+          properties:
+            'latitude':
+              type: number
+              minimum: -90
+              maximum: 90
+            'longitude':
+              type: number
+              minimum: -180
+              maximum: 180
         #——————————————————————————
         'organization_caption':
           description: >
@@ -744,7 +749,7 @@ components:
           example: Administrator
         #——————————————————————————
         'contact_summary':
-          description: Updated status of the contact person
+          description: Description of the contact person
           type: string
         #——————————————————————————
         'email':
@@ -786,7 +791,7 @@ components:
             'licence_label':
               description: Value of the field SkosConcept.concept_code
               type: string
-              format: skosConceptCode
+              # format: skosConceptCode
 
       #---------------------------------------------------------------------------
     'LicenceCustom':
@@ -806,7 +811,7 @@ components:
             'custom_licence_uri':
               description: URL towards the custom licence
               type: string
-              format: URI
+              format: uri
 
     #---------------------------------------------------------------------------
     'Media':
@@ -828,17 +833,17 @@ components:
           format: uuid
         #——————————————————————————
         'media_name':
-          type: string
           description: Name of the Media
+          type: string
         #——————————————————————————
         'media_caption':
-          type: string
           description: Description of the Media
+          type: string
         #——————————————————————————
         'media_visual':
-          type: string
-          format: URI
           description: Link towards a (low-fidelity) visualization of the Media
+          type: string
+          format: uri
         #——————————————————————————
         'media_dates':
           allOf:
@@ -852,8 +857,8 @@ components:
         propertyName: media_type
         mapping:
           'FILE': '#/components/schemas/MediaFile'
+          'SERVICE': '#/components/schemas/MediaService'
           'SERIES': '#/components/schemas/MediaSeries'
-          'SERVICES': '#/components/schemas/MediaService'
 
     #---------------------------------------------------------------------------
     'MediaService':
@@ -861,6 +866,11 @@ components:
         - $ref: '#/components/schemas/Media'
         - description: Link to a service
           type: object
+          properties:
+            'api_documentation_url':
+              description: Link towards the resource that describes the structure of the API
+              type: string
+              format: uri
 
     #---------------------------------------------------------------------------
     'MediaFile':
@@ -886,7 +896,7 @@ components:
               format: int64
             #——————————————————————————
             'checksum':
-              description: Hash that makes it possible to check the a file intergrity
+              description: Hash that makes it possible to check the file intergrity
                 (determined automatically)
               type: object
               required:
@@ -903,7 +913,7 @@ components:
                 Link towards the resource that describes the structure of the data
                 (language, norm, data structure, JSON schema, OpenAPI, etc.)
               type: string
-              format: URI
+              format: uri
               #'URI definition - https://tools.ietf.org/html/rfc2396'
             #——————————————————————————
             'file_encoding':
@@ -981,7 +991,7 @@ components:
         #——————————————————————————
         'url':
           type: string
-          format: URI
+          format: uri
         #——————————————————————————
         'interface_contract':
           description: Protocol to access the resource through the URL
@@ -1013,6 +1023,7 @@ components:
                 type: array
                 items:
                   type: object
+
     #---------------------------------------------------------------------------
     'IntegrationError':
       required:
@@ -1049,17 +1060,15 @@ components:
         #——————————————————————————
         'submission_date':
           allOf:
-            - description: >
-                Date when the integration request was submitted by the 
-                Producer node
-              type: string
             - $ref: '#/components/schemas/Date'
+            - description: Date when the integration request was submitted by the Producer node
+              type: string
         #——————————————————————————
         'treatment_date':
           allOf:
+            - $ref: '#/components/schemas/Date'
             - description: Date when the integration request was processed by the Portal
               type: string
-            - $ref: '#/components/schemas/Date'
         #——————————————————————————
         'method':
           description: Method used by the Producer node for the integration request
@@ -1232,7 +1241,7 @@ components:
 
     #---------------------------------------------------------------------------
     'ReferenceDates':
-      description: 'Dates of the ac tions on the data'
+      description: 'Dates of the actions on the data'
       type: object
       required:
         - created
@@ -1246,9 +1255,9 @@ components:
           $ref: '#/components/schemas/Date'
         'updated':
           $ref: '#/components/schemas/Date'
-        'deleted':
-          $ref: '#/components/schemas/Date'
         'expires':
+          $ref: '#/components/schemas/Date'
+        'deleted':
           $ref: '#/components/schemas/Date'
 
     #---------------------------------------------------------------------------
@@ -1397,10 +1406,10 @@ components:
         #——————————————————————————
         'of_scheme':
           allOf:
+            - $ref: '#/components/schemas/SkosScheme'
             - description: >
                 Reference to the constrained vocabulary, thesaurus or classification scheme
               type: object
-            - $ref: '#/components/schemas/SkosScheme'
         #——————————————————————————
         'concept_role':
           description: >
@@ -1481,7 +1490,40 @@ components:
       type: string
       pattern: '^[a-z]{2}(-[A-Z]{2})?$'
       enum:
-        ['cs', 'da', 'de', 'en', 'el', 'es', 'fr', 'hu', 'it', 'no', 'pl', 'pt', 'ro', 'ru', 'sk']
+        [
+          'cs-CZ',
+          'da-DK',
+          'de-CH',
+          'de-DE',
+          'en-GB',
+          'en-US',
+          'el-GR',
+          'es-ES',
+          'fr-FR',
+          'hu-HU',
+          'it-IT',
+          'no-NO',
+          'pl-PL',
+          'pt-PT',
+          'ro-RO',
+          'ru-RU',
+          'sk-SK',
+          'cs',
+          'da',
+          'de',
+          'en',
+          'el',
+          'es',
+          'fr',
+          'hu',
+          'it',
+          'no',
+          'pl',
+          'pt',
+          'ro',
+          'ru',
+          'sk',
+        ]
 
       # norm: https://www.rfc-editor.org/rfc/bcp/bcp47.txt
       # source for enum: https://app.swaggerhub.com/apis/nologo/thesaurus/1.0.0#/default/get_thesaurus_v1

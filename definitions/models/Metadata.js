@@ -398,12 +398,13 @@ const MetadataSchema = new mongoose.Schema(
         /** Restriction level for the resource */
         confidentiality: {
           /**
-           * True if the dataset has a restricted access.
-           * False for open data
+           * If the dataset has a restricted access, this string is the name of
+           * the target ('s public key)
+           * Empty for open data
            * */
           restricted_access: {
-            type: Boolean,
-            default: false,
+            type: String,
+            default: undefined,
           },
 
           /** True if the dataset embeds personal data */
