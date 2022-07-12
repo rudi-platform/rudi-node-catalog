@@ -51,11 +51,15 @@
 #     metadata may not be available or relevant anymore
 #   - Added MediaTypes '+crypt' for encrypted files
 #   - Added a new MIME type 'text/x-yaml' for .yaml / .yml files
+# [1.4.0]
+#   - Added 'ext_metadata' to be able to extend the current metadata with
+#     additional sub-parts, in particular 'ext_selfdata' to describe a
+#     dataset that contains personal (GDPR) information.
 #
 #•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
 openapi: 3.0.0
 info:
-  version: 1.3.0
+  version: 1.4.0
   title: Public API for RUDI producer node
   description: "API pour l'accès aux données au niveau du nœud producteur RUDI"
   termsOfService: 'no'
@@ -519,8 +523,7 @@ components:
                   minimum: -180
                   maximum: 180
             #......................
-            # Global geographic distribution of the data expressed in
-            # 'EPSG:4326/WGS 84' projection
+            # Global geographic distribution of the data expressed in 'EPSG:4326/WGS 84' projection
             'geographic_distribution':
               $ref: 'https://app.swaggerhub.com/apis/OlivierMartineau/GeoJSON/1.0.1'
             #......................
@@ -552,9 +555,9 @@ components:
         #——————————————————————————
         'dataset_dates':
           allOf:
+            - $ref: '#/components/schemas/ReferenceDates'
             - description: Dates of the actions performed on the data (creation, publishing, update, deletion...)
               type: object
-            - $ref: '#/components/schemas/ReferenceDates'
 
         #——————————————————————————
         'storage_status':
@@ -641,6 +644,7 @@ components:
               items:
                 $ref: '#/components/schemas/DictionaryEntry'
               example: [{ 'lang': 'fr', 'text': "Pas de restriction d'accès public" }]
+
         #—•—•—•—•—•—•—•—•—•—•—•—•—•
         # METADATA INFO
         #——————————————————————————
@@ -660,9 +664,9 @@ components:
             #......................
             'metadata_provider':
               allOf:
+                - $ref: '#/components/schemas/Organization'
                 - description: Description of the organization that produced the metadata
                   type: object
-                - $ref: '#/components/schemas/Organization'
             #......................
             'metadata_contacts':
               description: Addresses to get further information on the metadata
@@ -673,7 +677,33 @@ components:
             'metadata_source':
               description: URI of the initial metadata
               type: string
-              format: URI
+              format: uri
+
+        #—•—•—•—•—•—•—•—•—•—•—•—•—•
+        # EXTENDED METADATA
+        #——————————————————————————
+        'ext_metadata':
+          description: Extension of the metadata
+          type: object
+          properties:
+            'ext_selfdata':
+              description: Extension to deal with the declaration of "self-data". The format of the JSON object that describes the self-data is refenced bellow as "1.0.0self" and is described in an external OpenAPI document.
+              type: object
+              properties:
+                'ext_selfdata_connector':
+                  # Connector towards an encrypted media that contains the metadata extension as a JSON object in "1.0.0self" format.
+                  # This is stored on the Producer Node but not sent to the Portal.
+                  # A version of metadata that has such a field is referenced as "1.4.0int".
+                  # All "1.4.0int" metadata are set as readonly on the Producer Node UX.
+                  $ref: '#/components/schemas/Connector'
+
+                'ext_selfdata_content':
+                  # JSON object of the metadata in "1.0.0self" format that describes the self-data
+                  # This is sent to the Portal but not stored in the Producer Node.
+                  # A version of metadata that has such a field is referenced as "1.4.0ext".
+                  type:
+                    object
+                    # $ref: <externally described "1.0.0self" format>
 
     #---------------------------------------------------------------------------
     'Organization': # Organization
@@ -792,8 +822,18 @@ components:
             'licence_label':
               description: Value of the field SkosConcept.concept_code
               type: string
-              format: skosConceptCode
-
+              # format: skosConceptCode
+              # enum:
+              #   [
+              #     'apache-2.0',
+              #     'cc-by-nd-4.0',
+              #     'etalab-1.0',
+              #     'etalab-2.0',
+              #     'gpl-3.0',
+              #     'mit',
+              #     'odbl-1.0',
+              #     'public-domain-cc0',
+              #   ]
       #---------------------------------------------------------------------------
     'LicenceCustom':
       allOf:
@@ -812,7 +852,7 @@ components:
             'custom_licence_uri':
               description: URL towards the custom licence
               type: string
-              format: URI
+              format: uri
 
     #---------------------------------------------------------------------------
     'Media':
@@ -844,12 +884,12 @@ components:
         'media_visual':
           description: Link towards a (low-fidelity) visualization of the Media
           type: string
-          format: URI
+          format: uri
         #——————————————————————————
         'media_dates':
           allOf:
-            - description: Time of the creation / last update of the Media
             - $ref: '#/components/schemas/ReferenceDates'
+            - description: Time of the creation / last update of the Media
         #——————————————————————————
         'connector':
           $ref: '#/components/schemas/Connector'
@@ -871,7 +911,7 @@ components:
             'api_documentation_url':
               description: Link towards the resource that describes the structure of the API
               type: string
-              format: URI
+              format: uri
 
     #---------------------------------------------------------------------------
     'MediaFile':
@@ -914,7 +954,7 @@ components:
                 Link towards the resource that describes the structure of the data
                 (language, norm, data structure, JSON schema, OpenAPI, etc.)
               type: string
-              format: URI
+              format: uri
               #'URI definition - https://tools.ietf.org/html/rfc2396'
             #——————————————————————————
             'file_encoding':
@@ -992,7 +1032,7 @@ components:
         #——————————————————————————
         'url':
           type: string
-          format: URI
+          format: uri
         #——————————————————————————
         'interface_contract':
           description: Protocol to access the resource through the URL
@@ -1061,17 +1101,15 @@ components:
         #——————————————————————————
         'submission_date':
           allOf:
-            - description: >
-                Date when the integration request was submitted by the 
-                Producer node
-              type: string
             - $ref: '#/components/schemas/Date'
+            - description: Date when the integration request was submitted by the Producer node
+              type: string
         #——————————————————————————
         'treatment_date':
           allOf:
+            - $ref: '#/components/schemas/Date'
             - description: Date when the integration request was processed by the Portal
               type: string
-            - $ref: '#/components/schemas/Date'
         #——————————————————————————
         'method':
           description: Method used by the Producer node for the integration request
@@ -1244,7 +1282,7 @@ components:
 
     #---------------------------------------------------------------------------
     'ReferenceDates':
-      description: 'Dates of the ac tions on the data'
+      description: 'Dates of the actions on the data'
       type: object
       required:
         - created
@@ -1409,10 +1447,10 @@ components:
         #——————————————————————————
         'of_scheme':
           allOf:
+            - $ref: '#/components/schemas/SkosScheme'
             - description: >
                 Reference to the constrained vocabulary, thesaurus or classification scheme
               type: object
-            - $ref: '#/components/schemas/SkosScheme'
         #——————————————————————————
         'concept_role':
           description: >
@@ -1493,7 +1531,40 @@ components:
       type: string
       pattern: '^[a-z]{2}(-[A-Z]{2})?$'
       enum:
-        ['cs', 'da', 'de', 'en', 'el', 'es', 'fr', 'hu', 'it', 'no', 'pl', 'pt', 'ro', 'ru', 'sk']
+        [
+          'cs-CZ',
+          'da-DK',
+          'de-CH',
+          'de-DE',
+          'en-GB',
+          'en-US',
+          'el-GR',
+          'es-ES',
+          'fr-FR',
+          'hu-HU',
+          'it-IT',
+          'no-NO',
+          'pl-PL',
+          'pt-PT',
+          'ro-RO',
+          'ru-RU',
+          'sk-SK',
+          'cs',
+          'da',
+          'de',
+          'en',
+          'el',
+          'es',
+          'fr',
+          'hu',
+          'it',
+          'no',
+          'pl',
+          'pt',
+          'ro',
+          'ru',
+          'sk',
+        ]
 
       # norm: https://www.rfc-editor.org/rfc/bcp/bcp47.txt
       # source for enum: https://app.swaggerhub.com/apis/nologo/thesaurus/1.0.0#/default/get_thesaurus_v1

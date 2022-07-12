@@ -1173,8 +1173,8 @@ export const deleteDbObject = async (objectType, rudiId) => {
   }
 }
 
-export const deleteAllDbObjects = async (objectType) => {
-  const fun = `deleteAll`
+export const deleteAllDbObjectsWithType = async (objectType) => {
+  const fun = `deleteAllDbObjectsWithType`
   // logD(mod, fun, `Model: ${Model}`)
   const Model = getObjectModel(objectType)
   try {

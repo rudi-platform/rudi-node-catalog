@@ -53,7 +53,7 @@ import {
 
 import {
   countDbObjectList,
-  deleteAllDbObjects,
+  deleteAllDbObjectsWithType,
   deleteManyDbObjectsWithFilter,
   deleteManyDbObjectsWithRudiIds,
   deleteDbObject,
@@ -614,7 +614,7 @@ export const deleteManyObjects = async (req, reply) => {
     const confirmation = parsedParameters[QUERY_CONFIRM] || false
 
     if (isEmptyObject(filter)) {
-      if (confirmation) return await deleteAllDbObjects(objectType)
+      if (confirmation) return await deleteAllDbObjectsWithType(objectType)
       else {
         const msg = `Use confirm=true as a parameter to confirm the deletion of all ${objectType}`
         logW(mod, fun, msg)

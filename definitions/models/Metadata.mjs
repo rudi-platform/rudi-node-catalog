@@ -124,6 +124,7 @@ import { MediaTypes } from './Media.mjs'
 // Other controllers
 // ------------------------------------------------------------------------------------------------
 import { get as getLicenceCodes } from '../../definitions/thesaurus/LicenceCodes.mjs'
+import { API_CONFIDENTIALITY, API_RESTRICTED_ACCESS } from '../../db/dbFields.js'
 
 // ------------------------------------------------------------------------------------------------
 // Fields with specific treatments
@@ -392,14 +393,15 @@ const MetadataSchema = new mongoose.Schema(
       validate: validObjectNotEmpty,
       type: {
         /** Restriction level for the resource */
-        confidentiality: {
+        [API_CONFIDENTIALITY]: {
           /**
-           * True if the dataset has a restricted access.
-           * False for open data
+           * If the dataset has a restricted access, this string is the name of
+           * the target ('s public key)
+           * Empty for open data
            * */
-          restricted_access: {
-            type: String,
-            default: undefined,
+          [API_RESTRICTED_ACCESS]: {
+            type: Boolean,
+            default: false,
           },
 
           /** True if the dataset embeds personal data */
