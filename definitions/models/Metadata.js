@@ -405,8 +405,8 @@ const MetadataSchema = new mongoose.Schema(
            * Empty for open data
            * */
           [API_RESTRICTED_ACCESS]: {
-            type: String,
-            default: undefined,
+            type: Boolean,
+            default: false,
           },
 
           /** True if the dataset embeds personal data */

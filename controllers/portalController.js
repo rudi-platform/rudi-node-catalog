@@ -18,9 +18,6 @@ const {
   API_METAINFO_PROPERTY,
   API_COLLECTION_TAG,
   getUpdatedDate,
-  API_ACCESS_CONDITION,
-  API_CONFIDENTIALITY,
-  API_RESTRICTED_ACCESS,
 } = require('../db/dbFields')
 
 // ------------------------------------------------------------------------------------------------
@@ -526,11 +523,11 @@ exports.sendMetadataToPortal = async (metadataId) => {
     metadataClean[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = api.API_VERSION
 
     // restricted_access as a boolean
-    if (
-      metadataClean[API_ACCESS_CONDITION][API_CONFIDENTIALITY] &&
-      metadataClean[API_ACCESS_CONDITION][API_CONFIDENTIALITY][API_RESTRICTED_ACCESS]
-    )
-      metadataClean[API_ACCESS_CONDITION][API_CONFIDENTIALITY][API_RESTRICTED_ACCESS] = true
+    // if (
+    //   metadataClean[API_ACCESS_CONDITION][API_CONFIDENTIALITY] &&
+    //   metadataClean[API_ACCESS_CONDITION][API_CONFIDENTIALITY][API_RESTRICTED_ACCESS]
+    // )
+    //   metadataClean[API_ACCESS_CONDITION][API_CONFIDENTIALITY][API_RESTRICTED_ACCESS] = true
 
     // MIME type: YAML
     // metadataClean[API_MEDIA_PROPERTY].map((media) => {
