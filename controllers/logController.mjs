@@ -20,6 +20,7 @@ import {
   QUERY_COUNT_BY,
   ACT_SEARCH,
 } from '../config/confApi.mjs'
+
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
@@ -27,8 +28,8 @@ import { logD, logT, logW } from '../utils/logging.mjs'
 import { RudiError } from '../utils/errors.mjs'
 import { isEmptyArray } from '../utils/jsUtils.mjs'
 
-import { getLogEntries, searchObjects } from '../db/dbQueries.mjs'
-import { parseQueryParameters } from './genericController.mjs'
+import { getLogEntries, searchDbObjects } from '../db/dbQueries.mjs'
+import { parseQueryParameters } from '../utils/parseRequest.mjs'
 
 // ------------------------------------------------------------------------------------------------
 // Logs API access
@@ -87,7 +88,7 @@ export const searchLogs = async (req, reply) => {
       QUERY_SEARCH_TERMS,
       QUERY_COUNT_BY,
     ])
-    const objectList = await searchObjects(objectType, options)
+    const objectList = await searchDbObjects(objectType, options)
 
     return objectList
   } catch (err) {

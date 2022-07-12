@@ -12,19 +12,18 @@ const mod = 'repCtrl'
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
-import { logD, logI, logT, logW } from '../utils/logging.mjs'
+import { logD, logI, logMetadata, logT, logW } from '../utils/logging.mjs'
 import { objectAlreadyExists, parametersMismatch } from '../utils/msg.mjs'
 
 import {
   doesObjectExistWithRudiId,
+  getDbObjectList,
   getEnsuredObjectWithRudiId,
   getObjectWithRudiId,
-  overwriteObject,
+  overwriteDbObject,
 } from '../db/dbQueries.mjs'
-import { beautify } from '../utils/jsUtils.mjs'
+import { beautify, nowISO, padZerosLeft as pad0 } from '../utils/jsUtils.mjs'
 import { accessProperty, accessReqParam } from '../utils/jsonAccess.mjs'
-
-import { getObjectList, setPublishedFlag } from './genericController.mjs'
 
 // ------------------------------------------------------------------------------------------------
 // Constants
@@ -42,6 +41,7 @@ import {
   API_REPORT_TREATMENT_DATE,
   API_REPORT_METHOD,
   API_COLLECTION_TAG,
+  DB_PUBLISHED_AT,
 } from '../db/dbFields.mjs'
 import {
   PARAM_OBJECT,
@@ -68,6 +68,7 @@ import {
   ObjectNotFoundError,
   MethodNotAllowedError,
   RudiError,
+  ParameterExpectedError,
 } from '../utils/errors.mjs'
 // ------------------------------------------------------------------------------------------------
 // Comformity functions
@@ -90,19 +91,32 @@ function dateArrayToDate(dateArray) {
   try {
     if (!Array.isArray(dateArray) || dateArray.length !== 7) return dateArray
     logD(mod, fun, `Date is an array: ${dateArray}`)
-    return
-    ;`${dateArray[0]}-${pad(dateArray[1])}-${pad(dateArray[2])}T` +
-      `${pad(dateArray[3])}:${pad(dateArray[4])}:${pad(dateArray[5])}.${dateArray[6]}Z`
-    // logD(mod, fun, `Date: ${date}`)
+    return (
+      `${dateArray[0]}-${pad0(dateArray[1])}-${pad0(dateArray[2])}T` +
+      `${pad0(dateArray[3])}:${pad0(dateArray[4])}:${pad0(dateArray[5])}.${dateArray[6]}Z`
+    )
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
 }
-function pad(number, nbZeros) {
-  // const fun = 'pad'
-  if (!nbZeros) nbZeros = 2
-  return String(number).padStart(nbZeros, '0')
+
+export const setPublishedFlag = async (dbObject, rudiId) => {
+  const fun = 'setPublishedFlag'
+  logD(mod, fun, '')
+  try {
+    if (!dbObject) throw new ParameterExpectedError('dbObject', mod, fun)
+    if (!dbObject[DB_PUBLISHED_AT]) {
+      dbObject[DB_PUBLISHED_AT] = nowISO()
+      await dbObject.save()
+      logD(mod, fun, `dbObject published: ${logMetadata(dbObject)}`)
+    } else {
+      logI(mod, fun, `Data had already been published for id '${rudiId}'`)
+    }
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
 }
+
 // ------------------------------------------------------------------------------------------------
 // Controllers: integration report for any object
 // ------------------------------------------------------------------------------------------------
@@ -252,7 +266,7 @@ export const addOrEditSingleReport = async (objectType, req, reply) => {
     } else {
       // updating existing report
       logD(mod, fun, `Updating existing report`)
-      dbReadyReport = await overwriteObject(OBJ_REPORTS, reportBody)
+      dbReadyReport = await overwriteDbObject(OBJ_REPORTS, reportBody)
       logI(mod, fun, `Report edited: ${beautify(dbReadyReport)}`)
     }
 
@@ -302,7 +316,7 @@ export const getReportList = async (objectType, req, reply) => {
       [QUERY_OFFSET]: offset,
       [QUERY_FILTER]: { [API_REPORT_RESOURCE_ID]: urlObjectId },
     }
-    const dbReportList = await getObjectList(OBJ_REPORTS, options)
+    const dbReportList = await getDbObjectList(OBJ_REPORTS, options)
 
     return dbReportList
   } catch (err) {

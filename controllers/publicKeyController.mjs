@@ -32,7 +32,7 @@ import { getApiUrl } from '../config/confSystem.mjs'
 import { OBJ_PUB_KEYS, URL_PREFIX_PUBLIC, PARAM_ID, PARAM_PROP } from '../config/confApi.mjs'
 import { accessReqParam } from '../utils/jsonAccess.mjs'
 import { CallContext } from '../definitions/constructors/callContext.mjs'
-import { getEnsuredObjectWithRudiId, overwriteObject } from '../db/dbQueries.mjs'
+import { getEnsuredObjectWithRudiId, overwriteDbObject } from '../db/dbQueries.mjs'
 import { REGEX_WORD } from '../definitions/schemaValidators.mjs'
 
 // ------------------------------------------------------------------------------------------------
@@ -182,7 +182,7 @@ export const overwritePubKey = async (pubKeyJson) => {
     logT(mod, fun, ``)
     await normalizeKeyData(pubKeyJson)
 
-    const dbPubKey = await overwriteObject(OBJ_PUB_KEYS, pubKeyJson)
+    const dbPubKey = await overwriteDbObject(OBJ_PUB_KEYS, pubKeyJson)
     return dbPubKey
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)

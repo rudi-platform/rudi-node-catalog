@@ -14,28 +14,6 @@ import _ from 'lodash'
 const { mergeWith, pick } = _
 
 // ------------------------------------------------------------------------------------------------
-// Internal dependencies
-// ------------------------------------------------------------------------------------------------
-import { beautify, deepClone, isNotEmptyArray, isEmptyArray, isNothing } from '../utils/jsUtils.mjs'
-import { logD, logE, logI, logT, logV, logW } from '../utils/logging.mjs'
-import {
-  contactNotFound,
-  missingObjectProperty,
-  organizationNotFound,
-  parameterExpected,
-} from '../utils/msg.mjs'
-import {
-  NotFoundError,
-  BadRequestError,
-  InternalServerError,
-  ParameterExpectedError,
-  ObjectNotFoundError,
-  RudiError,
-} from '../utils/errors.mjs'
-import { accessProperty, accessReqParam } from '../utils/jsonAccess.mjs'
-import { bboxToGeoJsonPolygon } from '../utils/geo.mjs'
-
-// ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
 import {
@@ -89,17 +67,36 @@ import {
 import { isPortalConnectionDisabled } from '../config/confPortal.mjs'
 
 // ------------------------------------------------------------------------------------------------
+// Internal dependencies
+// ------------------------------------------------------------------------------------------------
+import { bboxToGeoJsonPolygon } from '../utils/geo.mjs'
+import { beautify, deepClone, isNotEmptyArray, isEmptyArray, isNothing } from '../utils/jsUtils.mjs'
+import { logD, logE, logI, logT, logV, logW } from '../utils/logging.mjs'
+import {
+  contactNotFound,
+  missingObjectProperty,
+  organizationNotFound,
+  parameterExpected,
+} from '../utils/msg.mjs'
+import {
+  NotFoundError,
+  BadRequestError,
+  InternalServerError,
+  ParameterExpectedError,
+  ObjectNotFoundError,
+  RudiError,
+} from '../utils/errors.mjs'
+import { accessProperty, accessReqParam } from '../utils/jsonAccess.mjs'
+
+// ------------------------------------------------------------------------------------------------
 // Data models
 // ------------------------------------------------------------------------------------------------
-
 import { Metadata } from '../definitions/models/Metadata.mjs'
 import { Media } from '../definitions/models/Media.mjs'
 
 // ------------------------------------------------------------------------------------------------
 // Controllers
 // ------------------------------------------------------------------------------------------------
-
-import { getManyObjects, parseQueryParameters, searchObjects } from './genericController.mjs'
 import { newOrganization } from './organizationController.mjs'
 import { newContact } from './contactController.mjs'
 import { initializeLicences } from './licenceController.mjs'
@@ -118,12 +115,15 @@ import {
   getEnsuredObjectWithRudiId,
   getEnsuredOrganizationWithDbId,
   getMediaDbIdWithJson,
-  getObjectListAndCount,
+  getDbObjectListAndCount,
   getOrganizationDbIdWithJson,
   getOrganizationWithJson,
   listThemesInMetadata,
-  overwriteObject,
+  overwriteDbObject,
+  searchDbObjects,
 } from '../db/dbQueries.mjs'
+
+import { parseQueryParameters } from '../utils/parseRequest.mjs'
 
 // ------------------------------------------------------------------------------------------------
 // Atomic treatments of properties: RUDI -> DB
@@ -219,7 +219,7 @@ export const mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFo
           mediaDbId = media[DB_ID]
           // logD(mod, fun, `newly created mediaDbId: ${beautify(mediaDbId)}`)
         } else {
-          await overwriteObject(OBJ_MEDIA, rudiMedia) // TODO: valider ! Doit-on vraiment mettre un jour un media, ou recréer cette métadonnée ?
+          await overwriteDbObject(OBJ_MEDIA, rudiMedia) // TODO: valider ! Doit-on vraiment mettre un jour un media, ou recréer cette métadonnée ?
         }
         mediaDbIds.push(new MongooseTypes.ObjectId(mediaDbId))
         // logD(mod, fun, `${beautify(rudiMedia)} -> ${mediaDbId} `)
@@ -640,7 +640,7 @@ export const overwriteMetadata = async (incomingRudiMetadata) => {
 
     const dbReadyEditedMetadata = await rudiToDbFormat(incomingRudiMetadata, true)
     // logD(mod, fun, `dbReadyEditedMetadata: ${beautify(dbReadyEditedMetadata)}`)
-    const dbMetadata = await overwriteObject(OBJ_METADATA, dbReadyEditedMetadata)
+    const dbMetadata = await overwriteDbObject(OBJ_METADATA, dbReadyEditedMetadata)
     // logD(mod, fun, `dbMetadata: ${beautify(dbMetadata)}`)
     // const reply = await dbMetadata.save()
     // logD(mod, fun, `reply: ${beautify(reply)}`)
@@ -710,7 +710,7 @@ export const sendManyMetadataToPortal = async (req) => {
 
     if (!listIds || isEmptyArray(listIds)) {
       logD(mod, fun, 'Getting the list of metadata ids')
-      let metadataListAndCount = await getObjectListAndCount(OBJ_METADATA, {
+      let metadataListAndCount = await getDbObjectListAndCount(OBJ_METADATA, {
         [QUERY_FIELDS]: [API_METADATA_ID],
       })
       const metadataCount = metadataListAndCount[COUNT_LABEL]
@@ -719,7 +719,7 @@ export const sendManyMetadataToPortal = async (req) => {
 
       if (currentCount < metadataCount) {
         logD(mod, fun, 'Getting the whole list of metadata ids')
-        metadataListAndCount = await getObjectListAndCount(OBJ_METADATA, {
+        metadataListAndCount = await getDbObjectListAndCount(OBJ_METADATA, {
           [QUERY_FIELDS]: [API_METADATA_ID],
           [QUERY_LIMIT]: metadataCount,
         })
@@ -790,7 +790,7 @@ export const searchMetadata = async (req, reply) => {
       QUERY_SEARCH_TERMS,
       QUERY_COUNT_BY,
     ])
-    const objectList = await searchObjects(OBJ_METADATA, options)
+    const objectList = await searchDbObjects(OBJ_METADATA, options)
 
     // return the object
 
@@ -868,21 +868,6 @@ export const getSingleMetadata = async (req, reply) => {
     return dbObject
   } catch (err) {
     const error = err.name === MONGO_ERROR ? new BadRequestError(err) : new NotFoundError(err)
-    throw RudiError.treatError(mod, fun, error)
-  }
-}
-
-/**
- * Get several metadata
- * => GET /resources
- */
-export const getMetadataList = async (req, reply) => {
-  const fun = 'getMetadataList'
-  try {
-    logT(mod, fun, `< GET ${URL_PUB_METADATA}`)
-    return await getManyObjects(OBJ_METADATA, req, reply)
-  } catch (err) {
-    const error = err.name === MONGO_ERROR ? new BadRequestError(err) : new NotFoundError(error)
     throw RudiError.treatError(mod, fun, error)
   }
 }

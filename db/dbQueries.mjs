@@ -651,8 +651,8 @@ function getParamValue(options, param, defaultVal, maxVal) {
   return maxVal
 }
 
-export const getObjectList = async (objectType, options) => {
-  const fun = `getObjectList`
+export const getDbObjectList = async (objectType, options) => {
+  const fun = `getDbObjectList`
   try {
     logT(mod, fun, ``)
     //--- Parameters
@@ -714,8 +714,8 @@ export const getObjectList = async (objectType, options) => {
  * @param {JSON} options
  * @returns
  */
-export const getObjectListAndCount = async (objectType, options) => {
-  const fun = `getObjectListAndCount`
+export const getDbObjectListAndCount = async (objectType, options) => {
+  const fun = `getDbObjectListAndCount`
   try {
     logT(mod, fun, ``)
     // logT(mod, fun, `objectType: '${objectType}', options: ${beautify(options)}`)
@@ -796,11 +796,11 @@ export const getObjectListAndCount = async (objectType, options) => {
  * @param {JSON} options
  * @returns
  */
-export const getMetadataListAndCount = async (options) => {
-  const fun = `getMetadataListAndCount`
+export const getDbMetadataListAndCount = async (options) => {
+  const fun = `getDbMetadataListAndCount`
   try {
     logT(mod, fun, ``)
-    return await getObjectListAndCount(OBJ_METADATA, options)
+    return await getDbObjectListAndCount(OBJ_METADATA, options)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -808,8 +808,8 @@ export const getMetadataListAndCount = async (options) => {
 
 const MDB_ERR_NO_INDEX = `Error 500 (${MONGO_ERROR}): text index required for $text query`
 const MDB_ERR_MSG_NO_INDEX = `text index required for $text query`
-export const searchObjects = async (objectType, options) => {
-  const fun = 'searchObjects'
+export const searchDbObjects = async (objectType, options) => {
+  const fun = 'searchDbObjects'
   try {
     logT(mod, fun, ``)
     // logD(mod, fun, `options: ${beautify(options)}`)
@@ -828,13 +828,13 @@ export const searchObjects = async (objectType, options) => {
     // Case objectType is a metadata
     try {
       if (countBy) {
-        return await countObjectList(objectType, countBy, options)
+        return await countDbObjectList(objectType, countBy, options)
         // } else if (groupBy) {
         //   return await groupObjectList(objectType, groupBy, options)
       } else if (objectType === OBJ_METADATA) {
-        return await getMetadataListAndCount(options)
+        return await getDbMetadataListAndCount(options)
       } else {
-        return await getObjectListAndCount(objectType, options)
+        return await getDbObjectListAndCount(objectType, options)
       }
     } catch (err) {
       // logV(mod, fun, beautify(err.message.substring(0, MDB_ERR_MSG_NO_INDEX.length)))
@@ -851,7 +851,7 @@ export const searchObjects = async (objectType, options) => {
           logW(mod, fun, `Couldn't create indexes for collection '${Model.collection.name}': ${er}`)
           throw new RudiError(`Couldn't create indexes`)
         }
-        return await searchObjects(objectType, options)
+        return await searchDbObjects(objectType, options)
       } else if (`${err}`.substring(0, MDB_ERR_NO_INDEX.length) === MDB_ERR_NO_INDEX) {
         logW(mod, fun, err)
         return { total: 0, items: [] }
@@ -878,8 +878,8 @@ export const searchObjects = async (objectType, options) => {
  * @returns list of objects with count, the property used for grouping, and the
  * list of aggregated objects that share this property
  */
-export const groupObjectList = async (objectType, unionField, options) => {
-  const fun = `groupObjectList`
+export const groupDbObjectList = async (objectType, unionField, options) => {
+  const fun = `groupDbObjectList`
 
   try {
     logT(mod, fun, `options: ${options}`)
@@ -1005,8 +1005,8 @@ export const groupObjectList = async (objectType, unionField, options) => {
   }
 }
 
-export const countObjectList = async (objectType, unionField, options) => {
-  const fun = `countObjectList`
+export const countDbObjectList = async (objectType, unionField, options) => {
+  const fun = `countDbObjectList`
 
   try {
     logT(mod, fun, `unionField: ${unionField}, options: ${beautify(options)}`)
@@ -1065,8 +1065,8 @@ export const countObjectList = async (objectType, unionField, options) => {
   }
 }
 
-export const updateObject = async (objectType, updateData) => {
-  const fun = `updateObject`
+export const updateDbObject = async (objectType, updateData) => {
+  const fun = `updateDbObject`
   // logT(mod, fun, ``)
   try {
     assertIsString(fun, objectType)
@@ -1090,8 +1090,8 @@ export const updateObject = async (objectType, updateData) => {
   // logD(mod, fun, `updatedObject: ${beautify(updatedObject)}`)
 }
 
-export const overwriteObject = async (objectType, updateData) => {
-  const fun = `overwriteObject`
+export const overwriteDbObject = async (objectType, updateData) => {
+  const fun = `overwriteDbObject`
   // logT(mod, fun, ``)
   logT(mod, fun, `objectType: ${objectType}`)
   try {
@@ -1155,8 +1155,8 @@ export const getOrphans = async (objectType) => {
   return objectList
 }
 
-export const deleteObject = async (objectType, rudiId) => {
-  const fun = `deleteObject`
+export const deleteDbObject = async (objectType, rudiId) => {
+  const fun = `deleteDbObject`
   logT(mod, fun, ``)
   try {
     const { Model, idField } = getObjectAccesses(objectType)
@@ -1173,7 +1173,7 @@ export const deleteObject = async (objectType, rudiId) => {
   }
 }
 
-export const deleteAll = async (objectType) => {
+export const deleteAllDbObjects = async (objectType) => {
   const fun = `deleteAll`
   // logD(mod, fun, `Model: ${Model}`)
   const Model = getObjectModel(objectType)
@@ -1184,7 +1184,7 @@ export const deleteAll = async (objectType) => {
   }
 }
 
-export const deleteManyWithRudiIds = async (objectType, rudiIdList) => {
+export const deleteManyDbObjectsWithRudiIds = async (objectType, rudiIdList) => {
   const fun = `deleteManyWithRudiIds`
   // logD(mod, fun, `conditions: ${conditions}`)
 
@@ -1211,7 +1211,7 @@ export const deleteManyWithRudiIds = async (objectType, rudiIdList) => {
   }
 }
 
-export const deleteManyWithFilter = async (objectType, conditions) => {
+export const deleteManyDbObjectsWithFilter = async (objectType, conditions) => {
   const fun = `deleteManyWithFilter`
   logD(mod, fun, `conditions: ${beautify(conditions)}`)
   const Model = getObjectModel(objectType)
@@ -1294,7 +1294,7 @@ export const updateMetadata = async (jsonMetadata) => {
     if (!existingMetadata) throw new NotFoundError(`${metadataNotFound(id)}`)
 
     // Updating the ùetadata
-    const updatedMetadata = await overwriteObject(OBJ_METADATA, jsonMetadata)
+    const updatedMetadata = await overwriteDbObject(OBJ_METADATA, jsonMetadata)
 
     return updatedMetadata
   } catch (err) {
@@ -1314,7 +1314,7 @@ export const deleteMetadata = async (metadataRudiId) => {
     throw new NotFoundError(`${metadataNotFound(metadataRudiId)}`)
 
   // Deleting the metadata
-  const deletedMetadata = await deleteObject(OBJ_METADATA, metadataRudiId)
+  const deletedMetadata = await deleteDbObject(OBJ_METADATA, metadataRudiId)
 
   return deletedMetadata
 }
@@ -1398,7 +1398,7 @@ export const updateOrganization = async (jsonOrganization) => {
   }
 
   // Updating the organization
-  const updatedOrganization = await overwriteObject(OBJ_ORGANIZATIONS, jsonOrganization)
+  const updatedOrganization = await overwriteDbObject(OBJ_ORGANIZATIONS, jsonOrganization)
   logD(mod, fun, `${organizationUpdated(id)}`)
 
   return updatedOrganization
@@ -1417,7 +1417,7 @@ export const deleteOrganization = async (organizationRudiId) => {
   await getEnsuredOrganizationWithRudiId(organizationRudiId)
 
   // Deleting the organization
-  const deletedOrganization = await deleteObject(OBJ_ORGANIZATIONS, organizationRudiId)
+  const deletedOrganization = await deleteDbObject(OBJ_ORGANIZATIONS, organizationRudiId)
   logD(mod, fun, `${organizationDeleted(organizationRudiId)}`)
 
   return deletedOrganization
@@ -1492,7 +1492,7 @@ export const updateContact = async (jsonContact) => {
   getEnsuredContactWithRudiId(rudiId)
 
   // Updating the contact
-  const updatedcontact = await overwriteObject(OBJ_CONTACTS, jsonContact)
+  const updatedcontact = await overwriteDbObject(OBJ_CONTACTS, jsonContact)
   logD(mod, fun, `${contactUpdated(rudiId)}`)
 
   return updatedcontact
@@ -1509,7 +1509,7 @@ export const deleteContact = async (contactRudiId) => {
   await getEnsuredContactWithRudiId(contactRudiId)
 
   // Deleting the contact
-  const deletedContact = await deleteObject(OBJ_CONTACTS, contactRudiId)
+  const deletedContact = await deleteDbObject(OBJ_CONTACTS, contactRudiId)
   logD(mod, fun, `${contactDeleted(contactRudiId)}`)
 
   return deletedContact
