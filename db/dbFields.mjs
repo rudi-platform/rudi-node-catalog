@@ -70,6 +70,9 @@ export const API_END_DATE_PROPERTY = 'end_date'
 // Metadata properties: access condition / licence
 // ------------------------------------------------------------------------------------------------
 export const API_ACCESS_CONDITION = 'access_condition'
+export const API_CONFIDENTIALITY = 'confidentiality'
+export const API_RESTRICTED_ACCESS = 'restricted_access'
+
 export const API_LICENCE = 'licence'
 export const API_LICENCE_TYPE = 'licence_type'
 export const API_LICENCE_LABEL = 'licence_label'

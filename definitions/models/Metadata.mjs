@@ -68,6 +68,8 @@ import {
   API_METAINFO_SOURCE_PROPERTY,
   API_MEDIA_TYPE,
   API_FILE_MIME,
+  API_CONFIDENTIALITY,
+  API_RESTRICTED_ACCESS,
 } from '../../db/dbFields.mjs'
 
 import { get as getFileTypes, MIME_YAML_ALT, MIME_YAML } from '../thesaurus/FileTypes.mjs'
@@ -107,6 +109,7 @@ import Themes from '../thesaurus/Themes.mjs'
 import { isValid as isLanguageValid } from '../thesaurus/Languages.mjs'
 import { isValid as isProjectionValid } from '../thesaurus/Projections.mjs'
 import { isValid as isStorageStatusValid } from '../thesaurus/StorageStatus.mjs'
+import { get as getLicenceCodes } from '../../definitions/thesaurus/LicenceCodes.mjs'
 // ------------------------------------------------------------------------------------------------
 // Schema definitions
 // ------------------------------------------------------------------------------------------------
@@ -119,12 +122,6 @@ import ReferenceDates from '../schemas/ReferenceDates.mjs'
 // Model definitions
 // ------------------------------------------------------------------------------------------------
 import { MediaTypes } from './Media.mjs'
-
-// ------------------------------------------------------------------------------------------------
-// Other controllers
-// ------------------------------------------------------------------------------------------------
-import { get as getLicenceCodes } from '../../definitions/thesaurus/LicenceCodes.mjs'
-import { API_CONFIDENTIALITY, API_RESTRICTED_ACCESS } from '../../db/dbFields.js'
 
 // ------------------------------------------------------------------------------------------------
 // Fields with specific treatments
