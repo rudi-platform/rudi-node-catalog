@@ -168,11 +168,14 @@ consoleLog(mod, 'init', `DB: ${DB_URL}`)
 // ----- SKOSMOS section
 const SKOSMOS_SECTION = 'skosmos'
 const skosmosConfFile = getIniValue(SKOSMOS_SECTION, 'skosmos_conf')
-const SKOSMOS_CONF = skosmosConfFile ? readIniFile(skosmosConfFile) : undefined
-export const getSkosmosConf = (prop) => {
-  if (!SKOSMOS_CONF) return
-  return prop ? SKOSMOS_CONF[prop] : SKOSMOS_CONF
+let SKOSMOS_CONF
+try {
+  if (skosmosConfFile) readIniFile(skosmosConfFile)
+} catch (e) {
+  consoleErr(e)
 }
+export const getSkosmosConf = (prop) =>
+  !SKOSMOS_CONF ? null : prop ? SKOSMOS_CONF[prop] : SKOSMOS_CONF
 
 // ------------------------------------------------------------------------------------------------
 // App ID
