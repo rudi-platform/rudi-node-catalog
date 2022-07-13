@@ -24,6 +24,7 @@ import {
   QUERY_GROUP_LIMIT_CAML,
   QUERY_GROUP_OFFSET,
   QUERY_GROUP_OFFSET_CAML,
+  QUERY_LANG,
   QUERY_LIMIT,
   QUERY_OFFSET,
   QUERY_SEARCH_TERMS,
@@ -66,6 +67,7 @@ const QUERY_RESERVED_WORDS = [
   QUERY_GROUP_LIMIT_CAML,
   QUERY_GROUP_OFFSET,
   QUERY_GROUP_OFFSET_CAML,
+  QUERY_LANG,
   QUERY_LIMIT,
   QUERY_OFFSET,
   QUERY_SORT_BY,
@@ -112,6 +114,7 @@ export const parseQueryParameters = async (objectType, fullUrl) => {
       [QUERY_FILTER]: {},
       [QUERY_CONFIRM]: false,
       [EXT_REFS]: [],
+      [QUERY_LANG]: undefined,
       [QUERY_SEARCH_TERMS]: [],
     }
     const filters = []
@@ -141,6 +144,9 @@ export const parseQueryParameters = async (objectType, fullUrl) => {
       if (QUERY_RESERVED_WORDS.includes(key)) {
         // logD(mod, fun, `Key is a reserved word: ${beautify(key)} => ${beautify(queryParameters[key])}`)
         switch (key) {
+          case QUERY_LANG:
+            returnedFilter[QUERY_LANG] = value
+            break
           case QUERY_LIMIT:
           case QUERY_OFFSET:
           case QUERY_GROUP_LIMIT:

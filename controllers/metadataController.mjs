@@ -124,6 +124,7 @@ import {
 } from '../db/dbQueries.mjs'
 
 import { parseQueryParameters } from '../utils/parseRequest.mjs'
+import { readJsonFile } from '../utils/fileActions.mjs'
 
 // ------------------------------------------------------------------------------------------------
 // Atomic treatments of properties: RUDI -> DB
@@ -810,9 +811,9 @@ export const initWithODR = async (req, reply) => {
 
     // await dropDB()
 
-    const initProd = require(`../data/datarennes_prod.json`)
-    const initCont = require(`../data/datarennes_cont.json`)
-    const initData = require(`../data/datarennes_meta.json`)
+    const initProd = readJsonFile('./data/datarennes_prod.json')
+    const initCont = readJsonFile(`./data/datarennes_cont.json`)
+    const initData = readJsonFile(`./data/datarennes_meta.json`)
 
     await initializeLicences()
     // Themes.init('reset')

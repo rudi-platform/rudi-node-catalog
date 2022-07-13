@@ -15,16 +15,32 @@ import { consoleErr } from './jsUtils.mjs'
 // Functions
 // ------------------------------------------------------------------------------------------------
 
-// Local configuration file extraction
+/** Local configuration file extraction */
 export const readIniFile = (confFile) => {
   const fun = 'readIniFile'
   try {
     const fileContent = readFileSync(`${confFile}`, 'utf-8')
-    // utils.consoleLog(mod, fun, `Conf file: ${confFile}`)
-    const conf = parse(fileContent)
-    return conf
+    return parse(fileContent)
   } catch (err) {
     consoleErr(mod, fun, `Couldn't read file '${confFile}': ${err}`)
     throw new Error(`Couldn't read file '${confFile}': ${err}`)
+  }
+}
+
+/** Reads a JSON file and returns a Javascript object */
+export const readJsonFile = (jsonFile) => {
+  const fun = 'readJsonFile'
+  let jsonStr
+  try {
+    jsonStr = readFileSync(jsonFile, 'utf-8')
+  } catch (err) {
+    consoleErr(mod, fun, `Couldn't read file '${jsonFile}': ${err}`)
+    throw new Error(`Couldn't read file '${jsonFile}': ${err}`)
+  }
+  try {
+    return JSON.parse(jsonStr)
+  } catch (err) {
+    consoleErr(mod, fun, `Couldn't parse file '${jsonFile}': ${err}`)
+    throw new Error(`Couldn't parse file '${jsonFile}': ${err}`)
   }
 }

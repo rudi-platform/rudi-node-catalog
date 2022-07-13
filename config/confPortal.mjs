@@ -77,11 +77,13 @@ const PORTAL_SECTION = 'portal'
 const AUTH_URL = getPortalIniValue(PORTAL_SECTION, 'auth_url')
 const AUTH_GET = getPortalIniValue(PORTAL_SECTION, 'auth_get')
 const AUTH_CHK = getPortalIniValue(PORTAL_SECTION, 'auth_chk')
-const PUB_KEY_URL = getPortalIniValue(PORTAL_SECTION, 'auth_pub')
+const JWT_PUB_KEY_URL = getPortalIniValue(PORTAL_SECTION, 'auth_pub')
+const CRYPT_PUB_KEY_URL = getPortalIniValue(PORTAL_SECTION, 'encrypt_pub')
 
 export const getAuthUrl = () => `${AUTH_URL}/${AUTH_GET}`
 export const getCheckAuthUrl = () => `${AUTH_URL}/${AUTH_CHK}`
-export const getPortalPubKeyUrl = () => `${AUTH_URL}/${PUB_KEY_URL}`
+export const getPortalJwtPubKeyUrl = () => `${AUTH_URL}/${JWT_PUB_KEY_URL}`
+export const getPortalCryptPubUrl = () => `${AUTH_URL}/${CRYPT_PUB_KEY_URL}`
 
 // ----- Creds
 const isPwdB64 = getPortalIniValue(PORTAL_SECTION, 'is_pwd_b64')
@@ -108,6 +110,7 @@ const API_PORTAL_URL = getPortalIniValue(PORTAL_SECTION, 'portal_url', false)
 export const isPortalConnectionDisabled = () => {
   return !API_PORTAL_URL
 }
+export const getPortalBaseUrl = () => API_PORTAL_URL
 
 const API_GET_URL = getPortalIniValue(PORTAL_SECTION, 'get_url', '')
 const API_SEND_URL = getPortalIniValue(PORTAL_SECTION, 'put_url', '')

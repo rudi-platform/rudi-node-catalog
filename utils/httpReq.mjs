@@ -12,10 +12,12 @@ import axios from 'axios'
 // ------------------------------------------------------------------------------------------------
 // Internal dependecies
 // ------------------------------------------------------------------------------------------------
-import { logD, logHttpAnswer, logT } from './logging.mjs'
+import { USER_AGENT } from '../config/confApi.mjs'
 import { beautify } from './jsUtils.mjs'
-
+import { logD, logHttpAnswer, logT } from './logging.mjs'
 import { RudiError, BadRequestError } from './errors.mjs'
+import AxiosCurlirize from 'axios-curlirize'
+// import AxiosCurlirize from 'axios-curlirize'
 
 // ------------------------------------------------------------------------------------------------
 // Functions: header treatments
@@ -62,7 +64,7 @@ export const httpGet = async (destUrl, authorizationToken) => {
   try {
     const reqOpts = {
       headers: {
-        'User-Agent': 'Rudi-Producer',
+        'User-Agent': USER_AGENT,
         'Content-Type': 'application/json',
       },
     }
@@ -83,7 +85,7 @@ export const httpDelete = async (destUrl, authorizationToken) => {
 
     const reqOpts = {
       headers: {
-        'User-Agent': 'Rudi-Producer',
+        'User-Agent': USER_AGENT,
         'Content-Type': 'application/json',
       },
     }
@@ -115,7 +117,7 @@ export const httpPost = async (destUrl, dataToSend, authorizationToken) => {
     logT(mod, fun, ``)
     const reqOpts = {
       headers: {
-        'User-Agent': 'Rudi-Producer',
+        'User-Agent': USER_AGENT,
         'Content-Type': 'application/json',
       },
     }
@@ -136,7 +138,7 @@ export const httpPut = async (destUrl, dataToSend, authorizationToken) => {
     logT(mod, fun, ``)
     const reqOpts = {
       headers: {
-        'User-Agent': 'Rudi-Producer',
+        'User-Agent': USER_AGENT,
         'Content-Type': 'application/json',
       },
     }
@@ -151,17 +153,27 @@ export const httpPut = async (destUrl, dataToSend, authorizationToken) => {
   }
 }
 
+AxiosCurlirize(axios)
+// AxiosCurlirize(axios, (result, err) => {
+//   const fun = 'AxiosCurlirize'
+//   const { command } = result
+//   if (err) {
+//     logE(mod, fun, err)
+//     throw RudiError.treatCommunicationError(mod, fun, err)
+//   } else {
+//     logT(mod, fun, command)
+//     return result
+//     // use your logger here
+//   }
+// })
+
 export const directGet = async (destUrl, reqOpts) => {
   const fun = 'directGet'
   try {
     logT(mod, fun, ``)
-    logD(mod, fun, `destUrl: ${destUrl}`)
-    logD(mod, fun, `reqOpts: ${beautify(reqOpts)}`)
-    // if (reqOpts) reqOpts.httpsAgent = sslAgent
-    // else reqOpts = { httpsAgent: sslAgent }
-    logD(mod, fun, 'right before')
+
     const answer = await axios.get(destUrl, reqOpts)
-    logD(mod, fun, 'right after')
+
     logHttpAnswer(mod, fun, answer)
     return answer
   } catch (err) {
@@ -172,9 +184,7 @@ export const directGet = async (destUrl, reqOpts) => {
 export const directPost = async (destUrl, dataToSend, reqOpts) => {
   const fun = 'directPost'
   logT(mod, fun, ``)
-  // logD(mod, fun, `${destUrl}`)
-  // if (reqOpts) reqOpts.httpsAgent = sslAgent
-  // else reqOpts = { httpsAgent: sslAgent }
+
   try {
     const answer = await axios.post(destUrl, dataToSend, reqOpts)
     logHttpAnswer(mod, fun, answer)
@@ -188,9 +198,6 @@ export const directPost = async (destUrl, dataToSend, reqOpts) => {
 export const directPut = async (destUrl, dataToSend, reqOpts) => {
   const fun = 'directPut'
   logT(mod, fun, ``)
-  // logD(mod, fun, `${destUrl}`)
-  // if (reqOpts) reqOpts.httpsAgent = sslAgent
-  // else reqOpts = { httpsAgent: sslAgent }
   try {
     const answer = await axios.put(destUrl, dataToSend, reqOpts)
     logHttpAnswer(mod, fun, answer)

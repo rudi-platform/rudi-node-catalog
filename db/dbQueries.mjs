@@ -45,6 +45,7 @@ import {
   OBJ_SKOS_SCHEMES_CAML,
   OBJ_PUB_KEYS,
   OBJ_PUB_KEYS_CAML,
+  QUERY_LANG,
 } from '../config/confApi.mjs'
 // Fields from the JSON as definied in the API
 import {
@@ -821,7 +822,11 @@ export const searchDbObjects = async (objectType, options) => {
 
     logD(mod, fun, `searching: ${searchTermsList}`)
 
-    options[QUERY_FILTER].$text = { $search: searchTermsList.join(' ') }
+    const lang = options[QUERY_LANG]?.substring(0, 2) || 'fr'
+    options[QUERY_FILTER].$text = {
+      $search: searchTermsList.join(' '),
+      $language: lang,
+    }
     const countBy = options[QUERY_COUNT_BY]
     // const groupBy = options[QUERY_GROUP_BY]
 

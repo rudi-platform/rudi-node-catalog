@@ -49,6 +49,7 @@ import {
   PARAM_PROP,
   ACT_EXT_SEARCH,
   ROUTE_OPT,
+  QUERY_LANG,
 } from '../config/confApi.mjs'
 
 import {
@@ -296,6 +297,7 @@ export const searchObjects = async (req, reply) => {
     }
 
     const options = pick(parsedParameters, [
+      QUERY_LANG,
       QUERY_LIMIT,
       QUERY_OFFSET,
       QUERY_SORT_BY,
@@ -306,7 +308,10 @@ export const searchObjects = async (req, reply) => {
     ])
 
     if (opt === ACT_EXT_SEARCH) {
-      const extendedSearchTerms = await widenSearch(options[QUERY_SEARCH_TERMS])
+      const extendedSearchTerms = await widenSearch(
+        options[QUERY_SEARCH_TERMS],
+        options[QUERY_LANG]
+      )
       logD(mod, fun, `extendedSearchTerms: ${extendedSearchTerms}`)
       options[QUERY_SEARCH_TERMS].push(extendedSearchTerms)
     }

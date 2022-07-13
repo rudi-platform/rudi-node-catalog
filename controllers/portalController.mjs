@@ -7,6 +7,7 @@ const mod = 'portalCtrl'
 // ------------------------------------------------------------------------------------------------
 import { parseKey } from 'sshpk'
 import axios from 'axios'
+import https from 'node:https'
 
 // ------------------------------------------------------------------------------------------------
 // Constants
@@ -22,7 +23,7 @@ import {
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
 import { logD, logI, logT, logV, logW } from '../utils/logging.mjs'
-import { API_VERSION, OBJ_METADATA, PARAM_ID } from '../config/confApi.mjs'
+import { API_VERSION, OBJ_METADATA, PARAM_ID, USER_AGENT } from '../config/confApi.mjs'
 import {
   beautify,
   dateEpochSToIso,
@@ -42,11 +43,12 @@ import {
   getCheckAuthUrl,
   getCredentials,
   getPortalMetaUrl,
-  getPortalPubKeyUrl,
+  getPortalJwtPubKeyUrl,
   isPortalConnectionDisabled,
   JWT_USER,
   PARAM_TOKEN,
   postPortalMetaUrl,
+  getPortalCryptPubUrl,
 } from '../config/confPortal.mjs'
 
 import { isUUID } from '../definitions/schemaValidators.mjs'
@@ -66,6 +68,45 @@ import {
   RudiError,
   UnauthorizedError,
 } from '../utils/errors.mjs'
+// ------------------------------------------------------------------------------------------------
+// Portal auth header
+// ------------------------------------------------------------------------------------------------
+const portalHttpsAgent = new https.Agent({
+  rejectUnauthorized: false,
+})
+
+export const getPortalAuthHeaderBasic = () => {
+  const fun = 'getPortalAuthHeaderBasic'
+  try {
+    logT(mod, fun, ``)
+    const [usr, pwdb64] = getCredentials()
+    const pwd = decodeBase64(pwdb64)
+    const basicAuth = padWithEqualSignBase4(toBase64(`${usr}:${pwd}`))
+    return {
+      headers: {
+        'User-Agent': USER_AGENT,
+        Authorization: `Basic ${basicAuth}`,
+      },
+    }
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+export const getPortalAuthHeaderBearer = async () => {
+  const fun = 'getPortalAuthHeaderBearer'
+  try {
+    logT(mod, fun, ``)
+    return {
+      headers: {
+        'User-Agent': USER_AGENT,
+        Authorization: `Bearer ${await getPortalToken()}`,
+      },
+    }
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
 // ------------------------------------------------------------------------------------------------
 // Token manager
 // ------------------------------------------------------------------------------------------------
@@ -215,41 +256,61 @@ export const deleteMetadata = async (req, reply) => {
 // ------------------------------------------------------------------------------------------------
 // Portal calls: GET public key
 // ------------------------------------------------------------------------------------------------
-let cachedPortalPubKey
+let cachedPortalJwtPubKey
 // ----- GET Portal public key
-export const getPortalPublicKey = async () => {
-  const fun = 'getPortalPublicKey'
+export const getPortalJwtPubKey = async () => {
+  const fun = 'getPortalJwtPubKey'
   try {
     logT(mod, fun, ``)
-    if (cachedPortalPubKey) return cachedPortalPubKey
+    if (cachedPortalJwtPubKey) return cachedPortalJwtPubKey
 
-    const publicKeyUrl = getPortalPubKeyUrl()
+    const publicKeyUrl = getPortalJwtPubKeyUrl()
     logD(mod, fun, 'publicKeyUrl: ' + publicKeyUrl)
 
-    const publicKeyObj = await httpGet(publicKeyUrl)
-    // logD(mod, fun, 'publicKeyObj: ' + publicKeyObj)
-    const publicKey = publicKeyObj?.value
-    // logD(mod, fun, 'publicKey: ' + publicKey)
-
-    cachedPortalPubKey = publicKey
-    return cachedPortalPubKey
-    logD(mod, fun, `publicKey: ${publicKey}`)
+    const publicKeyObj = await axios.get(publicKeyUrl, getPortalAuthHeaderBasic())
+    logD(mod, fun, 'publicKeyObj: ' + beautify(publicKeyObj))
+    cachedPortalJwtPubKey = publicKeyObj?.data?.value
+    logD(mod, fun, `portalJwtPubKey: ${cachedPortalJwtPubKey}`)
+    return cachedPortalJwtPubKey
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
 }
 
+let cachedPortalEncryptPubKey
+export const getPortalEncryptPubKey = async () => {
+  const fun = 'getPortalEncryptPubKey'
+  try {
+    logT(mod, fun, ``)
+    // if (cachedPortalEncryptPubKey) return cachedPortalEncryptPubKey
+
+    // cachedPortalEncryptPubKey = await axiosInstanceForPortal.get(getPortalCryptPubUrl())
+    const portalCryptPubData = await axios.get(getPortalCryptPubUrl(), {
+      headers: {
+        'User-Agent': USER_AGENT,
+        Authorization: `Bearer ${await getPortalToken()}`,
+      },
+      httpsAgent: portalHttpsAgent,
+    })
+    cachedPortalEncryptPubKey = portalCryptPubData?.data
+    // logD(mod, fun, `portalEncryptPubKey: ${beautify(cachedPortalEncryptPubKey)}`)
+    return cachedPortalEncryptPubKey
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
 // ------------------------------------------------------------------------------------------------
 // Portal calls: token
 // ------------------------------------------------------------------------------------------------
 export const getNewTokenFromPortal = async () => {
   const fun = 'getNewTokenFromPortal'
-  logT(mod, fun, ``)
   try {
+    logT(mod, fun, ``)
     const [usr, pwdb64] = getCredentials()
+    const pwd = decodeBase64(pwdb64)
+
     const portalAuthUrl = getAuthUrl()
     // LM -- the password is now provided in base64
-    const pwd = decodeBase64(pwdb64)
     // logD(mod, fun, `pwdb64: ${pwdb64}`)
     // logD(mod, fun, `pwd: ${pwd}`)
     // const body = {
@@ -262,22 +323,9 @@ export const getNewTokenFromPortal = async () => {
     const body =
       `grant_type=password&scope=read&username=${encodeURIComponent(usr)}&` +
       `password=${encodeURIComponent(pwd)}`
-    // logD(mod, fun, `body: ${body}`)
-
-    const basicAuth = padWithEqualSignBase4(toBase64(`${usr}:${pwd}`))
-    // logD(mod, fun, `basicAuth: ${basicAuth}`)
-
-    const opts = {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': `RudiProd/${API_VERSION}`,
-        Authorization: `Basic ${basicAuth}`,
-      },
-    }
-    // logD(mod, fun, beautify(opts))
     let answer
     try {
-      answer = await directPost(portalAuthUrl, body, opts)
+      answer = await directPost(portalAuthUrl, body, getPortalAuthHeaderBasic())
     } catch (err) {
       if (RudiError.isRudiError(err)) throw RudiError.treatError(mod, fun, err)
       else {
@@ -411,7 +459,7 @@ export const checkSignatureWithPubKey = async (accessToken) => {
     // Retrieve the public key
     let pubKeyPem
     try {
-      pubKeyPem = await getPortalPublicKey()
+      pubKeyPem = await getPortalJwtPubKey()
     } catch (err) {
       throw new InternalServerError(`Couldn't retrieve online portal public key: ${err}`)
     }
@@ -544,7 +592,7 @@ export const sendMetadataToPortal = async (metadataId) => {
     const portalToken = await getPortalToken()
     const reqOpts = {
       headers: {
-        'User-Agent': 'Rudi-Producer',
+        'User-Agent': USER_AGENT,
         'Content-Type': 'application/json',
         Authorization: `Bearer ${portalToken}`,
       },

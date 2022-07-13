@@ -27,17 +27,10 @@ export const toPaddedBase64Url = (str) => padWithEqualSignBase4(toBase64Url(str)
 export const decodeBase64 = (data) => convertEncoding(data, 'base64', 'utf-8')
 export const decodeBase64url = (data) => convertEncoding(data, 'base64url', 'utf-8')
 
-export const convertEncoding = (data, fromEncoding, toEncoding) => {
-  const fun = 'convertEncoding'
-  try {
-    let dataStr = data
-    if (typeof data === 'object') dataStr = JSON.stringify(data)
-    return Buffer.from(dataStr, fromEncoding).toString(toEncoding)
-  } catch (err) {
-    consoleErr(mod, fun, err)
-    throw err
-  }
-}
+export const convertEncoding = (data, fromEncoding, toEncoding) =>
+  Buffer.from(typeof data === 'object' ? JSON.stringify(data) : data, fromEncoding).toString(
+    toEncoding
+  )
 
 /**
  * Adds a sign at the end of a string so that the padded string has a length that is a multiple of a given base.

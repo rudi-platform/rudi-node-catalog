@@ -2,6 +2,7 @@
 // API version
 // ------------------------------------------------------------------------------------------------
 export const API_VERSION = '1.3.0'
+export const USER_AGENT = `Rudi-Producer ${API_VERSION}`
 
 // ------------------------------------------------------------------------------------------------
 // REQ methods
@@ -40,6 +41,7 @@ export const OBJ_PUB_KEYS = 'pub_keys'
 export const OBJ_PUB_KEYS_CAML = 'pubKeys'
 
 // --- "In query" parameters
+export const QUERY_LANG = 'lang'
 export const QUERY_LIMIT = 'limit'
 export const QUERY_OFFSET = 'offset'
 export const QUERY_FILTER = 'filter'

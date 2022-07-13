@@ -34,6 +34,7 @@ import { accessReqParam } from '../utils/jsonAccess.mjs'
 import { CallContext } from '../definitions/constructors/callContext.mjs'
 import { getEnsuredObjectWithRudiId, overwriteDbObject } from '../db/dbQueries.mjs'
 import { REGEX_WORD } from '../definitions/schemaValidators.mjs'
+import { getPortalEncryptPubKey } from './portalController.mjs'
 
 // ------------------------------------------------------------------------------------------------
 // Helper functions
@@ -102,8 +103,13 @@ const normalizeKeyData = async (pubKeyJson) => {
       // We have an URL
       let response
       try {
-        // Get the key at the (public) URL
-        response = await httpGet(pubKeyJson[API_PUB_URL])
+        // Special case: portal key
+        if (pubKeyJson[API_PUB_URL].endsWith('/konsult/v1/encryption-key')) {
+          response = await getPortalEncryptPubKey()
+        } else {
+          // Get the key at the (public) URL
+          response = await httpGet(pubKeyJson[API_PUB_URL])
+        }
       } catch (err) {
         throw new NotFoundError(
           `Couldn't reach the public key URL: ${pubKeyJson[API_PUB_URL]}: ${err.message}`
@@ -115,10 +121,10 @@ const normalizeKeyData = async (pubKeyJson) => {
       const key = checkKeyPem(keyPem)
 
       if (!pubKeyJson[API_PUB_PEM]) pubKeyJson[API_PUB_PEM] = keyPem
-      else if (keyPem !== pubKeyJson[API_PUB_PEM])
+      else if (keyPem.replace(/[\n\s\r]/g, '') !== pubKeyJson[API_PUB_PEM].replace(/[\n\s\r]/g, ''))
         throw new BadRequestError(
           `Provided PEM doesn't match the one found at the provided URL: ${pubKeyJson[API_PUB_URL]}` +
-            `\n${pubKeyJson[API_PUB_PEM]} !== ${keyPem}`
+            `\n${pubKeyJson[API_PUB_PEM]}\n !==\n ${keyPem}`
         )
 
       pubKeyJson[API_PUB_KEY] = `${key}`.replace(' (unnamed)', ` (${pubKeyJson[API_PUB_NAME]})`)

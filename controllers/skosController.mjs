@@ -9,13 +9,58 @@ const mod = 'skosCtrl'
 // ------------------------------------------------------------------------------------------------
 
 // ------------------------------------------------------------------------------------------------
+// Constants
+// ------------------------------------------------------------------------------------------------
+import {
+  URL_PV_THESAURUS_ACCESS,
+  PARAM_THESAURUS_CODE,
+  PARAM_THESAURUS_LANG,
+  USER_AGENT,
+} from '../config/confApi.mjs'
+
+import {
+  DB_ID,
+  API_SKOS_SCHEME_ID,
+  API_SKOS_SCHEME_CODE,
+  API_SKOS_CONCEPT_ID,
+  API_SKOS_CONCEPT_CODE,
+  API_SCHEME_TOPS_PROPERTY,
+  API_CONCEPT_CLASS_PROPERTY,
+  API_CONCEPT_PARENTS_PROPERTY,
+  API_CONCEPT_CHILDREN_PROPERTY,
+  API_CONCEPT_SIBLINGS_PROPERTY,
+  API_CONCEPT_RELATIVE_PROPERTY,
+  LicenceTypes,
+} from '../db/dbFields.mjs'
+
+const PROPERTIES_WITH_CONCEPT_REFS = [
+  API_CONCEPT_PARENTS_PROPERTY,
+  API_CONCEPT_CHILDREN_PROPERTY,
+  API_CONCEPT_SIBLINGS_PROPERTY,
+  API_CONCEPT_RELATIVE_PROPERTY,
+]
+
+// ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
-import { beautify, isNotEmptyArray, isNotEmptyObject, deepClone } from '../utils/jsUtils.mjs'
+import {
+  beautify,
+  isNotEmptyArray,
+  isNotEmptyObject,
+  deepClone,
+  toPaddedBase64Url,
+} from '../utils/jsUtils.mjs'
+
+import { getSkosmosConf } from '../config/confSystem.mjs'
+import { accessProperty, accessReqParam } from '../utils/jsonAccess.mjs'
 import { logD, logE, logT, logV, logW } from '../utils/logging.mjs'
 
-import { accessProperty, accessReqParam } from '../utils/jsonAccess.mjs'
-import { getSkosmosConf } from '../config/confSystem.mjs'
+import {
+  ParameterExpectedError,
+  NotFoundError,
+  RudiError,
+  BadRequestError,
+} from '../utils/errors.mjs'
 
 import {
   getConceptDbIdWithRudiId,
@@ -25,13 +70,11 @@ import {
 
 import { directGet } from '../utils/httpReq.mjs'
 
-// logD(mod, 'init', 'Schemas, Models and definitions')
-import Themes from '../definitions/thesaurus/Themes.mjs'
-import Keywords from '../definitions/thesaurus/Keywords.mjs'
-
 // ------------------------------------------------------------------------------------------------
 // Thesauri
 // ------------------------------------------------------------------------------------------------
+import Themes from '../definitions/thesaurus/Themes.mjs'
+import Keywords from '../definitions/thesaurus/Keywords.mjs'
 import { get as getEncodings } from '../definitions/thesaurus/Encodings.mjs'
 import { get as getFileTypes, getExtensions } from '../definitions/thesaurus/FileTypes.mjs'
 import { get as getHashAlgorithms } from '../definitions/thesaurus/HashAlgorithms.mjs'
@@ -50,41 +93,6 @@ import { getAllLicenceCodes } from './licenceController.mjs'
 import SkosScheme from '../definitions/models/SkosScheme.mjs'
 import SkosConcept from '../definitions/models/SkosConcept.mjs'
 
-// ------------------------------------------------------------------------------------------------
-// Constants
-// ------------------------------------------------------------------------------------------------
-import {
-  DB_ID,
-  API_SKOS_SCHEME_ID,
-  API_SKOS_SCHEME_CODE,
-  API_SKOS_CONCEPT_ID,
-  API_SKOS_CONCEPT_CODE,
-  API_SCHEME_TOPS_PROPERTY,
-  API_CONCEPT_CLASS_PROPERTY,
-  API_CONCEPT_PARENTS_PROPERTY,
-  API_CONCEPT_CHILDREN_PROPERTY,
-  API_CONCEPT_SIBLINGS_PROPERTY,
-  API_CONCEPT_RELATIVE_PROPERTY,
-  LicenceTypes,
-} from '../db/dbFields.mjs'
-const PROPERTIES_WITH_CONCEPT_REFS = [
-  API_CONCEPT_PARENTS_PROPERTY,
-  API_CONCEPT_CHILDREN_PROPERTY,
-  API_CONCEPT_SIBLINGS_PROPERTY,
-  API_CONCEPT_RELATIVE_PROPERTY,
-]
-
-import {
-  URL_PV_THESAURUS_ACCESS,
-  PARAM_THESAURUS_CODE,
-  PARAM_THESAURUS_LANG,
-} from '../config/confApi.mjs'
-import {
-  ParameterExpectedError,
-  NotFoundError,
-  RudiError,
-  BadRequestError,
-} from '../utils/errors.mjs'
 // ------------------------------------------------------------------------------------------------
 // Controllers: Scheme
 // ------------------------------------------------------------------------------------------------
@@ -623,14 +631,15 @@ export const getSingleThesaurusLabels = async (req, reply) => {
 // SKOSMOS server calls
 // ------------------------------------------------------------------------------------------------
 
-export const widenSearch = async (searchTerms) => {
+export const widenSearch = async (searchTerms, lang) => {
   const fun = 'widenSearch'
   try {
     logT(mod, fun, ``)
     if (!searchTerms || !getSkosmosConf()) return searchTerms
 
-    const widenedSearchTerms = await Promise.all(searchTerms.map((term) => askSkosmos(term)))
-    logD(mod, fun, `widened search terms: ${beautify(widenedSearchTerms)}`)
+    const widenedSearchTerms = []
+    await Promise.all(searchTerms.map((term) => askSkosmos(term, lang)))
+    logD(mod, fun, `widened search terms: ${widenedSearchTerms}`)
     return widenedSearchTerms
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -655,28 +664,28 @@ export const askSkosmos = async (term, lang = 'fr', vocabulary) => {
     // const reqUrl = 'http://127.0.0.1:3030/api/v1/resources'
     const reqUrl = `${SKOSMOS_URL}/search?clang=${lang}${
       vocabulary ? '&vocab=' + vocabulary : ''
-    }&query=${term}`
+    }&query=${encodeURIComponent(term)}`
 
     if (!SKOSMOS_AUTH) {
-      // const skosmosUsr = getSkosmosConf('usr')
-      // const skosmosPwd = getSkosmosConf('pwd')
-      // const basicAuth = toPaddedBase64Url(skosmosUsr + ':' + skosmosPwd)
+      const skosmosUsr = getSkosmosConf('usr')
+      const skosmosPwd = getSkosmosConf('pwd')
+      const basicAuth = toPaddedBase64Url(skosmosUsr + ':' + skosmosPwd)
       // logD(mod, fun, 'skosmosUsr: ' + skosmosUsr)
       // logD(mod, fun, 'skosmosPwd: ' + skosmosPwd)
       // logD(mod, fun, 'encodedAuth: ' + encodedAuth)
 
-      // SKOSMOS_AUTH = {
-      //   headers: {
-      //     'User-Agent': `RudiProd/${API_VERSION}`,
-      //     Authorization: `Basic ${basicAuth}`,
-      //   },
-      // }
       SKOSMOS_AUTH = {
-        auth: {
-          username: getSkosmosConf('usr'),
-          password: getSkosmosConf('pwd'),
+        headers: {
+          'User-Agent': USER_AGENT,
+          Authorization: `Basic ${basicAuth}`,
         },
       }
+      // SKOSMOS_AUTH = {
+      //   auth: {
+      //     username: getSkosmosConf('usr'),
+      //     password: getSkosmosConf('pwd'),
+      //   },
+      // }
     }
 
     // logD(mod, fun, 'reqUrl: ' + reqUrl)
@@ -684,13 +693,13 @@ export const askSkosmos = async (term, lang = 'fr', vocabulary) => {
     try {
       const reply = await directGet(reqUrl, SKOSMOS_AUTH)
       // logD(mod, fun, 'reply: ' + beautify(reply))
-      logD(mod, fun, 'status: ' + reply.status)
+      // logD(mod, fun, 'status: ' + reply.status)
       // logD(mod, fun, 'data: ' + beautify(reply.data))
       // logD(mod, fun, 'results: ' + beautify(reply.data?.results))
       const labels = []
       reply.data?.results?.map((result) => {
-        labels.push(result.prefLabel)
-        labels.push(result.altLabel)
+        if (result.prefLabel) labels.push(result.prefLabel)
+        if (result.altLabel) labels.push(result.altLabel)
       })
       return labels
     } catch (e) {
