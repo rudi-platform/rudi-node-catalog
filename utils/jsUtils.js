@@ -1,0 +1,299 @@
+/* eslint-disable no-console */
+
+const mod = 'utils'
+
+// ------------------------------------------------------------------------------------------------
+// External dependencies
+// ------------------------------------------------------------------------------------------------
+import { inspect } from 'util'
+
+import _ from 'lodash'
+const { floor, pick } = _
+
+import datetime from 'date-and-time'
+
+// ------------------------------------------------------------------------------------------------
+// Internal dependencies
+// ------------------------------------------------------------------------------------------------
+import { TRACE } from '../config/confApi.js'
+
+// ------------------------------------------------------------------------------------------------
+// String
+// ------------------------------------------------------------------------------------------------
+export const padWithEqualSignBase4 = (str) => pad(str, 4, '=')
+export const toBase64 = (str) => convertEncoding(str, 'utf-8', 'base64')
+export const toBase64Url = (str) => convertEncoding(str, 'utf-8', 'base64url')
+export const toPaddedBase64Url = (str) => padWithEqualSignBase4(toBase64Url(str))
+export const decodeBase64 = (data) => convertEncoding(data, 'base64', 'utf-8')
+export const decodeBase64url = (data) => convertEncoding(data, 'base64url', 'utf-8')
+
+export const convertEncoding = (data, fromEncoding, toEncoding) =>
+  Buffer.from(typeof data === 'object' ? JSON.stringify(data) : data, fromEncoding).toString(
+    toEncoding
+  )
+
+/**
+ * Adds a sign at the end of a string so that the padded string has a length that is a multiple of a given base.
+ * @param {String} str The input string
+ * @param {Number} base The number the length of the padded string must be a multiple of
+ * @param {String} padSign The character used for the padding
+ * @returns
+ */
+export const pad = (str, base, padSign) => {
+  const fun = 'pad'
+  // consoleLog(mod, fun, `base = ${base}, sign = '${padSign}'`)
+  try {
+    padSign = padSign?.substring(0, 1)
+    const modulo = str.length % base
+
+    // consoleLog(mod, fun, `str.length: ${str.length}`)
+    // consoleLog(mod, fun, `modulo: ${modulo}`)
+    if (modulo === 0) return str
+
+    let padding = padSign
+    for (let i = modulo; i > base; i++) {
+      padding = `${padding}${padSign}`
+    }
+    // consoleLog(mod, fun, `padding: ${padding}`)
+    return `${str}${padding}`
+  } catch (err) {
+    consoleErr(mod, fun, err)
+    throw err
+  }
+}
+
+export const shorten = (str, len) => {
+  if (!str) return
+  if (str.length < len) return str
+  return str.substring(0, len) + '[...]'
+}
+
+export const padA1 = (num) => {
+  var norm = Math.floor(Math.abs(num))
+  return (norm < 10 ? '0' : '') + norm
+}
+
+export const padZerosLeft = (number, nbZeros = 2) => String(number).padStart(nbZeros, '0')
+
+// ------------------------------------------------------------------------------------------------
+// Dates
+// ------------------------------------------------------------------------------------------------
+export const nowISO = () => new Date().toISOString()
+
+export const toISOLocale = (date) => {
+  if (!date) date = new Date()
+
+  const isoTimezoneOffset = -date.getTimezoneOffset()
+  const dif = isoTimezoneOffset >= 0 ? '+' : '-'
+
+  return (
+    date.getFullYear() +
+    '-' +
+    padA1(date.getMonth() + 1) +
+    '-' +
+    padA1(date.getDate()) +
+    'T' +
+    padA1(date.getHours()) +
+    ':' +
+    padA1(date.getMinutes()) +
+    ':' +
+    padA1(date.getSeconds()) +
+    dif +
+    padA1(isoTimezoneOffset / 60) +
+    ':' +
+    padA1(isoTimezoneOffset % 60)
+  )
+}
+
+export const nowEpochMs = () => new Date().getTime()
+
+export const nowEpochS = () => floor(nowEpochMs() / 1000)
+
+export const dateEpochSToIso = (utcSeconds) => {
+  const fun = 'dateEpochSToIso'
+  try {
+    return dateEpochMsToIso(utcSeconds * 1000)
+  } catch (err) {
+    consoleErr(mod, fun, `input: ${utcSeconds} -> err: ${err}`)
+  }
+}
+
+export const dateEpochMsToIso = (utcMs) => {
+  const fun = 'dateEpochMsToIso'
+  try {
+    return new Date(utcMs).toISOString()
+  } catch (err) {
+    consoleErr(mod, fun, `input: ${utcMs} -> err: ${err}`)
+  }
+}
+
+export const LOG_DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss SSS'
+
+export const nowLocaleFormatted = () => datetime.format(new Date(), LOG_DATE_FORMAT)
+// const [date, month, year] = new Date().toLocaleDateString('fr-FR').split('/')
+// const [h, m, s] = new Date().toLocaleTimeString('fr-FR').split(/:| /)
+// return `${year}/${month}/${date} ${h}:${m}:${s}`
+
+// ------------------------------------------------------------------------------------------------
+// Strings
+// ------------------------------------------------------------------------------------------------
+export const isString = (str) => typeof str === 'string'
+
+// ------------------------------------------------------------------------------------------------
+// Arrays
+// ------------------------------------------------------------------------------------------------
+export const isArray = (anArray) => Array.isArray(anArray)
+export const isNotEmptyArray = (anArray) => Array.isArray(anArray) && anArray.length > 0
+export const isEmptyArray = (anArray) => Array.isArray(anArray) && anArray.length === 0
+export const getLast = (array) => (Array.isArray(array) ? array[array.length - 1] : null)
+// ------------------------------------------------------------------------------------------------
+// Objects
+// ------------------------------------------------------------------------------------------------
+export const isObject = (obj) => Object.prototype.toString.call(obj) === '[object Object]'
+//Object.keys(obj).length > 0
+export const isEmptyObject = (obj) =>
+  !isString(obj) && !Array.isArray(obj) && Object.keys(obj).length === 0
+export const isNotEmptyObject = (obj) => obj && Object.keys(obj).length > 0
+
+export const NOT_FOUND = '!_not_found_!'
+export const quietAccess = (obj, prop) => {
+  try {
+    if (typeof obj[prop] === 'undefined') return NOT_FOUND
+    return obj[prop]
+  } catch {
+    return NOT_FOUND
+  }
+}
+
+/** !! TODO: treat object arrays! */
+export const getPaths = async (root, parentKeyName) => {
+  // if obj has no keys, abort
+  if (isString(root) || Array.isArray(root) || Object.keys(root).length === 0) {
+    return []
+  }
+  const keys = Object.keys(root)
+  let rootSubPaths = []
+
+  // console.log(beautify(root))
+
+  await Promise.all(
+    keys.map(async (key) => {
+      const subObj = root[key]
+      if (!subObj) return
+      const keyPath = parentKeyName ? `${parentKeyName}.${key}` : `${key}`
+      // console.log(`keyPath: ${keyPath}`)
+      rootSubPaths.push(keyPath)
+      if (isNotEmptyObject(subObj)) {
+        const keyPaths = await getPaths(subObj, keyPath)
+        rootSubPaths = rootSubPaths.concat(keyPaths)
+        return true
+      } else return false
+    })
+  )
+  // console.log(beautify(rootSubPaths))
+  return rootSubPaths
+}
+
+export const listPick = (objList, fieldList) => {
+  const reshapedList = objList.map((obj) => pick(obj, fieldList))
+  return reshapedList
+}
+
+export const filterOnValue = async (obj, predicate) => {
+  const result = {}
+
+  await Promise.all(
+    Object.keys(obj).map((key) => {
+      if (predicate(obj[key])) {
+        result[key] = obj[key]
+      }
+      return result[key]
+    })
+  )
+
+  return result
+}
+
+// ------------------------------------------------------------------------------------------------
+// JSON
+// ------------------------------------------------------------------------------------------------
+export const isEmpty = (prop) => {
+  const strProp = JSON.stringify(prop)
+  return prop == '' || prop == '{}' || prop == '[]' || strProp == '{}' || strProp == '[]'
+}
+
+/* 
+  TRUE:
+    !null
+    !undefined
+    !''
+
+  FALSE:
+    !{}
+    ![]
+*/
+export const isNothing = (prop) => {
+  return !prop || isEmpty(prop)
+}
+
+/**
+ * Custom JSON beautifying function
+ * @param {JSON} jsonObject: a JSON object
+ * @param {String or number} options: JSON.stringify options. 4 or '\t' make it possible
+ *                                    to display the JSON on several lines
+ * @returns {String} JSON.stringify options
+ */
+export const beautify = (jsonObject, option) => {
+  try {
+    return `${JSON.stringify(jsonObject, null, option).replace(/\\"/g, '"')}${
+      option != null ? '\n' : ''
+    }`
+  } catch (err) {
+    return `${inspect(jsonObject)}`
+  }
+}
+
+/**
+ * Clone a (JSON) object through JSON.stringify then JSON.parse (beware, it can be slow)
+ * @param {JSON} jsonObject
+ * @returns {JSON} The deep (dissociated) clone of the input object
+ * @throws parameter 'jsonObject' is undefined, null or empty
+ */
+export const deepClone = (jsonObject) => {
+  return JSON.parse(JSON.stringify(jsonObject))
+}
+
+// ------------------------------------------------------------------------------------------------
+// Basic logging
+// ------------------------------------------------------------------------------------------------
+
+const BASE_LINE = `================================================================================`
+
+export const separateLogs = (insertStr, shouldDisplayDate) => {
+  const dateStr = shouldDisplayDate ? `${nowLocaleFormatted()} ` : ''
+  const inputStr = insertStr ? `[ ${insertStr} ]==` : ''
+  const eatenCharacters = dateStr.length + inputStr.length
+
+  const line = BASE_LINE.substring(eatenCharacters)
+
+  const logSeparator = `${dateStr}${line}${inputStr}`
+
+  console.log('\nD ' + logSeparator)
+  return logSeparator
+}
+
+export const logWhere = (srcMod, srcFun) =>
+  !srcMod ? srcFun : !srcFun ? srcMod : `${srcMod} . ${srcFun}`
+
+export const displayStr = (srcMod, srcFun, msg) =>
+  `[ ${logWhere(srcMod, srcFun)} ] ${msg !== '' ? msg : '<-'}`
+
+export const consoleLog = (srcMod, srcFun, msg) =>
+  console.log('D', nowLocaleFormatted(), displayStr(srcMod, srcFun, msg))
+
+export const consoleErr = (srcMod, srcFun, msg) =>
+  console.error(
+    'E',
+    nowLocaleFormatted(),
+    displayStr(srcMod, srcFun, !msg ? undefined : msg[TRACE] || msg)
+  )

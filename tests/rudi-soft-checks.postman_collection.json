@@ -1200,6 +1200,15 @@
 								],
 								"type": "text/javascript"
 							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"time.wait(1000)"
+								],
+								"type": "text/javascript"
+							}
 						}
 					],
 					"request": {
@@ -1237,6 +1246,15 @@
 									"    const res = pm.response.json();",
 									"    pm.expect(res.total).to.eq(1);",
 									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"time.wait(2000)"
 								],
 								"type": "text/javascript"
 							}
@@ -1564,6 +1582,15 @@
 								],
 								"type": "text/javascript"
 							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"time.wait(1000)"
+								],
+								"type": "text/javascript"
+							}
 						}
 					],
 					"request": {
@@ -1595,6 +1622,15 @@
 									"    const res = pm.response.json();",
 									"    pm.expect(res.total).to.eq(1);",
 									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"time.wait(1000)"
 								],
 								"type": "text/javascript"
 							}
@@ -2622,6 +2658,15 @@
 									"    const metadataList = pm.response.json();",
 									"    pm.expect(metadataList.length).to.eq(1);",
 									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"time.wait(1000)"
 								],
 								"type": "text/javascript"
 							}
@@ -5760,7 +5805,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"portal-{{stamp}}\",\n    \"url\": \"{{portalBaseUrl}}/oauth/token_key\",\n    \"prop\": \"value\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"raw": "{\n    \"name\": \"portal-{{stamp}}\",\n    \"url\": \"https://rudi.qualif.open-groupe.com/konsult/v1/encryption-key\",\n    \"pem\": \"-----BEGIN PUBLIC KEY-----\\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvS3nTZOj01kq1V6wKpMe\\nnROzRDb8V/uBLS6Ey90sWdhbRhv8R1QIYSRs3YjMZ2HBdMOQzuMQvyUF5lJv0KDN\\njYIf74n3+rDNxICkTlm7cwggtks/JOdNw1o/fGbU83tlAnSr4QbLCCqThzslchiK\\nmGVH5pCiV/aX2bl81iNKkGDiFpmyT/au8+OtZOZe910sDnBsyPHH+wCkh/bb4E+t\\nkKHUGLKpi4T8cm9wrNXFySxP532zuPsJ5CsaDWyu3jXivfYvC5Q520B72F+eK6nI\\ndozONJLMtd9lFegxuRtU3fsYMAZww77hiCsH5mgfLo+iwXicdTCWogkGl8n9ODYh\\nUwIDAQAB\\n-----END PUBLIC KEY-----\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -5973,6 +6018,7 @@
 					"    now: () => new Date().toISOString(),",
 					"    nowEpochS: () => _.floor(new Date().getTime() / 1000),",
 					"    timezone: () => new Date().getTimezoneOffset(),",
+					"    wait: (delayMs) => setTimeout(function(){}, [delayMs]),",
 					"}",
 					"codec = {",
 					"    streamToString: (data) => data?.stream?.toString('utf8'),",
@@ -6166,6 +6212,202 @@
 		{
 			"key": "stamp",
 			"value": "soft-checks"
+		},
+		{
+			"key": "apiJwt",
+			"value": ""
+		},
+		{
+			"key": "portalJwt",
+			"value": ""
+		},
+		{
+			"key": "pubKeyName",
+			"value": ""
+		},
+		{
+			"key": "portalPem",
+			"value": ""
+		},
+		{
+			"key": "dateUpdate",
+			"value": ""
+		},
+		{
+			"key": "gitHash",
+			"value": ""
+		},
+		{
+			"key": "apiVersion",
+			"value": ""
+		},
+		{
+			"key": "keywords",
+			"value": ""
+		},
+		{
+			"key": "themes",
+			"value": ""
+		},
+		{
+			"key": "sanityLicence",
+			"value": ""
+		},
+		{
+			"key": "licences",
+			"value": ""
+		},
+		{
+			"key": "softOrg1Id",
+			"value": ""
+		},
+		{
+			"key": "softOrg1Name",
+			"value": ""
+		},
+		{
+			"key": "softOrg1Address",
+			"value": ""
+		},
+		{
+			"key": "softOrg2Id",
+			"value": ""
+		},
+		{
+			"key": "softOrg2Name",
+			"value": ""
+		},
+		{
+			"key": "softOrg2Address",
+			"value": ""
+		},
+		{
+			"key": "softContact1Id",
+			"value": ""
+		},
+		{
+			"key": "softContact1Name",
+			"value": ""
+		},
+		{
+			"key": "softContact1Email",
+			"value": ""
+		},
+		{
+			"key": "softContact2Id",
+			"value": ""
+		},
+		{
+			"key": "softContact2Name",
+			"value": ""
+		},
+		{
+			"key": "softContact2Email",
+			"value": ""
+		},
+		{
+			"key": "softContact3Id",
+			"value": ""
+		},
+		{
+			"key": "softContact3Name",
+			"value": ""
+		},
+		{
+			"key": "softContact3Email",
+			"value": ""
+		},
+		{
+			"key": "now",
+			"value": ""
+		},
+		{
+			"key": "softMeta1Id",
+			"value": ""
+		},
+		{
+			"key": "softMedia1Id",
+			"value": ""
+		},
+		{
+			"key": "randomTheme",
+			"value": ""
+		},
+		{
+			"key": "randomKeyword1",
+			"value": ""
+		},
+		{
+			"key": "randomKeyword2",
+			"value": ""
+		},
+		{
+			"key": "softLicence",
+			"value": ""
+		},
+		{
+			"key": "randomOrgId",
+			"value": ""
+		},
+		{
+			"key": "randomContact1",
+			"value": ""
+		},
+		{
+			"key": "randomContact2",
+			"value": ""
+		},
+		{
+			"key": "randomTitle",
+			"value": ""
+		},
+		{
+			"key": "randomSynopsis",
+			"value": ""
+		},
+		{
+			"key": "randomSummary",
+			"value": ""
+		},
+		{
+			"key": "softMeta2Id",
+			"value": ""
+		},
+		{
+			"key": "mediaId2",
+			"value": ""
+		},
+		{
+			"key": "softMedia2Id",
+			"value": ""
+		},
+		{
+			"key": "countWithOrg1",
+			"value": ""
+		},
+		{
+			"key": "softReport1Id",
+			"value": ""
+		},
+		{
+			"key": "softReport2Id",
+			"value": ""
+		},
+		{
+			"key": "unkownMetaId",
+			"value": ""
+		},
+		{
+			"key": "softReport3Id",
+			"value": ""
+		},
+		{
+			"key": "apiToken",
+			"value": ""
+		},
+		{
+			"key": "portalToken",
+			"value": ""
 		}
 	]
 }
