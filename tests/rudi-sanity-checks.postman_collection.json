@@ -5860,6 +5860,102 @@
 			"name": "Admin",
 			"item": [
 				{
+					"name": "Add portal key",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Creating the Portal key\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const pubKey = pm.response.json()",
+									"    pm.expect(pubKey.name).to.be.eq(pm.collectionVariables.get('portalKeyName'))",
+									"    pm.expect(pubKey.url).to.be.not.null",
+									"    pm.expect(pubKey.pem).to.be.not.null",
+									"    pm.expect(pubKey.type).to.be.not.null",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set('portalKeyName','portail-qualif')"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{portalKeyName}}\",\n    \"url\": \"https://rudi.qualif.open-groupe.com/konsult/v1/encryption-key\",\n    \"pem\": \"-----BEGIN PUBLIC KEY-----\\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvS3nTZOj01kq1V6wKpMe\\nnROzRDb8V/uBLS6Ey90sWdhbRhv8R1QIYSRs3YjMZ2HBdMOQzuMQvyUF5lJv0KDN\\njYIf74n3+rDNxICkTlm7cwggtks/JOdNw1o/fGbU83tlAnSr4QbLCCqThzslchiK\\nmGVH5pCiV/aX2bl81iNKkGDiFpmyT/au8+OtZOZe910sDnBsyPHH+wCkh/bb4E+t\\nkKHUGLKpi4T8cm9wrNXFySxP532zuPsJ5CsaDWyu3jXivfYvC5Q520B72F+eK6nI\\ndozONJLMtd9lFegxuRtU3fsYMAZww77hiCsH5mgfLo+iwXicdTCWogkGl8n9ODYh\\nUwIDAQAB\\n-----END PUBLIC KEY-----\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/api/admin/pub_keys",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"pub_keys"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET portal public key",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Portal key added\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const pem = pm.response.stream.toString('utf8');",
+									"    pm.expect(pem).to.be.not.null",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/api/v1/pub_keys/{{portalKeyName}}/key",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"pub_keys",
+								"{{portalKeyName}}",
+								"key"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "getLogs",
 					"event": [
 						{
@@ -5869,17 +5965,9 @@
 									"pm.test(\"Accessing logs\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const response = pm.response.json()",
+									"    //const pm.response.header",
 									"    pm.expect(response.length).to.eq(20)",
 									"});"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"//const dateUpdate = pm.collectionVariables.get('dateUpdate')"
 								],
 								"type": "text/javascript"
 							}
@@ -5889,7 +5977,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{apiUrl}}/api/admin/logs?limit=20&updatedAfter={{dateUpdate}}",
+							"raw": "{{apiUrl}}/api/admin/logs?limit=20&sort_by=-updatedAt&updatedAfter={{dateUpdate}}",
 							"host": [
 								"{{apiUrl}}"
 							],
@@ -5902,6 +5990,10 @@
 								{
 									"key": "limit",
 									"value": "20"
+								},
+								{
+									"key": "sort_by",
+									"value": "-updatedAt"
 								},
 								{
 									"key": "updatedAfter",
