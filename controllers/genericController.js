@@ -107,6 +107,7 @@ import { newSkosConcept, newSkosScheme, widenSearch } from './skosController.js'
 import { newPublicKey, overwritePubKey } from './publicKeyController.js'
 
 import { deletePortalMetadata } from './portalController.js'
+import { API_ACCESS_CONDITION, API_CONFIDENTIALITY, API_RESTRICTED_ACCESS } from '../db/dbFields.js'
 
 // -------------------------------------------------------------------------------------------------
 // Specific object type helper functions
@@ -179,6 +180,25 @@ async function isObjectReferenced(objectType, rudiId) {
     default:
       return false
   }
+}
+
+function overrideFilter(filterList, field, value) {
+  const fun = 'overrideFilter'
+  const newFilter = { [field]: value }
+
+  if (!filterList || filterList[field]) return { $and: [newFilter] }
+  if (!filterList.$and) {
+    // Simple filter
+    return { $and: [filterList, newFilter] }
+  }
+
+  filterList.$and.findIndex((val, i, ara) => {
+    if (Object.keys(val).indexOf(field) !== -1) ara.splice(i, 1)
+  })
+  logD(mod, fun, beautify(filterList))
+  filterList.$and.push(newFilter)
+  logD(mod, fun, beautify(filterList))
+  return filterList
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -439,11 +459,13 @@ export const getMetadataListAndCount = async (req, reply) => {
       QUERY_FILTER,
       QUERY_FIELDS,
     ])
-    const filter = parsedParameters[QUERY_FILTER]
-    logD(mod, fun, beautify(filter))
-    // const filterNoRestricted = {
-    //   $and: { [API_ACCESS_CONDITION.API_CONFIDENTIALITY.API_RESTRICTED_ACCESS]: undefined },
-    // }
+    logD(mod, fun, beautify(options[QUERY_FILTER]))
+    options[QUERY_FILTER] = overrideFilter(
+      options[QUERY_FILTER],
+      `${API_ACCESS_CONDITION}.${API_CONFIDENTIALITY}.${API_RESTRICTED_ACCESS}`,
+      false
+    )
+    logD(mod, fun, beautify(options[QUERY_FILTER]))
 
     objectList = await getDbMetadataListAndCount(options)
     logD(mod, fun, objectList.total)

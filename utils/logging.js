@@ -98,6 +98,7 @@ export const logLine = (logLevel, srcMod, srcFun, msg) => {
     if (SHOULD_LOG_CONSOLE)
       wLogger.log({ level: logLevel, message: displayStr(srcMod, srcFun, msg) })
     // console.log(displayStr(srcMod, srcFun, msg))
+    if (`${msg}` === '[Object]: Object' || `${msg}` === '[object Object]') msg = JSON.stringify(msg)
     addLogEntry(logLevel, srcMod, srcFun, msg)
   } catch (e) {
     consoleErr(e)
