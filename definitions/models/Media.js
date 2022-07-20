@@ -1,7 +1,7 @@
 const mod = 'mediaSch'
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // External dependencies
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 import mongoose from 'mongoose'
 
 import mongooseInt32 from 'mongoose-int32'
@@ -12,9 +12,9 @@ import sanitize from 'sanitize-filename'
 import _ from 'lodash'
 const { omit } = _
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Constants
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 import {
   FIELDS_TO_SKIP,
   API_COLLECTION_TAG,
@@ -35,14 +35,14 @@ import {
   API_MEDIA_URL_VISUAL,
 } from '../../db/dbFields.js'
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Internal dependencies
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 import ReferenceDatesSchema from '../schemas/ReferenceDates.js'
 import { ConnectorParameter } from '../schemas/ConnectorParameters.js'
 
 import { VALID_URI } from '../schemaValidators.js'
-import { UUIDv4 } from '../schemas/Identifiers.js'
+import { UuidV4Schema } from '../schemas/Identifiers.js'
 import { isNotEmptyObject } from '../../utils/jsUtils.js'
 import { logD, logW } from '../../utils/logging.js'
 import { missingField } from '../../utils/msg.js'
@@ -53,9 +53,9 @@ import { get as getEncodings } from '../thesaurus/Encodings.js'
 import { get as getFileTypes } from '../thesaurus/FileTypes.js'
 import { get as getHashAlgorithms } from '../thesaurus/HashAlgorithms.js'
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Media constants
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 export const MediaTypes = {
   File: 'FILE',
   Series: 'SERIES',
@@ -79,9 +79,9 @@ const commonSchemaOptions = {
   id: false,
 }
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Media schema definition
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 const MediaSchema = new mongoose.Schema(
   {
@@ -89,7 +89,7 @@ const MediaSchema = new mongoose.Schema(
      * Unique and permanent identifier for the organization in RUDI
      * system (required)
      */
-    [API_MEDIA_ID]: UUIDv4,
+    [API_MEDIA_ID]: UuidV4Schema,
 
     /** Updated offical name of the organization */
     [API_MEDIA_TYPE]: {
@@ -99,20 +99,13 @@ const MediaSchema = new mongoose.Schema(
     },
 
     /** Original name of the file */
-    [API_MEDIA_NAME]: {
-      type: String,
-      // required: true,
-    },
+    [API_MEDIA_NAME]: String,
 
     /** Short description of the media */
-    [API_MEDIA_CAPTION]: {
-      type: String,
-    },
+    [API_MEDIA_CAPTION]: String,
 
     /** Time of the creation / last update of the Media */
-    [API_MEDIA_DATES]: {
-      type: ReferenceDatesSchema,
-    },
+    [API_MEDIA_DATES]: ReferenceDatesSchema,
 
     /** Link towards a (low-fidelity) visualization of the media */
     [API_MEDIA_URL_VISUAL]: {
@@ -138,7 +131,6 @@ const MediaSchema = new mongoose.Schema(
       // Optional connector parameters
       [API_MEDIA_CONNECTOR_PARAMS]: {
         type: [ConnectorParameter],
-        _id: false,
         default: undefined,
       },
     },
@@ -174,9 +166,9 @@ MediaSchema.pre('save', function (next) {
   }
 })
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // File schema definition
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 const FileSchema = new mongoose.Schema(
   {
     // Native format of the resource
@@ -194,19 +186,15 @@ const FileSchema = new mongoose.Schema(
 
     // Makes it possible to check data integrity
     [API_FILE_CHECKSUM]: {
-      type: {
-        algo: {
-          type: String,
-          enum: Object.values(getHashAlgorithms()),
-          required: true,
-        },
-        hash: {
-          type: String,
-          required: true,
-        },
+      algo: {
+        type: String,
+        enum: Object.values(getHashAlgorithms()),
+        required: true,
       },
-      required: true,
-      _id: false,
+      hash: {
+        type: String,
+        required: true,
+      },
     },
 
     // Link towards the resource that describes the structure of the data
@@ -239,6 +227,7 @@ const FileSchema = new mongoose.Schema(
 )
 
 FileSchema.pre('save', function (next) {
+  const mod = 'FileSchema'
   const fun = 'pre save hook'
   // logD('FileSchema', fun, ``)
   try {
@@ -247,14 +236,14 @@ FileSchema.pre('save', function (next) {
     }
     next()
   } catch (err) {
-    logW('FileSchema', fun, err)
+    logW(mod, fun, err)
     next(err)
   }
 })
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Series schema definition
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 const SeriesSchema = new mongoose.Schema(
   {
     // Theorical delay between the production of the record and its availability,
@@ -297,13 +286,13 @@ const SeriesSchema = new mongoose.Schema(
   commonSchemaOptions
 )
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // MediaService schema definition
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 const ServiceSchema = new mongoose.Schema({}, commonSchemaOptions)
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Schema refinements
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 // ----- toJSON cleanup
 MediaSchema.methods.toJSON = function () {
@@ -319,9 +308,9 @@ ServiceSchema.methods.toJSON = function () {
   return omit(this.toObject(), FIELDS_TO_SKIP)
 }
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Models definition
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 export const Media = mongoose.model('Media', MediaSchema)
 export const MediaFile = Media.discriminator(MediaTypes.File, FileSchema, { clone: false })
 export const MediaSeries = Media.discriminator(MediaTypes.Series, SeriesSchema, { clone: false })

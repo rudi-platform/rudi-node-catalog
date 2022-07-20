@@ -1,7 +1,7 @@
 const mod = 'metaSch'
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // External dependencies
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 import mongoose from 'mongoose'
 
 import _ from 'lodash'
@@ -14,9 +14,9 @@ const Int32 = mongooseInt32.loadType(mongoose)
 
 import objectPath from 'object-path'
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Fields
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 import { DEFAULT_LANG } from '../../config/confApi.js'
 
 import {
@@ -42,7 +42,6 @@ import {
   API_DATES_PUBLISHED,
   API_DATES_VALIDATED,
   API_DATES_EXPIRES,
-  API_DATES_DELETED,
   API_MEDIA_PROPERTY,
   FIELDS_TO_SKIP,
   API_DATA_DATES_PROPERTY,
@@ -64,46 +63,46 @@ import {
   API_GEO_BBOX_SOUTH,
   API_GEO_BBOX_NORTH,
   API_GEO_GEOJSON_PROPERTY,
-  API_METAINFO_VERSION_PROPERTY,
   LicenceTypes,
   DICT_TEXT,
-  API_METAINFO_SOURCE_PROPERTY,
   API_MEDIA_TYPE,
   API_FILE_MIME,
   API_CONFIDENTIALITY,
   API_RESTRICTED_ACCESS,
+  API_METAINFO_SOURCE_PROPERTY,
+  API_DATES_DELETED,
+  API_METAINFO_VERSION_PROPERTY,
 } from '../../db/dbFields.js'
 
 import { get as getFileTypes, MIME_YAML_ALT, MIME_YAML } from '../thesaurus/FileTypes.js'
 import { Longitude, Latitude } from '../schemas/GpsCoordinates.js'
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Validators
-// ------------------------------------------------------------------------------------------------
-import { VALID_API_VERSION, VALID_URI } from '../schemaValidators.js'
+// -------------------------------------------------------------------------------------------------
 
 const validArrayNotNull = {
   validator: isNotEmptyArray,
   message: `'{PATH}' property should not be empty`,
 }
-const validObjectNotEmpty = {
-  validator: isNotEmptyObject,
-  message: `'{PATH}' property should not be empty`,
-}
+// const validObjectNotEmpty = {
+//   validator: isNotEmptyObject,
+//   message: `'{PATH}' property should not be empty`,
+// }
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Internal dependencies
-// ------------------------------------------------------------------------------------------------
-import { beautify, isNotEmptyArray, isNotEmptyObject, isNothing } from '../../utils/jsUtils.js'
-import { logD, logE, logT } from '../../utils/logging.js'
+// -------------------------------------------------------------------------------------------------
+import { beautify, isNotEmptyArray, isNothing } from '../../utils/jsUtils.js'
+import { logD, logE, logI, logT, logV } from '../../utils/logging.js'
 import { incorrectVal, incorrectValueForEnum } from '../../utils/msg.js'
 import { NotFoundError, BadRequestError, RudiError } from '../../utils/errors.js'
 import { accessProperty, requireSubProperty } from '../../utils/jsonAccess.js'
 import { makeSearchable } from '../../db/dbActions.js'
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Thesaurus definiitons
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // logD(mod, 'init', 'Schemas, Models and definitions')
 import Keywords from '../thesaurus/Keywords.js'
 import Themes from '../thesaurus/Themes.js'
@@ -112,22 +111,24 @@ import { isValid as isLanguageValid } from '../thesaurus/Languages.js'
 import { isValid as isProjectionValid } from '../thesaurus/Projections.js'
 import { isValid as isStorageStatusValid } from '../thesaurus/StorageStatus.js'
 import { get as getLicenceCodes } from '../thesaurus/LicenceCodes.js'
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Schema definitions
-// ------------------------------------------------------------------------------------------------
-import { DOI, UUIDv4 } from '../schemas/Identifiers.js'
+// -------------------------------------------------------------------------------------------------
+import { DoiSchema, UuidV4Schema } from '../schemas/Identifiers.js'
 
-import { DictionaryEntry } from '../schemas/DictionaryEntry.js'
-import ReferenceDates from '../schemas/ReferenceDates.js'
+import { DictionaryEntrySchema } from '../schemas/DictionaryEntry.js'
+import { ReferenceDatesSchema } from '../schemas/ReferenceDates.js'
+import { AccesConditionSchema } from '../schemas/AccesConditions.js'
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Model definitions
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 import { MediaTypes } from './Media.js'
+import { VALID_API_VERSION, VALID_URI } from '../schemaValidators.js'
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Fields with specific treatments
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 export const METADATA_FIELDS_TO_POPULATE = [
   API_DATA_PRODUCER_PROPERTY,
   API_DATA_CONTACTS_PROPERTY,
@@ -141,9 +142,9 @@ const POPULATE_OPTS = {
   select: `-${FIELDS_TO_SKIP.concat(API_RESTRICTED_ACCESS).join(' -')}`,
 }
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Custom schema definitions
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 const MetadataSchema = new mongoose.Schema(
   {
     // ---------------------------
@@ -151,7 +152,7 @@ const MetadataSchema = new mongoose.Schema(
     // ---------------------------
 
     /** Unique and permanent identifier for the ressource in RUDI system (required) */
-    [API_METADATA_ID]: UUIDv4,
+    [API_METADATA_ID]: UuidV4Schema,
 
     /** Identifier for the ressource in the producer system (optional) */
     [API_METADATA_LOCAL_ID]: {
@@ -169,7 +170,7 @@ const MetadataSchema = new mongoose.Schema(
     },
 
     // Digital Object Identifier for the ressource (optional)
-    doi: DOI,
+    doi: DoiSchema,
 
     // ---------------------------
     // Dataset description
@@ -184,22 +185,25 @@ const MetadataSchema = new mongoose.Schema(
 
     /** 'synopsis': short description for the whole dataset */
     [API_DATA_DETAILS_PROPERTY]: {
-      type: [DictionaryEntry],
+      type: [DictionaryEntrySchema],
       required: true,
       validate: validArrayNotNull,
+      _id: false,
     },
 
     /** 'summary': more precise description for the whole dataset */
     [API_DATA_DESCRIPTION_PROPERTY]: {
-      type: [DictionaryEntry],
+      type: [DictionaryEntrySchema],
       required: true,
       validate: validArrayNotNull,
+      _id: false,
     },
 
     /** Context, objectives and final use of the data */
     purpose: {
-      type: [DictionaryEntry],
+      type: [DictionaryEntrySchema],
       default: undefined,
+      _id: false,
     },
 
     // ---------------------------
@@ -313,6 +317,8 @@ const MetadataSchema = new mongoose.Schema(
           /** 'north_latitude': Northernmost latitude given as a decimal number */
           [API_GEO_BBOX_NORTH]: Latitude,
         },
+        _id: false,
+        default: undefined,
       },
 
       /**
@@ -326,25 +332,21 @@ const MetadataSchema = new mongoose.Schema(
        *
        * Source: https://tools.ietf.org/html/rfc7946#section-3.1.1
        */
-      [API_GEO_GEOJSON_PROPERTY]: {
-        type: GeoJSON,
-      },
+      [API_GEO_GEOJSON_PROPERTY]: GeoJSON,
 
       /**
        * 'projection': Cartographic projection used to describe the data
        */
       [API_GEO_PROJECTION_PROPERTY]: {
         type: String,
+        // default: 'WGS 84 (EPSG:4326)',
         // ,enum: Object.values(Projections)
-        // default: 'WGS 84'
       },
 
       /**
        * Data topology
        */
-      spatial_representation: {
-        type: String,
-      },
+      spatial_representation: String,
     },
 
     /**
@@ -364,10 +366,7 @@ const MetadataSchema = new mongoose.Schema(
     /**
      * 'dataset_dates': Dates of the actions performed on the data (creation, publishing, update, deletion...)
      */
-    [API_DATA_DATES_PROPERTY]: {
-      type: ReferenceDates,
-      required: true,
-    },
+    [API_DATA_DATES_PROPERTY]: ReferenceDatesSchema,
 
     // Status of the storage of the dataset
     // Metadata can exist without the data
@@ -385,105 +384,7 @@ const MetadataSchema = new mongoose.Schema(
      * licence, confidentiality, terms of service, habilitation or required rights,
      * economical model. Default is open licence.
      */
-    access_condition: {
-      _id: false,
-      required: true,
-      validate: validObjectNotEmpty,
-      type: {
-        /** Restriction level for the resource */
-        confidentiality: {
-          /**
-           * If the dataset has a restricted access, this string is the name of
-           * the target ('s public key)
-           * Empty for open data
-           * */
-          restricted_access: {
-            type: Boolean,
-            default: false,
-          },
-
-          /** True if the dataset embeds personal data */
-          gdpr_sensitive: {
-            type: Boolean,
-            default: false,
-          },
-        },
-
-        /**
-         * 'licence': Standard licence (recognized by RUDI system)
-         */
-        [API_LICENCE]: {
-          required: true,
-          _id: false,
-          type: {
-            /** Enum to differenciate standard from custom licence */
-            [API_LICENCE_TYPE]: {
-              type: String,
-              enum: Object.values(LicenceTypes),
-              required: true,
-            },
-
-            /** Standard licence (recognized by RUDI system): label of the licence = concept code */
-            [API_LICENCE_LABEL]: {
-              type: String,
-              default: undefined,
-            },
-
-            /** Custom licence: Title of the custom licence */
-            [API_LICENCE_CUSTOM_LABEL]: {
-              type: [DictionaryEntry],
-              default: undefined,
-            },
-
-            /** Custom licence: Informative URL towards the custom licence */
-            [API_LICENCE_CUSTOM_URI]: {
-              type: String,
-              match: VALID_URI,
-              index: {
-                unique: true,
-                // accept empty values as non-duplicates
-                partialFilterExpression: {
-                  [API_LICENCE_CUSTOM_URI]: {
-                    $type: 'string',
-                  },
-                },
-              },
-            },
-          },
-        },
-
-        /** Describes how constrained is the use of the resource */
-        usage_constraint: {
-          type: [DictionaryEntry],
-          default: undefined,
-        },
-
-        /** Information that MUST be cited every time the data is used */
-        bibliographical_reference: {
-          type: [DictionaryEntry],
-          default: undefined,
-        },
-
-        /**
-         * Mention that must be cited verbatim in every publication that
-         * makes use of the data
-         */
-        mandatory_mention: {
-          type: [DictionaryEntry],
-          default: undefined,
-        },
-
-        access_constraint: {
-          type: [DictionaryEntry],
-          default: undefined,
-        },
-
-        other_constraints: {
-          type: [DictionaryEntry],
-          default: undefined,
-        },
-      },
-    },
+    [API_ACCESS_CONDITION]: AccesConditionSchema,
 
     /** 'metadata_info': Metadata on the metadata */
     [API_METAINFO_PROPERTY]: {
@@ -526,9 +427,8 @@ const MetadataSchema = new mongoose.Schema(
     },
 
     /** 'publishedAt': Date when the resource has been successfully integrated on Rudi Portal for the first time */
-    [DB_PUBLISHED_AT]: {
-      type: Date,
-    },
+    [DB_PUBLISHED_AT]: Date,
+
     /** Creation date, made immutable  */
     [DB_CREATED_AT]: {
       type: Date,
@@ -554,9 +454,9 @@ const MetadataSchema = new mongoose.Schema(
   }
 )
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Validation
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 async function checkLicence(metadata) {
   const fun = 'checkLicence'
   try {
@@ -710,8 +610,9 @@ async function checkThesaurus(metadata) {
       }
     }
 
-    // logT(mod, fun, `geography`)
+    logT(mod, fun, `geography`)
     const geography = metadata[API_GEOGRAPHY]
+    logI(mod, fun, `geography: ${beautify(geography)}`)
     if (geography) {
       const projection = geography[API_GEO_PROJECTION_PROPERTY]
       if (projection) {
@@ -807,9 +708,9 @@ function checkDates(datesObj, firstDateProp, secondDateProp, shouldInitialize) {
   }
 }
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Schema refinements
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 // ----- toJSON cleanup
 MetadataSchema.methods.toJSON = function () {
@@ -851,11 +752,12 @@ MetadataSchema.pre('save', async function (next) {
   try {
     logT(mod, fun, ``)
     const metadata = this
+    logD(mod, fun, metadata[API_GEOGRAPHY])
     // If 'geography' field is defined, the field 'geography.bbox' is required
     if (requireSubProperty(metadata, API_GEOGRAPHY, API_GEO_BBOX_PROPERTY)) {
       if (isNothing(metadata[API_GEOGRAPHY][API_GEO_PROJECTION_PROPERTY])) {
         // If 'geography' field is defined, but 'geography.projection' is not, it is initialized to the defaul value.
-        metadata[API_GEOGRAPHY][API_GEO_PROJECTION_PROPERTY] = 'WGS 84'
+        metadata[API_GEOGRAPHY][API_GEO_PROJECTION_PROPERTY] = 'WGS 84 (EPSG:4326)'
       }
     }
 
@@ -890,7 +792,7 @@ MetadataSchema.pre('save', async function (next) {
     // await checkMedia(metadata)
     logT(mod, fun, `pre save checks OK`)
   } catch (err) {
-    logT(mod, fun, `pre save checks KO`)
+    logV(mod, fun, `pre save checks KO: ${err}`)
     err.message = err.message + ` (metadata ${this[API_METADATA_ID]})`
     next(err)
   }
@@ -928,9 +830,9 @@ MetadataSchema.post('find', async function (docs, next) {
 })
  */
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Models definition
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 export const Metadata = mongoose.model('Metadata', MetadataSchema)
 
 // Making fields searchable

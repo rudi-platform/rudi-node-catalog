@@ -1909,7 +1909,7 @@
 									"    pm.expect(pm.response.code).to.gte(400);",
 									"    const responseJson = pm.response.json();",
 									"    //console.log(responseJson.message);",
-									"    const msg = \"Metadata validation failed: access_condition: Path `access_condition` is required.\"",
+									"    const msg = \"Metadata validation failed: access_condition.licence.licence_type: Path `access_condition.licence.licence_type` is required.\"",
 									"    pm.expect(responseJson.message.substring(0, msg.length)).to.eql(msg);",
 									"",
 									"});"
@@ -1965,7 +1965,7 @@
 									"    const responseJson = pm.response.json();",
 									"    ////console.log(responseJson.message);",
 									"    //const msg = \"La propriété 'access_condition.licence' est requise lorsque la propriété parente 'access_condition' est renseignée\"",
-									"    const msg = \"Metadata validation failed: access_condition.licence: Path `licence` is required.\"",
+									"    const msg = \"Metadata validation failed: access_condition.licence.licence_type: Path `access_condition.licence.licence_type` is required.\"",
 									"    pm.expect(responseJson.message.substring(0, msg.length)).to.eql(msg);",
 									"",
 									"});"
@@ -2077,7 +2077,7 @@
 									"    pm.expect(pm.response.code).to.gte(400);",
 									"    const requestBody = JSON.parse(pm.request.body);",
 									"    // const licenceLabel = requestBody.access_condition.licence.licence_label;",
-									"    const expectedResponse = \"Metadata validation failed: access_condition.licence.licence_type: Path `licence_type` is required.\"",
+									"    const expectedResponse = \"Metadata validation failed: access_condition.licence.licence_type: Path `access_condition.licence.licence_type` is required.\"",
 									"",
 									"    const responseJson = pm.response.json();",
 									"    //console.log(responseJson.message);",

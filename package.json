@@ -36,7 +36,7 @@
     "fastify": "^3.29.1",
     "ini": "^3.0.0",
     "lodash": "^4.17.21",
-    "mongoose": "^6.4.4",
+    "mongoose": "^6.4.5",
     "mongoose-geojson-schema": "^2.2.2",
     "mongoose-int32": "^0.6.0",
     "nanoid": "^4.0.0",

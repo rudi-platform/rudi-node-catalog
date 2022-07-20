@@ -1,3 +1,7 @@
+// -------------------------------------------------------------------------------------------------
+// Custom schema definition
+// -------------------------------------------------------------------------------------------------
+
 /**
  * Position on the South / North meridian
  */
@@ -19,8 +23,7 @@ export const Longitude = {
 /**
  * 2D position on the globe
  */
-export const GpsCoordinates = {
+export const GpsCoordinatesSchema = {
   latitude: Latitude,
   longitude: Longitude,
-  _id: false,
 }
