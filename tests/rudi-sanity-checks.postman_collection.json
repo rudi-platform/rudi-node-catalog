@@ -5467,6 +5467,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
+									"pm.collectionVariables.set('pubKeyName',rand.randomize('pubKeyName'))",
 									""
 								],
 								"type": "text/javascript"

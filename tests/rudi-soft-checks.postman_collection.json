@@ -5532,9 +5532,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"const name = 'pubKeyName'",
-									"const val = rand.randomize(name)",
-									"console.log(pm.collectionVariables.set(name,val))",
+									"pm.collectionVariables.set('pubKeyName',rand.randomize('pubKeyName'))",
 									""
 								],
 								"type": "text/javascript"
@@ -5636,9 +5634,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"const name = 'pubKeyName'",
-									"const val = rand.randomize(name)",
-									"console.log(pm.collectionVariables.set(name,val))",
+									"pm.collectionVariables.set('pubKeyName',rand.randomize('pubKeyName'))",
 									""
 								],
 								"type": "text/javascript"
