@@ -5996,7 +5996,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{apiUrl}}/api/v1/pub_keys/{{portalKeyName}}/jey",
+							"raw": "{{apiUrl}}/api/v1/pub_keys/{{portalKeyName}}/key",
 							"host": [
 								"{{apiUrl}}"
 							],
@@ -6005,7 +6005,7 @@
 								"v1",
 								"pub_keys",
 								"{{portalKeyName}}",
-								"jey"
+								"key"
 							]
 						}
 					},
