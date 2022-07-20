@@ -18,11 +18,7 @@ import { URL_PV_DB_ACCESS, PARAM_OBJECT, MONGO_ERROR } from '../config/confApi.j
 
 import { NotFoundError, BadRequestError, RudiError } from '../utils/errors.js'
 
-import {
-  dropDB as daDropDB,
-  getCollections as daGetCollections,
-  dropCollection as daDropCollection,
-} from '../db/dbActions.js'
+import { daDropDB, daGetCollections, daDropCollection } from '../db/dbActions.js'
 
 import { accessReqParam } from '../utils/jsonAccess.js'
 import { logT } from '../utils/logging.js'

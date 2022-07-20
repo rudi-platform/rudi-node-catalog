@@ -8,7 +8,7 @@ import { DICT_LANG, DICT_TEXT } from '../../db/dbFields.js'
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
 // ------------------------------------------------------------------------------------------------
-import { isObject, isString, beautify } from '../../utils/jsUtils.js'
+import { isObject, isString } from '../../utils/jsUtils.js'
 import { logD, logT, logW } from '../../utils/logging.js'
 import { parameterExpected } from '../../utils/msg.js'
 import {
@@ -141,7 +141,7 @@ export class Thesaurus {
       if (!this.#hasLabels || !lang) return this.#currentValues
 
       // There is a lang labels for each value AND a language is asked
-      logD(mod, fun, beautify(this.#currentValues))
+      // logD(mod, fun, beautify(this.#currentValues))
       const langLabels = {}
       Object.keys(this.#currentValues)
         .sort()

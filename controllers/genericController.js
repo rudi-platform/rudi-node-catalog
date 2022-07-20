@@ -129,8 +129,8 @@ function getObjectParam(req) {
 }
 
 function checkIsUrlObject(objectType) {
-  const fun = 'checkIsUrlObject'
-  logT(mod, fun, beautify(URL_OBJECTS))
+  // const fun = 'checkIsUrlObject'
+  // logT(mod, fun, beautify(URL_OBJECTS))
   if (URL_OBJECTS.indexOf(objectType) === -1)
     throw new NotFoundError(objectTypeNotFound(objectType))
 }
@@ -308,12 +308,16 @@ export const searchObjects = async (req, reply) => {
     ])
 
     if (opt === ACT_EXT_SEARCH) {
-      const extendedSearchTerms = await widenSearch(
-        options[QUERY_SEARCH_TERMS],
-        options[QUERY_LANG]
-      )
-      logD(mod, fun, `extendedSearchTerms: ${extendedSearchTerms}`)
-      options[QUERY_SEARCH_TERMS].push(extendedSearchTerms)
+      try {
+        const extendedSearchTerms = await widenSearch(
+          options[QUERY_SEARCH_TERMS],
+          options[QUERY_LANG]
+        )
+        logD(mod, fun, `extendedSearchTerms: ${extendedSearchTerms}`)
+        options[QUERY_SEARCH_TERMS].push(extendedSearchTerms)
+      } catch (e) {
+        // logE(mod, fun, `SKOSMOS down!: ERR ${e}`)
+      }
     }
     const objectList = await searchDbObjects(objectType, options)
 
@@ -435,7 +439,14 @@ export const getMetadataListAndCount = async (req, reply) => {
       QUERY_FILTER,
       QUERY_FIELDS,
     ])
+    const filter = parsedParameters[QUERY_FILTER]
+    logD(mod, fun, beautify(filter))
+    // const filterNoRestricted = {
+    //   $and: { [API_ACCESS_CONDITION.API_CONFIDENTIALITY.API_RESTRICTED_ACCESS]: undefined },
+    // }
+
     objectList = await getDbMetadataListAndCount(options)
+    logD(mod, fun, objectList.total)
     return objectList
   } catch (err) {
     const error = err.name === MONGO_ERROR ? new BadRequestError(err) : new NotFoundError(err)

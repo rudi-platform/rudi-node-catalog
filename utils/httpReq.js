@@ -7,8 +7,6 @@ const mod = 'http'
 // import http from 'http'
 // import { curlirize } from 'axios-curlirize'
 import axios from 'axios'
-// curlirize(axios)
-
 // ------------------------------------------------------------------------------------------------
 // Internal dependecies
 // ------------------------------------------------------------------------------------------------
@@ -16,8 +14,13 @@ import { USER_AGENT } from '../config/confApi.js'
 import { beautify } from './jsUtils.js'
 import { logD, logHttpAnswer, logT } from './logging.js'
 import { RudiError, BadRequestError } from './errors.js'
+
+// ------------------------------------------------------------------------------------------------
+// Debug axios
+// ------------------------------------------------------------------------------------------------
 import AxiosCurlirize from 'axios-curlirize'
-// import AxiosCurlirize from 'axios-curlirize'
+import { ENV_DEV, getEnvironment } from '../controllers/sysController.js'
+if (getEnvironment() === ENV_DEV) AxiosCurlirize(axios)
 
 // ------------------------------------------------------------------------------------------------
 // Functions: header treatments
@@ -153,7 +156,6 @@ export const httpPut = async (destUrl, dataToSend, authorizationToken) => {
   }
 }
 
-AxiosCurlirize(axios)
 // AxiosCurlirize(axios, (result, err) => {
 //   const fun = 'AxiosCurlirize'
 //   const { command } = result

@@ -53,7 +53,7 @@ import {
 
 import { getSkosmosConf } from '../config/confSystem.js'
 import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
-import { logD, logE, logT, logV, logW } from '../utils/logging.js'
+import { logD, logE, logT, logV, logW, sysAlert } from '../utils/logging.js'
 
 import {
   ParameterExpectedError,
@@ -170,7 +170,7 @@ export const dbSchemeToRudi = async (dbScheme) => {
 export const createConceptHierarchy = async (listConcepts, schemeDbId, parentConcept) => {
   const fun = 'createConceptHierarchy'
   try {
-    logT(mod, fun, ``)
+    // logT(mod, fun, ``)
     // Check input parameters
     if (!listConcepts) throw new ParameterExpectedError('listConcepts', mod, fun)
     if (!schemeDbId) throw new ParameterExpectedError('schemeDbId', mod, fun)
@@ -180,7 +180,7 @@ export const createConceptHierarchy = async (listConcepts, schemeDbId, parentCon
     await Promise.all(
       listConcepts.map(async (conceptJson) => {
         let dbConcept = getConceptWithJson(conceptJson)
-        logD(mod, fun, `dbConcept: ${beautify(dbConcept)}`)
+        // logD(mod, fun, `dbConcept: ${beautify(dbConcept)}`)
 
         if (isNotEmptyObject(dbConcept)) {
           // logD(mod, fun, `Concept already created: ${beautify(dbConcept[API_SKOS_CONCEPT_ID])} `)
@@ -702,10 +702,14 @@ export const askSkosmos = async (term, lang = 'fr', vocabulary) => {
         if (result.altLabel) labels.push(result.altLabel)
       })
       return labels
-    } catch (e) {
-      logE(mod, fun, 'COMMUNICATION ERROR!')
-      logE(mod, fun, e)
-      throw RudiError.treatCommunicationError(mod, fun, e)
+    } catch (error) {
+      if (error.message?.startsWith('getaddrinfo ENOTFOUND'))
+        error.message = `Skosmos server can't be reached: ${error.message}`
+      else if (error.message === 'Request failed with status code 404')
+        error.message = `URL to reach Skosmos server is wrong : ${reqUrl}`
+      const e = RudiError.treatCommunicationError(mod, fun, error)
+      sysAlert(error.message, 'skosController.askSkosmos', {}, { error: e })
+      throw e
     }
   } catch (err) {
     logE(mod, fun, err)

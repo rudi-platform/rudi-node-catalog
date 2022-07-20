@@ -209,15 +209,18 @@ export class RudiError extends Error {
       // logD(mod, fun, JSON.parse(JSON.stringify(comError)).status)
       // logD(mod, fun, `data: ${beautify(comError.response?.data)}`)
 
-      const errCode = parseInt(
-        comError.status ||
-          comError.code ||
-          comError.statusCode ||
-          comError.response?.status ||
-          comError.response?.data?.code ||
-          comError.response?.data?.status ||
-          JSON.parse(JSON.stringify(comError)).status
-      )
+      const errCode =
+        parseInt(
+          comError.status ||
+            JSON.parse(JSON.stringify(comError)).status ||
+            comError.code ||
+            comError.statusCode ||
+            comError.response?.status ||
+            comError.response?.data?.code ||
+            comError.response?.data?.status
+        ) || comError.code == 'ENOTFOUND'
+          ? 404
+          : 0
 
       // logD(mod, fun, `${errFlag}error code: ${errCode}`)
 

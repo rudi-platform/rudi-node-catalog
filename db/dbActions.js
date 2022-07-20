@@ -20,9 +20,18 @@ import { logD, logT, logV, logW } from '../utils/logging.js'
 import { RudiError } from '../utils/errors.js'
 
 // ------------------------------------------------------------------------------------------------
-// Actions on DB tables
+// Actions on MongoDB tables from mongoose
 // ------------------------------------------------------------------------------------------------
-export const getCollections = async () => {
+export const daDropModelCollection = (Model) =>
+  Model?.collection
+    ?.drop()
+    .then(() => logD(mod, 'dropModelCollection', `done`))
+    .catch((err) => logW(mod, 'dropModelCollection', err))
+
+// ------------------------------------------------------------------------------------------------
+// Actions on MongoDB tables
+// ------------------------------------------------------------------------------------------------
+export const daGetCollections = async () => {
   const fun = `getCollections`
   try {
     const collections = await connection.db.listCollections().toArray()
@@ -33,30 +42,32 @@ export const getCollections = async () => {
   }
 }
 
-export const dropDB = async (req, reply) => {
-  const fun = `dropDB`
+export const daDropDB = async (req, reply) => {
+  const fun = `daDropDB`
   try {
     logT(mod, fun, ``)
     /* Drop the whole DB !!! */
     // const dbActionResult = await connection.db.dropDatabase()
     // logD(mod, fun, 'DB dropped')
 
-    const logsCollection =
-      LogEntry && LogEntry.collection && LogEntry.collection.name
-        ? LogEntry.collection.name
-        : 'logentries'
+    const logsCollection = LogEntry?.collection?.name || 'logentries'
 
     const listCollections = await connection.db.listCollections().toArray()
-    // logD(mod, fun, `listCollections: ${utils.beautify(listCollections)}`)
-    logD(mod, fun, `listCollections: ${beautify(listCollections)}`)
+    // logD(mod, fun, `listCollections: ${beautify(listCollections)}`)
 
     const collectionDropped = {}
     await Promise.all(
       listCollections.map(async (collection) => {
         if (!collection) logD(mod, fun, `Weird: ${beautify(collection)}`)
         if (collection.name !== logsCollection) {
-          logD(mod, fun, `dropping '${collection.name}'`)
-          connection.db.dropCollection(collection.name)
+          logD(mod, fun, `Dropping '${collection.name}'`)
+          connection.db.dropCollection(collection.name, (err, res) => {
+            if (err) {
+              logW(mod, fun, `Coudn't drop '${collection.name}': ERR ${err}`)
+            } else {
+              logD(mod, fun, `Dropped '${collection.name}': ${res}`)
+            }
+          })
           collectionDropped[collection.name] = true
         }
       })
@@ -67,8 +78,8 @@ export const dropDB = async (req, reply) => {
   }
 }
 
-export const dropCollection = async (collectionName) => {
-  const fun = `dropCollection`
+export const daDropCollection = async (collectionName) => {
+  const fun = `daDropCollection`
   try {
     const listCollections = await connection.db.listCollections().toArray()
     // logD(mod, fun, `listCollections: ${utils.beautify(listCollections)}`)
@@ -76,7 +87,13 @@ export const dropCollection = async (collectionName) => {
     await Promise.all(
       listCollections.map(async (collection) => {
         if (collection.name === collectionName) {
-          connection.db.dropCollection(collectionName)
+          connection.db.dropCollection(collectionName, (err, res) => {
+            if (err) {
+              logW(mod, fun, `Coudn't drop '${collection.name}': ERR ${err}`)
+            } else {
+              logD(mod, fun, `Dropped '${collection.name}': ${res}`)
+            }
+          })
           isCollectionDropped = true
           return isCollectionDropped
         }
@@ -107,11 +124,11 @@ export const makeSearchable = async (Model) => {
     try {
       collection = Model.collection
     } catch (err) {
-      logD(mod, fun, `No collection for '${Model.name}: ${err}`)
+      logW(mod, fun, `No collection for '${Model.name}: ${err}`)
       return
     }
     if (!collection) {
-      logD(mod, fun, `No collection for '${Model.name}`)
+      logW(mod, fun, `No collection for '${Model.name}`)
       return
     }
     let searchableFields
@@ -136,8 +153,11 @@ export const makeSearchable = async (Model) => {
         // await collection.dropIndex(SEARCH_INDEX)
       }
     } catch (er) {
-      if (er.codeName === 'NamespaceNotFound') logV(mod, fun, 'Not dropping inexistant indexes')
-      else logW(mod, fun, er) // throw er?
+      if (er.codeName === 'NamespaceNotFound') {
+        logV(mod, fun, 'Not dropping inexistant indexes')
+      } else {
+        logW(mod, fun, er) // throw er?
+      }
     }
     // Preparing the 'text' (=== searchable) indexes
     const searchIndexes = {}
@@ -151,8 +171,12 @@ export const makeSearchable = async (Model) => {
 
     // (Re)creating the indexes
     // logT(mod, fun, `Creating search indexes for collection '${collection.name}'}`)
-    await collection
+    return collection
       .createIndex(searchIndexes, indexOpts)
+      .catch((err) => {
+        logW(mod, fun, `Indexes not created for '${Model.collection.name}': ${err}`)
+        throw RudiError.treatError(mod, fun, err)
+      })
       .then(
         logT(
           mod,

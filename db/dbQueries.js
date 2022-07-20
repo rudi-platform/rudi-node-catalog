@@ -6,11 +6,11 @@ const mod = 'db'
 // ------------------------------------------------------------------------------------------------
 // External dependencies
 // ------------------------------------------------------------------------------------------------
-
 import mongoose from 'mongoose'
 
 import _ from 'lodash'
 const { omit, pick } = _
+
 // ------------------------------------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------------------------------------
@@ -122,7 +122,7 @@ import { PublicKey } from '../definitions/models/PublicKey.js'
 // ------------------------------------------------------------------------------------------------
 // Other internal dependencies
 // ------------------------------------------------------------------------------------------------
-import { dropCollection, makeSearchable } from './dbActions.js'
+import { daDropCollection, makeSearchable } from './dbActions.js'
 
 // ------------------------------------------------------------------------------------------------
 // Properties with special treatments
@@ -302,13 +302,9 @@ export const listThemesInMetadata = async () => {
 // ------------------------------------------------------------------------------------------------
 // Helper functions
 // ------------------------------------------------------------------------------------------------
-export const getModelPropertyNames = (Model) => {
-  return Object.keys(Model.schema.paths)
-}
+export const getModelPropertyNames = (Model) => Object.keys(Model.schema.paths) // Model.schema.paths
 
-export const isProperty = (Model, prop) => {
-  return getModelPropertyNames(Model).includes(prop)
-}
+export const isProperty = (Model, prop) => getModelPropertyNames(Model).includes(prop)
 
 // ------------------------------------------------------------------------------------------------
 // Actions on DB tables
@@ -322,8 +318,8 @@ export const cleanLicences = async () => {
 
   try {
     // TODO: target only licences hierarchy!
-    await dropCollection(SkosConcept.collection.name)
-    await dropCollection(SkosScheme.collection.name)
+    await daDropCollection(SkosConcept.collection.name)
+    await daDropCollection(SkosScheme.collection.name)
   } catch (err) {
     // logW(mod, fun, err)
     throw RudiError.treatError(mod, fun, err)
@@ -768,10 +764,12 @@ export const getDbObjectListAndCount = async (objectType, options) => {
     const globalCount = result[0][COUNT_LABEL][0] ? result[0][COUNT_LABEL][0].count : 0
     const objectList = result[0][LIST_LABEL]
 
-    logD(mod, fun, `total: ${globalCount}`)
+    // logD(mod, fun, `total: ${globalCount}`)
 
     let populateOptions = getPopulateOptions(objectType)
     const objListPopulated = await Model.populate(objectList, populateOptions)
+
+    // logD(mod, fun, `objListPopulated: ${objListPopulated}`)
 
     // Reshaping: selecting fields
     let finalObjList
@@ -780,6 +778,7 @@ export const getDbObjectListAndCount = async (objectType, options) => {
     } else {
       finalObjList = objListPopulated.map((obj) => pick(obj, fieldsToKeep))
     }
+    // logD(mod, fun, `finalObjList: ${finalObjList}`)
 
     const reshapedResult = {
       [COUNT_LABEL]: globalCount,

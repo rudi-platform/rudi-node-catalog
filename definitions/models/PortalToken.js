@@ -21,31 +21,19 @@ import { UUID } from '../schemas/Identifiers.js'
 const PortalTokenSchema = new mongoose.Schema(
   {
     /** Base 64 encoded token information */
-    access_token: {
-      type: String,
-    },
+    access_token: String,
 
-    token_type: {
-      type: String,
-    },
+    token_type: String,
 
     /** Token life span in seconds */
-    expires_in: {
-      type: Int32,
-    },
+    expires_in: Int32,
 
     /** Expiration date in Epoch seconds */
-    exp: {
-      type: Int32,
-    },
+    exp: Int32,
 
-    scope: {
-      type: String,
-    },
+    scope: String,
 
-    jti: {
-      type: UUID,
-    },
+    jti: UUID,
   },
   {
     timestamps: true,

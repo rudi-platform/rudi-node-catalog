@@ -1,4 +1,4 @@
-const mod = 'hashThes'
+const mod = 'lccThes'
 
 // ------------------------------------------------------------------------------------------------
 // Internal dependencies
@@ -31,6 +31,7 @@ export const get = () => {
 export const set = (newValue) => {
   const fun = 'set'
   try {
+    // logT(mod, fun, ``)
     if (!newValue) {
       const errMsg = parameterExpected(fun, 'newValue')
       logW(mod, fun, errMsg)

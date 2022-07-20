@@ -105,7 +105,7 @@ export const parseQueryParameters = async (objectType, fullUrl) => {
     // identify object model
     const Model = getObjectModel(objectType)
     const modelProperties = getModelPropertyNames(Model)
-
+    logD(mod, fun, beautify(modelProperties))
     const returnedFilter = {
       [QUERY_LIMIT]: DEFAULT_QUERY_LIMIT,
       [QUERY_GROUP_LIMIT]: DEFAULT_QUERY_LIMIT,

@@ -6,6 +6,7 @@ const mod = 'utils'
 // External dependencies
 // ------------------------------------------------------------------------------------------------
 import { inspect } from 'util'
+import objectPath from 'object-path'
 
 import _ from 'lodash'
 const { floor, pick } = _
@@ -213,6 +214,9 @@ export const filterOnValue = async (obj, predicate) => {
 
   return result
 }
+
+export const getSubProp = (obj, propArray) => objectPath.get(obj, propArray)
+export const setSubProp = (obj, propArray, value) => objectPath.set(obj, propArray, value)
 
 // ------------------------------------------------------------------------------------------------
 // JSON

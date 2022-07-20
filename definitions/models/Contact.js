@@ -123,8 +123,9 @@ Contact.initialize = async () => {
   const fun = 'initContact'
   try {
     logT(mod, fun, ``)
-    await makeSearchable(Contact)
-    logD(mod, fun, `Indexes created`)
+    return makeSearchable(Contact)
+      .catch((err) => logW(mod, fun, err))
+      .then(logD(mod, fun, `Indexes created`))
   } catch (err) {
     logW(mod, fun, err)
     RudiError.treatError(mod, fun, err)

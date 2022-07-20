@@ -170,9 +170,9 @@ const SKOSMOS_SECTION = 'skosmos'
 const skosmosConfFile = getIniValue(SKOSMOS_SECTION, 'skosmos_conf')
 let SKOSMOS_CONF
 try {
-  if (skosmosConfFile) readIniFile(skosmosConfFile)
+  if (skosmosConfFile) SKOSMOS_CONF = readIniFile(skosmosConfFile)
 } catch (e) {
-  consoleErr(e)
+  consoleErr(mod, 'skosmosConfFile', e)
 }
 export const getSkosmosConf = (prop) =>
   !SKOSMOS_CONF ? null : prop ? SKOSMOS_CONF[prop] : SKOSMOS_CONF

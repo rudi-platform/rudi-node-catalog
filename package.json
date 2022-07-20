@@ -40,6 +40,7 @@
     "mongoose-geojson-schema": "^2.2.2",
     "mongoose-int32": "^0.6.0",
     "nanoid": "^4.0.0",
+    "object-path": "^0.11.8",
     "sanitize-filename": "^1.6.3",
     "sshpk": "^1.17.0",
     "uuid": "^8.3.2",

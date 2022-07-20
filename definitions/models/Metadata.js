@@ -12,6 +12,8 @@ import GeoJSON from 'mongoose-geojson-schema'
 import mongooseInt32 from 'mongoose-int32'
 const Int32 = mongooseInt32.loadType(mongoose)
 
+import objectPath from 'object-path'
+
 // ------------------------------------------------------------------------------------------------
 // Fields
 // ------------------------------------------------------------------------------------------------
@@ -134,11 +136,9 @@ export const METADATA_FIELDS_TO_POPULATE = [
   API_MEDIA_PROPERTY,
 ].join(' ')
 
-const SKIP_FIELDS = `-${FIELDS_TO_SKIP.join(' -')}`
-
 const POPULATE_OPTS = {
   path: METADATA_FIELDS_TO_POPULATE,
-  select: SKIP_FIELDS,
+  select: `-${FIELDS_TO_SKIP.concat(API_RESTRICTED_ACCESS).join(' -')}`,
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -301,17 +301,18 @@ const MetadataSchema = new mongoose.Schema(
        * The 4 parameters are given as decimal as described in the norm ISO 6709
        */
       [API_GEO_BBOX_PROPERTY]: {
-        type: Object,
-        // Custom validation in pre-save hook: required if 'geography' is defined !
+        type: {
+          // Custom validation in pre-save hook: required if 'geography' is defined !
 
-        /** 'west_longitude': Westernmost longitude given as a decimal number */
-        [API_GEO_BBOX_WEST]: Longitude,
-        /* 'east_longitude': Easternmost longitude given as a decimal number */
-        [API_GEO_BBOX_EAST]: Longitude,
-        /** 'south_latitude': Southernmost latitude given as a decimal number */
-        [API_GEO_BBOX_SOUTH]: Latitude,
-        /** 'north_latitude': Northernmost latitude given as a decimal number */
-        [API_GEO_BBOX_NORTH]: Latitude,
+          /** 'west_longitude': Westernmost longitude given as a decimal number */
+          [API_GEO_BBOX_WEST]: Longitude,
+          /* 'east_longitude': Easternmost longitude given as a decimal number */
+          [API_GEO_BBOX_EAST]: Longitude,
+          /** 'south_latitude': Southernmost latitude given as a decimal number */
+          [API_GEO_BBOX_SOUTH]: Latitude,
+          /** 'north_latitude': Northernmost latitude given as a decimal number */
+          [API_GEO_BBOX_NORTH]: Latitude,
+        },
       },
 
       /**
@@ -384,19 +385,19 @@ const MetadataSchema = new mongoose.Schema(
      * licence, confidentiality, terms of service, habilitation or required rights,
      * economical model. Default is open licence.
      */
-    [API_ACCESS_CONDITION]: {
+    access_condition: {
       _id: false,
       required: true,
       validate: validObjectNotEmpty,
       type: {
         /** Restriction level for the resource */
-        [API_CONFIDENTIALITY]: {
+        confidentiality: {
           /**
            * If the dataset has a restricted access, this string is the name of
            * the target ('s public key)
            * Empty for open data
            * */
-          [API_RESTRICTED_ACCESS]: {
+          restricted_access: {
             type: Boolean,
             default: false,
           },
@@ -776,7 +777,7 @@ function toISOString(dateStr) {
 function checkDates(datesObj, firstDateProp, secondDateProp, shouldInitialize) {
   const fun = 'checkDates'
   try {
-    logT(mod, fun, ``)
+    // logT(mod, fun, ``)
     if (!datesObj) return
 
     if (!datesObj[secondDateProp]) {
@@ -831,6 +832,18 @@ MetadataSchema.virtual(`${API_METAINFO_PROPERTY}.${API_METAINFO_DATES}.${API_DAT
     return this[DB_PUBLISHED_AT]
   }
 )
+
+MetadataSchema.virtual(API_RESTRICTED_ACCESS).get(function () {
+  return objectPath.get(this, [API_ACCESS_CONDITION, API_CONFIDENTIALITY, API_RESTRICTED_ACCESS])
+})
+
+MetadataSchema.virtual(API_RESTRICTED_ACCESS).set(function (isRestricted) {
+  return objectPath.set(
+    this,
+    [API_ACCESS_CONDITION, API_CONFIDENTIALITY, API_RESTRICTED_ACCESS],
+    !!isRestricted
+  )
+})
 
 MetadataSchema.pre('save', async function (next) {
   const fun = 'pre save hook'

@@ -51,11 +51,10 @@ import mongoose from 'mongoose'
 // }
 
 import { getAppHash, getEnvironment } from './controllers/sysController.js'
-import { addLogEntry, logE, logI, sysAlert, sysCrit, sysInfo } from './utils/logging.js'
+import { addLogEntry, logE, logI, logT, sysAlert, sysCrit, sysInfo } from './utils/logging.js'
 
 consoleLog(mod, 'mongo', `Connecting to [${getDbUrl()}]`)
 
-// import { fastifyConf, declareRoutes } from './routes/fastify'
 import { LogEntry } from './definitions/models/LogEntry.js'
 import { Contact } from './definitions/models/Contact.js'
 import { Organization } from './definitions/models/Organization.js'
@@ -64,6 +63,7 @@ import { Metadata } from './definitions/models/Metadata.js'
 import Keywords from './definitions/thesaurus/Keywords.js'
 import Themes from './definitions/thesaurus/Themes.js'
 import { fastifyConf, declareRoutes } from './routes/fastify.js'
+import { getLicenceCodes } from './controllers/licenceController.js'
 
 mongoose
   .connect(getDbUrl())
@@ -134,9 +134,13 @@ const start = async () => {
 
     await Promise.all(
       [LogEntry, Contact, Organization, Media, Metadata, Keywords, Themes].map((model) =>
-        model.initialize()
+        model
+          .initialize()
+          .catch((err) => logE(mod, fun, err))
+          .then(logT(mod, fun, `Indexes created`))
       )
     )
+    await getLicenceCodes()
 
     separateLogs('Start', true) //////////////////////////////////////////////////////////////
     const appVer = getAppHash()

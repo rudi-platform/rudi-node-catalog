@@ -109,8 +109,6 @@ const LogEntrySchema = new Schema(
 
 LogEntrySchema.index({ [DB_UPDATED_AT]: 1 }, { expires: LOG_EXP })
 
-// LogEntrySchema.virtual('time').get(() => this.createdAt.getTime())
-
 // ------------------------------------------------------------------------------------------------
 // Schema refinements
 // ------------------------------------------------------------------------------------------------
@@ -118,7 +116,6 @@ LogEntrySchema.index({ [DB_UPDATED_AT]: 1 }, { expires: LOG_EXP })
 // ----- toJSON cleanup
 LogEntrySchema.methods.toJSON = function () {
   return logLineToString(this)
-
   // return omit(this.toObject(), [DB_ID, DB_V, DB_UPDATED_AT])
 }
 
@@ -139,18 +136,10 @@ export function makeLogInfo(logLvl, mod, fun, msg) {
   }
 }
 
-export function logLineToString(logLine) {
-  // const fun = 'logLineToString'
-  // logD(mod, fun , `logLine: ${beautify(logLine)}`)
-  // const dateStr = `${format(logLine[DB_CREATED_AT], LOG_DATE_FORMAT)} ${logLine[
-  //   DB_CREATED_AT
-  // ].getTime()}`
-  return (
-    `${datetime.format(logLine[DB_CREATED_AT], LOG_DATE_FORMAT)} ${logLine.time} ${
-      logLine.log_level
-    } ` + `[ ${logLine.location_module} . ${logLine.location_function} ] ${logLine.message}`
-  )
-}
+export const logLineToString = (logLine) =>
+  `${datetime.format(logLine[DB_CREATED_AT], LOG_DATE_FORMAT)} ${logLine.time} ${
+    logLine.log_level
+  } ` + `[ ${logLine.location_module} . ${logLine.location_function} ] ${logLine.message}`
 
 // ------------------------------------------------------------------------------------------------
 // Exports
