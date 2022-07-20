@@ -282,7 +282,7 @@ export const separateLogs = (insertStr, shouldDisplayDate) => {
 
   const logSeparator = `${dateStr}${line}${inputStr}`
 
-  console.log('\nD ' + logSeparator)
+  console.log('D ' + logSeparator)
   return logSeparator
 }
 

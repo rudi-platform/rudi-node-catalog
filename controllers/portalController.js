@@ -265,12 +265,12 @@ export const getPortalJwtPubKey = async () => {
     if (cachedPortalJwtPubKey) return cachedPortalJwtPubKey
 
     const publicKeyUrl = getPortalJwtPubKeyUrl()
-    logD(mod, fun, 'publicKeyUrl: ' + publicKeyUrl)
+    // logD(mod, fun, 'publicKeyUrl: ' + publicKeyUrl)
 
     const publicKeyObj = await axios.get(publicKeyUrl, getPortalAuthHeaderBasic())
-    logD(mod, fun, 'publicKeyObj: ' + beautify(publicKeyObj))
+    // logD(mod, fun, 'publicKeyObj: ' + beautify(publicKeyObj))
     cachedPortalJwtPubKey = publicKeyObj?.data?.value
-    logD(mod, fun, `portalJwtPubKey: ${cachedPortalJwtPubKey}`)
+    // logD(mod, fun, `portalJwtPubKey: ${cachedPortalJwtPubKey}`)
     return cachedPortalJwtPubKey
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)

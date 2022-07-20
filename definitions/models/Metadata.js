@@ -752,7 +752,7 @@ MetadataSchema.pre('save', async function (next) {
   try {
     logT(mod, fun, ``)
     const metadata = this
-    logD(mod, fun, metadata[API_GEOGRAPHY])
+    // logD(mod, fun, metadata[API_GEOGRAPHY])
     // If 'geography' field is defined, the field 'geography.bbox' is required
     if (requireSubProperty(metadata, API_GEOGRAPHY, API_GEO_BBOX_PROPERTY)) {
       if (isNothing(metadata[API_GEOGRAPHY][API_GEO_PROJECTION_PROPERTY])) {
