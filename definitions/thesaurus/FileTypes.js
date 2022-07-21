@@ -84,6 +84,9 @@ export const FileTypes = [
   'video/x-msvideo', // (.avi)
 ]
 
+const FileTypesAndEncrypted = FileTypes
+FileTypes.map((mime) => FileTypesAndEncrypted.push(`${mime}+crypt`))
+
 export const Extensions = {
   '3gp': 'video/3gpp',
   '3gpp': 'video/3gpp',
@@ -169,6 +172,10 @@ export const initialize = (arg) => {
 
 export const get = (prop) => {
   return prop ? Thesaurus[prop] : Thesaurus
+}
+
+export const getFileTypesWithCrypt = (prop) => {
+  return prop ? FileTypesAndEncrypted[prop] : FileTypesAndEncrypted
 }
 
 export const getExtensions = () => {

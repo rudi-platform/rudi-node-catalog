@@ -50,7 +50,7 @@ import { BadRequestError, RudiError } from '../../utils/errors.js'
 import { makeSearchable } from '../../db/dbActions.js'
 
 import { get as getEncodings } from '../thesaurus/Encodings.js'
-import { get as getFileTypes } from '../thesaurus/FileTypes.js'
+import { getFileTypesWithCrypt } from '../thesaurus/FileTypes.js'
 import { get as getHashAlgorithms } from '../thesaurus/HashAlgorithms.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -174,7 +174,7 @@ const FileSchema = new mongoose.Schema(
     // Native format of the resource
     [API_FILE_MIME]: {
       type: String,
-      enum: Object.values(getFileTypes()),
+      enum: Object.values(getFileTypesWithCrypt()),
       required: true,
     },
 

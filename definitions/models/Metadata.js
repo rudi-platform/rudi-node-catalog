@@ -94,7 +94,7 @@ const validArrayNotNull = {
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { beautify, isNotEmptyArray, isNothing } from '../../utils/jsUtils.js'
-import { logD, logE, logI, logT, logV } from '../../utils/logging.js'
+import { logD, logE, logT, logV } from '../../utils/logging.js'
 import { incorrectVal, incorrectValueForEnum } from '../../utils/msg.js'
 import { NotFoundError, BadRequestError, RudiError } from '../../utils/errors.js'
 import { accessProperty, requireSubProperty } from '../../utils/jsonAccess.js'
@@ -610,9 +610,9 @@ async function checkThesaurus(metadata) {
       }
     }
 
-    logT(mod, fun, `geography`)
+    // logT(mod, fun, `geography`)
     const geography = metadata[API_GEOGRAPHY]
-    logI(mod, fun, `geography: ${beautify(geography)}`)
+    // logI(mod, fun, `geography: ${beautify(geography)}`)
     if (geography) {
       const projection = geography[API_GEO_PROJECTION_PROPERTY]
       if (projection) {
