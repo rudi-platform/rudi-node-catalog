@@ -746,6 +746,9 @@ MetadataSchema.virtual(API_RESTRICTED_ACCESS).set(function (isRestricted) {
   )
 })
 
+// -------------------------------------------------------------------------------------------------
+// Hooks
+// -------------------------------------------------------------------------------------------------
 MetadataSchema.pre('save', async function (next) {
   const fun = 'pre save hook'
 

@@ -44,7 +44,7 @@ import { ConnectorParameter } from '../schemas/ConnectorParameters.js'
 import { VALID_URI } from '../schemaValidators.js'
 import { UuidV4Schema } from '../schemas/Identifiers.js'
 import { isNotEmptyObject } from '../../utils/jsUtils.js'
-import { logD, logW } from '../../utils/logging.js'
+import { logD, logV, logW } from '../../utils/logging.js'
 import { missingField } from '../../utils/msg.js'
 import { BadRequestError, RudiError } from '../../utils/errors.js'
 import { makeSearchable } from '../../db/dbActions.js'
@@ -290,6 +290,7 @@ const SeriesSchema = new mongoose.Schema(
 // MediaService schema definition
 // -------------------------------------------------------------------------------------------------
 const ServiceSchema = new mongoose.Schema({}, commonSchemaOptions)
+
 // -------------------------------------------------------------------------------------------------
 // Schema refinements
 // -------------------------------------------------------------------------------------------------
@@ -307,6 +308,25 @@ SeriesSchema.methods.toJSON = function () {
 ServiceSchema.methods.toJSON = function () {
   return omit(this.toObject(), FIELDS_TO_SKIP)
 }
+
+// -------------------------------------------------------------------------------------------------
+// Hooks
+// -------------------------------------------------------------------------------------------------
+MediaSchema.pre('save', async function (next) {
+  const fun = 'pre save hook'
+
+  const media = this
+  try {
+    // logT(mod, fun, ``)
+    if (!media[API_MEDIA_NAME]) media[API_MEDIA_NAME] = media[API_MEDIA_ID]
+  } catch (err) {
+    logV(mod, fun, `pre save checks KO: ${err}`)
+    err.message = err.message + ` (media ${media[API_MEDIA_ID]})`
+    next(err)
+  }
+
+  // next()
+})
 
 // -------------------------------------------------------------------------------------------------
 // Models definition
