@@ -12,12 +12,12 @@ const DEFAULT_MESSAGE = 'Rudi producer node - API Server Error'
 const IS_RUDI_ERROR = 'is_rudi_error'
 const ERR_ID = 'errId'
 
-import { TRACE, STATUS_CODE, TRACE_MOD, TRACE_FUN, TRACE_ERR } from '../config/confApi.js'
+import { TRACE, STATUS_CODE, TRACE_MOD, TRACE_FUN, TRACE_ERR, ERR_PATH } from '../config/confApi.js'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { beautify } from './jsUtils.js'
+import { beautify, isArray } from './jsUtils.js'
 import { logD, logT, logW } from './logging.js'
 import { objectNotFound, parameterExpected } from './msg.js'
 
@@ -29,7 +29,7 @@ import { objectNotFound, parameterExpected } from './msg.js'
 // Custom http errors
 // -------------------------------------------------------------------------------------------------
 export class RudiError extends Error {
-  constructor(message, code, name, description, errTrace, ctxMod, ctxFun) {
+  constructor(message, code, name, description, errTrace, ctxMod, ctxFun, path) {
     // const fun = 'RudiError()'
     // logT(mod, fun, `${beautify(errTrace)}`)
     // const lastTrace = getLast(errTrace)
@@ -45,6 +45,7 @@ export class RudiError extends Error {
     this.setId()
     this[TRACE_MOD] = ctxMod
     this[TRACE_FUN] = ctxFun
+    this[ERR_PATH] = path
   }
 
   toString() {
@@ -119,13 +120,13 @@ export class RudiError extends Error {
     )
   }
 
-  static createRudiHttpError(code, message, ctxMod, ctxFun) {
+  static createRudiHttpError(code, message, ctxMod, ctxFun, path) {
     const fun = 'createRudiHttpError'
     try {
       logD(mod, fun, `Error ${code}: ${message}`)
       switch (parseInt(code)) {
         case 400:
-          return new BadRequestError(message, ctxMod, ctxFun)
+          return new BadRequestError(message, ctxMod, ctxFun, path)
         case 401:
           return new UnauthorizedError(message, ctxMod, ctxFun)
         case 403:
@@ -182,7 +183,8 @@ export class RudiError extends Error {
         error.error,
         errTrace,
         ctxMod,
-        ctxFun
+        ctxFun,
+        error.path
       )
       // logD(mod, fun, error.isRudiError())
 
@@ -289,7 +291,7 @@ export class RudiError extends Error {
 }
 
 export class BadRequestError extends RudiError {
-  constructor(errMessage, ctxMod, ctxFun) {
+  constructor(errMessage, ctxMod, ctxFun, pathArray) {
     super(
       errMessage,
       400,
@@ -297,8 +299,28 @@ export class BadRequestError extends RudiError {
       'The JSON (or the request) is not valid',
       undefined,
       ctxMod,
-      ctxFun
+      ctxFun,
+      pathArray
     )
+    if (pathArray && !isArray(pathArray)) {
+      logW(ctxMod, ctxFun, `BadRequest constructor Error: 4th parameter should be an array`)
+      this.path = [pathArray]
+    }
+  }
+  toJSON() {
+    return {
+      [STATUS_CODE]: this[STATUS_CODE],
+      type: this.constructor.name,
+      name: this.name,
+      error: this.error,
+      message: this.message,
+      id: this.id,
+      path: this.path,
+    }
+  }
+
+  toString() {
+    return `Error ${this[STATUS_CODE]} (${this.name}): ${this.message} [${this.path}]`
   }
 }
 

@@ -28,7 +28,7 @@ export const newContact = async (contactJson) => {
   logD(mod, fun, `${beautify(contactJson)}`)
   let dbContact
   try {
-    dbContact = await new Contact(contactJson)
+    dbContact = new Contact(contactJson)
     await dbContact.save()
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)

@@ -31,7 +31,7 @@ export const newOrganization = async (orgJson) => {
   let dbOrganization
 
   try {
-    dbOrganization = await new Organization(orgJson)
+    dbOrganization = new Organization(orgJson)
     await dbOrganization.save()
     // cache.addOrganization(dbOrganization)
   } catch (err) {

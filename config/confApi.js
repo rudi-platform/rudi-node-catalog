@@ -170,4 +170,6 @@ export const TRACE_MOD = 'mod'
 export const TRACE_FUN = 'fun'
 export const TRACE_ERR = 'err'
 
+export const ERR_PATH = 'path'
+
 export const MONGO_ERROR = 'MongoServerError'

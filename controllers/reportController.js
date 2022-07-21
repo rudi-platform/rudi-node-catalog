@@ -157,7 +157,7 @@ export const addSingleReportForObject = async (req, reply) => {
 
     // add new integration report
     logD(mod, fun, `add new integration report`)
-    const dbReadyReport = await new Report(reportBody)
+    const dbReadyReport = new Report(reportBody)
     logD(mod, fun, `save new integration report`)
     await dbReadyReport.save()
     logI(mod, fun, `Report saved: ${beautify(dbReadyReport)}`)
@@ -253,7 +253,7 @@ export const addOrEditSingleReport = async (objectType, req, reply) => {
       // logD(mod, fun, `Adding new report`)
       // add new integration report
       try {
-        dbReadyReport = await new Report(reportBody)
+        dbReadyReport = new Report(reportBody)
         await dbReadyReport.save()
         logI(mod, fun, `Report created: ${beautify(dbReadyReport)}`)
       } catch (er) {

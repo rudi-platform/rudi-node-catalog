@@ -1823,7 +1823,7 @@ export const cleanStoredToken = (dbToken) => {
 export const storePortalToken = async (token) => {
   const fun = 'storePortalToken'
   try {
-    const dbToken = await new PortalToken(token)
+    const dbToken = new PortalToken(token)
     return await dbToken.save()
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)

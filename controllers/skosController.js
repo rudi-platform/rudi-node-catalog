@@ -116,7 +116,7 @@ export const newSkosScheme = async (rudiScheme) => {
 
     delete rudiScheme[API_SCHEME_TOPS_PROPERTY]
 
-    const dbReadySchemeNoRef = await new SkosScheme(rudiScheme)
+    const dbReadySchemeNoRef = new SkosScheme(rudiScheme)
     const dbScheme = await dbReadySchemeNoRef.save()
 
     const schemeDbId = dbScheme[DB_ID]
@@ -204,7 +204,7 @@ export const createConceptHierarchy = async (listConcepts, schemeDbId, parentCon
           // Create concept without references
           // logD(mod, fun, `Saving the new Concept`)
           // logD(mod, fun, `conceptJson: ${beautify(conceptJson)}`)
-          dbConcept = await new SkosConcept(conceptJson)
+          dbConcept = new SkosConcept(conceptJson)
           await dbConcept.save()
           // logD(mod, fun, `=> done`)
           const conceptDbId = dbConcept[DB_ID]
@@ -274,7 +274,7 @@ export const newSkosConcept = async (rudiConcept, inSchemeDbId) => {
       })
     )
 
-    const dbConcept = await new SkosConcept(rudiConcept)
+    const dbConcept = new SkosConcept(rudiConcept)
     // logD(mod, fun, `dbConcept: ${beautify(dbConcept)}`)
     await dbConcept.save()
     // logD(mod, fun, `=> saved`)

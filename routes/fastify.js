@@ -95,6 +95,7 @@ fastifyConf.setErrorHandler((error, request, reply) => {
   try {
     logT(mod, fun, ``)
     // logD(mod, fun, RudiError.isRudiError(error))
+    logT(mod, fun, beautify(error))
     let rudiHttpError
     if (RudiError.isRudiError(error)) rudiHttpError = error
     else {
@@ -102,11 +103,24 @@ fastifyConf.setErrorHandler((error, request, reply) => {
         error.statusCode,
         error.message || error,
         mod,
-        fun
+        fun,
+        error.path
       )
     }
+    if (shouldShowErrorPile()) RudiError.logErrorPile(rudiHttpError)
+
+    const errorResponse = {
+      [STATUS_CODE]: rudiHttpError.statusCode || 500,
+      error: rudiHttpError.name,
+      message: rudiHttpError.message,
+      path: rudiHttpError.path,
+    }
+
     reply.isError = true
-    reply.code(rudiHttpError[STATUS_CODE]).send(rudiHttpError)
+
+    // reply.code(rudiHttpError[STATUS_CODE]).send(rudiHttpError)
+    reply.code(errorResponse[STATUS_CODE]).send(errorResponse)
+
     // sysError(`Error ${rudiHttpError.statusCode}: ${rudiHttpError.message}`)
   } catch (uncaughtErr) {
     logE(mod, fun, `Uncaught! ${uncaughtErr}`)

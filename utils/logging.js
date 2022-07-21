@@ -249,7 +249,7 @@ export const addLogEntry = async (logLvl, loc_module, loc_function, msg) => {
     if (!msg || msg == '') msg = '<-'
     // utils.consoleLog(mod, fun, ``)
     const logInfo = makeLogInfo(logLvl, loc_module, loc_function, msg)
-    const logEntry = await new LogEntry(logInfo)
+    const logEntry = new LogEntry(logInfo)
     return await logEntry.save()
   } catch (err) {
     // No logD / logE function here or you'll create a loopback !!!

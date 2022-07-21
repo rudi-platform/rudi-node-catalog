@@ -62,6 +62,7 @@ import {
   QUERY_FILTER,
   QUERY_SEARCH_TERMS,
   QUERY_COUNT_BY,
+  STATUS_CODE,
 } from '../config/confApi.js'
 
 import { isPortalConnectionDisabled } from '../config/confPortal.js'
@@ -125,18 +126,26 @@ import {
 
 import { parseQueryParameters } from '../utils/parseRequest.js'
 import { readJsonFile } from '../utils/fileActions.js'
+import Contact from '../definitions/models/Contact.js'
 
 // -------------------------------------------------------------------------------------------------
 // Atomic treatments of properties: RUDI -> DB
 // -------------------------------------------------------------------------------------------------
 
-export const organizationRudiToDbFormat = async (rudiProducer, shouldCreateIfNotFound) => {
+export const organizationRudiToDbFormat = async (rudiProducer, path, shouldCreateIfNotFound) => {
   const fun = 'organizationRudiToDbFormat'
   try {
     logT(mod, fun, ``)
     if (!rudiProducer) throw new ParameterExpectedError('rudiProducer', mod, fun)
-
-    let organizationDbId = await getOrganizationDbIdWithJson(rudiProducer)
+    let organizationDbId
+    try {
+      organizationDbId = await getOrganizationDbIdWithJson(rudiProducer)
+    } catch (e) {
+      if (e[STATUS_CODE] === 400) {
+        throw new BadRequestError(e.message, mod, 'org.get', path)
+      }
+      throw e
+    }
     // logD(mod, fun, `organizationDbId: -> ${organizationDbId} `)
 
     if (!organizationDbId) {
@@ -145,7 +154,11 @@ export const organizationRudiToDbFormat = async (rudiProducer, shouldCreateIfNot
         throw RudiError.treatError(mod, fun, err)
       }
       const newOrg = await newOrganization(rudiProducer)
-      await newOrg.save()
+      try {
+        await newOrg.save()
+      } catch (e) {
+        throw new BadRequestError(e.message, mod, 'org.save', path)
+      }
       logD(mod, fun, `new Organization: ${beautify(rudiProducer)}`)
 
       organizationDbId = newOrg[DB_ID]
@@ -157,7 +170,7 @@ export const organizationRudiToDbFormat = async (rudiProducer, shouldCreateIfNot
   }
 }
 
-export const contactListRudiToDbFormat = async (rudiContactList, shouldCreateIfNotFound) => {
+export const contactListRudiToDbFormat = async (rudiContactList, path, shouldCreateIfNotFound) => {
   const fun = 'contactListRudiToDbFormat'
   try {
     logT(mod, fun, ``)
@@ -165,17 +178,28 @@ export const contactListRudiToDbFormat = async (rudiContactList, shouldCreateIfN
 
     const contactDbIds = []
     await Promise.all(
-      rudiContactList.map(async (rudiContact) => {
+      rudiContactList.map(async (rudiContact, i) => {
         let contactDbId
-        contactDbId = await getContactDbIdWithJson(rudiContact)
+        try {
+          contactDbId = await getContactDbIdWithJson(rudiContact)
+        } catch (e) {
+          if (e[STATUS_CODE] === 400) {
+            throw new BadRequestError(e.message, mod, 'contact.get', path.concat(i))
+          }
+          throw e
+        }
         if (!contactDbId) {
           if (!shouldCreateIfNotFound) {
             const err = new NotFoundError(contactNotFound(rudiContact[API_CONTACT_ID]))
             throw RudiError.treatError(mod, fun, err)
           }
 
-          const dbContact = await newContact(rudiContact)
-          dbContact.save()
+          const dbContact = new Contact(rudiContact)
+          try {
+            await dbContact.save()
+          } catch (e) {
+            throw new BadRequestError(e.message, mod, 'contact.save', path.concat(i))
+          }
           logD(mod, fun, `new Contact: ${beautify(rudiContact)}`)
 
           contactDbId = dbContact[DB_ID]
@@ -199,28 +223,46 @@ export const mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFo
 
     const mediaDbIds = []
     await Promise.all(
-      rudiMediaList.map(async (rudiMedia) => {
+      rudiMediaList.map(async (rudiMedia, i) => {
         // logD(mod, fun, `rudiMedia: ${beautify(rudiMedia)}`)
-        if (!rudiMedia) throw new BadRequestError(`Parameter 'rudiMedia' should not be null`)
-        let mediaDbId = await getMediaDbIdWithJson(rudiMedia)
+        if (!rudiMedia)
+          throw new BadRequestError(`Parameter 'rudiMedia' should not be empty`, mod, fun, [
+            API_MEDIA_PROPERTY,
+            i,
+          ])
+        let mediaDbId
+        try {
+          mediaDbId = await getMediaDbIdWithJson(rudiMedia)
+        } catch (e) {
+          if (e[STATUS_CODE] === 400) {
+            throw new BadRequestError(e.message, mod, 'media.get', [API_MEDIA_PROPERTY, i])
+          }
+          throw e
+        }
 
         if (!mediaDbId) {
           if (!shouldCreateIfNotFound)
             throw new ObjectNotFoundError(OBJ_MEDIA, rudiMedia[API_MEDIA_ID])
 
-          // logD(mod, fun, `rudiMedia[API_MEDIA_TYPE_PROPERTY]: ${beautify(rudiMedia[API_MEDIA_TYPE_PROPERTY])}`)
-          const media = new Media(rudiMedia)
-          // logD(mod, fun, `new Media: ${beautify(media)}`)
+          let media
 
-          // logD(mod, fun, media)
-          // const dbActionResult = await media.save()
-          // logD(mod, fun, `dbActionResult: ${beautify(dbActionResult)}`)
-          await media.save()
+          try {
+            media = new Media(rudiMedia)
+            await media.save()
+          } catch (e) {
+            logW(mod, fun, e.message)
+            throw new BadRequestError(e.message, mod, 'media.save', [API_MEDIA_PROPERTY, i])
+          }
 
           mediaDbId = media[DB_ID]
           // logD(mod, fun, `newly created mediaDbId: ${beautify(mediaDbId)}`)
         } else {
-          await overwriteDbObject(OBJ_MEDIA, rudiMedia) // TODO: valider ! Doit-on vraiment mettre un jour un media, ou recréer cette métadonnée ?
+          try {
+            await overwriteDbObject(OBJ_MEDIA, rudiMedia) // TODO: valider ! Doit-on vraiment mettre un jour un media, ou recréer cette métadonnée ?
+          } catch (e) {
+            logW(mod, fun, e.message)
+            throw new BadRequestError(e.message, mod, 'media.overwrite', [API_MEDIA_PROPERTY, i])
+          }
         }
         mediaDbIds.push(new MongooseTypes.ObjectId(mediaDbId))
         // logD(mod, fun, `${beautify(rudiMedia)} -> ${mediaDbId} `)
@@ -359,6 +401,7 @@ export const rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) 
     if (producer) {
       dbReadyMetadata[API_DATA_PRODUCER_PROPERTY] = await organizationRudiToDbFormat(
         producer,
+        [API_DATA_PRODUCER_PROPERTY],
         SHOULD_CREATE_IF_NOT_FOUND
       )
     }
@@ -371,7 +414,10 @@ export const rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) 
       contacts = accessProperty(dbReadyMetadata, API_DATA_CONTACTS_PROPERTY)
       if (!isNotEmptyArray(contacts))
         throw new BadRequestError(
-          `${missingObjectProperty(dbReadyMetadata, API_DATA_CONTACTS_PROPERTY)}`
+          `${missingObjectProperty(dbReadyMetadata, API_DATA_CONTACTS_PROPERTY)}`,
+          mod,
+          fun,
+          [API_DATA_CONTACTS_PROPERTY]
         )
     } else {
       contacts = dbReadyMetadata[API_DATA_CONTACTS_PROPERTY]
@@ -379,6 +425,7 @@ export const rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) 
     if (isNotEmptyArray(contacts)) {
       dbReadyMetadata[API_DATA_CONTACTS_PROPERTY] = await contactListRudiToDbFormat(
         contacts,
+        [API_DATA_CONTACTS_PROPERTY],
         SHOULD_CREATE_IF_NOT_FOUND
       )
     }
@@ -390,7 +437,12 @@ export const rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) 
     if (shouldBeStrict) {
       mediaList = accessProperty(dbReadyMetadata, API_MEDIA_PROPERTY)
       if (!isNotEmptyArray(mediaList))
-        throw new BadRequestError(`${missingObjectProperty(dbReadyMetadata, API_MEDIA_PROPERTY)}`)
+        throw new BadRequestError(
+          `${missingObjectProperty(dbReadyMetadata, API_MEDIA_PROPERTY)}`,
+          mod,
+          fun,
+          [API_MEDIA_PROPERTY]
+        )
     } else {
       mediaList = dbReadyMetadata[API_MEDIA_PROPERTY]
     }
@@ -417,13 +469,21 @@ export const rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) 
       const metaInfoProvider = metaInfo[API_METAINFO_PROVIDER_PROPERTY]
       if (metaInfoProvider) {
         dbReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_PROVIDER_PROPERTY] =
-          await organizationRudiToDbFormat(metaInfoProvider, SHOULD_CREATE_IF_NOT_FOUND)
+          await organizationRudiToDbFormat(
+            metaInfoProvider,
+            [API_METAINFO_PROPERTY, API_METAINFO_PROVIDER_PROPERTY],
+            SHOULD_CREATE_IF_NOT_FOUND
+          )
       }
 
       const metaInfoContacts = metaInfo[API_METAINFO_CONTACTS_PROPERTY]
       if (isNotEmptyArray(metaInfoContacts)) {
         dbReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_CONTACTS_PROPERTY] =
-          await contactListRudiToDbFormat(metaInfoContacts, SHOULD_CREATE_IF_NOT_FOUND)
+          await contactListRudiToDbFormat(
+            metaInfoContacts,
+            [API_METAINFO_PROPERTY, API_METAINFO_CONTACTS_PROPERTY],
+            SHOULD_CREATE_IF_NOT_FOUND
+          )
       }
     }
 
@@ -590,7 +650,7 @@ export const newMetadata = async (rudiMetadata) => {
     logI(mod, fun, `dbReadyObject: ${beautify(dbReadyObject[API_METADATA_ID])}`)
     let dbMetadata
     try {
-      dbMetadata = await new Metadata(dbReadyObject)
+      dbMetadata = new Metadata(dbReadyObject)
       logV(mod, fun, `dbMetadata: ${beautify(dbMetadata[API_METADATA_ID])}`)
       await dbMetadata.save()
     } catch (err) {

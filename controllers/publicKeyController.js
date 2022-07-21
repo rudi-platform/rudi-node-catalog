@@ -40,15 +40,24 @@ import { getPortalEncryptPubKey } from './portalController.js'
 // Helper functions
 // -------------------------------------------------------------------------------------------------
 const checkKeyName = (pubKeyName) => {
+  const fun = 'checkKeyName'
   // Check if the name (== id) of the public key is provided
   if (!pubKeyName)
-    throw new BadRequestError(`The 'name' property of the public key should be provided`)
+    throw new BadRequestError(
+      `The 'name' property of the public key should be provided`,
+      mod,
+      fun,
+      [API_PUB_NAME]
+    )
 
   // Check that there are only permitted characters
   if (!pubKeyName.match(REGEX_WORD))
     throw new BadRequestError(
       `The 'name' property of the public key should only contain letters, numbers as well as` +
-        ` minus and underscore signs`
+        ` minus and underscore signs`,
+      mod,
+      fun,
+      [API_PUB_NAME]
     )
 }
 
@@ -64,7 +73,8 @@ const checkKeyPem = (keyPem) => {
     throw new BadRequestError(
       `The key PEM cannot be parsed: '${keyPem}' ${err ? `. Error: ${err}` : ''}`,
       mod,
-      fun
+      fun,
+      [API_PUB_PEM]
     )
   }
 }
@@ -86,7 +96,10 @@ const normalizeKeyData = async (pubKeyJson) => {
     if (!pubKeyJson[API_PUB_PEM] && !pubKeyJson[API_PUB_URL])
       throw new BadRequestError(
         'Either the URL should be provided for the public key to get fetched, or the PEM' +
-          ' of the public key should be directly given'
+          ' of the public key should be directly given',
+        mod,
+        fun,
+        [API_PUB_URL]
       )
 
     // URL was not provided
@@ -124,7 +137,10 @@ const normalizeKeyData = async (pubKeyJson) => {
       else if (keyPem.replace(/[\n\s\r]/g, '') !== pubKeyJson[API_PUB_PEM].replace(/[\n\s\r]/g, ''))
         throw new BadRequestError(
           `Provided PEM doesn't match the one found at the provided URL: ${pubKeyJson[API_PUB_URL]}` +
-            `\n${pubKeyJson[API_PUB_PEM]}\n !==\n ${keyPem}`
+            `\n${pubKeyJson[API_PUB_PEM]}\n !==\n ${keyPem}`,
+          mod,
+          fun,
+          [API_PUB_PEM]
         )
 
       pubKeyJson[API_PUB_KEY] = `${key}`.replace(' (unnamed)', ` (${pubKeyJson[API_PUB_NAME]})`)
@@ -174,7 +190,7 @@ export const newPublicKey = async (pubKeyJson) => {
     logT(mod, fun, ``)
     await normalizeKeyData(pubKeyJson)
 
-    const dbPubKey = await new PublicKey(pubKeyJson)
+    const dbPubKey = new PublicKey(pubKeyJson)
     await dbPubKey.save()
     return dbPubKey
   } catch (err) {

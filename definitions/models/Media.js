@@ -149,7 +149,7 @@ MediaSchema.pre('save', function (next) {
   // logT(mod, fun, ``)
   try {
     if (this[API_MEDIA_TYPE] === MediaTypes.File && !isNotEmptyObject(this[API_FILE_CHECKSUM]))
-      throw new BadRequestError(missingField(API_FILE_CHECKSUM))
+      throw new BadRequestError(missingField(API_FILE_CHECKSUM), mod, fun, [API_FILE_CHECKSUM])
 
     if (!!this[API_MEDIA_NAME]) {
       const nameBefore = this[API_MEDIA_NAME]
@@ -232,7 +232,7 @@ FileSchema.pre('save', function (next) {
   // logD('FileSchema', fun, ``)
   try {
     if (!isNotEmptyObject(this[API_FILE_CHECKSUM])) {
-      throw new BadRequestError(missingField(API_FILE_CHECKSUM))
+      throw new BadRequestError(missingField(API_FILE_CHECKSUM), mod, fun, [API_FILE_CHECKSUM])
     }
     next()
   } catch (err) {

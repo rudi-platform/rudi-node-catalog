@@ -50,6 +50,7 @@ import {
   ACT_EXT_SEARCH,
   ROUTE_OPT,
   QUERY_LANG,
+  STATUS_CODE,
 } from '../config/confApi.js'
 
 import {
@@ -163,6 +164,9 @@ async function newObject(objectType, objectData) {
         throw new NotFoundError(objectTypeNotFound(objectType))
     }
   } catch (err) {
+    if (err[STATUS_CODE] === 400) {
+      throw new BadRequestError(err.message, mod, `${fun}.${objectType}`, err.path)
+    }
     throw RudiError.treatError(mod, fun, err)
   }
 }

@@ -72,6 +72,7 @@ import {
   API_METAINFO_SOURCE_PROPERTY,
   API_DATES_DELETED,
   API_METAINFO_VERSION_PROPERTY,
+  API_STORAGE_STATUS,
 } from '../../db/dbFields.js'
 
 import { get as getFileTypes, MIME_YAML_ALT, MIME_YAML } from '../thesaurus/FileTypes.js'
@@ -373,7 +374,7 @@ const MetadataSchema = new mongoose.Schema(
     //   - online = data are published and available
     //   - archived = data are not immediately available, access is not automatic
     //   - unavailable = data were deleted
-    storage_status: {
+    [API_STORAGE_STATUS]: {
       type: String,
       // enum: Object.values(StorageStatus),
       required: true,
@@ -511,7 +512,11 @@ async function checkLicence(metadata) {
           licenceType
         )
         logE(mod, fun, errMsg)
-        throw new BadRequestError(errMsg)
+        throw new BadRequestError(errMsg, mod, fun, [
+          API_ACCESS_CONDITION,
+          API_LICENCE,
+          API_LICENCE_TYPE,
+        ])
       }
     }
   } catch (err) {
@@ -524,7 +529,7 @@ async function checkFileTypes(metadata) {
   try {
     logT(mod, fun, ``)
     const medias = metadata[API_MEDIA_PROPERTY]
-    medias.map((media) => {
+    medias.map((media, i) => {
       if (media[API_MEDIA_TYPE] !== MediaTypes.File) return
 
       const [mimeType, encrypted] = /^(.*?)(\+crypt)?$/.exec(media[API_FILE_MIME])
@@ -534,7 +539,11 @@ async function checkFileTypes(metadata) {
         return true
       }
       if (getFileTypes().indexOf(mimeType) == -1)
-        throw new BadRequestError(`Unrecognized MIME type: '${mimeType}'`)
+        throw new BadRequestError(`Unrecognized MIME type: '${mimeType}'`, mod, fun, [
+          API_MEDIA_PROPERTY,
+          i,
+          API_FILE_MIME,
+        ])
     })
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -561,7 +570,10 @@ async function checkThesaurus(metadata) {
         throw new BadRequestError(
           `${incorrectVal(API_THEME_PROPERTY, dataTheme)}. ` +
             `Allowed: ${beautify(Themes.get())} ` +
-            `(metadata ${metadata[API_METADATA_ID]}) `
+            `(metadata ${metadata[API_METADATA_ID]}) `,
+          mod,
+          fun,
+          [API_THEME_PROPERTY]
         )
       }
     }
@@ -580,7 +592,11 @@ async function checkThesaurus(metadata) {
               }
               return true
             } else {
-              throw new BadRequestError(incorrectVal(API_KEYWORDS_PROPERTY, keyword))
+              throw new BadRequestError(
+                incorrectVal(API_KEYWORDS_PROPERTY, keyword),
+                mod,
+                fun[API_KEYWORDS_PROPERTY]
+              )
             }
           })
           .catch((err) => {
@@ -602,7 +618,10 @@ async function checkThesaurus(metadata) {
             if (!isLanguageValid(lang, shouldInit))
               throw new BadRequestError(
                 incorrectVal(API_LANGUAGES_PROPERTY, lang) +
-                  ` (metadata ${metadata[API_METADATA_ID]})`
+                  ` (metadata ${metadata[API_METADATA_ID]})`,
+                mod,
+                fun,
+                [API_LANGUAGES_PROPERTY]
               )
             return true
           })
@@ -619,14 +638,22 @@ async function checkThesaurus(metadata) {
         if (projection === 'WGS 84') geography[API_GEO_PROJECTION_PROPERTY] = 'WGS 84 (EPSG:4326)'
         else if (!isProjectionValid(projection, shouldInit))
           throw new BadRequestError(
-            incorrectVal(`${API_GEOGRAPHY}.${API_GEO_PROJECTION_PROPERTY}`, projection)
+            incorrectVal(`${API_GEOGRAPHY}.${API_GEO_PROJECTION_PROPERTY}`, projection),
+            mod,
+            fun,
+            [API_GEOGRAPHY, API_GEO_PROJECTION_PROPERTY]
           )
       }
     }
 
     // logT(mod, fun, `storage status`)
-    if (!isStorageStatusValid(metadata.storage_status, shouldInit)) {
-      throw new BadRequestError(incorrectVal('storage_status', metadata.storage_status))
+    if (!isStorageStatusValid(metadata[API_STORAGE_STATUS], shouldInit)) {
+      throw new BadRequestError(
+        incorrectVal(API_STORAGE_STATUS, metadata[API_STORAGE_STATUS]),
+        mod,
+        fun,
+        [[API_STORAGE_STATUS]]
+      )
     }
     return true
   } catch (err) {
@@ -767,8 +794,11 @@ MetadataSchema.pre('save', async function (next) {
     // If 'temporal_spread' is defined, the field 'start_date' should be defined
     requireSubProperty(metadata, API_PERIOD_PROPERTY, API_START_DATE_PROPERTY)
 
-    checkDates(metadata[API_PERIOD_PROPERTY], API_START_DATE_PROPERTY, API_END_DATE_PROPERTY)
-
+    try {
+      checkDates(metadata[API_PERIOD_PROPERTY], API_START_DATE_PROPERTY, API_END_DATE_PROPERTY)
+    } catch (e) {
+      throw new BadRequestError(e.message, mod, fun, [API_PERIOD_PROPERTY, API_END_DATE_PROPERTY])
+    }
     checkDates(
       metadata[API_DATA_DATES_PROPERTY],
       API_DATES_CREATED,
@@ -776,15 +806,30 @@ MetadataSchema.pre('save', async function (next) {
       true // If 'dataset_dates.updated' is not defined, it is initialized with 'dataset_dates.created'
     )
 
-    checkDates(metadata[API_DATA_DATES_PROPERTY], API_DATES_CREATED, API_DATES_PUBLISHED)
-    checkDates(metadata[API_DATA_DATES_PROPERTY], API_DATES_CREATED, API_DATES_VALIDATED)
-    checkDates(metadata[API_DATA_DATES_PROPERTY], API_DATES_CREATED, API_DATES_EXPIRES)
-
-    checkDates(
-      metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES],
-      API_DATES_CREATED,
-      API_DATES_EXPIRES
-    )
+    try {
+      checkDates(metadata[API_DATA_DATES_PROPERTY], API_DATES_CREATED, API_DATES_PUBLISHED)
+    } catch (e) {
+      throw new BadRequestError(e.message, mod, fun, [API_DATA_DATES_PROPERTY, API_DATES_PUBLISHED])
+    }
+    try {
+      checkDates(metadata[API_DATA_DATES_PROPERTY], API_DATES_CREATED, API_DATES_VALIDATED)
+    } catch (e) {
+      throw new BadRequestError(e.message, mod, fun, [API_DATA_DATES_PROPERTY, API_DATES_VALIDATED])
+    }
+    try {
+      checkDates(metadata[API_DATA_DATES_PROPERTY], API_DATES_CREATED, API_DATES_EXPIRES)
+    } catch (e) {
+      throw new BadRequestError(e.message, mod, fun, [API_DATA_DATES_PROPERTY, API_DATES_EXPIRES])
+    }
+    try {
+      checkDates(
+        metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES],
+        API_DATES_CREATED,
+        API_DATES_EXPIRES
+      )
+    } catch (e) {
+      throw new BadRequestError(e.message, mod, fun, [API_METAINFO_DATES, API_DATES_EXPIRES])
+    }
 
     // Checking 'licence' field
     await checkLicence(metadata)
