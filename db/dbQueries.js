@@ -1123,7 +1123,9 @@ export const overwriteDbObject = async (objectType, updateData) => {
     // logD(mod, fun, `dbObject: ${beautify(dbObject)}`)
     return dbObject
   } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
+    logV(mod, fun, beautify(err))
+    const path = Object.keys(err.errors)[0]?.split('.')
+    throw RudiError.treatError(mod, fun, err, path)
   }
   // logD(mod, fun, `updatedObject: ${beautify(updatedObject)}`)
 }

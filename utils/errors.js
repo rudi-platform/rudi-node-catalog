@@ -155,7 +155,7 @@ export class RudiError extends Error {
    * @param {*} errLocation error location (mod: module/file, fun: function)
    * @returns
    */
-  static treatError(ctxMod, ctxFun, error) {
+  static treatError(ctxMod, ctxFun, error, path) {
     const fun = 'treatError'
     try {
       if (!error) throw new ParameterExpectedError('error', mod, fun)
@@ -184,7 +184,7 @@ export class RudiError extends Error {
         errTrace,
         ctxMod,
         ctxFun,
-        error.path
+        path || error.path
       )
       // logD(mod, fun, error.isRudiError())
 

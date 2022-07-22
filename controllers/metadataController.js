@@ -127,6 +127,7 @@ import {
 import { parseQueryParameters } from '../utils/parseRequest.js'
 import { readJsonFile } from '../utils/fileActions.js'
 import Contact from '../definitions/models/Contact.js'
+import Organization from '../definitions/models/Organization.js'
 
 // -------------------------------------------------------------------------------------------------
 // Atomic treatments of properties: RUDI -> DB
@@ -153,7 +154,7 @@ export const organizationRudiToDbFormat = async (rudiProducer, path, shouldCreat
         const err = new NotFoundError(organizationNotFound(rudiProducer[API_ORGANIZATION_ID]))
         throw RudiError.treatError(mod, fun, err)
       }
-      const newOrg = await newOrganization(rudiProducer)
+      const newOrg = new Organization(rudiProducer)
       try {
         await newOrg.save()
       } catch (e) {
@@ -648,10 +649,9 @@ export const newMetadata = async (rudiMetadata) => {
     // Special update for metadataInfo.referenceDates: update 'createdDate'
     const rudiId = dbReadyObject[API_METADATA_ID]
     logI(mod, fun, `dbReadyObject: ${beautify(dbReadyObject[API_METADATA_ID])}`)
-    let dbMetadata
+    const dbMetadata = new Metadata(dbReadyObject)
+    // logV(mod, fun, `dbMetadata: ${beautify(dbMetadata[API_METADATA_ID])}`)
     try {
-      dbMetadata = new Metadata(dbReadyObject)
-      logV(mod, fun, `dbMetadata: ${beautify(dbMetadata[API_METADATA_ID])}`)
       await dbMetadata.save()
     } catch (err) {
       // const errMsg = `New object '${OBJ_METADATA}': ${rudiId} | Error: ${err}`
