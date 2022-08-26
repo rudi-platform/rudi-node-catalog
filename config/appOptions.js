@@ -37,6 +37,11 @@ export const OPTIONS = {
     env: 'NODE_ENV',
     cli: '--node_env',
   },
+  [OPT_APP_ENV]: {
+    text: `Module environment type: ${ENV_PRODUCTION}|${ENV_RELEASE}|${ENV_SHARED}|${ENV_TEST}`,
+    cli: '--app_env',
+    env: 'RUDI_API_ENV',
+  },
   [OPT_GIT_HASH]: {
     text: 'Git hash',
     cli: '--hash',
@@ -76,8 +81,8 @@ const APP_OPTIONS = {}
 export const loadAppOptions = () => {
   if (ARE_APP_OPTIONS_LOADED) return
   const SEP_LINE =
-    '-----------------------------------------------' +
-    '-----------------------------------------------'
+    '------------------------------------------------------' +
+    '------------------------------------------------------'
   console.log('\n' + SEP_LINE) ///////////////////////////////////////////////////////////////////////
 
   console.log(' Options to run this app: ')

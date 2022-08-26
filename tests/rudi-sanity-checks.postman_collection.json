@@ -104,8 +104,8 @@
 								"exec": [
 									"pm.test(`Check connection to Portal`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const token = pm.response.toJSON();",
-									"    console.log(token)",
+									"    const token = pm.response.json();",
+									"    pm.expect(token.access_token).to.be.not.undefined",
 									"});"
 								],
 								"type": "text/javascript"

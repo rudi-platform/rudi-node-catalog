@@ -26,8 +26,8 @@ export const LOG_DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss SSS'
 export const nowLocaleFormatted = () => datetime.format(new Date(), LOG_DATE_FORMAT)
 
 const BASE_LINE =
-  '============================================================================================'
-
+  '=====================================================' +
+  '====================================================='
 export const separateLogs = (insertStr, shouldDisplayDate) => {
   const dateStr = shouldDisplayDate ? `${nowLocaleFormatted()} ` : ''
   const inputStr = `${insertStr}` ? `[ ${insertStr} ]==` : ''
