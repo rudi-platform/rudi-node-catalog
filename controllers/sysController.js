@@ -16,7 +16,7 @@ import mongoose from 'mongoose'
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { NOT_FOUND } from '../utils/jsUtils.js'
-import { getGitHash as getGitHashOpt, getAppOptions, OPT_APP_ENV } from '../config/appOptions.js'
+import { getGitHash as getGitHashOpt, getAppOptions, OPT_NODE_ENV } from '../config/appOptions.js'
 import { getAppHash as getAppHashOpt } from '../config/confSystem.js'
 import { RudiError } from '../utils/errors.js'
 import { API_VERSION } from '../config/confApi.js'
@@ -51,17 +51,12 @@ export const getAppHash = () => {
 }
 export const getApiVersion = () => API_VERSION
 
-export const ENV_DEV = 'local'
-export const ENV_TEST = 'test'
-export const ENV_SHARED = 'shared'
-export const ENV_RELEASE = 'release'
-
 /** @returns the current environment for this module */
 export const getEnvironment = () => {
   const fun = 'getEnvironment'
   try {
-    logT(mod, fun, getAppOptions(OPT_APP_ENV))
-    const appEnv = getAppOptions(OPT_APP_ENV)
+    logT(mod, fun, getAppOptions(OPT_NODE_ENV))
+    const appEnv = getAppOptions(OPT_NODE_ENV)
     const env = appEnv || NOT_FOUND
     return env
   } catch (err) {

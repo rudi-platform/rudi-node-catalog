@@ -120,7 +120,7 @@ export const parseQueryParameters = async (objectType, fullUrl) => {
     const filters = []
 
     // extract request parameters
-    if (fullUrl.indexOf('?') === -1) {
+    if (`${fullUrl}`.indexOf('?') === -1) {
       // logD(mod, fun, `No question mark in url: ${reqUrl}`)
       return returnedFilter
     }

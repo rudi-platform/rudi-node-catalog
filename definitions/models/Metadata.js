@@ -17,7 +17,7 @@ import objectPath from 'object-path'
 // -------------------------------------------------------------------------------------------------
 // Fields
 // -------------------------------------------------------------------------------------------------
-import { DEFAULT_LANG } from '../../config/confApi.js'
+import { DEFAULT_LANG, OBJ_METADATA, URL_PREFIX_PUBLIC } from '../../config/confApi.js'
 
 import {
   API_DATA_PRODUCER_PROPERTY,
@@ -126,6 +126,7 @@ import { AccesConditionSchema } from '../schemas/AccesConditions.js'
 // -------------------------------------------------------------------------------------------------
 import { MediaTypes } from './Media.js'
 import { VALID_API_VERSION, VALID_URI } from '../schemaValidators.js'
+import { getApiUrl } from '../../config/confSystem.js'
 
 // -------------------------------------------------------------------------------------------------
 // Fields with specific treatments
@@ -458,6 +459,18 @@ const MetadataSchema = new mongoose.Schema(
 // -------------------------------------------------------------------------------------------------
 // Validation
 // -------------------------------------------------------------------------------------------------
+async function checkMetadataSource(metadata) {
+  const fun = 'checkMetadataSource'
+  try {
+    if (!metadata[API_METAINFO_PROPERTY][API_METAINFO_SOURCE_PROPERTY])
+      metadata[API_METAINFO_PROPERTY][API_METAINFO_SOURCE_PROPERTY] = getApiUrl(
+        `${URL_PREFIX_PUBLIC}/${OBJ_METADATA}/${metadata[API_METADATA_ID]}`
+      )
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
 async function checkLicence(metadata) {
   const fun = 'checkLicence'
   try {
@@ -837,6 +850,8 @@ MetadataSchema.pre('save', async function (next) {
     await checkThesaurus(metadata)
 
     await checkFileTypes(metadata)
+
+    await checkMetadataSource(metadata)
     // await checkMedia(metadata)
     logT(mod, fun, `pre save checks OK`)
   } catch (err) {

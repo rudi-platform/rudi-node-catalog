@@ -1009,6 +1009,18 @@ export const groupDbObjectList = async (objectType, unionField, options) => {
   }
 }
 
+export const countDbObjects = async (objectType) => {
+  const fun = 'countDbObjects'
+  try {
+    logT(mod, fun, ``)
+    const Model = getObjectModel(objectType)
+    const count = await Model.countDocuments()
+    return count
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
 export const countDbObjectList = async (objectType, unionField, options) => {
   const fun = `countDbObjectList`
 
@@ -1798,6 +1810,7 @@ export const isContactUsedInMetadata = async (dbContact) => {
 export const getLatestStoredPortalToken = async () => {
   const fun = 'getLatestStoredPortalToken'
   try {
+    logT(mod, fun, ``)
     const lastToken = await PortalToken.findOne()
       .sort({
         field: 'asc',
@@ -1825,6 +1838,7 @@ export const cleanStoredToken = (dbToken) => {
 export const storePortalToken = async (token) => {
   const fun = 'storePortalToken'
   try {
+    logT(mod, fun, ``)
     const dbToken = new PortalToken(token)
     return await dbToken.save()
   } catch (err) {

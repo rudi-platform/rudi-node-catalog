@@ -11,16 +11,17 @@ import {
   getGitHash,
   OPT_USER_CONF,
   ENV_USER_CONF,
-  OPT_SERVER_URL,
+  OPT_API_URL,
 } from './appOptions.js'
 import { TRACE, TRACE_MOD, TRACE_FUN, TRACE_ERR } from './confApi.js'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependecies
 // -------------------------------------------------------------------------------------------------
-import { consoleLog, consoleErr, quietAccess, NOT_FOUND } from '../utils/jsUtils.js'
+import { consoleLog, consoleErr, quietAccess, NOT_FOUND, separateLogs } from '../utils/jsUtils.js'
 import { readIniFile } from '../utils/fileActions.js'
-// utils.separateLogs()
+
+separateLogs('Loading sys conf', true) ///////////////////////////////////////////////////////////
 
 // -------------------------------------------------------------------------------------------------
 // Constants: local ini file configuration settings
@@ -131,7 +132,7 @@ const APP_NAME = getIniValue(SERVER_SECTION, 'app_name', 'rudiprod.api')
 const LISTENING_ADDR = getIniValue(SERVER_SECTION, 'listening_address')
 const LISTENING_PORT = getIniValue(SERVER_SECTION, 'listening_port')
 
-const apiUrl = getAppOptions(OPT_SERVER_URL) || getIniValue(SERVER_SECTION, 'server_url')
+const apiUrl = `${getAppOptions(OPT_API_URL) || getIniValue(SERVER_SECTION, 'server_url')}`
 const API_URL = apiUrl.endsWith('/') ? apiUrl.slice(0, -1) : apiUrl
 
 export const getAppName = () => APP_NAME

@@ -70,6 +70,7 @@ import {
   isReferencedInMetadata,
   overwriteDbObject,
   searchDbObjects,
+  countDbObjects,
 } from '../db/dbQueries.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -173,16 +174,19 @@ async function newObject(objectType, objectData) {
 
 async function isObjectReferenced(objectType, rudiId) {
   const fun = 'isObjectReferenced'
-
-  switch (objectType) {
-    case OBJ_ORGANIZATIONS:
-    case OBJ_CONTACTS:
-    case OBJ_MEDIA: {
-      logD(mod, fun, `objectType: ${objectType}, id: ${rudiId}`)
-      return await isReferencedInMetadata(objectType, rudiId)
+  try {
+    switch (objectType) {
+      case OBJ_ORGANIZATIONS:
+      case OBJ_CONTACTS:
+      case OBJ_MEDIA: {
+        logD(mod, fun, `objectType: ${objectType}, id: ${rudiId}`)
+        return await isReferencedInMetadata(objectType, rudiId)
+      }
+      default:
+        return false
     }
-    default:
-      return false
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -215,8 +219,8 @@ function overrideFilter(filterList, field, value) {
  */
 export const addSingleObject = async (req, reply) => {
   const fun = 'addSingleObject'
-  logT(mod, fun, `< POST ${URL_PV_OBJECT_GENERIC}`)
   try {
+    logT(mod, fun, `< POST ${URL_PV_OBJECT_GENERIC}`)
     // retrieve url parameters: object type
     const objectType = getObjectParam(req, PARAM_OBJECT)
 
@@ -358,19 +362,22 @@ export const searchObjects = async (req, reply) => {
 
 export const getSearchableProperties = (req, reply) => {
   const fun = 'getSearchableProperties'
-  logT(mod, fun, ``)
-
-  const rudiObjectList = getRudiObjectList()
-  const getSearchableFields = {}
-  // logD(mod, fun, `rudiObjectList: ${beautify(rudiObjectList)}`)
-  Object.keys(rudiObjectList).map((objectType) => {
-    try {
-      getSearchableFields[objectType] = rudiObjectList[objectType].Model.getSearchableFields()
-    } catch (err) {
-      logD(mod, fun, `${objectType}: not searchable`)
-    }
-  })
-  return getSearchableFields
+  try {
+    logT(mod, fun, ``)
+    const rudiObjectList = getRudiObjectList()
+    const getSearchableFields = {}
+    // logD(mod, fun, `rudiObjectList: ${beautify(rudiObjectList)}`)
+    Object.keys(rudiObjectList).map((objectType) => {
+      try {
+        getSearchableFields[objectType] = rudiObjectList[objectType].Model.getSearchableFields()
+      } catch (err) {
+        logD(mod, fun, `${objectType}: not searchable`)
+      }
+    })
+    return getSearchableFields
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
 }
 
 /**
@@ -437,6 +444,18 @@ export const getManyObjects = async (objectType, req) => {
   }
 }
 
+export const countObjects = async (req, reply) => {
+  const fun = 'countObjects'
+  try {
+    logT(mod, fun, ``)
+    const objectType = getObjectParam(req)
+    const count = await countDbObjects(objectType)
+    return count
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
 /**
  * Get many metadata and a count of all that match the filter
  * @param {*} req
@@ -497,8 +516,8 @@ export const getManyPubKeys = async (req, reply) => {
  */
 export const updateSingleObject = async (req, reply) => {
   const fun = 'updateSingleObject'
-  logT(mod, fun, `< PUT ${URL_PV_OBJECT_GENERIC}`)
   try {
+    logT(mod, fun, `< PUT ${URL_PV_OBJECT_GENERIC}`)
     // retrieve url parameters: object type, object id
     const objectType = getObjectParam(req)
     const idField = getObjectIdField(objectType)
@@ -531,8 +550,8 @@ export const updateSingleObject = async (req, reply) => {
  */
 export const upsertSingleObject = async (req, reply) => {
   const fun = 'upsertSingleObject'
-  logT(mod, fun, `< PUT ${URL_PV_OBJECT_GENERIC}`)
   try {
+    logT(mod, fun, `< PUT ${URL_PV_OBJECT_GENERIC}`)
     // retrieve url parameters: object type, object id
     const objectType = getObjectParam(req)
     const idField = getObjectIdField(objectType)
@@ -572,8 +591,8 @@ export const upsertSingleObject = async (req, reply) => {
  */
 export const deleteSingleObject = async (req, reply) => {
   const fun = 'deleteSingleObject'
-  logT(mod, fun, `< DELETE ${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`)
   try {
+    logT(mod, fun, `< DELETE ${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`)
     // retrieve url parameters: object type, object id
     const objectType = getObjectParam(req)
     const rudiId = accessReqParam(req, PARAM_ID)
@@ -609,8 +628,8 @@ export const deleteSingleObject = async (req, reply) => {
  */
 export const deleteObjectList = async (req, reply) => {
   const fun = 'deleteObjectList'
-  logT(mod, fun, `< POST ${URL_PV_OBJECT_GENERIC}/${ACT_DELETION}`)
   try {
+    logT(mod, fun, `< POST ${URL_PV_OBJECT_GENERIC}/${ACT_DELETION}`)
     // retrieve url parameters: object type, object id
     const objectType = getObjectParam(req)
 
@@ -646,8 +665,8 @@ export const deleteObjectList = async (req, reply) => {
  */
 export const deleteManyObjects = async (req, reply) => {
   const fun = 'deleteManyObjects'
-  logT(mod, fun, `< DELETE ${URL_PV_OBJECT_GENERIC}`)
   try {
+    logT(mod, fun, `< DELETE ${URL_PV_OBJECT_GENERIC}`)
     const objectType = getObjectParam(req)
     let parsedParameters = await parseQueryParameters(objectType, req.url)
     logD(mod, fun, `parsedParameters: ${beautify(parsedParameters)}`)
@@ -687,8 +706,8 @@ export const getOrphans = async (objectType) => {
  */
 export const generateUUID = async (req, reply) => {
   const fun = 'generateUUID'
-  logT(mod, fun, ``)
   try {
+    logT(mod, fun, ``)
     return UUIDv4()
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)

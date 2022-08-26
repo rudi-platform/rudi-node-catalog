@@ -85,7 +85,7 @@ const checkKeyPem = (keyPem) => {
  * @returns
  */
 const normalizeKeyData = async (pubKeyJson) => {
-  const fun = 'checkKeyData'
+  const fun = 'normalizeKeyData'
 
   try {
     logT(mod, fun, ``)

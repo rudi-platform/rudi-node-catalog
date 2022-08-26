@@ -12,7 +12,7 @@ import https from 'node:https'
 // -------------------------------------------------------------------------------------------------
 // Constants
 // -------------------------------------------------------------------------------------------------
-import { extractJwt, JWT_EXP, REQ_MTD } from '../utils/crypto.js'
+import { API_VERSION, OBJ_METADATA, PARAM_ID, USER_AGENT } from '../config/confApi.js'
 import {
   API_METAINFO_VERSION_PROPERTY,
   API_METAINFO_PROPERTY,
@@ -22,8 +22,8 @@ import {
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
+import { extractJwt, JWT_EXP, REQ_MTD } from '../utils/crypto.js'
 import { logD, logI, logT, logV, logW } from '../utils/logging.js'
-import { API_VERSION, OBJ_METADATA, PARAM_ID, USER_AGENT } from '../config/confApi.js'
 import {
   beautify,
   dateEpochSToIso,
@@ -165,7 +165,8 @@ export const getPortalToken = async () => {
   let token, rmToken
   try {
     rmToken = await getLatestStoredPortalToken()
-    if (!rmToken || rmToken.expires_in < nowEpochS()) {
+    // logD(mod, fun, beautify(rmToken))
+    if (!rmToken || rmToken.exp < nowEpochS()) {
       logD(mod, fun, 'Need for a new portal token')
       rmToken = await getNewTokenFromPortal()
     }
@@ -215,11 +216,13 @@ export const getMetadata = async (req, reply) => {
   const fun = 'getMetadata'
   logT(mod, fun, ``)
   try {
-    let metadataId = req.params[PARAM_ID]
-    logD(mod, fun, `metadataId: ${metadataId}`)
-    if (metadataId && !isUUID(metadataId)) metadataId = null
+    let metadataId = req.params[PARAM_ID] || undefined
+    if (metadataId && !isUUID(metadataId)) metadataId = undefined
+    if (metadataId) logD(mod, fun, `metadataId: ${metadataId}`)
 
-    return await getMetadataFromPortal(metadataId)
+    const additionalParameters = req.url?.split('?')[1]
+
+    return await getMetadataFromPortal(metadataId, additionalParameters)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -308,7 +311,8 @@ export const getNewTokenFromPortal = async () => {
     logT(mod, fun, ``)
     const [usr, pwdb64] = getCredentials()
     const pwd = decodeBase64(pwdb64)
-
+    // consoleLog(mod, fun, pwdb64)
+    // consoleLog(mod, fun, pwd)
     const portalAuthUrl = getAuthUrl()
     // LM -- the password is now provided in base64
     // logD(mod, fun, `pwdb64: ${pwdb64}`)
@@ -376,6 +380,7 @@ export const getTokenCheckedByPortal = async (token) => {
     logT(mod, fun, ``)
     if (!token) throw new BadRequestError('No token to check!')
     const portalUrl = getCheckAuthUrl()
+    // logD(mod, fun, portalUrl)
 
     const requestUrl = `${portalUrl}?${PARAM_TOKEN}=${token}`
     // logD(mod, fun, requestUrl)
@@ -619,14 +624,17 @@ export const sendMetadataToPortal = async (metadataId) => {
   }
 }
 
-export const getMetadataFromPortal = async (metadataId) => {
+export const getPortalMetadataListWithToken = (token, additionalParameters) =>
+  httpGet(getPortalMetaUrl(null, additionalParameters), token)
+
+export const getMetadataFromPortal = async (metadataId, additionalParameters) => {
   const fun = 'getMetadataFromPortal'
   logT(mod, fun, ``)
   try {
     const token = await getPortalToken()
 
-    if (!metadataId) return httpGet(getPortalMetaUrl(), token)
-    else return httpGet(getPortalMetaUrl(metadataId), token)
+    if (!metadataId) return httpGet(getPortalMetaUrl(null, additionalParameters), token)
+    else return httpGet(getPortalMetaUrl(metadataId, additionalParameters), token)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }

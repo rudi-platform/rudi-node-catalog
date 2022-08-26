@@ -247,6 +247,7 @@ export const addLogEntry = async (logLvl, loc_module, loc_function, msg) => {
   const fun = 'addLogEntry'
   try {
     if (!msg || msg == '') msg = '<-'
+    else msg = `${msg}`
     // utils.consoleLog(mod, fun, ``)
     const logInfo = makeLogInfo(logLvl, loc_module, loc_function, msg)
     const logEntry = new LogEntry(logInfo)

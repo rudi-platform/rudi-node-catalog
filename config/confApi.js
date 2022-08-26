@@ -66,6 +66,7 @@ export const QUERY_SEARCH_TERMS = 'searchTerms'
 
 export const COUNT_LABEL = 'total'
 export const LIST_LABEL = 'items'
+export const TIME_LABEL = 'time'
 
 export const DEFAULT_QUERY_LIMIT = 100
 export const DEFAULT_QUERY_OFFSET = 0
@@ -89,6 +90,8 @@ export const ACT_REPORT = 'report'
 export const ACT_SEARCH = 'search'
 export const ACT_EXT_SEARCH = 'ext_search'
 export const ACT_SEND = 'send'
+
+export const ACT_CHECK = 'check'
 
 // -------------------------------------------------------------------------------------------------
 // Body parameters
@@ -117,10 +120,11 @@ export const URL_OBJECTS = [
 
 export const URL_PREFIX_PRIVATE = '/api/admin'
 
-const URL_SUFFIX_PORTAL = 'portal'
-const URL_SUFFIX_DB = 'db'
-const URL_SUFFIX_THESAURUS = 'enum'
-const URL_SUFFIX_LICENCE_CODES = 'licence_codes'
+export const URL_SUFFIX_PORTAL = 'portal'
+export const URL_SUFFIX_NODE = 'node'
+export const URL_SUFFIX_DB = 'db'
+export const URL_SUFFIX_THESAURUS = 'enum'
+export const URL_SUFFIX_LICENCE_CODES = 'licence_codes'
 
 export const URL_SUFFIX_AUTH = 'auth'
 export const URL_SUFFIX_PUB_KEY = 'pub'
@@ -153,6 +157,8 @@ export const URL_PV_OBJECT_GENERIC = `${URL_PREFIX_PRIVATE}/:${PARAM_OBJECT}`
 export const URL_PV_THESAURUS_ACCESS = `${URL_PREFIX_PRIVATE}/${URL_SUFFIX_THESAURUS}`
 export const URL_PV_LICENCE_ACCESS = `${URL_PREFIX_PRIVATE}/${URL_LICENCE_SUFFIX}`
 export const URL_PV_LICENCE_CODES_ACCESS = `${URL_PREFIX_PRIVATE}/${URL_SUFFIX_LICENCE_CODES}`
+
+export const URL_PREFIX_CHECK = `${URL_PREFIX_PRIVATE}/${ACT_CHECK}`
 
 // -------------------------------------------------------------------------------------------------
 // Syslog places

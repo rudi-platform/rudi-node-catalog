@@ -48,7 +48,7 @@ import {
   isNotEmptyArray,
   isNotEmptyObject,
   deepClone,
-  toPaddedBase64Url,
+  toPaddedBase64url,
 } from '../utils/jsUtils.js'
 
 import { getSkosmosConf } from '../config/confSystem.js'
@@ -669,7 +669,7 @@ export const askSkosmos = async (term, lang = 'fr', vocabulary) => {
     if (!SKOSMOS_AUTH) {
       const skosmosUsr = getSkosmosConf('usr')
       const skosmosPwd = getSkosmosConf('pwd')
-      const basicAuth = toPaddedBase64Url(skosmosUsr + ':' + skosmosPwd)
+      const basicAuth = toPaddedBase64url(skosmosUsr + ':' + skosmosPwd)
       // logD(mod, fun, 'skosmosUsr: ' + skosmosUsr)
       // logD(mod, fun, 'skosmosPwd: ' + skosmosPwd)
       // logD(mod, fun, 'encodedAuth: ' + encodedAuth)

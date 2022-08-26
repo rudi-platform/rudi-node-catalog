@@ -19,12 +19,38 @@ import datetime from 'date-and-time'
 import { TRACE } from '../config/confApi.js'
 
 // -------------------------------------------------------------------------------------------------
+// Basic logging
+// -------------------------------------------------------------------------------------------------
+
+export const LOG_DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss SSS'
+export const nowLocaleFormatted = () => datetime.format(new Date(), LOG_DATE_FORMAT)
+
+const BASE_LINE =
+  '============================================================================================'
+
+export const separateLogs = (insertStr, shouldDisplayDate) => {
+  const dateStr = shouldDisplayDate ? `${nowLocaleFormatted()} ` : ''
+  const inputStr = `${insertStr}` ? `[ ${insertStr} ]==` : ''
+  const eatenCharacters = dateStr.length + inputStr.length
+  // const line = inputStr.padStart(BASE_LINE.length - eatenCharacters, '=')
+  const line = BASE_LINE.substring(eatenCharacters)
+
+  const logSeparator = `${dateStr}${line}${inputStr}`
+
+  console.log('D ' + logSeparator)
+  return logSeparator
+}
+separateLogs('Booting', true)
+
+// -------------------------------------------------------------------------------------------------
 // String
 // -------------------------------------------------------------------------------------------------
+export const isString = (str) => typeof str === 'string'
+
 export const padWithEqualSignBase4 = (str) => pad(str, 4, '=')
 export const toBase64 = (str) => convertEncoding(str, 'utf-8', 'base64')
-export const toBase64Url = (str) => convertEncoding(str, 'utf-8', 'base64url')
-export const toPaddedBase64Url = (str) => padWithEqualSignBase4(toBase64Url(str))
+export const toBase64url = (str) => convertEncoding(str, 'utf-8', 'base64url')
+export const toPaddedBase64url = (str) => padWithEqualSignBase4(toBase64url(str))
 export const decodeBase64 = (data) => convertEncoding(data, 'base64', 'utf-8')
 export const decodeBase64url = (data) => convertEncoding(data, 'base64url', 'utf-8')
 
@@ -127,10 +153,6 @@ export const dateEpochMsToIso = (utcMs) => {
     consoleErr(mod, fun, `input: ${utcMs} -> err: ${err}`)
   }
 }
-
-export const LOG_DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss SSS'
-
-export const nowLocaleFormatted = () => datetime.format(new Date(), LOG_DATE_FORMAT)
 // const [date, month, year] = new Date().toLocaleDateString('fr-FR').split('/')
 // const [h, m, s] = new Date().toLocaleTimeString('fr-FR').split(/:| /)
 // return `${year}/${month}/${date} ${h}:${m}:${s}`
@@ -138,7 +160,6 @@ export const nowLocaleFormatted = () => datetime.format(new Date(), LOG_DATE_FOR
 // -------------------------------------------------------------------------------------------------
 // Strings
 // -------------------------------------------------------------------------------------------------
-export const isString = (str) => typeof str === 'string'
 
 // -------------------------------------------------------------------------------------------------
 // Arrays
@@ -265,25 +286,6 @@ export const beautify = (jsonObject, option) => {
  */
 export const deepClone = (jsonObject) => {
   return JSON.parse(JSON.stringify(jsonObject))
-}
-
-// -------------------------------------------------------------------------------------------------
-// Basic logging
-// -------------------------------------------------------------------------------------------------
-
-const BASE_LINE = `================================================================================`
-
-export const separateLogs = (insertStr, shouldDisplayDate) => {
-  const dateStr = shouldDisplayDate ? `${nowLocaleFormatted()} ` : ''
-  const inputStr = insertStr ? `[ ${insertStr} ]==` : ''
-  const eatenCharacters = dateStr.length + inputStr.length
-
-  const line = BASE_LINE.substring(eatenCharacters)
-
-  const logSeparator = `${dateStr}${line}${inputStr}`
-
-  console.log('D ' + logSeparator)
-  return logSeparator
 }
 
 export const logWhere = (srcMod, srcFun) =>

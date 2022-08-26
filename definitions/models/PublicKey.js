@@ -55,14 +55,10 @@ const PublicKeySchema = new mongoose.Schema(
     },
 
     /** PEM-shaped key string content */
-    [API_PUB_PEM]: {
-      type: String,
-    },
+    [API_PUB_PEM]: String,
 
     /** The parsed public key */
-    [API_PUB_KEY]: {
-      type: String,
-    },
+    [API_PUB_KEY]: String,
 
     /** Type/algo of the public key */
     [API_PUB_TYPE]: {

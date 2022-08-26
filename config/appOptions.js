@@ -3,6 +3,9 @@
 // External dependencies
 // -------------------------------------------------------------------------------------------------
 import { execSync } from 'child_process'
+import _ from 'lodash'
+
+const { max } = _
 
 // -------------------------------------------------------------------------------------------------
 // App options: environment variables
@@ -15,22 +18,24 @@ export const OPT_APP_ENV = 'appEnv'
 export const OPT_USER_CONF = 'conf'
 export const OPT_PORTAL_CONF = 'portalConf'
 
-export const OPT_SERVER_URL = 'apiUrl'
+export const OPT_API_URL = 'apiUrl'
 
 export const ENV_USER_CONF = 'RUDI_API_USER_CONF'
+
+export const ENV_LOCAL = 'local'
+export const ENV_TEST = 'test'
+export const ENV_SHARED = 'shared'
+export const ENV_RELEASE = 'release'
+export const ENV_PRODUCTION = 'production'
+export const ENV_DEVELOPMENT = 'development'
 // -------------------------------------------------------------------------------------------------
 // App options
 // -------------------------------------------------------------------------------------------------
 export const OPTIONS = {
   [OPT_NODE_ENV]: {
-    text: 'Node environment: production | development',
+    text: `Node environment: ${ENV_PRODUCTION}|${ENV_DEVELOPMENT}`,
     env: 'NODE_ENV',
     cli: '--node_env',
-  },
-  [OPT_APP_ENV]: {
-    text: 'Module environment type: production | release | shared | test',
-    cli: '--app_env',
-    env: 'RUDI_API_ENV',
   },
   [OPT_GIT_HASH]: {
     text: 'Git hash',
@@ -47,29 +52,40 @@ export const OPTIONS = {
     cli: '--portal_conf',
     env: 'RUDI_API_PORTAL_CONF',
   },
-  [OPT_SERVER_URL]: {
+  [OPT_API_URL]: {
     text: 'API server URL',
-    cli: '--url',
+    cli: '--api_url',
     env: 'RUDI_API_URL',
   },
 }
+
+let longestOptName = 0
+let longestCliOpt = 0
+let longestEnvOpt = 0
+let longestText = 0
+Object.keys(OPTIONS).map((key) => {
+  longestOptName = max([longestOptName, key.length])
+  longestCliOpt = max([longestCliOpt, OPTIONS[key].cli.length])
+  longestEnvOpt = max([longestEnvOpt, OPTIONS[key].env.length])
+  longestText = max([longestText, OPTIONS[key].text.length])
+})
 
 let ARE_APP_OPTIONS_LOADED = false
 const APP_OPTIONS = {}
 
 export const loadAppOptions = () => {
   if (ARE_APP_OPTIONS_LOADED) return
-  const SEP_LINE = '----------------------------------------------------'
+  const SEP_LINE =
+    '-----------------------------------------------' +
+    '-----------------------------------------------'
   console.log('\n' + SEP_LINE) ///////////////////////////////////////////////////////////////////////
 
   console.log(' Options to run this app: ')
   Object.keys(OPTIONS).map((opt) =>
     console.log(
-      '    cli: ' +
-        OPTIONS[opt].cli +
-        (OPTIONS[opt].cli?.length < 8 ? '\t' : '') +
-        '\t| env: ' +
-        OPTIONS[opt].env
+      `    cli: ${OPTIONS[opt].cli.padEnd(longestCliOpt, ' ')}` +
+        ` | env: ${OPTIONS[opt].env.padEnd(longestEnvOpt, ' ')}` +
+        ` # ${OPTIONS[opt].text.padEnd(longestText, ' ')}`
     )
   )
   console.log(SEP_LINE) //////////////////////////////////////////////////////////////////////////////
@@ -92,12 +108,12 @@ export const loadAppOptions = () => {
   Object.keys(OPTIONS).map((opt) => {
     if (cliOptionsValues[opt]) {
       APP_OPTIONS[opt] = cliOptionsValues[opt]
-      console.log('    (cli) ' + opt + ' => ' + APP_OPTIONS[opt])
+      console.log('    (cli) ' + opt.padEnd(longestOptName) + ' => ' + APP_OPTIONS[opt])
     } else {
       const envVar = OPTIONS[opt].env
       if (process.env[envVar]) {
         APP_OPTIONS[opt] = process.env[envVar]
-        console.log('    (env) ' + opt + ' => ' + APP_OPTIONS[opt])
+        console.log('    (env) ' + opt.padEnd(longestOptName) + ' => ' + APP_OPTIONS[opt])
       }
     }
   })

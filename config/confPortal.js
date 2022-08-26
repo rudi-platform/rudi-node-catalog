@@ -3,10 +3,12 @@ const mod = 'confPortal'
 // -------------------------------------------------------------------------------------------------
 // Internal dependecies
 // -------------------------------------------------------------------------------------------------
-import { quietAccess, NOT_FOUND, toBase64 } from '../utils/jsUtils.js'
+import { quietAccess, NOT_FOUND, toBase64, separateLogs } from '../utils/jsUtils.js'
 import { RudiError } from '../utils/errors.js'
 import { readIniFile } from '../utils/fileActions.js'
 import { logD } from '../utils/logging.js'
+
+separateLogs('Portal conf', true) ////////////////////////////////////////////////////////
 
 // -------------------------------------------------------------------------------------------------
 // Constants: Portal JWT properties
@@ -91,7 +93,7 @@ const LOGIN = getPortalIniValue(PORTAL_SECTION, 'login')
 const READ_PASSW = getPortalIniValue(PORTAL_SECTION, 'passw')
 // consoleLog(mod, 'readPortalConf',`READ_PASSW: ${READ_PASSW}` )
 const PASSW_B64 =
-  isPwdB64 === 1 ||
+  isPwdB64 == 1 ||
   `${isPwdB64}`.toLocaleLowerCase() === 'true' ||
   `${isPwdB64}`.toLocaleLowerCase() === 'yes'
     ? READ_PASSW
@@ -115,11 +117,13 @@ export const getPortalBaseUrl = () => API_PORTAL_URL
 const API_GET_URL = getPortalIniValue(PORTAL_SECTION, 'get_url', '')
 const API_SEND_URL = getPortalIniValue(PORTAL_SECTION, 'put_url', '')
 
-export const getPortalMetaUrl = (id) =>
-  !id
+export const getPortalMetaUrl = (id, additionalParameters) => {
+  const reqUrl = !id
     ? `${API_PORTAL_URL}/${API_GET_URL.replace('/{{id}}', '')}`
     : `${API_PORTAL_URL}/${API_GET_URL.replace('{{id}}', id)}`
-
+  const options = additionalParameters ? `?${additionalParameters}` : ''
+  return `${reqUrl}${options}`
+}
 export const postPortalMetaUrl = (id) =>
   !id ? `${API_PORTAL_URL}/${API_SEND_URL}` : `${API_PORTAL_URL}/${API_SEND_URL}/${id}`
 

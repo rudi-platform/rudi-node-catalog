@@ -26,13 +26,15 @@ Object.assign(
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { getGitHash, getAppOptions, OPT_NODE_ENV } from './appOptions.js'
-import { consoleLog, consoleErr, LOG_DATE_FORMAT } from '../utils/jsUtils.js'
+import { consoleLog, consoleErr, LOG_DATE_FORMAT, separateLogs } from '../utils/jsUtils.js'
 import {
   getAppName,
   getIniValue,
   shouldControlPrivateRequests,
   shouldControlPublicRequests,
 } from './confSystem.js'
+
+separateLogs('Loading log conf', true) ///////////////////////////////////////////////////////////
 
 // -------------------------------------------------------------------------------------------------
 // Reading conf file

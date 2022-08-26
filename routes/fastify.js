@@ -8,7 +8,7 @@ import { STATUS_CODE, ROUTE_NAME } from '../config/confApi.js'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { padA1, nowEpochMs, beautify } from '../utils/jsUtils.js'
+import { padA1, nowEpochMs, beautify, separateLogs } from '../utils/jsUtils.js'
 import { shouldControlPrivateRequests, shouldControlPublicRequests } from '../config/confSystem.js'
 import { initFFLogger, shouldShowErrorPile, shouldShowRoutes } from '../config/confLogs.js'
 import { JWT_USER } from '../config/confPortal.js'
@@ -137,7 +137,7 @@ fastifyConf.setErrorHandler((error, request, reply) => {
 })
 
 fastifyConf.decorate('notFound', (req, reply) => {
-  const fun = 'notFound'
+  const fun = 'route404'
   // const ip = req.ip
 
   const response = {
@@ -356,11 +356,10 @@ function declareRouteGroup(routeGroup, preHandler, routeGroupName, logLevel) {
  */
 export const declareRoutes = () => {
   // declareRouteGroup(redirectRoutes, onPortalRoute, 'Redirect', 'd')
+  separateLogs('Routes', true) /////////////////////////////////////////////////////////////
   declareRouteGroup(publicRoutes, onPublicRoute, 'Public', 'info')
   declareRouteGroup(portalRoutes, onPortalRoute, 'Portal', 'verbose')
   declareRouteGroup(unrestrictedPrivateRoutes, onUnrestrictedPrivateRoute, 'Unrestricted', 'info')
   declareRouteGroup(backOfficeRoutes, onPrivateRoute, 'Private', 'debug')
   declareRouteGroup(devRoutes, onPrivateRoute, 'Dev', 'verbose')
 }
-
-declareRoutes()

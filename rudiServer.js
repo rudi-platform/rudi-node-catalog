@@ -6,8 +6,7 @@ const mod = 'main'
 import { API_VERSION } from './config/confApi.js'
 
 // 1. Utils
-import { separateLogs, beautify, consoleErr, consoleLog } from './utils/jsUtils.js'
-separateLogs('Loading conf', true) ///////////////////////////////////////////////////////////
+import { beautify, consoleErr, consoleLog, separateLogs } from './utils/jsUtils.js'
 
 // 2. Sys conf
 import { getAppName, getDbUrl, getServerAddress, getServerPort } from './config/confSystem.js'
@@ -16,6 +15,17 @@ import { getAppName, getDbUrl, getServerAddress, getServerPort } from './config/
 import './config/confLogs.js'
 
 // 4. Anything, now
+import { getAppHash, getEnvironment } from './controllers/sysController.js'
+import { LogEntry } from './definitions/models/LogEntry.js'
+import { addLogEntry, logE, logI, logT, sysAlert, sysCrit, sysInfo } from './utils/logging.js'
+import { Contact } from './definitions/models/Contact.js'
+import { Organization } from './definitions/models/Organization.js'
+import { Media } from './definitions/models/Media.js'
+import Keywords from './definitions/thesaurus/Keywords.js'
+import Themes from './definitions/thesaurus/Themes.js'
+import { getLicenceCodes } from './controllers/licenceController.js'
+import { Metadata } from './definitions/models/Metadata.js'
+import { fastifyConf, declareRoutes } from './routes/fastify.js'
 
 // -------------------------------------------------------------------------------------------------
 // Prerequisites
@@ -28,7 +38,6 @@ RegExp.prototype.toJSON = RegExp.prototype.toString
 // -------------------------------------------------------------------------------------------------
 // Require external modules
 separateLogs('Connecting to DB', true) ///////////////////////////////////////////////////////
-
 import mongoose from 'mongoose'
 
 // Import Swagger Options
@@ -50,20 +59,7 @@ import mongoose from 'mongoose'
 // useNewUrlParser: true,
 // }
 
-import { getAppHash, getEnvironment } from './controllers/sysController.js'
-import { addLogEntry, logE, logI, logT, sysAlert, sysCrit, sysInfo } from './utils/logging.js'
-
 consoleLog(mod, 'mongo', `Connecting to [${getDbUrl()}]`)
-
-import { LogEntry } from './definitions/models/LogEntry.js'
-import { Contact } from './definitions/models/Contact.js'
-import { Organization } from './definitions/models/Organization.js'
-import { Media } from './definitions/models/Media.js'
-import { Metadata } from './definitions/models/Metadata.js'
-import Keywords from './definitions/thesaurus/Keywords.js'
-import Themes from './definitions/thesaurus/Themes.js'
-import { fastifyConf, declareRoutes } from './routes/fastify.js'
-import { getLicenceCodes } from './controllers/licenceController.js'
 
 mongoose
   .connect(getDbUrl())
@@ -119,19 +115,16 @@ const start = async () => {
       sysCrit(`Promise rejection error: ${err}`, 'rudiServer.on', {}, { error: err })
     })
 
-    separateLogs('Portal conf', true) ////////////////////////////////////////////////////////
     import('./config/confPortal.js')
 
-    separateLogs('Routes', true) /////////////////////////////////////////////////////////////
-
-    await fastifyConf
+    fastifyConf
       .listen(getServerPort(), getServerAddress())
       .catch((err) => logE(mod, 'Fastify listen', `${err}`))
     // fastify.swagger()
     // fastify.info(`Listening on ${fastify.server.address().address}:${fastify.server.address().port}`)
     declareRoutes()
-    separateLogs('Models', true) /////////////////////////////////////////////////////////////
 
+    separateLogs('Models', true) /////////////////////////////////////////////////////////////
     await Promise.all(
       [LogEntry, Contact, Organization, Media, Metadata, Keywords, Themes].map((model) =>
         model
@@ -142,9 +135,9 @@ const start = async () => {
     )
     await getLicenceCodes()
 
-    separateLogs('Start', true) //////////////////////////////////////////////////////////////
     const appVer = getAppHash()
     const curEnv = getEnvironment()
+    separateLogs('Start', true) //////////////////////////////////////////////////////////////
     const startMsg = `API v${API_VERSION} ` + `| App version: '${appVer}' ` + `| '${curEnv}' env`
     logI(mod, fun, startMsg)
     sysInfo(startMsg, '', '', ' ')

@@ -44,6 +44,9 @@ import {
   URL_SUFFIX_TOKEN_CHECK,
   URL_SUFFIX_TOKEN_GET,
   ROUTE_OPT,
+  URL_PREFIX_CHECK,
+  URL_SUFFIX_PORTAL,
+  URL_SUFFIX_NODE,
 } from '../config/confApi.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -61,6 +64,7 @@ import { logD } from '../utils/logging.js'
 // -------------------------------------------------------------------------------------------------
 import {
   addSingleObject,
+  countObjects,
   deleteManyObjects,
   deleteObjectList,
   deleteSingleObject,
@@ -125,6 +129,12 @@ import {
   sendMetadata,
 } from '../controllers/portalController.js'
 import { getSinglePubKey } from '../controllers/publicKeyController.js'
+import {
+  getPortalCachedMetadataList,
+  getPortalMetadataFields,
+} from '../controllers/stateController.js'
+import { getPortalBaseUrl } from '../config/confPortal.js'
+import { getApiUrl } from '../config/confSystem.js'
 
 // -------------------------------------------------------------------------------------------------
 // Route names
@@ -156,7 +166,8 @@ const PRV_DEL_ONE = 'prv_del_one'
 const PRV_DEL_MANY = 'prv_del_many'
 const PRV_DEL_LIST = 'prv_del_list'
 
-const PRV_RCH_OBJ = 'prv_rch_obj'
+const PRV_OBJ_SEARCH = 'prv_obj_search'
+const PRV_OBJ_COUNT = 'prv_obj_count'
 
 const PRV_ADD_OBJ_REPORT = 'prv_add_obj_report'
 const PRV_UPSERT_OBJ_REPORT = 'prv_upsert_obj_report'
@@ -166,6 +177,9 @@ const PRV_GET_ALL_OBJ_REPORT = 'prv_get_all_obj_report'
 const PRV_DEL_OBJ_REPORT = 'prv_del_obj_report'
 const PRV_DEL_ALL_OBJ_REPORT = 'prv_del_all_obj_report'
 const PRV_DEL_LIST_OBJ_REPORT = 'prv_del_list_obj_report'
+
+const PRV_CHECK_PORTAL_METADATA = 'prv_check_portal_metadata'
+const PRV_CHECK_PORTAL_METADATA_IDS = 'prv_check_portal_metadata_ids'
 
 const DEV_GET_EVERY_THESAURUS = 'dev_get_every_thesaurus'
 const DEV_GET_SINGLE_THESAURUS = 'dev_get_single_thesaurus'
@@ -190,6 +204,9 @@ const DEV_GET_COLLECTIONS = 'dev_get_collections'
 const DEV_DROP_COLLECTION = 'dev_drop_collection'
 const DEV_DROP_DB = 'dev_drop_db'
 const DEV_INIT_THEMES = 'dev_init_themes'
+
+const DEV_CHECK_NODE_URL = 'dev_check_node_url'
+const DEV_CHECK_PORTAL_URL = 'dev_check_portal_url'
 
 // -------------------------------------------------------------------------------------------------
 // Free routes (no authentification required)
@@ -547,22 +564,30 @@ export const backOfficeRoutes = [
     method: HTTP_METHODS.GET,
     url: `${URL_PV_OBJECT_GENERIC}/${ACT_SEARCH}`,
     handler: searchObjects,
-    config: { [ROUTE_NAME]: PRV_RCH_OBJ },
+    config: { [ROUTE_NAME]: PRV_OBJ_SEARCH },
   },
   // Extended search on object
   {
     method: HTTP_METHODS.GET,
     url: `${URL_PV_OBJECT_GENERIC}/${ACT_EXT_SEARCH}`,
     handler: searchObjects,
-    config: { [ROUTE_NAME]: PRV_RCH_OBJ, [ROUTE_OPT]: ACT_EXT_SEARCH },
+    config: { [ROUTE_NAME]: PRV_OBJ_SEARCH, [ROUTE_OPT]: ACT_EXT_SEARCH },
   },
   // Get searchable fields for an object type
   {
     method: HTTP_METHODS.GET,
     url: `${URL_PREFIX_PRIVATE}/${ACT_SEARCH}`,
     handler: getSearchableProperties,
-    config: { [ROUTE_NAME]: PRV_RCH_OBJ },
+    config: { [ROUTE_NAME]: PRV_OBJ_SEARCH },
   },
+  // Count the number of objects
+  {
+    method: HTTP_METHODS.GET,
+    url: `${URL_PV_OBJECT_GENERIC}/count`,
+    handler: countObjects,
+    config: { [ROUTE_NAME]: PRV_OBJ_COUNT },
+  },
+
   // -------------------------------------------------------------------------------------------------
   // Integration reports
   // -------------------------------------------------------------------------------------------------
@@ -747,6 +772,12 @@ export const devRoutes = [
     config: { [ROUTE_NAME]: DEV_GET_PORTAL_METADATA },
   },
   {
+    method: HTTP_METHODS.GET,
+    url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}`,
+    handler: getMetadata,
+    config: { [ROUTE_NAME]: DEV_GET_PORTAL_METADATA },
+  },
+  {
     method: HTTP_METHODS.POST,
     url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}/:${PARAM_ID}`,
     handler: sendMetadata,
@@ -759,6 +790,34 @@ export const devRoutes = [
     config: { [ROUTE_NAME]: DEV_DEL_PORTAL_METADATA },
   },
 
+  // -------------------------------------------------------------------------------------------------
+  //  Monitoring/control checks on metadata/data
+  // -------------------------------------------------------------------------------------------------
+  // Get the portal URL associated with this node
+  {
+    method: HTTP_METHODS.GET,
+    url: `${URL_PREFIX_CHECK}/${URL_SUFFIX_NODE}/url`,
+    handler: () => getApiUrl(),
+    config: { [ROUTE_NAME]: DEV_CHECK_NODE_URL },
+  },
+  {
+    method: HTTP_METHODS.GET,
+    url: `${URL_PREFIX_CHECK}/${URL_SUFFIX_PORTAL}/url`,
+    handler: getPortalBaseUrl,
+    config: { [ROUTE_NAME]: DEV_CHECK_PORTAL_URL },
+  },
+  {
+    method: HTTP_METHODS.GET,
+    url: `${URL_PREFIX_CHECK}/${URL_SUFFIX_PORTAL}/${OBJ_METADATA}`,
+    handler: getPortalCachedMetadataList,
+    config: { [ROUTE_NAME]: PRV_CHECK_PORTAL_METADATA },
+  },
+  {
+    method: HTTP_METHODS.GET,
+    url: `${URL_PREFIX_CHECK}/${URL_SUFFIX_PORTAL}/ids`,
+    handler: getPortalMetadataFields,
+    config: { [ROUTE_NAME]: PRV_CHECK_PORTAL_METADATA_IDS },
+  },
   // -------------------------------------------------------------------------------------------------
   // Accessing logs
   // -------------------------------------------------------------------------------------------------

@@ -63,7 +63,7 @@
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const env = pm.variables.get('env')",
 									"    const currentEnv = pm.response.stream.toString('utf8');",
-									"    if (!['dev', 'local', 'test'].includes(currentEnv))",
+									"    if (!['dev', 'local', 'test', 'development'].includes(currentEnv))",
 									"        {",
 									"            pm.collectionVariables.set('pm_jwt', 'environment not suited');",
 									"            throw new Error(`Environment '${currentEnv}' not suited for sanity tests`)",
@@ -90,6 +90,41 @@
 								"api",
 								"admin",
 								"env"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check portal connection",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(`Check connection to Portal`, () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const token = pm.response.toJSON();",
+									"    console.log(token)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/api/admin/portal/token",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"portal",
+								"token"
 							]
 						}
 					},
@@ -5858,6 +5893,161 @@
 			]
 		},
 		{
+			"name": "11. Functional checks",
+			"item": [
+				{
+					"name": "Check node URL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check portal URL\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = codec.streamToString(pm.response)",
+									"    pm.expect(res.startsWith('http')).to.be.true",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/api/admin/check/node/url",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"check",
+								"node",
+								"url"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check portal URL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check portal URL\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = codec.streamToString(pm.response)",
+									"    pm.expect(res.startsWith('http')).to.be.true",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/api/admin/check/portal/url",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"check",
+								"portal",
+								"url"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check portal resources",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check portal resources\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    pm.expect(res.time).to.be.not.undefined",
+									"    pm.expect(res.total).to.be.not.undefined",
+									"    pm.expect(res.items?.length).to.eq(res.total)",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/api/admin/check/portal/resources",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"check",
+								"portal",
+								"resources"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check portal resources ids",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check portal resources ids\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    pm.expect(res[0].global_id).to.be.not.undefined",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/api/admin/check/portal/ids",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"check",
+								"portal",
+								"ids"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Admin",
 			"item": [
 				{
@@ -5895,7 +6085,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"{{portalKeyName}}\",\n    \"url\": \"https://rudi.qualif.open-groupe.com/konsult/v1/encryption-key\",\n    \"pem\": \"-----BEGIN PUBLIC KEY-----\\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvS3nTZOj01kq1V6wKpMe\\nnROzRDb8V/uBLS6Ey90sWdhbRhv8R1QIYSRs3YjMZ2HBdMOQzuMQvyUF5lJv0KDN\\njYIf74n3+rDNxICkTlm7cwggtks/JOdNw1o/fGbU83tlAnSr4QbLCCqThzslchiK\\nmGVH5pCiV/aX2bl81iNKkGDiFpmyT/au8+OtZOZe910sDnBsyPHH+wCkh/bb4E+t\\nkKHUGLKpi4T8cm9wrNXFySxP532zuPsJ5CsaDWyu3jXivfYvC5Q520B72F+eK6nI\\ndozONJLMtd9lFegxuRtU3fsYMAZww77hiCsH5mgfLo+iwXicdTCWogkGl8n9ODYh\\nUwIDAQAB\\n-----END PUBLIC KEY-----\"\n}",
+							"raw": "{\n    \"name\": \"{{portalKeyName}}\",\n    \"url\": \"https://rudi.qualif.open-groupe.com/konsult/v1/encryption-key\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -6049,11 +6239,16 @@
 					"log.t('PORTAL_TOKEN_NAME: ' + PORTAL_TOKEN_NAME)",
 					"log.t('ADMIN_URL: ' + ADMIN_URL)",
 					"",
+					"",
+					"error = {",
+					"    throwNotFound: (msg) => { throw { statusCode: 404, name: 'NotFound', message: msg } }",
+					"}",
+					"",
 					"time = {",
 					"    now: () => new Date().toISOString(),",
 					"    nowEpochS: () => _.floor(new Date().getTime() / 1000),",
 					"    timezone: () => new Date().getTimezoneOffset(),",
-					"    wait: (delayMs) => setTimeout(function(){}, [delayMs]),",
+					"    wait: (delayMs) => setTimeout(function () { }, [delayMs]),",
 					"}",
 					"codec = {",
 					"    streamToString: (data) => data?.stream?.toString('utf8'),",
@@ -6077,8 +6272,7 @@
 					"    },",
 					"",
 					"    streamToUtf8: (data) => data?.stream?.toString('utf8')",
-					"",
-					"};",
+					"}",
 					"",
 					"rand = {",
 					"    get: (randName) => pm.collectionVariables.replaceIn(randName),",
@@ -6134,7 +6328,7 @@
 					"        }",
 					"        // log.d('is token valid?')",
 					"        const isValid = jwtBody.exp > time.nowEpochS()",
-					"        // log.d(tokenName + ' is ' + (isValid ? '' : 'not ') + 'valid')",
+					"        log.d(tokenName + ' is ' + (isValid ? '' : 'not ') + 'valid')",
 					"        return isValid",
 					"    },",
 					"",
@@ -6159,7 +6353,10 @@
 					"            }",
 					"        }",
 					"        pm.sendRequest(reqNewToken, (err, res) => {",
-					"            if (err) throw err",
+					"            if (err) {",
+					"                log.d(`[renewApiToken] Error: 'Crypto' module unreachable on ${reqUrl}`)",
+					"                error.throwNotFound(`Crypto module unreachable on ${reqUrl}`)",
+					"            }",
 					"            const token = codec.streamToUtf8(res)",
 					"            // log.d('rudiProdToken : ' + token)",
 					"            try {",
@@ -6190,12 +6387,17 @@
 					"            },",
 					"        }",
 					"        pm.sendRequest(reqNewToken, (err, res) => {",
-					"            if (err) throw err",
+					"            if (err) {",
+					"                log.d(`[renewPortalToken] Error: RUDI API unreachable on ${reqUrl}`)",
+					"                error.throwNotFound(`RUDI API unreachable on ${reqUrl}`)",
+					"            }",
 					"            try {",
 					"                pm.expect(res).to.have.property('code', 200);",
 					"            } catch (error) {",
-					"                console.error('[renewPortalToken]: ' + error)",
-					"                throw new Error('[renewPortalToken]: ' + error)",
+					"                log.d('[renewPortalToken] Error: ' + codec.streamToString(res))",
+					"                //log.d('[renewPortalToken] Response to Postman req: ' + codec.streamToString(res))",
+					"                return new Error('[renewPortalToken]: ' + codec.streamToString(res))",
+					"                throw new Error('[renewPortalToken]: ' + codec.streamToString(res))",
 					"            }",
 					"            //log.d('renewPortalToken res: ' + JSON.stringify(res))",
 					"            const token = JSON.parse(codec.streamToUtf8(res)).access_token",
@@ -6249,11 +6451,31 @@
 			"value": "sanity-checks"
 		},
 		{
+			"key": "apiToken",
+			"value": ""
+		},
+		{
+			"key": "dateUpdate",
+			"value": ""
+		},
+		{
+			"key": "pm_jwt",
+			"value": ""
+		},
+		{
 			"key": "apiJwt",
 			"value": ""
 		},
 		{
 			"key": "portalJwt",
+			"value": ""
+		},
+		{
+			"key": "gitHash",
+			"value": ""
+		},
+		{
+			"key": "apiVersion",
 			"value": ""
 		},
 		{
@@ -6298,18 +6520,6 @@
 		},
 		{
 			"key": "mediaId2",
-			"value": ""
-		},
-		{
-			"key": "dateUpdate",
-			"value": ""
-		},
-		{
-			"key": "gitHash",
-			"value": ""
-		},
-		{
-			"key": "apiVersion",
 			"value": ""
 		},
 		{

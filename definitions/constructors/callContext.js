@@ -29,7 +29,7 @@ import { protectHeaderAuth, protectHeaderUrl, protectHeaderMethod } from '../../
 // -------------------------------------------------------------------------------------------------
 // Internal constants
 // -------------------------------------------------------------------------------------------------
-const ACTIVATE_LOG = false
+const ACTIVATE_LOG = true
 /**
  * This class makes it possible to add to the request received by node a context that will be
  * helpful to create syslog lines.
@@ -129,7 +129,7 @@ export const CallContext = class CallContext {
     this[AUTH][REQ_APP] = clientApp
   }
   get clientApp() {
-    return this[AUTH][REQ_APP]
+    return this[AUTH][REQ_APP] || ''
   }
 
   set reqUser(userId) {
@@ -137,7 +137,7 @@ export const CallContext = class CallContext {
     this[AUTH][REQ_USR] = userId
   }
   get reqUser() {
-    return this[AUTH][REQ_USR]
+    return this[AUTH][REQ_USR] || ''
   }
 
   setAuth(ips, clientApp, userId) {
@@ -207,8 +207,7 @@ export const CallContext = class CallContext {
     try {
       return (
         this.reqDetailsMsg +
-        ` <- ${this.clientApp ? `${this.clientApp}` : ''}` +
-        `${this.reqUser ? ` | ${this.reqUser}` : ''}${
+        ` <- ${this.clientApp}${this.reqUser}${
           this.clientApp || this.reqUser ? ' @ ' : ''
         }${this.ips.join(' <- ')}`
       )
@@ -412,9 +411,9 @@ export const CallContext = class CallContext {
   static extractIpRedirections(req) {
     const headers = req.headers
     const redirections = headers['x-forwarded-for'] || headers['X-Forwarded-For']
+    if (!redirections) return
     if (Array.isArray(redirections)) return redirections
     if (typeof redirections === 'string') return redirections.split(',')
-    if (!redirections) return
     logD(mod, 'extractIpRedirections', `redirections: ${beautify(redirections)}`)
   }
 
@@ -428,7 +427,7 @@ export const CallContext = class CallContext {
     const headers = req.headers
     if (!headers) return ''
     const redirections = CallContext.extractIpRedirections(req)
-    return redirections ? ` <- ${redirections.join(' <- ')} ` : ''
+    return redirections && isNotEmptyArray(redirections) ? ` <- ${redirections.join(' <- ')} ` : ''
   }
 
   static createIpsMsg(req) {

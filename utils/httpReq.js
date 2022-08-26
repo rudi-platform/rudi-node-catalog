@@ -7,20 +7,21 @@ const mod = 'http'
 // import http from 'http'
 // import { curlirize } from 'axios-curlirize'
 import axios from 'axios'
+import AxiosCurlirize from 'axios-curlirize'
 // -------------------------------------------------------------------------------------------------
 // Internal dependecies
 // -------------------------------------------------------------------------------------------------
 import { USER_AGENT } from '../config/confApi.js'
+import { ENV_LOCAL } from '../config/appOptions.js'
 import { beautify } from './jsUtils.js'
+import { getEnvironment } from '../controllers/sysController.js'
 import { logD, logHttpAnswer, logT } from './logging.js'
 import { RudiError, BadRequestError } from './errors.js'
 
 // -------------------------------------------------------------------------------------------------
 // Debug axios
 // -------------------------------------------------------------------------------------------------
-import AxiosCurlirize from 'axios-curlirize'
-import { ENV_DEV, getEnvironment } from '../controllers/sysController.js'
-if (getEnvironment() === ENV_DEV) AxiosCurlirize(axios)
+if (getEnvironment() === ENV_LOCAL) AxiosCurlirize(axios)
 
 // -------------------------------------------------------------------------------------------------
 // Functions: header treatments
