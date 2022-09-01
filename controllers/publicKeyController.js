@@ -90,7 +90,9 @@ const normalizeKeyData = async (pubKeyJson) => {
   try {
     logT(mod, fun, ``)
     // logT(mod, fun, `pubKeyJson: ${beautify(pubKeyJson)}`)
-    checkKeyName(pubKeyJson[API_PUB_NAME])
+    const pubKeyName = pubKeyJson[API_PUB_NAME].replace(/\s/g, '_')
+    pubKeyJson[API_PUB_NAME] = pubKeyName
+    checkKeyName(pubKeyName)
 
     // Check if either the URL or the PEM are provided
     if (!pubKeyJson[API_PUB_PEM] && !pubKeyJson[API_PUB_URL])
