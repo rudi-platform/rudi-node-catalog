@@ -118,7 +118,7 @@ const start = async () => {
     import('./config/confPortal.js')
 
     fastifyConf
-      .listen(getServerPort(), getServerAddress())
+      .listen({ port: getServerPort(), host: getServerAddress() })
       .catch((err) => logE(mod, 'Fastify listen', `${err}`))
     // fastify.swagger()
     // fastify.info(`Listening on ${fastify.server.address().address}:${fastify.server.address().port}`)
