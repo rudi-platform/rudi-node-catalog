@@ -5868,7 +5868,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"portal-{{stamp}}\",\n    \"url\": \"https://rudi.qualif.open-groupe.com/konsult/v1/encryption-key\",\n    \"pem\": \"-----BEGIN PUBLIC KEY-----\\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlvCYHABBgCdolisF8qAY\\nA1Zmrqbe5bzAC1hPiQQTiOl+gn0cZJMkGNhnElLa5p9OYKMoNiV2gJeoYaHVGjLE\\nCekSA4+zZLkXsy8W6KA6Ix6rq6NTIYFx5Y5i8pycF27cLYH0y3nG6Bll07LoZBUO\\n8vmXw3OTd6FcC3r35KPW586K1Tycmyvn5j6oH5XScAFxookzjMODDd+RpnWhK4Vx\\nRM4aL8RiCxRrqNktMoiFiDVKzZ4cQZs8+hzY4qPkdAdhf6Xpo3JdKKnCC48iLsS/\\nkP/zexw0+4MCxliFkz3fm6xo6orSguwvZSxPp/5oOXNYJYg8+C+N1OBmADRUbyG3\\nTQIDAQAB\\n-----END PUBLIC KEY-----\\n\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"raw": "{\n    \"name\": \"portal-{{stamp}}\",\n    \"url\": \"https://rudi.qualif.open-groupe.com/konsult/v1/encryption-key\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
