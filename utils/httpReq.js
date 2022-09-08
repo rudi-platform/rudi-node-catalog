@@ -3,25 +3,24 @@ const mod = 'http'
 // -------------------------------------------------------------------------------------------------
 // External dependecies
 // -------------------------------------------------------------------------------------------------
-// import https from 'https'
-// import http from 'http'
-// import { curlirize } from 'axios-curlirize'
 import axios from 'axios'
-import AxiosCurlirize from 'axios-curlirize'
-// -------------------------------------------------------------------------------------------------
-// Internal dependecies
-// -------------------------------------------------------------------------------------------------
-import { USER_AGENT } from '../config/confApi.js'
-import { ENV_LOCAL } from '../config/appOptions.js'
-import { beautify } from './jsUtils.js'
-import { getEnvironment } from '../controllers/sysController.js'
-import { logD, logHttpAnswer, logT } from './logging.js'
-import { RudiError, BadRequestError } from './errors.js'
 
 // -------------------------------------------------------------------------------------------------
 // Debug axios
 // -------------------------------------------------------------------------------------------------
-if (getEnvironment() === ENV_LOCAL) AxiosCurlirize(axios)
+// if (getEnvironment() === ENV_LOCAL) {
+//   const AxiosCurlirize = await import('axios-curlirize')
+//   AxiosCurlirize(axios)
+// }
+// -------------------------------------------------------------------------------------------------
+// Internal dependecies
+// -------------------------------------------------------------------------------------------------
+import { USER_AGENT } from '../config/confApi.js'
+// import { ENV_LOCAL } from '../config/appOptions.js'
+import { beautify } from './jsUtils.js'
+// import { getEnvironment } from '../controllers/sysController.js'
+import { logD, logHttpAnswer, logT } from './logging.js'
+import { RudiError, BadRequestError } from './errors.js'
 
 // -------------------------------------------------------------------------------------------------
 // Functions: header treatments

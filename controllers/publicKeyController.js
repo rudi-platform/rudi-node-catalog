@@ -45,7 +45,7 @@ import { latiniseString } from '../utils/lang.js'
 // -------------------------------------------------------------------------------------------------
 // Helper functions
 // -------------------------------------------------------------------------------------------------
-const checkKeyName = (pubKeyName) => {
+export const checkKeyName = (pubKeyName) => {
   const fun = 'checkKeyName'
   // Check if the name (== id) of the public key is provided
   if (!pubKeyName)
