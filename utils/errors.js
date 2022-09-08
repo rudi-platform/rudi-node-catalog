@@ -123,7 +123,7 @@ export class RudiError extends Error {
   static createRudiHttpError(code, message, ctxMod, ctxFun, path) {
     const fun = 'createRudiHttpError'
     try {
-      logD(mod, fun, `Error ${code}: ${message}`)
+      // logD(mod, fun, `Error ${code}: ${message}`)
       switch (parseInt(code)) {
         case 400:
           return new BadRequestError(message, ctxMod, ctxFun, path)
@@ -199,41 +199,52 @@ export class RudiError extends Error {
   // eslint-disable-next-line complexity
   static treatCommunicationError(ctxMod, ctxFun, comError, errPrefix) {
     const fun = 'treatCommunicationError'
-    logT(mod, fun, ``)
-
-    let error
     try {
+      logT(mod, fun, ``)
+
+      let error
       const errFlag = `${errPrefix ? errPrefix + ' ' : ''}`
       // logD(mod, fun, `message: ${comError.message}`)
       // logD(mod, fun, `name: ${comError.name}`)
-      // logD(mod, fun, `config: ${beautify(comError.config)}`)
+      // // logD(mod, fun, `config: ${beautify(comError.config)}`)
       // logD(mod, fun, `status: ${JSON.parse(JSON.stringify(comError)).status}`)
       // logD(mod, fun, JSON.parse(JSON.stringify(comError)).status)
       // logD(mod, fun, `data: ${beautify(comError.response?.data)}`)
 
+      logW(mod, fun, beautify(comError.response))
+
+      // logD(mod, fun, `comError.status : ${comError.status}`)
+      // // logD(mod, fun, `comError.status : ${JSON.parse(beautify(comError)).status}`)
+      // logD(mod, fun, `comError.response.status : ${comError.response?.status}`)
+      // logD(mod, fun, `comError.response?.data?.code : ${comError.response?.data?.code}`)
+      // logD(mod, fun, `comError.code : ${comError.code}`)
+      // logD(mod, fun, `comError.response?.data?.status : ${comError.response?.data?.status}`)
+
       const errCode =
         parseInt(
-          comError.status ||
-            JSON.parse(JSON.stringify(comError)).status ||
+          comError.response?.data?.code ||
+            comError.status ||
+            comError.response?.status ||
             comError.code ||
             comError.statusCode ||
-            comError.response?.status ||
-            comError.response?.data?.code ||
-            comError.response?.data?.status
-        ) || comError.code == 'ENOTFOUND'
-          ? 404
-          : 0
+            comError.response?.data?.status ||
+            JSON.parse(JSON.stringify(comError)).status
+        ) || (comError.code == 'ENOTFOUND' ? 404 : 0)
 
-      // logD(mod, fun, `${errFlag}error code: ${errCode}`)
+      logD(mod, fun, `${errFlag}error code: ${errCode}`)
+
+      logD(mod, fun, `response?.data?.label : ${comError.response?.data?.label}`)
+      logD(mod, fun, `message : ${comError.message}`)
+      logD(mod, fun, `data?.message : ${comError.data?.message}`)
 
       const errMessage = `${
-        comError.message || comError.data?.message || comError.response?.data?.label
+        comError.response?.data?.label || comError.message || comError.data?.message
       }`
 
-      logW(mod, fun, beautify(comError))
+      logW(mod, fun, beautify(errMessage))
 
       if (errCode && errMessage) {
-        logT(mod, fun, beautify(errMessage))
+        // logT(mod, fun, beautify(errMessage))
         return RudiError.createRudiHttpError(errCode, errMessage)
       } else if (comError.response?.data) {
         const errData = comError.response.data

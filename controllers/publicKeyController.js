@@ -35,6 +35,7 @@ import { CallContext } from '../definitions/constructors/callContext.js'
 import { getEnsuredObjectWithRudiId, overwriteDbObject } from '../db/dbQueries.js'
 import { REGEX_WORD } from '../definitions/schemaValidators.js'
 import { getPortalEncryptPubKey } from './portalController.js'
+import { latiniseString } from '../utils/lang.js'
 
 // -------------------------------------------------------------------------------------------------
 // Helper functions
@@ -89,10 +90,8 @@ const normalizeKeyData = async (pubKeyJson) => {
 
   try {
     logT(mod, fun, ``)
-    // logT(mod, fun, `pubKeyJson: ${beautify(pubKeyJson)}`)
-    const pubKeyName = pubKeyJson[API_PUB_NAME].replace(/\s/g, '_')
-    pubKeyJson[API_PUB_NAME] = pubKeyName
-    checkKeyName(pubKeyName)
+    // Latinize pubKeyName
+    pubKeyJson[API_PUB_NAME] = latiniseString(pubKeyJson[API_PUB_NAME]).replace(/[^\w-]/g, '_')
 
     // Check if either the URL or the PEM are provided
     if (!pubKeyJson[API_PUB_PEM] && !pubKeyJson[API_PUB_URL])
