@@ -600,14 +600,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{apiUrl}}/api/admin/resources?collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/reports?collection_tag={{stamp}}",
 							"host": [
 								"{{apiUrl}}"
 							],
 							"path": [
 								"api",
 								"admin",
-								"resources"
+								"reports"
 							],
 							"query": [
 								{
@@ -4771,6 +4771,58 @@
 								"api",
 								"admin",
 								"media"
+							],
+							"query": [
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete reports with stamp",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const stamp = pm.collectionVariables.get('stamp')",
+									"pm.test(`Delete reports with '${stamp}' stamp`, () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    // pm.expect(responseJson.n).to.eq(2);",
+									"    // pm.expect(responseJson.ok).to.eq(1);",
+									"    pm.expect(responseJson.deletedCount).to.eq(0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    \"{{softMeta1Id}}\",\n    \"{{softMeta2Id}}\"\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/api/admin/reports?collection_tag={{stamp}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"reports"
 							],
 							"query": [
 								{
