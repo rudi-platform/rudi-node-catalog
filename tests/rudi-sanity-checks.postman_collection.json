@@ -2741,6 +2741,41 @@
 					"response": []
 				},
 				{
+					"name": "Count metadata",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Count metadata\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const result = parseInt(codec.streamToString(pm.response))",
+									"    pm.expect(result).to.gte(2);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/api/admin/resources/count",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"resources",
+								"count"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Count metadata (api_version)",
 					"event": [
 						{
@@ -5429,16 +5464,67 @@
 					"response": []
 				},
 				{
-					"name": "ERR: bad name",
+					"name": "Bad names get normalized",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Throwing an error when creating a public key with a wrong name\", () => {",
+									"pm.test(\"Bad pubkey names get normalized\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{pubKeyName}}€%©\",\n    \"pem\": \"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBQ/tgB/vCQxkgSlzztRAmE4dNsOo1HzLXcqTOtDIhi rudi_prod_manager\",\n    \"collection_tag\":\"{{stamp}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/api/admin/pub_keys",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"pub_keys"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ERR: pub key already exists",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Pub key already exists\", () => {",
 									"    pm.expect(pm.response.code).to.eql(400);",
 									"    const error = pm.response.json()",
-									"    pm.expect(error.message).to.eql(\"The 'name' property of the public key should only contain letters, numbers as well as minus and underscore signs\")",
+									"    pm.expect(error.message.startsWith('A public key already exists with the name ')).to.be.true",
 									"});",
 									""
 								],
@@ -6552,6 +6638,10 @@
 		},
 		{
 			"key": "portalKeyName",
+			"value": ""
+		},
+		{
+			"key": "portalToken",
 			"value": ""
 		}
 	]

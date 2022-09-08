@@ -258,7 +258,7 @@ export const CallContext = class CallContext {
       logT(mod, fun, ``)
       if (RudiError.isRudiError(error)) {
         if (ACTIVATE_LOG) logT(mod, fun, `rudi error`)
-        if (ACTIVATE_LOG) logT(mod, fun, `this[DETAILS]: ${this[DETAILS]}`)
+        if (ACTIVATE_LOG) logT(mod, fun, `this[DETAILS]: ${beautify(this[DETAILS])}`)
         if (!this[DETAILS][ERROR]) this[DETAILS][ERROR] = error
         else {
           {

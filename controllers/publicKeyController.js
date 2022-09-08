@@ -18,6 +18,7 @@ import {
   API_PUB_TYPE,
   API_PUB_PROP,
   API_PUB_KEY,
+  API_PUB_ID,
 } from '../db/dbFields.js'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
@@ -32,7 +33,11 @@ import { getApiUrl } from '../config/confSystem.js'
 import { OBJ_PUB_KEYS, URL_PREFIX_PUBLIC, PARAM_ID, PARAM_PROP } from '../config/confApi.js'
 import { accessReqParam } from '../utils/jsonAccess.js'
 import { CallContext } from '../definitions/constructors/callContext.js'
-import { getEnsuredObjectWithRudiId, overwriteDbObject } from '../db/dbQueries.js'
+import {
+  doesObjectExistWithRudiId,
+  getEnsuredObjectWithRudiId,
+  overwriteDbObject,
+} from '../db/dbQueries.js'
 import { REGEX_WORD } from '../definitions/schemaValidators.js'
 import { getPortalEncryptPubKey } from './portalController.js'
 import { latiniseString } from '../utils/lang.js'
@@ -90,8 +95,10 @@ const normalizeKeyData = async (pubKeyJson) => {
 
   try {
     logT(mod, fun, ``)
-    // Latinize pubKeyName
-    pubKeyJson[API_PUB_NAME] = latiniseString(pubKeyJson[API_PUB_NAME]).replace(/[^\w-]/g, '_')
+    // Latinize pubKey name
+    pubKeyJson[API_PUB_NAME] = latiniseString(pubKeyJson[API_PUB_NAME])
+      .replace(/[\s]/g, '_')
+      .replace(/[^\w-]/g, '')
 
     // Check if either the URL or the PEM are provided
     if (!pubKeyJson[API_PUB_PEM] && !pubKeyJson[API_PUB_URL])
@@ -190,9 +197,13 @@ export const newPublicKey = async (pubKeyJson) => {
   try {
     logT(mod, fun, ``)
     await normalizeKeyData(pubKeyJson)
-
+    const pubKeyId = pubKeyJson[API_PUB_ID]
+    const existsPubKey = await doesObjectExistWithRudiId(OBJ_PUB_KEYS, pubKeyId)
+    if (existsPubKey)
+      throw new BadRequestError(`A public key already exists with the name '${pubKeyId}'`)
     const dbPubKey = new PublicKey(pubKeyJson)
     await dbPubKey.save()
+
     return dbPubKey
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)

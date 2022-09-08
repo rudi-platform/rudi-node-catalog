@@ -646,7 +646,7 @@ export const newMetadata = async (rudiMetadata) => {
     const dbReadyObject = await rudiToDbFormat(rudiMetadata, true)
     // logD(mod, fun, `dbReadyObject: ${beautify(dbReadyObject)}`)
 
-    // Special update for metadataInfo.referenceDates: update 'createdDate'
+    // Special update for metadataInfo.referenceDates: update 'Createddate'
     const rudiId = dbReadyObject[API_METADATA_ID]
     logI(mod, fun, `dbReadyObject: ${beautify(dbReadyObject[API_METADATA_ID])}`)
     const dbMetadata = new Metadata(dbReadyObject)
