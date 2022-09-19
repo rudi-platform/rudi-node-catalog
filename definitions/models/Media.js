@@ -132,13 +132,12 @@ const MediaSchema = new mongoose.Schema(
       [API_MEDIA_CONNECTOR_PARAMS]: {
         type: [ConnectorParameter],
         default: undefined,
+        _id: false,
       },
     },
 
     /** Tag for identifying a collection of resources */
-    [API_COLLECTION_TAG]: {
-      type: String,
-    },
+    [API_COLLECTION_TAG]: String,
   },
   commonSchemaOptions
 )

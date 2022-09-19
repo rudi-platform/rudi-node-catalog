@@ -29,7 +29,7 @@ export const ConnectorParameter = {
   usage: String,
   accepted_values: {
     type: [mongoose.Mixed],
-    _id: false,
     default: undefined,
+    _id: false,
   },
 }
