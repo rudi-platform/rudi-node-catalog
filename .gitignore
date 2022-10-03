@@ -19,8 +19,9 @@
 **/*.xls*
 
 # Keys
-**/*.pub
+**/*.pem
 **/*.prv
+**/*.pub
 
 # Idz
 features

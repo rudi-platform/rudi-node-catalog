@@ -1128,6 +1128,7 @@ export const overwriteDbObject = async (objectType, updateData) => {
       updateData[DB_CREATED_AT] = existingObject[DB_CREATED_AT]
     }
     const dbObject = await Model.findOneAndUpdate(filter, updateData, updateOpts)
+    logD(mod, fun, beautify(dbObject))
 
     // logD(mod, fun, `dbObject: ${beautify(dbObject)}`)
     await dbObject.save()

@@ -33,12 +33,14 @@ import {
   API_MEDIA_CAPTION,
   API_MEDIA_DATES,
   API_MEDIA_URL_VISUAL,
+  API_DATES_CREATED,
+  API_DATES_EDITED,
 } from '../../db/dbFields.js'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import ReferenceDatesSchema from '../schemas/ReferenceDates.js'
+import ReferenceDatesSchema, { checkDates } from '../schemas/ReferenceDates.js'
 import { ConnectorParameter } from '../schemas/ConnectorParameters.js'
 
 import { VALID_URI } from '../schemaValidators.js'
@@ -230,9 +232,17 @@ FileSchema.pre('save', function (next) {
   const fun = 'pre save hook'
   // logD('FileSchema', fun, ``)
   try {
-    if (!isNotEmptyObject(this[API_FILE_CHECKSUM])) {
+    if (!isNotEmptyObject(this[API_FILE_CHECKSUM]))
       throw new BadRequestError(missingField(API_FILE_CHECKSUM), mod, fun, [API_FILE_CHECKSUM])
-    }
+
+    logD(mod, fun, 'checking MEDIA_DATES')
+    checkDates(
+      this[API_MEDIA_DATES],
+      API_DATES_CREATED,
+      API_DATES_EDITED,
+      true // If 'media_dates.updated' is not defined, it is initialized with 'media_dates.created'
+    )
+
     next()
   } catch (err) {
     logW(mod, fun, err)

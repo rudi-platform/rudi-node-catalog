@@ -11,8 +11,6 @@ import objectPath from 'object-path'
 import _ from 'lodash'
 const { floor, pick } = _
 
-import datetime from 'date-and-time'
-
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
@@ -23,7 +21,9 @@ import { TRACE } from '../config/confApi.js'
 // -------------------------------------------------------------------------------------------------
 
 export const LOG_DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss SSS'
-export const nowLocaleFormatted = () => datetime.format(new Date(), LOG_DATE_FORMAT)
+export const nowLocaleFormatted = () =>
+  new Date().toISOString().replace(/T\./, ' ').replace('Z', '')
+// datetime.format(new Date(), LOG_DATE_FORMAT)
 
 const BASE_LINE =
   '=====================================================' +
@@ -133,7 +133,6 @@ export const toISOLocale = (date) => {
 }
 
 export const nowEpochMs = () => new Date().getTime()
-
 export const nowEpochS = () => floor(nowEpochMs() / 1000)
 
 export const dateEpochSToIso = (utcSeconds) => {

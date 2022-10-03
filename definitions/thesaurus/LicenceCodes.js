@@ -24,9 +24,7 @@ export const initialize = (arg) => {
   if (arg) Thesaurus = []
 }
 
-export const get = () => {
-  return Thesaurus
-}
+export const get = () => Thesaurus
 
 export const set = (newValue) => {
   const fun = 'set'

@@ -65,7 +65,7 @@ export const fastifyConf = fastify({
 fastifyConf.addHook('onError', (request, reply, error, done) => {
   const fun = 'onError'
   try {
-    logT(mod, fun, ``)
+    logV(mod, fun, ``)
     // logD(mod, fun, `isRudiError: ${RudiError.isRudiError(error)}`)
     // logD(mod, fun, `showErrorPile: ${shouldShowErrorPile()}`)
 
