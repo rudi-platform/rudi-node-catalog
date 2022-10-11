@@ -169,7 +169,8 @@ export const API_FILE_SIZE = 'file_size'
 export const API_FILE_CHECKSUM = 'checksum'
 export const API_FILE_STRUCTURE = 'file_structure'
 export const API_FILE_ENCODING = 'file_encoding'
-export const API_FILE_UPDATE_STATUS = 'update_status'
+export const API_FILE_STORAGE_STATUS = 'storage_status'
+export const API_FILE_STATUS_UPDATE = 'status_update'
 
 // -------------------------------------------------------------------------------------------------
 // Public key properties

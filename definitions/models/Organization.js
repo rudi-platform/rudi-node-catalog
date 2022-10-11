@@ -27,7 +27,6 @@ import {
 // -------------------------------------------------------------------------------------------------
 import { GpsCoordinatesSchema } from '../schemas/GpsCoordinates.js'
 import { UuidV4Schema } from '../schemas/Identifiers.js'
-import { logD, logT, logW } from '../../utils/logging.js'
 import { RudiError } from '../../utils/errors.js'
 import { makeSearchable } from '../../db/dbActions.js'
 
@@ -101,10 +100,9 @@ Organization.getSearchableFields = () => [API_ORGANIZATION_ID, API_ORGANIZATION_
 Organization.initialize = async () => {
   const fun = 'initOrganization'
   try {
-    logT(mod, fun, ``)
-    return makeSearchable(Organization)
-      .catch((err) => logW(mod, fun, err))
-      .then(logD(mod, fun, `Indexes created`))
+    // logT(mod, fun, ``)
+    await makeSearchable(Organization)
+    return `Organization indexes created`
   } catch (err) {
     RudiError.treatError(mod, fun, err)
   }

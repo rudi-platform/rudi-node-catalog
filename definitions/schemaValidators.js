@@ -83,9 +83,9 @@ export const REGEX_B64_NO_PADDING = '[a-zA-Z\\d+\\/]+'
 // -------------------------------------------------------------------------------------------------
 // JSON Web Token
 // -------------------------------------------------------------------------------------------------
-export const REGEX_JWT_ENCODED = /^[\w-]+\.[\w-]+\.([\w-]+={,3})$/
-export const REGEX_JWT_AUTH = /^Bearer [\w-]+\.[\w-]+\.[\w-]+={,3}$/
-export const REGEX_BASIC_AUTH = /^Basic [\w-]+={,3}$/
+export const REGEX_JWT_ENCODED = /^[\w-]+\.[\w-]+\.([\w-]+={0,3})$/
+export const REGEX_JWT_AUTH = /^Bearer [\w-]+\.[\w-]+\.[\w-]+={0,3}$/
+export const REGEX_BASIC_AUTH = /^Basic [\w-]+={0,3}$/
 
 // -------------------------------------------------------------------------------------------------
 // Request protection

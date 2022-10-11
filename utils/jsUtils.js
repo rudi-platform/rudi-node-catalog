@@ -72,9 +72,6 @@ export const pad = (str, base, padSign) => {
   try {
     padSign = padSign?.substring(0, 1)
     const modulo = str.length % base
-
-    // consoleLog(mod, fun, `str.length: ${str.length}`)
-    // consoleLog(mod, fun, `modulo: ${modulo}`)
     if (modulo === 0) return str
 
     let padding = padSign
@@ -246,7 +243,7 @@ export const isEmpty = (prop) => {
   return prop == '' || prop == '{}' || prop == '[]' || strProp == '{}' || strProp == '[]'
 }
 
-/* 
+/*
   TRUE:
     !null
     !undefined

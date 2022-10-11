@@ -47,6 +47,8 @@ import {
   URL_PREFIX_CHECK,
   URL_SUFFIX_PORTAL,
   URL_SUFFIX_NODE,
+  OBJ_MEDIA,
+  ACT_COMMIT,
 } from '../config/confApi.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -78,6 +80,7 @@ import {
   upsertSingleObject,
 } from '../controllers/genericController.js'
 import {
+  commitMedia,
   getSingleMetadata,
   initThemes,
   initWithODR,
@@ -120,7 +123,7 @@ import {
   initLicences,
 } from '../controllers/licenceController.js'
 
-// import devController from '../controllers/testController'
+import { test } from '../controllers/testController.js'
 import {
   checkStoredToken,
   deleteMetadata,
@@ -165,6 +168,7 @@ const PRV_GET_ONE = 'prv_get_one'
 const PRV_DEL_ONE = 'prv_del_one'
 const PRV_DEL_MANY = 'prv_del_many'
 const PRV_DEL_LIST = 'prv_del_list'
+const PRV_MEDIA_COMMIT = 'prv_media_commit'
 
 const PRV_OBJ_SEARCH = 'prv_obj_search'
 const PRV_OBJ_COUNT = 'prv_obj_count'
@@ -587,7 +591,16 @@ export const backOfficeRoutes = [
     handler: countObjects,
     config: { [ROUTE_NAME]: PRV_OBJ_COUNT },
   },
-
+  // -------------------------------------------------------------------------------------------------
+  // Media
+  // -------------------------------------------------------------------------------------------------
+  // Commit a media
+  {
+    method: HTTP_METHODS.POST,
+    url: `${URL_PREFIX_PRIVATE}/${OBJ_MEDIA}/:${PARAM_ID}/${ACT_COMMIT}`,
+    handler: commitMedia,
+    config: { [ROUTE_NAME]: PRV_MEDIA_COMMIT },
+  },
   // -------------------------------------------------------------------------------------------------
   // Integration reports
   // -------------------------------------------------------------------------------------------------
@@ -868,10 +881,10 @@ export const devRoutes = [
   // -------------------------------------------------------------------------------------------------
   // Tests entry
   // -------------------------------------------------------------------------------------------------
-  /*  {
+  {
     method: HTTP_METHODS.GET,
     url: `${URL_PREFIX_PRIVATE}/test`,
-    handler: devController.test,
-    config: { [ROUTE_NAME]: DEV_TEST },
-  }, */
+    handler: test,
+    config: { [ROUTE_NAME]: 'dev_test' },
+  },
 ]

@@ -43,6 +43,8 @@ import {
   DB_CREATED_AT,
   DB_UPDATED_AT,
   DICT_LANG,
+  API_FILE_STORAGE_STATUS,
+  API_FILE_STATUS_UPDATE,
 } from '../db/dbFields.js'
 
 import {
@@ -71,7 +73,14 @@ import { isPortalConnectionDisabled } from '../config/confPortal.js'
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { bboxToGeoJsonPolygon } from '../utils/geo.js'
-import { beautify, deepClone, isNotEmptyArray, isEmptyArray, isNothing } from '../utils/jsUtils.js'
+import {
+  beautify,
+  deepClone,
+  isNotEmptyArray,
+  isEmptyArray,
+  isNothing,
+  nowISO,
+} from '../utils/jsUtils.js'
 import { logD, logE, logI, logT, logV, logW } from '../utils/logging.js'
 import {
   contactNotFound,
@@ -93,7 +102,7 @@ import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
 // Data models
 // -------------------------------------------------------------------------------------------------
 import { Metadata } from '../definitions/models/Metadata.js'
-import { Media } from '../definitions/models/Media.js'
+import { Media, MediaStorageStatus } from '../definitions/models/Media.js'
 
 // -------------------------------------------------------------------------------------------------
 // Controllers
@@ -122,6 +131,7 @@ import {
   listThemesInMetadata,
   overwriteDbObject,
   searchDbObjects,
+  getObjectWithRudiId,
 } from '../db/dbQueries.js'
 
 import { parseQueryParameters } from '../utils/parseRequest.js'
@@ -635,6 +645,7 @@ export const upsertMetadata = async (rudiMetadata) => {
     throw RudiError.treatError(mod, fun, error)
   }
 }
+
 export const newMetadata = async (rudiMetadata) => {
   const fun = 'newMetadata'
   try {
@@ -753,6 +764,39 @@ export const updateMetadata = async (incomingRudiMetadata) => {
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
+}
+
+export const commitMedia = async (req, res) => {
+  const mediaId = accessReqParam(req, PARAM_ID)
+  const metadataId = req.body[API_METADATA_ID]
+
+  // --- Checks
+  // Check mediaId exists
+  const mediaInfo = await getObjectWithRudiId(OBJ_MEDIA, mediaId)
+  if (!mediaInfo)
+    return res.code(404).send(new NotFoundError(`Media not found for id '${mediaId}'`))
+  // Check metadataId exists
+  const metadata = await getObjectWithRudiId(OBJ_METADATA, metadataId)
+  if (!metadata)
+    return res.code(404).send(new NotFoundError(`Metadata not found for id '${metadataId}'`))
+  // Check metadata is bound to media
+  const metadataMediaList = metadata[API_MEDIA_PROPERTY]
+  const mediaIndex = metadataMediaList.findIndex((media) => mediaId === media[API_MEDIA_ID])
+  if (mediaIndex === -1)
+    return res
+      .code(400)
+      .send(new BadRequestError(`Media '${mediaId}' not linked to metadata '${metadataId}'`))
+
+  // --- Updates
+  // Set media storage_status to 'available'
+  mediaInfo[API_FILE_STORAGE_STATUS] = MediaStorageStatus.Available
+
+  // Set status_update date
+  mediaInfo[API_FILE_STATUS_UPDATE] = nowISO()
+
+  const media = await overwriteDbObject(OBJ_MEDIA, mediaInfo)
+  const result = pick(media, [API_MEDIA_ID, API_FILE_STORAGE_STATUS, API_FILE_STATUS_UPDATE])
+  return res.code(200).send(result)
 }
 
 export const sendManyMetadataToPortal = async (req) => {

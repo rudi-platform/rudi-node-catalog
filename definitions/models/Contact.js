@@ -29,7 +29,7 @@ import {
 import { VALID_EMAIL } from '../schemaValidators.js'
 import { UuidV4Schema } from '../schemas/Identifiers.js'
 
-import { logD, logT, logW } from '../../utils/logging.js'
+import { logW } from '../../utils/logging.js'
 import { RudiError } from '../../utils/errors.js'
 import { makeSearchable } from '../../db/dbActions.js'
 
@@ -115,10 +115,9 @@ Contact.getSearchableFields = () => [
 Contact.initialize = async () => {
   const fun = 'initContact'
   try {
-    logT(mod, fun, ``)
-    return makeSearchable(Contact)
-      .catch((err) => logW(mod, fun, err))
-      .then(logD(mod, fun, `Indexes created`))
+    // logT(mod, fun, ``)
+    await makeSearchable(Contact)
+    return `Contact indexes created`
   } catch (err) {
     logW(mod, fun, err)
     RudiError.treatError(mod, fun, err)

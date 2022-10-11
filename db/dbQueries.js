@@ -1251,7 +1251,7 @@ export const deleteManyDbObjectsWithFilter = async (objectType, conditions) => {
     throw RudiError.treatError(mod, fun, err)
   }
 }
-/* 
+/*
 function changeConditionsIntoRegex(conditions) {
   const fun = `changeConditionsIntoRegex`
 

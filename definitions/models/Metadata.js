@@ -673,7 +673,7 @@ async function checkThesaurus(metadata) {
     throw RudiError.treatError(mod, fun, err)
   }
 }
-/* 
+/*
   function checkMedia(metadata) {
     const fun = 'checkMedia'
     logD(mod, fun, `metadata: ${beautify(metadata)}`)
@@ -859,7 +859,7 @@ Metadata.initialize = async () => {
   const fun = 'initMetadata'
   try {
     await makeSearchable(Metadata)
-    logD(mod, fun, `Indexes created`)
+    return `Metadata indexes created`
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }

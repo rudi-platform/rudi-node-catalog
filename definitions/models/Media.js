@@ -28,13 +28,14 @@ import {
   API_FILE_CHECKSUM,
   API_FILE_STRUCTURE,
   API_FILE_ENCODING,
-  API_FILE_UPDATE_STATUS,
+  API_FILE_STORAGE_STATUS,
   API_MEDIA_CONNECTOR_PARAMS,
   API_MEDIA_CAPTION,
   API_MEDIA_DATES,
   API_MEDIA_URL_VISUAL,
   API_DATES_CREATED,
   API_DATES_EDITED,
+  API_FILE_STATUS_UPDATE,
 } from '../../db/dbFields.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -64,12 +65,15 @@ export const MediaTypes = {
   Service: 'SERVICE',
 }
 
-export const UpdateStatus = [
-  'modified', // the data is in the process of being created but still incomplete
-  'updated', // the data is up to date
-  'historical', // ancient data that has been updated
-  'obsolete', // dataset that is too old but cannot be updated or replaced with another
-]
+export const MediaStorageStatus = {
+  Nonexistant: 'nonexistant', // the file has not been uploaded yet to the "Media" storage module
+  Available: 'available', // the file has been successfully uploaded to "Media" storage module
+  Missing: 'missing', // the file had been successfully uploaded but is temporarily unavailable
+  Historical: 'historical', // ancient data that has been updated
+  Obsolete: 'obsolete', // dataset that is too old but cannot be updated or replaced with another
+  Archived: 'archived', // data are not immediately available, access is not automatic
+  Removed: 'removed', // the file has been deleted and is no longer available
+}
 
 export const InterfaceContract = {
   Dwnld: 'dwnl',
@@ -212,17 +216,23 @@ const FileSchema = new mongoose.Schema(
       default: getEncodings().Unicode,
     },
 
-    // Relevance status of the data
-    //   - 'modified'   = the data is in the process of being created
-    //                    but still incomplete
-    //   - 'updated'    = the data is up to date
-    //   - 'historical' = ancient data that has been updated
-    //   - 'obsolete'   = dataset that is too old but cannot be updated
-    //                    or replaced with another
-    [API_FILE_UPDATE_STATUS]: {
+    /**
+     * Storage/relevance status of the data
+     * - nonexistant: the file has not been uploaded yet to the "Media" storage module
+     * - available: the file has been successfully uploaded to "Media" storage module
+     * - missing: the file had been successfully uploaded but is temporarily unavailable
+     * - historical: ancient data that has been updated
+     * - obsolete: dataset that is too old but cannot be updated or replaced with another
+     * - archived: data are not immediately available, access is not automatic
+     * - removed: the file has been deleted and is no longer available
+     */
+    [API_FILE_STORAGE_STATUS]: {
       type: String,
-      enum: Object.values(UpdateStatus),
+      enum: Object.values(MediaStorageStatus),
     },
+
+    /** Date of the last status update */
+    [API_FILE_STATUS_UPDATE]: Date,
   },
   commonSchemaOptions
 )
@@ -250,6 +260,10 @@ FileSchema.pre('save', function (next) {
   }
 })
 
+const PositiveInt = {
+  type: Int32,
+  minimum: 0,
+}
 // -------------------------------------------------------------------------------------------------
 // Series schema definition
 // -------------------------------------------------------------------------------------------------
@@ -257,40 +271,22 @@ const SeriesSchema = new mongoose.Schema(
   {
     // Theorical delay between the production of the record and its availability,
     // in milliseconds.
-    latency: {
-      type: Int32,
-      minimum: 0,
-    },
+    latency: PositiveInt,
 
     // Theorical delay between the production of two records, in milliseconds.
-    period: {
-      type: Int32,
-      minimum: 0,
-    },
+    period: PositiveInt,
 
     // Actual number of records
-    current_number_of_records: {
-      type: Int32,
-      minimum: 0,
-    },
+    current_number_of_records: PositiveInt,
 
     // Actual size of the data, in bytes (refreshed automatically)
-    current_size: {
-      type: Int32,
-      minimum: 0,
-    },
+    current_size: PositiveInt,
 
     // Estimated total number of records
-    total_number_of_records: {
-      type: Int32,
-      minimum: 0,
-    },
+    total_number_of_records: PositiveInt,
 
     // Estimated total size of the data, in bytes
-    total_size: {
-      type: Int32,
-      minimum: 0,
-    },
+    total_size: PositiveInt,
   },
   commonSchemaOptions
 )
@@ -350,7 +346,7 @@ Media.getSearchableFields = () => [
   API_MEDIA_TYPE,
   API_MEDIA_NAME,
   API_FILE_MIME,
-  API_FILE_UPDATE_STATUS,
+  API_FILE_STORAGE_STATUS,
 ]
 
 Media.initialize = async () => {
