@@ -149,8 +149,8 @@ export const makeSearchable = async (Model) => {
     try {
       const indexes = await collection.getIndexes()
       if (!!indexes[SEARCH_INDEX]) {
-        const val = indexes[SEARCH_INDEX]
-        // logD(mod, fun, `Search indexes already exist: ${collection.name} / ${val}`)
+        // const val = indexes[SEARCH_INDEX]
+        logD(mod, fun, `Search indexes already exist: ${collection.name}`)
         // logT(mod, fun, `Dropping search indexes for '${collection.name}'`)
         // await collection.dropIndex(SEARCH_INDEX)
       }

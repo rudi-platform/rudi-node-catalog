@@ -18,6 +18,7 @@ import {
   API_METAINFO_PROPERTY,
   API_COLLECTION_TAG,
   getUpdatedDate,
+  API_STORAGE_STATUS,
 } from '../db/dbFields.js'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
@@ -68,6 +69,7 @@ import {
   RudiError,
   UnauthorizedError,
 } from '../utils/errors.js'
+import { StorageStatus } from '../definitions/thesaurus/StorageStatus.js'
 // -------------------------------------------------------------------------------------------------
 // Portal auth header
 // -------------------------------------------------------------------------------------------------
@@ -421,7 +423,7 @@ jwtBody = {
   scope: ['read']
 }
 */
-/* 
+/*
   export const checkSignatureWithSecret = (accessToken) => {
     const fun = 'checkSignatureWithSecret'
     logT(mod, fun, ``)
@@ -579,6 +581,10 @@ export const sendMetadataToPortal = async (metadataId) => {
       return
     }
 
+    if (metadata[API_STORAGE_STATUS === StorageStatus.Pending]) {
+      logD(mod, fun, `Waiting for other media to get uploaded: ${metadataId}`)
+      return
+    }
     //--- Ensuring compatibility with portal
     const metadataClean = deepClone(metadata)
     // API version

@@ -1,4 +1,4 @@
-const mod = 'themeThes'
+// const mod = 'themeThes'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
@@ -9,7 +9,7 @@ import { Thesaurus } from './Thesaurus.js'
 // Dynamic enum init
 // -------------------------------------------------------------------------------------------------
 
-/*   
+/*
   farming: "Agriculture",
   biota: "Biote",
   biota: "Biote",

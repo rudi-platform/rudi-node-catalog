@@ -45,6 +45,7 @@ import {
   DICT_LANG,
   API_FILE_STORAGE_STATUS,
   API_FILE_STATUS_UPDATE,
+  API_STORAGE_STATUS,
 } from '../db/dbFields.js'
 
 import {
@@ -138,6 +139,7 @@ import { parseQueryParameters } from '../utils/parseRequest.js'
 import { readJsonFile } from '../utils/fileActions.js'
 import Contact from '../definitions/models/Contact.js'
 import Organization from '../definitions/models/Organization.js'
+import { StorageStatus } from '../definitions/thesaurus/StorageStatus.js'
 
 // -------------------------------------------------------------------------------------------------
 // Atomic treatments of properties: RUDI -> DB
@@ -767,36 +769,61 @@ export const updateMetadata = async (incomingRudiMetadata) => {
 }
 
 export const commitMedia = async (req, res) => {
-  const mediaId = accessReqParam(req, PARAM_ID)
-  const metadataId = req.body[API_METADATA_ID]
+  const fun = 'commitMedia'
+  try {
+    logT(mod, fun, ``)
+    const mediaId = accessReqParam(req, PARAM_ID)
+    const metadataId = req.body[API_METADATA_ID]
 
-  // --- Checks
-  // Check mediaId exists
-  const mediaInfo = await getObjectWithRudiId(OBJ_MEDIA, mediaId)
-  if (!mediaInfo)
-    return res.code(404).send(new NotFoundError(`Media not found for id '${mediaId}'`))
-  // Check metadataId exists
-  const metadata = await getObjectWithRudiId(OBJ_METADATA, metadataId)
-  if (!metadata)
-    return res.code(404).send(new NotFoundError(`Metadata not found for id '${metadataId}'`))
-  // Check metadata is bound to media
-  const metadataMediaList = metadata[API_MEDIA_PROPERTY]
-  const mediaIndex = metadataMediaList.findIndex((media) => mediaId === media[API_MEDIA_ID])
-  if (mediaIndex === -1)
-    return res
-      .code(400)
-      .send(new BadRequestError(`Media '${mediaId}' not linked to metadata '${metadataId}'`))
+    // --- Checks
+    // Check mediaId exists
+    const mediaInfo = await getObjectWithRudiId(OBJ_MEDIA, mediaId)
+    if (!mediaInfo)
+      return res.code(404).send(new NotFoundError(`Media not found for id '${mediaId}'`))
+    // Check metadataId exists
+    const metadata = await getObjectWithRudiId(OBJ_METADATA, metadataId)
+    if (!metadata)
+      return res.code(404).send(new NotFoundError(`Metadata not found for id '${metadataId}'`))
+    // Check metadata is bound to media
+    const metadataMediaList = metadata[API_MEDIA_PROPERTY]
+    const mediaIndex = metadataMediaList.findIndex((media) => mediaId === media[API_MEDIA_ID])
+    if (mediaIndex === -1)
+      return res
+        .code(400)
+        .send(new BadRequestError(`Media '${mediaId}' not linked to metadata '${metadataId}'`))
 
-  // --- Updates
-  // Set media storage_status to 'available'
-  mediaInfo[API_FILE_STORAGE_STATUS] = MediaStorageStatus.Available
+    // --- Updates
+    // Set media storage_status to 'available'
+    mediaInfo[API_FILE_STORAGE_STATUS] = MediaStorageStatus.Available
 
-  // Set status_update date
-  mediaInfo[API_FILE_STATUS_UPDATE] = nowISO()
+    // Set status_update date
+    mediaInfo[API_FILE_STATUS_UPDATE] = nowISO()
 
-  const media = await overwriteDbObject(OBJ_MEDIA, mediaInfo)
-  const result = pick(media, [API_MEDIA_ID, API_FILE_STORAGE_STATUS, API_FILE_STATUS_UPDATE])
-  return res.code(200).send(result)
+    const media = await overwriteDbObject(OBJ_MEDIA, mediaInfo)
+    let shouldUpdateMetadata = true
+    metadataMediaList.map((media) => {
+      const mediaStatus = media[API_FILE_STORAGE_STATUS]
+      if (
+        mediaStatus === MediaStorageStatus.Missing ||
+        mediaStatus === MediaStorageStatus.Nonexistant
+      )
+        shouldUpdateMetadata = false
+    })
+    const result = {
+      media: pick(media, [API_MEDIA_ID, API_FILE_STORAGE_STATUS, API_FILE_STATUS_UPDATE]),
+    }
+    if (!shouldUpdateMetadata) return res.code(200).send(result)
+
+    // All media are available! Let's send the metadata
+    const meta = await getObjectWithRudiId(OBJ_METADATA, metadataId)
+    meta[API_STORAGE_STATUS] = StorageStatus.Online
+    await overwriteMetadata(meta)
+    result.metadata = pick(meta, [API_METADATA_ID, API_STORAGE_STATUS])
+
+    return res.code(200).send(result)
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
 }
 
 export const sendManyMetadataToPortal = async (req) => {

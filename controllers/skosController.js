@@ -481,7 +481,7 @@ export const getThesaurusList = async (lang) => {
   try {
     const keywords = await Keywords.get(lang)
     const themes = await Themes.get(lang)
-    const licences = await await getAllLicenceCodes()
+    const licences = await getAllLicenceCodes()
 
     const thesauri = {
       encodings: getEncodings(),
