@@ -119,7 +119,6 @@ import Themes from '../definitions/thesaurus/Themes.js'
 import {
   doesObjectExistWithRudiId,
   getContactDbIdWithJson,
-  getContactWithJson,
   getEnsuredContactWithDbId,
   getEnsuredMediaWithDbId,
   getEnsuredMetadataWithRudiId,
@@ -128,7 +127,6 @@ import {
   getMediaDbIdWithJson,
   getDbObjectListAndCount,
   getOrganizationDbIdWithJson,
-  getOrganizationWithJson,
   listThemesInMetadata,
   overwriteDbObject,
   searchDbObjects,
@@ -773,24 +771,21 @@ export const commitMedia = async (req, res) => {
   try {
     logT(mod, fun, ``)
     const mediaId = accessReqParam(req, PARAM_ID)
-    const metadataId = req.body[API_METADATA_ID]
+    const { metadataId } = req.body
+    // const { metadataId, commitId } = req.body
 
     // --- Checks
     // Check mediaId exists
     const mediaInfo = await getObjectWithRudiId(OBJ_MEDIA, mediaId)
-    if (!mediaInfo)
-      return res.code(404).send(new NotFoundError(`Media not found for id '${mediaId}'`))
+    if (!mediaInfo) throw new NotFoundError(`Media not found for id '${mediaId}'`)
     // Check metadataId exists
     const metadata = await getObjectWithRudiId(OBJ_METADATA, metadataId)
-    if (!metadata)
-      return res.code(404).send(new NotFoundError(`Metadata not found for id '${metadataId}'`))
+    if (!metadata) throw new NotFoundError(`Metadata not found for id '${metadataId}'`)
     // Check metadata is bound to media
     const metadataMediaList = metadata[API_MEDIA_PROPERTY]
     const mediaIndex = metadataMediaList.findIndex((media) => mediaId === media[API_MEDIA_ID])
     if (mediaIndex === -1)
-      return res
-        .code(400)
-        .send(new BadRequestError(`Media '${mediaId}' not linked to metadata '${metadataId}'`))
+      throw new BadRequestError(`Media '${mediaId}' not linked to metadata '${metadataId}'`)
 
     // --- Updates
     // Set media storage_status to 'available'
@@ -950,17 +945,8 @@ export const initWithODR = async (req, reply) => {
     // Themes.init('reset')
     // Keywords.init('reset')
 
-    await Promise.all(
-      initProd.map(async (prod) => {
-        if (!(await getOrganizationWithJson(prod))) await newOrganization(prod)
-      })
-    )
-
-    await Promise.all(
-      initCont.map(async (cont) => {
-        if (!(await getContactWithJson(cont))) await newContact(cont)
-      })
-    )
+    await Promise.all(initProd.map(async (prod) => newOrganization(prod)))
+    await Promise.all(initCont.map(async (cont) => newContact(cont)))
 
     Promise.all(
       initData.map(async (metadata) => {

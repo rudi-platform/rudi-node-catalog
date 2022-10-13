@@ -163,6 +163,7 @@ fastifyConf.addHook('onRequest', (req, res, next) => {
   try {
     const context = new CallContext()
     logV(mod, fun, `----- Rcv req #${context.id} -----vvv---`)
+    // logV(mod, fun, req.url)
     const now = nowEpochMs()
     context.setIpsFromRequest(req)
     context.timestamp = now

@@ -329,13 +329,13 @@ export const cleanLicences = async () => {
 // -------------------------------------------------------------------------------------------------
 // Generic functions: get single object
 // -------------------------------------------------------------------------------------------------
-export const getObject = async (objectType, filter) => {
+export const getObject = async (objectType, filter, shouldSkipPopulate) => {
   const fun = `getObject`
   // // logT(mod, fun, ``)
 
   try {
     const Model = getObjectModel(objectType)
-    const populateOpts = getPopulateOptions(objectType)
+    const populateOpts = shouldSkipPopulate ? [] : getPopulateOptions(objectType)
 
     // logD(mod, fun, `populateOpts: ${beautify(populateOpts)}`)
 
@@ -353,14 +353,22 @@ export const getObject = async (objectType, filter) => {
   }
 }
 
-export const getObjectWithDbId = async (objectType, dbId) => {
-  // const fun = `getObjectWithDbId`
-  // logT(mod, fun, ``)
-  const filter = { [DB_ID]: dbId }
-  return await getObject(objectType, filter)
-}
+/**
+ * @param {String} objectType The RUDI object type
+ * @param {String} dbId The MongoDB id of the object
+ * @param {Boolean} shouldSkipPopulate True if the populating action should be skipped
+ * @returns {Object} the RUDI object that is looked for
+ */
+export const getObjectWithDbId = async (objectType, dbId, shouldSkipPopulate) =>
+  await getObject(objectType, { [DB_ID]: dbId }, shouldSkipPopulate)
 
-export const getObjectWithRudiId = async (objectType, rudiId) => {
+/**
+ * @param {String} objectType The RUDI object type
+ * @param {String} rudiId The RUDI id of the object (most likely a UUID v4)
+ * @param {Boolean} shouldSkipPopulate True if the populating action should be skipped
+ * @returns {Object} the RUDI object that is looked for
+ */
+export const getObjectWithRudiId = async (objectType, rudiId, shouldSkipPopulate) => {
   const fun = `getObjectWithRudiId`
   // // logT(mod, fun, ``)
   try {
@@ -369,7 +377,7 @@ export const getObjectWithRudiId = async (objectType, rudiId) => {
     const idField = getObjectIdField(objectType)
     const filter = { [idField]: rudiId }
 
-    return await getObject(objectType, filter)
+    return await getObject(objectType, filter, shouldSkipPopulate)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -388,13 +396,13 @@ export const getEnsuredObjectWithRudiId = async (objectType, rudiId) => {
   }
 }
 
-export const getObjectWithJson = async (objectType, rudiObject) => {
+export const getObjectWithJson = async (objectType, rudiObject, shouldSkipPopulate) => {
   const fun = `getObjectWithJson`
   // // logT(mod, fun, ``)
   try {
     const idField = getObjectIdField(objectType)
     const rudiId = accessProperty(rudiObject, idField)
-    return await getObjectWithRudiId(objectType, rudiId)
+    return await getObjectWithRudiId(objectType, rudiId, shouldSkipPopulate)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -441,8 +449,7 @@ export const doesObjectExistWithRudiId = async (objectType, rudiId) => {
   const fun = `doesObjectExistWithRudiId`
   // logT(mod, fun, ``)
   try {
-    const dbObject = await getObjectWithRudiId(objectType, rudiId)
-    return !!dbObject
+    return !!(await getObjectWithRudiId(objectType, rudiId, true))
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -452,8 +459,7 @@ export const doesObjectExistWithJson = async (objectType, rudiObject) => {
   const fun = `doesObjectExistWithJson`
   // // logT(mod, fun, ``)
   try {
-    const dbObject = await getObjectWithJson(objectType, rudiObject)
-    return !!dbObject
+    return !!(await getObjectWithJson(objectType, rudiObject, true))
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
