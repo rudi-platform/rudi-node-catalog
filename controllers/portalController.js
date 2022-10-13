@@ -581,7 +581,7 @@ export const sendMetadataToPortal = async (metadataId) => {
       return
     }
 
-    if (metadata[API_STORAGE_STATUS === StorageStatus.Pending]) {
+    if (metadata[API_STORAGE_STATUS] === StorageStatus.Pending) {
       logD(mod, fun, `Waiting for other media to get uploaded: ${metadataId}`)
       return
     }
