@@ -159,7 +159,13 @@ const SECURITY_SECTION = 'security'
 const profilesConfFile = getIniValue(SECURITY_SECTION, 'profiles')
 const PROFILES = readIniFile(profilesConfFile)
 
-export const getProfile = (subject) => PROFILES[subject]
+export const getProfile = (subject) => {
+  if (!subject)
+    throw { code: 403, name: 'Forbidden', message: `No subject provided for profile access` }
+  if (!PROFILES[subject])
+    throw { code: 403, name: 'Forbidden', message: `Profile not found for subject: ${subject}` }
+  return PROFILES[subject]
+}
 
 // const now = utils.nowLocaleFormatted()
 const appMsg = `App '${APP_NAME}' listening on: ${getHost()}`

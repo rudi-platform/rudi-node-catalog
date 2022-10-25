@@ -6457,7 +6457,7 @@
 					"const TRACE = false",
 					"const DEBUG = false",
 					"",
-					"const WAIT_TIME = 100",
+					"const WAIT_TIME = 300",
 					"const TOKEN_DURATION_S = 1200",
 					"",
 					"",

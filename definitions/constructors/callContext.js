@@ -443,7 +443,7 @@ export const CallContext = class CallContext {
       if (!context) {
         if (ACTIVATE_LOG) logT(mod, fun, 'No context set yet')
         return (
-          `${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})` +
+          `${req.method} ${req.url} (${req.routeConfig[ROUTE_NAME]})` +
           ` <- ${CallContext.createIpsMsg(req)}`
         )
       } else {

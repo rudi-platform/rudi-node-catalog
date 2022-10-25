@@ -127,17 +127,17 @@ const start = async () => {
     separateLogs('Models', true) /////////////////////////////////////////////////////////////
     try {
       await Promise.all(
-        [LogEntry, Contact, Organization, Media, Metadata, Keywords, Themes].map(
+        [LogEntry, Contact, Organization, Media, Metadata].map(
           (model) =>
             new Promise((resolve, reject) => {
               model
                 .initialize()
                 .catch((err) => {
-                  logE(mod, fun, err)
+                  logE(mod, `Init model ${model?.collection?.name}`, err)
                   reject(err)
                 })
                 .then((res) => {
-                  logT(mod, fun, res)
+                  logT(mod, `Init model ${model?.collection?.name}`, res)
                   resolve(res)
                 })
             })
@@ -146,6 +146,8 @@ const start = async () => {
     } catch (e) {
       throw new Error(`Model index initialization failed: ${e}`)
     }
+    await Keywords.initialize()
+    await Themes.initialize()
     await getLicenceCodes()
 
     const appVer = getAppHash()

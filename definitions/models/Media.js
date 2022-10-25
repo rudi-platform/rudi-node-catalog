@@ -353,6 +353,7 @@ Media.initialize = async () => {
   const fun = 'initMedia'
   try {
     await makeSearchable(Media)
+    return `Media indexes created`
   } catch (err) {
     RudiError.treatError(mod, fun, err)
   }

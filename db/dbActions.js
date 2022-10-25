@@ -190,6 +190,7 @@ export const makeSearchable = async (Model) => {
       logW(mod, fun, `Indexes not created for '${Model.collection.name}': ${e}`)
       throw RudiError.treatError(mod, fun, e)
     }
+    return `${collection.name} indexes created`
   } catch (err) {
     logW(mod, fun, `Couldn't create indexes for '${Model.collection.name}': ${err}`)
     throw RudiError.treatError(mod, fun, err)

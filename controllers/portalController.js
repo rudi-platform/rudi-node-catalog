@@ -5,7 +5,6 @@ const mod = 'portalCtrl'
 // -------------------------------------------------------------------------------------------------
 // External dependencies
 // -------------------------------------------------------------------------------------------------
-import { parseKey } from 'sshpk'
 import axios from 'axios'
 import https from 'node:https'
 
@@ -23,13 +22,12 @@ import {
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { extractJwt, JWT_EXP, REQ_MTD } from '../utils/crypto.js'
-import { logD, logI, logT, logV, logW } from '../utils/logging.js'
+import { JWT_EXP, REQ_MTD } from '../utils/crypto.js'
+import { logD, logT, logV, logW } from '../utils/logging.js'
 import {
   beautify,
   dateEpochSToIso,
   decodeBase64,
-  decodeBase64url,
   deepClone,
   nowEpochS,
   padWithEqualSignBase4,
@@ -70,6 +68,8 @@ import {
   UnauthorizedError,
 } from '../utils/errors.js'
 import { StorageStatus } from '../definitions/thesaurus/StorageStatus.js'
+import { extractJwt, verifyToken } from '@aqmo.org/jwt_lib'
+import { readPublicKeyPem } from '@aqmo.org/jwt_lib/dist/crypt.js'
 // -------------------------------------------------------------------------------------------------
 // Portal auth header
 // -------------------------------------------------------------------------------------------------
@@ -261,22 +261,23 @@ export const deleteMetadata = async (req, reply) => {
 // -------------------------------------------------------------------------------------------------
 // Portal calls: GET public key
 // -------------------------------------------------------------------------------------------------
-let cachedPortalJwtPubKey
 // ----- GET Portal public key
+let CACHED_PORTAL_PUB
 export const getPortalJwtPubKey = async () => {
   const fun = 'getPortalJwtPubKey'
   try {
     logT(mod, fun, ``)
-    if (cachedPortalJwtPubKey) return cachedPortalJwtPubKey
+    if (CACHED_PORTAL_PUB) return CACHED_PORTAL_PUB
 
     const publicKeyUrl = getPortalJwtPubKeyUrl()
     // logD(mod, fun, 'publicKeyUrl: ' + publicKeyUrl)
 
     const publicKeyObj = await axios.get(publicKeyUrl, getPortalAuthHeaderBasic())
     // logD(mod, fun, 'publicKeyObj: ' + beautify(publicKeyObj))
-    cachedPortalJwtPubKey = publicKeyObj?.data?.value
+    const cachedPortalJwtPubKeyPem = publicKeyObj?.data?.value
     // logD(mod, fun, `portalJwtPubKey: ${cachedPortalJwtPubKey}`)
-    return cachedPortalJwtPubKey
+    CACHED_PORTAL_PUB = readPublicKeyPem(cachedPortalJwtPubKeyPem)
+    return CACHED_PORTAL_PUB
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -455,97 +456,21 @@ jwtBody = {
     }
   }
  */
-export const checkSignatureWithPubKey = async (accessToken) => {
-  const fun = 'checkSignatureWithPubKey'
-  try {
-    logT(mod, fun, ``)
-
-    if (!accessToken) throw new BadRequestError('No token = no signature to check!')
-    const [jwtHeaderBase64url, jwtPayloadBase64url, jwtSignatureBase64url] = accessToken.split('.')
-
-    // Retrieve the public key
-    let pubKeyPem
-    try {
-      pubKeyPem = await getPortalJwtPubKey()
-    } catch (err) {
-      throw new InternalServerError(`Couldn't retrieve online portal public key: ${err}`)
-    }
-    let sslKey
-    try {
-      sslKey = parseKey(pubKeyPem)
-    } catch (err) {
-      throw new InternalServerError(
-        `The Portal public key is incorrect, please check the content: ${err}`
-      )
-    }
-
-    // logD(mod, fun, `sslKey: ${ beautify(sslKey)}`)
-    // const keyName = sslKey.comment && sslKey.comment !== '(unnamed)' ? `'${sslKey.comment}' ` : ''
-    // logD(mod, fun, `${keyName}public key: ${sslKey.type} ${sslKey.size} bits`)
-    let signatureIsValid
-    try {
-      const verifier = sslKey.createVerify('sha256')
-      verifier.update(`${jwtHeaderBase64url}.${jwtPayloadBase64url}`)
-      signatureIsValid = verifier.verify(jwtSignatureBase64url, 'base64url')
-    } catch (err) {
-      throw new ForbiddenError(`Error while verifying the Portal token signature: ${err}`)
-    }
-    if (signatureIsValid) {
-      logI(mod, fun, `signature is valid`)
-    } else {
-      logW(mod, fun, `signature is not valid`)
-    }
-    return signatureIsValid
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
 
 export const verifyPortalToken = async (accessToken) => {
   const fun = 'verifyPortalToken'
   logT(mod, fun, ``)
 
   try {
-    if (!accessToken) throw new BadRequestError('No token to verify!')
-    const [jwtHeaderBase64, jwtPayloadBase64, _] = accessToken.split('.')
+    if (!accessToken) throw new ForbiddenError('No token to verify!')
 
-    // Check JWT header
-    const jwtHeader = JSON.parse(decodeBase64url(jwtHeaderBase64))
+    const portalPubKey = await getPortalJwtPubKey()
+    const { header, payload } = verifyToken(portalPubKey, accessToken)
 
-    // Check JWT body
-    const jwtPayload = JSON.parse(decodeBase64url(jwtPayloadBase64))
-
-    const jwtPortalUser = jwtPayload[JWT_USER]
-    if (!jwtPortalUser && jwtPayload[REQ_MTD])
+    if (!payload[JWT_USER] && payload[REQ_MTD])
       throw new ForbiddenError(`Using a RUDI internal JWT to access a Portal route is incorrect.`)
-    /*
-      // const login = getCredentials()[0]
-      // logD(mod, fun, `JWT Portal payload: ${ beautify(jwtPayload)}`)
-      // logD(mod, fun, `JWT Portal user: ${jwtPortalUser}`)
-      if (jwtPortalUser !== login) {
-        // logW(mod, fun, `Portal JWT: incorrect user: ${jwtPortalUser}`)
-        logE(`Portal JWT: incorrect user: ${jwtPortalUser}, token=${accessToken}`)
-        // throw new ForbiddenError(`Portal JWT: incorrect user`)
-      }
-      // if (jwtPayload[JWT_CLIENT] !== login)
-      //   throw new ForbiddenError('Portal JWT: incorrect client')
-    */
-    if (jwtPayload[JWT_EXP] < nowEpochS())
-      throw new ForbiddenError(
-        `Portal JWT expired: ` +
-          `expire_date=${dateEpochSToIso(jwtPayload[JWT_EXP])}` +
-          ` < now=${dateEpochSToIso(nowEpochS())}`
-      )
-    // logD(mod, fun, `jwtHeader: ${ beautify(jwtHeader)}`)
-    // logD(mod, fun, `jwtPayload: ${ beautify(jwtPayload)}`)
 
-    // Check JWT signature
-    if (!(await checkSignatureWithPubKey(accessToken)))
-      throw new ForbiddenError('Portal JWT signature is not valid')
-
-    // logD(mod, fun, `jwtHeader: ${ beautify(jwtHeader)}`)
-    // logD(mod, fun, `jwtPayload: ${ beautify(jwtPayload)}`)
-    return [jwtHeader, jwtPayload]
+    return [header, payload]
   } catch (err) {
     const errMsg = `Invalid token: ${err}`
     logW(mod, fun, errMsg)

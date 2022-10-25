@@ -76,7 +76,7 @@ import {
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { logD, logE, logI, logT, logW } from '../utils/logging.js'
+import { logD, logE, logI, logT, logV, logW } from '../utils/logging.js'
 import {
   objectAdded,
   objectAlreadyExists,
@@ -305,7 +305,9 @@ export const searchObjects = async (req, reply) => {
     logT(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}/${ACT_SEARCH}`)
     // retrieve url parameters: object type, object id
     const objectType = getObjectParam(req)
-    const opt = req.context?.config ? req.context.config[ROUTE_OPT] : undefined
+    logV(mod, fun, req.routeConfig)
+    logV(mod, fun, req.routeSchema)
+    const opt = req.routeConfig ? req.routeConfig[ROUTE_OPT] : undefined
     logD(mod, fun, `opt: ${beautify(opt)}`)
 
     let parsedParameters

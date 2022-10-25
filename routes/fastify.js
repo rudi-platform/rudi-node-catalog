@@ -173,13 +173,12 @@ fastifyConf.addHook('onRequest', (req, res, next) => {
       context.setReqDescription(
         req.method,
         req.url.substring(0, getUrlMaxLength()),
-        req.context.config[ROUTE_NAME]
+        req.routeConfig[ROUTE_NAME]
       )
       CallContext.setAsReqContext(req, context)
       throw err
     }
-
-    context.setReqDescription(req.method, req.url, req.context.config[ROUTE_NAME])
+    context.setReqDescription(req.method, req.url, req.routeConfig[ROUTE_NAME])
     CallContext.setAsReqContext(req, context)
 
     logT('http', fun, CallContext.createApiCallMsg(req))
