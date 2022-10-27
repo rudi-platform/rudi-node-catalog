@@ -771,13 +771,13 @@ export const commitMedia = async (req, res) => {
   try {
     logT(mod, fun, ``)
     const mediaId = accessReqParam(req, PARAM_ID)
-    const { metadataId } = req.body
-    // const { metadataId, commitId } = req.body
+    const { metadataId, commitId } = req.body
+    logD(mod, fun, `commitId: ${commitId}`)
 
     // --- Checks
     // Check mediaId exists
-    const mediaInfo = await getObjectWithRudiId(OBJ_MEDIA, mediaId)
-    if (!mediaInfo) throw new NotFoundError(`Media not found for id '${mediaId}'`)
+    const dbMedia = await getObjectWithRudiId(OBJ_MEDIA, mediaId)
+    if (!dbMedia) throw new NotFoundError(`Media not found for id '${mediaId}'`)
     // Check metadataId exists
     const metadata = await getObjectWithRudiId(OBJ_METADATA, metadataId)
     if (!metadata) throw new NotFoundError(`Metadata not found for id '${metadataId}'`)
@@ -789,12 +789,12 @@ export const commitMedia = async (req, res) => {
 
     // --- Updates
     // Set media storage_status to 'available'
-    mediaInfo[API_FILE_STORAGE_STATUS] = MediaStorageStatus.Available
+    dbMedia[API_FILE_STORAGE_STATUS] = MediaStorageStatus.Available
 
     // Set status_update date
-    mediaInfo[API_FILE_STATUS_UPDATE] = nowISO()
+    dbMedia[API_FILE_STATUS_UPDATE] = nowISO()
 
-    const media = await overwriteDbObject(OBJ_MEDIA, mediaInfo)
+    await dbMedia.save()
     let shouldUpdateMetadata = true
     metadataMediaList.map((media) => {
       const mediaStatus = media[API_FILE_STORAGE_STATUS]
@@ -805,15 +805,27 @@ export const commitMedia = async (req, res) => {
         shouldUpdateMetadata = false
     })
     const result = {
-      media: pick(media, [API_MEDIA_ID, API_FILE_STORAGE_STATUS, API_FILE_STATUS_UPDATE]),
+      media: pick(dbMedia, [API_MEDIA_ID, API_FILE_STORAGE_STATUS, API_FILE_STATUS_UPDATE]),
     }
-    if (!shouldUpdateMetadata) return res.code(200).send(result)
+    if (!shouldUpdateMetadata) {
+      logD(mod, fun, `Media commit success: ${beautify(result)}`)
+      return res.code(200).send(result)
+    }
 
+    logD(mod, fun, `Let's update the metadata`)
     // All media are available! Let's send the metadata
-    const meta = await getObjectWithRudiId(OBJ_METADATA, metadataId)
-    meta[API_STORAGE_STATUS] = StorageStatus.Online
-    await overwriteMetadata(meta)
-    result.metadata = pick(meta, [API_METADATA_ID, API_STORAGE_STATUS])
+    const dbMetadata = await getObjectWithRudiId(OBJ_METADATA, metadataId)
+    dbMetadata[API_STORAGE_STATUS] = StorageStatus.Online
+    // logD(mod, fun, `Now let's save the metadata`)
+    await dbMetadata.save()
+    // logD(mod, fun, `Saved!`)
+    // logD(mod, fun, `Let's check...`)
+    // const metaUpd = await getObjectWithRudiId(OBJ_METADATA, metadataId)
+    // logD(mod, fun, `Status: ${beautify(metaUpd[API_STORAGE_STATUS])}`)
+
+    // const dbMeta = await overwriteMetadata(meta)
+    result.metadata = pick(dbMetadata, [API_METADATA_ID, API_STORAGE_STATUS])
+    logD(mod, fun, `Media commit success : ${beautify(result)}`)
 
     return res.code(200).send(result)
   } catch (err) {
