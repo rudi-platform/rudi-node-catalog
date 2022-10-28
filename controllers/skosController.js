@@ -125,7 +125,7 @@ export const newSkosScheme = async (rudiScheme) => {
       dbScheme[API_SCHEME_TOPS_PROPERTY] = await createConceptHierarchy(topConcepts, schemeDbId)
     }
     // TODO: reinforce the associations between concepts through siblings/relative properties
-    dbScheme.save()
+    await dbScheme.save()
 
     return await dbSchemeToRudi(dbScheme)
   } catch (err) {

@@ -7,6 +7,7 @@ const mod = 'portalCtrl'
 // -------------------------------------------------------------------------------------------------
 import axios from 'axios'
 import https from 'node:https'
+import { extractJwt, readPublicKeyPem, verifyToken } from '@aqmo.org/jwt_lib'
 
 // -------------------------------------------------------------------------------------------------
 // Constants
@@ -18,7 +19,9 @@ import {
   API_COLLECTION_TAG,
   getUpdatedDate,
   API_STORAGE_STATUS,
+  API_MEDIA_PROPERTY,
 } from '../db/dbFields.js'
+
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
@@ -51,6 +54,8 @@ import {
 } from '../config/confPortal.js'
 
 import { isUUID } from '../definitions/schemaValidators.js'
+import { StorageStatus } from '../definitions/thesaurus/StorageStatus.js'
+
 import {
   getEnsuredObjectWithRudiId,
   getLatestStoredPortalToken,
@@ -67,9 +72,6 @@ import {
   RudiError,
   UnauthorizedError,
 } from '../utils/errors.js'
-import { StorageStatus } from '../definitions/thesaurus/StorageStatus.js'
-import { extractJwt, verifyToken } from '@aqmo.org/jwt_lib'
-import { readPublicKeyPem } from '@aqmo.org/jwt_lib/dist/crypt.js'
 // -------------------------------------------------------------------------------------------------
 // Portal auth header
 // -------------------------------------------------------------------------------------------------
@@ -481,11 +483,10 @@ export const verifyPortalToken = async (accessToken) => {
 // -------------------------------------------------------------------------------------------------
 // Portal calls: metadata
 // -------------------------------------------------------------------------------------------------
-export const sendMetadataToPortal = async (metadataId) => {
-  const fun = 'sendMetadataToPortal'
+export const isMetadataSendable = async (metadataId) => {
+  const fun = 'isMetadataSendable'
   try {
-    logT(mod, fun, ``)
-    if (isPortalConnectionDisabled()) return
+    if (isPortalConnectionDisabled()) return false
 
     //--- Check input param
     if (!metadataId) throw new NotImplementedError('Not yet implemented')
@@ -499,32 +500,46 @@ export const sendMetadataToPortal = async (metadataId) => {
       throw new NotFoundError(errMsg)
     }
 
-    //--- If 'collection_tag' is set (ie for tests), metadata is not sent
+    //--- If 'collection_tag' is set (ie for tests), metadata is not sent to the Portal
     const collectionTag = metadata[API_COLLECTION_TAG]
     if (collectionTag) {
       logD(mod, fun, `Not sending to portal: ${metadataId} (${collectionTag})`)
-      return
+      return false
     }
 
+    //--- If media still need to be uploaded, metadata is not sent to the Portal
     if (metadata[API_STORAGE_STATUS] === StorageStatus.Pending) {
       logD(mod, fun, `Waiting for other media to get uploaded: ${metadataId}`)
-      return
+      return false
     }
+
+    //--- If a media is restricted, metadata is not sent to the Portal
+    if (metadata[API_MEDIA_PROPERTY][0] === StorageStatus.Pending) {
+      logD(mod, fun, `Waiting for other media to get uploaded: ${metadataId}`)
+      return false
+    }
+
+    return metadata
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+const PORTAL_POST_URL = postPortalMetaUrl()
+export const sendMetadataToPortal = async (metadataId) => {
+  const fun = 'sendMetadataToPortal'
+  try {
+    logT(mod, fun, ``)
+
+    const metadata = await isMetadataSendable(metadataId)
+    if (!metadata) return
+
     //--- Ensuring compatibility with portal
     const metadataClean = deepClone(metadata)
     // API version
     metadataClean[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = API_VERSION
-    // MIME type: YAML
-    // metadataClean[API_MEDIA_PROPERTY].map((media) => {
-    //   if (media[API_MEDIA_TYPE] === MediaTypes.File && media[API_FILE_TYPE] === MIME_YAML) {
-    //     media[API_FILE_TYPE] = 'text/plain'
-    //   }
-    // })
-
-    // logD(mod, fun, beautify(metadataClean))
 
     //--- Sending to portal
-    const sendPortalUrl = postPortalMetaUrl()
     const portalToken = await getPortalToken()
     const reqOpts = {
       headers: {
@@ -533,22 +548,24 @@ export const sendMetadataToPortal = async (metadataId) => {
         Authorization: `Bearer ${portalToken}`,
       },
     }
+    let answer
     try {
       logD(mod, fun, `Checking if the metadata is on the portal`)
-      const answer = await axios.get(getPortalMetaUrl(metadataId), reqOpts)
-      const portalMetadata = answer.data
-
-      if (getUpdatedDate(portalMetadata) < getUpdatedDate(metadataClean)) {
-        logD(mod, fun, `Metadata is on the portal and older: updating '${metadataId}'`)
-        return httpPut(sendPortalUrl, metadataClean, portalToken)
-      } else {
-        logD(mod, fun, `Metadata is on the portal and same: not updating '${metadataId}'`)
-      }
+      answer = await axios.get(getPortalMetaUrl(metadataId), reqOpts)
     } catch (err) {
       logV(mod, fun, err)
       logD(mod, fun, `Metadata is not on the portal: sending '${metadataId}'`)
-      return httpPost(sendPortalUrl, metadataClean, portalToken)
+      return httpPost(PORTAL_POST_URL, metadataClean, portalToken)
     }
+    const portalMetadata = answer.data
+
+    if (getUpdatedDate(portalMetadata) < getUpdatedDate(metadataClean)) {
+      logD(mod, fun, `Metadata is on the portal and older: updating '${metadataId}'`)
+      return httpPut(PORTAL_POST_URL, metadataClean, portalToken)
+    } else {
+      logD(mod, fun, `Metadata is on the portal and same: not updating '${metadataId}'`)
+    }
+
     // logD(mod, fun, `reply: ${ beautify(reply)}`)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
