@@ -43,8 +43,8 @@ import {
   DB_CREATED_AT,
   DB_UPDATED_AT,
   DICT_LANG,
-  API_FILE_STORAGE_STATUS,
   API_FILE_STATUS_UPDATE,
+  API_FILE_STORAGE_STATUS,
   API_STORAGE_STATUS,
   API_METAINFO_VERSION_PROPERTY,
 } from '../db/dbFields.js'
@@ -752,7 +752,6 @@ export const commitMedia = async (req, res) => {
     // --- Updates
     // Set media storage_status to 'available'
     dbMedia[API_FILE_STORAGE_STATUS] = MediaStorageStatus.Available
-
     // Set status_update date
     dbMedia[API_FILE_STATUS_UPDATE] = nowISO()
 

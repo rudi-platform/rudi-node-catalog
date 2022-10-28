@@ -110,7 +110,7 @@ import Themes from '../thesaurus/Themes.js'
 
 import { isValid as isLanguageValid } from '../thesaurus/Languages.js'
 import { isValid as isProjectionValid } from '../thesaurus/Projections.js'
-import { isValid as isStorageStatusValid } from '../thesaurus/StorageStatus.js'
+import { isValid as isStorageStatusValid, StorageStatus } from '../thesaurus/StorageStatus.js'
 import { get as getLicenceCodes } from '../thesaurus/LicenceCodes.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -378,7 +378,7 @@ const MetadataSchema = new mongoose.Schema(
     //   - unavailable = data were deleted
     [API_STORAGE_STATUS]: {
       type: String,
-      // enum: Object.values(StorageStatus),
+      enum: Object.values(StorageStatus),
       required: true,
     },
 

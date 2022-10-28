@@ -179,10 +179,13 @@ Two commit processes types are ongoing parallely:
    Each MediaFile get uploaded to the Media module: the upload status determines if the MediaFile status is set to commited.
    More technically speaking, in case of success
 
-   - `available_formats[i].storage_status` is set to `available`
-   - `available_formats[i].status_update` is updated
+   - `available_formats[i].file_storage_status` is set to `available`
+   - `available_formats[i].file_status_update` is updated
 
 2. Metadata
+   If all the media were set as available, the metadata is sent to the portal and its status set to `pending`.
+   If at least one upload fails to be committed, the metadata is set as `unavailable` and the user has to re-upload
+   the file for the status to be updated anew.
 
 ## Verification process
 
