@@ -16,7 +16,12 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									""
+									"const cacheKeys = ['stamp', pm.variables.get('apiTokenName'), pm.variables.get('portalTokenName')]",
+									"const cache = {}",
+									"cacheKeys.map(key => { cache[key] = pm.collectionVariables.get(key) })",
+									"pm.collectionVariables.clear()",
+									"for (const key in cache) pm.collectionVariables.set(key, cache[key])",
+									"pm.collectionVariables.set('dateUpdate', time.now())"
 								],
 								"type": "text/javascript"
 							}
@@ -6502,6 +6507,15 @@
 					"    gitHash: (str) => regexCheck(REGEX_GIT_HASH_SHORT, str),",
 					"}",
 					"",
+					"postm = {",
+					"    clearVars: () => {",
+					"        const stamp = pm.collectionVariables.get('stamp')",
+					"        pm.collectionVariables.clear()",
+					"        pm.collectionVariables.set('stamp', stamp)",
+					"        pm.collectionVariables.set('dateUpdate', time.now())",
+					"    }",
+					"}",
+					"",
 					"error = {",
 					"    throwNotFound: (msg) => { throw { statusCode: 404, name: 'NotFound', message: msg } }",
 					"}",
@@ -6728,187 +6742,15 @@
 			"value": "soft-checks"
 		},
 		{
+			"key": "dateUpdate",
+			"value": ""
+		},
+		{
 			"key": "apiJwt",
 			"value": ""
 		},
 		{
 			"key": "portalJwt",
-			"value": ""
-		},
-		{
-			"key": "gitHash",
-			"value": ""
-		},
-		{
-			"key": "apiVersion",
-			"value": ""
-		},
-		{
-			"key": "keywords",
-			"value": ""
-		},
-		{
-			"key": "themes",
-			"value": ""
-		},
-		{
-			"key": "sanityLicence",
-			"value": ""
-		},
-		{
-			"key": "licences",
-			"value": ""
-		},
-		{
-			"key": "softOrg1Id",
-			"value": ""
-		},
-		{
-			"key": "softOrg1Name",
-			"value": ""
-		},
-		{
-			"key": "softOrg1Address",
-			"value": ""
-		},
-		{
-			"key": "softOrg2Id",
-			"value": ""
-		},
-		{
-			"key": "softOrg2Name",
-			"value": ""
-		},
-		{
-			"key": "softOrg2Address",
-			"value": ""
-		},
-		{
-			"key": "softContact1Id",
-			"value": ""
-		},
-		{
-			"key": "softContact1Name",
-			"value": ""
-		},
-		{
-			"key": "softContact1Email",
-			"value": ""
-		},
-		{
-			"key": "softContact2Id",
-			"value": ""
-		},
-		{
-			"key": "softContact2Name",
-			"value": ""
-		},
-		{
-			"key": "softContact2Email",
-			"value": ""
-		},
-		{
-			"key": "softContact3Id",
-			"value": ""
-		},
-		{
-			"key": "softContact3Name",
-			"value": ""
-		},
-		{
-			"key": "softContact3Email",
-			"value": ""
-		},
-		{
-			"key": "now",
-			"value": ""
-		},
-		{
-			"key": "softMeta1Id",
-			"value": ""
-		},
-		{
-			"key": "softMedia1Id",
-			"value": ""
-		},
-		{
-			"key": "randomTheme",
-			"value": ""
-		},
-		{
-			"key": "randomKeyword1",
-			"value": ""
-		},
-		{
-			"key": "randomKeyword2",
-			"value": ""
-		},
-		{
-			"key": "softLicence",
-			"value": ""
-		},
-		{
-			"key": "randomOrgId",
-			"value": ""
-		},
-		{
-			"key": "randomContact1",
-			"value": ""
-		},
-		{
-			"key": "randomContact2",
-			"value": ""
-		},
-		{
-			"key": "randomTitle",
-			"value": ""
-		},
-		{
-			"key": "randomSynopsis",
-			"value": ""
-		},
-		{
-			"key": "randomSummary",
-			"value": ""
-		},
-		{
-			"key": "softMeta2Id",
-			"value": ""
-		},
-		{
-			"key": "mediaId2",
-			"value": ""
-		},
-		{
-			"key": "softMedia2Id",
-			"value": ""
-		},
-		{
-			"key": "countWithOrg1",
-			"value": ""
-		},
-		{
-			"key": "softReport1Id",
-			"value": ""
-		},
-		{
-			"key": "softReport2Id",
-			"value": ""
-		},
-		{
-			"key": "unkownMetaId",
-			"value": ""
-		},
-		{
-			"key": "softReport3Id",
-			"value": ""
-		},
-		{
-			"key": "pubKeyName",
-			"value": ""
-		},
-		{
-			"key": "portalKeyName",
 			"value": ""
 		}
 	]

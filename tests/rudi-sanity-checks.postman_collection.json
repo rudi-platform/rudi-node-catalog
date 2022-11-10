@@ -16,7 +16,12 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									""
+									"const cacheKeys = ['stamp', pm.variables.get('apiTokenName'), pm.variables.get('portalTokenName')]",
+									"const cache = {}",
+									"cacheKeys.map(key => { cache[key] = pm.collectionVariables.get(key) })",
+									"pm.collectionVariables.clear()",
+									"for (const key in cache) pm.collectionVariables.set(key, cache[key])",
+									"pm.collectionVariables.set('dateUpdate', time.now())"
 								],
 								"type": "text/javascript"
 							}
@@ -6589,6 +6594,18 @@
 		{
 			"key": "stamp",
 			"value": "sanity-checks"
+		},
+		{
+			"key": "apiJwt",
+			"value": ""
+		},
+		{
+			"key": "portalJwt",
+			"value": ""
+		},
+		{
+			"key": "dateUpdate",
+			"value": ""
 		}
 	]
 }
