@@ -22,6 +22,7 @@ import {
   sysCrit,
   sysNotice,
   sysOnError,
+  logI,
 } from '../utils/logging.js'
 
 import { JWT_SUB, JWT_CLIENT } from '../utils/crypto.js'
@@ -95,10 +96,12 @@ fastifyConf.setErrorHandler((error, request, reply) => {
   try {
     logT(mod, fun, ``)
     // logD(mod, fun, RudiError.isRudiError(error))
-    logT(mod, fun, beautify(error))
     let rudiHttpError
-    if (RudiError.isRudiError(error)) rudiHttpError = error
-    else {
+    if (RudiError.isRudiError(error)) {
+      logV(mod, fun, beautify(error))
+      rudiHttpError = error
+    } else {
+      logI(mod, fun, beautify(error))
       rudiHttpError = RudiError.createRudiHttpError(
         error.statusCode,
         error.message || error,
@@ -107,17 +110,18 @@ fastifyConf.setErrorHandler((error, request, reply) => {
         error.path
       )
     }
+
     if (shouldShowErrorPile()) RudiError.logErrorPile(rudiHttpError)
 
     const errorResponse = {
-      [STATUS_CODE]: rudiHttpError.statusCode || 500,
+      [STATUS_CODE]: rudiHttpError[STATUS_CODE] || 500,
       error: rudiHttpError.name,
       message: rudiHttpError.message,
       path: rudiHttpError.path,
     }
 
     reply.isError = true
-
+    logI(mod, fun, beautify(errorResponse))
     // reply.code(rudiHttpError[STATUS_CODE]).send(rudiHttpError)
     reply.code(errorResponse[STATUS_CODE]).send(errorResponse)
 
@@ -128,9 +132,7 @@ fastifyConf.setErrorHandler((error, request, reply) => {
       `Uncaught error: ${uncaughtErr}`,
       'ff.errorHandler',
       CallContext.getReqContext(request),
-      {
-        error: uncaughtErr,
-      }
+      { error: uncaughtErr }
     )
   }
   logT(mod, fun, 'done')

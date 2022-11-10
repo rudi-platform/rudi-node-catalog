@@ -130,6 +130,7 @@ import {
   overwriteDbObject,
   searchDbObjects,
   getObjectWithRudiId,
+  getMetadataWithJson,
 } from '../db/dbQueries.js'
 
 import { parseQueryParameters } from '../utils/parseRequest.js'
@@ -151,9 +152,7 @@ export const organizationRudiToDbFormat = async (rudiProducer, path, shouldCreat
     try {
       organizationDbId = await getOrganizationDbIdWithJson(rudiProducer)
     } catch (e) {
-      if (e[STATUS_CODE] === 400) {
-        throw new BadRequestError(e.message, mod, 'org.get', path)
-      }
+      if (e[STATUS_CODE] === 400) throw new BadRequestError(e.message, mod, 'org.get', path)
       throw e
     }
     // logD(mod, fun, `organizationDbId: -> ${organizationDbId} `)
@@ -658,19 +657,16 @@ export const newMetadata = async (rudiMetadata) => {
 
     // Special treatment!
     const dbReadyObject = await rudiToDbFormat(rudiMetadata, true)
-    // logD(mod, fun, `dbReadyObject: ${beautify(dbReadyObject)}`)
-
-    // Special update for metadataInfo.referenceDates: update 'Createddate'
-    logI(mod, fun, `dbReadyObject: ${beautify(dbReadyObject[API_METADATA_ID])}`)
+    // logI(mod, fun, `dbReadyObject: ${beautify(dbReadyObject)}`)
     const dbMetadata = new Metadata(dbReadyObject)
     const isMetadataSendable = await updateMetadataState(dbMetadata)
 
     await dbMetadata.save()
+    const finalMetadata = await getMetadataWithJson(dbMetadata)
+    logI(mod, fun, `finalMetadata: ${beautify(finalMetadata)}`)
+    if (isMetadataSendable) sendToPortal(finalMetadata)
 
-    if (isMetadataSendable) sendToPortal(dbMetadata)
-
-    return dbMetadata
-    // return dbMetadataToRudi(dbMetadata)
+    return finalMetadata
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -690,10 +686,11 @@ export const overwriteMetadata = async (incomingRudiMetadata) => {
 
     const isMetadataSendable = await updateMetadataState(dbMetadata)
     const reply = await dbMetadata.save()
+    const finalMetadata = await getMetadataWithJson(dbMetadata)
 
-    if (isMetadataSendable) sendToPortal(dbMetadata)
+    if (isMetadataSendable) sendToPortal(finalMetadata)
 
-    return dbMetadata
+    return finalMetadata
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }

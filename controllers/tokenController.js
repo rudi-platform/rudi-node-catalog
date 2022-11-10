@@ -17,7 +17,7 @@ import {
 import { decodeBase64url } from '../utils/jsUtils.js'
 import { accessProperty } from '../utils/jsonAccess.js'
 
-import { logT, logV } from '../utils/logging.js'
+import { logT } from '../utils/logging.js'
 
 import { getProfile } from '../config/confSystem.js'
 import { ForbiddenError, UnauthorizedError, RudiError } from '../utils/errors.js'
@@ -170,7 +170,7 @@ export const verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
 
     const subject = accessProperty(payload, JWT_SUB)
     const pubKey = getPubKey(subject)
-    logV(mod, fun + ' pubKey:', pubKey)
+    // logV(mod, fun + ' pubKey:', pubKey)
     try {
       verifyToken(pubKey, token)
     } catch (e) {

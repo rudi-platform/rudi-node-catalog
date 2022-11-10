@@ -16,7 +16,6 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.collectionVariables.set('dateUpdate',time.now())",
 									""
 								],
 								"type": "text/javascript"
@@ -60,8 +59,8 @@
 								"exec": [
 									"pm.test(\"Database accessible\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const token = pm.response.json()",
-									"    pm.expect(token.access_token).to.be.not.undefined",
+									"    const res = pm.response.json()",
+									"    pm.expect(!!match.jwt(res.access_token)).to.be.true",
 									"});"
 								],
 								"type": "text/javascript"
@@ -93,7 +92,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Database accessible\", () => {",
+									"pm.test(\"Logs accessible\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json()",
 									"    // responseJson.map(coll => console.log(coll))",
@@ -172,9 +171,8 @@
 								"exec": [
 									"pm.test(\"Git hash : 7 alphanumerical characters\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseStr = pm.response.stream.toString('utf8');",
-									"    pm.expect(responseStr).to.match(/^[0-9a-z]{7}|[0-9a-z]{40}$/)",
-									"",
+									"    const responseStr = codec.streamToString(pm.response)",
+									"    pm.expect(!!match.gitHash(responseStr)).to.be.true",
 									"    pm.collectionVariables.set('gitHash', responseStr)",
 									"});"
 								],
@@ -206,14 +204,14 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const gitHash = pm.collectionVariables.get('gitHash');",
-									"",
 									"pm.test(\"Current app hash = git hash\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseStr = pm.response.stream.toString('utf8');",
-									"    pm.expect(responseStr).to.match(/^[0-9a-z]{7}|[0-9a-z]{40}$/)",
+									"    const gitHash = pm.collectionVariables.get('gitHash');",
+									"    const responseStr = codec.streamToString(pm.response)",
+									"    pm.expect(!!match.gitHash(responseStr)).to.be.true",
 									"    pm.expect(responseStr).to.eq(gitHash)",
-									"});"
+									"});",
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -248,9 +246,9 @@
 								"exec": [
 									"pm.test(\"API version\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const apiVersion = pm.response.stream.toString('utf8');",
-									"    pm.expect(apiVersion).to.match(/^([0-9]+\\.){2}[0-9]+[a-z]*$/)",
-									"    pm.collectionVariables.set('apiVersion',apiVersion)",
+									"    const apiVersion = codec.streamToString(pm.response)",
+									"    pm.expect(!!match.version(apiVersion)).to.be.true",
+									"    pm.collectionVariables.set('apiVersion', apiVersion)",
 									"});"
 								],
 								"type": "text/javascript"
@@ -327,8 +325,8 @@
 								"exec": [
 									"pm.test(\"Get new UUID\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseStr = pm.response.stream.toString('utf8');",
-									"    pm.expect(responseStr).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)",
+									"    const responseStr = codec.streamToString(pm.response)",
+									"    pm.expect(!!match.uuid(responseStr)).to.be.true",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1835,6 +1833,7 @@
 									"    const orgId = pm.collectionVariables.get('softOrg1Id');",
 									"    pm.expect(responseJson.global_id).to.eq(metaId);",
 									"    pm.expect(responseJson.producer.organization_id).to.eq(orgId);",
+									"    pm.expect(!!match.uuid(responseJson.contacts[0]));",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2746,12 +2745,14 @@
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    const metaId = pm.variables.get('softMeta1Id');",
-									"    const orgId1 = pm.variables.get('orgId1');",
+									"    const orgId1 = pm.variables.get('softOrg1Id');",
 									"    const orgId2 = pm.variables.get('orgId2');",
 									"    const contId1 = pm.variables.get('contId1');",
 									"    const contId2 = pm.variables.get('contId2');",
 									"",
 									"    pm.expect(responseJson.global_id).to.eq(metaId);",
+									"    pm.expect(responseJson.producer.organization_id).to.eq(orgId1);",
+									"    pm.expect(!!match.uuid(responseJson.contacts[0]));",
 									"",
 									"});"
 								],
@@ -6457,7 +6458,7 @@
 					"const TRACE = false",
 					"const DEBUG = false",
 					"",
-					"const WAIT_TIME = 300",
+					"const WAIT_TIME = 50",
 					"const TOKEN_DURATION_S = 1200",
 					"",
 					"",
@@ -6486,6 +6487,20 @@
 					"log.t('PORTAL_TOKEN_NAME: ' + PORTAL_TOKEN_NAME)",
 					"log.t('ADMIN_URL: ' + ADMIN_URL)",
 					"",
+					"const REGEX_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i",
+					"const REGEX_JWT = /^[\\w-]+\\.[\\w-]+\\.([\\w-]+={0,3})$/",
+					"const REGEX_API_VERSION = /^[0-9]+\\.[0-9]+(\\.[0-9]+)?[a-z]*$/",
+					"const REGEX_URI = /^(https?|ftp):\\/\\/([\\w-]+(\\.[\\w-]+)+|(:[0-9]+)?)([\\w.,@?^=%&amp;:\\/~+#-]*[\\w@?^=%&amp;\\/~+#-])?$/",
+					"const REGEX_GIT_HASH_SHORT = /^[a-z0-9]{7}/",
+					"",
+					"const regexCheck = (regex, str) => str ? regex.exec(`${str}`) : regex",
+					"match = {",
+					"    uuid: (str) => regexCheck(REGEX_UUID, str),",
+					"    jwt: (str) => regexCheck(REGEX_JWT, str),",
+					"    version: (str) => regexCheck(REGEX_API_VERSION, str),",
+					"    uri: (str) => regexCheck(REGEX_URI, str),",
+					"    gitHash: (str) => regexCheck(REGEX_GIT_HASH_SHORT, str),",
+					"}",
 					"",
 					"error = {",
 					"    throwNotFound: (msg) => { throw { statusCode: 404, name: 'NotFound', message: msg } }",
@@ -6493,6 +6508,7 @@
 					"",
 					"time = {",
 					"    now: () => new Date().toISOString(),",
+					"    nowEpochMS: () => new Date().getTime(),",
 					"    nowEpochS: () => _.floor(new Date().getTime() / 1000),",
 					"    timezone: () => new Date().getTimezoneOffset(),",
 					"    wait: (delayMs, doSomething) => {",
@@ -6534,8 +6550,8 @@
 					"    initVal: (field) => {",
 					"        const val = pm.collectionVariables.get(field);",
 					"        if (val) return val;",
-					"        const randVal = rand.get('{{$randomUUID}}');",
-					"        pm.collectionVariables.set(field, randVal);",
+					"        const randVal = rand.uuid();",
+					"        pm.collectionVariables.set(field, randVal, 'string');",
 					"        return randVal;",
 					"    },",
 					"",
@@ -6720,18 +6736,6 @@
 			"value": ""
 		},
 		{
-			"key": "pubKeyName",
-			"value": ""
-		},
-		{
-			"key": "portalPem",
-			"value": ""
-		},
-		{
-			"key": "dateUpdate",
-			"value": ""
-		},
-		{
 			"key": "gitHash",
 			"value": ""
 		},
@@ -6900,11 +6904,7 @@
 			"value": ""
 		},
 		{
-			"key": "apiToken",
-			"value": ""
-		},
-		{
-			"key": "portalToken",
+			"key": "pubKeyName",
 			"value": ""
 		},
 		{

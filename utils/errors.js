@@ -123,7 +123,7 @@ export class RudiError extends Error {
   static createRudiHttpError(code, message, ctxMod, ctxFun, path) {
     const fun = 'createRudiHttpError'
     try {
-      // logD(mod, fun, `Error ${code}: ${message}`)
+      logD(mod, fun, `Error ${code}: ${message}`)
       switch (parseInt(code)) {
         case 400:
           return new BadRequestError(message, ctxMod, ctxFun, path)
@@ -187,7 +187,7 @@ export class RudiError extends Error {
         path || error.path
       )
       // logD(mod, fun, error.isRudiError())
-
+      if (transmittedError[STATUS_CODE] > 600) transmittedError[STATUS_CODE] = 500
       // logD(mod, fun, `B) ${error} -> ${beautify(transmittedError)}`)
       return transmittedError
     } catch (err) {

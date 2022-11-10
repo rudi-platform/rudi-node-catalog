@@ -553,7 +553,7 @@ async function checkFileTypes(metadata) {
         return true
       }
       const fileTypes = getFileTypes()
-      logT(mod, fun + ' fileTypes', beautify(fileTypes))
+      // logT(mod, fun + ' fileTypes', beautify(fileTypes))
       if (fileTypes.indexOf(mimeType) == -1)
         throw new BadRequestError(`Unrecognized MIME type: '${mimeType}'`, mod, fun, [
           API_MEDIA_PROPERTY,
@@ -574,15 +574,15 @@ async function checkThesaurus(metadata) {
     const dataTheme = metadata[API_THEME_PROPERTY]
     // const themes = Themes.get()
     const themeLabels = Themes.getLabels(DEFAULT_LANG)
-    logT(mod, fun + ' themeLabels [T]', beautify(themeLabels))
+    // logT(mod, fun + ' themeLabels [T]', beautify(themeLabels))
     const themeKeyIndex = Object.keys(themeLabels).indexOf(dataTheme)
-    logT(mod, fun + ' themeLabels [T]', beautify(themeLabels))
+    // logT(mod, fun + ' themeLabels [T]', beautify(themeLabels))
     if (themeKeyIndex === -1) {
-      logT(mod, fun + ' themeLabelsVals [T]', beautify(Object.values(themeLabels)))
+      // logT(mod, fun + ' themeLabelsVals [T]', beautify(Object.values(themeLabels)))
       const themeValIndex = Object.values(themeLabels).indexOf(dataTheme)
       if (themeValIndex > -1) {
         const allowedDataTheme = Object.keys(themeLabels)[themeValIndex]
-        logD(mod, fun, `Changing Theme value: ${dataTheme} -> ${allowedDataTheme}`)
+        // logD(mod, fun, `Changing Theme value: ${dataTheme} -> ${allowedDataTheme}`)
         metadata[API_THEME_PROPERTY] = allowedDataTheme
       } else if (!(await Themes.isValid(dataTheme, shouldInit))) {
         throw new BadRequestError(
@@ -807,9 +807,9 @@ MetadataSchema.pre('save', async function (next) {
   } catch (err) {
     logV(mod, fun, `pre save checks KO: ${err}`)
     err.message = err.message + ` (metadata ${this[API_METADATA_ID]})`
-    next(err)
+    // next(err)
+    throw RudiError.treatError(mod, fun, err)
   }
-
   // next()
 })
 
@@ -821,7 +821,8 @@ MetadataSchema.post('save', async function (doc, next) {
     await this.populate(POPULATE_OPTS) //.execPopulate()
     next()
   } catch (err) {
-    next(err)
+    // next(err)
+    throw RudiError.treatError(mod, fun, err)
   }
   // next()
 })

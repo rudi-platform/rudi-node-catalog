@@ -16,8 +16,6 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"",
-									"pm.collectionVariables.set('dateUpdate',time.now())",
 									""
 								],
 								"type": "text/javascript"
@@ -6352,6 +6350,20 @@
 					"log.t('PORTAL_TOKEN_NAME: ' + PORTAL_TOKEN_NAME)",
 					"log.t('ADMIN_URL: ' + ADMIN_URL)",
 					"",
+					"const REGEX_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i",
+					"const REGEX_JWT = /^[\\w-]+\\.[\\w-]+\\.([\\w-]+={0,3})$/",
+					"const REGEX_API_VERSION = /^[0-9]+\\.[0-9]+(\\.[0-9]+)?[a-z]*$/",
+					"const REGEX_URI = /^(https?|ftp):\\/\\/([\\w-]+(\\.[\\w-]+)+|(:[0-9]+)?)([\\w.,@?^=%&amp;:\\/~+#-]*[\\w@?^=%&amp;\\/~+#-])?$/",
+					"const REGEX_GIT_HASH_SHORT = /^[a-z0-9]{7}/",
+					"",
+					"const regexCheck = (regex, str) => str ? regex.exec(`${str}`) : regex",
+					"match = {",
+					"    uuid: (str) => regexCheck(REGEX_UUID, str),",
+					"    jwt: (str) => regexCheck(REGEX_JWT, str),",
+					"    version: (str) => regexCheck(REGEX_API_VERSION, str),",
+					"    uri: (str) => regexCheck(REGEX_URI, str),",
+					"    gitHash: (str) => regexCheck(REGEX_GIT_HASH_SHORT, str),",
+					"}",
 					"",
 					"error = {",
 					"    throwNotFound: (msg) => { throw { statusCode: 404, name: 'NotFound', message: msg } }",
@@ -6359,6 +6371,7 @@
 					"",
 					"time = {",
 					"    now: () => new Date().toISOString(),",
+					"    nowEpochMS: () => new Date().getTime(),",
 					"    nowEpochS: () => _.floor(new Date().getTime() / 1000),",
 					"    timezone: () => new Date().getTimezoneOffset(),",
 					"    wait: (delayMs, doSomething) => {",
@@ -6400,8 +6413,8 @@
 					"    initVal: (field) => {",
 					"        const val = pm.collectionVariables.get(field);",
 					"        if (val) return val;",
-					"        const randVal = rand.get('{{$randomUUID}}');",
-					"        pm.collectionVariables.set(field, randVal);",
+					"        const randVal = rand.uuid();",
+					"        pm.collectionVariables.set(field, randVal, 'string');",
 					"        return randVal;",
 					"    },",
 					"",
@@ -6576,102 +6589,6 @@
 		{
 			"key": "stamp",
 			"value": "sanity-checks"
-		},
-		{
-			"key": "apiJwt",
-			"value": ""
-		},
-		{
-			"key": "portalJwt",
-			"value": ""
-		},
-		{
-			"key": "dateUpdate",
-			"value": ""
-		},
-		{
-			"key": "gitHash",
-			"value": ""
-		},
-		{
-			"key": "apiVersion",
-			"value": ""
-		},
-		{
-			"key": "metaId1",
-			"value": ""
-		},
-		{
-			"key": "metaId2",
-			"value": ""
-		},
-		{
-			"key": "orgId1",
-			"value": ""
-		},
-		{
-			"key": "orgId2",
-			"value": ""
-		},
-		{
-			"key": "contId1",
-			"value": ""
-		},
-		{
-			"key": "contId2",
-			"value": ""
-		},
-		{
-			"key": "contId3",
-			"value": ""
-		},
-		{
-			"key": "reportId1",
-			"value": ""
-		},
-		{
-			"key": "reportId2",
-			"value": ""
-		},
-		{
-			"key": "mediaId1",
-			"value": ""
-		},
-		{
-			"key": "mediaId2",
-			"value": ""
-		},
-		{
-			"key": "keywords",
-			"value": ""
-		},
-		{
-			"key": "themes",
-			"value": ""
-		},
-		{
-			"key": "sanityLicence",
-			"value": ""
-		},
-		{
-			"key": "licences",
-			"value": ""
-		},
-		{
-			"key": "now",
-			"value": ""
-		},
-		{
-			"key": "countWithOrg1",
-			"value": ""
-		},
-		{
-			"key": "pubKeyName",
-			"value": ""
-		},
-		{
-			"key": "portalKeyName",
-			"value": ""
 		}
 	]
 }
