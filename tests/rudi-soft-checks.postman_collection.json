@@ -16,8 +16,25 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.collectionVariables.set('dateUpdate',time.now())",
-									""
+									"const cacheKeys = ['stamp', pm.variables.get('apiTokenName'), pm.variables.get('portalTokenName')]",
+									"const cache = {}",
+									"cacheKeys.map(key => { cache[key] = pm.collectionVariables.get(key) })",
+									"pm.collectionVariables.clear()",
+									"for (const key in cache) pm.collectionVariables.set(key, cache[key])",
+									"pm.collectionVariables.set('dateUpdate', time.now())"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Token loaded\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res =  codec.streamToString(pm.response)",
+									"    pm.expect(res).to.eq('JWT is valid')",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -47,8 +64,8 @@
 								"exec": [
 									"pm.test(\"Database accessible\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const token = pm.response.json()",
-									"    pm.expect(token.access_token).to.be.not.undefined",
+									"    const res = pm.response.json()",
+									"    pm.expect(!!match.jwt(res.access_token)).to.be.true",
 									"});"
 								],
 								"type": "text/javascript"
@@ -80,7 +97,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Database accessible\", () => {",
+									"pm.test(\"Logs accessible\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json()",
 									"    // responseJson.map(coll => console.log(coll))",
@@ -122,7 +139,7 @@
 									"pm.test(`Env: ${pm.variables.get('env')}`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const env = pm.variables.get('env')",
-									"    const responseStr = pm.response.stream.toString('utf8');",
+									"    const responseStr = codec.streamToString(pm.response)",
 									"    pm.expect(responseStr).to.eq(env)",
 									"});"
 								],
@@ -159,9 +176,8 @@
 								"exec": [
 									"pm.test(\"Git hash : 7 alphanumerical characters\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseStr = pm.response.stream.toString('utf8');",
-									"    pm.expect(responseStr).to.match(/^[0-9a-z]{7}|[0-9a-z]{40}$/)",
-									"",
+									"    const responseStr = codec.streamToString(pm.response)",
+									"    pm.expect(!!match.gitHash(responseStr)).to.be.true",
 									"    pm.collectionVariables.set('gitHash', responseStr)",
 									"});"
 								],
@@ -193,14 +209,14 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const gitHash = pm.collectionVariables.get('gitHash');",
-									"",
 									"pm.test(\"Current app hash = git hash\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseStr = pm.response.stream.toString('utf8');",
-									"    pm.expect(responseStr).to.match(/^[0-9a-z]{7}|[0-9a-z]{40}$/)",
+									"    const gitHash = pm.collectionVariables.get('gitHash');",
+									"    const responseStr = codec.streamToString(pm.response)",
+									"    pm.expect(!!match.gitHash(responseStr)).to.be.true",
 									"    pm.expect(responseStr).to.eq(gitHash)",
-									"});"
+									"});",
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -235,9 +251,9 @@
 								"exec": [
 									"pm.test(\"API version\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const apiVersion = pm.response.stream.toString('utf8');",
-									"    pm.expect(apiVersion).to.match(/^([0-9]+\\.){2}[0-9]+[a-z]*$/)",
-									"    pm.collectionVariables.set('apiVersion',apiVersion)",
+									"    const apiVersion = codec.streamToString(pm.response)",
+									"    pm.expect(!!match.version(apiVersion)).to.be.true",
+									"    pm.collectionVariables.set('apiVersion', apiVersion)",
 									"});"
 								],
 								"type": "text/javascript"
@@ -314,8 +330,8 @@
 								"exec": [
 									"pm.test(\"Get new UUID\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseStr = pm.response.stream.toString('utf8');",
-									"    pm.expect(responseStr).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)",
+									"    const responseStr = codec.streamToString(pm.response)",
+									"    pm.expect(!!match.uuid(responseStr)).to.be.true",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1822,6 +1838,7 @@
 									"    const orgId = pm.collectionVariables.get('softOrg1Id');",
 									"    pm.expect(responseJson.global_id).to.eq(metaId);",
 									"    pm.expect(responseJson.producer.organization_id).to.eq(orgId);",
+									"    pm.expect(!!match.uuid(responseJson.contacts[0]));",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2733,12 +2750,14 @@
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    const metaId = pm.variables.get('softMeta1Id');",
-									"    const orgId1 = pm.variables.get('orgId1');",
+									"    const orgId1 = pm.variables.get('softOrg1Id');",
 									"    const orgId2 = pm.variables.get('orgId2');",
 									"    const contId1 = pm.variables.get('contId1');",
 									"    const contId2 = pm.variables.get('contId2');",
 									"",
 									"    pm.expect(responseJson.global_id).to.eq(metaId);",
+									"    pm.expect(responseJson.producer.organization_id).to.eq(orgId1);",
+									"    pm.expect(!!match.uuid(responseJson.contacts[0]));",
 									"",
 									"});"
 								],
@@ -6444,11 +6463,22 @@
 					"const TRACE = false",
 					"const DEBUG = false",
 					"",
+					"const WAIT_TIME = 50",
 					"const TOKEN_DURATION_S = 1200",
+					"",
+					"",
+					"log = {",
+					"    d: (msg) => { if (DEBUG || TRACE) console.log(msg) },",
+					"    t: (msg) => { if (TRACE) console.log(msg) }",
+					"}",
 					"",
 					"const initStoredVar = (name, defaultVal) => {",
 					"    const storedVal = pm.variables.get(name)",
-					"    if (!storedVal) pm.variables.set(name, defaultVal)",
+					"    if (!storedVal) {",
+					"        log.t('[initStoredVar] no value stored for ' + name)",
+					"        pm.variables.set(name, defaultVal)",
+					"    }",
+					"    // log.t('[initStoredVar] val for ' + name + ' is: ' + storedVal || defaultVal)",
 					"    return storedVal || defaultVal",
 					"}",
 					"",
@@ -6457,15 +6487,34 @@
 					"",
 					"const ADMIN_URL = pm.variables.get('apiUrl') + '/api/admin'",
 					"",
-					"log = {",
-					"    d: (msg) => { if (DEBUG || TRACE) console.log(msg) },",
-					"    t: (msg) => { if (TRACE) console.log(msg) }",
-					"}",
 					"",
 					"log.t('API_TOKEN_NAME: ' + API_TOKEN_NAME)",
 					"log.t('PORTAL_TOKEN_NAME: ' + PORTAL_TOKEN_NAME)",
 					"log.t('ADMIN_URL: ' + ADMIN_URL)",
 					"",
+					"const REGEX_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i",
+					"const REGEX_JWT = /^[\\w-]+\\.[\\w-]+\\.([\\w-]+={0,3})$/",
+					"const REGEX_API_VERSION = /^[0-9]+\\.[0-9]+(\\.[0-9]+)?[a-z]*$/",
+					"const REGEX_URI = /^(https?|ftp):\\/\\/([\\w-]+(\\.[\\w-]+)+|(:[0-9]+)?)([\\w.,@?^=%&amp;:\\/~+#-]*[\\w@?^=%&amp;\\/~+#-])?$/",
+					"const REGEX_GIT_HASH_SHORT = /^[a-z0-9]{7}/",
+					"",
+					"const regexCheck = (regex, str) => str ? regex.exec(`${str}`) : regex",
+					"match = {",
+					"    uuid: (str) => regexCheck(REGEX_UUID, str),",
+					"    jwt: (str) => regexCheck(REGEX_JWT, str),",
+					"    version: (str) => regexCheck(REGEX_API_VERSION, str),",
+					"    uri: (str) => regexCheck(REGEX_URI, str),",
+					"    gitHash: (str) => regexCheck(REGEX_GIT_HASH_SHORT, str),",
+					"}",
+					"",
+					"postm = {",
+					"    clearVars: () => {",
+					"        const stamp = pm.collectionVariables.get('stamp')",
+					"        pm.collectionVariables.clear()",
+					"        pm.collectionVariables.set('stamp', stamp)",
+					"        pm.collectionVariables.set('dateUpdate', time.now())",
+					"    }",
+					"}",
 					"",
 					"error = {",
 					"    throwNotFound: (msg) => { throw { statusCode: 404, name: 'NotFound', message: msg } }",
@@ -6473,9 +6522,13 @@
 					"",
 					"time = {",
 					"    now: () => new Date().toISOString(),",
+					"    nowEpochMS: () => new Date().getTime(),",
 					"    nowEpochS: () => _.floor(new Date().getTime() / 1000),",
 					"    timezone: () => new Date().getTimezoneOffset(),",
-					"    wait: (delayMs) => setTimeout(function () { }, [delayMs]),",
+					"    wait: (delayMs, doSomething) => {",
+					"        log.d(`Waiting ${delayMs / 1000}s...`)",
+					"        setTimeout(doSomething ? doSomething : () => { log.d(`Waited ${delayMs / 1000}s`) }, delayMs)",
+					"    },",
 					"}",
 					"codec = {",
 					"    streamToString: (data) => data?.stream?.toString('utf8'),",
@@ -6496,9 +6549,7 @@
 					"            .replace(\"-\", \"+\");",
 					"        // log.d('base64Str: ' + base64Str)",
 					"        return codec.fromBase64(base64Str);",
-					"    },",
-					"",
-					"    streamToUtf8: (data) => data?.stream?.toString('utf8')",
+					"    }",
 					"}",
 					"",
 					"rand = {",
@@ -6513,8 +6564,8 @@
 					"    initVal: (field) => {",
 					"        const val = pm.collectionVariables.get(field);",
 					"        if (val) return val;",
-					"        const randVal = rand.get('{{$randomUUID}}');",
-					"        pm.collectionVariables.set(field, randVal);",
+					"        const randVal = rand.uuid();",
+					"        pm.collectionVariables.set(field, randVal, 'string');",
 					"        return randVal;",
 					"    },",
 					"",
@@ -6534,7 +6585,6 @@
 					"};",
 					"",
 					"secu = {",
-					"",
 					"    isTokenValid: (tokenName) => {",
 					"        log.t('-- is ' + tokenName + ' Valid --')",
 					"        const token = pm.collectionVariables.get(tokenName)",
@@ -6559,7 +6609,7 @@
 					"        return isValid",
 					"    },",
 					"",
-					"    renewApiToken: async (tokenName, next) => {",
+					"    renewApiToken: (tokenName, next) => {",
 					"        log.t('-- renewApiToken --')",
 					"        const reqUrl = pm.variables.get('cryptoJwtUrl') + '/forge'",
 					"        // log.d('reqUrl: ' + reqUrl)",
@@ -6579,29 +6629,33 @@
 					"                })",
 					"            }",
 					"        }",
-					"        pm.sendRequest(reqNewToken, (err, res) => {",
-					"            if (err) {",
-					"                log.d(`[renewApiToken] Error: 'Crypto' module unreachable on ${reqUrl}`)",
-					"                error.throwNotFound(`Crypto module unreachable on ${reqUrl}`)",
-					"            }",
-					"            const token = codec.streamToUtf8(res)",
-					"            // log.d('rudiProdToken : ' + token)",
-					"            try {",
-					"                pm.expect(res).to.have.property('code', 200);",
-					"            } catch (err) {",
-					"                console.error('[renewApiToken]: ' + err)",
-					"                throw new Error('[renewApiToken]: ' + err)",
-					"            }",
-					"            pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
-					"            pm.collectionVariables.set(tokenName, token)",
-					"            log.d('API token stored')",
+					"        return new Promise((resolve, reject) => {",
+					"            pm.sendRequest(reqNewToken, (err, res) => {",
+					"                if (err || res.code > 399 || res.statusCode > 399) {",
+					"                    log.d(`[renewApiToken] Error: 'Crypto' module unreachable on ${reqUrl}`)",
+					"                    return reject(`Crypto module unreachable on ${reqUrl}`)",
+					"                    // error.throwNotFound(`Crypto module unreachable on ${reqUrl}`)",
+					"                }",
+					"                const token = codec.streamToString(res)",
+					"                // log.d('rudiProdToken : ' + token)",
+					"                try {",
+					"                    pm.expect(res).to.have.property('code', 200);",
+					"                    pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
+					"                } catch (err) {",
+					"                    console.error('[renewApiToken]: ' + err)",
+					"                    return reject('[renewApiToken]: ' + err)",
+					"                    // throw new Error('[renewApiToken]: ' + err)",
+					"                }",
+					"                pm.collectionVariables.set(tokenName, token)",
+					"                log.d('API token stored')",
 					"",
-					"            if (next) next(token)",
-					"            //return token",
+					"                if (next) return resolve(next(token))",
+					"                return resolve(token)",
+					"            })",
 					"        })",
 					"    },",
 					"",
-					"    renewPortalToken: async (tokenName, rudiProdToken) => {",
+					"    renewPortalToken: (tokenName, rudiProdToken) => {",
 					"        log.t('-- renewPortalToken --')",
 					"        const reqUrl = ADMIN_URL + '/portal/token'",
 					"        // log.d('reqUrl: ' + reqUrl)",
@@ -6613,28 +6667,37 @@
 					"                'Authorization': 'Bearer ' + rudiProdToken",
 					"            },",
 					"        }",
-					"        pm.sendRequest(reqNewToken, (err, res) => {",
-					"            if (err) {",
-					"                log.d(`[renewPortalToken] Error: RUDI API unreachable on ${reqUrl}`)",
-					"                error.throwNotFound(`RUDI API unreachable on ${reqUrl}`)",
-					"            }",
-					"            try {",
-					"                pm.expect(res).to.have.property('code', 200);",
-					"            } catch (error) {",
-					"                log.d('[renewPortalToken] Error: ' + codec.streamToString(res))",
-					"                //log.d('[renewPortalToken] Response to Postman req: ' + codec.streamToString(res))",
-					"                return new Error('[renewPortalToken]: ' + codec.streamToString(res))",
-					"                throw new Error('[renewPortalToken]: ' + codec.streamToString(res))",
-					"            }",
-					"            //log.d('renewPortalToken res: ' + JSON.stringify(res))",
-					"            const token = JSON.parse(codec.streamToUtf8(res)).access_token",
-					"            //const token = res.json()",
-					"            log.d('Portal token: ' + token)",
+					"        return new Promise((resolve, reject) => {",
+					"            pm.sendRequest(reqNewToken, (err, res) => {",
+					"                if (err) {",
+					"                    log.d(`[renewPortalToken] Error: RUDI API unreachable on ${reqUrl}`)",
+					"                    // error.throwNotFound(`RUDI API unreachable on ${reqUrl}`)",
+					"                    return reject(`RUDI API unreachable on ${reqUrl}`)",
+					"                }",
+					"                try {",
+					"                    pm.expect(res).to.have.property('code', 200);",
+					"                } catch (error) {",
+					"                    log.d('[renewPortalToken] Error: ' + codec.streamToString(res))",
+					"                    //log.d('[renewPortalToken] Response to Postman req: ' + codec.streamToString(res))",
+					"                    return reject('[renewPortalToken]: ' + codec.streamToString(res))",
+					"                    // throw new Error('[renewPortalToken]: ' + codec.streamToString(res))",
+					"                }",
+					"                //log.d('renewPortalToken res: ' + JSON.stringify(res))",
+					"                const token = JSON.parse(codec.streamToString(res))?.access_token",
+					"                log.d('Portal token: ' + token)",
+					"                try {",
+					"                    pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
+					"                } catch (error) {",
+					"                    log.d('[renewPortalToken] Error: ' + codec.streamToString(res))",
+					"                    //log.d('[renewPortalToken] Response to Postman req: ' + codec.streamToString(res))",
+					"                    return reject('[renewPortalToken]: ' + codec.streamToString(res))",
+					"                    // throw new Error('[renewPortalToken]: ' + codec.streamToString(res))",
+					"                }",
 					"",
-					"            pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
-					"            pm.collectionVariables.set(tokenName, token)",
-					"            log.d('Portal token stored')",
-					"",
+					"                pm.collectionVariables.set(tokenName, token)",
+					"                log.d('Portal token stored')",
+					"                return resolve(token)",
+					"            })",
 					"        })",
 					"    },",
 					"",
@@ -6657,7 +6720,8 @@
 					"",
 					"}",
 					"",
-					"secu.getRudiProdToken(secu.getPortalToken)",
+					"secu.getRudiProdToken(secu.getPortalToken).then(res => log.d('[End] Received ' + res))",
+					"time.wait(WAIT_TIME, () => { if (TRACE) console.info('Pre-request Scripts loaded') })",
 					""
 				]
 			}
@@ -6678,203 +6742,15 @@
 			"value": "soft-checks"
 		},
 		{
+			"key": "dateUpdate",
+			"value": ""
+		},
+		{
 			"key": "apiJwt",
 			"value": ""
 		},
 		{
 			"key": "portalJwt",
-			"value": ""
-		},
-		{
-			"key": "pubKeyName",
-			"value": ""
-		},
-		{
-			"key": "portalPem",
-			"value": ""
-		},
-		{
-			"key": "dateUpdate",
-			"value": ""
-		},
-		{
-			"key": "gitHash",
-			"value": ""
-		},
-		{
-			"key": "apiVersion",
-			"value": ""
-		},
-		{
-			"key": "keywords",
-			"value": ""
-		},
-		{
-			"key": "themes",
-			"value": ""
-		},
-		{
-			"key": "sanityLicence",
-			"value": ""
-		},
-		{
-			"key": "licences",
-			"value": ""
-		},
-		{
-			"key": "softOrg1Id",
-			"value": ""
-		},
-		{
-			"key": "softOrg1Name",
-			"value": ""
-		},
-		{
-			"key": "softOrg1Address",
-			"value": ""
-		},
-		{
-			"key": "softOrg2Id",
-			"value": ""
-		},
-		{
-			"key": "softOrg2Name",
-			"value": ""
-		},
-		{
-			"key": "softOrg2Address",
-			"value": ""
-		},
-		{
-			"key": "softContact1Id",
-			"value": ""
-		},
-		{
-			"key": "softContact1Name",
-			"value": ""
-		},
-		{
-			"key": "softContact1Email",
-			"value": ""
-		},
-		{
-			"key": "softContact2Id",
-			"value": ""
-		},
-		{
-			"key": "softContact2Name",
-			"value": ""
-		},
-		{
-			"key": "softContact2Email",
-			"value": ""
-		},
-		{
-			"key": "softContact3Id",
-			"value": ""
-		},
-		{
-			"key": "softContact3Name",
-			"value": ""
-		},
-		{
-			"key": "softContact3Email",
-			"value": ""
-		},
-		{
-			"key": "now",
-			"value": ""
-		},
-		{
-			"key": "softMeta1Id",
-			"value": ""
-		},
-		{
-			"key": "softMedia1Id",
-			"value": ""
-		},
-		{
-			"key": "randomTheme",
-			"value": ""
-		},
-		{
-			"key": "randomKeyword1",
-			"value": ""
-		},
-		{
-			"key": "randomKeyword2",
-			"value": ""
-		},
-		{
-			"key": "softLicence",
-			"value": ""
-		},
-		{
-			"key": "randomOrgId",
-			"value": ""
-		},
-		{
-			"key": "randomContact1",
-			"value": ""
-		},
-		{
-			"key": "randomContact2",
-			"value": ""
-		},
-		{
-			"key": "randomTitle",
-			"value": ""
-		},
-		{
-			"key": "randomSynopsis",
-			"value": ""
-		},
-		{
-			"key": "randomSummary",
-			"value": ""
-		},
-		{
-			"key": "softMeta2Id",
-			"value": ""
-		},
-		{
-			"key": "mediaId2",
-			"value": ""
-		},
-		{
-			"key": "softMedia2Id",
-			"value": ""
-		},
-		{
-			"key": "countWithOrg1",
-			"value": ""
-		},
-		{
-			"key": "softReport1Id",
-			"value": ""
-		},
-		{
-			"key": "softReport2Id",
-			"value": ""
-		},
-		{
-			"key": "unkownMetaId",
-			"value": ""
-		},
-		{
-			"key": "softReport3Id",
-			"value": ""
-		},
-		{
-			"key": "apiToken",
-			"value": ""
-		},
-		{
-			"key": "portalToken",
-			"value": ""
-		},
-		{
-			"key": "portalKeyName",
 			"value": ""
 		}
 	]

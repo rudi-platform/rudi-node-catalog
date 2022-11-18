@@ -110,8 +110,9 @@ import Themes from '../thesaurus/Themes.js'
 
 import { isValid as isLanguageValid } from '../thesaurus/Languages.js'
 import { isValid as isProjectionValid } from '../thesaurus/Projections.js'
-import { isValid as isStorageStatusValid } from '../thesaurus/StorageStatus.js'
+import { isValid as isStorageStatusValid, StorageStatus } from '../thesaurus/StorageStatus.js'
 import { get as getLicenceCodes } from '../thesaurus/LicenceCodes.js'
+
 // -------------------------------------------------------------------------------------------------
 // Schema definitions
 // -------------------------------------------------------------------------------------------------
@@ -377,7 +378,7 @@ const MetadataSchema = new mongoose.Schema(
     //   - unavailable = data were deleted
     [API_STORAGE_STATUS]: {
       type: String,
-      // enum: Object.values(StorageStatus),
+      enum: Object.values(StorageStatus),
       required: true,
     },
 
@@ -490,7 +491,7 @@ async function checkLicence(metadata) {
           LicenceTypes.Standard
         )
         const listLicenceCode = await getLicenceCodes()
-        // logD(mod, fun, `licence list: ${beautify(listLicenceCode)}`)
+        logD(mod, fun, ` [T] licence list: ${beautify(listLicenceCode)}`)
         if (listLicenceCode.indexOf(licenceLabel) === -1) {
           throw new NotFoundError(
             `Licence label '${licenceLabel}' was not found in licence list '${listLicenceCode}'`
@@ -551,7 +552,9 @@ async function checkFileTypes(metadata) {
         media[API_FILE_MIME] = MIME_YAML + encrypted
         return true
       }
-      if (getFileTypes().indexOf(mimeType) == -1)
+      const fileTypes = getFileTypes()
+      // logT(mod, fun + ' fileTypes', beautify(fileTypes))
+      if (fileTypes.indexOf(mimeType) == -1)
         throw new BadRequestError(`Unrecognized MIME type: '${mimeType}'`, mod, fun, [
           API_MEDIA_PROPERTY,
           i,
@@ -564,20 +567,22 @@ async function checkFileTypes(metadata) {
 }
 async function checkThesaurus(metadata) {
   const fun = 'checkThesaurus'
-  // if (metadata.init) logD(mod, fun, `init`)
   try {
     logT(mod, fun, ``)
+    if (metadata.init) logD(mod, fun, `init`)
     const shouldInit = metadata[API_COLLECTION_TAG] === 'init'
     const dataTheme = metadata[API_THEME_PROPERTY]
     // const themes = Themes.get()
     const themeLabels = Themes.getLabels(DEFAULT_LANG)
-
+    // logT(mod, fun + ' themeLabels [T]', beautify(themeLabels))
     const themeKeyIndex = Object.keys(themeLabels).indexOf(dataTheme)
+    // logT(mod, fun + ' themeLabels [T]', beautify(themeLabels))
     if (themeKeyIndex === -1) {
+      // logT(mod, fun + ' themeLabelsVals [T]', beautify(Object.values(themeLabels)))
       const themeValIndex = Object.values(themeLabels).indexOf(dataTheme)
       if (themeValIndex > -1) {
         const allowedDataTheme = Object.keys(themeLabels)[themeValIndex]
-        logD(mod, fun, `Changing Theme value: ${dataTheme} -> ${allowedDataTheme}`)
+        // logD(mod, fun, `Changing Theme value: ${dataTheme} -> ${allowedDataTheme}`)
         metadata[API_THEME_PROPERTY] = allowedDataTheme
       } else if (!(await Themes.isValid(dataTheme, shouldInit))) {
         throw new BadRequestError(
@@ -592,7 +597,7 @@ async function checkThesaurus(metadata) {
     }
 
     const keywords = metadata[API_KEYWORDS_PROPERTY]
-    // logT(mod, fun, `keywords: ${beautify(keywords)}`)
+    logT(mod, fun, `keywords: ${beautify(keywords)}`)
 
     await Promise.all(
       keywords.map((keyword, index) => {
@@ -619,7 +624,7 @@ async function checkThesaurus(metadata) {
       })
     )
 
-    // logT(mod, fun, `languages`)
+    logT(mod, fun, `languages`)
     const languages = metadata[API_LANGUAGES_PROPERTY]
     if (languages) {
       const langStr = beautify(languages)
@@ -642,7 +647,7 @@ async function checkThesaurus(metadata) {
       }
     }
 
-    // logT(mod, fun, `geography`)
+    logT(mod, fun, `geography`)
     const geography = metadata[API_GEOGRAPHY]
     // logI(mod, fun, `geography: ${beautify(geography)}`)
     if (geography) {
@@ -659,7 +664,7 @@ async function checkThesaurus(metadata) {
       }
     }
 
-    // logT(mod, fun, `storage status`)
+    logT(mod, fun, `is storage status valid`)
     if (!isStorageStatusValid(metadata[API_STORAGE_STATUS], shouldInit)) {
       throw new BadRequestError(
         incorrectVal(API_STORAGE_STATUS, metadata[API_STORAGE_STATUS]),
@@ -673,7 +678,7 @@ async function checkThesaurus(metadata) {
     throw RudiError.treatError(mod, fun, err)
   }
 }
-/* 
+/*
   function checkMedia(metadata) {
     const fun = 'checkMedia'
     logD(mod, fun, `metadata: ${beautify(metadata)}`)
@@ -793,9 +798,7 @@ MetadataSchema.pre('save', async function (next) {
 
     // Checking 'licence' field
     await checkLicence(metadata)
-
     await checkThesaurus(metadata)
-
     await checkFileTypes(metadata)
 
     await checkMetadataSource(metadata)
@@ -804,9 +807,9 @@ MetadataSchema.pre('save', async function (next) {
   } catch (err) {
     logV(mod, fun, `pre save checks KO: ${err}`)
     err.message = err.message + ` (metadata ${this[API_METADATA_ID]})`
-    next(err)
+    // next(err)
+    throw RudiError.treatError(mod, fun, err)
   }
-
   // next()
 })
 
@@ -818,7 +821,8 @@ MetadataSchema.post('save', async function (doc, next) {
     await this.populate(POPULATE_OPTS) //.execPopulate()
     next()
   } catch (err) {
-    next(err)
+    // next(err)
+    throw RudiError.treatError(mod, fun, err)
   }
   // next()
 })
@@ -859,7 +863,7 @@ Metadata.initialize = async () => {
   const fun = 'initMetadata'
   try {
     await makeSearchable(Metadata)
-    logD(mod, fun, `Indexes created`)
+    return `Metadata indexes created`
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }

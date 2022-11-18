@@ -5,9 +5,9 @@ const mod = 'portalCtrl'
 // -------------------------------------------------------------------------------------------------
 // External dependencies
 // -------------------------------------------------------------------------------------------------
-import { parseKey } from 'sshpk'
 import axios from 'axios'
 import https from 'node:https'
+import { extractJwt, readPublicKeyPem, verifyToken } from '@aqmo.org/jwt_lib'
 
 // -------------------------------------------------------------------------------------------------
 // Constants
@@ -18,17 +18,19 @@ import {
   API_METAINFO_PROPERTY,
   API_COLLECTION_TAG,
   getUpdatedDate,
+  API_STORAGE_STATUS,
+  API_MEDIA_PROPERTY,
 } from '../db/dbFields.js'
+
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { extractJwt, JWT_EXP, REQ_MTD } from '../utils/crypto.js'
-import { logD, logI, logT, logV, logW } from '../utils/logging.js'
+import { JWT_EXP, REQ_MTD } from '../utils/crypto.js'
+import { logD, logT, logV, logW } from '../utils/logging.js'
 import {
   beautify,
   dateEpochSToIso,
   decodeBase64,
-  decodeBase64url,
   deepClone,
   nowEpochS,
   padWithEqualSignBase4,
@@ -52,6 +54,8 @@ import {
 } from '../config/confPortal.js'
 
 import { isUUID } from '../definitions/schemaValidators.js'
+import { StorageStatus } from '../definitions/thesaurus/StorageStatus.js'
+
 import {
   getEnsuredObjectWithRudiId,
   getLatestStoredPortalToken,
@@ -259,22 +263,23 @@ export const deleteMetadata = async (req, reply) => {
 // -------------------------------------------------------------------------------------------------
 // Portal calls: GET public key
 // -------------------------------------------------------------------------------------------------
-let cachedPortalJwtPubKey
 // ----- GET Portal public key
+let CACHED_PORTAL_PUB
 export const getPortalJwtPubKey = async () => {
   const fun = 'getPortalJwtPubKey'
   try {
     logT(mod, fun, ``)
-    if (cachedPortalJwtPubKey) return cachedPortalJwtPubKey
+    if (CACHED_PORTAL_PUB) return CACHED_PORTAL_PUB
 
     const publicKeyUrl = getPortalJwtPubKeyUrl()
     // logD(mod, fun, 'publicKeyUrl: ' + publicKeyUrl)
 
     const publicKeyObj = await axios.get(publicKeyUrl, getPortalAuthHeaderBasic())
     // logD(mod, fun, 'publicKeyObj: ' + beautify(publicKeyObj))
-    cachedPortalJwtPubKey = publicKeyObj?.data?.value
+    const cachedPortalJwtPubKeyPem = publicKeyObj?.data?.value
     // logD(mod, fun, `portalJwtPubKey: ${cachedPortalJwtPubKey}`)
-    return cachedPortalJwtPubKey
+    CACHED_PORTAL_PUB = readPublicKeyPem(cachedPortalJwtPubKeyPem)
+    return CACHED_PORTAL_PUB
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -421,7 +426,7 @@ jwtBody = {
   scope: ['read']
 }
 */
-/* 
+/*
   export const checkSignatureWithSecret = (accessToken) => {
     const fun = 'checkSignatureWithSecret'
     logT(mod, fun, ``)
@@ -453,97 +458,21 @@ jwtBody = {
     }
   }
  */
-export const checkSignatureWithPubKey = async (accessToken) => {
-  const fun = 'checkSignatureWithPubKey'
-  try {
-    logT(mod, fun, ``)
-
-    if (!accessToken) throw new BadRequestError('No token = no signature to check!')
-    const [jwtHeaderBase64url, jwtPayloadBase64url, jwtSignatureBase64url] = accessToken.split('.')
-
-    // Retrieve the public key
-    let pubKeyPem
-    try {
-      pubKeyPem = await getPortalJwtPubKey()
-    } catch (err) {
-      throw new InternalServerError(`Couldn't retrieve online portal public key: ${err}`)
-    }
-    let sslKey
-    try {
-      sslKey = parseKey(pubKeyPem)
-    } catch (err) {
-      throw new InternalServerError(
-        `The Portal public key is incorrect, please check the content: ${err}`
-      )
-    }
-
-    // logD(mod, fun, `sslKey: ${ beautify(sslKey)}`)
-    // const keyName = sslKey.comment && sslKey.comment !== '(unnamed)' ? `'${sslKey.comment}' ` : ''
-    // logD(mod, fun, `${keyName}public key: ${sslKey.type} ${sslKey.size} bits`)
-    let signatureIsValid
-    try {
-      const verifier = sslKey.createVerify('sha256')
-      verifier.update(`${jwtHeaderBase64url}.${jwtPayloadBase64url}`)
-      signatureIsValid = verifier.verify(jwtSignatureBase64url, 'base64url')
-    } catch (err) {
-      throw new ForbiddenError(`Error while verifying the Portal token signature: ${err}`)
-    }
-    if (signatureIsValid) {
-      logI(mod, fun, `signature is valid`)
-    } else {
-      logW(mod, fun, `signature is not valid`)
-    }
-    return signatureIsValid
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
 
 export const verifyPortalToken = async (accessToken) => {
   const fun = 'verifyPortalToken'
   logT(mod, fun, ``)
 
   try {
-    if (!accessToken) throw new BadRequestError('No token to verify!')
-    const [jwtHeaderBase64, jwtPayloadBase64, _] = accessToken.split('.')
+    if (!accessToken) throw new ForbiddenError('No token to verify!')
 
-    // Check JWT header
-    const jwtHeader = JSON.parse(decodeBase64url(jwtHeaderBase64))
+    const portalPubKey = await getPortalJwtPubKey()
+    const { header, payload } = verifyToken(portalPubKey, accessToken)
 
-    // Check JWT body
-    const jwtPayload = JSON.parse(decodeBase64url(jwtPayloadBase64))
-
-    const jwtPortalUser = jwtPayload[JWT_USER]
-    if (!jwtPortalUser && jwtPayload[REQ_MTD])
+    if (!payload[JWT_USER] && payload[REQ_MTD])
       throw new ForbiddenError(`Using a RUDI internal JWT to access a Portal route is incorrect.`)
-    /*
-      // const login = getCredentials()[0]
-      // logD(mod, fun, `JWT Portal payload: ${ beautify(jwtPayload)}`)
-      // logD(mod, fun, `JWT Portal user: ${jwtPortalUser}`)
-      if (jwtPortalUser !== login) {
-        // logW(mod, fun, `Portal JWT: incorrect user: ${jwtPortalUser}`)
-        logE(`Portal JWT: incorrect user: ${jwtPortalUser}, token=${accessToken}`)
-        // throw new ForbiddenError(`Portal JWT: incorrect user`)
-      }
-      // if (jwtPayload[JWT_CLIENT] !== login)
-      //   throw new ForbiddenError('Portal JWT: incorrect client')
-    */
-    if (jwtPayload[JWT_EXP] < nowEpochS())
-      throw new ForbiddenError(
-        `Portal JWT expired: ` +
-          `expire_date=${dateEpochSToIso(jwtPayload[JWT_EXP])}` +
-          ` < now=${dateEpochSToIso(nowEpochS())}`
-      )
-    // logD(mod, fun, `jwtHeader: ${ beautify(jwtHeader)}`)
-    // logD(mod, fun, `jwtPayload: ${ beautify(jwtPayload)}`)
 
-    // Check JWT signature
-    if (!(await checkSignatureWithPubKey(accessToken)))
-      throw new ForbiddenError('Portal JWT signature is not valid')
-
-    // logD(mod, fun, `jwtHeader: ${ beautify(jwtHeader)}`)
-    // logD(mod, fun, `jwtPayload: ${ beautify(jwtPayload)}`)
-    return [jwtHeader, jwtPayload]
+    return [header, payload]
   } catch (err) {
     const errMsg = `Invalid token: ${err}`
     logW(mod, fun, errMsg)
@@ -554,11 +483,10 @@ export const verifyPortalToken = async (accessToken) => {
 // -------------------------------------------------------------------------------------------------
 // Portal calls: metadata
 // -------------------------------------------------------------------------------------------------
-export const sendMetadataToPortal = async (metadataId) => {
-  const fun = 'sendMetadataToPortal'
+export const isMetadataSendable = async (metadataId) => {
+  const fun = 'isMetadataSendable'
   try {
-    logT(mod, fun, ``)
-    if (isPortalConnectionDisabled()) return
+    if (isPortalConnectionDisabled()) return false
 
     //--- Check input param
     if (!metadataId) throw new NotImplementedError('Not yet implemented')
@@ -572,28 +500,46 @@ export const sendMetadataToPortal = async (metadataId) => {
       throw new NotFoundError(errMsg)
     }
 
-    //--- If 'collection_tag' is set (ie for tests), metadata is not sent
+    //--- If 'collection_tag' is set (ie for tests), metadata is not sent to the Portal
     const collectionTag = metadata[API_COLLECTION_TAG]
     if (collectionTag) {
       logD(mod, fun, `Not sending to portal: ${metadataId} (${collectionTag})`)
-      return
+      return false
     }
+
+    //--- If media still need to be uploaded, metadata is not sent to the Portal
+    if (metadata[API_STORAGE_STATUS] === StorageStatus.Pending) {
+      logD(mod, fun, `Waiting for other media to get uploaded: ${metadataId}`)
+      return false
+    }
+
+    //--- If a media is restricted, metadata is not sent to the Portal
+    if (metadata[API_MEDIA_PROPERTY][0] === StorageStatus.Pending) {
+      logD(mod, fun, `Waiting for other media to get uploaded: ${metadataId}`)
+      return false
+    }
+
+    return metadata
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+const PORTAL_POST_URL = postPortalMetaUrl()
+export const sendMetadataToPortal = async (metadataId) => {
+  const fun = 'sendMetadataToPortal'
+  try {
+    logT(mod, fun, ``)
+
+    const metadata = await isMetadataSendable(metadataId)
+    if (!metadata) return
 
     //--- Ensuring compatibility with portal
     const metadataClean = deepClone(metadata)
     // API version
     metadataClean[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = API_VERSION
-    // MIME type: YAML
-    // metadataClean[API_MEDIA_PROPERTY].map((media) => {
-    //   if (media[API_MEDIA_TYPE] === MediaTypes.File && media[API_FILE_TYPE] === MIME_YAML) {
-    //     media[API_FILE_TYPE] = 'text/plain'
-    //   }
-    // })
-
-    // logD(mod, fun, beautify(metadataClean))
 
     //--- Sending to portal
-    const sendPortalUrl = postPortalMetaUrl()
     const portalToken = await getPortalToken()
     const reqOpts = {
       headers: {
@@ -602,22 +548,24 @@ export const sendMetadataToPortal = async (metadataId) => {
         Authorization: `Bearer ${portalToken}`,
       },
     }
+    let answer
     try {
       logD(mod, fun, `Checking if the metadata is on the portal`)
-      const answer = await axios.get(getPortalMetaUrl(metadataId), reqOpts)
-      const portalMetadata = answer.data
-
-      if (getUpdatedDate(portalMetadata) < getUpdatedDate(metadataClean)) {
-        logD(mod, fun, `Metadata is on the portal and older: updating '${metadataId}'`)
-        return httpPut(sendPortalUrl, metadataClean, portalToken)
-      } else {
-        logD(mod, fun, `Metadata is on the portal and same: not updating '${metadataId}'`)
-      }
+      answer = await axios.get(getPortalMetaUrl(metadataId), reqOpts)
     } catch (err) {
       logV(mod, fun, err)
       logD(mod, fun, `Metadata is not on the portal: sending '${metadataId}'`)
-      return httpPost(sendPortalUrl, metadataClean, portalToken)
+      return httpPost(PORTAL_POST_URL, metadataClean, portalToken)
     }
+    const portalMetadata = answer.data
+
+    if (getUpdatedDate(portalMetadata) < getUpdatedDate(metadataClean)) {
+      logD(mod, fun, `Metadata is on the portal and older: updating '${metadataId}'`)
+      return httpPut(PORTAL_POST_URL, metadataClean, portalToken)
+    } else {
+      logD(mod, fun, `Metadata is on the portal and same: not updating '${metadataId}'`)
+    }
+
     // logD(mod, fun, `reply: ${ beautify(reply)}`)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)

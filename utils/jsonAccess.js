@@ -40,11 +40,13 @@ export const accessReqParam = (req, param) => {
  * @throws object property is missing
  */
 export const accessProperty = (jsonObject, jsonProperty) => {
-  // logD(mod, fun, `Accessing property '${jsonProperty}' from object '${beautify(jsonObject)}'`)
-  const value = jsonObject[jsonProperty]
-  // logD(mod, fun, `=> value = ${beautify(value)}`)
+  let value
+  try {
+    value = jsonObject[jsonProperty]
+  } catch (e) {
+    throw new BadRequestError(`This should be an object: ${beautify(jsonObject)}`)
+  }
   if (!value) throw new BadRequestError(`${missingObjectProperty(jsonObject, jsonProperty)}`)
-  // logD(mod, fun, `=> ${jsonProperty} = ${beautify(value)}`)
   return value
 }
 

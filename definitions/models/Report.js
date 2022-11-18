@@ -10,7 +10,6 @@ const { omit } = _
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { logD } from '../../utils/logging.js'
 
 import { HTTP_METHODS } from '../../config/confApi.js'
 import { UuidSchema, UuidV4Schema } from '../schemas/Identifiers.js'
@@ -143,7 +142,7 @@ ReportSchema.methods.toJSON = function () {
   return omit(this.toObject(), FIELDS_TO_SKIP)
 }
 
-/* 
+/*
 ReportSchema.pre('save', async function (next) {
   const fun = 'pre save hook'
   // if(this.version === 'v1') this.version = api.VERSION
@@ -172,7 +171,7 @@ Report.initialize = async () => {
   const fun = 'initReport'
   try {
     await makeSearchable(Report)
-    logD(mod, fun, `Indexes created`)
+    return `Report indexes created`
   } catch (err) {
     RudiError.treatError(mod, fun, err)
   }

@@ -11,7 +11,8 @@ import mongoose from 'mongoose'
 const { Types: MongooseTypes } = mongoose
 
 import _ from 'lodash'
-const { mergeWith, pick } = _
+const { pick } = _
+// const { mergeWith } = _
 
 // -------------------------------------------------------------------------------------------------
 // Constants
@@ -35,7 +36,6 @@ import {
   API_GEO_BBOX_NORTH,
   API_GEO_BBOX_SOUTH,
   API_MEDIA_ID,
-  API_COLLECTION_TAG,
   API_PURPOSE,
   API_LANGUAGES_PROPERTY,
   API_DATA_DESCRIPTION_PROPERTY,
@@ -43,6 +43,10 @@ import {
   DB_CREATED_AT,
   DB_UPDATED_AT,
   DICT_LANG,
+  API_FILE_STATUS_UPDATE,
+  API_FILE_STORAGE_STATUS,
+  API_STORAGE_STATUS,
+  API_METAINFO_VERSION_PROPERTY,
 } from '../db/dbFields.js'
 
 import {
@@ -63,16 +67,22 @@ import {
   QUERY_SEARCH_TERMS,
   QUERY_COUNT_BY,
   STATUS_CODE,
+  API_VERSION,
 } from '../config/confApi.js'
-
-import { isPortalConnectionDisabled } from '../config/confPortal.js'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { bboxToGeoJsonPolygon } from '../utils/geo.js'
-import { beautify, deepClone, isNotEmptyArray, isEmptyArray, isNothing } from '../utils/jsUtils.js'
-import { logD, logE, logI, logT, logV, logW } from '../utils/logging.js'
+import {
+  beautify,
+  deepClone,
+  isNotEmptyArray,
+  isEmptyArray,
+  isNothing,
+  nowISO,
+} from '../utils/jsUtils.js'
+import { logD, logE, logI, logT, logW } from '../utils/logging.js'
 import {
   contactNotFound,
   missingObjectProperty,
@@ -93,7 +103,7 @@ import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
 // Data models
 // -------------------------------------------------------------------------------------------------
 import { Metadata } from '../definitions/models/Metadata.js'
-import { Media } from '../definitions/models/Media.js'
+import { Media, MediaStorageStatus } from '../definitions/models/Media.js'
 
 // -------------------------------------------------------------------------------------------------
 // Controllers
@@ -109,25 +119,25 @@ import Themes from '../definitions/thesaurus/Themes.js'
 import {
   doesObjectExistWithRudiId,
   getContactDbIdWithJson,
-  getContactWithJson,
   getEnsuredContactWithDbId,
   getEnsuredMediaWithDbId,
   getEnsuredMetadataWithRudiId,
-  getEnsuredObjectWithRudiId,
   getEnsuredOrganizationWithDbId,
   getMediaDbIdWithJson,
   getDbObjectListAndCount,
   getOrganizationDbIdWithJson,
-  getOrganizationWithJson,
   listThemesInMetadata,
   overwriteDbObject,
   searchDbObjects,
+  getObjectWithRudiId,
+  getMetadataWithJson,
 } from '../db/dbQueries.js'
 
 import { parseQueryParameters } from '../utils/parseRequest.js'
 import { readJsonFile } from '../utils/fileActions.js'
 import Contact from '../definitions/models/Contact.js'
 import Organization from '../definitions/models/Organization.js'
+import { StorageStatus } from '../definitions/thesaurus/StorageStatus.js'
 
 // -------------------------------------------------------------------------------------------------
 // Atomic treatments of properties: RUDI -> DB
@@ -142,9 +152,7 @@ export const organizationRudiToDbFormat = async (rudiProducer, path, shouldCreat
     try {
       organizationDbId = await getOrganizationDbIdWithJson(rudiProducer)
     } catch (e) {
-      if (e[STATUS_CODE] === 400) {
-        throw new BadRequestError(e.message, mod, 'org.get', path)
-      }
+      if (e[STATUS_CODE] === 400) throw new BadRequestError(e.message, mod, 'org.get', path)
       throw e
     }
     // logD(mod, fun, `organizationDbId: -> ${organizationDbId} `)
@@ -275,37 +283,37 @@ export const mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFo
   }
 }
 
-function customMerger(value, srcValue, key) {
-  const fun = 'customMerger'
-  logV(mod, fun, `'${key}': ${beautify(srcValue)} -> ${beautify(value)}`)
-  if (Array.isArray(srcValue)) return srcValue
-  return undefined
-}
+// function customMerger(value, srcValue, key) {
+//   const fun = 'customMerger'
+//   logV(mod, fun, `'${key}': ${beautify(srcValue)} -> ${beautify(value)}`)
+//   if (Array.isArray(srcValue)) return srcValue
+//   return undefined
+// }
 
-// Parameter 'dbMetadata' gets mutated!
-async function metadataCustomMerge(dbMetadata, dbReadyModMetadata) {
-  const fun = 'metadataCustomMerge'
-  logT(mod, fun, ``)
-  // logD(mod, fun, `dbMetadata: ${beautify(dbMetadata)}`)
+// // Parameter 'dbMetadata' gets mutated!
+// async function metadataCustomMerge(dbMetadata, dbReadyModMetadata) {
+//   const fun = 'metadataCustomMerge'
+//   logT(mod, fun, ``)
+//   // logD(mod, fun, `dbMetadata: ${beautify(dbMetadata)}`)
 
-  //   const dataDates = dbMetadata[API_DATA_DATES_PROPERTY]
-  //   const metaDates = dbMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY]
-  //  const modDataDates = dbReadyModMetadata[API_DATA_DATES_PROPERTY]
-  //   const modMetaDates = !dbReadyModMetadata[API_METAINFO_PROPERTY]
-  //     ? {}
-  //     : dbReadyModMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY]
+//   //   const dataDates = dbMetadata[API_DATA_DATES_PROPERTY]
+//   //   const metaDates = dbMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY]
+//   //  const modDataDates = dbReadyModMetadata[API_DATA_DATES_PROPERTY]
+//   //   const modMetaDates = !dbReadyModMetadata[API_METAINFO_PROPERTY]
+//   //     ? {}
+//   //     : dbReadyModMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY]
 
-  //   _.extend(dataDates, modDataDates)
-  //   _.extend(metaDates, modMetaDates)
+//   //   _.extend(dataDates, modDataDates)
+//   //   _.extend(metaDates, modMetaDates)
 
-  await mergeWith(dbMetadata, dbReadyModMetadata, customMerger)
+//   await mergeWith(dbMetadata, dbReadyModMetadata, customMerger)
 
-  // dbMetadata[API_DATA_DATES_PROPERTY] = dataDates
-  // dbMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY] = metaDates
+//   // dbMetadata[API_DATA_DATES_PROPERTY] = dataDates
+//   // dbMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY] = metaDates
 
-  // logD(mod, fun, `dbMetadata updated: ${beautify(dbMetadata)}`)
-  return dbMetadata
-}
+//   // logD(mod, fun, `dbMetadata updated: ${beautify(dbMetadata)}`)
+//   return dbMetadata
+// }
 
 // -------------------------------------------------------------------------------------------------
 // Atomic treatments of properties: DB -> RUDI
@@ -503,6 +511,10 @@ export const rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) 
     toMDBLanguage(dbReadyMetadata, API_DATA_DETAILS_PROPERTY)
     toMDBLanguage(dbReadyMetadata, API_DATA_DESCRIPTION_PROPERTY)
 
+    // Update API version
+    dbReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = API_VERSION
+
+    // Avoid dates manipulation
     stripTimestamps(dbReadyMetadata)
     // logD(mod, fun, `dbReadyMetadata: ${beautify(dbReadyMetadata, 2)}`)
     return dbReadyMetadata
@@ -635,6 +647,7 @@ export const upsertMetadata = async (rudiMetadata) => {
     throw RudiError.treatError(mod, fun, error)
   }
 }
+
 export const newMetadata = async (rudiMetadata) => {
   const fun = 'newMetadata'
   try {
@@ -644,43 +657,16 @@ export const newMetadata = async (rudiMetadata) => {
 
     // Special treatment!
     const dbReadyObject = await rudiToDbFormat(rudiMetadata, true)
-    // logD(mod, fun, `dbReadyObject: ${beautify(dbReadyObject)}`)
-
-    // Special update for metadataInfo.referenceDates: update 'Createddate'
-    const rudiId = dbReadyObject[API_METADATA_ID]
-    logI(mod, fun, `dbReadyObject: ${beautify(dbReadyObject[API_METADATA_ID])}`)
+    // logI(mod, fun, `dbReadyObject: ${beautify(dbReadyObject)}`)
     const dbMetadata = new Metadata(dbReadyObject)
-    // logV(mod, fun, `dbMetadata: ${beautify(dbMetadata[API_METADATA_ID])}`)
-    try {
-      await dbMetadata.save()
-    } catch (err) {
-      // const errMsg = `New object '${OBJ_METADATA}': ${rudiId} | Error: ${err}`
-      // const error = new Error(errMsg)
-      // logD(mod, fun, beautify(err))
-      throw RudiError.treatError(mod, fun, err)
-    }
-    // try {
-    //   await dbMetadata.save()
-    // } catch (err) {
-    //   // const errMsg = `Error while saving object '${OBJ_METADATA}' (${rudiId}): ${err}`
-    //   logD(mod, fun, beautify(err))
-    //   logD(mod, fun, beautify(err.name))
-    //   throw RudiError.treatError(mod, fun + ' save', err)
-    // if (err.name === 'ValidationError') throw new BadRequestError(err, mod, fun)
-    //   else throw RudiError.treatError(mod, fun + ' save', err)
-    // }
-    // logD(mod, fun, `dbMetadata: ${beautify(dbMetadata)}`)
+    const isMetadataSendable = await updateMetadataState(dbMetadata)
 
-    sendToPortal(dbMetadata)
-      .catch((err) => logE(mod, fun, `Sending to portal failed for metadata '${rudiId}': ${err}`))
-      .then((reply) =>
-        reply
-          ? logI(mod, fun, `Creation request received by the portal for metadata '${rudiId}'`)
-          : logD(mod, fun, `Not sending to portal: ${rudiId} (${dbMetadata[API_COLLECTION_TAG]})`)
-      )
+    await dbMetadata.save()
+    const finalMetadata = await getMetadataWithJson(dbMetadata)
+    logI(mod, fun, `finalMetadata: ${beautify(finalMetadata)}`)
+    if (isMetadataSendable) sendToPortal(finalMetadata)
 
-    return dbMetadata
-    // return dbMetadataToRudi(dbMetadata)
+    return finalMetadata
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -695,61 +681,99 @@ export const overwriteMetadata = async (incomingRudiMetadata) => {
     if (!incomingRudiMetadata) throw new ParameterExpectedError('incomingRudiMetadata', mod, fun)
     // logD(mod, fun, `edited metadata: ${beautify(incomingRudiMetadata)}\n`)
 
-    // ensure the metadata already exist
-    const rudiId = accessProperty(incomingRudiMetadata, API_METADATA_ID)
-    // logD(mod, fun, `incomingRudiMetadata: ${beautify(incomingRudiMetadata)}`)
-
     const dbReadyEditedMetadata = await rudiToDbFormat(incomingRudiMetadata, true)
-    // logD(mod, fun, `dbReadyEditedMetadata: ${beautify(dbReadyEditedMetadata)}`)
     const dbMetadata = await overwriteDbObject(OBJ_METADATA, dbReadyEditedMetadata)
-    // logD(mod, fun, `dbMetadata: ${beautify(dbMetadata)}`)
-    // const reply = await dbMetadata.save()
-    // logD(mod, fun, `reply: ${beautify(reply)}`)
-    // logD(mod, fun, `reply: ${beautify(reply.contacts[0])}`)
 
-    sendToPortal(dbMetadata)
-      .catch((err) => logE(mod, fun, `Sending to portal failed for metadata '${rudiId}': ${err}`))
-      .then((res) => {
-        if (res) logI(mod, fun, `'Update request received by the portal for metadata '${rudiId}'`)
-      })
+    const isMetadataSendable = await updateMetadataState(dbMetadata)
+    const reply = await dbMetadata.save()
+    const finalMetadata = await getMetadataWithJson(dbMetadata)
 
-    return dbMetadata
+    if (isMetadataSendable) sendToPortal(finalMetadata)
+
+    return finalMetadata
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
 }
 
-// parameter incomingRudiMetadata can be partial metadata
-// (obsolete)
-export const updateMetadata = async (incomingRudiMetadata) => {
-  const fun = 'updateMetadata'
+const updateMetadataState = async (dbMetadata, newState = StorageStatus.Online) => {
+  const fun = 'updateMetadataState'
   try {
     logT(mod, fun, ``)
+    const metadataMediaList = dbMetadata[API_MEDIA_PROPERTY]
 
-    if (!incomingRudiMetadata) throw new ParameterExpectedError('incomingRudiMetadata', mod, fun)
-    // logD(mod, fun, `edited metadata: ${beautify(incomingRudiMetadata)}\n`)
+    let areAllMediaAvailable = true
+    metadataMediaList.map((media) => {
+      const mediaStatus = media[API_FILE_STORAGE_STATUS]
+      if (
+        mediaStatus === MediaStorageStatus.Missing ||
+        mediaStatus === MediaStorageStatus.Nonexistant ||
+        mediaStatus === MediaStorageStatus.Removed
+      ) {
+        areAllMediaAvailable = false // 1 media is missing!
+      }
+    })
+    if (areAllMediaAvailable) {
+      dbMetadata[API_STORAGE_STATUS] = newState
+    } else {
+      dbMetadata[API_STORAGE_STATUS] = StorageStatus.Pending
+    }
+    await dbMetadata.save()
+    return areAllMediaAvailable // OK to send
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
 
-    // ensure the metadata already exist
-    const rudiId = accessProperty(incomingRudiMetadata, API_METADATA_ID)
-    // // let dbMetadata = await getEnsuredMetadataWithRudiId(rudiId) // No => no populate please !
-    const dbMetadata = await getEnsuredObjectWithRudiId(OBJ_METADATA, rudiId)
-    // logV(mod, fun, `corresponding db object: ${beautify(dbMetadata)}\n`)
+export const commitMedia = async (req, res) => {
+  const fun = 'commitMedia'
+  try {
+    logT(mod, fun, ``)
+    const mediaId = accessReqParam(req, PARAM_ID)
+    const { metadataId, commitId } = req.body
+    logD(mod, fun, `commitId: ${commitId}`)
 
-    const dbReadyEditedMetadata = await rudiToDbFormat(incomingRudiMetadata)
-    // logV(mod, fun, `dbReadyEditedMetadata: ${beautify(dbReadyEditedMetadata)}\n`)
+    // --- Checks
+    // Check mediaId exists
+    const dbMedia = await getObjectWithRudiId(OBJ_MEDIA, mediaId)
+    if (!dbMedia) throw new NotFoundError(`Media not found for id '${mediaId}'`)
+    // Check metadataId exists
+    const dbMetadata = await getObjectWithRudiId(OBJ_METADATA, metadataId)
+    if (!dbMetadata) throw new NotFoundError(`Metadata not found for id '${metadataId}'`)
+    // Check metadata is bound to media
+    const metadataMediaList = dbMetadata[API_MEDIA_PROPERTY]
+    const mediaIndex = metadataMediaList.findIndex((media) => mediaId === media[API_MEDIA_ID])
+    if (mediaIndex === -1)
+      throw new BadRequestError(`Media '${mediaId}' not linked to metadata '${metadataId}'`)
 
-    // Backing up existing dates ('dataset_dates' and 'metadata_info.meadatada_dates' properties)
+    // --- Updates
+    // Set media storage_status to 'available'
+    dbMedia[API_FILE_STORAGE_STATUS] = MediaStorageStatus.Available
+    // Set status_update date
+    dbMedia[API_FILE_STATUS_UPDATE] = nowISO()
 
-    await metadataCustomMerge(dbMetadata, dbReadyEditedMetadata)
-    // logD(mod, fun, `modified metadata: ${beautify(dbMetadata)}`)
+    await dbMedia.save()
 
-    const reply = await dbMetadata.save()
-    // logD(mod, fun, `metadata saved: ${beautify(reply)}`)
+    const isMetadataSendable = await updateMetadataState(dbMetadata)
+
+    const result = {
+      media: pick(dbMedia, [API_MEDIA_ID, API_FILE_STORAGE_STATUS, API_FILE_STATUS_UPDATE]),
+    }
+
+    // If other media are still waiting, we do not send the metadata
+    if (!isMetadataSendable) {
+      logD(mod, fun, `Media commit success: ${beautify(result)}`)
+      return res.code(200).send(result)
+    }
+
+    // All media are available! Let's send the metadata
+    logD(mod, fun, `Let's update the metadata`)
+
+    result.metadata = pick(dbMetadata, [API_METADATA_ID, API_STORAGE_STATUS])
+    logD(mod, fun, `Media commit success : ${beautify(result)}`)
+
     sendToPortal(dbMetadata)
-      .catch((err) => logE(mod, fun, `Sending to portal failed for metadata '${rudiId}': ${err}`))
-      .then(() => logI(mod, fun, `'Update request received by the portal for metadata '${rudiId}'`))
-
-    return reply
+    return res.code(200).send(result)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -800,22 +824,16 @@ export const sendManyMetadataToPortal = async (req) => {
   }
 }
 
-export const sendToPortal = async (metadata) => {
+export const sendToPortal = (metadata) => {
   const fun = 'sendToPortal'
   try {
-    if (isPortalConnectionDisabled()) return
-
-    // If 'collection_tag' property is set, we don't send the metadata to the Portal
-    const metadataId = metadata[API_METADATA_ID]
-    const collectionTag = metadata[API_COLLECTION_TAG]
-    if (collectionTag) {
-      logD(mod, fun, `Not sending to portal: ${metadataId} (${collectionTag})`)
-      // logD(mod, fun, beautify(metadata))
-      return
-    }
-
-    return await sendMetadataToPortal(metadataId)
-    logV(mod, fun, `Sent to portal: ${metadataId}`)
+    const metaId = metadata[API_METADATA_ID]
+    return sendMetadataToPortal(metaId)
+      .catch((err) => logE(mod, fun, `Sending to portal failed for metadata '${metaId}': ${err}`))
+      .then((res) => {
+        if (res) logI(mod, fun, `'Update request received by the portal for metadata '${metaId}'`)
+      })
+    // logV(mod, fun, `Sent request to portal: ${metaId}`)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -879,17 +897,8 @@ export const initWithODR = async (req, reply) => {
     // Themes.init('reset')
     // Keywords.init('reset')
 
-    await Promise.all(
-      initProd.map(async (prod) => {
-        if (!(await getOrganizationWithJson(prod))) await newOrganization(prod)
-      })
-    )
-
-    await Promise.all(
-      initCont.map(async (cont) => {
-        if (!(await getContactWithJson(cont))) await newContact(cont)
-      })
-    )
+    await Promise.all(initProd.map(async (prod) => newOrganization(prod)))
+    await Promise.all(initCont.map(async (cont) => newContact(cont)))
 
     Promise.all(
       initData.map(async (metadata) => {

@@ -107,7 +107,7 @@ export class Thesaurus {
     const fun = 'get'
     try {
       if (!this.#isInit) {
-        const errMsg = 'Init first'
+        const errMsg = `Init first Thesaurus '${this.#code}'`
         logW(mod, fun, errMsg)
         throw new MethodNotAllowedError(errMsg, mod, fun)
       }

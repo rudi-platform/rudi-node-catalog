@@ -124,20 +124,22 @@ export const makeSearchable = async (Model) => {
     try {
       collection = Model.collection
     } catch (err) {
-      logW(mod, fun, `No collection for '${Model.name}: ${err}`)
+      logW(mod, fun, `No collection for '${Model.name}': ${err}`)
       return
     }
     if (!collection) {
-      logW(mod, fun, `No collection for '${Model.name}`)
+      logW(mod, fun, `No collection for '${Model.name}'`)
       return
     }
+
     let searchableFields
     try {
       searchableFields = Model.getSearchableFields()
-      if (!searchableFields) throw Error()
+      if (!searchableFields)
+        throw Error(`Can't find any searchable field for Model '${collection.name}'`)
     } catch (err) {
       // => searchableFields is undefined or method Model.getSearchableFields() doesn't exist
-      logD(mod, fun, `No searchable fields for '${collection.name}`)
+      logD(mod, fun, `No searchable fields for '${collection.name}'`)
       return
     }
 
@@ -145,10 +147,10 @@ export const makeSearchable = async (Model) => {
 
     // Dropping current text indexes if they exist
     try {
-      const indexes = collection.getIndexes()
+      const indexes = await collection.getIndexes()
       if (!!indexes[SEARCH_INDEX]) {
-        const val = indexes[SEARCH_INDEX]
-        logD(mod, fun, `Search already exists: ${collection.name} - ${val}`)
+        // const val = indexes[SEARCH_INDEX]
+        logD(mod, fun, `Search indexes already exist: ${collection.name}`)
         // logT(mod, fun, `Dropping search indexes for '${collection.name}'`)
         // await collection.dropIndex(SEARCH_INDEX)
       }
@@ -171,21 +173,24 @@ export const makeSearchable = async (Model) => {
 
     // (Re)creating the indexes
     // logT(mod, fun, `Creating search indexes for collection '${collection.name}'}`)
-    return collection
-      .createIndex(searchIndexes, indexOpts)
-      .catch((err) => {
-        logW(mod, fun, `Indexes not created for '${Model.collection.name}': ${err}`)
-        throw RudiError.treatError(mod, fun, err)
-      })
-      .then(
-        logT(
-          mod,
-          fun,
-          `Created ${collection.name} indexes: ${
-            (await collection.getIndexes())[SEARCH_INDEX] ? 'ok' : 'KO!!'
-          }`
-        )
-      )
+    try {
+      try {
+        await collection.createIndex(searchIndexes, indexOpts)
+      } catch (e) {
+        logT(mod, fun, `Need for droping ${collection.name} indexes`)
+        await collection.dropIndex(SEARCH_INDEX)
+        await collection.createIndex(searchIndexes, indexOpts)
+      }
+      const indexes = await collection.getIndexes()
+      const msg = `Indexes creation for ${collection.name}: ${
+        indexes[SEARCH_INDEX] ? 'ok' : 'KO!!'
+      }`
+      logT(mod, fun, msg)
+    } catch (e) {
+      logW(mod, fun, `Indexes not created for '${Model.collection.name}': ${e}`)
+      throw RudiError.treatError(mod, fun, e)
+    }
+    return `${collection.name} indexes created`
   } catch (err) {
     logW(mod, fun, `Couldn't create indexes for '${Model.collection.name}': ${err}`)
     throw RudiError.treatError(mod, fun, err)

@@ -10,7 +10,12 @@ import { BadRequestError, RudiError } from '../../utils/errors.js'
 // -------------------------------------------------------------------------------------------------
 // Custom schema definition
 // -------------------------------------------------------------------------------------------------
-const StorageStatus = ['online', 'archived', 'unavailable']
+export const StorageStatus = {
+  Pending: 'pending',
+  Online: 'online',
+  Archived: 'archived',
+  Unavailable: 'unavailable',
+}
 
 // -------------------------------------------------------------------------------------------------
 // Getter / setter
@@ -21,9 +26,7 @@ export const initialize = (arg) => {
   if (arg) Thesaurus = []
 }
 
-export const get = (lang) => {
-  return lang ? Thesaurus[lang] : Thesaurus
-}
+export const get = () => Object.values(StorageStatus)
 
 export const set = (newValue) => {
   const fun = 'set'
@@ -46,7 +49,7 @@ export const isValid = (value, shouldInit) => {
     logW(mod, fun, parameterExpected(fun, 'value'))
     return false
   }
-  const isIn = Thesaurus.indexOf(value) > -1
+  const isIn = get().indexOf(value) > -1
   if (!isIn && shouldInit) {
     this.set(value)
     return true

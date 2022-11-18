@@ -19,6 +19,7 @@ import { beautify } from '../utils/jsUtils.js'
 // -------------------------------------------------------------------------------------------------
 import { Organization } from '../definitions/models/Organization.js'
 import { RudiError } from '../utils/errors.js'
+import { getOrganizationWithJson } from '../db/dbQueries.js'
 // import cache from '../db/dbCache'
 
 // -------------------------------------------------------------------------------------------------
@@ -27,15 +28,14 @@ import { RudiError } from '../utils/errors.js'
 export const newOrganization = async (orgJson) => {
   const fun = 'newOrganization'
   logT(mod, fun, beautify(orgJson))
-
-  let dbOrganization
-
   try {
-    dbOrganization = new Organization(orgJson)
+    const org = await getOrganizationWithJson(orgJson)
+    if (!!org) return org
+
+    const dbOrganization = new Organization(orgJson)
     await dbOrganization.save()
-    // cache.addOrganization(dbOrganization)
+    return dbOrganization
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
-  return dbOrganization
 }

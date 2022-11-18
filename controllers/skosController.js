@@ -85,7 +85,7 @@ import { get as getStorageStatus } from '../definitions/thesaurus/StorageStatus.
 // -------------------------------------------------------------------------------------------------
 // Controllers
 // -------------------------------------------------------------------------------------------------
-import { getAllLicenceCodes } from './licenceController.js'
+import { getLicenceCodes } from './licenceController.js'
 
 // -------------------------------------------------------------------------------------------------
 // Data models
@@ -125,7 +125,7 @@ export const newSkosScheme = async (rudiScheme) => {
       dbScheme[API_SCHEME_TOPS_PROPERTY] = await createConceptHierarchy(topConcepts, schemeDbId)
     }
     // TODO: reinforce the associations between concepts through siblings/relative properties
-    dbScheme.save()
+    await dbScheme.save()
 
     return await dbSchemeToRudi(dbScheme)
   } catch (err) {
@@ -481,7 +481,7 @@ export const getThesaurusList = async (lang) => {
   try {
     const keywords = await Keywords.get(lang)
     const themes = await Themes.get(lang)
-    const licences = await await getAllLicenceCodes()
+    const licences = await getLicenceCodes()
 
     const thesauri = {
       encodings: getEncodings(),
@@ -510,7 +510,7 @@ export const getThesaurus = async (thesaurusCode) => {
 
     if (code === 'keywords') return await Keywords.get()
     if (code === 'themes') return await Themes.get()
-    if (code === 'licences') return await getAllLicenceCodes()
+    if (code === 'licences') return await getLicenceCodes()
 
     switch (code) {
       case 'encodings':
@@ -541,7 +541,7 @@ export const getThesaurusLabel = async (thesaurusCode, lang) => {
     if (code === 'themes') return await Themes.getLabels(lang)
 
     if (code === 'keywords') return await Keywords.get()
-    if (code === 'licences') return await getAllLicenceCodes()
+    if (code === 'licences') return await getLicenceCodes()
 
     switch (code) {
       case 'encodings':

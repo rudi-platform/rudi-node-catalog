@@ -3,14 +3,18 @@ const mod = 'jwtCtrl'
 // -------------------------------------------------------------------------------------------------
 // External dependencies
 // -------------------------------------------------------------------------------------------------
-import { readFileSync } from 'fs'
-import { parseKey } from 'sshpk'
+import {
+  extractJwt,
+  readPublicKeyFile,
+  tokenStringToJwtObject,
+  verifyToken,
+} from '@aqmo.org/jwt_lib'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 
-import { decodeBase64url, nowEpochS, nowISO, dateEpochSToIso } from '../utils/jsUtils.js'
+import { decodeBase64url } from '../utils/jsUtils.js'
 import { accessProperty } from '../utils/jsonAccess.js'
 
 import { logT } from '../utils/logging.js'
@@ -25,15 +29,7 @@ const PUB_KEY = 'pub_key'
 const SUB_ACL = 'routes'
 const REQ_ROUTE_ALL = 'all'
 
-import {
-  extractJwt,
-  JWT_ALG,
-  JWT_EXP,
-  JWT_SUB,
-  JWT_CLIENT,
-  REQ_MTD,
-  REQ_URL,
-} from '../utils/crypto.js'
+import { JWT_SUB, JWT_CLIENT, REQ_MTD, REQ_URL } from '../utils/crypto.js'
 import { ROUTE_NAME } from '../config/confApi.js'
 // -------------------------------------------------------------------------------------------------
 // Controllers
@@ -109,20 +105,22 @@ export const checkRudiProdPermission = async (req, isCheckOptional) => {
   try {
     let token
     try {
+      // logI(mod, fun, `req: ${beautify(req.headers?.authorization)}`)
       token = extractJwt(req)
     } catch (err) {
+      // logE(mod, fun, `err: ${err}`)
       if (isCheckOptional) throw err
-      const error = new UnauthorizedError(err)
+      const error = new UnauthorizedError(err.message)
       throw RudiError.treatError(mod, fun, error)
     }
-
     // logD(mod, fun, `token: ${token}`)
     const { subject, clientId } = await verifyRudiProdToken(token, req.method, req.url)
     // logD(mod, fun, `subject: ${subject}, clientId: ${clientId}`)
 
     // Check the ACL (= does the subject have permission to enter this route?)
     // logD(mod, fun, `req: ${beautify(req.context.config[ROUTE_NAME])}`)
-    const reqRouteName = accessProperty(req.context.config, ROUTE_NAME)
+
+    const reqRouteName = accessProperty(req.routeConfig, ROUTE_NAME)
     checkSubjPermission(subject, reqRouteName)
     return { subject, clientId }
     // return 'ok'
@@ -144,85 +142,56 @@ function checkSubjPermission(subject, reqRouteName) {
   return true
 }
 
+const CACHED_PUB_KEYS = {}
+const getPubKey = (subject) => {
+  const fun = 'getPubKey'
+  try {
+    const subjProfile = getProfile(subject)
+    // logD(mod, fun + ' profile:', beautify(subjProfile))
+    const keyFile = subjProfile[PUB_KEY]
+    if (!keyFile)
+      throw new ForbiddenError(`Wrong configuration, public key path not found for '${subject}'`)
+
+    if (!CACHED_PUB_KEYS[subject]) CACHED_PUB_KEYS[subject] = readPublicKeyFile(keyFile)
+    return CACHED_PUB_KEYS[subject]
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
 export const verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
   const fun = 'verifyRudiProdToken'
-  // logD(mod, fun, `token: ${token}`)
-
   try {
-    const [jwtHeaderBase64url, jwtPayloadBase64url, jwtSignatureBase64url] = token.split('.')
-    // logD(mod, fun, `JWT header b64: ${jwtHeaderBase64url}`)
+    // logD(mod, fun, ``)
 
-    // Identify the signature hash algorithm from the JWT header alg property
-    const jwtHeader = JSON.parse(decodeBase64url(jwtHeaderBase64url))
-    // logD(mod, fun, `JWT algo: ${jwtHeader.alg}`)
-    const hashAlgo = getHashAlgo(jwtHeader[JWT_ALG])
-    // logD(mod, fun, `hash algo: ${hashAlgo}`)
+    // Retrieve the public key
+    const { payload } = tokenStringToJwtObject(token)
+    // logD(mod, fun, beautify(payload))
 
-    // Check if the token is still valid
-
-    const jwtPayload = JSON.parse(decodeBase64url(jwtPayloadBase64url))
-    const jwtExp = accessProperty(jwtPayload, JWT_EXP)
-    // logD(mod, fun, `jwtPayload: ${beautify(jwtPayload)}`)
-
-    if (nowEpochS() > jwtExp)
-      throw new ForbiddenError(
-        `JWT expired: JWT expires after ${dateEpochSToIso(jwtExp)} (now is ${nowISO()})`
-      )
+    const subject = accessProperty(payload, JWT_SUB)
+    const pubKey = getPubKey(subject)
+    // logV(mod, fun + ' pubKey:', pubKey)
+    try {
+      verifyToken(pubKey, token)
+    } catch (e) {
+      throw new ForbiddenError(e.message)
+    }
 
     // Check the current route
-    const jwtMtd = accessProperty(jwtPayload, REQ_MTD)
+    const jwtMtd = accessProperty(payload, REQ_MTD)
     if (jwtMtd !== reqMethod && jwtMtd !== REQ_ROUTE_ALL)
       throw new ForbiddenError(
         `The http request method '${reqMethod}' doesn't match what has been declared in the JWT: '${jwtMtd}'`
       )
-    const jwtUrl = accessProperty(jwtPayload, REQ_URL)
+    const jwtUrl = accessProperty(payload, REQ_URL)
     if (jwtUrl !== reqUrl && jwtUrl !== REQ_ROUTE_ALL)
       throw new ForbiddenError(
         `The request URL '${reqUrl}' doesn't match what has been declared in the JWT: '${jwtUrl}'`
       )
 
     // Identify the subject (= caller/requester)
-    const subject = accessProperty(jwtPayload, JWT_SUB)
-    const clientId = jwtPayload[JWT_CLIENT]
+    const clientId = payload[JWT_CLIENT]
 
-    // Retrieve the public key
-    // logD(mod, fun, `Retrieve the public key for '${subject}'`)
-
-    const subjProfile = getProfile(subject)
-    if (!subjProfile)
-      throw new ForbiddenError(`No profile was found for this subject: '${subject}'`)
-
-    let keyFile
-    try {
-      keyFile = accessProperty(subjProfile, PUB_KEY)
-    } catch (err) {
-      throw new Error(`Wrong configuration, public key path not found for '${subject}': ${err}`)
-    }
-    let pubKeyPem
-    try {
-      pubKeyPem = readFileSync(keyFile, 'ascii')
-    } catch (err) {
-      throw new Error(`Wrong configuration, public key cannot be read at '${keyFile}': ${err}`)
-    }
-    let sshKey
-    try {
-      sshKey = parseKey(pubKeyPem)
-    } catch (err) {
-      throw new Error(`Wrong configuration, public key cannot be parsed from '${keyFile}': ${err}`)
-    }
-    // logD(mod, fun, `sslKey: ${beautify(sslKey)}`)
-
-    // Check the signature
-    // logD(mod, fun, `Check the signature: ${beautify(sslKey)}`)
-
-    const verifier = sshKey.createVerify(hashAlgo)
-    verifier.update(`${jwtHeaderBase64url}.${jwtPayloadBase64url}`)
-    const signatureIsValid = verifier.verify(jwtSignatureBase64url, 'base64url')
-    if (!signatureIsValid) throw new ForbiddenError('Signature is not valid')
-    // Check the ACL (= does the subject have permission to enter this route?)
-    // const subjAcl = accessProperty(subjProfile, SUB_ACL)
-
-    // logD(mod, fun, `subject: ${subject}, clientId: ${clientId}`)
     return { subject, clientId }
   } catch (err) {
     // logW(mod, fun, err)

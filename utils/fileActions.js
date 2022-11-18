@@ -9,7 +9,7 @@ import { parse } from 'ini'
 // -------------------------------------------------------------------------------------------------
 // Internal dependecies
 // -------------------------------------------------------------------------------------------------
-import { consoleErr } from './jsUtils.js'
+import { consoleErr, consoleLog } from './jsUtils.js'
 
 // -------------------------------------------------------------------------------------------------
 // Functions
@@ -19,8 +19,10 @@ import { consoleErr } from './jsUtils.js'
 export const readIniFile = (confFile) => {
   const fun = 'readIniFile'
   try {
+    consoleLog(mod, fun, confFile)
     const fileContent = readFileSync(`${confFile}`, 'utf-8')
-    return parse(fileContent)
+    const conf = JSON.parse(JSON.stringify(parse(fileContent)))
+    return conf
   } catch (err) {
     consoleErr(mod, fun, `Couldn't read file '${confFile}': ${err}`)
     throw new Error(`Couldn't read file '${confFile}': ${err}`)

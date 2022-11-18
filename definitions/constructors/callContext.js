@@ -9,7 +9,7 @@ import { nanoid } from 'nanoid'
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { isNotEmptyArray, beautify, dateEpochMsToIso } from '../../utils/jsUtils.js'
-import { logD, logI, logT, logW, sysInfo, sysOnError } from '../../utils/logging.js'
+import { logD, logI, logT, logV, logW, sysInfo, sysOnError } from '../../utils/logging.js'
 import { RudiError } from '../../utils/errors.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -290,7 +290,7 @@ export const CallContext = class CallContext {
 
       if (!this.getError()) this.addError(ctxMod, ctxFun, err)
       const error = this.getError()
-      // logD(mod, fun, beautify(errôor))
+      logV(mod, fun, beautify(error))
       const primeError = error.primeError || error
 
       const errMsg = `Error ${error.statusCode} (${error.name}): ${error.message}`
@@ -443,7 +443,7 @@ export const CallContext = class CallContext {
       if (!context) {
         if (ACTIVATE_LOG) logT(mod, fun, 'No context set yet')
         return (
-          `${req.method} ${req.url} (${req.context.config[ROUTE_NAME]})` +
+          `${req.method} ${req.url} (${req.routeConfig[ROUTE_NAME]})` +
           ` <- ${CallContext.createIpsMsg(req)}`
         )
       } else {

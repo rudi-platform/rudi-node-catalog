@@ -141,6 +141,7 @@ export const parseQueryParameters = async (objectType, fullUrl) => {
     //  logD(mod, fun, `urlSearchParams: ${urlSearchParams}`)
 
     for (const [key, value] of urlParams) {
+      if (!key) break
       if (QUERY_RESERVED_WORDS.includes(key)) {
         // logD(mod, fun, `Key is a reserved word: ${beautify(key)} => ${beautify(queryParameters[key])}`)
         switch (key) {

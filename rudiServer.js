@@ -125,14 +125,29 @@ const start = async () => {
     declareRoutes()
 
     separateLogs('Models', true) /////////////////////////////////////////////////////////////
-    await Promise.all(
-      [LogEntry, Contact, Organization, Media, Metadata, Keywords, Themes].map((model) =>
-        model
-          .initialize()
-          .catch((err) => logE(mod, fun, err))
-          .then(logT(mod, fun, `Indexes created`))
+    try {
+      await Promise.all(
+        [LogEntry, Contact, Organization, Media, Metadata].map(
+          (model) =>
+            new Promise((resolve, reject) => {
+              model
+                .initialize()
+                .catch((err) => {
+                  logE(mod, `Init model ${model?.collection?.name}`, err)
+                  reject(err)
+                })
+                .then((res) => {
+                  logT(mod, `Init model ${model?.collection?.name}`, res)
+                  resolve(res)
+                })
+            })
+        )
       )
-    )
+    } catch (e) {
+      throw new Error(`Model index initialization failed: ${e}`)
+    }
+    await Keywords.initialize()
+    await Themes.initialize()
     await getLicenceCodes()
 
     const appVer = getAppHash()

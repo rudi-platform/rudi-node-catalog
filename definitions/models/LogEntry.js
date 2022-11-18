@@ -30,7 +30,7 @@ import { VALID_UUID, VALID_EPOCH_MS } from '../schemaValidators.js'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { LOG_DATE_FORMAT, consoleErr, consoleLog } from '../../utils/jsUtils.js'
+import { LOG_DATE_FORMAT, consoleErr } from '../../utils/jsUtils.js'
 import { LOG_EXP } from '../../config/confLogs.js'
 
 // const dayS = 60 * 60 * 24
@@ -173,8 +173,7 @@ LogEntry.initialize = async () => {
     )
     // (Re)creating the indexes
     await collection.createIndex(searchIndexes, indexOpts)
-
-    consoleLog(mod, fun, `Indexes created`)
+    return `LogEntry indexes created`
   } catch (err) {
     consoleErr(mod, fun, err)
   }

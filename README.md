@@ -171,6 +171,33 @@ curl -X $MTD -H "Authorization: Bearer $JWT" ${NODE}${URL}
 
 ---
 
+## Commit process
+
+Two commit processes types are ongoing parallely:
+
+1. MediaFile
+   Each MediaFile get uploaded to the Media module: the upload status determines if the MediaFile status is set to commited.
+   More technically speaking, in case of success
+
+   - `available_formats[i].file_storage_status` is set to `available`
+   - `available_formats[i].file_status_update` is updated
+
+2. Metadata
+   If all the media were set as available, the metadata is sent to the portal and its status set to `pending`.
+   If at least one upload fails to be committed, the metadata is set as `unavailable` and the user has to re-upload
+   the file for the status to be updated anew.
+
+## Verification process
+
+Each MediaFile will be periodically checked.
+
+If the file is found, the field `available_formats[i].media_dates.verified` is updated.
+If `available_formats[i].storage_status` was set to `nonexistant` or `missing`, it is set to `available` and `available_formats[i].status_update` date is updated.
+
+If the file is not found and `available_formats[i].storage_status === 'available'`, then `available_formats[i].storage_status` is set to `missing` and `available_formats[i].status_update` date is updated.
+
+---
+
 ## Test files
 
 In `tests/env-rudi-*.postman_environment.json` the value for the key `cryptoJwtUrl` should be replaced with the valid address of the client/crypto module. See [Tests documentation.md](tests/Tests_documentation.md) for further details

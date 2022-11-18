@@ -77,6 +77,7 @@ export const MAX_QUERY_LIMIT = 500
 // REQ URL
 // -------------------------------------------------------------------------------------------------
 export const URL_PREFIX_PUBLIC = '/api/v1'
+export const URL_PREFIX_PRIVATE = '/api/admin'
 
 // This generic URL will be used to factorize the treatments on resources, organizations, contacts, etc.
 export const URL_PUB_METADATA = `${URL_PREFIX_PUBLIC}/${OBJ_METADATA}`
@@ -90,6 +91,7 @@ export const ACT_REPORT = 'report'
 export const ACT_SEARCH = 'search'
 export const ACT_EXT_SEARCH = 'ext_search'
 export const ACT_SEND = 'send'
+export const ACT_COMMIT = 'commit'
 
 export const ACT_CHECK = 'check'
 
@@ -117,8 +119,6 @@ export const URL_OBJECTS = [
   OBJ_REPORTS,
   OBJ_LOGS,
 ]
-
-export const URL_PREFIX_PRIVATE = '/api/admin'
 
 export const URL_SUFFIX_PORTAL = 'portal'
 export const URL_SUFFIX_NODE = 'node'

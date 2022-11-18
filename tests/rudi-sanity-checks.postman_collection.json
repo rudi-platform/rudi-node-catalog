@@ -16,10 +16,12 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"//const token = pm.collectionVariables.get('pm_jwt');",
-									"pm.collectionVariables.set('dateUpdate',time.now())",
-									"",
-									""
+									"const cacheKeys = ['stamp', pm.variables.get('apiTokenName'), pm.variables.get('portalTokenName')]",
+									"const cache = {}",
+									"cacheKeys.map(key => { cache[key] = pm.collectionVariables.get(key) })",
+									"pm.collectionVariables.clear()",
+									"for (const key in cache) pm.collectionVariables.set(key, cache[key])",
+									"pm.collectionVariables.set('dateUpdate', time.now())"
 								],
 								"type": "text/javascript"
 							}
@@ -129,6 +131,27 @@
 						}
 					},
 					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"time.wait(2000, () => console.info('Tokens pre-request timer'))",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
 				}
 			]
 		},
@@ -6303,11 +6326,22 @@
 					"const TRACE = false",
 					"const DEBUG = false",
 					"",
+					"const WAIT_TIME = 50",
 					"const TOKEN_DURATION_S = 1200",
+					"",
+					"",
+					"log = {",
+					"    d: (msg) => { if (DEBUG || TRACE) console.log(msg) },",
+					"    t: (msg) => { if (TRACE) console.log(msg) }",
+					"}",
 					"",
 					"const initStoredVar = (name, defaultVal) => {",
 					"    const storedVal = pm.variables.get(name)",
-					"    if (!storedVal) pm.variables.set(name, defaultVal)",
+					"    if (!storedVal) {",
+					"        log.t('[initStoredVar] no value stored for ' + name)",
+					"        pm.variables.set(name, defaultVal)",
+					"    }",
+					"    // log.t('[initStoredVar] val for ' + name + ' is: ' + storedVal || defaultVal)",
 					"    return storedVal || defaultVal",
 					"}",
 					"",
@@ -6316,15 +6350,25 @@
 					"",
 					"const ADMIN_URL = pm.variables.get('apiUrl') + '/api/admin'",
 					"",
-					"log = {",
-					"    d: (msg) => { if (DEBUG || TRACE) console.log(msg) },",
-					"    t: (msg) => { if (TRACE) console.log(msg) }",
-					"}",
 					"",
 					"log.t('API_TOKEN_NAME: ' + API_TOKEN_NAME)",
 					"log.t('PORTAL_TOKEN_NAME: ' + PORTAL_TOKEN_NAME)",
 					"log.t('ADMIN_URL: ' + ADMIN_URL)",
 					"",
+					"const REGEX_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i",
+					"const REGEX_JWT = /^[\\w-]+\\.[\\w-]+\\.([\\w-]+={0,3})$/",
+					"const REGEX_API_VERSION = /^[0-9]+\\.[0-9]+(\\.[0-9]+)?[a-z]*$/",
+					"const REGEX_URI = /^(https?|ftp):\\/\\/([\\w-]+(\\.[\\w-]+)+|(:[0-9]+)?)([\\w.,@?^=%&amp;:\\/~+#-]*[\\w@?^=%&amp;\\/~+#-])?$/",
+					"const REGEX_GIT_HASH_SHORT = /^[a-z0-9]{7}/",
+					"",
+					"const regexCheck = (regex, str) => str ? regex.exec(`${str}`) : regex",
+					"match = {",
+					"    uuid: (str) => regexCheck(REGEX_UUID, str),",
+					"    jwt: (str) => regexCheck(REGEX_JWT, str),",
+					"    version: (str) => regexCheck(REGEX_API_VERSION, str),",
+					"    uri: (str) => regexCheck(REGEX_URI, str),",
+					"    gitHash: (str) => regexCheck(REGEX_GIT_HASH_SHORT, str),",
+					"}",
 					"",
 					"error = {",
 					"    throwNotFound: (msg) => { throw { statusCode: 404, name: 'NotFound', message: msg } }",
@@ -6332,9 +6376,13 @@
 					"",
 					"time = {",
 					"    now: () => new Date().toISOString(),",
+					"    nowEpochMS: () => new Date().getTime(),",
 					"    nowEpochS: () => _.floor(new Date().getTime() / 1000),",
 					"    timezone: () => new Date().getTimezoneOffset(),",
-					"    wait: (delayMs) => setTimeout(function () { }, [delayMs]),",
+					"    wait: (delayMs, doSomething) => {",
+					"        log.d(`Waiting ${delayMs / 1000}s...`)",
+					"        setTimeout(doSomething ? doSomething : () => { log.d(`Waited ${delayMs / 1000}s`) }, delayMs)",
+					"    },",
 					"}",
 					"codec = {",
 					"    streamToString: (data) => data?.stream?.toString('utf8'),",
@@ -6355,9 +6403,7 @@
 					"            .replace(\"-\", \"+\");",
 					"        // log.d('base64Str: ' + base64Str)",
 					"        return codec.fromBase64(base64Str);",
-					"    },",
-					"",
-					"    streamToUtf8: (data) => data?.stream?.toString('utf8')",
+					"    }",
 					"}",
 					"",
 					"rand = {",
@@ -6372,8 +6418,8 @@
 					"    initVal: (field) => {",
 					"        const val = pm.collectionVariables.get(field);",
 					"        if (val) return val;",
-					"        const randVal = rand.get('{{$randomUUID}}');",
-					"        pm.collectionVariables.set(field, randVal);",
+					"        const randVal = rand.uuid();",
+					"        pm.collectionVariables.set(field, randVal, 'string');",
 					"        return randVal;",
 					"    },",
 					"",
@@ -6393,7 +6439,6 @@
 					"};",
 					"",
 					"secu = {",
-					"",
 					"    isTokenValid: (tokenName) => {",
 					"        log.t('-- is ' + tokenName + ' Valid --')",
 					"        const token = pm.collectionVariables.get(tokenName)",
@@ -6418,7 +6463,7 @@
 					"        return isValid",
 					"    },",
 					"",
-					"    renewApiToken: async (tokenName, next) => {",
+					"    renewApiToken: (tokenName, next) => {",
 					"        log.t('-- renewApiToken --')",
 					"        const reqUrl = pm.variables.get('cryptoJwtUrl') + '/forge'",
 					"        // log.d('reqUrl: ' + reqUrl)",
@@ -6438,29 +6483,33 @@
 					"                })",
 					"            }",
 					"        }",
-					"        pm.sendRequest(reqNewToken, (err, res) => {",
-					"            if (err) {",
-					"                log.d(`[renewApiToken] Error: 'Crypto' module unreachable on ${reqUrl}`)",
-					"                error.throwNotFound(`Crypto module unreachable on ${reqUrl}`)",
-					"            }",
-					"            const token = codec.streamToUtf8(res)",
-					"            // log.d('rudiProdToken : ' + token)",
-					"            try {",
-					"                pm.expect(res).to.have.property('code', 200);",
-					"            } catch (err) {",
-					"                console.error('[renewApiToken]: ' + err)",
-					"                throw new Error('[renewApiToken]: ' + err)",
-					"            }",
-					"            pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
-					"            pm.collectionVariables.set(tokenName, token)",
-					"            log.d('API token stored')",
+					"        return new Promise((resolve, reject) => {",
+					"            pm.sendRequest(reqNewToken, (err, res) => {",
+					"                if (err || res.code > 399 || res.statusCode > 399) {",
+					"                    log.d(`[renewApiToken] Error: 'Crypto' module unreachable on ${reqUrl}`)",
+					"                    return reject(`Crypto module unreachable on ${reqUrl}`)",
+					"                    // error.throwNotFound(`Crypto module unreachable on ${reqUrl}`)",
+					"                }",
+					"                const token = codec.streamToString(res)",
+					"                // log.d('rudiProdToken : ' + token)",
+					"                try {",
+					"                    pm.expect(res).to.have.property('code', 200);",
+					"                    pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
+					"                } catch (err) {",
+					"                    console.error('[renewApiToken]: ' + err)",
+					"                    return reject('[renewApiToken]: ' + err)",
+					"                    // throw new Error('[renewApiToken]: ' + err)",
+					"                }",
+					"                pm.collectionVariables.set(tokenName, token)",
+					"                log.d('API token stored')",
 					"",
-					"            if (next) next(token)",
-					"            //return token",
+					"                if (next) return resolve(next(token))",
+					"                return resolve(token)",
+					"            })",
 					"        })",
 					"    },",
 					"",
-					"    renewPortalToken: async (tokenName, rudiProdToken) => {",
+					"    renewPortalToken: (tokenName, rudiProdToken) => {",
 					"        log.t('-- renewPortalToken --')",
 					"        const reqUrl = ADMIN_URL + '/portal/token'",
 					"        // log.d('reqUrl: ' + reqUrl)",
@@ -6472,28 +6521,37 @@
 					"                'Authorization': 'Bearer ' + rudiProdToken",
 					"            },",
 					"        }",
-					"        pm.sendRequest(reqNewToken, (err, res) => {",
-					"            if (err) {",
-					"                log.d(`[renewPortalToken] Error: RUDI API unreachable on ${reqUrl}`)",
-					"                error.throwNotFound(`RUDI API unreachable on ${reqUrl}`)",
-					"            }",
-					"            try {",
-					"                pm.expect(res).to.have.property('code', 200);",
-					"            } catch (error) {",
-					"                log.d('[renewPortalToken] Error: ' + codec.streamToString(res))",
-					"                //log.d('[renewPortalToken] Response to Postman req: ' + codec.streamToString(res))",
-					"                return new Error('[renewPortalToken]: ' + codec.streamToString(res))",
-					"                throw new Error('[renewPortalToken]: ' + codec.streamToString(res))",
-					"            }",
-					"            //log.d('renewPortalToken res: ' + JSON.stringify(res))",
-					"            const token = JSON.parse(codec.streamToUtf8(res)).access_token",
-					"            //const token = res.json()",
-					"            log.d('Portal token: ' + token)",
+					"        return new Promise((resolve, reject) => {",
+					"            pm.sendRequest(reqNewToken, (err, res) => {",
+					"                if (err) {",
+					"                    log.d(`[renewPortalToken] Error: RUDI API unreachable on ${reqUrl}`)",
+					"                    // error.throwNotFound(`RUDI API unreachable on ${reqUrl}`)",
+					"                    return reject(`RUDI API unreachable on ${reqUrl}`)",
+					"                }",
+					"                try {",
+					"                    pm.expect(res).to.have.property('code', 200);",
+					"                } catch (error) {",
+					"                    log.d('[renewPortalToken] Error: ' + codec.streamToString(res))",
+					"                    //log.d('[renewPortalToken] Response to Postman req: ' + codec.streamToString(res))",
+					"                    return reject('[renewPortalToken]: ' + codec.streamToString(res))",
+					"                    // throw new Error('[renewPortalToken]: ' + codec.streamToString(res))",
+					"                }",
+					"                //log.d('renewPortalToken res: ' + JSON.stringify(res))",
+					"                const token = JSON.parse(codec.streamToString(res))?.access_token",
+					"                log.d('Portal token: ' + token)",
+					"                try {",
+					"                    pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
+					"                } catch (error) {",
+					"                    log.d('[renewPortalToken] Error: ' + codec.streamToString(res))",
+					"                    //log.d('[renewPortalToken] Response to Postman req: ' + codec.streamToString(res))",
+					"                    return reject('[renewPortalToken]: ' + codec.streamToString(res))",
+					"                    // throw new Error('[renewPortalToken]: ' + codec.streamToString(res))",
+					"                }",
 					"",
-					"            pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
-					"            pm.collectionVariables.set(tokenName, token)",
-					"            log.d('Portal token stored')",
-					"",
+					"                pm.collectionVariables.set(tokenName, token)",
+					"                log.d('Portal token stored')",
+					"                return resolve(token)",
+					"            })",
 					"        })",
 					"    },",
 					"",
@@ -6516,7 +6574,8 @@
 					"",
 					"}",
 					"",
-					"secu.getRudiProdToken(secu.getPortalToken)",
+					"secu.getRudiProdToken(secu.getPortalToken).then(res => log.d('[End] Received ' + res))",
+					"time.wait(WAIT_TIME, () => { if (TRACE) console.info('Pre-request Scripts loaded') })",
 					""
 				]
 			}
@@ -6537,18 +6596,6 @@
 			"value": "sanity-checks"
 		},
 		{
-			"key": "apiToken",
-			"value": ""
-		},
-		{
-			"key": "dateUpdate",
-			"value": ""
-		},
-		{
-			"key": "pm_jwt",
-			"value": ""
-		},
-		{
 			"key": "apiJwt",
 			"value": ""
 		},
@@ -6557,91 +6604,7 @@
 			"value": ""
 		},
 		{
-			"key": "gitHash",
-			"value": ""
-		},
-		{
-			"key": "apiVersion",
-			"value": ""
-		},
-		{
-			"key": "metaId1",
-			"value": ""
-		},
-		{
-			"key": "metaId2",
-			"value": ""
-		},
-		{
-			"key": "orgId1",
-			"value": ""
-		},
-		{
-			"key": "orgId2",
-			"value": ""
-		},
-		{
-			"key": "contId1",
-			"value": ""
-		},
-		{
-			"key": "contId2",
-			"value": ""
-		},
-		{
-			"key": "contId3",
-			"value": ""
-		},
-		{
-			"key": "reportId1",
-			"value": ""
-		},
-		{
-			"key": "reportId2",
-			"value": ""
-		},
-		{
-			"key": "mediaId1",
-			"value": ""
-		},
-		{
-			"key": "mediaId2",
-			"value": ""
-		},
-		{
-			"key": "keywords",
-			"value": ""
-		},
-		{
-			"key": "themes",
-			"value": ""
-		},
-		{
-			"key": "sanityLicence",
-			"value": ""
-		},
-		{
-			"key": "licences",
-			"value": ""
-		},
-		{
-			"key": "now",
-			"value": ""
-		},
-		{
-			"key": "countWithOrg1",
-			"value": ""
-		},
-		{
-			"key": "pubKeyName",
-			"value": ""
-		},
-		{
-			"key": "portalKeyName",
-			"value": ""
-		},
-		{
-			"key": "portalToken",
+			"key": "dateUpdate",
 			"value": ""
 		}
 	]

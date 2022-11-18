@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 // const mod = 'crypto'
 
-import { HEADERS, HD_AUTH, HD_AUTH_LOWER } from '../config/headers.js'
 // -------------------------------------------------------------------------------------------------
 // External dependencies
 // -------------------------------------------------------------------------------------------------
@@ -9,7 +8,6 @@ import { HEADERS, HD_AUTH, HD_AUTH_LOWER } from '../config/headers.js'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { accessProperty } from './jsonAccess.js'
 
 // -------------------------------------------------------------------------------------------------
 // Constants
@@ -31,24 +29,3 @@ export const REQ_URL = 'req_url'
 export const JWT_ID = 'jti' // https://www.rfc-editor.org/rfc/rfc7519.html#section-4.1.7
 // const JWT_IAT = 'iat' // Issued At https://www.rfc-editor.org/rfc/rfc7519.html#section-4.1.6
 export const JWT_CLIENT = 'client_id' // https://www.rfc-editor.org/rfc/rfc6749.html#section-2.2
-
-// -------------------------------------------------------------------------------------------------
-// Crypto
-// -------------------------------------------------------------------------------------------------
-
-export const extractJwt = (req) => {
-  // const fun = 'extractJwt'
-  try {
-    const header = accessProperty(req, HEADERS)
-    const auth = header[HD_AUTH] || header[HD_AUTH_LOWER]
-    if (!auth)
-      throw new Error(`Headers should include a JWT in the form '${HD_AUTH}': Bearer <JWT>"`)
-
-    const token = auth.substring(7)
-    return token
-  } catch (err) {
-    const errMsg = `No token was found in the header (${err})`
-    // consoleErr(mod, fun, errMsg)
-    throw new Error(errMsg)
-  }
-}
