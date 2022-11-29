@@ -25,6 +25,7 @@
     "no-self-assign": "warn",
     "no-self-compare": "warn",
     "no-undef": "error",
+    "no-unused-vars": "off",
     "quotes": ["error", "single", { "allowTemplateLiterals": true }],
     "prefer-arrow-callback": "off",
     "prettier/prettier": "warn",
@@ -37,9 +38,9 @@
       "warn",
       {
         "vars": "all",
-        "varsIgnorePattern": "^_|req|reply|res|next",
+        "varsIgnorePattern": "^(_|req|reply|res|next)$",
         "args": "after-used",
-        "argsIgnorePattern": "^_|req|reply|res|next"
+        "argsIgnorePattern": "^(_|req|reply|res|next)$"
       }
     ]
   },

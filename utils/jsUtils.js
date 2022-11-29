@@ -156,7 +156,47 @@ export const dateEpochMsToIso = (utcMs) => {
 // -------------------------------------------------------------------------------------------------
 // Strings
 // -------------------------------------------------------------------------------------------------
+/**
+ * Split an input string with an array of single characters
+ * @param {*} inputStr the input string
+ * @param {*} singleCharDelimiterArray an array of single characters
+ * @param {*} shouldTrim true if each chunk should be trimmed
+ * @returns the splitted string
+ */
+export const multiSplit = (inputStr, singleCharDelimiterArray, shouldTrim) => {
+  if (!Array.isArray(singleCharDelimiterArray) && singleCharDelimiterArray.length > 0)
+    throw new Error('Wrong use, second parameter should be an array')
 
+  // Converts input delimiters array elements into string
+  const delimiters = []
+  singleCharDelimiterArray.map((c) => {
+    if (`${c}`.length !== 1)
+      throw new Error('Wrong use, second parameter should be an array of single character strings')
+    delimiters.push(`${c}`)
+  })
+
+  // Examine input string, one character at a time
+  const result = []
+  let chunk = ''
+  for (let i = 0; i < inputStr.length; i++) {
+    let isDelimiter = false
+    // Check if the current input character is a delimiter
+    for (let j = 0; j < delimiters.length; j++) {
+      if (inputStr[i] === delimiters[j]) {
+        // Current input character is a delimiter
+        if (shouldTrim) chunk = chunk.trim()
+        if (chunk.length > 0) result.push(chunk)
+        chunk = ''
+        isDelimiter = true
+        break
+      }
+    }
+    if (!isDelimiter) chunk += inputStr[i]
+  }
+  if (shouldTrim) chunk = chunk.trim()
+  if (chunk.length > 0) result.push(chunk)
+  return result
+}
 // -------------------------------------------------------------------------------------------------
 // Arrays
 // -------------------------------------------------------------------------------------------------

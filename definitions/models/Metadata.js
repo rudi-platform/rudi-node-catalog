@@ -94,7 +94,7 @@ const validArrayNotNull = {
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { beautify, isNotEmptyArray, isNothing } from '../../utils/jsUtils.js'
+import { beautify, isNotEmptyArray, isNothing, multiSplit } from '../../utils/jsUtils.js'
 import { logD, logE, logT, logV } from '../../utils/logging.js'
 import { incorrectVal, incorrectValueForEnum } from '../../utils/msg.js'
 import { NotFoundError, BadRequestError, RudiError } from '../../utils/errors.js'
@@ -596,18 +596,19 @@ async function checkThesaurus(metadata) {
       }
     }
 
-    const keywords = metadata[API_KEYWORDS_PROPERTY]
+    const origKeywords = metadata[API_KEYWORDS_PROPERTY]
+    const keywords = origKeywords.length === 1 ? multiSplit(origKeywords, [',', ';']) : origKeywords
+
     logT(mod, fun, `keywords: ${beautify(keywords)}`)
 
     await Promise.all(
       keywords.map((keyword, index) => {
+        keyword = `${keyword}`.trim()
         // logT(mod, fun, `keyword: ${keyword}`)
         Keywords.isValid(keyword, true)
-          .then((resolve) => {
-            if (resolve) {
-              if (keyword !== keyword.trim()) {
-                metadata[API_KEYWORDS_PROPERTY][index] = keyword.trim()
-              }
+          .then((isKnown) => {
+            if (isKnown) {
+              metadata[API_KEYWORDS_PROPERTY][index] = keyword
               return true
             } else {
               throw new BadRequestError(
