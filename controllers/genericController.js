@@ -109,7 +109,12 @@ import { newSkosConcept, newSkosScheme, widenSearch } from './skosController.js'
 import { newPublicKey, overwritePubKey } from './publicKeyController.js'
 
 import { deletePortalMetadata } from './portalController.js'
-import { API_ACCESS_CONDITION, API_CONFIDENTIALITY, API_RESTRICTED_ACCESS } from '../db/dbFields.js'
+import {
+  API_ACCESS_CONDITION,
+  API_COLLECTION_TAG,
+  API_CONFIDENTIALITY,
+  API_RESTRICTED_ACCESS,
+} from '../db/dbFields.js'
 
 // -------------------------------------------------------------------------------------------------
 // Specific object type helper functions
@@ -600,7 +605,7 @@ export const deleteSingleObject = async (req, reply) => {
     const rudiId = accessReqParam(req, PARAM_ID)
 
     // ensure the object exists
-    await getEnsuredObjectWithRudiId(objectType, rudiId)
+    const rudiObj = await getEnsuredObjectWithRudiId(objectType, rudiId)
 
     if (await isObjectReferenced(objectType, rudiId))
       throw new ForbiddenError(objectNotDeletedBecauseUsed(objectType, rudiId))
@@ -609,7 +614,7 @@ export const deleteSingleObject = async (req, reply) => {
     // TODO: if SkosConcept: update all other SkosConcepts that reference it (parents/children/siblings/relatives)
     const answer = await deleteDbObject(objectType, rudiId)
 
-    if (objectType === OBJ_METADATA) {
+    if (objectType === OBJ_METADATA && !rudiObj[API_COLLECTION_TAG]) {
       deletePortalMetadata(rudiId)
         .then(() => logI(mod, fun, `Portal accepted the deletion request for metadata '${rudiId}'`))
         .catch((err) => logE(mod, fun, `Portal couldn't delete metadata '${rudiId}': ${err}`))

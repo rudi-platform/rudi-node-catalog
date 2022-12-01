@@ -575,7 +575,10 @@ async function checkThesaurus(metadata) {
     // const themes = Themes.get()
     const themeLabels = Themes.getLabels(DEFAULT_LANG)
     // logT(mod, fun + ' themeLabels [T]', beautify(themeLabels))
-    const themeKeyIndex = Object.keys(themeLabels).indexOf(dataTheme)
+    const themeKeyIndex =
+      Object.keys(themeLabels).indexOf(dataTheme) ||
+      Object.keys(themeLabels).find((key) => themeLabels[key]?.fr === dataTheme)
+
     // logT(mod, fun + ' themeLabels [T]', beautify(themeLabels))
     if (themeKeyIndex === -1) {
       // logT(mod, fun + ' themeLabelsVals [T]', beautify(Object.values(themeLabels)))

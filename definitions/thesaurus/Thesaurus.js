@@ -208,6 +208,11 @@ export class Thesaurus {
     }
   }
 
+  traduce = (val, lang) => {
+    const list = this.getLabels(lang)
+    return Object.keys(list).find((key) => list[key] === val)
+  }
+
   isValid = async (val, shouldInit) => {
     const fun = 'isValid'
     try {

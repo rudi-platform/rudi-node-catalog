@@ -20,6 +20,10 @@ import {
   getUpdatedDate,
   API_STORAGE_STATUS,
   API_MEDIA_PROPERTY,
+  API_MEDIA_DATES,
+  API_DATES_CREATED,
+  API_METAINFO_DATES,
+  API_DATES_EDITED,
 } from '../db/dbFields.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -518,6 +522,17 @@ export const isMetadataSendable = async (metadataId) => {
       logD(mod, fun, `Waiting for other media to get uploaded: ${metadataId}`)
       return false
     }
+
+    const mediaList = metadata[API_MEDIA_PROPERTY]
+    const metadataInfoDates = metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES]
+    mediaList.map((media) => {
+      const mediaDates = media[API_MEDIA_DATES]
+      if (!mediaDates[API_DATES_CREATED])
+        mediaDates[API_DATES_CREATED] = metadataInfoDates[API_DATES_CREATED]
+      if (!mediaDates[API_DATES_EDITED])
+        mediaDates[API_DATES_EDITED] = metadataInfoDates[API_DATES_EDITED]
+    })
+    metadata.save()
 
     return metadata
   } catch (err) {

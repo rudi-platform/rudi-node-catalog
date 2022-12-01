@@ -211,7 +211,7 @@ export class RudiError extends Error {
       // logD(mod, fun, JSON.parse(JSON.stringify(comError)).status)
       // logD(mod, fun, `data: ${beautify(comError.response?.data)}`)
 
-      logW(mod, fun, beautify(comError.response))
+      // logW(mod, fun, beautify(comError.response))
 
       // logD(mod, fun, `comError.status : ${comError.status}`)
       // // logD(mod, fun, `comError.status : ${JSON.parse(beautify(comError)).status}`)
