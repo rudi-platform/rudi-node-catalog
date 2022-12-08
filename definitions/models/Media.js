@@ -46,7 +46,7 @@ import { ConnectorParameter } from '../schemas/ConnectorParameters.js'
 
 import { VALID_URI } from '../schemaValidators.js'
 import { UuidV4Schema } from '../schemas/Identifiers.js'
-import { isNotEmptyObject } from '../../utils/jsUtils.js'
+import { isNotEmptyObject, nowISO } from '../../utils/jsUtils.js'
 import { logD, logV, logW } from '../../utils/logging.js'
 import { missingField } from '../../utils/msg.js'
 import { BadRequestError, RudiError } from '../../utils/errors.js'
@@ -85,6 +85,18 @@ const commonSchemaOptions = {
   id: false,
 }
 
+// -------------------------------------------------------------------------------------------------
+// Helper functions
+// -------------------------------------------------------------------------------------------------
+export const isMediaMissing = (rudiMedia) => {
+  const mediaStatus = rudiMedia[API_FILE_STORAGE_STATUS]
+  return (
+    !mediaStatus ||
+    mediaStatus === MediaStorageStatus.Missing ||
+    mediaStatus === MediaStorageStatus.Nonexistant ||
+    mediaStatus === MediaStorageStatus.Removed
+  )
+}
 // -------------------------------------------------------------------------------------------------
 // Media schema definition
 // -------------------------------------------------------------------------------------------------
@@ -164,6 +176,18 @@ MediaSchema.pre('save', function (next) {
         logD(mod, fun, `sanitized: '${nameBefore}' -> '${nameAfter}'`)
       }
     }
+
+    const mediaDates = this[API_MEDIA_DATES]
+    if (!mediaDates)
+      throw new BadRequestError(
+        `Incoming Media must have creation and update dates in field ${API_MEDIA_DATES}`
+      )
+    if (!mediaDates[API_DATES_CREATED])
+      mediaDates[API_DATES_CREATED] = mediaDates[API_DATES_EDITED]
+        ? mediaDates[API_DATES_EDITED]
+        : nowISO()
+    if (!mediaDates[API_DATES_EDITED]) mediaDates[API_DATES_EDITED] = mediaDates[API_DATES_CREATED]
+
     next()
   } catch (err) {
     logW(mod, fun, err)
@@ -229,10 +253,14 @@ const FileSchema = new mongoose.Schema(
     [API_FILE_STORAGE_STATUS]: {
       type: String,
       enum: Object.values(MediaStorageStatus),
+      default: MediaStorageStatus.Missing,
     },
 
     /** Date of the last status update */
-    [API_FILE_STATUS_UPDATE]: Date,
+    [API_FILE_STATUS_UPDATE]: {
+      type: Date,
+      default: nowISO(),
+    },
   },
   commonSchemaOptions
 )

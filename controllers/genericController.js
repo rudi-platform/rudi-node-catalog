@@ -88,13 +88,7 @@ import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
 
 import { beautify, isEmptyObject, isEmptyArray } from '../utils/jsUtils.js'
 
-import {
-  NotFoundError,
-  ForbiddenError,
-  ObjectNotFoundError,
-  BadRequestError,
-  RudiError,
-} from '../utils/errors.js'
+import { NotFoundError, ForbiddenError, BadRequestError, RudiError } from '../utils/errors.js'
 
 import { parseQueryParameters } from '../utils/parseRequest.js'
 import { CallContext } from '../definitions/constructors/callContext.js'
@@ -517,41 +511,6 @@ export const getManyPubKeys = async (req, reply) => {
 }
 
 /**
- * Update an existing object (obsolete)
- * => PUT /{object}
- *  (obsolete)
- */
-export const updateSingleObject = async (req, reply) => {
-  const fun = 'updateSingleObject'
-  try {
-    logT(mod, fun, `< PUT ${URL_PV_OBJECT_GENERIC}`)
-    // retrieve url parameters: object type, object id
-    const objectType = getObjectParam(req)
-    const idField = getObjectIdField(objectType)
-
-    const updateData = req.body
-
-    // retrieve url parameters: object type, object id
-    const rudiId = accessProperty(updateData, idField)
-
-    const existsObject = await doesObjectExistWithRudiId(objectType, rudiId)
-    if (!existsObject) throw new ObjectNotFoundError(objectType, rudiId)
-
-    const context = CallContext.getCallContextFromReq(req)
-
-    if (objectType === OBJ_METADATA) {
-      if (context) context.addMetaId(rudiId)
-      return await overwriteMetadata(updateData)
-    } else {
-      if (context) context.addObjId(objectType, rudiId)
-      return await overwriteDbObject(objectType, updateData)
-    }
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
-
-/**
  * Update an existing object or creates it if it doesn't exist
  * => PUT /{object}
  */
@@ -571,19 +530,16 @@ export const upsertSingleObject = async (req, reply) => {
     const existsObject = await doesObjectExistWithRudiId(objectType, rudiId)
 
     const context = CallContext.getCallContextFromReq(req)
-    if (!existsObject) {
-      if (context) context.addObjId(objectType, rudiId)
+    if (context) context.addObjId(objectType, rudiId)
 
+    if (!existsObject) {
       return await newObject(objectType, updateData)
     } else {
       if (objectType === OBJ_METADATA) {
-        if (context) context.addMetaId(rudiId)
         return await overwriteMetadata(updateData)
       } else if (objectType === OBJ_PUB_KEYS) {
-        if (context) context.addObjId(objectType, rudiId)
         return await overwritePubKey(updateData)
       } else {
-        if (context) context.addObjId(objectType, rudiId)
         return await overwriteDbObject(objectType, updateData)
       }
     }

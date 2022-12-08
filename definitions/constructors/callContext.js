@@ -197,7 +197,7 @@ export const CallContext = class CallContext {
   }
 
   formatReqDetails = () => {
-    const reqDetails = this.getReqDetails()
+    // const reqDetails = this.getReqDetails()
     return `${dateEpochMsToIso(this.timestamp)} [${this.id}] ${this.reqMethod} ${this.reqUrl}`
   }
 

@@ -109,9 +109,7 @@ export const shouldControlExtRequest = () => SHOULD_CONTROL_EXT_REQUESTS
 
 // ----- API
 const API_PORTAL_URL = getPortalIniValue(PORTAL_SECTION, 'portal_url', false)
-export const isPortalConnectionDisabled = () => {
-  return !API_PORTAL_URL
-}
+export const isPortalConnectionDisabled = () => !API_PORTAL_URL
 export const getPortalBaseUrl = () => API_PORTAL_URL
 
 const API_GET_URL = getPortalIniValue(PORTAL_SECTION, 'get_url', '')

@@ -47,7 +47,8 @@ export const LicenceSchema = {
       // accept empty values as non-duplicates
       partialFilterExpression: {
         [API_LICENCE_CUSTOM_URI]: {
-          $type: 'string',
+          $exists: true,
+          $gt: '',
         },
       },
     },

@@ -102,7 +102,7 @@ import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
 // -------------------------------------------------------------------------------------------------
 // Data models
 // -------------------------------------------------------------------------------------------------
-import { Metadata } from '../definitions/models/Metadata.js'
+import { isEveryMediaAvailable, Metadata } from '../definitions/models/Metadata.js'
 import { Media, MediaStorageStatus } from '../definitions/models/Media.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -659,12 +659,12 @@ export const newMetadata = async (rudiMetadata) => {
     const dbReadyObject = await rudiToDbFormat(rudiMetadata, true)
     // logI(mod, fun, `dbReadyObject: ${beautify(dbReadyObject)}`)
     const dbMetadata = new Metadata(dbReadyObject)
-    const isMetadataSendable = await updateMetadataState(dbMetadata)
-
     await dbMetadata.save()
-    const finalMetadata = await getMetadataWithJson(dbMetadata)
+
+    const { metadata: finalMetadata, areAllMediaAvailable } = await updateMetadataState(dbMetadata)
+
     logI(mod, fun, `finalMetadata: ${beautify(finalMetadata)}`)
-    if (isMetadataSendable) sendToPortal(finalMetadata)
+    if (areAllMediaAvailable) sendToPortal(finalMetadata)
 
     return finalMetadata
   } catch (err) {
@@ -684,11 +684,8 @@ export const overwriteMetadata = async (incomingRudiMetadata) => {
     const dbReadyEditedMetadata = await rudiToDbFormat(incomingRudiMetadata, true)
     const dbMetadata = await overwriteDbObject(OBJ_METADATA, dbReadyEditedMetadata)
 
-    const isMetadataSendable = await updateMetadataState(dbMetadata)
-    const reply = await dbMetadata.save()
-    const finalMetadata = await getMetadataWithJson(dbMetadata)
-
-    if (isMetadataSendable) sendToPortal(finalMetadata)
+    const { metadata: finalMetadata, areAllMediaAvailable } = await updateMetadataState(dbMetadata)
+    if (areAllMediaAvailable) sendToPortal(finalMetadata)
 
     return finalMetadata
   } catch (err) {
@@ -696,35 +693,49 @@ export const overwriteMetadata = async (incomingRudiMetadata) => {
   }
 }
 
+/**
+ * Updates the state of a metadata by checking the state of every bound media.
+ * If one media is Missing, NonExitant or Removed (see MediaStorageStatus)
+ * the state of the metadata is set to Pending (see StorageStatus)
+ * It is otherwise set to the state provided (Online if none was provided)
+ * @param {Object} dbMetadata
+ * @param {string?} newState
+ * @return {Boolean} True if all media were commited and metadata can be sent to Portal
+ */
 const updateMetadataState = async (dbMetadata, newState = StorageStatus.Online) => {
   const fun = 'updateMetadataState'
   try {
     logT(mod, fun, ``)
-    const metadataMediaList = dbMetadata[API_MEDIA_PROPERTY]
+    const metadata = await getMetadataWithJson(dbMetadata)
 
-    let areAllMediaAvailable = true
-    metadataMediaList.map((media) => {
-      const mediaStatus = media[API_FILE_STORAGE_STATUS]
-      if (
-        mediaStatus === MediaStorageStatus.Missing ||
-        mediaStatus === MediaStorageStatus.Nonexistant ||
-        mediaStatus === MediaStorageStatus.Removed
-      ) {
-        areAllMediaAvailable = false // 1 media is missing!
-      }
-    })
+    const areAllMediaAvailable = await isEveryMediaAvailable(metadata)
     if (areAllMediaAvailable) {
-      dbMetadata[API_STORAGE_STATUS] = newState
+      metadata[API_STORAGE_STATUS] = newState
     } else {
-      dbMetadata[API_STORAGE_STATUS] = StorageStatus.Pending
+      metadata[API_STORAGE_STATUS] = StorageStatus.Pending
     }
-    await dbMetadata.save()
-    return areAllMediaAvailable // OK to send
+    console.log('T (updateMetadataState) API_STORAGE_STATUS:', metadata[API_STORAGE_STATUS])
+    if (dbMetadata[API_STORAGE_STATUS] !== metadata[API_STORAGE_STATUS]) {
+      dbMetadata[API_STORAGE_STATUS] = metadata[API_STORAGE_STATUS]
+      await dbMetadata.save()
+    }
+    logD(
+      mod,
+      fun,
+      `Metadata is ${areAllMediaAvailable ? '' : 'not '} sendable: ${dbMetadata[API_METADATA_ID]}`
+    )
+    return { metadata, areAllMediaAvailable } // OK to send
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
 }
 
+/**
+ * Commits a Media (meaning the Media was successfully stored on "RUDI Media" storage)
+ * @param {*} req
+ * @param {*} res
+ * @returns
+ */
 export const commitMedia = async (req, res) => {
   const fun = 'commitMedia'
   try {
@@ -754,14 +765,14 @@ export const commitMedia = async (req, res) => {
 
     await dbMedia.save()
 
-    const isMetadataSendable = await updateMetadataState(dbMetadata)
+    const { metadata: finalMetadata, areAllMediaAvailable } = await updateMetadataState(dbMetadata)
 
     const result = {
       media: pick(dbMedia, [API_MEDIA_ID, API_FILE_STORAGE_STATUS, API_FILE_STATUS_UPDATE]),
     }
 
     // If other media are still waiting, we do not send the metadata
-    if (!isMetadataSendable) {
+    if (!areAllMediaAvailable) {
       logD(mod, fun, `Media commit success: ${beautify(result)}`)
       return res.code(200).send(result)
     }
@@ -772,7 +783,7 @@ export const commitMedia = async (req, res) => {
     result.metadata = pick(dbMetadata, [API_METADATA_ID, API_STORAGE_STATUS])
     logD(mod, fun, `Media commit success : ${beautify(result)}`)
 
-    sendToPortal(dbMetadata)
+    sendToPortal(finalMetadata)
     return res.code(200).send(result)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -828,6 +839,7 @@ export const sendToPortal = (metadata) => {
   const fun = 'sendToPortal'
   try {
     const metaId = metadata[API_METADATA_ID]
+    logT(mod, fun, `${metaId}`)
     return sendMetadataToPortal(metaId)
       .catch((err) => logE(mod, fun, `Sending to portal failed for metadata '${metaId}': ${err}`))
       .then((res) => {

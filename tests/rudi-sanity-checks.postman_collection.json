@@ -104,10 +104,10 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(`Check connection to Portal`, () => {",
+									"pm.test(\"Testing portal connection\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const token = pm.response.json();",
-									"    pm.expect(token.access_token).to.be.not.undefined",
+									"    const res = pm.response.json()",
+									"    pm.expect(!!match.jwt(res.access_token)).to.be.true",
 									"});"
 								],
 								"type": "text/javascript"
@@ -6605,6 +6605,94 @@
 		},
 		{
 			"key": "dateUpdate",
+			"value": ""
+		},
+		{
+			"key": "gitHash",
+			"value": ""
+		},
+		{
+			"key": "apiVersion",
+			"value": ""
+		},
+		{
+			"key": "metaId1",
+			"value": ""
+		},
+		{
+			"key": "metaId2",
+			"value": ""
+		},
+		{
+			"key": "orgId1",
+			"value": ""
+		},
+		{
+			"key": "orgId2",
+			"value": ""
+		},
+		{
+			"key": "contId1",
+			"value": ""
+		},
+		{
+			"key": "contId2",
+			"value": ""
+		},
+		{
+			"key": "contId3",
+			"value": ""
+		},
+		{
+			"key": "reportId1",
+			"value": ""
+		},
+		{
+			"key": "reportId2",
+			"value": ""
+		},
+		{
+			"key": "mediaId1",
+			"value": ""
+		},
+		{
+			"key": "mediaId2",
+			"value": ""
+		},
+		{
+			"key": "keywords",
+			"value": ""
+		},
+		{
+			"key": "themes",
+			"value": ""
+		},
+		{
+			"key": "sanityLicence",
+			"value": ""
+		},
+		{
+			"key": "licences",
+			"value": ""
+		},
+		{
+			"key": "now",
+			"value": ""
+		},
+		{
+			"key": "countWithOrg1",
+			"value": ""
+		},
+		{
+			"key": "pubKeyName",
+			"value": ""
+		},
+		{
+			"key": "portalKeyName",
+			"value": ""
+		},
+		{
+			"key": "pm_jwt",
 			"value": ""
 		}
 	]

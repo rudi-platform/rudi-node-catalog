@@ -73,6 +73,8 @@ import {
   API_DATES_DELETED,
   API_METAINFO_VERSION_PROPERTY,
   API_STORAGE_STATUS,
+  API_FILE_STORAGE_STATUS,
+  API_MEDIA_ID,
 } from '../../db/dbFields.js'
 
 import { get as getFileTypes, MIME_YAML_ALT, MIME_YAML } from '../thesaurus/FileTypes.js'
@@ -125,7 +127,7 @@ import { AccesConditionSchema } from '../schemas/AccesConditions.js'
 // -------------------------------------------------------------------------------------------------
 // Model definitions
 // -------------------------------------------------------------------------------------------------
-import { MediaTypes } from './Media.js'
+import { isMediaMissing, MediaTypes } from './Media.js'
 import { VALID_API_VERSION, VALID_URI } from '../schemaValidators.js'
 import { getApiUrl } from '../../config/confSystem.js'
 
@@ -143,6 +145,44 @@ export const METADATA_FIELDS_TO_POPULATE = [
 const POPULATE_OPTS = {
   path: METADATA_FIELDS_TO_POPULATE,
   select: `-${FIELDS_TO_SKIP.concat(API_RESTRICTED_ACCESS).join(' -')}`,
+}
+
+// -------------------------------------------------------------------------------------------------
+// Helper functions
+// -------------------------------------------------------------------------------------------------
+/**
+ * For a given Metadata object, Lists the ids of the Media that are not yet stored
+ * @param {Object} rudiMetadata JSON that represents a Rudi Metadata
+ * @return {Array} The list of media that are still not available
+ */
+export const listMissingMedia = (rudiMetadata) => {
+  const metadataMediaList = rudiMetadata[API_MEDIA_PROPERTY]
+  const missingMediaList = []
+  metadataMediaList.map((media) => {
+    if (isMediaMissing(media[API_FILE_STORAGE_STATUS])) missingMediaList.push(media[API_MEDIA_ID])
+  })
+  return missingMediaList.length > 0 ? missingMediaList : null
+}
+
+export const isEveryMediaAvailable = (rudiMetadata) => {
+  const fun = 'isEveryMediaAvailable'
+  try {
+    logT(mod, fun, ``)
+    // console.log('T (isEveryMediaAvailable) metadata:', rudiMetadata)
+
+    const metadataMediaList = rudiMetadata[API_MEDIA_PROPERTY]
+    console.log('T (isEveryMediaAvailable) metadataMediaList:', metadataMediaList)
+    let isOneMediaMissing = false
+    for (const media of metadataMediaList) {
+      if (isMediaMissing(media)) {
+        isOneMediaMissing = true
+        break
+      }
+    }
+    return !isOneMediaMissing
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -166,7 +206,8 @@ const MetadataSchema = new mongoose.Schema(
         // accept empty values as non-duplicates
         partialFilterExpression: {
           [API_METADATA_LOCAL_ID]: {
-            $type: 'string',
+            $exists: true,
+            $gt: '',
           },
         },
       },
@@ -674,7 +715,7 @@ async function checkThesaurus(metadata) {
         incorrectVal(API_STORAGE_STATUS, metadata[API_STORAGE_STATUS]),
         mod,
         fun,
-        [[API_STORAGE_STATUS]]
+        [API_STORAGE_STATUS]
       )
     }
     return true

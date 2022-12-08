@@ -19,11 +19,9 @@ import {
   API_COLLECTION_TAG,
   getUpdatedDate,
   API_STORAGE_STATUS,
-  API_MEDIA_PROPERTY,
-  API_MEDIA_DATES,
-  API_DATES_CREATED,
-  API_METAINFO_DATES,
-  API_DATES_EDITED,
+  API_METADATA_ID,
+  DB_UPDATED_AT,
+  API_REPORT_ID,
 } from '../db/dbFields.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -69,13 +67,14 @@ import {
 import {
   NotFoundError,
   InternalServerError,
-  NotImplementedError,
   BadRequestError,
   ForbiddenError,
   NotAcceptableError,
   RudiError,
   UnauthorizedError,
 } from '../utils/errors.js'
+import { isEveryMediaAvailable } from '../definitions/models/Metadata.js'
+
 // -------------------------------------------------------------------------------------------------
 // Portal auth header
 // -------------------------------------------------------------------------------------------------
@@ -487,14 +486,43 @@ export const verifyPortalToken = async (accessToken) => {
 // -------------------------------------------------------------------------------------------------
 // Portal calls: metadata
 // -------------------------------------------------------------------------------------------------
-export const isMetadataSendable = async (metadataId) => {
-  const fun = 'isMetadataSendable'
+const metadatasWaitingForPortalFeedback = []
+
+export const removeMetadataFromWaitingList = (metadataId, reportId) => {
+  const fun = 'removeMetadataFromWaitingList'
+  const waitIndex = metadatasWaitingForPortalFeedback.findIndex(
+    (sentMetadata) => sentMetadata[API_METADATA_ID] === metadataId
+  )
+  if (waitIndex === -1) {
+    const warnMsg = `Metadata ${metadataId} (report ${reportId}) not found in the from waiting room`
+    logW(mod, fun, warnMsg)
+    return
+  }
+  if (metadatasWaitingForPortalFeedback[waitIndex][API_REPORT_ID] !== reportId) {
+    const warnMsg = `Removing metadata ${metadataId} from the waiting room with mismatching reportId ${reportId}`
+    logW(mod, fun, warnMsg)
+  } else {
+    const msg = `Removing metadata ${metadataId} from the waiting room with reportId ${reportId}`
+    logD(mod, fun, msg)
+  }
+  metadatasWaitingForPortalFeedback.splice(waitIndex, 1)
+}
+
+const WAITING_ROOM_TIMEOUT_S = 3600
+const WAIT_DATE = 'wait_date'
+/**
+ * Check a metadata
+ * @param {String} metadataId UUID v4 (global_id) that identifies a metadata in this system
+ * @return {Object} The metadata
+ */
+const isMetadataSendableToPortal = async (metadataId) => {
+  const fun = 'isMetadataAcceptableByPortal'
   try {
     if (isPortalConnectionDisabled()) return false
 
     //--- Check input param
-    if (!metadataId) throw new NotImplementedError('Not yet implemented')
-    if (!isUUID(metadataId)) throw new BadRequestError(`Bad formatted UUID: ${metadataId}`)
+    if (!metadataId) throw new BadRequestError('Input metadata id is requested', mod, fun)
+    if (!isUUID(metadataId)) throw new BadRequestError(`Badly formatted UUID: ${metadataId}`)
 
     //--- Get local metadata from ID
     const metadata = await getEnsuredObjectWithRudiId(OBJ_METADATA, metadataId)
@@ -512,29 +540,42 @@ export const isMetadataSendable = async (metadataId) => {
     }
 
     //--- If media still need to be uploaded, metadata is not sent to the Portal
-    if (metadata[API_STORAGE_STATUS] === StorageStatus.Pending) {
+    if (
+      metadata[API_STORAGE_STATUS] === StorageStatus.Pending ||
+      !isEveryMediaAvailable(metadata)
+    ) {
       logD(mod, fun, `Waiting for other media to get uploaded: ${metadataId}`)
       return false
     }
+    //--- Purging the waiting room
+    for (const i = metadatasWaitingForPortalFeedback.length; i >= 0; i--)
+      if (metadatasWaitingForPortalFeedback[i][WAIT_DATE] < nowEpochS() + WAITING_ROOM_TIMEOUT_S)
+        metadatasWaitingForPortalFeedback.splice(i, 1)
 
-    //--- If a media is restricted, metadata is not sent to the Portal
-    if (metadata[API_MEDIA_PROPERTY][0] === StorageStatus.Pending) {
-      logD(mod, fun, `Waiting for other media to get uploaded: ${metadataId}`)
+    //--- Check if the metadata has already been sent to portal
+    let isMetadataAlreadyWaitingToBeSent = false
+    for (const sentMetadata of metadatasWaitingForPortalFeedback) {
+      if (
+        sentMetadata[API_METADATA_ID] === metadata[API_METADATA_ID] &&
+        sentMetadata[DB_UPDATED_AT] >= metadata[DB_UPDATED_AT]
+      ) {
+        isMetadataAlreadyWaitingToBeSent = true
+        break
+      }
+    }
+    if (isMetadataAlreadyWaitingToBeSent) {
+      logD(mod, fun, `Metadata is already waiting to be sent: ${metadataId}`)
       return false
     }
-
-    const mediaList = metadata[API_MEDIA_PROPERTY]
-    const metadataInfoDates = metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES]
-    mediaList.map((media) => {
-      const mediaDates = media[API_MEDIA_DATES]
-      if (!mediaDates[API_DATES_CREATED])
-        mediaDates[API_DATES_CREATED] = metadataInfoDates[API_DATES_CREATED]
-      if (!mediaDates[API_DATES_EDITED])
-        mediaDates[API_DATES_EDITED] = metadataInfoDates[API_DATES_EDITED]
+    metadatasWaitingForPortalFeedback.push({
+      [API_METADATA_ID]: metadata[API_METADATA_ID],
+      [DB_UPDATED_AT]: metadata[DB_UPDATED_AT],
+      [WAIT_DATE]: nowEpochS(),
     })
-    metadata.save()
+    //--- If a media is restricted, metadata is not sent to the Portal
+    // if( metadata[API_RESTRICTED_ACCESS]&&metadata[API_MEDIA_PROPERTY][0][API_MEDIA_CONNECTOR]
 
-    return metadata
+    return { metadata, waitIndex: metadatasWaitingForPortalFeedback.length }
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -546,8 +587,9 @@ export const sendMetadataToPortal = async (metadataId) => {
   try {
     logT(mod, fun, ``)
 
-    const metadata = await isMetadataSendable(metadataId)
-    if (!metadata) return
+    const sendableData = await isMetadataSendableToPortal(metadataId)
+    if (!sendableData) return
+    const { metadata, waitIndex } = sendableData
 
     //--- Ensuring compatibility with portal
     const metadataClean = deepClone(metadata)
@@ -563,25 +605,28 @@ export const sendMetadataToPortal = async (metadataId) => {
         Authorization: `Bearer ${portalToken}`,
       },
     }
-    let answer
+    let portalAnswer
     try {
       logD(mod, fun, `Checking if the metadata is on the portal`)
-      answer = await axios.get(getPortalMetaUrl(metadataId), reqOpts)
+      portalAnswer = await axios.get(getPortalMetaUrl(metadataId), reqOpts)
     } catch (err) {
-      logV(mod, fun, err)
+      // logV(mod, fun, err)
       logD(mod, fun, `Metadata is not on the portal: sending '${metadataId}'`)
-      return httpPost(PORTAL_POST_URL, metadataClean, portalToken)
+      const postAnswer = await httpPost(PORTAL_POST_URL, metadataClean, portalToken)
+      metadatasWaitingForPortalFeedback[waitIndex][API_REPORT_ID] = postAnswer.data
+      return postAnswer
     }
-    const portalMetadata = answer.data
+    const portalMetadata = portalAnswer.data
 
     if (getUpdatedDate(portalMetadata) < getUpdatedDate(metadataClean)) {
       logD(mod, fun, `Metadata is on the portal and older: updating '${metadataId}'`)
-      return httpPut(PORTAL_POST_URL, metadataClean, portalToken)
+      const putAnswer = await httpPut(PORTAL_POST_URL, metadataClean, portalToken)
+      metadatasWaitingForPortalFeedback[waitIndex][API_REPORT_ID] = putAnswer.data
+      return putAnswer
     } else {
+      metadatasWaitingForPortalFeedback.splice(waitIndex, 1)
       logD(mod, fun, `Metadata is on the portal and same: not updating '${metadataId}'`)
     }
-
-    // logD(mod, fun, `reply: ${ beautify(reply)}`)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
