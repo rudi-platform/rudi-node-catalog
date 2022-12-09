@@ -821,13 +821,13 @@ export const sendManyMetadataToPortal = async (req) => {
         })
         metadataList = metadataListAndCount[LIST_LABEL]
       }
-      await Promise.all(
-        metadataList.map((meta) => {
-          sendMetadataToPortal(meta[API_METADATA_ID])
+      metadataList.map((meta) => sendToPortal(meta))
+    } else {
+      listIds.map((id) =>
+        sendMetadataToPortal(id).then((res) => {
+          if (res) logI(mod, fun, `'Update request received by the portal for metadata '${id}'`)
         })
       )
-    } else {
-      await Promise.all(listIds.map((id) => sendMetadataToPortal(id)))
     }
     return 'Sending metadata to portal'
   } catch (err) {
