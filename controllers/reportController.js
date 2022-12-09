@@ -227,7 +227,7 @@ export const addOrEditSingleReport = async (objectType, req, reply) => {
     // retrieve body parameters: object id, report id
     const reportId = accessProperty(reportBody, API_REPORT_ID)
     const bodyObjectId = accessProperty(reportBody, API_REPORT_RESOURCE_ID)
-    removeMetadataFromWaitingList(urlObjectId, bodyObjectId)
+    removeMetadataFromWaitingList(urlObjectId, reportId)
 
     // ensure url object id and body object id match
     if (urlObjectId !== bodyObjectId)
