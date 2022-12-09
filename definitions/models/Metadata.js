@@ -171,7 +171,7 @@ export const isEveryMediaAvailable = (rudiMetadata) => {
     // console.log('T (isEveryMediaAvailable) metadata:', rudiMetadata)
 
     const metadataMediaList = rudiMetadata[API_MEDIA_PROPERTY]
-    console.log('T (isEveryMediaAvailable) metadataMediaList:', metadataMediaList)
+    // console.log('T (isEveryMediaAvailable) metadataMediaList:', metadataMediaList)
     let isOneMediaMissing = false
     for (const media of metadataMediaList) {
       if (isMediaMissing(media)) {

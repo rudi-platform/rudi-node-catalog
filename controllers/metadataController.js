@@ -714,7 +714,7 @@ const updateMetadataState = async (dbMetadata, newState = StorageStatus.Online) 
     } else {
       metadata[API_STORAGE_STATUS] = StorageStatus.Pending
     }
-    console.log('T (updateMetadataState) API_STORAGE_STATUS:', metadata[API_STORAGE_STATUS])
+    // console.log('T (updateMetadataState) API_STORAGE_STATUS:', metadata[API_STORAGE_STATUS])
     if (dbMetadata[API_STORAGE_STATUS] !== metadata[API_STORAGE_STATUS]) {
       dbMetadata[API_STORAGE_STATUS] = metadata[API_STORAGE_STATUS]
       await dbMetadata.save()

@@ -548,8 +548,11 @@ const isMetadataSendableToPortal = async (metadataId) => {
       return false
     }
     //--- Purging the waiting room
-    for (const i = metadatasWaitingForPortalFeedback.length; i >= 0; i--)
-      if (metadatasWaitingForPortalFeedback[i][WAIT_DATE] < nowEpochS() + WAITING_ROOM_TIMEOUT_S)
+    for (const i = metadatasWaitingForPortalFeedback.length - 1; i >= 0; i--)
+      if (
+        metadatasWaitingForPortalFeedback[i] &&
+        metadatasWaitingForPortalFeedback[i][WAIT_DATE] < nowEpochS() + WAITING_ROOM_TIMEOUT_S
+      )
         metadatasWaitingForPortalFeedback.splice(i, 1)
 
     //--- Check if the metadata has already been sent to portal
