@@ -73,7 +73,6 @@ import {
   API_DATES_DELETED,
   API_METAINFO_VERSION_PROPERTY,
   API_STORAGE_STATUS,
-  API_FILE_STORAGE_STATUS,
   API_MEDIA_ID,
 } from '../../db/dbFields.js'
 
@@ -159,7 +158,7 @@ export const listMissingMedia = (rudiMetadata) => {
   const metadataMediaList = rudiMetadata[API_MEDIA_PROPERTY]
   const missingMediaList = []
   metadataMediaList.map((media) => {
-    if (media[API_MEDIA_TYPE === MediaTypes.File] && isMediaMissing(media[API_FILE_STORAGE_STATUS]))
+    if (media[API_MEDIA_TYPE] === MediaTypes.File && isMediaMissing(media))
       missingMediaList.push(media[API_MEDIA_ID])
   })
   return missingMediaList.length > 0 ? missingMediaList : null

@@ -89,6 +89,7 @@ const commonSchemaOptions = {
 // Helper functions
 // -------------------------------------------------------------------------------------------------
 export const isMediaMissing = (rudiMedia) => {
+  if (rudiMedia[API_MEDIA_TYPE] !== MediaTypes.File) return false
   const mediaStatus = rudiMedia[API_FILE_STORAGE_STATUS]
   return (
     !mediaStatus ||
@@ -165,9 +166,15 @@ MediaSchema.pre('save', function (next) {
   const fun = 'pre save hook'
   // logT(mod, fun, ``)
   try {
-    if (this[API_MEDIA_TYPE] === MediaTypes.File && !isNotEmptyObject(this[API_FILE_CHECKSUM]))
-      throw new BadRequestError(missingField(API_FILE_CHECKSUM), mod, fun, [API_FILE_CHECKSUM])
-
+    if (this[API_MEDIA_TYPE] === MediaTypes.File) {
+      if (!isNotEmptyObject(this[API_FILE_CHECKSUM]))
+        throw new BadRequestError(missingField(API_FILE_CHECKSUM), mod, fun, [API_FILE_CHECKSUM])
+    } else {
+      // Set media storage_status to 'available'
+      this[API_FILE_STORAGE_STATUS] = this[API_FILE_STORAGE_STATUS] || MediaStorageStatus.Available
+      // Set status_update date
+      this[API_FILE_STATUS_UPDATE] = this[API_FILE_STATUS_UPDATE] || nowISO()
+    }
     if (!!this[API_MEDIA_NAME]) {
       const nameBefore = this[API_MEDIA_NAME]
       const nameAfter = sanitize(this[API_MEDIA_NAME])
@@ -175,7 +182,7 @@ MediaSchema.pre('save', function (next) {
         this[API_MEDIA_NAME] = nameAfter
         logD(mod, fun, `sanitized: '${nameBefore}' -> '${nameAfter}'`)
       }
-    }
+    } else this[API_MEDIA_NAME] = this[API_MEDIA_ID]
 
     const mediaDates = this[API_MEDIA_DATES]
     if (!mediaDates)

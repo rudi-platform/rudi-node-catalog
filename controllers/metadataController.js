@@ -250,6 +250,13 @@ export const mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFo
           throw e
         }
 
+        if (rudiMedia[API_MEDIA_TYPE] !== MediaTypes.File) {
+          // Set media storage_status to 'available'
+          rudiMedia[API_FILE_STORAGE_STATUS] = MediaStorageStatus.Available
+          // Set status_update date
+          rudiMedia[API_FILE_STATUS_UPDATE] = rudiMedia[API_FILE_STATUS_UPDATE] || nowISO()
+        }
+
         if (!mediaDbId) {
           if (!shouldCreateIfNotFound)
             throw new ObjectNotFoundError(OBJ_MEDIA, rudiMedia[API_MEDIA_ID])
@@ -258,12 +265,6 @@ export const mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFo
 
           try {
             media = new Media(rudiMedia)
-            if (media[API_MEDIA_TYPE] !== MediaTypes.File) {
-              // Set media storage_status to 'available'
-              media[API_FILE_STORAGE_STATUS] = MediaStorageStatus.Available
-              // Set status_update date
-              media[API_FILE_STATUS_UPDATE] = nowISO()
-            }
             await media.save()
           } catch (e) {
             logW(mod, fun, e.message)
@@ -274,13 +275,6 @@ export const mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFo
           // logD(mod, fun, `newly created mediaDbId: ${beautify(mediaDbId)}`)
         } else {
           try {
-            if (rudiMedia[API_MEDIA_TYPE] !== MediaTypes.File) {
-              // Set media storage_status to 'available'
-              rudiMedia[API_FILE_STORAGE_STATUS] =
-                rudiMedia[API_FILE_STORAGE_STATUS] || MediaStorageStatus.Available
-              // Set status_update date
-              rudiMedia[API_FILE_STATUS_UPDATE] = rudiMedia[API_FILE_STATUS_UPDATE] || nowISO()
-            }
             await overwriteDbObject(OBJ_MEDIA, rudiMedia) // TODO: valider ! Doit-on vraiment mettre un jour un media, ou recréer cette métadonnée ?
           } catch (e) {
             logW(mod, fun, e.message)
