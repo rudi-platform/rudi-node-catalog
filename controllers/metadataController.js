@@ -47,6 +47,7 @@ import {
   API_FILE_STORAGE_STATUS,
   API_STORAGE_STATUS,
   API_METAINFO_VERSION_PROPERTY,
+  API_MEDIA_TYPE,
 } from '../db/dbFields.js'
 
 import {
@@ -103,7 +104,7 @@ import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
 // Data models
 // -------------------------------------------------------------------------------------------------
 import { isEveryMediaAvailable, Metadata } from '../definitions/models/Metadata.js'
-import { Media, MediaStorageStatus } from '../definitions/models/Media.js'
+import { Media, MediaStorageStatus, MediaTypes } from '../definitions/models/Media.js'
 
 // -------------------------------------------------------------------------------------------------
 // Controllers
@@ -257,6 +258,12 @@ export const mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFo
 
           try {
             media = new Media(rudiMedia)
+            if (media[API_MEDIA_TYPE] !== MediaTypes.File) {
+              // Set media storage_status to 'available'
+              media[API_FILE_STORAGE_STATUS] = MediaStorageStatus.Available
+              // Set status_update date
+              media[API_FILE_STATUS_UPDATE] = nowISO()
+            }
             await media.save()
           } catch (e) {
             logW(mod, fun, e.message)

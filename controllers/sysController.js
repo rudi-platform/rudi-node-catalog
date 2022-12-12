@@ -81,7 +81,7 @@ export const getNodeVersion = async () => {
 
     let mongoDbVersion = 'n/a'
     try {
-      mongoDbVersion = await getMongDbVersion()
+      mongoDbVersion = await getMongoDbVersion()
     } catch (err) {
       logW(mod, fun, `Couldn't get MongoDB version: ${err}`)
     }
@@ -100,7 +100,7 @@ export const getNodeVersion = async () => {
   }
 }
 
-async function getMongDbVersion() {
+async function getMongoDbVersion() {
   const fun = 'getMongDbVersion'
   try {
     const admin = new mongoose.mongo.Admin(mongoose.connection.db)

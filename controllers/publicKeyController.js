@@ -193,7 +193,6 @@ export const getSinglePubKey = async (req, reply) => {
  */
 export const newPublicKey = async (pubKeyJson) => {
   const fun = 'newPublicKey'
-
   try {
     logT(mod, fun, ``)
     await normalizeKeyData(pubKeyJson)

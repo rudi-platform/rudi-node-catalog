@@ -159,7 +159,8 @@ export const listMissingMedia = (rudiMetadata) => {
   const metadataMediaList = rudiMetadata[API_MEDIA_PROPERTY]
   const missingMediaList = []
   metadataMediaList.map((media) => {
-    if (isMediaMissing(media[API_FILE_STORAGE_STATUS])) missingMediaList.push(media[API_MEDIA_ID])
+    if (media[API_MEDIA_TYPE === MediaTypes.File] && isMediaMissing(media[API_FILE_STORAGE_STATUS]))
+      missingMediaList.push(media[API_MEDIA_ID])
   })
   return missingMediaList.length > 0 ? missingMediaList : null
 }
