@@ -730,8 +730,9 @@ const updateMetadataState = async (dbMetadata, newState = StorageStatus.Online) 
     }
     if (metadata[API_INTEGRATION_ERROR_ID]) {
       delete metadata[API_INTEGRATION_ERROR_ID]
-      delete dbMetadata[API_INTEGRATION_ERROR_ID]
+      dbMetadata[API_INTEGRATION_ERROR_ID] = null
       await dbMetadata.save()
+      logD(mod, fun, 'Integration error flag removed')
     }
     logD(
       mod,
