@@ -133,6 +133,7 @@ import {
   searchDbObjects,
   getObjectWithRudiId,
   getMetadataWithJson,
+  getObjectWithJson,
 } from '../db/dbQueries.js'
 
 import { parseQueryParameters } from '../utils/parseRequest.js'
@@ -988,6 +989,8 @@ export const initThemes = async (req, reply) => {
 export const setFlagIntegrationKO = async (metadata, reportId) => {
   metadata[API_INTEGRATION_ERROR_ID] = reportId
   await metadata.save()
+  // metadata = await getObjectWithJson(OBJ_METADATA, metadata)
+  // return metadata
 }
 
 export const removeFlagIntegrationError = async (metadata) => {
@@ -997,6 +1000,8 @@ export const removeFlagIntegrationError = async (metadata) => {
     if (!metadata[API_INTEGRATION_ERROR_ID]) return
     delete metadata[API_INTEGRATION_ERROR_ID]
     await overwriteDbObject(OBJ_METADATA, metadata)
+    metadata = await getObjectWithJson(OBJ_METADATA, metadata)
+    // console.debug(`T (${fun}) metadata`, metadata)
     return metadata
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)

@@ -74,6 +74,7 @@ import {
   API_METAINFO_VERSION_PROPERTY,
   API_STORAGE_STATUS,
   API_MEDIA_ID,
+  API_INTEGRATION_ERROR_ID,
 } from '../../db/dbFields.js'
 
 import { get as getFileTypes, MIME_YAML_ALT, MIME_YAML } from '../thesaurus/FileTypes.js'
@@ -117,7 +118,7 @@ import { get as getLicenceCodes } from '../thesaurus/LicenceCodes.js'
 // -------------------------------------------------------------------------------------------------
 // Schema definitions
 // -------------------------------------------------------------------------------------------------
-import { DoiSchema, UuidV4Schema } from '../schemas/Identifiers.js'
+import { DoiSchema, UuidSchema, UuidV4Schema } from '../schemas/Identifiers.js'
 
 import { DictionaryEntrySchema } from '../schemas/DictionaryEntry.js'
 import { checkDates, ReferenceDatesSchema } from '../schemas/ReferenceDates.js'
@@ -271,6 +272,9 @@ const MetadataSchema = new mongoose.Schema(
     [API_COLLECTION_TAG]: {
       type: String,
     },
+
+    /** 'integration_error_id': id of the last integration error report from the portal */
+    [API_INTEGRATION_ERROR_ID]: UuidSchema,
 
     // ---------------------------
     // Involved parties

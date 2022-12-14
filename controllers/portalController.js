@@ -558,9 +558,9 @@ const isMetadataSendableToPortal = async (metadataId) => {
     }
 
     if (metadata[API_INTEGRATION_ERROR_ID]) {
-      logD(mod, fun + '.before', beautify(metadata))
+      // logD(mod, fun + '.before', beautify(metadata))
       await removeFlagIntegrationError(metadata)
-      logD(mod, fun + '.after', beautify(metadata))
+      logD(mod, fun + '.removeReportErr', beautify(metadata))
     }
 
     //--- Purging the waiting room / buffer of metadatas waiting for an integration report
@@ -630,6 +630,8 @@ export const sendMetadataToPortal = async (metadataId) => {
       delete media[API_FILE_STORAGE_STATUS]
       delete media[API_FILE_STATUS_UPDATE]
     })
+    delete metadataClean[API_INTEGRATION_ERROR_ID]
+
     logV(mod, fun, `Metadata sent to portal: ${beautify(metadataClean)}`)
     // console.debug('T (sendMetadataToPortal) metadata', metadataClean[API_MEDIA_PROPERTY][0])
     //--- Sending to portal

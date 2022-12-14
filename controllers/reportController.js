@@ -166,13 +166,14 @@ export const addSingleReportForObject = async (req, reply) => {
     logI(mod, fun, `Report saved: ${beautify(dbReadyReport)}`)
     logD(mod, fun, `dbObject: ${beautify(dbObject)}`)
 
-    if (dbObject)
+    if (dbObject) {
       if (reportBody[API_REPORT_STATUS] === IntegrationStatus.OK) {
         await setPublishedFlag(dbObject, urlObjectId)
       } else {
         await setFlagIntegrationKO(dbObject, reportBody[API_REPORT_ID])
         // TODO: IntegrationStatus.KO => flag to set a problem
       }
+    }
 
     return dbReadyReport
   } catch (err) {
@@ -278,8 +279,14 @@ export const addOrEditSingleReport = async (objectType, req, reply) => {
       logI(mod, fun, `Report edited: ${beautify(dbReadyReport)}`)
     }
 
-    if (dbObject && reportBody[API_REPORT_STATUS] === IntegrationStatus.OK) {
-      await setPublishedFlag(dbObject, urlObjectId)
+    if (dbObject) {
+      if (reportBody[API_REPORT_STATUS] === IntegrationStatus.OK) {
+        await setPublishedFlag(dbObject, urlObjectId)
+      } else {
+        await setFlagIntegrationKO(dbObject, reportBody[API_REPORT_ID])
+        // TODO: IntegrationStatus.KO => flag to set a problem
+      }
+      // console.debug(`T (${fun}) dbObject:`, dbObject)
     }
 
     return dbReadyReport
