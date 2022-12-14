@@ -123,8 +123,9 @@ export const setPublishedDate = (metadata, datePublished) => {
 // -------------------------------------------------------------------------------------------------
 // Specific fields
 // -------------------------------------------------------------------------------------------------
-export const API_COLLECTION_TAG = 'collection_tag'
 export const API_PURPOSE = 'purpose'
+export const API_COLLECTION_TAG = 'collection_tag'
+export const API_INTEGRATION_ERROR_ID = 'integration_error_id'
 
 // -------------------------------------------------------------------------------------------------
 // Properties with restricted values

@@ -12,9 +12,17 @@ const mod = 'repCtrl'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { logD, logI, logMetadata, logT, logW } from '../utils/logging.js'
+import { beautify, nowISO, padZerosLeft as pad0 } from '../utils/jsUtils.js'
+import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
 import { objectAlreadyExists, parametersMismatch } from '../utils/msg.js'
-
+import { logD, logI, logMetadata, logT, logW } from '../utils/logging.js'
+import {
+  BadRequestError,
+  ObjectNotFoundError,
+  MethodNotAllowedError,
+  RudiError,
+  ParameterExpectedError,
+} from '../utils/errors.js'
 import {
   doesObjectExistWithRudiId,
   getDbObjectList,
@@ -22,8 +30,6 @@ import {
   getObjectWithRudiId,
   overwriteDbObject,
 } from '../db/dbQueries.js'
-import { beautify, nowISO, padZerosLeft as pad0 } from '../utils/jsUtils.js'
-import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
 
 // -------------------------------------------------------------------------------------------------
 // Constants
@@ -63,14 +69,10 @@ import {
 // Data models
 // -------------------------------------------------------------------------------------------------
 import { Report, IntegrationStatus } from '../definitions/models/Report.js'
-import {
-  BadRequestError,
-  ObjectNotFoundError,
-  MethodNotAllowedError,
-  RudiError,
-  ParameterExpectedError,
-} from '../utils/errors.js'
+
 import { removeMetadataFromWaitingList } from './portalController.js'
+import { setFlagIntegrationKO } from './metadataController.js'
+
 // -------------------------------------------------------------------------------------------------
 // Comformity functions
 // -------------------------------------------------------------------------------------------------
@@ -164,10 +166,13 @@ export const addSingleReportForObject = async (req, reply) => {
     logI(mod, fun, `Report saved: ${beautify(dbReadyReport)}`)
     logD(mod, fun, `dbObject: ${beautify(dbObject)}`)
 
-    if (dbObject && reportBody[API_REPORT_STATUS] === IntegrationStatus.OK) {
-      await setPublishedFlag(dbObject, urlObjectId)
-    }
-    // TODO: IntegrationStatus.KO => flag to set a problem
+    if (dbObject)
+      if (reportBody[API_REPORT_STATUS] === IntegrationStatus.OK) {
+        await setPublishedFlag(dbObject, urlObjectId)
+      } else {
+        await setFlagIntegrationKO(dbObject, reportBody[API_REPORT_ID])
+        // TODO: IntegrationStatus.KO => flag to set a problem
+      }
 
     return dbReadyReport
   } catch (err) {

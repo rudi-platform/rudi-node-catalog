@@ -25,6 +25,7 @@ import {
   API_MEDIA_PROPERTY,
   API_FILE_STORAGE_STATUS,
   API_FILE_STATUS_UPDATE,
+  API_INTEGRATION_ERROR_ID,
 } from '../db/dbFields.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -62,8 +63,8 @@ import { isUUID } from '../definitions/schemaValidators.js'
 import { StorageStatus } from '../definitions/thesaurus/StorageStatus.js'
 
 import {
-  getEnsuredObjectWithRudiId,
   getLatestStoredPortalToken,
+  getObjectWithRudiId,
   storePortalToken,
 } from '../db/dbQueries.js'
 
@@ -77,6 +78,7 @@ import {
   UnauthorizedError,
 } from '../utils/errors.js'
 import { isEveryMediaAvailable } from '../definitions/models/Metadata.js'
+import { removeFlagIntegrationError } from './metadataController.js'
 
 // -------------------------------------------------------------------------------------------------
 // Portal auth header
@@ -350,7 +352,7 @@ export const getNewTokenFromPortal = async () => {
     }
     // logD(mod, fun, `answer.status: ${answer.status}`)
 
-    if (answer.status === 200) {
+    if (answer?.status === 200) {
       // logD(mod, fun, `config: ${ beautify(answer.config)}`)
       // logD(mod, fun, `data: ${ beautify(answer.data)}`)
       const portalToken = answer.data
@@ -397,7 +399,7 @@ export const getTokenCheckedByPortal = async (token) => {
     // logD(mod, fun, requestUrl)
     const portalResponse = await directGet(requestUrl)
 
-    if (portalResponse.status === 200) {
+    if (portalResponse?.status === 200) {
       logV(mod, fun, `RUDI Portal validated the token`)
       return portalResponse.data
     } else throw new ForbiddenError(`Portal invalidated the token: ${portalResponse.data}`)
@@ -532,7 +534,7 @@ const isMetadataSendableToPortal = async (metadataId) => {
     if (!isUUID(metadataId)) throw new BadRequestError(`Badly formatted UUID: ${metadataId}`)
 
     //--- Get local metadata from ID
-    const metadata = await getEnsuredObjectWithRudiId(OBJ_METADATA, metadataId)
+    const metadata = await getObjectWithRudiId(OBJ_METADATA, metadataId)
     if (!metadata) {
       const errMsg = `No data found locally for id '${metadataId}'`
       logW(mod, fun, errMsg)
@@ -554,6 +556,13 @@ const isMetadataSendableToPortal = async (metadataId) => {
       logD(mod, fun, `Waiting for other media to get uploaded: ${metadataId}`)
       return false
     }
+
+    if (metadata[API_INTEGRATION_ERROR_ID]) {
+      logD(mod, fun + '.before', beautify(metadata))
+      await removeFlagIntegrationError(metadata)
+      logD(mod, fun + '.after', beautify(metadata))
+    }
+
     //--- Purging the waiting room / buffer of metadatas waiting for an integration report
     try {
       for (let i = metadatasWaitingForPortalFeedback.length - 1; i >= 0; i--)

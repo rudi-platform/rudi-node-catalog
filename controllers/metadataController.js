@@ -48,6 +48,7 @@ import {
   API_STORAGE_STATUS,
   API_METAINFO_VERSION_PROPERTY,
   API_MEDIA_TYPE,
+  API_INTEGRATION_ERROR_ID,
 } from '../db/dbFields.js'
 
 import {
@@ -981,5 +982,23 @@ export const initThemes = async (req, reply) => {
   } catch (err) {
     const error = err.name === MONGO_ERROR ? new BadRequestError(err) : new NotFoundError(error)
     throw RudiError.treatError(mod, fun, error)
+  }
+}
+
+export const setFlagIntegrationKO = async (metadata, reportId) => {
+  metadata[API_INTEGRATION_ERROR_ID] = reportId
+  await metadata.save()
+}
+
+export const removeFlagIntegrationError = async (metadata) => {
+  const fun = 'removeFlagIntegrationError'
+  try {
+    if (!metadata) throw new BadRequestError('Missing parameter: metadata')
+    if (!metadata[API_INTEGRATION_ERROR_ID]) return
+    delete metadata[API_INTEGRATION_ERROR_ID]
+    await overwriteDbObject(OBJ_METADATA, metadata)
+    return metadata
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
   }
 }

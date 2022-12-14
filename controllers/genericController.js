@@ -194,7 +194,7 @@ function overrideFilter(filterList, field, value) {
   const newFilter = { [field]: value }
 
   if (!filterList || filterList[field]) return { $and: [newFilter] }
-  if (!filterList.$and) {
+  if (!filterList?.$and) {
     // Simple filter
     return { $and: [filterList, newFilter] }
   }
