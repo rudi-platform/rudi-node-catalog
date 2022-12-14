@@ -231,11 +231,11 @@ export class RudiError extends Error {
             JSON.parse(JSON.stringify(comError)).status
         ) || (comError.code == 'ENOTFOUND' ? 404 : 0)
 
-      logD(mod, fun, `${errFlag}error code: ${errCode}`)
+      // logD(mod, fun, `${errFlag}error code: ${errCode}`)
 
-      logD(mod, fun, `response?.data?.label : ${comError.response?.data?.label}`)
-      logD(mod, fun, `message : ${comError.message}`)
-      logD(mod, fun, `data?.message : ${comError.data?.message}`)
+      // logD(mod, fun, `response?.data?.label : ${comError.response?.data?.label}`)
+      // logD(mod, fun, `message : ${comError.message}`)
+      // logD(mod, fun, `data?.message : ${comError.data?.message}`)
 
       const errMessage = `${
         comError.response?.data?.label || comError.message || comError.data?.message

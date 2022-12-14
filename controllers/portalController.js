@@ -23,13 +23,15 @@ import {
   DB_UPDATED_AT,
   API_REPORT_ID,
   API_MEDIA_PROPERTY,
+  API_FILE_STORAGE_STATUS,
+  API_FILE_STATUS_UPDATE,
 } from '../db/dbFields.js'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { JWT_EXP, REQ_MTD } from '../utils/crypto.js'
-import { logD, logT, logV, logW } from '../utils/logging.js'
+import { logD, logE, logT, logV, logW } from '../utils/logging.js'
 import {
   beautify,
   dateEpochSToIso,
@@ -553,12 +555,16 @@ const isMetadataSendableToPortal = async (metadataId) => {
       return false
     }
     //--- Purging the waiting room / buffer of metadatas waiting for an integration report
-    for (let i = metadatasWaitingForPortalFeedback.length - 1; i >= 0; i--)
-      if (
-        metadatasWaitingForPortalFeedback[i] &&
-        metadatasWaitingForPortalFeedback[i][WAIT_DATE] < nowEpochS() + WAITING_ROOM_TIMEOUT_S
-      )
-        metadatasWaitingForPortalFeedback.splice(i, 1)
+    try {
+      for (let i = metadatasWaitingForPortalFeedback.length - 1; i >= 0; i--)
+        if (
+          metadatasWaitingForPortalFeedback[i] &&
+          metadatasWaitingForPortalFeedback[i][WAIT_DATE] < nowEpochS() + WAITING_ROOM_TIMEOUT_S
+        )
+          metadatasWaitingForPortalFeedback.splice(i, 1)
+    } catch (e) {
+      logE(mod, fun + '.purgeWaitBuffer', e)
+    }
 
     //--- Check if the metadata has already been sent to portal
     let isMetadataAlreadyWaitingToBeSent = false
@@ -610,9 +616,12 @@ export const sendMetadataToPortal = async (metadataId) => {
     const metadataClean = deepClone(metadata)
     // API version
     metadataClean[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = API_VERSION
-    delete metadataClean[API_MEDIA_PROPERTY][0].file_storage_status
-    delete metadataClean[API_MEDIA_PROPERTY][0].file_storage_update
-    console.debug('T (sendMetadataToPortal) metadata', beautify(metadataClean))
+
+    metadataClean[API_MEDIA_PROPERTY].map((media) => {
+      delete media[API_FILE_STORAGE_STATUS]
+      delete media[API_FILE_STATUS_UPDATE]
+    })
+    logV(mod, fun, `Metadata sent to portal: ${beautify(metadataClean)}`)
     // console.debug('T (sendMetadataToPortal) metadata', metadataClean[API_MEDIA_PROPERTY][0])
     //--- Sending to portal
     const portalToken = await getPortalToken()
