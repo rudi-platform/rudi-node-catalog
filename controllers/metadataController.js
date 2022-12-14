@@ -729,6 +729,7 @@ const updateMetadataState = async (dbMetadata, newState = StorageStatus.Online) 
       if (!dbMetadata[API_INTEGRATION_ERROR_ID]) await dbMetadata.save()
     }
     if (dbMetadata[API_INTEGRATION_ERROR_ID]) {
+      delete metadata[API_INTEGRATION_ERROR_ID]
       delete dbMetadata[API_INTEGRATION_ERROR_ID]
       await dbMetadata.save()
     }
