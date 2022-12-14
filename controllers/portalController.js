@@ -78,7 +78,6 @@ import {
   UnauthorizedError,
 } from '../utils/errors.js'
 import { isEveryMediaAvailable } from '../definitions/models/Metadata.js'
-import { removeFlagIntegrationError } from './metadataController.js'
 
 // -------------------------------------------------------------------------------------------------
 // Portal auth header
@@ -555,12 +554,6 @@ const isMetadataSendableToPortal = async (metadataId) => {
     ) {
       logD(mod, fun, `Waiting for other media to get uploaded: ${metadataId}`)
       return false
-    }
-
-    if (metadata[API_INTEGRATION_ERROR_ID]) {
-      // logD(mod, fun + '.before', beautify(metadata))
-      await removeFlagIntegrationError(metadata)
-      logD(mod, fun + '.removeReportErr', beautify(metadata))
     }
 
     //--- Purging the waiting room / buffer of metadatas waiting for an integration report

@@ -133,7 +133,6 @@ import {
   searchDbObjects,
   getObjectWithRudiId,
   getMetadataWithJson,
-  getObjectWithJson,
 } from '../db/dbQueries.js'
 
 import { parseQueryParameters } from '../utils/parseRequest.js'
@@ -727,12 +726,16 @@ const updateMetadataState = async (dbMetadata, newState = StorageStatus.Online) 
     // console.log('T (updateMetadataState) API_STORAGE_STATUS:', metadata[API_STORAGE_STATUS])
     if (dbMetadata[API_STORAGE_STATUS] !== metadata[API_STORAGE_STATUS]) {
       dbMetadata[API_STORAGE_STATUS] = metadata[API_STORAGE_STATUS]
+      if (!dbMetadata[API_INTEGRATION_ERROR_ID]) await dbMetadata.save()
+    }
+    if (dbMetadata[API_INTEGRATION_ERROR_ID]) {
+      delete dbMetadata[API_INTEGRATION_ERROR_ID]
       await dbMetadata.save()
     }
     logD(
       mod,
       fun,
-      `Metadata is ${areAllMediaAvailable ? '' : 'not '} sendable: ${dbMetadata[API_METADATA_ID]}`
+      `Metadata is ${areAllMediaAvailable ? '' : 'not '}sendable: ${dbMetadata[API_METADATA_ID]}`
     )
     return { metadata, areAllMediaAvailable } // OK to send
   } catch (err) {
@@ -991,19 +994,4 @@ export const setFlagIntegrationKO = async (metadata, reportId) => {
   await metadata.save()
   // metadata = await getObjectWithJson(OBJ_METADATA, metadata)
   // return metadata
-}
-
-export const removeFlagIntegrationError = async (metadata) => {
-  const fun = 'removeFlagIntegrationError'
-  try {
-    if (!metadata) throw new BadRequestError('Missing parameter: metadata')
-    if (!metadata[API_INTEGRATION_ERROR_ID]) return
-    delete metadata[API_INTEGRATION_ERROR_ID]
-    await overwriteDbObject(OBJ_METADATA, metadata)
-    metadata = await getObjectWithJson(OBJ_METADATA, metadata)
-    // console.debug(`T (${fun}) metadata`, metadata)
-    return metadata
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
 }
