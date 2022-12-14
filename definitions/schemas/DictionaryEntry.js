@@ -13,14 +13,17 @@ const Languages = getLanguages()
 // Custom schema definition
 // -------------------------------------------------------------------------------------------------
 export const DictionaryEntrySchema = {
-  [DICT_LANG]: {
-    type: String,
-    default: Languages.fr,
-    enum: Object.values(Languages),
-    required: true,
+  type: {
+    [DICT_LANG]: {
+      type: String,
+      default: Languages.fr,
+      enum: Object.values(Languages),
+      required: true,
+    },
+    [DICT_TEXT]: {
+      type: String, // Only one entry per language!
+      required: true,
+    },
   },
-  [DICT_TEXT]: {
-    type: String, // Only one entry per language!
-    required: true,
-  },
+  _id: false,
 }

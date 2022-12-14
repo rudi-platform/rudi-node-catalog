@@ -22,6 +22,7 @@ import {
   API_METADATA_ID,
   DB_UPDATED_AT,
   API_REPORT_ID,
+  API_MEDIA_PROPERTY,
 } from '../db/dbFields.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -552,7 +553,7 @@ const isMetadataSendableToPortal = async (metadataId) => {
       return false
     }
     //--- Purging the waiting room / buffer of metadatas waiting for an integration report
-    for (const i = metadatasWaitingForPortalFeedback.length - 1; i >= 0; i--)
+    for (let i = metadatasWaitingForPortalFeedback.length - 1; i >= 0; i--)
       if (
         metadatasWaitingForPortalFeedback[i] &&
         metadatasWaitingForPortalFeedback[i][WAIT_DATE] < nowEpochS() + WAITING_ROOM_TIMEOUT_S
@@ -609,7 +610,10 @@ export const sendMetadataToPortal = async (metadataId) => {
     const metadataClean = deepClone(metadata)
     // API version
     metadataClean[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = API_VERSION
-
+    delete metadataClean[API_MEDIA_PROPERTY][0].file_storage_status
+    delete metadataClean[API_MEDIA_PROPERTY][0].file_storage_update
+    console.debug('T (sendMetadataToPortal) metadata', beautify(metadataClean))
+    // console.debug('T (sendMetadataToPortal) metadata', metadataClean[API_MEDIA_PROPERTY][0])
     //--- Sending to portal
     const portalToken = await getPortalToken()
     const reqOpts = {

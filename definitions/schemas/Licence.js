@@ -36,6 +36,7 @@ export const LicenceSchema = {
   [API_LICENCE_CUSTOM_LABEL]: {
     type: [DictionaryEntrySchema],
     default: undefined,
+    _id: false,
   },
 
   /** Custom licence: Informative URL towards the custom licence */

@@ -167,6 +167,7 @@ export const addSingleReportForObject = async (req, reply) => {
     if (dbObject && reportBody[API_REPORT_STATUS] === IntegrationStatus.OK) {
       await setPublishedFlag(dbObject, urlObjectId)
     }
+    // TODO: IntegrationStatus.KO => flag to set a problem
 
     return dbReadyReport
   } catch (err) {

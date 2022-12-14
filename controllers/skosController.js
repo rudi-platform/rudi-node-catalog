@@ -53,7 +53,7 @@ import {
 
 import { getSkosmosConf } from '../config/confSystem.js'
 import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
-import { logD, logE, logT, logV, logW, sysAlert } from '../utils/logging.js'
+import { logD, logE, logT, logW, sysAlert } from '../utils/logging.js'
 
 import {
   ParameterExpectedError,
@@ -606,15 +606,15 @@ export const getSingleThesaurus = async (req, reply) => {
 export const getSingleThesaurusLabels = async (req, reply) => {
   const fun = 'getThesaurusLabels'
   try {
-    logV(
-      mod,
-      fun,
-      `< GET ${URL_PV_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}/:${PARAM_THESAURUS_LANG}`
-    )
+    // logT(
+    //   mod,
+    //   fun,
+    //   `< GET ${URL_PV_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}/:${PARAM_THESAURUS_LANG}`
+    // )
 
     const thesaurusCode = accessReqParam(req, PARAM_THESAURUS_CODE)
     const thesaurusLang = accessReqParam(req, PARAM_THESAURUS_LANG)
-    logD(mod, fun, `thesaurusCode: ${thesaurusCode}`)
+    // logD(mod, fun, `thesaurusCode: ${thesaurusCode}`)
 
     const thesaurus = await getThesaurusLabel(thesaurusCode, thesaurusLang)
     if (!thesaurus)

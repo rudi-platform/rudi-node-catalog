@@ -28,16 +28,16 @@ export const AccesConditionSchema = {
   },
 
   /** Describes how constrained is the use of the resource */
-  usage_constraint: { type: [DictionaryEntrySchema], default: undefined },
+  usage_constraint: { type: [DictionaryEntrySchema], default: undefined, _id: false },
 
   /** Information that MUST be cited every time the data is used */
-  bibliographical_reference: { type: [DictionaryEntrySchema], default: undefined },
+  bibliographical_reference: { type: [DictionaryEntrySchema], default: undefined, _id: false },
 
   /**
    * Mention that must be cited verbatim in every publication that
    * makes use of the data
    */
-  mandatory_mention: { type: [DictionaryEntrySchema], default: undefined },
-  access_constraint: { type: [DictionaryEntrySchema], default: undefined },
-  other_constraints: { type: [DictionaryEntrySchema], default: undefined },
+  mandatory_mention: { type: [DictionaryEntrySchema], default: undefined, _id: false },
+  access_constraint: { type: [DictionaryEntrySchema], default: undefined, _id: false },
+  other_constraints: { type: [DictionaryEntrySchema], default: undefined, _id: false },
 }
