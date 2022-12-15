@@ -26,6 +26,7 @@ import {
   API_FILE_STORAGE_STATUS,
   API_FILE_STATUS_UPDATE,
   API_INTEGRATION_ERROR_ID,
+  API_METAINFO_SOURCE_PROPERTY,
 } from '../db/dbFields.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -624,6 +625,7 @@ export const sendMetadataToPortal = async (metadataId) => {
       delete media[API_FILE_STATUS_UPDATE]
     })
     delete metadataClean[API_INTEGRATION_ERROR_ID]
+    delete metadataClean[API_METAINFO_PROPERTY][API_METAINFO_SOURCE_PROPERTY]
 
     logV(mod, fun, `Metadata sent to portal: ${beautify(metadataClean)}`)
     // console.debug('T (sendMetadataToPortal) metadata', metadataClean[API_MEDIA_PROPERTY][0])
