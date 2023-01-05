@@ -3,9 +3,6 @@
 // External dependencies
 // -------------------------------------------------------------------------------------------------
 import { execSync } from 'child_process'
-import _ from 'lodash'
-
-const { max } = _
 
 // -------------------------------------------------------------------------------------------------
 // App options: environment variables
@@ -69,10 +66,10 @@ let longestCliOpt = 0
 let longestEnvOpt = 0
 let longestText = 0
 Object.keys(OPTIONS).map((key) => {
-  longestOptName = max([longestOptName, key.length])
-  longestCliOpt = max([longestCliOpt, OPTIONS[key].cli.length])
-  longestEnvOpt = max([longestEnvOpt, OPTIONS[key].env.length])
-  longestText = max([longestText, OPTIONS[key].text.length])
+  longestOptName = Math.max([longestOptName, key.length])
+  longestCliOpt = Math.max([longestCliOpt, OPTIONS[key].cli.length])
+  longestEnvOpt = Math.max([longestEnvOpt, OPTIONS[key].env.length])
+  longestText = Math.max([longestText, OPTIONS[key].text.length])
 })
 
 let ARE_APP_OPTIONS_LOADED = false

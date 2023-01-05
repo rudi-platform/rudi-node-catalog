@@ -11,6 +11,7 @@
     "extstart": "nodemon -e js,ini --exec \"npm run rudiapp\"",
     "rudiapp": "npm install && node rudiServer.js",
     "devstart": "nodemon ./rudiServer.js --conf=./0-ini/conf_custom.ini",
+    "tracestart": "nodemon --inspect ./rudiServer.js --conf=./0-ini/conf_custom.ini",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint \"**/*.js\""
   },

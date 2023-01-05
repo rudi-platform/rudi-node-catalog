@@ -12,8 +12,8 @@ It also makes it possible to upload metadata from another module such as the Pro
 The API module provides :
 
 - A definition of the RUDI metadata that is compatible with the definition (https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER)
-- A public API for fetching metadata
-- A private API for creating, accessing, updating and deleting metadata.
+- An external API for fetching open-data metadata (public and accessible without any authentification)
+- An internal API for creating, accessing, updating and deleting metadata (https://app.swaggerhub.com/apis/OlivierMartineau/RudiProducer-InternalAPI)
 
 ---
 
@@ -103,6 +103,10 @@ _See https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/ for further
 - `GET /api/admin/db`
 - `DELETE /api/admin/db/:object`
 - `DELETE /api/admin/db`
+- `GET /api/admin/check/node/url`
+- `GET /api/admin/check/portal/url`
+- `GET /api/admin/check/portal/resources`
+- `GET /api/admin/check/portal/ids`
 
 ---
 
@@ -118,7 +122,7 @@ When the flag `should_control_private_requests` is true, JWT from incoming reque
 
 The parameter `profiles` indicates the path where is located the security file.
 
-This security file defines the "profiles" for each client that can connect on the private side of the API.
+This security file defines the "profiles" for each client that can connect on the internal side of the API.
 They are defined each by a section whose **name** reflects the `sub` payload field in the JWT.
 
 In this section,
