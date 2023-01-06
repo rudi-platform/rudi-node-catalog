@@ -850,7 +850,7 @@ MetadataSchema.pre('save', async function (next) {
     await checkThesaurus(metadata)
     await checkFileTypes(metadata)
 
-    await checkMetadataSource(metadata)
+    // await checkMetadataSource(metadata)
     // await checkMedia(metadata)
     logT(mod, fun, `pre save checks OK`)
   } catch (err) {
