@@ -505,6 +505,7 @@ const MetadataSchema = new mongoose.Schema(
 // -------------------------------------------------------------------------------------------------
 // Validation
 // -------------------------------------------------------------------------------------------------
+// eslint-disable-next-line unused-imports/no-unused-vars
 async function checkMetadataSource(metadata) {
   const fun = 'checkMetadataSource'
   try {

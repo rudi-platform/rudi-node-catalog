@@ -856,10 +856,10 @@ export const sendToPortal = (metadata) => {
     const metaId = metadata[API_METADATA_ID]
     logT(mod, fun, `${metaId}`)
     return sendMetadataToPortal(metaId)
-      .catch((err) => logE(mod, fun, `Sending to portal failed for metadata '${metaId}': ${err}`))
       .then((res) => {
         if (res) logI(mod, fun, `'Update request received by the portal for metadata '${metaId}'`)
       })
+      .catch((err) => logE(mod, fun, `Sending to portal failed for metadata '${metaId}': ${err}`))
     // logV(mod, fun, `Sent request to portal: ${metaId}`)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -933,12 +933,12 @@ export const initWithODR = async (req, reply) => {
         return upsertMetadata(metadata)
       })
     )
+      .then(() => logD(mod, fun, '--- Mass initialization done ---'))
       .catch((err) => {
         logE(mod, fun, err)
         const context = CallContext.getCallContextFromReq(req)
         context.logErr(mod, fun, err)
       })
-      .then(() => logD(mod, fun, '--- Mass initialization done ---'))
     return 'Initialization initiated'
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
