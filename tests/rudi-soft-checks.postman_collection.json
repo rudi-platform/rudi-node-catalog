@@ -1349,7 +1349,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{apiUrl}}/api/admin/organizations/search?{{softOrg1Name}}&collection_tag={{stamp}}",
+							"raw": "{{apiUrl}}/api/admin/organizations/search?{{softOrg1Id}}&collection_tag={{stamp}}",
 							"host": [
 								"{{apiUrl}}"
 							],
@@ -1361,7 +1361,7 @@
 							],
 							"query": [
 								{
-									"key": "{{softOrg1Name}}",
+									"key": "{{softOrg1Id}}",
 									"value": null
 								},
 								{
@@ -5077,44 +5077,6 @@
 					"response": []
 				},
 				{
-					"name": "Check portal URL Copy",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Get portal URL\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const portalUrl = codec.streamToString(pm.response)",
-									"    pm.expect(portalUrl == 'https://rudi.bzh' || portalUrl == 'http://rudi.qualif.open-groupe.com').to.be.true",
-									"    pm.collectionVariables.set('portalUrl', portalUrl)",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{apiUrl}}/api/admin/check/portal/url",
-							"host": [
-								"{{apiUrl}}"
-							],
-							"path": [
-								"api",
-								"admin",
-								"check",
-								"portal",
-								"url"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "ADD public key: PEM, no URL ⇒ OK",
 					"event": [
 						{
@@ -6178,6 +6140,44 @@
 					"response": []
 				},
 				{
+					"name": "Check portal URL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get portal URL\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const portalUrl = codec.streamToString(pm.response)",
+									"    pm.expect(portalUrl == 'https://rudi.bzh' || portalUrl == 'http://rudi.qualif.open-groupe.com' || portalUrl == 'https://rudi.qualif.open-groupe.com').to.be.true",
+									"    pm.collectionVariables.set('portalUrl', portalUrl)",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/api/admin/check/portal/url",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"check",
+								"portal",
+								"url"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Add portal key",
 					"event": [
 						{
@@ -6799,6 +6799,10 @@
 			"value": ""
 		},
 		{
+			"key": "gitHash",
+			"value": ""
+		},
+		{
 			"key": "apiVersion",
 			"value": ""
 		},
@@ -6951,6 +6955,10 @@
 			"value": ""
 		},
 		{
+			"key": "dateReport",
+			"value": ""
+		},
+		{
 			"key": "softReport2Id",
 			"value": ""
 		},
@@ -6967,19 +6975,11 @@
 			"value": ""
 		},
 		{
-			"key": "portalKeyName",
-			"value": ""
-		},
-		{
-			"key": "gitHash",
-			"value": ""
-		},
-		{
-			"key": "dateReport",
-			"value": ""
-		},
-		{
 			"key": "portalUrl",
+			"value": ""
+		},
+		{
+			"key": "portalKeyName",
 			"value": ""
 		}
 	]
