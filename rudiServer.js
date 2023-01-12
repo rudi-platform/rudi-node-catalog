@@ -51,7 +51,7 @@ import mongoose from 'mongoose'
 // -------------------------------------------------------------------------------------------------
 
 // Setting flags to avoid deprecation warnings
-// mongoose.set('useFindAndModify', false)
+mongoose.set('strictQuery', false)
 
 // const mongoConnectOptions = {
 // useUnifiedTopology: true,
