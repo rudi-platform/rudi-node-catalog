@@ -3509,6 +3509,7 @@
 							"script": {
 								"exec": [
 									"pm.collectionVariables.set('softReport1Id', rand.get('{{$randomUUID}}'));",
+									"pm.collectionVariables.set('dateReport', time.now());",
 									""
 								],
 								"type": "text/javascript"
@@ -3530,7 +3531,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"report_id\": \"{{softReport1Id}}\",\n    \"resource_id\": \"{{softMeta1Id}}\",\n    \"integration_status\": \"KO\",\n    \"version\": \"{{apiVersion}}\",\n    \"comment\": \"soft test report 1\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"raw": "{\n    \"report_id\": \"{{softReport1Id}}\",\n    \"resource_id\": \"{{softMeta1Id}}\",\n    \"resource_title\": \"Test report\",\n    \"submission_date\": \"{{dateReport}}\",\n    \"treatment_date\": \"{{dateReport}}\",\n    \"integration_status\": \"KO\",\n    \"version\": \"{{apiVersion}}\",\n    \"comment\": \"soft test report 1\",\n    \"collection_tag\": \"{{stamp}}\",\n    \"integration_errors\": [\n        {\n            \"error_code\": \"ERR-500\",\n            \"error_message\": \"Une erreur technique est survenue. Veuillez contacter l'administrateur Rudi pour analyser l'erreur.\",\n            \"_id\": \"63999e55e3ff81f445ea71ee\"\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3577,6 +3578,7 @@
 							"script": {
 								"exec": [
 									"pm.collectionVariables.set('softReport2Id', rand.get('{{$randomUUID}}'));",
+									"pm.collectionVariables.set('dateReport', time.now());",
 									""
 								],
 								"type": "text/javascript"
@@ -3598,7 +3600,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"report_id\": \"{{softReport2Id}}\",\n    \"resource_id\": \"{{softMeta1Id}}\",\n    \"integration_status\": \"OK\",\n    \"version\": \"{{apiVersion}}\",\n    \"comment\": \"soft test report 2\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"raw": "{\n    \"report_id\": \"{{softReport2Id}}\",\n    \"resource_id\": \"{{softMeta1Id}}\",\n    \"resource_title\": \"Test report\",\n    \"submission_date\": \"{{dateReport}}\",\n    \"treatment_date\": \"{{dateReport}}\",\n    \"integration_status\": \"OK\",\n    \"version\": \"{{apiVersion}}\",\n    \"comment\": \"soft test report 2\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3647,6 +3649,7 @@
 								"exec": [
 									"pm.collectionVariables.set('unkownMetaId', rand.get('{{$randomUUID}}'));",
 									"pm.collectionVariables.set('softReport3Id', rand.get('{{$randomUUID}}'));",
+									"pm.collectionVariables.set('dateReport', time.now());",
 									""
 								],
 								"type": "text/javascript"
@@ -3668,7 +3671,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"report_id\": \"{{softReport3Id}}\",\n    \"resource_id\": \"{{unkownMetaId}}\",\n    \"integration_status\": \"KO\",\n    \"version\": \"{{apiVersion}}\",\n    \"comment\": \"test report for unkown metadata\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"raw": "{\n    \"report_id\": \"{{softReport3Id}}\",\n    \"resource_id\": \"{{unkownMetaId}}\",\n    \"resource_title\": \"unkown report\",\n    \"submission_date\": \"{{dateReport}}\",\n    \"treatment_date\": \"{{dateReport}}\",\n    \"integration_status\": \"KO\",\n    \"version\": \"{{apiVersion}}\",\n    \"comment\": \"test report for unkown metadata\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3776,7 +3779,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"report_id\": \"{{softReport2Id}}\",\n    \"resource_id\": \"{{softMeta1Id}}\",\n    \"comment\": \"edit\",\n    \"method\": \"POST\",\n    \"resource_title\": \"Test de RUDI en local 44\",\n    \"treatment_date\": \"{{now}}\",\n    \"integration_status\": \"OK\",\n    \"version\": \"{{apiVersion}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"raw": "{\n    \"report_id\": \"{{softReport2Id}}\",\n    \"resource_id\": \"{{softMeta1Id}}\",\n    \"submission_date\": \"{{dateReport}}\",\n    \"comment\": \"edit\",\n    \"method\": \"POST\",\n    \"resource_title\": \"Test de RUDI en local 44\",\n    \"treatment_date\": \"{{now}}\",\n    \"integration_status\": \"OK\",\n    \"version\": \"{{apiVersion}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -5074,6 +5077,44 @@
 					"response": []
 				},
 				{
+					"name": "Check portal URL Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get portal URL\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const portalUrl = codec.streamToString(pm.response)",
+									"    pm.expect(portalUrl == 'https://rudi.bzh' || portalUrl == 'http://rudi.qualif.open-groupe.com').to.be.true",
+									"    pm.collectionVariables.set('portalUrl', portalUrl)",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/api/admin/check/portal/url",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"check",
+								"portal",
+								"url"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "ADD public key: PEM, no URL ⇒ OK",
 					"event": [
 						{
@@ -6160,7 +6201,11 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.collectionVariables.set('portalKeyName','portail-qualif')"
+									"const portalUrl = pm.collectionVariables.get('portalUrl')",
+									"if (portalUrl === 'https://rudi.bzh')",
+									"    pm.collectionVariables.set('portalKeyName', 'portail-rudi')",
+									"else",
+									"    pm.collectionVariables.set('portalKeyName', 'portail-qualif')"
 								],
 								"type": "text/javascript"
 							}
@@ -6171,7 +6216,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"{{portalKeyName}}\",\n    \"url\": \"https://rudi.qualif.open-groupe.com/konsult/v1/encryption-key\"\n}",
+							"raw": "{\n    \"name\": \"{{portalKeyName}}\",\n    \"url\": \"{{portalUrl}}/konsult/v1/encryption-key\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -6923,6 +6968,18 @@
 		},
 		{
 			"key": "portalKeyName",
+			"value": ""
+		},
+		{
+			"key": "gitHash",
+			"value": ""
+		},
+		{
+			"key": "dateReport",
+			"value": ""
+		},
+		{
+			"key": "portalUrl",
 			"value": ""
 		}
 	]
