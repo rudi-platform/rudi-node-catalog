@@ -1,6 +1,6 @@
 {
   "name": "rudi-prod-api",
-  "version": "1.2.3",
+  "version": "2.3.1",
   "private": false,
   "description": "API for RUDI producer node",
   "main": "./rudiServer.js",
