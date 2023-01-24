@@ -75,6 +75,8 @@ import {
   API_STORAGE_STATUS,
   API_MEDIA_ID,
   API_INTEGRATION_ERROR_ID,
+  API_STATUS_PROPERTY,
+  MetadataStatus,
 } from '../../db/dbFields.js'
 
 import { get as getFileTypes, MIME_YAML_ALT, MIME_YAML } from '../thesaurus/FileTypes.js'
@@ -775,18 +777,32 @@ MetadataSchema.virtual(`${API_METAINFO_PROPERTY}.${API_METAINFO_DATES}.${API_DAT
     return this[DB_PUBLISHED_AT]
   }
 )
+MetadataSchema.virtual(API_STATUS_PROPERTY).get(function () {
+  return
+  this[API_COLLECTION_TAG]
+    ? MetadataStatus.Local
+    : this[API_STORAGE_STATUS] === StorageStatus.Pending
+    ? MetadataStatus.Incomplete
+    : this[API_INTEGRATION_ERROR_ID]
+    ? MetadataStatus.Refused
+    : this[DB_PUBLISHED_AT]
+    ? MetadataStatus.Published
+    : objectPath.get(this, API_METAINFO_PROPERTY, API_METAINFO_DATES, API_DATES_DELETED)
+    ? MetadataStatus.Deleted
+    : MetadataStatus.Unset
+})
 
-MetadataSchema.virtual(API_RESTRICTED_ACCESS).get(() =>
+MetadataSchema.virtual(API_RESTRICTED_ACCESS).get(function () {
   objectPath.get(this, [API_ACCESS_CONDITION, API_CONFIDENTIALITY, API_RESTRICTED_ACCESS])
-)
+})
 
-MetadataSchema.virtual(API_RESTRICTED_ACCESS).set((isRestricted) =>
+MetadataSchema.virtual(API_RESTRICTED_ACCESS).set(function (isRestricted) {
   objectPath.set(
     this,
     [API_ACCESS_CONDITION, API_CONFIDENTIALITY, API_RESTRICTED_ACCESS],
     !!isRestricted
   )
-)
+})
 
 // -------------------------------------------------------------------------------------------------
 // Hooks
@@ -907,6 +923,7 @@ Metadata.getSearchableFields = () => [
   API_DATA_NAME_PROPERTY,
   `${API_DATA_DETAILS_PROPERTY}.${DICT_TEXT}`,
   `${API_DATA_DESCRIPTION_PROPERTY}.${DICT_TEXT}`,
+  API_STATUS_PROPERTY,
 ]
 
 Metadata.initialize = async () => {

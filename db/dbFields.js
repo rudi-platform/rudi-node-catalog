@@ -46,8 +46,21 @@ export const API_METAINFO_PROVIDER_PROPERTY = 'metadata_provider'
 export const API_METAINFO_CONTACTS_PROPERTY = 'metadata_contacts'
 export const API_METAINFO_DATES = 'metadata_dates'
 export const API_METAINFO_SOURCE_PROPERTY = 'metadata_source'
+export const API_STATUS_PROPERTY = 'metadata_status'
 export const API_METAINFO_VERSION_PROPERTY = 'api_version'
 
+// -------------------------------------------------------------------------------------------------
+// Metadata properties: status
+// -------------------------------------------------------------------------------------------------
+export const MetadataStatus = {
+  Local: 'local',
+  Incomplete: 'incomplete',
+  Refused: 'refused',
+  Sent: 'sent',
+  Published: 'published',
+  Deleted: 'deleted',
+  Unset: 'unset',
+}
 // -------------------------------------------------------------------------------------------------
 // Metadata properties: geospatial
 // -------------------------------------------------------------------------------------------------
