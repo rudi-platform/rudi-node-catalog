@@ -482,8 +482,8 @@ export const verifyPortalToken = async (accessToken) => {
 
     return [header, payload]
   } catch (err) {
-    const errMsg = `Invalid token: ${err}`
-    logV(mod, fun, errMsg)
+    // const errMsg = `Invalid token: ${err}`
+    // logV(mod, fun, errMsg)
     throw RudiError.treatError(mod, fun, err)
   }
 }
