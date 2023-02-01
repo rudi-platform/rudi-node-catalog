@@ -5782,7 +5782,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"portalxx-{{stamp}}\",\n    \"url\": \"http://rudi.qualif.open-groupe.com/oauth/token_key\",\n    \"prop\": \"value\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"raw": "{\n    \"name\": \"portalxx-{{stamp}}\",\n    \"url\": \"https://rudi-qualif.open-groupe.com/oauth/token_key\",\n    \"prop\": \"value\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -6194,7 +6194,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"{{portalKeyName}}\",\n    \"url\": \"https://rudi.qualif.open-groupe.com/konsult/v1/encryption-key\"\n}",
+							"raw": "{\n    \"name\": \"{{portalKeyName}}\",\n    \"url\": \"https://rudi-qualif.open-groupe.com/konsult/v1/encryption-key\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -6689,10 +6689,6 @@
 		},
 		{
 			"key": "portalKeyName",
-			"value": ""
-		},
-		{
-			"key": "pm_jwt",
 			"value": ""
 		}
 	]

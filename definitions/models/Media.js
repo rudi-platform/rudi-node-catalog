@@ -36,6 +36,7 @@ import {
   API_DATES_CREATED,
   API_DATES_EDITED,
   API_FILE_STATUS_UPDATE,
+  API_MEDIA_AFFILIATED,
 } from '../../db/dbFields.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -161,11 +162,22 @@ const MediaSchema = new mongoose.Schema(
   commonSchemaOptions
 )
 
+MediaSchema.add({
+  /**
+   * Array of media that may be used to have a previsualization or an excerpt
+   * of the data
+   */
+  [API_MEDIA_AFFILIATED]: [MediaSchema],
+})
+
 MediaSchema.pre('save', function (next) {
   const mod = 'MediaSchema'
   const fun = 'pre save hook'
   // logT(mod, fun, ``)
   try {
+    const connector = this[API_MEDIA_CONNECTOR]
+    if (!connector?.url)
+      throw new BadRequestError(missingField(API_MEDIA_CONNECTOR), mod, fun, [API_MEDIA_CONNECTOR])
     if (this[API_MEDIA_TYPE] === MediaTypes.File) {
       if (!isNotEmptyObject(this[API_FILE_CHECKSUM]))
         throw new BadRequestError(missingField(API_FILE_CHECKSUM), mod, fun, [API_FILE_CHECKSUM])
@@ -174,6 +186,8 @@ MediaSchema.pre('save', function (next) {
       this[API_FILE_STORAGE_STATUS] = this[API_FILE_STORAGE_STATUS] || MediaStorageStatus.Available
       // Set status_update date
       this[API_FILE_STATUS_UPDATE] = this[API_FILE_STATUS_UPDATE] || nowISO()
+      // Set connector interface_contract to 'external'
+      this[API_MEDIA_CONNECTOR][API_MEDIA_INTERFACE_CONTRACT]
     }
     if (!!this[API_MEDIA_NAME]) {
       const nameBefore = this[API_MEDIA_NAME]

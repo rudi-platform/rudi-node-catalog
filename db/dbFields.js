@@ -177,6 +177,7 @@ export const API_MEDIA_CONNECTOR = 'connector'
 export const API_MEDIA_INTERFACE_CONTRACT = 'interface_contract'
 export const API_MEDIA_CONNECTOR_PARAMS = 'connector_parameters'
 export const API_MEDIA_URL_VISUAL = 'media_visual'
+export const API_MEDIA_AFFILIATED = 'affiliated_medias'
 
 export const API_FILE_MIME = 'file_type'
 export const API_FILE_SIZE = 'file_size'

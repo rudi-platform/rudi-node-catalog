@@ -3389,6 +3389,65 @@
 					"response": []
 				},
 				{
+					"name": "Add meta 4 MediaService",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Metadata 4 created\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    // console.log(responseJson);",
+									"    const metaId = pm.variables.get('softMeta4Id');",
+									"    const orgId = pm.variables.get('softOrg1Id');",
+									"    pm.expect(responseJson.global_id).to.eq(metaId);",
+									"    pm.expect(responseJson.contacts.length).to.eq(1);",
+									"    pm.expect(responseJson.producer.organization_id).to.eq(orgId);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set('softMeta4Id', rand.get('{{$randomUUID}}'));",
+									"pm.collectionVariables.set('softMedia4Id', rand.get('{{$randomUUID}}'));",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"global_id\": \"{{softMeta4Id}}\",\n    \"local_id\": \"{{$randomUUID}}\",\n    \"resource_title\": \"Test de RUDI en local - {{softMeta4Id}}\",\n    \"collection_tag\": \"{{stamp}}\",\n    \"purpose\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{stamp}}\"\n        }\n    ],\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 33\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 3\"\n        }\n    ],\n    \"theme\": \"energyNetworks\",\n    \"keywords\": [\n        \"plu\",\n        \"municipality\"\n    ],\n    \"geography\": {\n        \"spatial_representation\": \"test\",\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\",\n        \"end_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{softOrg1Id}}\",\n        \"organization_name\": \"IRISA\",\n        \"collection_tag\": \"{{stamp}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{softContact1Id}}\",\n            \"contact_name\": \"Mme. Feya\",\n            \"email\": \"feya@irisa.fr\",\n            \"collection_tag\": \"{{stamp}}\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_provider\": {\n            \"organization_id\": \"{{softOrg1Id}}\"\n        },\n        \"metadata_contacts\": [\n            {\n                \"contact_id\": \"{{softContact1Id}}\"\n            }\n        ]\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"available_formats\": [\n        {\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/{{apiVersion}}\"\n            },\n            \"media_type\": \"SERVICE\",\n            \"media_id\": \"{{softMedia4Id}}\",\n            \"collection_tag\": \"{{stamp}}\"\n        }\n    ],\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"licence_label\": \"cc-by-nd-4.0\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/api/admin/resources",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"resources"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Send metadata list to portal",
 					"event": [
 						{
@@ -4132,7 +4191,7 @@
 					"response": []
 				},
 				{
-					"name": "Delete meta 1 & 2",
+					"name": "Delete meta 1, 2 & 4",
 					"event": [
 						{
 							"listen": "test",
@@ -4143,7 +4202,7 @@
 									"    const responseJson = pm.response.json();",
 									"    // pm.expect(responseJson.n).to.eq(2);",
 									"    // pm.expect(responseJson.ok).to.eq(1);",
-									"    pm.expect(responseJson.deletedCount).to.eq(2);",
+									"    pm.expect(responseJson.deletedCount).to.eq(3);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -4155,7 +4214,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n    \"{{softMeta1Id}}\",\n    \"{{softMeta2Id}}\"\n]",
+							"raw": "[\n    \"{{softMeta1Id}}\",\n    \"{{softMeta2Id}}\",\n    \"{{softMeta4Id}}\"\n]",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4765,7 +4824,7 @@
 									"    const responseJson = pm.response.json();",
 									"    // pm.expect(responseJson.n).to.eq(2);",
 									"    // pm.expect(responseJson.ok).to.eq(1);",
-									"    pm.expect(responseJson.deletedCount).to.eq(2);",
+									"    pm.expect(responseJson.deletedCount).to.eq(3);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -5923,7 +5982,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"portalxx-{{stamp}}\",\n    \"url\": \"http://rudi.qualif.open-groupe.com/oauth/token_key\",\n    \"prop\": \"value\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"raw": "{\n    \"name\": \"portalxx-{{stamp}}\",\n    \"url\": \"https://rudi-qualif.open-groupe.com/oauth/token_key\",\n    \"prop\": \"value\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -6028,7 +6087,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"portal-{{stamp}}\",\n    \"url\": \"https://rudi.qualif.open-groupe.com/konsult/v1/encryption-key\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"raw": "{\n    \"name\": \"portal-{{stamp}}\",\n    \"url\": \"https://rudi-qualif.open-groupe.com/konsult/v1/encryption-key\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -6149,7 +6208,7 @@
 									"pm.test(\"Get portal URL\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const portalUrl = codec.streamToString(pm.response)",
-									"    pm.expect(portalUrl == 'https://rudi.bzh' || portalUrl == 'http://rudi.qualif.open-groupe.com' || portalUrl == 'https://rudi.qualif.open-groupe.com').to.be.true",
+									"    pm.expect(portalUrl == 'https://rudi.bzh' || portalUrl == 'https://rudi-qualif.open-groupe.com' || portalUrl == 'https://rudi-qualif.open-groupe.com').to.be.true",
 									"    pm.collectionVariables.set('portalUrl', portalUrl)",
 									"});",
 									""
@@ -6750,7 +6809,9 @@
 					"        log.t('-- getRudiProdToken --')",
 					"        const tokenName = API_TOKEN_NAME",
 					"        if (!secu.isTokenValid(tokenName)) await secu.renewApiToken(tokenName, next)",
-					"        else if (next) next(pm.collectionVariables.get(tokenName))",
+					"        else if (next) try { next(pm.collectionVariables.get(tokenName)) } catch (err) {",
+					"            console.error()",
+					"        }",
 					"        log.t('API token stored')",
 					"        return pm.collectionVariables.get(tokenName)",
 					"    },",
@@ -6758,14 +6819,18 @@
 					"    getPortalToken: async (apiToken) => {",
 					"        log.t('-- getPortalToken --')",
 					"        const tokenName = PORTAL_TOKEN_NAME",
-					"        if (!secu.isTokenValid(tokenName)) await secu.renewPortalToken(tokenName, apiToken)",
-					"        log.t('Portal token stored')",
-					"        return pm.collectionVariables.get(tokenName)",
+					"        try {",
+					"            if (!secu.isTokenValid(tokenName)) await secu.renewPortalToken(tokenName, apiToken)",
+					"            log.t('Portal token stored')",
+					"            return pm.collectionVariables.get(tokenName)",
+					"        } catch (err) {",
+					"            console.error('E (getPortalToken)', err)",
+					"        }",
 					"    }",
 					"",
 					"}",
 					"",
-					"secu.getRudiProdToken(secu.getPortalToken).then(res => log.d('[End] Received ' + res))",
+					"secu.getRudiProdToken(secu.getPortalToken).then(res => log.d('[End] Received ' + res)).catch()",
 					"time.wait(WAIT_TIME, () => { if (TRACE) console.info('Pre-request Scripts loaded') })",
 					""
 				]
@@ -6948,6 +7013,14 @@
 		},
 		{
 			"key": "countWithOrg1",
+			"value": ""
+		},
+		{
+			"key": "softMeta4Id",
+			"value": ""
+		},
+		{
+			"key": "softMedia4Id",
 			"value": ""
 		},
 		{

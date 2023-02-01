@@ -12,7 +12,7 @@ import { extractJwt, readPublicKeyPem, verifyToken } from '@aqmo.org/jwt_lib'
 // -------------------------------------------------------------------------------------------------
 // Constants
 // -------------------------------------------------------------------------------------------------
-import { API_VERSION, OBJ_METADATA, PARAM_ID, USER_AGENT } from '../config/confApi.js'
+import { PORTAL_API_VERSION, OBJ_METADATA, PARAM_ID, USER_AGENT } from '../config/confApi.js'
 import {
   API_METAINFO_VERSION_PROPERTY,
   API_METAINFO_PROPERTY,
@@ -188,7 +188,7 @@ export const getPortalToken = async () => {
     await verifyPortalToken(token)
     logD(mod, fun, 'Stored token seems OK')
 
-    await getTokenCheckedByPortal(token)
+    // await getTokenCheckedByPortal(token)
     return token
     // logD(mod, fun, 'Stored token was validated by the Portal')
   } catch (err) {
@@ -618,7 +618,7 @@ export const sendMetadataToPortal = async (metadataId) => {
     //--- Ensuring compatibility with portal
     const metadataClean = deepClone(metadata)
     // API version
-    metadataClean[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = API_VERSION
+    metadataClean[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = PORTAL_API_VERSION
 
     metadataClean[API_MEDIA_PROPERTY].map((media) => {
       delete media[API_FILE_STORAGE_STATUS]

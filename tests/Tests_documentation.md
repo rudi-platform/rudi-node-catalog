@@ -36,7 +36,7 @@ The detail of the variables to alter is given bellow.
 | `pm_client_name` | The identifer that is used in the JWT. The name should be appear in the custom `profiles.ini` configuration file of the API module. | rudi_api_pm                                  |
 | `apiUrl`         | The URL of the API module for this environment.                                                                                     | https://shared-rudi.aqmo.org                 |
 | `pmBackUrl`      | The URL of the promanager back-end. This is not used in these tests, so you can just discard this variable.                         | https://admin-rudi.aqmo.org/prodmanager-test |
-| `portalBaseUrl`  | The URL of the portal associated with this environment. This is not used in these tests and can be discarded too.                   | http://rudi.qualif.open-groupe.com           |
+| `portalBaseUrl`  | The URL of the portal associated with this environment. This is not used in these tests and can be discarded too.                   | https://rudi-qualif.open-groupe.com          |
 | `env`            | The type of server. It is normally acessible through `/api/admin/env`, and should equal 'release' for production environments.      | release \| shared \| test                    |
 | `db`             | URL suffix to be used in `test` environment only. No need for change.                                                               | "db" (test env) \| "nodb" (env ≠ test)       |
 
