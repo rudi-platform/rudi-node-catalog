@@ -2736,7 +2736,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.collectionVariables.set('softMedia5Id', rand.get('{{$randomUUID}}'));",
+									"pm.collectionVariables.set('softMedia11Id', rand.get('{{$randomUUID}}'));",
 									""
 								],
 								"type": "text/javascript"
@@ -2770,7 +2770,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"global_id\": \"{{softMeta1Id}}\",\n    \"local_id\": \"testingID {{softMeta1Id}}\",\n    \"doi\": \"10.1007/s00223-003-0070-444/{{softMeta1Id}}\",\n    \"resource_title\": \"Test de RUDI en local {{softMeta1Id}}\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 4444\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 4\"\n        }\n    ],\n    \"collection_tag\": \"{{stamp}}\",\n    \"purpose\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{stamp}}\"\n        }\n    ],\n    \"theme\": \"energyNetworks\",\n    \"keywords\": [\n        \"energy_consommation\",\n        \"electricity\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{softOrg1Id}}\",\n        \"collection_tag\": \"{{stamp}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{softContact1Id}}\",\n            \"collection_tag\": \"{{stamp}}\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_provider\": {\n            \"organization_id\": \"{{softOrg2Id}}\",\n            \"collection_tag\": \"{{stamp}}\"\n        },\n        \"metadata_contacts\": [\n            {\n                \"contact_id\": \"{{softContact2Id}}\",\n                \"collection_tag\": \"{{stamp}}\"\n            }\n        ]\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"licence_label\": \"{{softLicence}}\"\n        }\n    },\n    \"available_formats\": [\n        {\n            \"media_type\": \"SERVICE\",\n            \"media_id\": \"{{softMedia5Id}}\",\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/{{apiVersion}}\"\n            },\n            \"collection_tag\": \"{{stamp}}\"\n        }\n    ]\n}",
+							"raw": "{\n    \"global_id\": \"{{softMeta1Id}}\",\n    \"local_id\": \"testingID {{softMeta1Id}}\",\n    \"doi\": \"10.1007/s00223-003-0070-444/{{softMeta1Id}}\",\n    \"resource_title\": \"Test de RUDI en local {{softMeta1Id}}\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 4444\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 4\"\n        }\n    ],\n    \"collection_tag\": \"{{stamp}}\",\n    \"purpose\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{stamp}}\"\n        }\n    ],\n    \"theme\": \"energyNetworks\",\n    \"keywords\": [\n        \"energy_consommation\",\n        \"electricity\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{softOrg1Id}}\",\n        \"collection_tag\": \"{{stamp}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{softContact1Id}}\",\n            \"collection_tag\": \"{{stamp}}\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_provider\": {\n            \"organization_id\": \"{{softOrg2Id}}\",\n            \"collection_tag\": \"{{stamp}}\"\n        },\n        \"metadata_contacts\": [\n            {\n                \"contact_id\": \"{{softContact2Id}}\",\n                \"collection_tag\": \"{{stamp}}\"\n            }\n        ]\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"licence_label\": \"{{softLicence}}\"\n        }\n    },\n    \"available_formats\": [\n        {\n            \"media_type\": \"SERVICE\",\n            \"media_id\": \"{{softMedia11Id}}\",\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/{{apiVersion}}\"\n            },\n            \"collection_tag\": \"{{stamp}}\"\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -7071,6 +7071,10 @@
 		},
 		{
 			"key": "softMedia5Id",
+			"value": ""
+		},
+		{
+			"key": "softMedia11Id",
 			"value": ""
 		}
 	]
