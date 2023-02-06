@@ -167,7 +167,7 @@ MediaSchema.add({
    * Array of media that may be used to have a previsualization or an excerpt
    * of the data
    */
-  [API_MEDIA_AFFILIATED]: [MediaSchema],
+  [API_MEDIA_AFFILIATED]: { type: [MediaSchema], default: undefined, _id: false },
 })
 
 MediaSchema.pre('save', function (next) {
@@ -187,7 +187,7 @@ MediaSchema.pre('save', function (next) {
       // Set status_update date
       this[API_FILE_STATUS_UPDATE] = this[API_FILE_STATUS_UPDATE] || nowISO()
       // Set connector interface_contract to 'external'
-      this[API_MEDIA_CONNECTOR][API_MEDIA_INTERFACE_CONTRACT]
+      this[API_MEDIA_CONNECTOR][API_MEDIA_INTERFACE_CONTRACT] = 'external'
     }
     if (!!this[API_MEDIA_NAME]) {
       const nameBefore = this[API_MEDIA_NAME]

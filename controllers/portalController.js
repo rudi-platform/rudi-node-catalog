@@ -27,6 +27,8 @@ import {
   API_FILE_STATUS_UPDATE,
   API_INTEGRATION_ERROR_ID,
   API_METAINFO_SOURCE_PROPERTY,
+  API_MEDIA_AFFILIATED,
+  API_MEDIA_URL_VISUAL,
 } from '../db/dbFields.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -623,6 +625,8 @@ export const sendMetadataToPortal = async (metadataId) => {
     metadataClean[API_MEDIA_PROPERTY].map((media) => {
       delete media[API_FILE_STORAGE_STATUS]
       delete media[API_FILE_STATUS_UPDATE]
+      delete media[API_MEDIA_AFFILIATED]
+      delete media[API_MEDIA_URL_VISUAL]
     })
     delete metadataClean[API_INTEGRATION_ERROR_ID]
     delete metadataClean[API_METAINFO_PROPERTY][API_METAINFO_SOURCE_PROPERTY]
