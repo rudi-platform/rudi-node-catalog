@@ -36,7 +36,6 @@ import {
   API_DATES_CREATED,
   API_DATES_EDITED,
   API_FILE_STATUS_UPDATE,
-  API_MEDIA_AFFILIATED,
 } from '../../db/dbFields.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -162,27 +161,27 @@ const MediaSchema = new mongoose.Schema(
   commonSchemaOptions
 )
 
-MediaSchema.add({
-  /**
-   * Array of media that may be used to have a previsualization or an excerpt
-   * of the data
-   */
-  [API_MEDIA_AFFILIATED]: {
-    type: [MediaSchema],
-    default: undefined,
-    _id: false,
-    index: {
-      unique: true,
-      // accept empty values as non-duplicates
-      partialFilterExpression: {
-        [API_MEDIA_AFFILIATED]: {
-          $exists: true,
-          $gt: '',
-        },
-      },
-    },
-  },
-})
+/* *
+ * Array of media that may be used to have a previsualization or an excerpt
+ * of the data
+ */
+// MediaSchema.add({
+//   [API_MEDIA_AFFILIATED]: {
+//     type: [MediaSchema],
+//     default: undefined,
+//     _id: false,
+//     index: {
+//       unique: false,
+//       // accept empty values as non-duplicates
+//       partialFilterExpression: {
+//         [API_MEDIA_AFFILIATED]: {
+//           $exists: true,
+//           $gt: '',
+//         },
+//       },
+//     },
+//   },
+// })
 
 MediaSchema.pre('save', function (next) {
   const mod = 'MediaSchema'
@@ -410,7 +409,6 @@ Media.getSearchableFields = () => [
   API_MEDIA_NAME,
   API_FILE_MIME,
   API_FILE_STORAGE_STATUS,
-  API_MEDIA_AFFILIATED,
   API_MEDIA_URL_VISUAL,
 ]
 
