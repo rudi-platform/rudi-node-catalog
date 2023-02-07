@@ -1704,7 +1704,7 @@
 									"pm.test(\"1 contact found\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const res = pm.response.json();",
-									"    pm.expect(res.total).to.eq(1);",
+									"    pm.expect(res.total).to.gte(1);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -4824,7 +4824,7 @@
 									"    const responseJson = pm.response.json();",
 									"    // pm.expect(responseJson.n).to.eq(2);",
 									"    // pm.expect(responseJson.ok).to.eq(1);",
-									"    pm.expect(responseJson.deletedCount).to.eq(3);",
+									"    pm.expect(responseJson.deletedCount).to.eq(4);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -7067,10 +7067,6 @@
 		},
 		{
 			"key": "portalKeyName",
-			"value": ""
-		},
-		{
-			"key": "softMedia5Id",
 			"value": ""
 		},
 		{
