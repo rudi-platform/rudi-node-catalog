@@ -250,7 +250,18 @@ export const mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFo
           }
           throw e
         }
-
+        // Check if the media set as "media visual" already exists
+        // const mediaVisual = rudiMedia[API_MEDIA_THUMBNAIL]
+        // if (mediaVisual) {
+        //   if (!mediaVisual[API_MEDIA_ID])
+        //     throw new BadRequestError(
+        //       `Parameter '${API_MEDIA_THUMBNAIL}' should be an identified media`,
+        //       mod,
+        //       'media.get',
+        //       [API_MEDIA_PROPERTY, i]
+        //     )
+        //   const dbMediaVisual = getObjectWithRudiId(OBJ_MEDIA, mediaVisual[API_MEDIA_ID])
+        // }
         if (rudiMedia[API_MEDIA_TYPE] !== MediaTypes.File) {
           // Set media storage_status to 'available'
           rudiMedia[API_FILE_STORAGE_STATUS] = MediaStorageStatus.Available

@@ -268,23 +268,29 @@ export const getMetadataFieldsWithObjectType = (objectType) => {
   }
 }
 
-function getPopulateOptions(objectType) {
-  if (objectType === OBJ_METADATA) {
-    return [
-      {
-        path: METADATA_FIELDS_TO_POPULATE,
-        select: SKIP_FIELDS,
-      },
-    ]
-  } else {
-    return []
-  }
-}
+const getPopulateOptions = (objectType) =>
+  objectType === OBJ_METADATA
+    ? [
+        {
+          path: METADATA_FIELDS_TO_POPULATE,
+          select: SKIP_FIELDS,
+        },
+      ]
+    : // : objectType === OBJ_MEDIA
+      // ? [
+      //     {
+      //       path: MEDIA_FIELDS_TO_POPULATE,
+      //       select: SKIP_FIELDS,
+      //     },
+      //   ]
+      []
 
-function getPopulateFields(objectType) {
-  if (objectType !== OBJ_METADATA) return []
-  return METADATA_FIELDS_TO_POPULATE
-}
+const getPopulateFields = (objectType) =>
+  objectType === OBJ_METADATA
+    ? METADATA_FIELDS_TO_POPULATE
+    : // : objectType === OBJ_MEDIA
+      // ? MEDIA_FIELDS_TO_POPULATE
+      []
 
 export const listThemesInMetadata = async () => {
   const fun = 'listThemesInMetadata'

@@ -32,10 +32,10 @@ import {
   API_MEDIA_CONNECTOR_PARAMS,
   API_MEDIA_CAPTION,
   API_MEDIA_DATES,
-  API_MEDIA_URL_VISUAL,
   API_DATES_CREATED,
   API_DATES_EDITED,
   API_FILE_STATUS_UPDATE,
+  API_MEDIA_VISUAL,
 } from '../../db/dbFields.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -85,6 +85,8 @@ const commonSchemaOptions = {
   id: false,
 }
 
+// export const MEDIA_FIELDS_TO_POPULATE = [API_MEDIA_THUMBNAIL, API_MEDIA_SATELLITES].join(' ')
+
 // -------------------------------------------------------------------------------------------------
 // Helper functions
 // -------------------------------------------------------------------------------------------------
@@ -126,12 +128,6 @@ const MediaSchema = new mongoose.Schema(
     /** Time of the creation / last update of the Media */
     [API_MEDIA_DATES]: ReferenceDatesSchema,
 
-    /** Link towards a (low-fidelity) visualization of the media */
-    [API_MEDIA_URL_VISUAL]: {
-      type: String,
-      match: VALID_URI,
-    },
-
     /** Updated name of the service, or possibly the person */
     [API_MEDIA_CONNECTOR]: {
       url: {
@@ -154,34 +150,40 @@ const MediaSchema = new mongoose.Schema(
         _id: false,
       },
     },
+    /** Link towards a (low-fidelity) visualization of the media */
+    [API_MEDIA_VISUAL]: {
+      type: String,
+      validate: VALID_URI,
+      default: undefined,
+      _id: false,
+    },
+    // /** Media visualization of the media */
+    // [API_MEDIA_THUMBNAIL]: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: 'Media',
+    //   default: undefined,
+    // },
 
+    // /* *
+    //  * Array of media that may be used to have a previsualization or an excerpt
+    //  * of the data
+    //  */
+    // [API_MEDIA_SATELLITES]: {
+    //   type: [
+    //     {
+    //       type: mongoose.Schema.Types.ObjectId,
+    //       ref: 'Media',
+    //     },
+    //   ],
+    //   default: undefined,
+    // },
     /** Tag for identifying a collection of resources */
     [API_COLLECTION_TAG]: String,
   },
   commonSchemaOptions
 )
 
-/* *
- * Array of media that may be used to have a previsualization or an excerpt
- * of the data
- */
-// MediaSchema.add({
-//   [API_MEDIA_AFFILIATED]: {
-//     type: [MediaSchema],
-//     default: undefined,
-//     _id: false,
-//     index: {
-//       unique: false,
-//       // accept empty values as non-duplicates
-//       partialFilterExpression: {
-//         [API_MEDIA_AFFILIATED]: {
-//           $exists: true,
-//           $gt: '',
-//         },
-//       },
-//     },
-//   },
-// })
+// MediaSchema.add({})
 
 MediaSchema.pre('save', function (next) {
   const mod = 'MediaSchema'
@@ -409,7 +411,7 @@ Media.getSearchableFields = () => [
   API_MEDIA_NAME,
   API_FILE_MIME,
   API_FILE_STORAGE_STATUS,
-  API_MEDIA_URL_VISUAL,
+  // API_MEDIA_THUMBNAIL,
 ]
 
 Media.initialize = async () => {
