@@ -544,11 +544,11 @@ async function checkLicence(metadata) {
           throw new NotFoundError(
             `Licence label '${licenceLabel}' was not found in licence list '${listLicenceCode}'`
           )
-        } else {
-          metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_CUSTOM_LABEL] = undefined
-          // delete metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_CUSTOM_LABEL]
-          return licenceLabel
         }
+
+        metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_CUSTOM_LABEL] = undefined
+        // delete metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_CUSTOM_LABEL]
+        return licenceLabel
       }
       case LicenceTypes.Custom: {
         // logD(mod, fun, `licenceType: ${beautify(licenceType)}`)
@@ -566,6 +566,14 @@ async function checkLicence(metadata) {
           API_LICENCE_TYPE,
           LicenceTypes.Custom
         )
+        if (typeof customLicenceLabel === 'string') {
+          throw new BadRequestError(
+            `La propriété '${API_LICENCE_CUSTOM_LABEL}' doit être multilingue`,
+            mod,
+            fun,
+            [API_ACCESS_CONDITION, API_LICENCE, API_LICENCE_CUSTOM_LABEL]
+          )
+        }
         return licence[API_LICENCE_CUSTOM_LABEL]
       }
       default: {
@@ -872,7 +880,7 @@ MetadataSchema.pre('save', async function (next) {
     logT(mod, fun, `pre save checks OK`)
   } catch (err) {
     logV(mod, fun, `pre save checks KO: ${err}`)
-    err.message = err.message + ` (metadata ${this[API_METADATA_ID]})`
+    err.message = `${err.message} (metadata ${this[API_METADATA_ID]})`
     // next(err)
     throw RudiError.treatError(mod, fun, err)
   }

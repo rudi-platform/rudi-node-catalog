@@ -49,6 +49,12 @@ import {
   API_METAINFO_VERSION_PROPERTY,
   API_MEDIA_TYPE,
   API_INTEGRATION_ERROR_ID,
+  API_ACCESS_CONDITION,
+  API_LICENCE,
+  API_LICENCE_TYPE,
+  LicenceTypes,
+  API_LICENCE_CUSTOM_URI,
+  API_LICENCE_CUSTOM_LABEL,
 } from '../db/dbFields.js'
 
 import {
@@ -527,6 +533,9 @@ export const rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) 
     }
     setGeography(dbReadyMetadata)
 
+    // ----- Licence pre-checks
+    checkLicence(dbReadyMetadata)
+
     // ----- Updating Dictionary entries (MongoDB doesn't accept all RUDI languages)
     toMDBLanguage(dbReadyMetadata, API_DATA_DETAILS_PROPERTY)
     toMDBLanguage(dbReadyMetadata, API_DATA_DESCRIPTION_PROPERTY)
@@ -536,12 +545,28 @@ export const rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) 
 
     // Avoid dates manipulation
     stripTimestamps(dbReadyMetadata)
+
     // logD(mod, fun, `dbReadyMetadata: ${beautify(dbReadyMetadata, 2)}`)
     return dbReadyMetadata
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
 }
+function checkLicence(metadata) {
+  if (!metadata[API_ACCESS_CONDITION] || !metadata[API_ACCESS_CONDITION][API_LICENCE]) return
+  if (!metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_TYPE]) return
+  const licenceType = metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_TYPE]
+  if (licenceType === LicenceTypes.Standard) {
+    delete metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_CUSTOM_URI]
+    delete metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_CUSTOM_LABEL]
+  } else {
+    if (typeof metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_CUSTOM_LABEL] === 'string')
+      metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_CUSTOM_LABEL] = [
+        { lang: 'fr', text: metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_CUSTOM_LABEL] },
+      ]
+  }
+}
+
 function stripTimestamps(metadata) {
   const fun = 'stripTimestamps'
   try {

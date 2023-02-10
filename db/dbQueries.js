@@ -1135,6 +1135,7 @@ export const overwriteDbObject = async (objectType, updateData) => {
     }
 
     const existingObject = await Model.findOne(filter)
+    logD(mod, fun, beautify(existingObject))
     if (!!existingObject) {
       // document exists in DB, we preserve the creation date
       updateData[DB_CREATED_AT] = existingObject[DB_CREATED_AT]

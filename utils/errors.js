@@ -158,9 +158,9 @@ export class RudiError extends Error {
   static treatError(ctxMod, ctxFun, error, path) {
     const fun = 'treatError'
     try {
-      if (!error) throw new ParameterExpectedError('error', mod, fun)
       if (!ctxMod) throw new ParameterExpectedError('ctxMod', mod, fun)
       if (!ctxFun) throw new ParameterExpectedError('ctxFun', mod, fun)
+      if (!error) throw new ParameterExpectedError('error', mod, fun)
       if (error.name === 'ValidationError') error[STATUS_CODE] = 400
 
       // logD(mod, fun, `A) ${error} -> ${beautify(error)}`)
