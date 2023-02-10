@@ -353,7 +353,7 @@ export const parseQueryParameters = async (objectType, fullUrl) => {
   }
 }
 
-function cleanDate(inputDate) {
+export function cleanDate(inputDate) {
   const fun = 'cleanDate'
 
   const cleanValue = inputDate.replace(/[\'\"\`]/g, '')

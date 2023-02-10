@@ -637,6 +637,8 @@ export const deleteManyObjects = async (req, reply) => {
     // const fields = parsedParameters[QUERY_FIELDS]
     const confirmation = parsedParameters[QUERY_CONFIRM] || false
 
+    // if (objectType === OBJ_REPORTS) return await deleteReportsBefore(req, reply)
+
     if (isEmptyObject(filter)) {
       if (confirmation) return await deleteAllDbObjectsWithType(objectType)
       else {

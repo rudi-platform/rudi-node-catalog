@@ -12,7 +12,7 @@ const mod = 'repCtrl'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { beautify, nowISO, padZerosLeft as pad0 } from '../utils/jsUtils.js'
+import { beautify, isEmptyObject, nowISO, padZerosLeft as pad0 } from '../utils/jsUtils.js'
 import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
 import { objectAlreadyExists, parametersMismatch } from '../utils/msg.js'
 import { logD, logI, logMetadata, logT, logW } from '../utils/logging.js'
@@ -24,6 +24,8 @@ import {
   ParameterExpectedError,
 } from '../utils/errors.js'
 import {
+  deleteAllDbObjectsWithType,
+  deleteManyDbObjectsWithFilter,
   doesObjectExistWithRudiId,
   getDbObjectList,
   getEnsuredObjectWithRudiId,
@@ -48,6 +50,7 @@ import {
   API_REPORT_METHOD,
   API_COLLECTION_TAG,
   DB_PUBLISHED_AT,
+  DB_UPDATED_AT,
 } from '../db/dbFields.js'
 import {
   PARAM_OBJECT,
@@ -64,6 +67,12 @@ import {
   DEFAULT_QUERY_LIMIT,
   QUERY_FILTER,
   OBJ_REPORTS,
+  QUERY_TREATED_BEFORE,
+  QUERY_TREATED_BEFORE_CAML,
+  QUERY_UPDATED_BEFORE,
+  QUERY_UPDATED_BEFORE_CAML,
+  QUERY_SUBMITTED_BEFORE,
+  QUERY_SUBMITTED_BEFORE_CAML,
 } from '../config/confApi.js'
 // -------------------------------------------------------------------------------------------------
 // Data models
@@ -72,6 +81,8 @@ import { Report, IntegrationStatus } from '../definitions/models/Report.js'
 
 import { removeMetadataFromWaitingList } from './portalController.js'
 import { setFlagIntegrationKO } from './metadataController.js'
+import { cleanDate } from '../utils/parseRequest.js'
+import mongoose from 'mongoose'
 
 // -------------------------------------------------------------------------------------------------
 // Comformity functions
@@ -394,6 +405,41 @@ export const deleteSingleReportForObject = async (req, reply) => {
 
     // delete this integration report for this object
     return `Function '${fun}' still needs to be implemented in module ${mod}`
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+export const deleteReportsBefore = async (req, reply) => {
+  const fun = 'deleteReportsBefore'
+  try {
+    logT(mod, fun, ``)
+    const queryParams = req.query
+    // if (isEmptyObject(queryParams)) return { status: 'OK', message: 'No request parameter found' }
+    if (isEmptyObject(queryParams)) return await deleteAllDbObjectsWithType(OBJ_REPORTS)
+
+    logT(mod, fun, `reqParams: ${beautify(queryParams)}`)
+
+    const dateUpdated = queryParams[QUERY_UPDATED_BEFORE] || queryParams[QUERY_UPDATED_BEFORE_CAML]
+    const dateTreated = queryParams[QUERY_TREATED_BEFORE] || queryParams[QUERY_TREATED_BEFORE_CAML]
+    const dateSubmitted =
+      queryParams[QUERY_SUBMITTED_BEFORE] || queryParams[QUERY_SUBMITTED_BEFORE_CAML]
+    if (!dateUpdated && !dateTreated && !dateSubmitted)
+      return { status: 'OK', message: 'No date parameter found' }
+
+    const filters = []
+    if (dateUpdated)
+      filters.push({ [DB_UPDATED_AT]: mongoose.trusted({ $lte: cleanDate(dateUpdated) }) })
+    if (dateTreated)
+      filters.push({
+        [API_REPORT_TREATMENT_DATE]: mongoose.trusted({ $lte: cleanDate(dateTreated) }),
+      })
+    if (dateSubmitted)
+      filters.push({
+        [API_REPORT_SUBMISSION_DATE]: mongoose.trusted({ $lte: cleanDate(dateSubmitted) }),
+      })
+
+    return await deleteManyDbObjectsWithFilter(OBJ_REPORTS, { $and: filters })
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }

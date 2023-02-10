@@ -228,7 +228,7 @@ export const getMetadata = async (req, reply) => {
   const fun = 'getMetadata'
   logT(mod, fun, ``)
   try {
-    let metadataId = req.params[PARAM_ID] || undefined
+    let metadataId = req.params[PARAM_ID]
     if (metadataId && !isUUID(metadataId)) metadataId = undefined
     if (metadataId) logD(mod, fun, `metadataId: ${metadataId}`)
 

@@ -93,6 +93,7 @@ import {
   addSingleReportForObject,
   deleteEveryReportForObject,
   deleteManyReportForObject,
+  deleteReportsBefore,
   deleteSingleReportForObject,
   getReportListForMetadata,
   getReportListForObject,
@@ -181,6 +182,7 @@ const PRV_GET_ALL_OBJ_REPORT = 'prv_get_all_obj_report'
 const PRV_DEL_OBJ_REPORT = 'prv_del_obj_report'
 const PRV_DEL_ALL_OBJ_REPORT = 'prv_del_all_obj_report'
 const PRV_DEL_LIST_OBJ_REPORT = 'prv_del_list_obj_report'
+const PRV_DEL_OLD_REPORTS = 'prv_del_old_reports'
 
 const PRV_CHECK_PORTAL_METADATA = 'prv_check_portal_metadata'
 const PRV_CHECK_PORTAL_METADATA_IDS = 'prv_check_portal_metadata_ids'
@@ -663,6 +665,13 @@ export const backOfficeRoutes = [
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}/${ACT_DELETION}`,
     handler: deleteManyReportForObject,
     config: { [ROUTE_NAME]: PRV_DEL_LIST_OBJ_REPORT },
+  },
+  // Purge old reports
+  {
+    method: HTTP_METHODS.DELETE,
+    url: `${URL_PREFIX_PRIVATE}/${OBJ_REPORTS}`,
+    handler: deleteReportsBefore,
+    config: { [ROUTE_NAME]: PRV_DEL_OLD_REPORTS },
   },
 ]
 
