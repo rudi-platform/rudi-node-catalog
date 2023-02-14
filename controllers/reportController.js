@@ -415,30 +415,34 @@ export const deleteReportsBefore = async (req, reply) => {
   try {
     logT(mod, fun, ``)
     const queryParams = req.query
+    // logT(mod, fun + '.queryParams', beautify(queryParams))
     // if (isEmptyObject(queryParams)) return { status: 'OK', message: 'No request parameter found' }
     if (isEmptyObject(queryParams)) return await deleteAllDbObjectsWithType(OBJ_REPORTS)
 
-    logT(mod, fun, `reqParams: ${beautify(queryParams)}`)
+    // logT(mod, fun, `reqParams: ${beautify(queryParams)}`)
 
-    const dateUpdated = queryParams[QUERY_UPDATED_BEFORE] || queryParams[QUERY_UPDATED_BEFORE_CAML]
-    const dateTreated = queryParams[QUERY_TREATED_BEFORE] || queryParams[QUERY_TREATED_BEFORE_CAML]
-    const dateSubmitted =
-      queryParams[QUERY_SUBMITTED_BEFORE] || queryParams[QUERY_SUBMITTED_BEFORE_CAML]
-    if (!dateUpdated && !dateTreated && !dateSubmitted)
-      return { status: 'OK', message: 'No date parameter found' }
+    const dateFilters = {
+      [DB_UPDATED_AT]: [QUERY_UPDATED_BEFORE, QUERY_UPDATED_BEFORE_CAML],
+      [API_REPORT_TREATMENT_DATE]: [QUERY_TREATED_BEFORE, QUERY_TREATED_BEFORE_CAML],
+      [API_REPORT_SUBMISSION_DATE]: [QUERY_SUBMITTED_BEFORE, QUERY_SUBMITTED_BEFORE_CAML],
+    }
 
     const filters = []
-    if (dateUpdated)
-      filters.push({ [DB_UPDATED_AT]: mongoose.trusted({ $lte: cleanDate(dateUpdated) }) })
-    if (dateTreated)
-      filters.push({
-        [API_REPORT_TREATMENT_DATE]: mongoose.trusted({ $lte: cleanDate(dateTreated) }),
-      })
-    if (dateSubmitted)
-      filters.push({
-        [API_REPORT_SUBMISSION_DATE]: mongoose.trusted({ $lte: cleanDate(dateSubmitted) }),
-      })
-
+    for (const metadataDateProp in dateFilters) {
+      const dateQueryFilters = dateFilters[metadataDateProp]
+      const dateRaw = queryParams[dateQueryFilters[0]] || queryParams[dateQueryFilters[1]]
+      if (dateRaw) {
+        const dateClean = cleanDate(dateRaw)
+        logT(mod, fun, dateRaw)
+        logT(mod, fun, dateClean)
+        filters.push({ [metadataDateProp]: mongoose.trusted({ $lte: dateClean }) })
+        delete queryParams[dateQueryFilters[0]]
+        delete queryParams[dateQueryFilters[1]]
+      }
+    }
+    for (const additionalFilter in queryParams) {
+      filters.push({ [additionalFilter]: mongoose.trusted(queryParams[additionalFilter]) })
+    }
     return await deleteManyDbObjectsWithFilter(OBJ_REPORTS, { $and: filters })
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)

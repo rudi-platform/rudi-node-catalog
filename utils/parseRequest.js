@@ -361,8 +361,7 @@ export function cleanDate(inputDate) {
   if (cleanValue.match(new RegExp(/^[0-9]{13}$/))) return new Date(parseInt(cleanValue))
   try {
     const cleanDate = new Date(cleanValue)
-    if (cleanDate === 'Invalid Date')
-      throw new BadRequestError(`Invalid date: '${inputDate} / ${cleanValue}'`)
+    if (cleanDate == 'Invalid Date') throw new BadRequestError(`Invalid date: '${inputDate}'`)
     // logD(mod, fun, `clean date: ${cleanDate.toISOString()}`)
     return cleanDate
   } catch (err) {
