@@ -80,7 +80,7 @@ fastifyConf.addHook('onError', (request, reply, error, done) => {
     } else {
       sysOnError(error.statusCode, '[onError] ' + beautify(error))
     }
-    reply.isError = true
+    if (reply) reply.isError = true
   } catch (err) {
     logE(mod, fun, err)
     // const context = CallContext.getCallContextFromReq(request)

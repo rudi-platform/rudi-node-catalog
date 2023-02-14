@@ -261,11 +261,10 @@ export const CallContext = class CallContext {
         if (ACTIVATE_LOG) logT(mod, fun, `this[DETAILS]: ${beautify(this[DETAILS])}`)
         if (!this[DETAILS][ERROR]) this[DETAILS][ERROR] = error
         else {
-          {
-            logW(mod, fun, `Error already added: ${beautify(this[DETAILS][ERROR])}`)
-            logW(mod, fun, `Trying to add error: ${beautify(error)}`)
-          }
+          logW(mod, fun, `Error already added: ${beautify(this[DETAILS][ERROR])}`)
+          logW(mod, fun, `Trying to add error: ${beautify(error)}`)
         }
+        if (ACTIVATE_LOG) logT(mod, fun, `this[DETAILS]: ${beautify(this[DETAILS])}`)
       } else {
         if (ACTIVATE_LOG) logT(mod, fun, `not rudi error`)
         const rudiError = RudiError.treatError(ctxMod, ctxFun, error)
@@ -289,16 +288,16 @@ export const CallContext = class CallContext {
       if (!err && !this.getError()) throw new RudiError('No error found in current context')
 
       if (!this.getError()) this.addError(ctxMod, ctxFun, err)
-      const error = this.getError()
-      logV(mod, fun, beautify(error))
-      const primeError = error.primeError || error
+      const rudiErr = this.getError()
+      logV(mod, fun, 'rudiErr: ' + beautify(rudiErr))
+      const primeError = rudiErr.primeError || rudiErr
 
-      const errMsg = `Error ${error.statusCode} (${error.name}): ${error.message}`
+      const errMsg = `Error ${rudiErr.statusCode} (${rudiErr.name}): ${rudiErr.message}`
       const errDetails =
         `${ERR_PLACE}: '${primeError[TRACE_MOD]}.${primeError[TRACE_FUN]}', ` +
         `${ERR_ON_REQ}: '${this.formatReqDetails()}'`
       // logD(mod, fun, errDetails)
-      sysOnError(error.statusCode, errMsg, this, errDetails)
+      sysOnError(rudiErr.statusCode, errMsg, this, errDetails)
     } catch (error) {
       // logE(mod, fun, error)
       throw RudiError.treatError(mod, fun, error)
