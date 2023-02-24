@@ -296,7 +296,7 @@ export const publicRoutes = [
    */
   {
     method: HTTP_METHODS.GET,
-    url: `${URL_PUB_API_VERSION}`,
+    url: URL_PUB_API_VERSION,
     handler: getApiVersion,
     config: { [ROUTE_NAME]: PUB_GET_API_VERSION },
   },

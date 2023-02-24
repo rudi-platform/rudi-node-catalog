@@ -8,9 +8,9 @@ import { STATUS_CODE, ROUTE_NAME } from '../config/confApi.js'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { padA1, nowEpochMs, beautify, separateLogs } from '../utils/jsUtils.js'
+import { padA1, nowEpochMs, beautify, separateLogs, consoleLog } from '../utils/jsUtils.js'
 import { shouldControlPrivateRequests, shouldControlPublicRequests } from '../config/confSystem.js'
-import { initFFLogger, shouldShowErrorPile, shouldShowRoutes } from '../config/confLogs.js'
+import { shouldShowErrorPile, shouldShowRoutes } from '../config/confLogs.js'
 import { JWT_USER } from '../config/confPortal.js'
 
 import {
@@ -23,6 +23,7 @@ import {
   sysNotice,
   sysOnError,
   logI,
+  fastifyLogger,
 } from '../utils/logging.js'
 
 import { JWT_SUB, JWT_CLIENT } from '../utils/crypto.js'
@@ -46,13 +47,15 @@ import { getUrlMaxLength } from '../utils/protection.js'
 // External dependencies
 // -------------------------------------------------------------------------------------------------
 // Require the fastify framework and instantiate it
+consoleLog(mod, 'ff', beautify(fastifyLogger.log))
 import fastify from 'fastify'
 export const fastifyConf = fastify({
-  logger: {
-    level: 'warn',
-    logger: initFFLogger(),
-    // file: sys.OUT_LOG
-  },
+  logger: fastifyLogger({ leve: 'warn' }),
+  // logger: initFFLogger(),
+  // logger: {
+  //    level: 'warn',
+  //    file: sys.OUT_LOG,
+  // },
   ignoreTrailingSlash: true,
 })
 

@@ -6833,7 +6833,8 @@
 					"        log.e(fun, 'Failed to get rudiProd token', `${e}`)",
 					"",
 					"    }",
-					"    if (rudiProdToken) {",
+					"    const skipPortalConnection = pm.variables.get('skipPortalConnection')",
+					"    if (rudiProdToken && !skipPortalConnection) {",
 					"        let portalToken",
 					"        try {",
 					"            portalToken = await secu.getPortalToken(rudiProdToken)",
@@ -7071,6 +7072,18 @@
 		},
 		{
 			"key": "portalKeyName",
+			"value": ""
+		},
+		{
+			"key": "apiToken",
+			"value": ""
+		},
+		{
+			"key": "portalToken",
+			"value": ""
+		},
+		{
+			"key": "rudiProdToken",
 			"value": ""
 		}
 	]

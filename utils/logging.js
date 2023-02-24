@@ -174,15 +174,36 @@ export const sysInfo = (msg, location, context, info, cid) =>
 
 // Normal operational messages - may be harvested for reporting, measuring throughput, etc.
 // No action required.
-export const sysDebug = (mod, fun, msg, context, info, cid) =>
-  sysLog('debug', msg, `${mod.fun}`, context, cid, info)
+export const sysDebug = (msg, location, context, info, cid) =>
+  sysLog('debug', msg, location, context, cid, info)
 
 // Normal operational messages - may be harvested for reporting, measuring throughput, etc.
 // No action required.
-export const sysTrace = (mod, fun, msg, context, info, cid) =>
+export const sysTrace = (msg, location, context, info, cid) =>
   getLogLevel() === ERR_LEVEL_TRACE
-    ? sysLog('debug', msg, `${mod.fun}`, context, cid, info)
+    ? sysLog('debug', msg, location, context, cid, info)
     : () => null
+
+// -------------------------------------------------------------------------------------------------
+// Fastify logger
+// -------------------------------------------------------------------------------------------------
+function FFLogger(...args) {
+  this.level = args?.level
+}
+FFLogger.prototype.fatal = (msg) => sysAlert(typeof msg == 'string' ? msg : `${beautify(msg)}`)
+FFLogger.prototype.error = (msg) => sysError(typeof msg == 'string' ? msg : `${beautify(msg)}`)
+FFLogger.prototype.warn = (msg) => sysWarn(typeof msg == 'string' ? msg : `${beautify(msg)}`)
+FFLogger.prototype.info = () => {}
+// FFLogger.prototype.info = (msg) => sysInfo(typeof msg == 'string' ? msg : `${beautify(msg)}`)
+FFLogger.prototype.debug = (msg) => sysDebug(typeof msg == 'string' ? msg : `${beautify(msg)}`)
+FFLogger.prototype.trace = (msg) =>
+  sysTrace(
+    typeof msg == 'string' ? msg : msg?.err ? `ERR ${msg.err.code} ${msg.err.message}` : `${msg}`
+  )
+
+FFLogger.prototype.child = () => new FFLogger()
+
+export const fastifyLogger = (...args) => new FFLogger(args)
 
 // -------------------------------------------------------------------------------------------------
 // Syslog functions: specific macros
