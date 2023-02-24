@@ -6867,15 +6867,15 @@
 			"value": "soft-checks"
 		},
 		{
+			"key": "dateUpdate",
+			"value": ""
+		},
+		{
 			"key": "apiJwt",
 			"value": ""
 		},
 		{
 			"key": "portalJwt",
-			"value": ""
-		},
-		{
-			"key": "dateUpdate",
 			"value": ""
 		},
 		{
@@ -7072,18 +7072,6 @@
 		},
 		{
 			"key": "portalKeyName",
-			"value": ""
-		},
-		{
-			"key": "apiToken",
-			"value": ""
-		},
-		{
-			"key": "portalToken",
-			"value": ""
-		},
-		{
-			"key": "rudiProdToken",
 			"value": ""
 		}
 	]
