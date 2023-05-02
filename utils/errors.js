@@ -341,7 +341,7 @@ export class UnauthorizedError extends RudiError {
       errMessage,
       401,
       'Unauthorized',
-      'The request requires an user authentication',
+      'The request requires a user authentication',
       undefined,
       ctxMod,
       ctxFun

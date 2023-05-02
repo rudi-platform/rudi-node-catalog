@@ -1666,9 +1666,7 @@ export const getAllConceptsFromScheme = async (schemeCode) => {
   try {
     logT(mod, fun, ``)
 
-    const conceptList = await SkosConcept.find({
-      [API_SKOS_SCHEME_CODE]: schemeCode,
-    })
+    const conceptList = await SkosConcept.find({ [API_SKOS_SCHEME_CODE]: schemeCode })
     return conceptList
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -1679,9 +1677,7 @@ export const getAllConceptsWithRole = async (conceptRole) => {
   const fun = `getAllConceptsWithRole`
   try {
     logT(mod, fun, ``)
-    const conceptList = await SkosConcept.find({
-      [API_SKOS_CONCEPT_ROLE]: conceptRole,
-    })
+    const conceptList = await SkosConcept.find({ [API_SKOS_CONCEPT_ROLE]: conceptRole })
     return conceptList
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -1691,11 +1687,6 @@ export const getAllConceptsWithRole = async (conceptRole) => {
 // ----------------------------------------
 // - Filters
 // ----------------------------------------
-/* export const findNotReferencedInMetadata = (objectType) => {
-  // const fun = `findNotReferencedInMetadata`
-  // logT(mod, fun, ``)
-}
- */
 export const isReferencedInMetadata = async (objectType, rudiId) => {
   const fun = `isReferencedInMetadata`
   logD(mod, fun, `${objectType}: ${rudiId}`)

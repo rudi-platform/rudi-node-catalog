@@ -11,7 +11,7 @@ import { STATUS_CODE, ROUTE_NAME } from '../config/confApi.js'
 import { padA1, nowEpochMs, beautify, separateLogs, consoleLog } from '../utils/jsUtils.js'
 import { shouldControlPrivateRequests, shouldControlPublicRequests } from '../config/confSystem.js'
 import { shouldShowErrorPile, shouldShowRoutes } from '../config/confLogs.js'
-import { JWT_USER } from '../config/confPortal.js'
+import { JWT_USER, isPortalConnectionDisabled } from '../config/confPortal.js'
 
 import {
   logLine,
@@ -74,8 +74,6 @@ fastifyConf.addHook('onError', (request, reply, error, done) => {
     // logD(mod, fun, `showErrorPile: ${shouldShowErrorPile()}`)
 
     const reqContext = CallContext.getCallContextFromReq(request)
-    // if (reqContext) logD(mod, fun, `request: ${beautify(reqContext)}`)
-
     if (RudiError.isRudiError(error) && shouldShowErrorPile()) RudiError.logErrorPile(error)
 
     if (!!reqContext) {
@@ -230,14 +228,7 @@ async function onPublicRoute(req, reply) {
     logT(mod, fun, `${req.method} ${req.url} `)
     const context = CallContext.getCallContextFromReq(req)
 
-    try {
-      // Checking the token, if it exists, to retrieve the user info
-      const portalJwt = await checkPortalTokenInHeader(req, true)
-      const jwtPayload = portalJwt[1]
-      // logD(mod, fun, `Payload: ${beautify(jwtPayload)}`)
-      context.clientApp = jwtPayload[JWT_SUB] || 'RUDI Portal'
-      context.reqUser = jwtPayload[JWT_USER] || jwtPayload[JWT_CLIENT]
-    } catch (er) {
+    if (isPortalConnectionDisabled()) {
       try {
         const { subject, clientId } = await checkRudiProdPermission(req, true)
         context.clientApp = subject
@@ -246,9 +237,25 @@ async function onPublicRoute(req, reply) {
         // It's OK to have no token
         logT(mod, fun, `Token-less call to ${req.method} ${req.url} `)
       }
-    } finally {
-      context.logInfo('route', fun, 'API call')
-      return true
+    } else {
+      try {
+        // Checking the token, if it exists, to retrieve the user info
+        const portalJwt = await checkPortalTokenInHeader(req, true)
+        const jwtPayload = portalJwt[1]
+        // logD(mod, fun, `Payload: ${beautify(jwtPayload)}`)
+        context.clientApp = jwtPayload[JWT_SUB] || 'RUDI Portal'
+        context.reqUser = jwtPayload[JWT_USER] || jwtPayload[JWT_CLIENT]
+      } catch (er) {
+        try {
+          const { subject, clientId } = await checkRudiProdPermission(req, true)
+          context.clientApp = subject
+          context.reqUser = clientId
+        } catch {
+          // It's OK to have no token
+          logT(mod, fun, `Token-less call to ${req.method} ${req.url} `)
+        }
+      }
+      context.logInfo('route', fun, 'v1 API call')
     }
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -325,7 +332,6 @@ async function onUnrestrictedPrivateRoute(req, reply) {
 
     try {
       const { subject, clientId } = await checkRudiProdPermission(req, true)
-
       context.clientApp = subject
       context.reqUser = clientId
     } catch (er) {
@@ -333,7 +339,6 @@ async function onUnrestrictedPrivateRoute(req, reply) {
       logT(mod, fun, `Token-less call to ${req.method} ${req.url} `)
     } finally {
       context.logInfo('route', fun, 'API call')
-      return true
     }
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)

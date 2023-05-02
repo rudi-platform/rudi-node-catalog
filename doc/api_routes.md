@@ -8,7 +8,7 @@ These routes are accessible from the internet, and especially the Portal:
 
 - `GET /api/v1/resources`
   - Returns a JSON with a property `total` that gives the total number of elements on the producer node and a property `items` that lists a portion of the total set
-  - Can be used of the optional parameters bellow can refine such request
+  - See optional parameters bellow to refine such request
 - `GET /api/v1/resources/:id`
   - Returns the metadata for the identified resource
 - `GET /api/v1/resources/search`

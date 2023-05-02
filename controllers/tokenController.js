@@ -14,10 +14,10 @@ import {
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 
-import { decodeBase64url } from '../utils/jsUtils.js'
+import { beautify, decodeBase64url } from '../utils/jsUtils.js'
 import { accessProperty } from '../utils/jsonAccess.js'
 
-import { logT } from '../utils/logging.js'
+import { logI, logT } from '../utils/logging.js'
 
 import { getProfile } from '../config/confSystem.js'
 import { ForbiddenError, UnauthorizedError, RudiError } from '../utils/errors.js'
@@ -105,7 +105,7 @@ export const checkRudiProdPermission = async (req, isCheckOptional) => {
   try {
     let token
     try {
-      // logI(mod, fun, `req: ${beautify(req.headers?.authorization)}`)
+      logI(mod, fun, `! req: ${beautify(req.headers)}`)
       token = extractJwt(req)
     } catch (err) {
       // logE(mod, fun, `err: ${err}`)

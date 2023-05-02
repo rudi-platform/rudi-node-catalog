@@ -47,7 +47,7 @@ export const protectHeaderAuth = (req) => {
       throw new BadRequestError(
         `The length of the token in request headers exceeds ${REQ_AUTH_MAX_LENGTH} characters (found ${auth.length})`
       )
-    if (!validateSchema(auth, REGEX_JWT_AUTH) && validateSchema(auth, REGEX_BASIC_AUTH))
+    if (!validateSchema(auth, REGEX_JWT_AUTH) && !validateSchema(auth, REGEX_BASIC_AUTH))
       throw new BadRequestError(
         `The token in headers does not respect JWT schema nor usr/pwd authentification`
       )
