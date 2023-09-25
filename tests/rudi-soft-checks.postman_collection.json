@@ -18,8 +18,7 @@
 								"exec": [
 									"pm.test(\"Testing portal connection\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const res = pm.response.json()",
-									"    pm.expect(!!match.jwt(res.access_token)).to.be.true",
+									"    pm.expect(codec.streamToString(pm.response) === pm.collectionVariables.get('noPortalMsg') || !!match.jwt(pm.response.json().access_token)).to.be.true",
 									"});"
 								],
 								"type": "text/javascript"
@@ -104,8 +103,10 @@
 								"exec": [
 									"pm.test(\"Testing portal connection\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const res = pm.response.json()",
-									"    pm.expect(!!match.jwt(res.access_token)).to.be.true",
+									"    pm.expect(",
+									"        codec.streamToString(pm.response) === pm.collectionVariables.get('noPortalMsg') ||",
+									"        !!match.jwt(pm.response.json().access_token)",
+									"    ).to.be.true",
 									"});"
 								],
 								"type": "text/javascript"
@@ -151,7 +152,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{apiUrl}}/api/admin/logs?limit=3030",
+							"raw": "{{apiUrl}}/api/admin/logs?limit=300",
 							"host": [
 								"{{apiUrl}}"
 							],
@@ -163,7 +164,7 @@
 							"query": [
 								{
 									"key": "limit",
-									"value": "3030"
+									"value": "300"
 								}
 							]
 						}
@@ -3503,7 +3504,7 @@
 									"pm.test(\"Send metadata list to portal\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const res = codec.streamToString(pm.response)",
-									"    pm.expect(res).to.eq(\"Sending metadata to portal\")",
+									"    pm.expect(res == \"Sending metadata to portal\" || res == pm.collectionVariables.get('noPortalMsg')).to.be.true",
 									"});"
 								],
 								"type": "text/javascript"
@@ -3548,7 +3549,7 @@
 									"pm.test(\"Send all metadata to portal\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const res = codec.streamToString(pm.response)",
-									"    pm.expect(res).to.eq(\"Sending metadata to portal\")",
+									"    pm.expect(res == \"Sending metadata to portal\" || res == pm.collectionVariables.get('noPortalMsg')).to.be.true",
 									"});"
 								],
 								"type": "text/javascript"
@@ -6105,6 +6106,7 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Creating the Portal key\", () => {",
+									"    if (pm.collectionVariables.get('skipPortalConnection')) return true",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const pubKey = pm.response.json()",
 									"    pm.expect(pubKey.name).to.be.eq('portal-' + pm.collectionVariables.get('stamp'))",
@@ -6162,6 +6164,7 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Getting a public key property\", () => {",
+									"    if (pm.collectionVariables.get('skipPortalConnection')) return true",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const pem = pm.response.stream.toString('utf8');",
 									"    pm.expect(pem).to.be.not.null",
@@ -6254,7 +6257,7 @@
 									"pm.test(\"Get portal URL\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const portalUrl = codec.streamToString(pm.response)",
-									"    pm.expect(portalUrl == 'https://rudi.bzh' || portalUrl == 'https://rudi-qualif.open-groupe.com' || portalUrl == 'https://rudi-qualif.open-groupe.com').to.be.true",
+									"    pm.expect(portalUrl == 'https://rudi.bzh' || portalUrl == 'https://rudi-qualif.open-groupe.com' || portalUrl == pm.collectionVariables.get('noPortalMsg')).to.be.true",
 									"    pm.collectionVariables.set('portalUrl', portalUrl)",
 									"});",
 									""
@@ -6290,6 +6293,7 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Creating the Portal key\", () => {",
+									"    if (pm.collectionVariables.get('skipPortalConnection')) return true",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const pubKey = pm.response.json()",
 									"    pm.expect(pubKey.name).to.be.eq(pm.collectionVariables.get('portalKeyName'))",
@@ -6350,6 +6354,7 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Portal key added\", () => {",
+									"    if (pm.collectionVariables.get('skipPortalConnection')) return true",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const pem = pm.response.stream.toString('utf8');",
 									"    pm.expect(pem).to.be.not.null",
@@ -6475,7 +6480,7 @@
 									"pm.test(\"Check portal URL\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const res = codec.streamToString(pm.response)",
-									"    pm.expect(res.startsWith('http')).to.be.true",
+									"    pm.expect(res.startsWith('http') || res === 'No portal connected').to.be.true",
 									"});",
 									""
 								],
@@ -6511,6 +6516,7 @@
 								"exec": [
 									"pm.test(\"Check portal resources\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
+									"    if (pm.collectionVariables.get('skipPortalConnection')) return true",
 									"    const res = pm.response.json()",
 									"    pm.expect(res.time).to.be.not.undefined",
 									"    pm.expect(res.total).to.be.not.undefined",
@@ -6550,6 +6556,7 @@
 								"exec": [
 									"pm.test(\"Check portal resources ids\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
+									"    if (pm.collectionVariables.get('skipPortalConnection')) return true",
 									"    const res = pm.response.json()",
 									"    pm.expect(res[0].global_id).to.be.not.undefined",
 									"});",
@@ -6651,7 +6658,7 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
-					"const DEBUG_LVL = 1",
+					"const DEBUG_LVL = 0",
 					"const TRACE = DEBUG_LVL > 3",
 					"const DEBUG = DEBUG_LVL > 2",
 					"const ERROR = DEBUG_LVL > 1",
@@ -6659,6 +6666,9 @@
 					"const WAIT_TIME = 50",
 					"const TOKEN_DURATION_S = 4147200",
 					"",
+					"const NO_PORTAL_MSG = 'No portal connected'",
+					"pm.collectionVariables.set('noPortalMsg', NO_PORTAL_MSG)",
+					"let skipPortalConnection",
 					"",
 					"log = {",
 					"    e: (fun, msg = '', arg = '') => { if (ERROR) console.error(`E (${fun}) ERROR: ${msg} ${arg}`) },",
@@ -6847,6 +6857,7 @@
 					"    renewPortalToken: (tokenName, rudiProdToken) => {",
 					"        const fun = 'renewPortalToken'",
 					"        log.t(fun)",
+					"        if (pm.collectionVariables.get('skipPortalConnection')) return new Promise((resolve, reject) => resolve(NO_PORTAL_MSG))",
 					"        const reqUrl = ADMIN_URL + '/portal/token'",
 					"        // log.d('reqUrl: ' + reqUrl)",
 					"        const reqNewToken = {",
@@ -6873,6 +6884,14 @@
 					"                    // throw new Error('[renewPortalToken]: ' + codec.streamToString(res))",
 					"                }",
 					"                //log.d('renewPortalToken res: ' + JSON.stringify(res))",
+					"                resStr = codec.streamToString(res)",
+					"                log.d(fun, 'response:', resStr)",
+					"                if (resStr == NO_PORTAL_MSG) {",
+					"                    log.d(fun, 'No portal connection')",
+					"",
+					"                    pm.collectionVariables.set('skipPortalConnection', true)",
+					"                    return resolve(NO_PORTAL_MSG)",
+					"                }",
 					"                const token = JSON.parse(codec.streamToString(res))?.access_token",
 					"                log.d(fun, 'Portal token:', token)",
 					"                try {",
@@ -6902,9 +6921,11 @@
 					"",
 					"    getPortalToken: async (apiToken) => {",
 					"        log.t('-- getPortalToken --')",
+					"        if (pm.collectionVariables.get('skipPortalConnection')) return NO_PORTAL_MSG",
 					"        const tokenName = PORTAL_TOKEN_NAME",
 					"        if (!secu.isTokenValid(tokenName)) await secu.renewPortalToken(tokenName, apiToken)",
 					"        log.t('Portal token stored')",
+					"        if (pm.collectionVariables.get('skipPortalConnection')) return NO_PORTAL_MSG",
 					"        return pm.collectionVariables.get(tokenName)",
 					"    }",
 					"",
@@ -6920,12 +6941,15 @@
 					"        log.e(fun, 'Failed to get rudiProd token', `${e}`)",
 					"",
 					"    }",
-					"    const skipPortalConnection = pm.variables.get('skipPortalConnection')",
+					"    skipPortalConnection = pm.collectionVariables.get('skipPortalConnection')",
+					"    log.t(fun, 'skipPortalConnection:', skipPortalConnection)",
 					"    if (rudiProdToken && !skipPortalConnection) {",
-					"        let portalToken",
 					"        try {",
 					"            portalToken = await secu.getPortalToken(rudiProdToken)",
-					"            log.d(fun, 'Portal token Received')",
+					"            if (portalToken == NO_PORTAL_MSG)",
+					"                log.d(fun, NO_PORTAL_MSG)",
+					"            else",
+					"                log.d(fun, 'Portal token received')",
 					"        } catch (e) {",
 					"            log.e(fun, 'Failed to get portal token', `${e}`)",
 					"        }",
@@ -6955,6 +6979,22 @@
 		},
 		{
 			"key": "dateUpdate",
+			"value": ""
+		},
+		{
+			"key": "apiJwt",
+			"value": ""
+		},
+		{
+			"key": "portalJwt",
+			"value": ""
+		},
+		{
+			"key": "noPortalMsg",
+			"value": ""
+		},
+		{
+			"key": "skipPortalConnection",
 			"value": ""
 		},
 		{
@@ -7042,30 +7082,6 @@
 			"value": ""
 		},
 		{
-			"key": "apiJwt",
-			"value": ""
-		},
-		{
-			"key": "portalJwt",
-			"value": ""
-		},
-		{
-			"key": "softReport1Id",
-			"value": ""
-		},
-		{
-			"key": "dateReport",
-			"value": ""
-		},
-		{
-			"key": "unkownMetaId",
-			"value": ""
-		},
-		{
-			"key": "softReport3Id",
-			"value": ""
-		},
-		{
 			"key": "now",
 			"value": ""
 		},
@@ -7146,7 +7162,23 @@
 			"value": ""
 		},
 		{
+			"key": "softReport1Id",
+			"value": ""
+		},
+		{
+			"key": "dateReport",
+			"value": ""
+		},
+		{
 			"key": "softReport2Id",
+			"value": ""
+		},
+		{
+			"key": "unkownMetaId",
+			"value": ""
+		},
+		{
+			"key": "softReport3Id",
 			"value": ""
 		},
 		{
@@ -7154,11 +7186,11 @@
 			"value": ""
 		},
 		{
-			"key": "portalUrl",
+			"key": "portalKeyName",
 			"value": ""
 		},
 		{
-			"key": "portalKeyName",
+			"key": "portalUrl",
 			"value": ""
 		}
 	]

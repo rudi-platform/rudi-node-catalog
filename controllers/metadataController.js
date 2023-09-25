@@ -146,6 +146,7 @@ import { readJsonFile } from '../utils/fileActions.js'
 import Contact from '../definitions/models/Contact.js'
 import Organization from '../definitions/models/Organization.js'
 import { StorageStatus } from '../definitions/thesaurus/StorageStatus.js'
+import { isPortalConnectionDisabled, NO_PORTAL_MSG } from '../config/confPortal.js'
 
 // -------------------------------------------------------------------------------------------------
 // Atomic treatments of properties: RUDI -> DB
@@ -845,6 +846,7 @@ export const sendManyMetadataToPortal = async (req) => {
   const fun = 'sendAllMetadataToPortal'
   try {
     logT(mod, fun, ``)
+    if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     const listIds = req.body
 
     if (!!listIds && !Array.isArray(listIds)) {

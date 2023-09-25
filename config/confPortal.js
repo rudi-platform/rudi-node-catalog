@@ -17,6 +17,8 @@ export const PARAM_TOKEN = 'token'
 export const FIELD_TOKEN = 'access_token'
 export const JWT_USER = 'user_name'
 
+export const NO_PORTAL_MSG = 'No portal connected'
+
 // -------------------------------------------------------------------------------------------------
 // Constants: Portal configuration
 // -------------------------------------------------------------------------------------------------
@@ -113,12 +115,13 @@ export const shouldControlExtRequest = () => SHOULD_CONTROL_EXT_REQUESTS
 // ----- API
 const API_PORTAL_URL = PORTAL_CUSTOM_CONF?.[PORTAL_SECTION]?.portal_url
 export const isPortalConnectionDisabled = () => !API_PORTAL_URL
-export const getPortalBaseUrl = () => API_PORTAL_URL || 'No portal connected'
+export const getPortalBaseUrl = () => API_PORTAL_URL || NO_PORTAL_MSG
 
 const API_GET_URL = getPortalIniValue(PORTAL_SECTION, 'get_url', '')
 const API_SEND_URL = getPortalIniValue(PORTAL_SECTION, 'put_url', '')
 
 export const getPortalMetaUrl = (id, additionalParameters) => {
+  if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
   const reqUrl = !id
     ? `${API_PORTAL_URL}/${API_GET_URL.replace('/{{id}}', '')}`
     : `${API_PORTAL_URL}/${API_GET_URL.replace('{{id}}', id)}`

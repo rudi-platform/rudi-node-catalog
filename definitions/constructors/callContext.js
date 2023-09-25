@@ -166,7 +166,7 @@ export const CallContext = class CallContext {
     this[OP][OP_TYPE] = routeName
   }
   get routeName() {
-    return this[OP][OP_TYPE]
+    return this[OP]?.[OP_TYPE]
   }
   set routeName(route) {
     return (this[OP][OP_TYPE] = route)

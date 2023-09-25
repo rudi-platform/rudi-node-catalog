@@ -36,6 +36,7 @@ import { parseQueryParameters } from '../utils/parseRequest.js'
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { getPortalMetadataListWithToken, getPortalToken } from './portalController.js'
+import { NO_PORTAL_MSG, isPortalConnectionDisabled } from '../config/confPortal.js'
 // import { getMetadataListAndCount } from './genericController'
 
 // -------------------------------------------------------------------------------------------------
@@ -53,6 +54,7 @@ export const getPortalCachedMetadataList = async (
 ) => {
   const fun = 'getPortalCachedMetadataList'
   try {
+    if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     // Check cache date
     if (
       cachedPortalMetadataList[TIME_LABEL] &&
@@ -132,6 +134,7 @@ const DEFAULT_FIELD_SELECTION = [
 export const getPortalMetadataFields = async (req, reply, fields = DEFAULT_FIELD_SELECTION) => {
   const fun = 'getPortalMetadataFields'
   try {
+    if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     const options = await parseQueryParameters(OBJ_METADATA, req.url)
     logD(mod, fun, `options: ${beautify(options)}`)
     const fieldFilter = options[QUERY_FIELDS] || fields
