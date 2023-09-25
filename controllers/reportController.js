@@ -1,7 +1,7 @@
 const mod = 'repCtrl'
 /*
  * This file describes the different steps followed for each
- * action on the intergration reports submitted by the Portal
+ * action on the integration reports submitted by the Portal
  * (for metadata as well as organizations and contacts integration)
  */
 
@@ -85,7 +85,7 @@ import { cleanDate } from '../utils/parseRequest.js'
 import mongoose from 'mongoose'
 
 // -------------------------------------------------------------------------------------------------
-// Comformity functions
+// Conformity functions
 // -------------------------------------------------------------------------------------------------
 function fromPortalToRudiFormat(reportBody) {
   if (reportBody[API_REPORT_VERSION] === 'v1') {

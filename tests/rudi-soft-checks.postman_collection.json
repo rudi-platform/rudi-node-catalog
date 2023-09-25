@@ -7,6 +7,46 @@
 	},
 	"item": [
 		{
+			"name": "test",
+			"item": [
+				{
+					"name": "Check portal connection Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Testing portal connection\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    pm.expect(!!match.jwt(res.access_token)).to.be.true",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/api/admin/portal/token",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"portal",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "00. Tokens",
 			"item": [
 				{
@@ -111,7 +151,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{apiUrl}}/api/admin/logs",
+							"raw": "{{apiUrl}}/api/admin/logs?limit=3030",
 							"host": [
 								"{{apiUrl}}"
 							],
@@ -119,6 +159,12 @@
 								"api",
 								"admin",
 								"logs"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "3030"
+								}
 							]
 						}
 					},
@@ -5982,7 +6028,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"portalxx-{{stamp}}\",\n    \"url\": \"https://rudi-qualif.open-groupe.com/oauth/token_key\",\n    \"prop\": \"value\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"raw": "{\n    \"name\": \"portalxx-{{stamp}}\",\n    \"url\": \"{{portalBaseUrl}}/oauth/token_key\",\n    \"prop\": \"value\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -6087,7 +6133,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"portal-{{stamp}}\",\n    \"url\": \"https://rudi-qualif.open-groupe.com/konsult/v1/encryption-key\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"raw": "{\n    \"name\": \"portal-{{stamp}}\",\n    \"url\": \"{{portalBaseUrl}}/konsult/v1/encryption-key\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -6335,6 +6381,47 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "GET portal public key direct",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Portal key added\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const pem = pm.response.stream.toString('utf8');",
+									"    pm.expect(pem).to.be.not.null",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://rudi-qualif.open-groupe.com/konsult/v1/encryption-key",
+							"protocol": "https",
+							"host": [
+								"rudi-qualif",
+								"open-groupe",
+								"com"
+							],
+							"path": [
+								"konsult",
+								"v1",
+								"encryption-key"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -6570,7 +6657,7 @@
 					"const ERROR = DEBUG_LVL > 1",
 					"",
 					"const WAIT_TIME = 50",
-					"const TOKEN_DURATION_S = 1200",
+					"const TOKEN_DURATION_S = 4147200",
 					"",
 					"",
 					"log = {",
@@ -6871,14 +6958,6 @@
 			"value": ""
 		},
 		{
-			"key": "apiJwt",
-			"value": ""
-		},
-		{
-			"key": "portalJwt",
-			"value": ""
-		},
-		{
 			"key": "gitHash",
 			"value": ""
 		},
@@ -6963,6 +7042,30 @@
 			"value": ""
 		},
 		{
+			"key": "apiJwt",
+			"value": ""
+		},
+		{
+			"key": "portalJwt",
+			"value": ""
+		},
+		{
+			"key": "softReport1Id",
+			"value": ""
+		},
+		{
+			"key": "dateReport",
+			"value": ""
+		},
+		{
+			"key": "unkownMetaId",
+			"value": ""
+		},
+		{
+			"key": "softReport3Id",
+			"value": ""
+		},
+		{
 			"key": "now",
 			"value": ""
 		},
@@ -7043,23 +7146,7 @@
 			"value": ""
 		},
 		{
-			"key": "softReport1Id",
-			"value": ""
-		},
-		{
-			"key": "dateReport",
-			"value": ""
-		},
-		{
 			"key": "softReport2Id",
-			"value": ""
-		},
-		{
-			"key": "unkownMetaId",
-			"value": ""
-		},
-		{
-			"key": "softReport3Id",
 			"value": ""
 		},
 		{

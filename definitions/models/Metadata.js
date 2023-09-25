@@ -90,10 +90,6 @@ const validArrayNotNull = {
   validator: isNotEmptyArray,
   message: `'{PATH}' property should not be empty`,
 }
-// const validObjectNotEmpty = {
-//   validator: isNotEmptyObject,
-//   message: `'{PATH}' property should not be empty`,
-// }
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
@@ -106,7 +102,7 @@ import { accessProperty, requireSubProperty } from '../../utils/jsonAccess.js'
 import { makeSearchable } from '../../db/dbActions.js'
 
 // -------------------------------------------------------------------------------------------------
-// Thesaurus definiitons
+// Thesaurus definitions
 // -------------------------------------------------------------------------------------------------
 // logD(mod, 'init', 'Schemas, Models and definitions')
 import Keywords from '../thesaurus/Keywords.js'
@@ -124,7 +120,7 @@ import { DoiSchema, UuidSchema, UuidV4Schema } from '../schemas/Identifiers.js'
 
 import { DictionaryEntrySchema } from '../schemas/DictionaryEntry.js'
 import { checkDates, ReferenceDatesSchema } from '../schemas/ReferenceDates.js'
-import { AccesConditionSchema } from '../schemas/AccesConditions.js'
+import { AccessConditionSchema } from '../schemas/AccessConditions.js'
 
 // -------------------------------------------------------------------------------------------------
 // Model definitions
@@ -197,10 +193,10 @@ const MetadataSchema = new mongoose.Schema(
     // Resource identifiers
     // ---------------------------
 
-    /** Unique and permanent identifier for the ressource in RUDI system (required) */
+    /** Unique and permanent identifier for the resource in RUDI system (required) */
     [API_METADATA_ID]: UuidV4Schema,
 
-    /** Identifier for the ressource in the producer system (optional) */
+    /** Identifier for the resource in the producer system (optional) */
     [API_METADATA_LOCAL_ID]: {
       type: String,
       trim: true,
@@ -216,7 +212,7 @@ const MetadataSchema = new mongoose.Schema(
       },
     },
 
-    // Digital Object Identifier for the ressource (optional)
+    // Digital Object Identifier for the resource (optional)
     doi: DoiSchema,
 
     // ---------------------------
@@ -374,7 +370,7 @@ const MetadataSchema = new mongoose.Schema(
       /**
        * 'geographic_distribution': Precise geographic distribution of the data
        *
-       * Précisions: GeoJSON uses a geographic coordinate reference system,
+       * Precisions: GeoJSON uses a geographic coordinate reference system,
        * World Geodetic System 1984, and units of decimal degrees.
        * The first two elements are longitude and latitude, or easting and
        * northing, precisely in that order and using decimal numbers.
@@ -434,7 +430,7 @@ const MetadataSchema = new mongoose.Schema(
      * licence, confidentiality, terms of service, habilitation or required rights,
      * economical model. Default is open licence.
      */
-    [API_ACCESS_CONDITION]: AccesConditionSchema,
+    [API_ACCESS_CONDITION]: AccessConditionSchema,
 
     /** 'metadata_info': Metadata on the metadata */
     [API_METAINFO_PROPERTY]: {
@@ -538,7 +534,7 @@ async function checkLicence(metadata) {
           API_LICENCE_TYPE,
           LicenceTypes.Standard
         )
-        const listLicenceCode = await getLicenceCodes()
+        const listLicenceCode = getLicenceCodes()
         // logD(mod, fun, ` [T] licence list: ${beautify(listLicenceCode)}`)
         if (listLicenceCode.indexOf(licenceLabel) === -1) {
           throw new NotFoundError(
@@ -738,27 +734,6 @@ async function checkThesaurus(metadata) {
     throw RudiError.treatError(mod, fun, err)
   }
 }
-/*
-  function checkMedia(metadata) {
-    const fun = 'checkMedia'
-    logD(mod, fun, `metadata: ${beautify(metadata)}`)
-    try {
-      const media = metadata[API_MEDIA_PROPERTY]
-      if (!media) throw new BadRequestError(missingField(API_MEDIA_PROPERTY)+` (metadata ${this[API_METADATA_ID]})`)
-      if (media[API_MEDIA_TYPE_PROPERTY] === MediaTypes.File) {
-        if (!isNotEmptyObject(media[API_FILE_CHECKSUM])) {
-          throw new BadRequestError(missingObjectProperty(this, API_FILE_CHECKSUM)+` (metadata ${this[API_METADATA_ID]})`)
-        }
-      } else {
-        logD(mod, fun, `media: ${beautify(metadata[API_MEDIA_PROPERTY])}`)
-        logD(mod, fun, `type: ${media[API_MEDIA_TYPE_PROPERTY]}`)
-      }
-    } catch (err) {
-          throw RudiError.treatError(mod, fun, err)
-
-    }
-  }
-*/
 
 // -------------------------------------------------------------------------------------------------
 // Schema refinements
@@ -786,18 +761,13 @@ MetadataSchema.virtual(`${API_METAINFO_PROPERTY}.${API_METAINFO_DATES}.${API_DAT
   }
 )
 MetadataSchema.virtual(API_STATUS_PROPERTY).get(function () {
-  return
-  this[API_COLLECTION_TAG]
-    ? MetadataStatus.Local
-    : this[API_STORAGE_STATUS] === StorageStatus.Pending
-    ? MetadataStatus.Incomplete
-    : this[API_INTEGRATION_ERROR_ID]
-    ? MetadataStatus.Refused
-    : this[DB_PUBLISHED_AT]
-    ? MetadataStatus.Published
-    : objectPath.get(this, API_METAINFO_PROPERTY, API_METAINFO_DATES, API_DATES_DELETED)
-    ? MetadataStatus.Deleted
-    : MetadataStatus.Unset
+  if (this[API_COLLECTION_TAG]) return MetadataStatus.Local
+  if (this[API_STORAGE_STATUS] === StorageStatus.Pending) return MetadataStatus.Incomplete
+  if (this[API_INTEGRATION_ERROR_ID]) return MetadataStatus.Refused
+  if (this[DB_PUBLISHED_AT]) return MetadataStatus.Published
+  if (objectPath.get(this, API_METAINFO_PROPERTY, API_METAINFO_DATES, API_DATES_DELETED))
+    return MetadataStatus.Deleted
+  return MetadataStatus.Unset
 })
 
 MetadataSchema.virtual(API_RESTRICTED_ACCESS).get(function () {
@@ -825,7 +795,7 @@ MetadataSchema.pre('save', async function (next) {
     // If 'geography' field is defined, the field 'geography.bbox' is required
     if (requireSubProperty(metadata, API_GEOGRAPHY, API_GEO_BBOX_PROPERTY)) {
       if (isNothing(metadata[API_GEOGRAPHY][API_GEO_PROJECTION_PROPERTY])) {
-        // If 'geography' field is defined, but 'geography.projection' is not, it is initialized to the defaul value.
+        // If 'geography' field is defined, but 'geography.projection' is not, it is initialized to the default value.
         metadata[API_GEOGRAPHY][API_GEO_PROJECTION_PROPERTY] = 'WGS 84 (EPSG:4326)'
       }
     }

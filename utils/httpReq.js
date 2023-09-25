@@ -1,7 +1,7 @@
 const mod = 'http'
 
 // -------------------------------------------------------------------------------------------------
-// External dependecies
+// External dependencies
 // -------------------------------------------------------------------------------------------------
 import axios from 'axios'
 
@@ -13,7 +13,7 @@ import axios from 'axios'
 //   AxiosCurlirize(axios)
 // }
 // -------------------------------------------------------------------------------------------------
-// Internal dependecies
+// Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { USER_AGENT } from '../config/confApi.js'
 // import { ENV_LOCAL } from '../config/appOptions.js'

@@ -1,6 +1,6 @@
 const mod = 'sysConf'
 // -------------------------------------------------------------------------------------------------
-// External dependecies
+// External dependencies
 // -------------------------------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------------------------------
@@ -16,7 +16,7 @@ import {
 import { TRACE, TRACE_MOD, TRACE_FUN, TRACE_ERR } from './confApi.js'
 
 // -------------------------------------------------------------------------------------------------
-// Internal dependecies
+// Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { consoleLog, consoleErr, quietAccess, NOT_FOUND, separateLogs } from '../utils/jsUtils.js'
 import { readIniFile } from '../utils/fileActions.js'
@@ -102,7 +102,11 @@ export const getIniValue = (section, field, defaultVal, customConf, defaultConf)
 
     if (userValue != NOT_FOUND) return userValue
     if (localValue != NOT_FOUND) return localValue
-    return typeof defaultVal === 'undefined' ? NOT_FOUND : defaultVal
+    if (typeof defaultVal === 'undefined')
+      throw new Error(
+        `The parameter '${section}.${field}' is incorrectly set in file '${USER_CONF_FILE}'`
+      )
+    else return defaultVal
   } catch (err) {
     consoleErr(mod, 'getIniValue', err)
     throw err
@@ -118,9 +122,14 @@ const FLAGS_SECTION = 'flags'
 
 const SHOULD_CONTROL_PRIVATE_REQUESTS = getIniValue(
   FLAGS_SECTION,
-  'should_control_private_requests'
+  'should_control_private_requests',
+  true
 )
-const SHOULD_CONTROL_PUBLIC_REQUESTS = getIniValue(FLAGS_SECTION, 'should_control_public_requests')
+const SHOULD_CONTROL_PUBLIC_REQUESTS = getIniValue(
+  FLAGS_SECTION,
+  'should_control_public_requests',
+  false
+)
 
 export const shouldControlPrivateRequests = () => SHOULD_CONTROL_PRIVATE_REQUESTS
 export const shouldControlPublicRequests = () => SHOULD_CONTROL_PUBLIC_REQUESTS

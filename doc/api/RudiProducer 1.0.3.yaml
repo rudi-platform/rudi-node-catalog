@@ -886,7 +886,7 @@ components:
         #——————————————————————————
         'dependencies':
           description: >
-            Dependecies are other resources that were used as sources for the
+            dependencies are other resources that were used as sources for the
             present resource (such ones are listed as parents) or that use
             the present resource as source (these are listed as children)
           type: object

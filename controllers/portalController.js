@@ -45,7 +45,7 @@ import {
 } from '../utils/jsUtils.js'
 import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
 
-import { httpGet, httpPost, httpDelete, directPost, directGet, httpPut } from '../utils/httpReq.js'
+import { httpGet, httpPost, httpDelete, directPost, httpPut } from '../utils/httpReq.js'
 import {
   FIELD_TOKEN,
   getAuthUrl,
@@ -91,6 +91,7 @@ export const getPortalAuthHeaderBasic = () => {
   const fun = 'getPortalAuthHeaderBasic'
   try {
     logT(mod, fun, ``)
+    if (isPortalConnectionDisabled()) return
     const [usr, pwdb64] = getCredentials()
     const pwd = decodeBase64(pwdb64)
     const basicAuth = padWithEqualSignBase4(toBase64(`${usr}:${pwd}`))
@@ -142,6 +143,7 @@ export const exposedGetPortalToken = async (req, reply) => {
   const fun = 'exposedGetPortalToken'
   logT(mod, fun, `< GET new portal token`)
   try {
+    if (isPortalConnectionDisabled()) return
     // logD(mod, fun, getAuthUrl())
     return await getNewTokenFromPortal()
   } catch (err) {
@@ -153,6 +155,7 @@ export const checkPortalTokenInHeader = async (req, isCheckOptional) => {
   const fun = 'checkPortalTokenInHeader'
   logT(mod, fun, ``)
   try {
+    if (isPortalConnectionDisabled()) return
     const token = extractJwt(req)
     const jwtInfo = await verifyPortalToken(token)
     return jwtInfo
@@ -176,6 +179,7 @@ export const getPortalToken = async () => {
   logT(mod, fun, ``)
   let token, rmToken
   try {
+    if (isPortalConnectionDisabled()) return
     rmToken = await getLatestStoredPortalToken()
     // logD(mod, fun, beautify(rmToken))
     if (!rmToken || rmToken.exp < nowEpochS()) {
@@ -205,6 +209,7 @@ export const checkStoredToken = async (req, reply) => {
   logT(mod, fun, ``)
   // logT(mod, fun, `< GET portal check token`)
   try {
+    if (isPortalConnectionDisabled()) return
     const token = await getLatestStoredPortalToken()
     if (!token) throw new NotFoundError('No Portal token is actually stored')
     return await getTokenCheckedByPortal(token[FIELD_TOKEN])
@@ -217,6 +222,7 @@ export const checkInputToken = async (req, reply) => {
   const fun = 'checkInputToken'
   logT(mod, fun, ``)
   try {
+    if (isPortalConnectionDisabled()) return
     const token = accessReqParam(req.params, PARAM_TOKEN)
     return await getTokenCheckedByPortal(token[FIELD_TOKEN])
   } catch (err) {
@@ -228,6 +234,7 @@ export const getMetadata = async (req, reply) => {
   const fun = 'getMetadata'
   logT(mod, fun, ``)
   try {
+    if (isPortalConnectionDisabled()) return
     let metadataId = req.params[PARAM_ID]
     if (metadataId && !isUUID(metadataId)) metadataId = undefined
     if (metadataId) logD(mod, fun, `metadataId: ${metadataId}`)
@@ -244,6 +251,7 @@ export const sendMetadata = async (req, reply) => {
   const fun = 'sendMetadata'
   logT(mod, fun, ``)
   try {
+    if (isPortalConnectionDisabled()) return
     let metadataId = req.params[PARAM_ID]
     logD(mod, fun, `metadataId: ${metadataId}`)
     if (!metadataId || !isUUID(metadataId))
@@ -259,6 +267,7 @@ export const deleteMetadata = async (req, reply) => {
   const fun = 'deleteMetadata'
   logT(mod, fun, ``)
   try {
+    if (isPortalConnectionDisabled()) return
     let metadataId = req.params[PARAM_ID]
     logD(mod, fun, `metadataId: ${metadataId}`)
     if (metadataId && !isUUID(metadataId)) metadataId = null
@@ -275,8 +284,9 @@ export const deleteMetadata = async (req, reply) => {
 let CACHED_PORTAL_PUB
 export const getPortalJwtPubKey = async () => {
   const fun = 'getPortalJwtPubKey'
+  logT(mod, fun, ``)
   try {
-    logT(mod, fun, ``)
+    if (isPortalConnectionDisabled()) return
     if (CACHED_PORTAL_PUB) return CACHED_PORTAL_PUB
 
     const publicKeyUrl = getPortalJwtPubKeyUrl()
@@ -293,14 +303,11 @@ export const getPortalJwtPubKey = async () => {
   }
 }
 
-let cachedPortalEncryptPubKey
 export const getPortalEncryptPubKey = async () => {
   const fun = 'getPortalEncryptPubKey'
+  logT(mod, fun, ``)
   try {
-    logT(mod, fun, ``)
-    // if (cachedPortalEncryptPubKey) return cachedPortalEncryptPubKey
-
-    // cachedPortalEncryptPubKey = await axiosInstanceForPortal.get(getPortalCryptPubUrl())
+    if (isPortalConnectionDisabled()) return
     const portalCryptPubData = await axios.get(getPortalCryptPubUrl(), {
       headers: {
         'User-Agent': USER_AGENT,
@@ -308,9 +315,8 @@ export const getPortalEncryptPubKey = async () => {
       },
       httpsAgent: portalHttpsAgent,
     })
-    cachedPortalEncryptPubKey = portalCryptPubData?.data
-    // logD(mod, fun, `portalEncryptPubKey: ${beautify(cachedPortalEncryptPubKey)}`)
-    return cachedPortalEncryptPubKey
+    const portalEncryptPubKey = portalCryptPubData?.data
+    return portalEncryptPubKey
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -320,8 +326,9 @@ export const getPortalEncryptPubKey = async () => {
 // -------------------------------------------------------------------------------------------------
 export const getNewTokenFromPortal = async () => {
   const fun = 'getNewTokenFromPortal'
+  logT(mod, fun, ``)
   try {
-    logT(mod, fun, ``)
+    if (isPortalConnectionDisabled()) return
     const [usr, pwdb64] = getCredentials()
     const pwd = decodeBase64(pwdb64)
     // consoleLog(mod, fun, pwdb64)
@@ -389,15 +396,19 @@ export const getNewTokenFromPortal = async () => {
 
 export const getTokenCheckedByPortal = async (token) => {
   const fun = 'getTokenCheckedByPortal'
+  logT(mod, fun, ``)
   try {
-    logT(mod, fun, ``)
+    if (isPortalConnectionDisabled()) return
     if (!token) throw new BadRequestError('No token to check!')
-    const portalUrl = getCheckAuthUrl()
+    // const portalUrl = getCheckAuthUrl()
     // logD(mod, fun, portalUrl)
 
-    const requestUrl = `${portalUrl}?${PARAM_TOKEN}=${token}`
-    // logD(mod, fun, requestUrl)
-    const portalResponse = await directGet(requestUrl)
+    // const requestUrl = `${portalUrl}?${PARAM_TOKEN}=${token}`
+    logD(mod, 'portalUrl', getCheckAuthUrl())
+    logD(mod, PARAM_TOKEN, token)
+    const portalResponse = await directPost(getCheckAuthUrl(), `${PARAM_TOKEN}=${token}`, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    })
 
     if (portalResponse?.status === 200) {
       logV(mod, fun, `RUDI Portal validated the token`)
@@ -408,70 +419,12 @@ export const getTokenCheckedByPortal = async (token) => {
   }
 }
 
-/* jwtHeader = {
-  alg: 'RS512',                     // RSA 512
-  typ: 'JWT'
-}
-jwtBody = {
-  jti: '<uuid>',                    // ID du JWT
-  authorities: ['rudi-prod-admin'], // ID de ton module
-  exp: 1622063934,                  // Date d'expiration (absolue, Epoch, secondes)
-  user_id: '<uuid>',                // Utilisateur qui effectue l'action
-  org_id: '<uuid>',                 // Entreprise/organisation de l'utilisateur
-  roles: ['admin', 'editor']         // Autorisations de l'utilisateur
-} */
-/*
-jwtHeader = {
-      alg: 'HS256',
-      typ: 'JWT'
-}
-jwtBody = {
-  exp: 1622063934,
-  user_name: '<uuid>',
-  authorities: ['PROVIDER'],
-  jti: '<uuid>',
-  client_id: '<uuid>',
-  scope: ['read']
-}
-*/
-/*
-  export const checkSignatureWithSecret = (accessToken) => {
-    const fun = 'checkSignatureWithSecret'
-    logT(mod, fun, ``)
-
-    try {
-      if (!accessToken) throw new BadRequestError('No token = no signature to verify!')
-      const [jwtHeaderBase64, jwtPayloadBase64, jwtSignatureBase64] = accessToken.split('.')
-
-      const hash = createHmac('sha256', getSecret())
-        .update(`${jwtHeaderBase64}.${jwtPayloadBase64}`)
-        .digest('base64url')
-
-      if (hash !== jwtSignatureBase64) {
-        const errMsg = `Forged token? Computed hash: ${hash} != jwt signature: ${jwtSignatureBase64}`
-        logW(mod, fun, errMsg)
-      }
-      return hash === jwtSignatureBase64
-
-      // if (hash !== jwtSignatureBase64) {
-      //   const errMsg = `Forged token? Computed hash: ${hash} != jwt signature: ${jwtSignatureBase64}`
-      //   logW(mod, fun, errMsg)
-      //   throw new Error(errMsg)
-      // }
-      // return true
-    } catch (err) {
-      const errMsg = `Invalid token: ${err}`
-      logW(mod, fun, errMsg)
-      throw err
-    }
-  }
- */
-
 export const verifyPortalToken = async (accessToken) => {
   const fun = 'verifyPortalToken'
   logT(mod, fun, ``)
 
   try {
+    if (isPortalConnectionDisabled()) return
     if (!accessToken) throw new ForbiddenError('No token to verify!')
 
     const portalPubKey = await getPortalJwtPubKey()
@@ -527,7 +480,7 @@ const WAIT_DATE = 'wait_date'
 const isMetadataSendableToPortal = async (metadataId) => {
   const fun = 'isMetadataAcceptableByPortal'
   try {
-    if (isPortalConnectionDisabled()) return false
+    if (isPortalConnectionDisabled()) return
 
     //--- Check input param
     if (!metadataId) throw new BadRequestError('Input metadata id is requested', mod, fun)
@@ -608,6 +561,7 @@ export const sendMetadataToPortal = async (metadataId) => {
   const fun = 'sendMetadataToPortal'
   try {
     logT(mod, fun, ``)
+    if (isPortalConnectionDisabled()) return
 
     const sendableData = await isMetadataSendableToPortal(metadataId)
     if (!sendableData) return
@@ -679,6 +633,7 @@ export const getMetadataFromPortal = async (metadataId, additionalParameters) =>
   const fun = 'getMetadataFromPortal'
   logT(mod, fun, ``)
   try {
+    if (isPortalConnectionDisabled()) return
     const token = await getPortalToken()
 
     if (!metadataId) return httpGet(getPortalMetaUrl(null, additionalParameters), token)
@@ -692,7 +647,8 @@ export const deletePortalMetadata = async (metadataId) => {
   const fun = 'deletePortalMetadata'
   logT(mod, fun, ``)
   try {
-    if (!metadataId) throw new BadRequestError('Metadata id required') // Can't get the resouces list yet.
+    if (isPortalConnectionDisabled()) return
+    if (!metadataId) throw new BadRequestError('Metadata id required') // Can't get the resources list yet.
 
     const token = await getPortalToken()
     const reply = await httpDelete(postPortalMetaUrl(metadataId), token)

@@ -87,7 +87,7 @@ const DATA_DATES = `${API_DATA_DATES_PROPERTY}.`
 const META_DATES = `${API_METAINFO_PROPERTY}.${API_METAINFO_DATES}.`
 
 // -------------------------------------------------------------------------------------------------
-// Internal dependecies
+// Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { beautify, isNotEmptyArray } from './jsUtils.js'
 import { logD, logT, logW } from './logging.js'

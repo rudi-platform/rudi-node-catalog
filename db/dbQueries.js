@@ -47,7 +47,7 @@ import {
   OBJ_PUB_KEYS_CAML,
   QUERY_LANG,
 } from '../config/confApi.js'
-// Fields from the JSON as definied in the API
+// Fields from the JSON as defined in the API
 import {
   DB_ID,
   DB_CREATED_AT,
@@ -296,7 +296,7 @@ export const listThemesInMetadata = async () => {
   const fun = 'listThemesInMetadata'
   try {
     logT(mod, fun, ``)
-    const listVals = await Metadata.distinct(API_THEME_PROPERTY)
+    const listVals = Metadata.distinct(API_THEME_PROPERTY)
     logD(mod, fun, beautify(listVals))
 
     return listVals
@@ -318,9 +318,6 @@ export const isProperty = (Model, prop) => getModelPropertyNames(Model).includes
 
 export const cleanLicences = async () => {
   const fun = `cleanLicences`
-
-  // const CONCEPTS_COLLECTION_NAME = 'skosconcepts'
-  // const SCHEMES_COLLECTION_NAME = 'skosschemes'
 
   try {
     // TODO: target only licences hierarchy!
@@ -594,64 +591,9 @@ export const getEnsuredDbIdWithJson = async (objectType, rudiObject) => {
   }
 }
 
-/*
-export const getObjectWithField = async (Model, fieldName, fieldValue, populateFields) => {
-  const fun = `getObjectWithField`
-  // // logT(mod, fun, ``)
-  try {
-    if (!fieldName) throw new ParameterExpectedError('field name', mod, fun)
-
-    const filter = {
-      [fieldName]: fieldValue
-    }
-    return await getObject(Model, filter, populateFields)
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
- */
-
 // -------------------------------------------------------------------------------------------------
 // Generic functions: get object list
 // -------------------------------------------------------------------------------------------------
-/* const LIST = 'list'
-const FIELD = 'field'
-const ID = 'id'
-
-function toMongoSortOptions(initialCriteria, sortByFields, conculsionCriteria) {
-  const fun = 'toMongoSortOptions'
-  const sortOptions = {}
-  const listOptions = { id: '$_id' }
-
-  if (sortByFields) {
-    let i = 1
-    sortByFields.map((field) => {
-      let absoluteField
-      const genericName = `${FIELD}${i}`
-      const genericField = `${LIST}.${genericName}`
-      if (field[0] === '-') {
-        absoluteField = field.substring(1)
-        sortOptions[genericField] = -1
-      } else {
-        absoluteField = field
-        sortOptions[genericField] = 1
-      }
-      listOptions[genericName] = `$${absoluteField}`
-
-      ++i
-    })
-    // logD(mod, fun, beautify(sortOptions))
-  }
-  return [{ ...initialCriteria, ...sortOptions, ...conculsionCriteria }, listOptions]
-}
- */
-
-// function addToFilterUpdated(filter, key, dateVal) {
-//   const fun = 'addToFilterUpdated'
-//   // // logT(mod, fun, ``)
-//   const date = new Date(dateVal)
-//   if (!filter.updatedAt) filter.updatedAt = { [key]: date }
-// }
 
 function getParamValue(options, param, defaultVal, maxVal) {
   const val = options ? options[param] : null
@@ -868,7 +810,7 @@ export const searchDbObjects = async (objectType, options) => {
           throw new RudiError(`Couldn't create indexes`)
         }
         return await searchDbObjects(objectType, options)
-      } else if (`${err}`.substring(0, MDB_ERR_NO_INDEX.length) === MDB_ERR_NO_INDEX) {
+      } else if (`${err}`.startsWith(MDB_ERR_NO_INDEX)) {
         logW(mod, fun, err)
         return { total: 0, items: [] }
       } else {
@@ -1162,7 +1104,7 @@ export const overwriteDbObject = async (objectType, updateData) => {
  * @returns
  */
 export const getOrphans = async (objectType) => {
-  const fun = `getUnlinkdedObjects`
+  const fun = `getOrphans`
   // logT(mod, fun, ``)
   if (objectType === OBJ_METADATA) {
     const errMsg = 'Not implemented'

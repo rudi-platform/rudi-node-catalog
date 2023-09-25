@@ -211,7 +211,7 @@ if (SHOULD_FILELOG) {
   // - Write all logs with level `debug`
   loggerOpts.transports.push(
     new winston.transports.File({
-      name: 'combinedlogs',
+      name: 'combinedLogs',
       filename: `${LOG_DIR}/${LOG_FILE}`,
       maxsize: MAX_SIZE,
       maxFiles: 5,

@@ -304,9 +304,9 @@ export const searchObjects = async (req, reply) => {
     logT(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}/${ACT_SEARCH}`)
     // retrieve url parameters: object type, object id
     const objectType = getObjectParam(req)
-    logV(mod, fun, req.routeConfig)
+    logV(mod, fun, req.routeOptions?.config)
     logV(mod, fun, req.routeSchema)
-    const opt = req.routeConfig ? req.routeConfig[ROUTE_OPT] : undefined
+    const opt = req.routeOptions?.config ? req.routeOptions?.config[ROUTE_OPT] : undefined
     logD(mod, fun, `opt: ${beautify(opt)}`)
 
     let parsedParameters
@@ -413,7 +413,7 @@ export const getManyObjects = async (objectType, req) => {
       objectList = await getDbObjectList(objectType, options)
     } else if (groupBy) {
       if (countBy) {
-        const msg = `'${QUERY_GROUP_BY}' parameter found, '${QUERY_COUNT_BY}' is redondant and ignored`
+        const msg = `'${QUERY_GROUP_BY}' parameter found, '${QUERY_COUNT_BY}' is redundant and ignored`
         logW(mod, fun, msg)
       }
       const options = pick(parsedParameters, [
@@ -660,7 +660,7 @@ export const deleteManyObjects = async (req, reply) => {
  * Generate an UUID v4
  */
 export const getOrphans = async (objectType) => {
-  const fun = 'getUnlinkdedObjects'
+  const fun = 'getOrphans'
   logT(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}/${ACT_UNLINKED}`)
 
   return await getOrphans(objectType)

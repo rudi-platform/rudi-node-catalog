@@ -12,7 +12,7 @@ import { LicenceSchema } from './Licence.js'
 // -------------------------------------------------------------------------------------------------
 // Custom schema definition
 // -------------------------------------------------------------------------------------------------
-export const AccesConditionSchema = {
+export const AccessConditionSchema = {
   /** 'licence': Standard licence (recognized by RUDI system) */
   [API_LICENCE]: LicenceSchema,
 

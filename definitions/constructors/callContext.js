@@ -37,13 +37,13 @@ const ACTIVATE_LOG = true
  * the RudiLogger structure (see https://gitlab.aqmo.org/rudidev/rudilogger)
  * and more specifically like this:
  * {
- *    [AUTH]: {JS object} identification informations
+ *    [AUTH]: {JS object} identification information
  *    {
  *        [REQ_IPS]: {array} list of IP redirections, in inverse chronological order
  *        [REQ_APP]: {string} identifier of the app/module that sends the request
  *        [REQ_USR]: {string} identified user that launches the request
  *    },
- *    [OP]: {JS object} operations informations
+ *    [OP]: {JS object} operations information
  *    {
  *        [OP_TYPE]: {string} identifies the operation corresponding to the request
  *        [STATUS_CODE]: {int} HTTP status code of the reply
@@ -442,7 +442,7 @@ export const CallContext = class CallContext {
       if (!context) {
         if (ACTIVATE_LOG) logT(mod, fun, 'No context set yet')
         return (
-          `${req.method} ${req.url} (${req.routeConfig[ROUTE_NAME]})` +
+          `${req.method} ${req.url} (${req.routeOptions.config[ROUTE_NAME]})` +
           ` <- ${CallContext.createIpsMsg(req)}`
         )
       } else {

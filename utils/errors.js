@@ -39,7 +39,7 @@ export class RudiError extends Error {
     this[IS_RUDI_ERROR] = true
     this[STATUS_CODE] = code || 500
     this.name = name || 'Internal Server Error'
-    this.error = description || 'An unexpected error occured'
+    this.error = description || 'An unexpected error occurred'
     this.type = this.constructor.name
     this[TRACE] = errTrace || []
     this.setId()
@@ -412,6 +412,20 @@ export class InternalServerError extends RudiError {
 export class ParameterExpectedError extends InternalServerError {
   constructor(param, ctxMod, ctxFun) {
     super(`${parameterExpected(ctxFun, param)}`, ctxMod, ctxFun)
+  }
+}
+
+export class ConfigurationError extends RudiError {
+  constructor(param, fileName, ctxMod, ctxFun) {
+    super(
+      `The parameter '${param}' is incorrectly set in file '${fileName}'`,
+      500,
+      'Configuration Error',
+      'Configuration Error',
+      undefined,
+      ctxMod,
+      ctxFun
+    )
   }
 }
 

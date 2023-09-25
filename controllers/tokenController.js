@@ -14,10 +14,10 @@ import {
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 
-import { beautify, decodeBase64url } from '../utils/jsUtils.js'
+import { decodeBase64url } from '../utils/jsUtils.js'
 import { accessProperty } from '../utils/jsonAccess.js'
 
-import { logI, logT } from '../utils/logging.js'
+import { logT } from '../utils/logging.js'
 
 import { getProfile } from '../config/confSystem.js'
 import { ForbiddenError, UnauthorizedError, RudiError } from '../utils/errors.js'
@@ -105,7 +105,7 @@ export const checkRudiProdPermission = async (req, isCheckOptional) => {
   try {
     let token
     try {
-      logI(mod, fun, `! req: ${beautify(req.headers)}`)
+      // logI(mod, fun, `! req: ${beautify(req.headers)}`)
       token = extractJwt(req)
     } catch (err) {
       // logE(mod, fun, `err: ${err}`)
@@ -120,7 +120,7 @@ export const checkRudiProdPermission = async (req, isCheckOptional) => {
     // Check the ACL (= does the subject have permission to enter this route?)
     // logD(mod, fun, `req: ${beautify(req.context.config[ROUTE_NAME])}`)
 
-    const reqRouteName = accessProperty(req.routeConfig, ROUTE_NAME)
+    const reqRouteName = accessProperty(req.routeOptions?.config, ROUTE_NAME)
     checkSubjPermission(subject, reqRouteName)
     return { subject, clientId }
     // return 'ok'

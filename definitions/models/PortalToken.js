@@ -13,7 +13,6 @@ const Int32 = mongooseInt32.loadType(mongoose)
 // Constants
 // -------------------------------------------------------------------------------------------------
 import { FIELDS_TO_SKIP } from '../../db/dbFields.js'
-import { UuidSchema } from '../schemas/Identifiers.js'
 
 // -------------------------------------------------------------------------------------------------
 // Custom schema definition
@@ -33,7 +32,7 @@ const PortalTokenSchema = new mongoose.Schema(
 
     scope: String,
 
-    jti: UuidSchema,
+    jti: String,
   },
   {
     timestamps: true,

@@ -126,7 +126,7 @@ export const serveFavicon = (req, res) => {
     // )
     res.header('Content-Length', favicon.length)
     res.header('Content-Type', 'image/png')
-    res.header('Cache-Control', `public, max-age=${MONTH_IN_S}`) // expiers after a month
+    res.header('Cache-Control', `public, max-age=${MONTH_IN_S}`) // expires after a month
     res.header('Expires', new Date(Date.now() + MONTH_IN_MS).toUTCString())
     res.statusCode = 200
     res.send(favicon)

@@ -39,12 +39,12 @@ export const getLicences = async () => {
     logT(mod, fun, ``)
     if (!LICENCE_LIST) {
       logD(mod, fun, `Init LICENCE_LIST`)
-      let dblicenceList = await getAllConceptsWithRole(LICENCE_CONCEPT_ROLE)
-      if (isEmptyArray(dblicenceList)) {
+      let dbLicenceList = await getAllConceptsWithRole(LICENCE_CONCEPT_ROLE)
+      if (isEmptyArray(dbLicenceList)) {
         await initializeLicences()
-        dblicenceList = await getAllConceptsWithRole(LICENCE_CONCEPT_ROLE)
+        dbLicenceList = await getAllConceptsWithRole(LICENCE_CONCEPT_ROLE)
       }
-      LICENCE_LIST = await dbConceptListToRudiRecursive(dblicenceList)
+      LICENCE_LIST = await dbConceptListToRudiRecursive(dbLicenceList)
     }
     return LICENCE_LIST
   } catch (err) {

@@ -50,7 +50,7 @@ import { getUrlMaxLength } from '../utils/protection.js'
 consoleLog(mod, 'ff', beautify(fastifyLogger.log))
 import fastify from 'fastify'
 export const fastifyConf = fastify({
-  logger: fastifyLogger({ leve: 'warn' }),
+  logger: fastifyLogger({ level: 'warn' }),
   // logger: initFFLogger(),
   // logger: {
   //    level: 'warn',
@@ -60,7 +60,7 @@ export const fastifyConf = fastify({
 })
 
 // -------------------------------------------------------------------------------------------------
-// Cosntants
+// Constants
 // -------------------------------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------------------------------
@@ -176,12 +176,12 @@ fastifyConf.addHook('onRequest', (req, res, next) => {
       context.setReqDescription(
         req.method,
         req.url.substring(0, getUrlMaxLength()),
-        req.routeConfig[ROUTE_NAME]
+        req.routeOptions?.config[ROUTE_NAME]
       )
       CallContext.setAsReqContext(req, context)
       throw err
     }
-    context.setReqDescription(req.method, req.url, req.routeConfig[ROUTE_NAME])
+    context.setReqDescription(req.method, req.url, req.routeOptions?.config[ROUTE_NAME])
     CallContext.setAsReqContext(req, context)
 
     logT('http', fun, CallContext.createApiCallMsg(req))
@@ -218,7 +218,7 @@ fastifyConf.addHook('onSend', (request, reply, payload, next) => {
 // Pre-handler functions
 // -------------------------------------------------------------------------------------------------
 /**
- * Pre-handler for requests that need no authentification ("free routes")
+ * Pre-handler for requests that need no authentication ("free routes")
  * @param {object} req incoming request
  * @param {object} reply reply
  */
@@ -263,7 +263,7 @@ async function onPublicRoute(req, reply) {
 }
 
 /**
- * Pre-handler for requests that need a "public" (aka portal) authentification
+ * Pre-handler for requests that need a "public" (aka portal) authentication
  * ("public routes")
  * @param {object} req incoming request
  * @param {object} reply reply
@@ -292,7 +292,7 @@ async function onPortalRoute(req, reply) {
 
 /**
  * Pre-handler for requests that need a "private" (aka rudi producer node)
- * authentification ("private/backoffice routes")
+ * authentication ("private/back-office routes")
  * These requests should normally bear a user identification
  * @param {object} req incoming request
  * @param {object} reply reply
@@ -318,7 +318,7 @@ async function onPrivateRoute(req, reply) {
 
 /**
  * Pre-handler for private requests that don't need an
- * authentification ("unrestricted private routes")
+ * authentication ("unrestricted private routes")
  * These requests are normally not user driven actions, but sent by an app
  * such as the prodmanager
  * @param {object} req incoming request
@@ -362,7 +362,7 @@ function declareRouteGroup(routeGroup, preHandler, routeGroupName, logLevel) {
 }
 
 /**
- * Pre-handler fonction assignments
+ * Pre-handler function assignments
  */
 export const declareRoutes = () => {
   // declareRouteGroup(redirectRoutes, onPortalRoute, 'Redirect', 'd')
