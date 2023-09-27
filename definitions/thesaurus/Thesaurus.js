@@ -145,7 +145,7 @@ export class Thesaurus {
       const langLabels = {}
       Object.keys(this.#currentValues)
         .sort()
-        .map((key) => {
+        .forEach((key) => {
           langLabels[key] = this.#currentValues[key][lang] || key
         })
       return langLabels
@@ -184,7 +184,7 @@ export class Thesaurus {
             throw new BadRequestError(
               `Adding a value to '${
                 this.#code
-              }' shoud be done with an object {thesaurusValue: {lang1: label1, lang2: label2}}`,
+              }' should be done with an object {thesaurusValue: {lang1: label1, lang2: label2}}`,
               mod,
               fun
             )
@@ -257,7 +257,7 @@ export class Thesaurus {
   #storeCurrentValues = async () => {
     const fun = '#storeCurrentValues'
     try {
-      if (!this.#currentValues) throw new MethodNotAllowedError('Values not inititalized')
+      if (!this.#currentValues) throw new MethodNotAllowedError('Values not initialized')
       await this.#storeEnum(this.#currentValues)
     } catch (err) {
       // logW(mod, fun, err)
@@ -296,26 +296,21 @@ export class Thesaurus {
   #storeEnum = async (thesaurusValues) => {
     const fun = '#storeEnum'
     try {
-      let dbAction
       logT(mod, fun, ``)
       if (!this.#hasLabels) {
         // case where thesaurusValues = [value1, value2]
-        dbAction = await DynamicEnum.findOneAndUpdate(
+        return await DynamicEnum.findOneAndUpdate(
           { [ENUM_CODE]: this.#code },
           { $set: { [ENUM_VALUES]: thesaurusValues } },
           { upsert: true, new: true }
         )
       } else {
-        // case where thesaurusValues = {
-        //    thesaurusValue1: { lang1: labelA, lang2: labelB },
-        //    thesaurusValue2: { lang1: labelX, lang2: labelY }
-        // }
         const storableEntries = []
 
         Object.keys(thesaurusValues).map((key) => {
           const storableLabels = []
           const labels = thesaurusValues[key]
-          Object.keys(labels).map((lang) => {
+          Object.keys(labels).forEach((lang) => {
             storableLabels.push({
               [DICT_LANG]: lang,
               [DICT_TEXT]: labels[lang],
@@ -323,15 +318,12 @@ export class Thesaurus {
           })
           storableEntries.push({ [ENUM_KEY]: key, [ENUM_LABELS]: storableLabels })
         })
-        // logD(mod, fun, beautify(storableEntries))
-        dbAction = await DynamicEnum.findOneAndUpdate(
+        return await DynamicEnum.findOneAndUpdate(
           { [ENUM_CODE]: this.#code },
           { $set: { [ENUM_LABELLED_VALUES]: storableEntries } },
           { upsert: true, new: true }
         )
       }
-      // logD(mod, fun, beautify(dbAction))
-      return dbAction
     } catch (err) {
       logW(mod, fun, err)
       throw RudiError.treatError(mod, fun, err)

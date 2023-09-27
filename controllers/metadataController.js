@@ -310,38 +310,6 @@ export const mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFo
   }
 }
 
-// function customMerger(value, srcValue, key) {
-//   const fun = 'customMerger'
-//   logV(mod, fun, `'${key}': ${beautify(srcValue)} -> ${beautify(value)}`)
-//   if (Array.isArray(srcValue)) return srcValue
-//   return undefined
-// }
-
-// // Parameter 'dbMetadata' gets mutated!
-// async function metadataCustomMerge(dbMetadata, dbReadyModMetadata) {
-//   const fun = 'metadataCustomMerge'
-//   logT(mod, fun, ``)
-//   // logD(mod, fun, `dbMetadata: ${beautify(dbMetadata)}`)
-
-//   //   const dataDates = dbMetadata[API_DATA_DATES_PROPERTY]
-//   //   const metaDates = dbMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY]
-//   //  const modDataDates = dbReadyModMetadata[API_DATA_DATES_PROPERTY]
-//   //   const modMetaDates = !dbReadyModMetadata[API_METAINFO_PROPERTY]
-//   //     ? {}
-//   //     : dbReadyModMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY]
-
-//   //   _.extend(dataDates, modDataDates)
-//   //   _.extend(metaDates, modMetaDates)
-
-//   await mergeWith(dbMetadata, dbReadyModMetadata, customMerger)
-
-//   // dbMetadata[API_DATA_DATES_PROPERTY] = dataDates
-//   // dbMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES_PROPERTY] = metaDates
-
-//   // logD(mod, fun, `dbMetadata updated: ${beautify(dbMetadata)}`)
-//   return dbMetadata
-// }
-
 // -------------------------------------------------------------------------------------------------
 // Atomic treatments of properties: DB -> RUDI
 // -------------------------------------------------------------------------------------------------
@@ -353,8 +321,6 @@ export const organizationDbToRudiFormat = async (producerDbId) => {
 
   const dbOrganization = await getEnsuredOrganizationWithDbId(producerDbId)
   logD(mod, fun, `dbOrganization -> ${beautify(dbOrganization)}`)
-  // const cleanedOrganization = dbRwk.unmongoosify(dbOrganization)
-  // logD(mod, fun, `${producerDbId} -> ${beautify(cleanedOrganization)}`)
   return dbOrganization
 }
 
@@ -367,9 +333,7 @@ export const contactListDbToRudiFormat = async (contactsDbIds) => {
   const contacts = []
   await Promise.all(
     contactsDbIds.map(async (contactDbId) => {
-      // logD(mod, fun, `contactDbId: ${contactDbId}`)
       const contact = await getEnsuredContactWithDbId(contactDbId)
-      // contacts.push(dbRwk.unmongoosify(contact))
       contacts.push(contact)
       logD(mod, fun, `${contactDbId} -> ${beautify(contact)}`)
     })
@@ -386,9 +350,7 @@ export const mediaListDbToRudiFormat = async (mediaDbIds) => {
   const mediaList = []
   await Promise.all(
     mediaDbIds.map(async (mediaDbId) => {
-      // logD(mod, fun, `contactDbId: ${contactDbId}`)
       const dbMedia = await getEnsuredMediaWithDbId(mediaDbId)
-      // contacts.push(dbRwk.unmongoosify(contact))
       mediaList.push(dbMedia)
       logD(mod, fun, `${mediaDbId} -> ${beautify(dbMedia)}`)
     })
@@ -554,17 +516,17 @@ export const rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) 
   }
 }
 function checkLicence(metadata) {
-  if (!metadata[API_ACCESS_CONDITION] || !metadata[API_ACCESS_CONDITION][API_LICENCE]) return
-  if (!metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_TYPE]) return
+  if (!metadata?.[API_ACCESS_CONDITION]?.[API_LICENCE]?.[API_LICENCE_TYPE]) return
   const licenceType = metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_TYPE]
   if (licenceType === LicenceTypes.Standard) {
     delete metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_CUSTOM_URI]
     delete metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_CUSTOM_LABEL]
-  } else {
-    if (typeof metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_CUSTOM_LABEL] === 'string')
-      metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_CUSTOM_LABEL] = [
-        { lang: 'fr', text: metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_CUSTOM_LABEL] },
-      ]
+  } else if (
+    typeof metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_CUSTOM_LABEL] === 'string'
+  ) {
+    metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_CUSTOM_LABEL] = [
+      { lang: 'fr', text: metadata[API_ACCESS_CONDITION][API_LICENCE][API_LICENCE_CUSTOM_LABEL] },
+    ]
   }
 }
 
@@ -587,7 +549,7 @@ function toMDBLanguage(metadata, field) {
       logW(mod, fun, `Field '${field}' should be an array: ${beautify(prop)}`)
       return
     }
-    prop.map((entry) => {
+    prop.forE((entry) => {
       if (entry[DICT_LANG]) entry[DICT_LANG] = entry[DICT_LANG].substring(0, 2)
     })
   } catch (err) {
@@ -1008,7 +970,7 @@ export const getSingleMetadata = async (req, reply) => {
 }
 
 /**
- * Reinit themes with stored data values for this field
+ * Reinitialize themes with stored data values for this field
  */
 export const initThemes = async (req, reply) => {
   const fun = 'initThemes'
@@ -1016,12 +978,7 @@ export const initThemes = async (req, reply) => {
     logT(mod, fun, ``)
     const valuesInStoredData = await listThemesInMetadata()
     logD(mod, fun, beautify(valuesInStoredData))
-    await Promise.all(
-      valuesInStoredData.map((val) => {
-        logD(mod, fun, val)
-        Themes.isValid(val, true)
-      })
-    )
+    await Promise.all(valuesInStoredData.map((val) => Themes.isValid(val, true)))
     return valuesInStoredData
   } catch (err) {
     const error = err.name === MONGO_ERROR ? new BadRequestError(err) : new NotFoundError(error)

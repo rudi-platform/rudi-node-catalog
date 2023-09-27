@@ -35,7 +35,7 @@ export const daGetCollections = async () => {
   const fun = `getCollections`
   try {
     const collections = await connection.db.listCollections().toArray()
-    collections.map((collection) => collection.name)
+    collections.forEach((collection) => collection.name)
     return collections
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)

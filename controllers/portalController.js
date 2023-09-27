@@ -92,7 +92,7 @@ export const getPortalAuthHeaderBasic = () => {
   const fun = 'getPortalAuthHeaderBasic'
   try {
     logT(mod, fun, ``)
-    if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
+    if (isPortalConnectionDisabled()) return
     const [usr, pwdb64] = getCredentials()
     const pwd = decodeBase64(pwdb64)
     const basicAuth = padWithEqualSignBase4(toBase64(`${usr}:${pwd}`))

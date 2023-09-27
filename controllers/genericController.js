@@ -221,7 +221,7 @@ export const addSingleObject = async (req, reply) => {
   try {
     logT(mod, fun, `< POST ${URL_PV_OBJECT_GENERIC}`)
     // retrieve url parameters: object type
-    const objectType = getObjectParam(req, PARAM_OBJECT)
+    const objectType = getObjectParam(req)
 
     // get the rudiId field for this object type
     const idField = getObjectIdField(objectType)
@@ -288,7 +288,7 @@ export const getObjectList = async (req, reply) => {
     // logD(mod, fun, beautify(req))
     const objectType = getObjectParam(req)
 
-    return await getManyObjects(objectType, req, reply)
+    return await getManyObjects(objectType, req)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -368,7 +368,7 @@ export const getSearchableProperties = (req, reply) => {
     const rudiObjectList = getRudiObjectList()
     const getSearchableFields = {}
     // logD(mod, fun, `rudiObjectList: ${beautify(rudiObjectList)}`)
-    Object.keys(rudiObjectList).map((objectType) => {
+    Object.keys(rudiObjectList).forEach((objectType) => {
       try {
         getSearchableFields[objectType] = rudiObjectList[objectType].Model.getSearchableFields()
       } catch (err) {
@@ -532,16 +532,15 @@ export const upsertSingleObject = async (req, reply) => {
     const context = CallContext.getCallContextFromReq(req)
     if (context) context.addObjId(objectType, rudiId)
 
-    if (!existsObject) {
-      return await newObject(objectType, updateData)
-    } else {
-      if (objectType === OBJ_METADATA) {
+    if (!existsObject) return await newObject(objectType, updateData)
+
+    switch (objectType) {
+      case OBJ_METADATA:
         return await overwriteMetadata(updateData)
-      } else if (objectType === OBJ_PUB_KEYS) {
+      case OBJ_PUB_KEYS:
         return await overwritePubKey(updateData)
-      } else {
+      default:
         return await overwriteDbObject(objectType, updateData)
-      }
     }
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -636,8 +635,6 @@ export const deleteManyObjects = async (req, reply) => {
     const filter = parsedParameters[QUERY_FILTER]
     // const fields = parsedParameters[QUERY_FIELDS]
     const confirmation = parsedParameters[QUERY_CONFIRM] || false
-
-    // if (objectType === OBJ_REPORTS) return await deleteReportsBefore(req, reply)
 
     if (isEmptyObject(filter)) {
       if (confirmation) return await deleteAllDbObjectsWithType(objectType)

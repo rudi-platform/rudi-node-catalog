@@ -218,30 +218,6 @@ export const addOrEditSingleReport = async (objectType, req, reply) => {
     let reportSrc = reportBody[API_COLLECTION_TAG] ? 'test' : 'Portal'
     logD(mod, fun, `Incoming ${reportSrc} report: ${beautify(req.body)}`)
 
-    // logV(mod, fun, `new report: ${beautify(reportBody)}`)
-    /* if (reportBody[API_COLLECTION_TAG]) {
-      try {
-        await checkRudiProdPermission(req, reply)
-        logI(mod, fun, `Report accepted with test access`)
-      } catch (err) {
-        const errMsg = `Incoming test integration report should be presented with a JWT identified request. Error: ${err}`
-        logW(mod, fun, errMsg)
-        throw new ForbiddenError(errMsg)
-      }
-    } else {
-      try {
-        const header = accessProperty(req, 'headers')
-        const auth = accessProperty(header, 'authorization')
-        const portalToken = auth.substring(7)
-        await getTokenCheckedByPortal(portalToken) // TODO: check ourselves
-        logI(mod, fun, `JWT issued from RUDI Portal`)
-      } catch (er) {
-        const errMsg = `Incoming Portal integration report should be presented with a JWT identified request. Error: ${error}`
-        logW(mod, fun, errMsg)
-        throw new ForbiddenError(errMsg)
-      }
-    } */
-
     // retrieve body parameters: object id, report id
     const reportId = accessProperty(reportBody, API_REPORT_ID)
     const bodyObjectId = accessProperty(reportBody, API_REPORT_RESOURCE_ID)

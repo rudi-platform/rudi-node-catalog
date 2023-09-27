@@ -201,7 +201,7 @@ export const getSearchableFields = (objectType) => {
     try {
       return Model.getSearchableFields()
     } catch (err) {
-      throw NotImplementedError(`Object '${objectType}' is not searchable yet.`)
+      throw new NotImplementedError(`Object '${objectType}' is not searchable yet.`)
     }
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -340,16 +340,10 @@ export const getObject = async (objectType, filter, shouldSkipPopulate) => {
     const Model = getObjectModel(objectType)
     const populateOpts = shouldSkipPopulate ? [] : getPopulateOptions(objectType)
 
-    // logD(mod, fun, `populateOpts: ${beautify(populateOpts)}`)
-
     if (isEmptyArray(populateOpts)) {
-      const obj = await Model.findOne(filter)
-      // logV(mod, fun, `obj: ${beautify(obj)}`)
-      return obj
+      return await Model.findOne(filter)
     } else {
-      const obj = await Model.findOne(filter).populate(populateOpts)
-      // logV(mod, fun, `obj: ${beautify(obj)}`)
-      return obj
+      return await Model.findOne(filter).populate(populateOpts)
     }
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -362,8 +356,8 @@ export const getObject = async (objectType, filter, shouldSkipPopulate) => {
  * @param {Boolean} shouldSkipPopulate True if the populating action should be skipped
  * @returns {Object} the RUDI object that is looked for
  */
-export const getObjectWithDbId = async (objectType, dbId, shouldSkipPopulate) =>
-  await getObject(objectType, { [DB_ID]: dbId }, shouldSkipPopulate)
+export const getObjectWithDbId = (objectType, dbId, shouldSkipPopulate) =>
+  getObject(objectType, { [DB_ID]: dbId }, shouldSkipPopulate)
 
 /**
  * @param {String} objectType The RUDI object type
@@ -1267,7 +1261,7 @@ export const updateMetadata = async (jsonMetadata) => {
     const existingMetadata = await getMetadataWithRudiId(id)
     if (!existingMetadata) throw new NotFoundError(`${metadataNotFound(id)}`)
 
-    // Updating the ùetadata
+    // Updating the metadata
     const updatedMetadata = await overwriteDbObject(OBJ_METADATA, jsonMetadata)
 
     return updatedMetadata
@@ -1401,59 +1395,28 @@ export const deleteOrganization = async (organizationRudiId) => {
 // - Contacts
 // ----------------------------------------
 
-export const getContactWithRudiId = async (contactRudiId) => {
-  // const fun = `getContactWithRudiId`
-  // logT(mod, fun, ``)
-  return await getObjectWithRudiId(OBJ_CONTACTS, contactRudiId)
-}
+export const getContactWithRudiId = (contactRudiId) =>
+  getObjectWithRudiId(OBJ_CONTACTS, contactRudiId)
 
-export const getEnsuredContactWithRudiId = async (contactRudiId) => {
-  // const fun = `getEnsuredContactWithRudiId`
-  // logT(mod, fun, ``)
-  return await getEnsuredObjectWithRudiId(OBJ_CONTACTS, contactRudiId)
-}
+export const getEnsuredContactWithRudiId = (contactRudiId) =>
+  getEnsuredObjectWithRudiId(OBJ_CONTACTS, contactRudiId)
 
-export const getContactWithJson = async (contactJson) => {
-  // const fun = `getContactWithJson`
-  // logT(mod, fun, ``)
-  return await getObjectWithJson(OBJ_CONTACTS, contactJson)
-}
+export const getContactWithJson = (contactJson) => getObjectWithJson(OBJ_CONTACTS, contactJson)
 
-export const getEnsuredContactWithJson = async (contactJson) => {
-  // const fun = `getEnsuredContactWithJson`
-  // logT(mod, fun, ``)
-  return await getEnsuredObjectWithJson(OBJ_CONTACTS, contactJson)
-}
+export const getEnsuredContactWithJson = (contactJson) =>
+  getEnsuredObjectWithJson(OBJ_CONTACTS, contactJson)
 
-export const getContactWithDbId = async (contactDbId) => {
-  // const fun = `getContactWithDbId`
-  // logT(mod, fun, ``)
-  return await getObjectWithDbId(OBJ_CONTACTS, contactDbId)
-}
+export const getContactWithDbId = (contactDbId) => getObjectWithDbId(OBJ_CONTACTS, contactDbId)
 
-export const getEnsuredContactWithDbId = async (contactDbId) => {
-  // const fun = `getEnsuredContactWithDbId`
-  // logT(mod, fun, ``)
-  return await getEnsuredObjectWithDbId(OBJ_CONTACTS, contactDbId)
-}
+export const getEnsuredContactWithDbId = (contactDbId) =>
+  getEnsuredObjectWithDbId(OBJ_CONTACTS, contactDbId)
 
-export const getContactDbIdWithJson = async (contactJson) => {
-  // const fun = `getContactDbIdWithJson`
-  // logT(mod, fun, ``)
-  return await getDbIdWithJson(OBJ_CONTACTS, contactJson)
-}
+export const getContactDbIdWithJson = (contactJson) => getDbIdWithJson(OBJ_CONTACTS, contactJson)
 
-export const getEnsuredContactDbIdWithJson = async (contactJson) => {
-  // const fun = `getEnsuredContactDbIdWithJson`
-  // logT(mod, fun, ``)
-  return await getEnsuredDbIdWithJson(OBJ_CONTACTS, contactJson)
-}
+export const getEnsuredContactDbIdWithJson = (contactJson) =>
+  getEnsuredDbIdWithJson(OBJ_CONTACTS, contactJson)
 
-export const getAllContacts = async () => {
-  // const fun = `getAllContacts`
-  // logT(mod, fun, ``)
-  return await Contact.find({})
-}
+export const getAllContacts = () => Contact.find({})
 
 export const updateContact = async (jsonContact) => {
   const fun = `updateContact`
@@ -1463,13 +1426,13 @@ export const updateContact = async (jsonContact) => {
   const rudiId = accessProperty(jsonContact, API_CONTACT_ID)
 
   // Checking that the contact already exists
-  getEnsuredContactWithRudiId(rudiId)
+  await getEnsuredContactWithRudiId(rudiId)
 
   // Updating the contact
-  const updatedcontact = await overwriteDbObject(OBJ_CONTACTS, jsonContact)
+  const updatedContact = await overwriteDbObject(OBJ_CONTACTS, jsonContact)
   logD(mod, fun, `${contactUpdated(rudiId)}`)
 
-  return updatedcontact
+  return updatedContact
 }
 
 export const deleteContact = async (contactRudiId) => {
@@ -1492,139 +1455,58 @@ export const deleteContact = async (contactRudiId) => {
 // ----------------------------------------
 // - Media
 // ----------------------------------------
-export const getMediaDbIdWithJson = async (mediaJson) => {
-  // const fun = `getMediaDbIdWithJson`
-  // logT(mod, fun, ``)
-  return await getDbIdWithJson(OBJ_MEDIA, mediaJson)
-}
+export const getMediaDbIdWithJson = (mediaJson) => getDbIdWithJson(OBJ_MEDIA, mediaJson)
 
-export const getEnsuredMediaDbIdWithJson = async (mediaJson) => {
-  // const fun = `getEnsuredMediaDbIdWithJson`
-  // logT(mod, fun, ``)
-  return await getEnsuredDbIdWithJson(OBJ_MEDIA, mediaJson)
-}
+export const getEnsuredMediaDbIdWithJson = (mediaJson) =>
+  getEnsuredDbIdWithJson(OBJ_MEDIA, mediaJson)
 
-export const getMediaWithDbId = async (mediaDbId) => {
-  // const fun = `getMediaWithDbId`
-  // logT(mod, fun, ``)
-  return await getObjectWithDbId(OBJ_MEDIA, mediaDbId)
-}
+export const getMediaWithDbId = (mediaDbId) => getObjectWithDbId(OBJ_MEDIA, mediaDbId)
 
-export const getEnsuredMediaWithDbId = async (mediaDbId) => {
-  // const fun = `getEnsuredMediaWithDbId`
-  // logT(mod, fun, ``)
-  return await getEnsuredObjectWithDbId(OBJ_MEDIA, mediaDbId)
-}
+export const getEnsuredMediaWithDbId = (mediaDbId) => getEnsuredObjectWithDbId(OBJ_MEDIA, mediaDbId)
 
 // ----------------------------------------
 // - SKOS: Scheme
 // ----------------------------------------
-export const getSchemeDbIdWithJson = async (schemeJson) => {
-  // const fun = `getSchemeDbIdWithJson`
-  // logT(mod, fun, ``)
-  return await getDbIdWithJson(OBJ_SKOS_SCHEMES, schemeJson)
-}
+export const getSchemeDbIdWithJson = (schemeJson) => getDbIdWithJson(OBJ_SKOS_SCHEMES, schemeJson)
 
-export const getSchemeDbIdWithRudiId = async (schemeRudiId) => {
-  // const fun = `getSchemeDbIdWithRudiId`
-  // logT(mod, fun, ``)
-  return await getDbIdWithRudiId(OBJ_SKOS_SCHEMES, schemeRudiId)
-}
+export const getSchemeDbIdWithRudiId = (schemeRudiId) =>
+  getDbIdWithRudiId(OBJ_SKOS_SCHEMES, schemeRudiId)
 
-export const getEnsuredSchemeDbIdWithRudiId = async (schemeRudiId) => {
-  // const fun = `getEnsuredSchemeDbIdWithRudiId`
-  // logT(mod, fun, ``)
-  return await getEnsuredDbIdWithRudiId(OBJ_SKOS_SCHEMES, schemeRudiId)
-}
+export const getEnsuredSchemeDbIdWithRudiId = (schemeRudiId) =>
+  getEnsuredDbIdWithRudiId(OBJ_SKOS_SCHEMES, schemeRudiId)
 
-export const getSchemeRudiIdWithDbId = async (schemeDbId) => {
-  // const fun = `getEnsuredSchemeDbIdWithRudiId`
-  // logT(mod, fun, ``)
-  return await getObjectPropertiesWithDbId(OBJ_SKOS_SCHEMES, schemeDbId, [API_SKOS_SCHEME_ID])
-}
+export const getSchemeRudiIdWithDbId = (schemeDbId) =>
+  getObjectPropertiesWithDbId(OBJ_SKOS_SCHEMES, schemeDbId, [API_SKOS_SCHEME_ID])
 
-export const getSchemeWithDbId = async (schemeDbId) => {
-  // const fun = `getSchemeWithDbId`
-  // logT(mod, fun, ``)
-  return await getObjectWithDbId(OBJ_SKOS_SCHEMES, schemeDbId)
-}
+export const getSchemeWithDbId = (schemeDbId) => getObjectWithDbId(OBJ_SKOS_SCHEMES, schemeDbId)
 
-export const getEnsuredSchemeWithDbId = async (schemeDbId) => {
-  // const fun = `getSchemeJsonIdWithDbId`
-  // logT(mod, fun, ``)
-  return await getEnsuredObjectWithDbId(OBJ_SKOS_SCHEMES, schemeDbId)
-}
-/*
-export const getEnsuredSchemeWithCode = async (schemeCode) => {
-  const fun = `getSchemeJsonIdWithDbId`
-  // logT(mod, fun, ``)
-  return getEnsuredObjectWithRudiId(URL_OBJECT_SKOS_SCHEME, SkosScheme, schemeDbId)
-}
- */
+export const getEnsuredSchemeWithDbId = (schemeDbId) =>
+  getEnsuredObjectWithDbId(OBJ_SKOS_SCHEMES, schemeDbId)
+
 // ----------------------------------------
 // - SKOS: Concept
 // ----------------------------------------
 
-export const getConceptWithDbId = async (conceptDbId) => {
-  // const fun = `getConceptWithDbId`
-  // logT(mod, fun, ``)
-  return await getObjectWithDbId(SkosConcept, conceptDbId)
-}
+export const getConceptWithDbId = (conceptDbId) => getObjectWithDbId(SkosConcept, conceptDbId)
 
-export const getConceptRudiIdWithDbId = async (conceptDbId) => {
-  // const fun = `getConceptRudiIdWithDbId`
-  // logT(mod, fun, ``)
-  return await getObjectPropertiesWithDbId(OBJ_SKOS_CONCEPTS, conceptDbId)
-}
+export const getConceptRudiIdWithDbId = (conceptDbId) =>
+  getObjectPropertiesWithDbId(OBJ_SKOS_CONCEPTS, conceptDbId)
 
-export const getConceptWithJson = async (conceptJson) => {
-  // const fun = `getConceptWithJson`
-  // // logT(mod, fun, ``)
-  return await getObjectWithJson(OBJ_SKOS_CONCEPTS, conceptJson)
-}
+export const getConceptWithJson = (conceptJson) => getObjectWithJson(OBJ_SKOS_CONCEPTS, conceptJson)
 
-export const getConceptDbIdWithJson = async (conceptJson) => {
-  // const fun = `getConceptDbIdWithJson`
-  // logT(mod, fun, ``)
-  return await getDbIdWithJson(OBJ_SKOS_CONCEPTS, conceptJson)
-}
+export const getConceptDbIdWithJson = (conceptJson) =>
+  getDbIdWithJson(OBJ_SKOS_CONCEPTS, conceptJson)
 
-export const getConceptDbIdWithRudiId = async (conceptRudiId) => {
-  // const fun = `getConceptDbIdWithRudiId`
-  // logT(mod, fun, ``)
-  return await getDbIdWithRudiId(OBJ_SKOS_CONCEPTS, conceptRudiId)
-}
+export const getConceptDbIdWithRudiId = (conceptRudiId) =>
+  getDbIdWithRudiId(OBJ_SKOS_CONCEPTS, conceptRudiId)
 
-export const getAllConcepts = async () => {
-  // const fun = `getAllConcepts`
-  // logT(mod, fun, ``)
+export const getAllConcepts = () => SkosConcept.find({})
 
-  const conceptList = await SkosConcept.find({})
-  return conceptList
-}
+export const getAllConceptsFromScheme = (schemeCode) =>
+  SkosConcept.find({ [API_SKOS_SCHEME_CODE]: schemeCode })
 
-export const getAllConceptsFromScheme = async (schemeCode) => {
-  const fun = `getAllConceptsFromScheme`
-  try {
-    logT(mod, fun, ``)
-
-    const conceptList = await SkosConcept.find({ [API_SKOS_SCHEME_CODE]: schemeCode })
-    return conceptList
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
-
-export const getAllConceptsWithRole = async (conceptRole) => {
-  const fun = `getAllConceptsWithRole`
-  try {
-    logT(mod, fun, ``)
-    const conceptList = await SkosConcept.find({ [API_SKOS_CONCEPT_ROLE]: conceptRole })
-    return conceptList
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
+export const getAllConceptsWithRole = async (conceptRole) =>
+  SkosConcept.find({ [API_SKOS_CONCEPT_ROLE]: conceptRole })
 
 // ----------------------------------------
 // - Filters
@@ -1759,10 +1641,7 @@ export const getLatestStoredPortalToken = async () => {
   try {
     logT(mod, fun, ``)
     const lastToken = await PortalToken.findOne()
-      .sort({
-        field: 'asc',
-        [DB_ID]: -1,
-      })
+      .sort({ field: 'asc', [DB_ID]: -1 })
       .limit(1)
     // logD(mod, fun, `lastToken: ${beautify(lastToken)}`)
     return lastToken
