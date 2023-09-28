@@ -76,12 +76,12 @@ fastifyConf.addHook('onError', (request, reply, error, done) => {
     const reqContext = CallContext.getCallContextFromReq(request)
     if (RudiError.isRudiError(error) && shouldShowErrorPile()) RudiError.logErrorPile(error)
 
-    if (!!reqContext) {
+    if (reqContext) {
       reqContext.logErr(mod, fun, error)
     } else {
       sysOnError(error.statusCode, '[onError] ' + beautify(error))
     }
-    if (reply) reply.isError = true
+    reply.isError = true
   } catch (err) {
     logE(mod, fun, err)
     // const context = CallContext.getCallContextFromReq(request)
@@ -198,7 +198,7 @@ fastifyConf.addHook('onSend', (request, reply, payload, next) => {
     // logT(mod, fun, ``)
     const now = nowEpochMs()
     const context = CallContext.getCallContextFromReq(request)
-    if (!!context) {
+    if (context) {
       context.duration = now - context.timestamp
       context.statusCode = reply.statusCode
       if (!reply.isError) context.logInfo(mod, fun, 'API reply')
