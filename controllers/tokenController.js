@@ -8,7 +8,7 @@ import {
   readPublicKeyFile,
   tokenStringToJwtObject,
   verifyToken,
-} from '@aqmo.org/jwt_lib'
+} from '@aqmo.org/jwt-lib'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies

@@ -549,7 +549,7 @@ function toMDBLanguage(metadata, field) {
       logW(mod, fun, `Field '${field}' should be an array: ${beautify(prop)}`)
       return
     }
-    prop.forE((entry) => {
+    prop.forEach((entry) => {
       if (entry[DICT_LANG]) entry[DICT_LANG] = entry[DICT_LANG].substring(0, 2)
     })
   } catch (err) {

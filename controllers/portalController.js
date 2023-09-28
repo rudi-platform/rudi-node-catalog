@@ -7,7 +7,7 @@ const mod = 'portalCtrl'
 // -------------------------------------------------------------------------------------------------
 import axios from 'axios'
 import https from 'node:https'
-import { extractJwt, readPublicKeyPem, verifyToken } from '@aqmo.org/jwt_lib'
+import { extractJwt, readPublicKeyPem, verifyToken } from '@aqmo.org/jwt-lib'
 
 // -------------------------------------------------------------------------------------------------
 // Constants
