@@ -573,6 +573,8 @@ export const cleanMetadataForPortal = (metadata) => {
   delete metadataClean[API_STATUS_PROPERTY]
   delete metadataClean[DB_UPDATED_AT]
   delete metadataClean[API_METAINFO_PROPERTY][API_METAINFO_SOURCE_PROPERTY]
+
+  return metadataClean
 }
 
 const PORTAL_POST_URL = postPortalMetaUrl()
