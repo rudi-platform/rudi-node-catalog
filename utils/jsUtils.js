@@ -272,7 +272,6 @@ export const filterOnValue = async (obj, predicate) => {
   return result
 }
 
-export const getSubProp = (obj, propArray) => objectPath.get(obj, propArray)
 export const setSubProp = (obj, propArray, value) => objectPath.set(obj, propArray, value)
 
 // -------------------------------------------------------------------------------------------------

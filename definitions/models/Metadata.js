@@ -765,13 +765,13 @@ MetadataSchema.virtual(API_STATUS_PROPERTY).get(function () {
   if (this[API_STORAGE_STATUS] === StorageStatus.Pending) return MetadataStatus.Incomplete
   if (this[API_INTEGRATION_ERROR_ID]) return MetadataStatus.Refused
   if (this[DB_PUBLISHED_AT]) return MetadataStatus.Published
-  if (objectPath.get(this, API_METAINFO_PROPERTY, API_METAINFO_DATES, API_DATES_DELETED))
+  if (this?.[API_METAINFO_PROPERTY]?.[API_METAINFO_DATES]?.[API_DATES_DELETED])
     return MetadataStatus.Deleted
   return MetadataStatus.Unset
 })
 
 MetadataSchema.virtual(API_RESTRICTED_ACCESS).get(function () {
-  objectPath.get(this, [API_ACCESS_CONDITION, API_CONFIDENTIALITY, API_RESTRICTED_ACCESS])
+  this?.[API_ACCESS_CONDITION]?.[API_CONFIDENTIALITY]?.[API_RESTRICTED_ACCESS]
 })
 
 MetadataSchema.virtual(API_RESTRICTED_ACCESS).set(function (isRestricted) {

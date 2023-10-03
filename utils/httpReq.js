@@ -156,19 +156,6 @@ export const httpPut = async (destUrl, dataToSend, authorizationToken) => {
   }
 }
 
-// AxiosCurlirize(axios, (result, err) => {
-//   const fun = 'AxiosCurlirize'
-//   const { command } = result
-//   if (err) {
-//     logE(mod, fun, err)
-//     throw RudiError.treatCommunicationError(mod, fun, err)
-//   } else {
-//     logT(mod, fun, command)
-//     return result
-//     // use your logger here
-//   }
-// })
-
 export const directGet = async (destUrl, reqOpts) => {
   const fun = 'directGet'
   try {
@@ -176,7 +163,7 @@ export const directGet = async (destUrl, reqOpts) => {
 
     const answer = await axios.get(destUrl, reqOpts)
 
-    logHttpAnswer(mod, fun, answer)
+    // logHttpAnswer(mod, fun, answer)
     return answer
   } catch (err) {
     throw RudiError.treatCommunicationError(mod, fun, err)
@@ -189,7 +176,7 @@ export const directPost = async (destUrl, dataToSend, reqOpts) => {
 
   try {
     const answer = await axios.post(destUrl, dataToSend, reqOpts)
-    logHttpAnswer(mod, fun, answer)
+    // logHttpAnswer(mod, fun, answer)
     return answer
   } catch (err) {
     // logW(mod, fun, beautify(err) || err)
@@ -202,55 +189,10 @@ export const directPut = async (destUrl, dataToSend, reqOpts) => {
   logT(mod, fun, ``)
   try {
     const answer = await axios.put(destUrl, dataToSend, reqOpts)
-    logHttpAnswer(mod, fun, answer)
+    // logHttpAnswer(mod, fun, answer)
     return answer
   } catch (err) {
     // logW(mod, fun, beautify(err) || err)
     throw RudiError.treatCommunicationError(mod, fun, err)
   }
 }
-
-/* function doHttpRequest(options, protocol, data) {
-  const fun = 'doHttpRequest'
-  // logT(mod, fun, ``)
-
-  const httpProtocol = protocol === PROTOCOL.HTTP ? http : https
-  // options.agent = new httpProtocol.Agent({rejectUnauthorized: false})
-  logD(mod, fun, `options: ${beautify(options)}`)
-
-  return new Promise((resolve, reject) => {
-    const req = httpProtocol.request(options, (res) => {
-      logD(mod, fun, `statusCode: ${res.statusCode}`)
-      if (res.statusCode < 200 || res.statusCode >= 300) {
-        return reject(new Error(`statusCode: ${res.statusCode}`))
-      }
-      // res.setEncoding('utf8')
-      let body = []
-
-      res.on('data', (chunk) => {
-        // logD(mod, fun, `chunk: ${beautify(chunk)}`)
-        body.push(chunk)
-      })
-
-      res.on('end', () => {
-        try {
-          body = JSON.parse(Buffer.concat(body).toString())
-        } catch (e) {
-          logW(mod, fun, e)
-          // reject(e)
-        }
-        resolve(body)
-      })
-    })
-
-    req.on('error', (err) => {
-      logW(mod, fun, `${err.stack} - ${beautify(err)}`)
-      reject(err)
-    })
-
-    if (data) req.write(data)
-
-    req.end()
-  })
-}
- */

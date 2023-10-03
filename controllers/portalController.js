@@ -27,6 +27,7 @@ import {
   API_FILE_STATUS_UPDATE,
   API_INTEGRATION_ERROR_ID,
   API_METAINFO_SOURCE_PROPERTY,
+  API_STATUS_PROPERTY,
 } from '../db/dbFields.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -401,12 +402,7 @@ export const getTokenCheckedByPortal = async (token) => {
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     if (!token) throw new BadRequestError('No token to check!')
-    // const portalUrl = getCheckAuthUrl()
-    // logD(mod, fun, portalUrl)
 
-    // const requestUrl = `${portalUrl}?${PARAM_TOKEN}=${token}`
-    logD(mod, 'portalUrl', getCheckAuthUrl())
-    logD(mod, PARAM_TOKEN, token)
     const portalResponse = await directPost(getCheckAuthUrl(), `${PARAM_TOKEN}=${token}`, {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     })
@@ -557,6 +553,28 @@ const isMetadataSendableToPortal = async (metadataId) => {
   }
 }
 
+export const cleanMetadataForPortal = (metadata) => {
+  const metadataClean = deepClone(metadata)
+
+  //--- Latest API version
+  metadataClean[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = PORTAL_API_VERSION
+
+  //--- Removing media fields that are node specific
+  metadataClean[API_MEDIA_PROPERTY].map((media) => {
+    delete media[API_FILE_STORAGE_STATUS]
+    delete media[API_FILE_STATUS_UPDATE]
+
+    // delete media[API_MEDIA_THUMBNAIL]
+    // delete media[API_MEDIA_SATELLITES]
+  })
+
+  //--- Removing metadata fields that are node specific
+  delete metadataClean[API_INTEGRATION_ERROR_ID]
+  delete metadataClean[API_STATUS_PROPERTY]
+  delete metadataClean[DB_UPDATED_AT]
+  delete metadataClean[API_METAINFO_PROPERTY][API_METAINFO_SOURCE_PROPERTY]
+}
+
 const PORTAL_POST_URL = postPortalMetaUrl()
 export const sendMetadataToPortal = async (metadataId) => {
   const fun = 'sendMetadataToPortal'
@@ -571,19 +589,7 @@ export const sendMetadataToPortal = async (metadataId) => {
     const waitingMetadata = metadatasWaitingForPortalFeedback[waitIndex]
     // console.log(`T (sendMetadataToPortal) waitingMetadata [${waitIndex}]`, waitingMetadata)
     //--- Ensuring compatibility with portal
-    const metadataClean = deepClone(metadata)
-    // API version
-    metadataClean[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = PORTAL_API_VERSION
-
-    metadataClean[API_MEDIA_PROPERTY].map((media) => {
-      delete media[API_FILE_STORAGE_STATUS]
-      delete media[API_FILE_STATUS_UPDATE]
-
-      // delete media[API_MEDIA_THUMBNAIL]
-      // delete media[API_MEDIA_SATELLITES]
-    })
-    delete metadataClean[API_INTEGRATION_ERROR_ID]
-    delete metadataClean[API_METAINFO_PROPERTY][API_METAINFO_SOURCE_PROPERTY]
+    const metadataClean = cleanMetadataForPortal(metadata)
 
     logV(mod, fun, `Metadata sent to portal: ${beautify(metadataClean)}`)
     // console.debug('T (sendMetadataToPortal) metadata', metadataClean[API_MEDIA_PROPERTY][0])
