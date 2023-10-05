@@ -8,7 +8,6 @@ import { existsSync, mkdirSync } from 'fs'
 
 import winston from 'winston'
 import 'winston-daily-rotate-file'
-// require('winston-syslog').Syslog
 import rudiLogger from '@aqmo.org/rudi_logger'
 
 const { combine, timestamp, printf, colorize, simple } = winston.format

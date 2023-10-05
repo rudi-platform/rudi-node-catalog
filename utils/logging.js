@@ -187,23 +187,26 @@ export const sysTrace = (msg, location, context, info, cid) =>
 // -------------------------------------------------------------------------------------------------
 // Fastify logger
 // -------------------------------------------------------------------------------------------------
-function FFLogger(...args) {
-  this.level = args?.level
+const stringifyMsg = (msg)=> typeof msg == 'string' ? msg : `${beautify(msg)}`
+export class FFLogger {
+  constructor(level) {
+    this.level = level
+  }
+
+  fatal(msg) { return sysAlert(stringifyMsg(msg)) }
+  error(msg) { return sysError(stringifyMsg(msg)) }
+  warn(msg)  { return sysWarn (stringifyMsg(msg)) }
+  info(msg)  { return sysInfo (stringifyMsg(msg)) }
+  log(msg) { return sysDebug(stringifyMsg(msg)) }
+  debug(msg) { return sysDebug(stringifyMsg(msg)) }
+  trace(msg) { 
+    return sysTrace(
+      typeof msg == 'string' ? msg : msg?.err ? `ERR ${msg.err.code} ${msg.err.message}` : `${msg}`
+    )
+  }
+  child() { return new FFLogger() }
 }
-FFLogger.prototype.fatal = (msg) => sysAlert(typeof msg == 'string' ? msg : `${beautify(msg)}`)
-FFLogger.prototype.error = (msg) => sysError(typeof msg == 'string' ? msg : `${beautify(msg)}`)
-FFLogger.prototype.warn = (msg) => sysWarn(typeof msg == 'string' ? msg : `${beautify(msg)}`)
-FFLogger.prototype.info = () => {}
-// FFLogger.prototype.info = (msg) => sysInfo(typeof msg == 'string' ? msg : `${beautify(msg)}`)
-FFLogger.prototype.debug = (msg) => sysDebug(typeof msg == 'string' ? msg : `${beautify(msg)}`)
-FFLogger.prototype.trace = (msg) =>
-  sysTrace(
-    typeof msg == 'string' ? msg : msg?.err ? `ERR ${msg.err.code} ${msg.err.message}` : `${msg}`
-  )
 
-FFLogger.prototype.child = () => new FFLogger()
-
-export const fastifyLogger = (...args) => new FFLogger(args)
 
 // -------------------------------------------------------------------------------------------------
 // Syslog functions: specific macros

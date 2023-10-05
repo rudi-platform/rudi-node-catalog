@@ -23,7 +23,7 @@ import {
   sysNotice,
   sysOnError,
   logI,
-  fastifyLogger,
+  FFLogger,
 } from '../utils/logging.js'
 
 import { JWT_SUB, JWT_CLIENT } from '../utils/crypto.js'
@@ -47,10 +47,11 @@ import { getUrlMaxLength } from '../utils/protection.js'
 // External dependencies
 // -------------------------------------------------------------------------------------------------
 // Require the fastify framework and instantiate it
-consoleLog(mod, 'ff', beautify(fastifyLogger.log))
 import fastify from 'fastify'
+
+const fastifyLogger = new FFLogger('warn')
 export const fastifyConf = fastify({
-  logger: fastifyLogger({ level: 'warn' }),
+  logger: fastifyLogger,
   // logger: initFFLogger(),
   // logger: {
   //    level: 'warn',
