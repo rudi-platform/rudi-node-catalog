@@ -1066,7 +1066,7 @@ export const overwriteDbObject = async (objectType, updateData) => {
     const filter = { [idField]: rudiId }
     const updateOpts = {
       new: true, // returns the updated document
-      overwrite: true,
+      // overwrite: true,
       upsert: true, // creates the document if it wasn't found
     }
 
