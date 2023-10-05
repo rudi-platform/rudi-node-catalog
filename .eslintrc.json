@@ -38,7 +38,7 @@
       "warn",
       {
         "vars": "all",
-        "varsIgnorePattern": "^(_|req|reply|res|next)$",
+        "varsIgnorePattern": "^_",
         "args": "after-used",
         "argsIgnorePattern": "^(_|req|reply|res|next)$"
       }

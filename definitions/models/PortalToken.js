@@ -1,12 +1,10 @@
 // -------------------------------------------------------------------------------------------------
 // External dependencies
 // -------------------------------------------------------------------------------------------------
-import mongoose from 'mongoose'
-
 import _ from 'lodash'
-const { omit } = _
-
+import mongoose from 'mongoose'
 import mongooseInt32 from 'mongoose-int32'
+const { omit } = _
 const Int32 = mongooseInt32.loadType(mongoose)
 
 // -------------------------------------------------------------------------------------------------

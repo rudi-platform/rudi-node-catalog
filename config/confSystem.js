@@ -7,18 +7,19 @@ const mod = 'sysConf'
 // Constants
 // -------------------------------------------------------------------------------------------------
 import {
-  getAppOptions,
-  getGitHash,
-  OPT_USER_CONF,
   ENV_USER_CONF,
   OPT_API_URL,
+  OPT_USER_CONF,
+  getAppOptions,
+  getGitHash,
 } from './appOptions.js'
-import { TRACE, TRACE_MOD, TRACE_FUN, TRACE_ERR } from './confApi.js'
+import { TRACE, TRACE_ERR, TRACE_FUN, TRACE_MOD } from './confApi.js'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { consoleLog, consoleErr, quietAccess, NOT_FOUND, separateLogs } from '../utils/jsUtils.js'
+import { NOT_FOUND, consoleErr, consoleLog, quietAccess, separateLogs } from '../utils/jsUtils.js'
+
 import { readIniFile } from '../utils/fileActions.js'
 
 separateLogs('Loading sys conf', true) ///////////////////////////////////////////////////////////

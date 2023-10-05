@@ -2,17 +2,13 @@ const mod = 'metaSch'
 // -------------------------------------------------------------------------------------------------
 // External dependencies
 // -------------------------------------------------------------------------------------------------
-import mongoose from 'mongoose'
-
 import _ from 'lodash'
-const { omit } = _
-
+import mongoose from 'mongoose'
 import GeoJSON from 'mongoose-geojson-schema'
-
 import mongooseInt32 from 'mongoose-int32'
-const Int32 = mongooseInt32.loadType(mongoose)
-
 import objectPath from 'object-path'
+const { omit } = _
+const Int32 = mongooseInt32.loadType(mongoose)
 
 // -------------------------------------------------------------------------------------------------
 // Fields
@@ -20,67 +16,67 @@ import objectPath from 'object-path'
 import { DEFAULT_LANG, OBJ_METADATA, URL_PREFIX_PUBLIC } from '../../config/confApi.js'
 
 import {
-  API_DATA_PRODUCER_PROPERTY,
-  API_DATA_CONTACTS_PROPERTY,
   API_ACCESS_CONDITION,
-  API_LICENCE,
-  API_LICENCE_TYPE,
-  API_LICENCE_LABEL,
-  API_LICENCE_CUSTOM_LABEL,
-  API_LICENCE_CUSTOM_URI,
-  API_GEOGRAPHY,
-  API_GEO_BBOX_PROPERTY,
-  API_GEO_PROJECTION_PROPERTY,
-  API_PERIOD_PROPERTY,
-  API_START_DATE_PROPERTY,
-  API_METAINFO_PROPERTY,
-  API_METAINFO_CONTACTS_PROPERTY,
-  API_METAINFO_PROVIDER_PROPERTY,
-  API_METAINFO_DATES,
+  API_COLLECTION_TAG,
+  API_CONFIDENTIALITY,
+  API_DATA_CONTACTS_PROPERTY,
+  API_DATA_DATES_PROPERTY,
+  API_DATA_DESCRIPTION_PROPERTY,
+  API_DATA_DETAILS_PROPERTY,
+  API_DATA_NAME_PROPERTY,
+  API_DATA_PRODUCER_PROPERTY,
   API_DATES_CREATED,
+  API_DATES_DELETED,
   API_DATES_EDITED,
+  API_DATES_EXPIRES,
   API_DATES_PUBLISHED,
   API_DATES_VALIDATED,
-  API_DATES_EXPIRES,
-  API_MEDIA_PROPERTY,
-  FIELDS_TO_SKIP,
-  API_DATA_DATES_PROPERTY,
-  API_THEME_PROPERTY,
+  API_END_DATE_PROPERTY,
+  API_FILE_MIME,
+  API_GEO_BBOX_EAST,
+  API_GEO_BBOX_NORTH,
+  API_GEO_BBOX_PROPERTY,
+  API_GEO_BBOX_SOUTH,
+  API_GEO_BBOX_WEST,
+  API_GEO_GEOJSON_PROPERTY,
+  API_GEO_PROJECTION_PROPERTY,
+  API_GEOGRAPHY,
+  API_INTEGRATION_ERROR_ID,
   API_KEYWORDS_PROPERTY,
   API_LANGUAGES_PROPERTY,
-  API_COLLECTION_TAG,
-  API_END_DATE_PROPERTY,
-  API_METADATA_ID,
-  API_DATA_NAME_PROPERTY,
-  API_METADATA_LOCAL_ID,
-  DB_CREATED_AT,
-  DB_UPDATED_AT,
-  DB_PUBLISHED_AT,
-  API_DATA_DETAILS_PROPERTY,
-  API_DATA_DESCRIPTION_PROPERTY,
-  API_GEO_BBOX_WEST,
-  API_GEO_BBOX_EAST,
-  API_GEO_BBOX_SOUTH,
-  API_GEO_BBOX_NORTH,
-  API_GEO_GEOJSON_PROPERTY,
-  LicenceTypes,
-  DICT_TEXT,
-  API_MEDIA_TYPE,
-  API_FILE_MIME,
-  API_CONFIDENTIALITY,
-  API_RESTRICTED_ACCESS,
-  API_METAINFO_SOURCE_PROPERTY,
-  API_DATES_DELETED,
-  API_METAINFO_VERSION_PROPERTY,
-  API_STORAGE_STATUS,
+  API_LICENCE,
+  API_LICENCE_CUSTOM_LABEL,
+  API_LICENCE_CUSTOM_URI,
+  API_LICENCE_LABEL,
+  API_LICENCE_TYPE,
   API_MEDIA_ID,
-  API_INTEGRATION_ERROR_ID,
+  API_MEDIA_PROPERTY,
+  API_MEDIA_TYPE,
+  API_METADATA_ID,
+  API_METADATA_LOCAL_ID,
+  API_METAINFO_CONTACTS_PROPERTY,
+  API_METAINFO_DATES,
+  API_METAINFO_PROPERTY,
+  API_METAINFO_PROVIDER_PROPERTY,
+  API_METAINFO_SOURCE_PROPERTY,
+  API_METAINFO_VERSION_PROPERTY,
+  API_PERIOD_PROPERTY,
+  API_RESTRICTED_ACCESS,
+  API_START_DATE_PROPERTY,
   API_STATUS_PROPERTY,
+  API_STORAGE_STATUS,
+  API_THEME_PROPERTY,
+  DB_CREATED_AT,
+  DB_PUBLISHED_AT,
+  DB_UPDATED_AT,
+  DICT_TEXT,
+  FIELDS_TO_SKIP,
+  LicenceTypes,
   MetadataStatus,
 } from '../../db/dbFields.js'
 
-import { get as getFileTypes, MIME_YAML_ALT, MIME_YAML } from '../thesaurus/FileTypes.js'
-import { Longitude, Latitude } from '../schemas/GpsCoordinates.js'
+import { Latitude, Longitude } from '../schemas/GpsCoordinates.js'
+import { get as getFileTypes, MIME_YAML, MIME_YAML_ALT } from '../thesaurus/FileTypes.js'
 
 // -------------------------------------------------------------------------------------------------
 // Validators
@@ -95,11 +91,13 @@ const validArrayNotNull = {
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { beautify, isNotEmptyArray, isNothing, multiSplit } from '../../utils/jsUtils.js'
+
 import { logD, logE, logT, logV } from '../../utils/logging.js'
-import { incorrectVal, incorrectValueForEnum } from '../../utils/msg.js'
-import { NotFoundError, BadRequestError, RudiError } from '../../utils/errors.js'
-import { accessProperty, requireSubProperty } from '../../utils/jsonAccess.js'
+
 import { makeSearchable } from '../../db/dbActions.js'
+import { BadRequestError, NotFoundError, RudiError } from '../../utils/errors.js'
+import { accessProperty, requireSubProperty } from '../../utils/jsonAccess.js'
+import { incorrectVal, incorrectValueForEnum } from '../../utils/msg.js'
 
 // -------------------------------------------------------------------------------------------------
 // Thesaurus definitions
@@ -109,26 +107,26 @@ import Keywords from '../thesaurus/Keywords.js'
 import Themes from '../thesaurus/Themes.js'
 
 import { isValid as isLanguageValid } from '../thesaurus/Languages.js'
+import { get as getLicenceCodes } from '../thesaurus/LicenceCodes.js'
 import { isValid as isProjectionValid } from '../thesaurus/Projections.js'
 import { isValid as isStorageStatusValid, StorageStatus } from '../thesaurus/StorageStatus.js'
-import { get as getLicenceCodes } from '../thesaurus/LicenceCodes.js'
 
 // -------------------------------------------------------------------------------------------------
 // Schema definitions
 // -------------------------------------------------------------------------------------------------
 import { DoiSchema, UuidSchema, UuidV4Schema } from '../schemas/Identifiers.js'
 
+import { AccessConditionSchema } from '../schemas/AccessConditions.js'
 import { DictionaryEntrySchema } from '../schemas/DictionaryEntry.js'
 import { checkDates, ReferenceDatesSchema } from '../schemas/ReferenceDates.js'
-import { AccessConditionSchema } from '../schemas/AccessConditions.js'
 
 // -------------------------------------------------------------------------------------------------
 // Model definitions
 // -------------------------------------------------------------------------------------------------
-import { isMediaMissing, MediaTypes } from './Media.js'
-import { VALID_API_VERSION, VALID_URI } from '../schemaValidators.js'
-import { getApiUrl } from '../../config/confSystem.js'
 import { isPortalConnectionDisabled } from '../../config/confPortal.js'
+import { getApiUrl } from '../../config/confSystem.js'
+import { VALID_API_VERSION, VALID_URI } from '../schemaValidators.js'
+import { isMediaMissing, MediaTypes } from './Media.js'
 
 // -------------------------------------------------------------------------------------------------
 // Fields with specific treatments

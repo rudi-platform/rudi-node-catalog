@@ -3,44 +3,47 @@ const mod = 'fastify'
 // -------------------------------------------------------------------------------------------------
 // Constants
 // -------------------------------------------------------------------------------------------------
-import { STATUS_CODE, ROUTE_NAME } from '../config/confApi.js'
+import { ROUTE_NAME, STATUS_CODE } from '../config/confApi.js'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { padA1, nowEpochMs, beautify, separateLogs, consoleLog } from '../utils/jsUtils.js'
+import { beautify, nowEpochMs, padA1, separateLogs } from '../utils/jsUtils.js'
+
 import { shouldControlPrivateRequests, shouldControlPublicRequests } from '../config/confSystem.js'
+
 import { shouldShowErrorPile, shouldShowRoutes } from '../config/confLogs.js'
+
 import { JWT_USER, isPortalConnectionDisabled } from '../config/confPortal.js'
 
 import {
-  logLine,
   logE,
+  logI,
+  logLine,
   logT,
   logV,
   logW,
   sysCrit,
   sysNotice,
   sysOnError,
-  logI,
-  FFLogger,
 } from '../utils/logging.js'
 
-import { JWT_SUB, JWT_CLIENT } from '../utils/crypto.js'
+import { JWT_CLIENT, JWT_SUB } from '../utils/crypto.js'
 
 import { RudiError } from '../utils/errors.js'
+
 import { CallContext } from '../definitions/constructors/callContext.js'
 
 import {
-  publicRoutes,
-  portalRoutes,
   backOfficeRoutes,
   devRoutes,
+  portalRoutes,
+  publicRoutes,
   unrestrictedPrivateRoutes,
 } from './routes.js'
 
-import { checkRudiProdPermission } from '../controllers/tokenController.js'
 import { checkPortalTokenInHeader } from '../controllers/portalController.js'
+import { checkRudiProdPermission } from '../controllers/tokenController.js'
 import { getUrlMaxLength } from '../utils/protection.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -49,9 +52,9 @@ import { getUrlMaxLength } from '../utils/protection.js'
 // Require the fastify framework and instantiate it
 import fastify from 'fastify'
 
-const fastifyLogger = new FFLogger('warn')
+// const fastifyLogger = new FFLogger('warn')
 export const fastifyConf = fastify({
-  logger: fastifyLogger,
+  // logger: fastifyLogger,
   // logger: initFFLogger(),
   // logger: {
   //    level: 'warn',

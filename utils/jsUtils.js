@@ -5,8 +5,8 @@ const mod = 'utils'
 // -------------------------------------------------------------------------------------------------
 // External dependencies
 // -------------------------------------------------------------------------------------------------
-import { inspect } from 'util'
 import objectPath from 'object-path'
+import { inspect } from 'util'
 
 import _ from 'lodash'
 const { floor, pick } = _

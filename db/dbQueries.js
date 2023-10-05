@@ -14,62 +14,62 @@ const { omit, pick } = _
 // -------------------------------------------------------------------------------------------------
 // Constants
 // -------------------------------------------------------------------------------------------------
-import { JWT_EXP } from '../utils/crypto.js'
 import {
-  PARAM_ID,
-  OBJ_METADATA,
-  OBJ_ORGANIZATIONS,
-  OBJ_CONTACTS,
-  OBJ_MEDIA,
-  OBJ_SKOS_SCHEMES,
-  OBJ_SKOS_CONCEPTS,
-  OBJ_REPORTS,
-  OBJ_LOGS,
-  OBJ_LICENCES,
-  QUERY_LIMIT,
-  QUERY_OFFSET,
-  QUERY_FILTER,
-  QUERY_FIELDS,
-  QUERY_GROUP_LIMIT,
-  QUERY_GROUP_OFFSET,
-  QUERY_SORT_BY,
-  QUERY_SEARCH_TERMS,
-  MAX_QUERY_LIMIT,
+  COUNT_LABEL,
   DEFAULT_QUERY_LIMIT,
   DEFAULT_QUERY_OFFSET,
-  QUERY_COUNT_BY,
-  MONGO_ERROR,
-  COUNT_LABEL,
   LIST_LABEL,
-  OBJ_SKOS_CONCEPTS_CAML,
-  OBJ_SKOS_SCHEMES_CAML,
+  MAX_QUERY_LIMIT,
+  MONGO_ERROR,
+  OBJ_CONTACTS,
+  OBJ_LICENCES,
+  OBJ_LOGS,
+  OBJ_MEDIA,
+  OBJ_METADATA,
+  OBJ_ORGANIZATIONS,
   OBJ_PUB_KEYS,
   OBJ_PUB_KEYS_CAML,
+  OBJ_REPORTS,
+  OBJ_SKOS_CONCEPTS,
+  OBJ_SKOS_CONCEPTS_CAML,
+  OBJ_SKOS_SCHEMES,
+  OBJ_SKOS_SCHEMES_CAML,
+  PARAM_ID,
+  QUERY_COUNT_BY,
+  QUERY_FIELDS,
+  QUERY_FILTER,
+  QUERY_GROUP_LIMIT,
+  QUERY_GROUP_OFFSET,
   QUERY_LANG,
+  QUERY_LIMIT,
+  QUERY_OFFSET,
+  QUERY_SEARCH_TERMS,
+  QUERY_SORT_BY,
 } from '../config/confApi.js'
+import { JWT_EXP } from '../utils/crypto.js'
 // Fields from the JSON as defined in the API
 import {
-  DB_ID,
-  DB_CREATED_AT,
-  API_METADATA_ID,
-  API_ORGANIZATION_ID,
   API_CONTACT_ID,
-  API_MEDIA_ID,
-  API_REPORT_ID,
-  API_DATA_PRODUCER_PROPERTY,
   API_DATA_CONTACTS_PROPERTY,
+  API_DATA_PRODUCER_PROPERTY,
+  API_MEDIA_ID,
+  API_MEDIA_PROPERTY,
+  API_METADATA_ID,
+  API_METAINFO_CONTACTS_PROPERTY,
   API_METAINFO_PROPERTY,
   API_METAINFO_PROVIDER_PROPERTY,
-  API_METAINFO_CONTACTS_PROPERTY,
-  API_SKOS_SCHEME_ID,
-  API_SKOS_CONCEPT_ID,
-  API_SKOS_SCHEME_CODE,
-  API_SKOS_CONCEPT_ROLE,
-  FIELDS_TO_SKIP,
-  API_MEDIA_PROPERTY,
-  LOG_ID,
-  API_THEME_PROPERTY,
+  API_ORGANIZATION_ID,
   API_PUB_NAME,
+  API_REPORT_ID,
+  API_SKOS_CONCEPT_ID,
+  API_SKOS_CONCEPT_ROLE,
+  API_SKOS_SCHEME_CODE,
+  API_SKOS_SCHEME_ID,
+  API_THEME_PROPERTY,
+  DB_CREATED_AT,
+  DB_ID,
+  FIELDS_TO_SKIP,
+  LOG_ID,
 } from './dbFields.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -94,30 +94,30 @@ import {
 import { accessProperty } from '../utils/jsonAccess.js'
 
 import {
-  ParameterExpectedError,
-  NotFoundError,
-  ObjectNotFoundError,
-  NotImplementedError,
   BadRequestError,
+  NotFoundError,
+  NotImplementedError,
+  ObjectNotFoundError,
+  ParameterExpectedError,
   RudiError,
 } from '../utils/errors.js'
 
 // -------------------------------------------------------------------------------------------------
 // Data models
 // -------------------------------------------------------------------------------------------------
-import SkosScheme from '../definitions/models/SkosScheme.js'
-import SkosConcept from '../definitions/models/SkosConcept.js'
 import PortalToken from '../definitions/models/PortalToken.js'
+import SkosConcept from '../definitions/models/SkosConcept.js'
+import SkosScheme from '../definitions/models/SkosScheme.js'
 
-import { LogEntry, logLineToString } from '../definitions/models/LogEntry.js'
-import { Organization } from '../definitions/models/Organization.js'
 import { Contact } from '../definitions/models/Contact.js'
+import { LogEntry, logLineToString } from '../definitions/models/LogEntry.js'
 import { Media } from '../definitions/models/Media.js'
+import { Organization } from '../definitions/models/Organization.js'
 
 import { Metadata, METADATA_FIELDS_TO_POPULATE } from '../definitions/models/Metadata.js'
 
-import { Report } from '../definitions/models/Report.js'
 import { PublicKey } from '../definitions/models/PublicKey.js'
+import { Report } from '../definitions/models/Report.js'
 
 // -------------------------------------------------------------------------------------------------
 // Other internal dependencies

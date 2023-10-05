@@ -3,8 +3,10 @@ const mod = 'confPortal'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { quietAccess, NOT_FOUND, toBase64, separateLogs } from '../utils/jsUtils.js'
+import { NOT_FOUND, quietAccess, separateLogs, toBase64 } from '../utils/jsUtils.js'
+
 import { ConfigurationError, RudiError } from '../utils/errors.js'
+
 import { readIniFile } from '../utils/fileActions.js'
 import { logD } from '../utils/logging.js'
 

@@ -6,9 +6,9 @@ const fun = 'init'
 // -------------------------------------------------------------------------------------------------
 import { existsSync, mkdirSync } from 'fs'
 
+import rudiLogger from '@aqmo.org/rudi_logger'
 import winston from 'winston'
 import 'winston-daily-rotate-file'
-import rudiLogger from '@aqmo.org/rudi_logger'
 
 const { combine, timestamp, printf, colorize, simple } = winston.format
 const syslogLevels = winston.config.syslog.levels
@@ -24,8 +24,8 @@ Object.assign(
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { getGitHash, getAppOptions, OPT_NODE_ENV } from './appOptions.js'
-import { consoleLog, consoleErr, LOG_DATE_FORMAT, separateLogs } from '../utils/jsUtils.js'
+import { LOG_DATE_FORMAT, consoleErr, consoleLog, separateLogs } from '../utils/jsUtils.js'
+import { OPT_NODE_ENV, getAppOptions, getGitHash } from './appOptions.js'
 import {
   getAppName,
   getIniValue,

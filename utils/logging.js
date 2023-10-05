@@ -187,26 +187,39 @@ export const sysTrace = (msg, location, context, info, cid) =>
 // -------------------------------------------------------------------------------------------------
 // Fastify logger
 // -------------------------------------------------------------------------------------------------
-const stringifyMsg = (msg)=> typeof msg == 'string' ? msg : `${beautify(msg)}`
+const stringifyMsg = (msg) => (typeof msg == 'string' ? msg : `${beautify(msg)}`)
 export class FFLogger {
-  constructor(level) {
+  constructor(level = 'warn') {
     this.level = level
   }
 
-  fatal(msg) { return sysAlert(stringifyMsg(msg)) }
-  error(msg) { return sysError(stringifyMsg(msg)) }
-  warn(msg)  { return sysWarn (stringifyMsg(msg)) }
-  info(msg)  { return sysInfo (stringifyMsg(msg)) }
-  log(msg) { return sysDebug(stringifyMsg(msg)) }
-  debug(msg) { return sysDebug(stringifyMsg(msg)) }
-  trace(msg) { 
+  fatal(msg) {
+    return sysAlert(stringifyMsg(msg))
+  }
+  error(msg) {
+    return sysError(stringifyMsg(msg))
+  }
+  warn(msg) {
+    return sysWarn(stringifyMsg(msg))
+  }
+  info(msg) {
+    return sysInfo(stringifyMsg(msg))
+  }
+  debug(msg) {
+    return sysDebug(stringifyMsg(msg))
+  }
+  trace(msg) {
     return sysTrace(
       typeof msg == 'string' ? msg : msg?.err ? `ERR ${msg.err.code} ${msg.err.message}` : `${msg}`
     )
   }
-  child() { return new FFLogger() }
+  log(msg) {
+    return sysLog(this.level, stringifyMsg(msg))
+  }
+  child() {
+    return new FFLogger()
+  }
 }
-
 
 // -------------------------------------------------------------------------------------------------
 // Syslog functions: specific macros
