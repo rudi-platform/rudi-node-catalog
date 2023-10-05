@@ -883,7 +883,7 @@ MetadataSchema.post('save', async function (doc, next) {
   logT(mod, fun, ``)
 
   try {
-    await this.populate(POPULATE_OPTS) //.execPopulate()
+    await doc.populate(POPULATE_OPTS) //.execPopulate()
     next()
   } catch (err) {
     // next(err)
@@ -894,7 +894,7 @@ MetadataSchema.post('save', async function (doc, next) {
 
 MetadataSchema.post('find', async function (docs, next) {
   const fun = 'post find hook'
-  logT(mod, fun, ``)
+  // logT(mod, fun, ``)
 
   try {
     for (const doc of docs) {

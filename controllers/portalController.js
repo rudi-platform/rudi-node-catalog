@@ -28,6 +28,7 @@ import {
   API_INTEGRATION_ERROR_ID,
   API_METAINFO_SOURCE_PROPERTY,
   API_STATUS_PROPERTY,
+  API_RESTRICTED_ACCESS,
 } from '../db/dbFields.js'
 
 // -------------------------------------------------------------------------------------------------

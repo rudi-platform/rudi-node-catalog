@@ -309,7 +309,7 @@ FileSchema.pre('save', function (next) {
     if (!isNotEmptyObject(this[API_FILE_CHECKSUM]))
       throw new BadRequestError(missingField(API_FILE_CHECKSUM), mod, fun, [API_FILE_CHECKSUM])
 
-    logD(mod, fun, 'checking MEDIA_DATES')
+    // logD(mod, fun, 'checking MEDIA_DATES')
     checkDates(
       this[API_MEDIA_DATES],
       API_DATES_CREATED,
