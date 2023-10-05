@@ -568,9 +568,10 @@ export const cleanMetadataForPortal = (metadata) => {
     // delete media[API_MEDIA_SATELLITES]
   })
 
-  //--- Removing metadata fields that are node specific
+  //--- Removing metadata fields that are node specific (e.g. virtual properties)
   delete metadataClean[API_INTEGRATION_ERROR_ID]
   delete metadataClean[API_STATUS_PROPERTY]
+  delete metadataClean[API_RESTRICTED_ACCESS]
   delete metadataClean[DB_UPDATED_AT]
   delete metadataClean[API_METAINFO_PROPERTY][API_METAINFO_SOURCE_PROPERTY]
 

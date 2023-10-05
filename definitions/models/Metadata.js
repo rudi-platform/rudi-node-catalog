@@ -128,6 +128,7 @@ import { AccessConditionSchema } from '../schemas/AccessConditions.js'
 import { isMediaMissing, MediaTypes } from './Media.js'
 import { VALID_API_VERSION, VALID_URI } from '../schemaValidators.js'
 import { getApiUrl } from '../../config/confSystem.js'
+import { isPortalConnectionDisabled } from '../../config/confPortal.js'
 
 // -------------------------------------------------------------------------------------------------
 // Fields with specific treatments
@@ -480,6 +481,12 @@ const MetadataSchema = new mongoose.Schema(
       type: Date,
       immutable: true,
     },
+
+    /** Metadata status  */
+    [API_STATUS_PROPERTY]: {
+      type: String,
+      enum: Object.values(MetadataStatus),
+    },
   },
   {
     id: false,
@@ -515,6 +522,10 @@ async function checkMetadataSource(metadata) {
     throw RudiError.treatError(mod, fun, err)
   }
 }
+
+MetadataSchema.virtual(API_RESTRICTED_ACCESS).get(function () {
+  return this[API_ACCESS_CONDITION]?.[API_CONFIDENTIALITY]?.[API_RESTRICTED_ACCESS]
+})
 
 async function checkLicence(metadata) {
   const fun = 'checkLicence'
@@ -735,6 +746,27 @@ async function checkThesaurus(metadata) {
   }
 }
 
+const reckonMetadataStatus = (metadata) => {
+  const fun = 'reckonMetadataStatus'
+  logT(mod, fun)
+  try {
+    if (metadata[API_STORAGE_STATUS] === StorageStatus.Pending) return MetadataStatus.Incomplete
+    if (metadata[API_INTEGRATION_ERROR_ID]) return MetadataStatus.Refused
+    if (metadata[API_METAINFO_PROPERTY]?.[API_METAINFO_DATES]?.[API_DATES_DELETED])
+      return MetadataStatus.Deleted
+    if (metadata[API_COLLECTION_TAG] || isPortalConnectionDisabled()) return MetadataStatus.Local
+    if (metadata[DB_PUBLISHED_AT]) return MetadataStatus.Published
+    if (!isPortalConnectionDisabled()) return MetadataStatus.Sent
+    return MetadataStatus.Unset
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+const updateMetadataStatus = (metadata) => {
+  metadata[API_STATUS_PROPERTY] = reckonMetadataStatus(metadata)
+}
+
 // -------------------------------------------------------------------------------------------------
 // Schema refinements
 // -------------------------------------------------------------------------------------------------
@@ -760,20 +792,6 @@ MetadataSchema.virtual(`${API_METAINFO_PROPERTY}.${API_METAINFO_DATES}.${API_DAT
     return this[DB_PUBLISHED_AT]
   }
 )
-MetadataSchema.virtual(API_STATUS_PROPERTY).get(function () {
-  if (this[API_COLLECTION_TAG]) return MetadataStatus.Local
-  if (this[API_STORAGE_STATUS] === StorageStatus.Pending) return MetadataStatus.Incomplete
-  if (this[API_INTEGRATION_ERROR_ID]) return MetadataStatus.Refused
-  if (this[DB_PUBLISHED_AT]) return MetadataStatus.Published
-  if (this?.[API_METAINFO_PROPERTY]?.[API_METAINFO_DATES]?.[API_DATES_DELETED])
-    return MetadataStatus.Deleted
-  return MetadataStatus.Unset
-})
-
-MetadataSchema.virtual(API_RESTRICTED_ACCESS).get(function () {
-  this?.[API_ACCESS_CONDITION]?.[API_CONFIDENTIALITY]?.[API_RESTRICTED_ACCESS]
-})
-
 MetadataSchema.virtual(API_RESTRICTED_ACCESS).set(function (isRestricted) {
   objectPath.set(
     this,
@@ -847,6 +865,9 @@ MetadataSchema.pre('save', async function (next) {
 
     // await checkMetadataSource(metadata)
     // await checkMedia(metadata)
+
+    updateMetadataStatus(metadata)
+
     logT(mod, fun, `pre save checks OK`)
   } catch (err) {
     logV(mod, fun, `pre save checks KO: ${err}`)
@@ -871,22 +892,22 @@ MetadataSchema.post('save', async function (doc, next) {
   // next()
 })
 
-/*
 MetadataSchema.post('find', async function (docs, next) {
   const fun = 'post find hook'
   logT(mod, fun, ``)
 
   try {
-    for (let doc of docs) {
-      // if (doc.isPublic)
-      await doc.populate(POPULATE_OPTS) //.execPopulate()
+    for (const doc of docs) {
+      if (!doc[API_STATUS_PROPERTY]) {
+        updateMetadataStatus(doc)
+        await doc.save()
+      }
     }
   } catch (err) {
     next(err)
   }
   next()
 })
- */
 
 // -------------------------------------------------------------------------------------------------
 // Models definition
