@@ -894,15 +894,14 @@ MetadataSchema.post('find', async function (docs, next) {
   const fun = 'post find hook'
   // logT(mod, fun, ``)
 
-  try {
-    for (const doc of docs) {
-      if (!doc[API_STATUS_PROPERTY]) {
-        updateMetadataStatus(doc)
-        await doc.save()
-      }
+  for (const doc of docs) {
+    if (!doc[API_STATUS_PROPERTY]) {
+      updateMetadataStatus(doc)
+      doc.save().catch((err) => {
+        logE(mod, fun + '.updateMetadataStatus', beautify(err))
+        next(err)
+      })
     }
-  } catch (err) {
-    next(err)
   }
   next()
 })

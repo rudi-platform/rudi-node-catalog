@@ -18,6 +18,7 @@
     "no-console": "warn",
     "no-dupe-keys": "error",
     "no-empty": "error",
+    "no-extend-native": ["error", { "exceptions": ["RegExp"] }],
     "no-invalid-regexp": "error",
     "no-redeclare": "error",
     "no-return-assign": "error",
