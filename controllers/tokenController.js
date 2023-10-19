@@ -4,10 +4,10 @@ const mod = 'jwtCtrl'
 // External dependencies
 // -------------------------------------------------------------------------------------------------
 import {
-  extractJwt,
-  readPublicKeyFile,
-  tokenStringToJwtObject,
-  verifyToken,
+    extractJwt,
+    readPublicKeyFile,
+    tokenStringToJwtObject,
+    verifyToken,
 } from '@aqmo.org/jwt-lib'
 
 // -------------------------------------------------------------------------------------------------
@@ -20,7 +20,7 @@ import { accessProperty } from '../utils/jsonAccess.js'
 import { logT } from '../utils/logging.js'
 
 import { getProfile } from '../config/confSystem.js'
-import { ForbiddenError, UnauthorizedError, RudiError } from '../utils/errors.js'
+import { ForbiddenError, RudiError, UnauthorizedError } from '../utils/errors.js'
 
 // -------------------------------------------------------------------------------------------------
 // Constants
@@ -29,8 +29,8 @@ const PUB_KEY = 'pub_key'
 const SUB_ACL = 'routes'
 const REQ_ROUTE_ALL = 'all'
 
-import { JWT_SUB, JWT_CLIENT, REQ_MTD, REQ_URL } from '../utils/crypto.js'
-import { ROUTE_NAME } from '../config/confApi.js'
+import { ROUTE_NAME } from '../config/constApi.js'
+import { JWT_CLIENT, JWT_SUB, REQ_MTD, REQ_URL } from '../config/constJwt.js'
 // -------------------------------------------------------------------------------------------------
 // Controllers
 // -------------------------------------------------------------------------------------------------

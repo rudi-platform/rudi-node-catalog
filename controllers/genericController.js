@@ -17,6 +17,7 @@ const { pick } = _
 // -------------------------------------------------------------------------------------------------
 import {
   ACT_DELETION,
+  ACT_EXT_SEARCH,
   ACT_SEARCH,
   ACT_UNLINKED,
   MONGO_ERROR,
@@ -24,10 +25,15 @@ import {
   OBJ_MEDIA,
   OBJ_METADATA,
   OBJ_ORGANIZATIONS,
+  OBJ_PUB_KEYS,
+  OBJ_PUB_KEYS_CAML,
   OBJ_SKOS_CONCEPTS,
+  OBJ_SKOS_CONCEPTS_CAML,
   OBJ_SKOS_SCHEMES,
+  OBJ_SKOS_SCHEMES_CAML,
   PARAM_ID,
   PARAM_OBJECT,
+  PARAM_PROP,
   QUERY_CONFIRM,
   QUERY_COUNT_BY,
   QUERY_FIELDS,
@@ -35,42 +41,36 @@ import {
   QUERY_GROUP_BY,
   QUERY_GROUP_LIMIT,
   QUERY_GROUP_OFFSET,
+  QUERY_LANG,
   QUERY_LIMIT,
   QUERY_OFFSET,
   QUERY_SEARCH_TERMS,
   QUERY_SORT_BY,
+  ROUTE_OPT,
+  STATUS_CODE,
   URL_OBJECTS,
   URL_PUB_METADATA,
   URL_PV_OBJECT_GENERIC,
-  OBJ_SKOS_CONCEPTS_CAML,
-  OBJ_SKOS_SCHEMES_CAML,
-  OBJ_PUB_KEYS,
-  OBJ_PUB_KEYS_CAML,
-  PARAM_PROP,
-  ACT_EXT_SEARCH,
-  ROUTE_OPT,
-  QUERY_LANG,
-  STATUS_CODE,
-} from '../config/confApi.js'
+} from '../config/constApi.js'
 
 import {
   countDbObjectList,
+  countDbObjects,
   deleteAllDbObjectsWithType,
+  deleteDbObject,
   deleteManyDbObjectsWithFilter,
   deleteManyDbObjectsWithRudiIds,
-  deleteDbObject,
   doesObjectExistWithJson,
   doesObjectExistWithRudiId,
+  getDbMetadataListAndCount,
+  getDbObjectList,
   getEnsuredObjectWithRudiId,
   getObjectIdField,
-  getDbObjectList,
-  getDbMetadataListAndCount,
   getRudiObjectList,
   groupDbObjectList,
   isReferencedInMetadata,
   overwriteDbObject,
   searchDbObjects,
-  countDbObjects,
 } from '../db/dbQueries.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -86,29 +86,29 @@ import {
 
 import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
 
-import { beautify, isEmptyObject, isEmptyArray } from '../utils/jsUtils.js'
+import { beautify, isEmptyArray, isEmptyObject } from '../utils/jsUtils.js'
 
-import { NotFoundError, ForbiddenError, BadRequestError, RudiError } from '../utils/errors.js'
+import { BadRequestError, ForbiddenError, NotFoundError, RudiError } from '../utils/errors.js'
 
-import { parseQueryParameters } from '../utils/parseRequest.js'
 import { CallContext } from '../definitions/constructors/callContext.js'
+import { parseQueryParameters } from '../utils/parseRequest.js'
 
 // -------------------------------------------------------------------------------------------------
 // Specific controllers
 // -------------------------------------------------------------------------------------------------
+import { newContact } from './contactController.js'
 import { newMetadata, overwriteMetadata } from './metadataController.js'
 import { newOrganization } from './organizationController.js'
-import { newContact } from './contactController.js'
-import { newSkosConcept, newSkosScheme, widenSearch } from './skosController.js'
 import { newPublicKey, overwritePubKey } from './publicKeyController.js'
+import { newSkosConcept, newSkosScheme, widenSearch } from './skosController.js'
 
-import { deletePortalMetadata } from './portalController.js'
 import {
   API_ACCESS_CONDITION,
   API_COLLECTION_TAG,
   API_CONFIDENTIALITY,
   API_RESTRICTED_ACCESS,
 } from '../db/dbFields.js'
+import { deletePortalMetadata } from './portalController.js'
 
 // -------------------------------------------------------------------------------------------------
 // Specific object type helper functions

@@ -3,7 +3,7 @@ const mod = 'main'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { API_VERSION } from './config/confApi.js'
+import { API_VERSION } from './config/constApi.js'
 
 // 1. Utils
 import { beautify, consoleErr, consoleLog, separateLogs } from './utils/jsUtils.js'

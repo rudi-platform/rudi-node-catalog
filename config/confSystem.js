@@ -13,7 +13,7 @@ import {
   getAppOptions,
   getGitHash,
 } from './appOptions.js'
-import { TRACE, TRACE_ERR, TRACE_FUN, TRACE_MOD } from './confApi.js'
+import { TRACE, TRACE_ERR, TRACE_FUN, TRACE_MOD } from './constApi.js'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies

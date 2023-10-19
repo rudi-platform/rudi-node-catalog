@@ -1,4 +1,4 @@
-import { DEFAULT_LANG } from '../config/confApi.js'
+import { DEFAULT_LANG } from '../config/constApi.js'
 
 let currentLanguage = DEFAULT_LANG
 

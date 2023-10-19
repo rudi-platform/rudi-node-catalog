@@ -9,7 +9,7 @@ const mod = 'protect'
 // -------------------------------------------------------------------------------------------------
 const ACTIVATE_LOG = false
 
-import { HEADERS, HD_AUTH, HD_URL, HD_AUTH_LOWER, HD_METHOD } from '../config/headers.js'
+import { HD_METHOD, HD_URL } from '../config/constHeaders.js'
 const REQ_AUTH_MAX_LENGTH = 1000
 const REQ_URL_MAX_LENGTH = 200
 
@@ -18,16 +18,16 @@ export const getUrlMaxLength = () => REQ_URL_MAX_LENGTH
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { HTTP_METHODS } from '../config/confApi.js'
-import { logT } from './logging.js'
-import { RudiError, BadRequestError } from './errors.js'
-import { accessProperty } from './jsonAccess.js'
+import { HTTP_METHODS } from '../config/constApi.js'
 import {
-  validateSchema,
+  REGEX_BASIC_AUTH,
   REGEX_JWT_AUTH,
   REGEX_URL_WRONG_CHAR,
-  REGEX_BASIC_AUTH,
+  validateSchema,
 } from '../definitions/schemaValidators.js'
+import { BadRequestError, RudiError } from './errors.js'
+import { accessProperty } from './jsonAccess.js'
+import { logT } from './logging.js'
 // -------------------------------------------------------------------------------------------------
 // Functions
 // -------------------------------------------------------------------------------------------------
@@ -40,8 +40,7 @@ export const protectHeaderAuth = (req) => {
   const fun = 'protectHeaderAuth'
   try {
     if (ACTIVATE_LOG) logT(mod, fun, ``)
-    const header = accessProperty(req, HEADERS)
-    const auth = header[HD_AUTH] || header[HD_AUTH_LOWER]
+    const auth = req?.headers?.Authorization || req?.headers?.authorization
     if (!auth) return
     if (auth.length > REQ_AUTH_MAX_LENGTH)
       throw new BadRequestError(

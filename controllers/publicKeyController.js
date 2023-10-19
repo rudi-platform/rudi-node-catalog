@@ -27,8 +27,8 @@ import { logT } from '../utils/logging.js'
 // import { beautify } from '../utils/jsUtils.js'
 import { httpGet } from '../utils/httpReq.js'
 
-import { OBJ_PUB_KEYS, PARAM_ID, PARAM_PROP, URL_PREFIX_PUBLIC } from '../config/confApi.js'
 import { getApiUrl } from '../config/confSystem.js'
+import { OBJ_PUB_KEYS, PARAM_ID, PARAM_PROP, URL_PREFIX_PUBLIC } from '../config/constApi.js'
 import {
   doesObjectExistWithRudiId,
   getEnsuredObjectWithRudiId,

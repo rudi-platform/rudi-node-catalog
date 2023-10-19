@@ -34,7 +34,7 @@ import {
   QUERY_UPDATED_AFTER_CAML,
   QUERY_UPDATED_BEFORE,
   QUERY_UPDATED_BEFORE_CAML,
-} from '../config/confApi.js'
+} from '../config/constApi.js'
 
 import {
   API_DATA_DATES_PROPERTY,
@@ -89,10 +89,10 @@ const META_DATES = `${API_METAINFO_PROPERTY}.${API_METAINFO_DATES}.`
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
+import { getModelPropertyNames, getNestedObject, getObjectModel } from '../db/dbQueries.js'
+import { BadRequestError, RudiError } from './errors.js'
 import { beautify, isNotEmptyArray } from './jsUtils.js'
 import { logD, logT, logW } from './logging.js'
-import { BadRequestError, RudiError } from './errors.js'
-import { getModelPropertyNames, getNestedObject, getObjectModel } from '../db/dbQueries.js'
 
 // -------------------------------------------------------------------------------------------------
 // Functions

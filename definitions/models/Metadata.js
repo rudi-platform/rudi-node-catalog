@@ -13,7 +13,7 @@ const Int32 = mongooseInt32.loadType(mongoose)
 // -------------------------------------------------------------------------------------------------
 // Fields
 // -------------------------------------------------------------------------------------------------
-import { DEFAULT_LANG, OBJ_METADATA, URL_PREFIX_PUBLIC } from '../../config/confApi.js'
+import { DEFAULT_LANG, OBJ_METADATA, URL_PREFIX_PUBLIC } from '../../config/constApi.js'
 
 import {
   API_ACCESS_CONDITION,

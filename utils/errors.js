@@ -12,7 +12,14 @@ const DEFAULT_MESSAGE = 'Rudi producer node - API Server Error'
 const IS_RUDI_ERROR = 'is_rudi_error'
 const ERR_ID = 'errId'
 
-import { TRACE, STATUS_CODE, TRACE_MOD, TRACE_FUN, TRACE_ERR, ERR_PATH } from '../config/confApi.js'
+import {
+  ERR_PATH,
+  STATUS_CODE,
+  TRACE,
+  TRACE_ERR,
+  TRACE_FUN,
+  TRACE_MOD,
+} from '../config/constApi.js'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies

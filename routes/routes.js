@@ -8,14 +8,16 @@ const mod = 'routes'
 // API request constants
 // -------------------------------------------------------------------------------------------------
 import {
+  ACT_COMMIT,
   ACT_DELETION,
+  ACT_EXT_SEARCH,
   ACT_INIT,
   ACT_REPORT,
   ACT_SEARCH,
-  ACT_EXT_SEARCH,
   ACT_SEND,
   ACT_UUID_GEN,
   HTTP_METHODS,
+  OBJ_MEDIA,
   OBJ_METADATA,
   OBJ_PUB_KEYS,
   OBJ_REPORTS,
@@ -26,6 +28,8 @@ import {
   PARAM_THESAURUS_CODE,
   PARAM_THESAURUS_LANG,
   ROUTE_NAME,
+  ROUTE_OPT,
+  URL_PREFIX_CHECK,
   URL_PREFIX_PRIVATE,
   URL_PREFIX_PUBLIC,
   URL_PUB_API_VERSION,
@@ -41,15 +45,11 @@ import {
   URL_PV_OBJECT_GENERIC,
   URL_PV_PORTAL_PREFIX,
   URL_PV_THESAURUS_ACCESS,
+  URL_SUFFIX_NODE,
+  URL_SUFFIX_PORTAL,
   URL_SUFFIX_TOKEN_CHECK,
   URL_SUFFIX_TOKEN_GET,
-  ROUTE_OPT,
-  URL_PREFIX_CHECK,
-  URL_SUFFIX_PORTAL,
-  URL_SUFFIX_NODE,
-  OBJ_MEDIA,
-  ACT_COMMIT,
-} from '../config/confApi.js'
+} from '../config/constApi.js'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
@@ -103,6 +103,7 @@ import {
 } from '../controllers/reportController.js'
 
 import { dropCollection, dropDB, getCollections } from '../controllers/dbController.js'
+import { getLogs, searchLogs } from '../controllers/logController.js'
 import {
   getApiVersion,
   getAppHash,
@@ -111,20 +112,20 @@ import {
   getNodeVersion,
   serveFavicon,
 } from '../controllers/sysController.js'
-import { getLogs, searchLogs } from '../controllers/logController.js'
 
-import {
-  getEveryThesaurus,
-  getSingleThesaurus,
-  getSingleThesaurusLabels,
-} from '../controllers/skosController.js'
 import {
   getAllLicenceCodes,
   getAllLicences,
   initLicences,
 } from '../controllers/licenceController.js'
+import {
+  getEveryThesaurus,
+  getSingleThesaurus,
+  getSingleThesaurusLabels,
+} from '../controllers/skosController.js'
 
-import { test } from '../controllers/testController.js'
+import { getPortalBaseUrl } from '../config/confPortal.js'
+import { getApiUrl } from '../config/confSystem.js'
 import {
   checkStoredToken,
   deleteMetadata,
@@ -137,8 +138,7 @@ import {
   getPortalCachedMetadataList,
   getPortalMetadataFields,
 } from '../controllers/stateController.js'
-import { getPortalBaseUrl } from '../config/confPortal.js'
-import { getApiUrl } from '../config/confSystem.js'
+import { test } from '../controllers/testController.js'
 
 // -------------------------------------------------------------------------------------------------
 // Route names

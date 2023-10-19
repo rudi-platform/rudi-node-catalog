@@ -12,24 +12,24 @@ const mod = 'skosCtrl'
 // Constants
 // -------------------------------------------------------------------------------------------------
 import {
-  URL_PV_THESAURUS_ACCESS,
   PARAM_THESAURUS_CODE,
   PARAM_THESAURUS_LANG,
+  URL_PV_THESAURUS_ACCESS,
   USER_AGENT,
-} from '../config/confApi.js'
+} from '../config/constApi.js'
 
 import {
-  DB_ID,
-  API_SKOS_SCHEME_ID,
-  API_SKOS_SCHEME_CODE,
-  API_SKOS_CONCEPT_ID,
-  API_SKOS_CONCEPT_CODE,
-  API_SCHEME_TOPS_PROPERTY,
+  API_CONCEPT_CHILDREN_PROPERTY,
   API_CONCEPT_CLASS_PROPERTY,
   API_CONCEPT_PARENTS_PROPERTY,
-  API_CONCEPT_CHILDREN_PROPERTY,
-  API_CONCEPT_SIBLINGS_PROPERTY,
   API_CONCEPT_RELATIVE_PROPERTY,
+  API_CONCEPT_SIBLINGS_PROPERTY,
+  API_SCHEME_TOPS_PROPERTY,
+  API_SKOS_CONCEPT_CODE,
+  API_SKOS_CONCEPT_ID,
+  API_SKOS_SCHEME_CODE,
+  API_SKOS_SCHEME_ID,
+  DB_ID,
   LicenceTypes,
 } from '../db/dbFields.js'
 
@@ -45,9 +45,9 @@ const PROPERTIES_WITH_CONCEPT_REFS = [
 // -------------------------------------------------------------------------------------------------
 import {
   beautify,
+  deepClone,
   isNotEmptyArray,
   isNotEmptyObject,
-  deepClone,
   toPaddedBase64url,
 } from '../utils/jsUtils.js'
 
@@ -56,10 +56,10 @@ import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
 import { logD, logE, logT, logW, sysAlert } from '../utils/logging.js'
 
 import {
-  ParameterExpectedError,
-  NotFoundError,
-  RudiError,
   BadRequestError,
+  NotFoundError,
+  ParameterExpectedError,
+  RudiError,
 } from '../utils/errors.js'
 
 import {
@@ -73,14 +73,14 @@ import { directGet } from '../utils/httpReq.js'
 // -------------------------------------------------------------------------------------------------
 // Thesauri
 // -------------------------------------------------------------------------------------------------
-import Themes from '../definitions/thesaurus/Themes.js'
-import Keywords from '../definitions/thesaurus/Keywords.js'
 import { get as getEncodings } from '../definitions/thesaurus/Encodings.js'
-import { get as getFileTypes, getExtensions } from '../definitions/thesaurus/FileTypes.js'
+import { getExtensions, get as getFileTypes } from '../definitions/thesaurus/FileTypes.js'
 import { get as getHashAlgorithms } from '../definitions/thesaurus/HashAlgorithms.js'
+import Keywords from '../definitions/thesaurus/Keywords.js'
 import { get as getLanguages } from '../definitions/thesaurus/Languages.js'
 import { get as getProjections } from '../definitions/thesaurus/Projections.js'
 import { get as getStorageStatus } from '../definitions/thesaurus/StorageStatus.js'
+import Themes from '../definitions/thesaurus/Themes.js'
 
 // -------------------------------------------------------------------------------------------------
 // Controllers
@@ -90,8 +90,8 @@ import { getLicenceCodes } from './licenceController.js'
 // -------------------------------------------------------------------------------------------------
 // Data models
 // -------------------------------------------------------------------------------------------------
-import SkosScheme from '../definitions/models/SkosScheme.js'
 import SkosConcept from '../definitions/models/SkosConcept.js'
+import SkosScheme from '../definitions/models/SkosScheme.js'
 
 // -------------------------------------------------------------------------------------------------
 // Controllers: Scheme

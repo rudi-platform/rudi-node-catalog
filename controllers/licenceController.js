@@ -7,22 +7,22 @@ import { v4 as uuid } from 'uuid'
 // -------------------------------------------------------------------------------------------------
 // Constants
 // -------------------------------------------------------------------------------------------------
-import { OBJ_LICENCES } from '../config/confApi.js'
-import { API_SKOS_CONCEPT_CODE, LICENCE_CONCEPT_ROLE, API_LICENCE_LABEL } from '../db/dbFields.js'
+import { OBJ_LICENCES } from '../config/constApi.js'
+import { API_LICENCE_LABEL, API_SKOS_CONCEPT_CODE, LICENCE_CONCEPT_ROLE } from '../db/dbFields.js'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
+import { cleanLicences, getAllConceptsWithRole, searchDbIdWithJson } from '../db/dbQueries.js'
+import { InternalServerError, RudiError } from '../utils/errors.js'
 import { isEmptyArray } from '../utils/jsUtils.js'
 import { logD, logT } from '../utils/logging.js'
-import { InternalServerError, RudiError } from '../utils/errors.js'
 import { dbConceptListToRudiRecursive, newSkosScheme } from './skosController.js'
-import { cleanLicences, getAllConceptsWithRole, searchDbIdWithJson } from '../db/dbQueries.js'
 
 import {
   get as getLicenceCodeList,
-  setAll as setLicenceCodes,
   initialize as initLicenceCodes,
+  setAll as setLicenceCodes,
 } from '../definitions/thesaurus/LicenceCodes.js'
 
 import licenceScheme from '../doc/api/licences.js'

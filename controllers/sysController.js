@@ -16,8 +16,8 @@ import mongoose from 'mongoose'
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { OPT_APP_ENV, getAppOptions, getGitHash as getGitHashOpt } from '../config/appOptions.js'
-import { API_VERSION } from '../config/confApi.js'
 import { getAppHash as getAppHashOpt } from '../config/confSystem.js'
+import { API_VERSION } from '../config/constApi.js'
 import { RudiError } from '../utils/errors.js'
 import { NOT_FOUND } from '../utils/jsUtils.js'
 import { logT, logW } from '../utils/logging.js'
@@ -85,7 +85,7 @@ export const getNodeVersion = async () => {
   try {
     mongooseVersion = execSync('npm view mongoose version')
   } catch (err) {
-    setTimeout(()=>logW(mod, fun, `Command 'npm view mongoose version' failed: ${err}`),3000)
+    setTimeout(() => logW(mod, fun, `Command 'npm view mongoose version' failed: ${err}`), 3000)
   }
 
   try {

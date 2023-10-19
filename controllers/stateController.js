@@ -11,7 +11,7 @@ import {
   OBJ_METADATA,
   QUERY_FIELDS,
   TIME_LABEL,
-} from '../config/confApi.js'
+} from '../config/constApi.js'
 import {
   API_DATA_NAME_PROPERTY,
   API_DATA_PRODUCER_PROPERTY,
@@ -35,8 +35,8 @@ import { parseQueryParameters } from '../utils/parseRequest.js'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { getPortalMetadataListWithToken, getPortalToken } from './portalController.js'
 import { NO_PORTAL_MSG, isPortalConnectionDisabled } from '../config/confPortal.js'
+import { getPortalMetadataListWithToken, getPortalToken } from './portalController.js'
 // import { getMetadataListAndCount } from './genericController'
 
 // -------------------------------------------------------------------------------------------------

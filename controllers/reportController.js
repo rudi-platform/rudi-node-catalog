@@ -12,17 +12,6 @@ const mod = 'repCtrl'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { beautify, isEmptyObject, nowISO, padZerosLeft as pad0 } from '../utils/jsUtils.js'
-import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
-import { objectAlreadyExists, parametersMismatch } from '../utils/msg.js'
-import { logD, logI, logMetadata, logT, logW } from '../utils/logging.js'
-import {
-  BadRequestError,
-  ObjectNotFoundError,
-  MethodNotAllowedError,
-  RudiError,
-  ParameterExpectedError,
-} from '../utils/errors.js'
 import {
   deleteAllDbObjectsWithType,
   deleteManyDbObjectsWithFilter,
@@ -32,57 +21,68 @@ import {
   getObjectWithRudiId,
   overwriteDbObject,
 } from '../db/dbQueries.js'
+import {
+  BadRequestError,
+  MethodNotAllowedError,
+  ObjectNotFoundError,
+  ParameterExpectedError,
+  RudiError,
+} from '../utils/errors.js'
+import { beautify, isEmptyObject, nowISO, padZerosLeft as pad0 } from '../utils/jsUtils.js'
+import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
+import { logD, logI, logMetadata, logT, logW } from '../utils/logging.js'
+import { objectAlreadyExists, parametersMismatch } from '../utils/msg.js'
 
 // -------------------------------------------------------------------------------------------------
 // Constants
 // -------------------------------------------------------------------------------------------------
 import {
-  API_REPORT_ID,
-  API_REPORT_RESOURCE_ID,
-  API_REPORT_STATUS,
-  LOCAL_REPORT_ERROR,
-  LOCAL_REPORT_ERROR_TYPE,
-  LOCAL_REPORT_ERROR_MSG,
-  API_REPORT_VERSION,
-  API_REPORT_ERRORS,
-  API_REPORT_SUBMISSION_DATE,
-  API_REPORT_TREATMENT_DATE,
-  API_REPORT_METHOD,
-  API_COLLECTION_TAG,
-  DB_PUBLISHED_AT,
-  DB_UPDATED_AT,
-} from '../db/dbFields.js'
-import {
-  PARAM_OBJECT,
+  ACT_DELETION,
+  ACT_REPORT,
+  API_VERSION,
+  DEFAULT_QUERY_LIMIT,
+  OBJ_METADATA,
+  OBJ_REPORTS,
   PARAM_ID,
+  PARAM_OBJECT,
   PARAM_REPORT_ID,
+  QUERY_FILTER,
   QUERY_LIMIT,
   QUERY_OFFSET,
-  ACT_REPORT,
-  URL_PUB_METADATA,
-  ACT_DELETION,
-  API_VERSION,
-  OBJ_METADATA,
-  URL_PV_OBJECT_GENERIC,
-  DEFAULT_QUERY_LIMIT,
-  QUERY_FILTER,
-  OBJ_REPORTS,
+  QUERY_SUBMITTED_BEFORE,
+  QUERY_SUBMITTED_BEFORE_CAML,
   QUERY_TREATED_BEFORE,
   QUERY_TREATED_BEFORE_CAML,
   QUERY_UPDATED_BEFORE,
   QUERY_UPDATED_BEFORE_CAML,
-  QUERY_SUBMITTED_BEFORE,
-  QUERY_SUBMITTED_BEFORE_CAML,
-} from '../config/confApi.js'
+  URL_PUB_METADATA,
+  URL_PV_OBJECT_GENERIC,
+} from '../config/constApi.js'
+import {
+  API_COLLECTION_TAG,
+  API_REPORT_ERRORS,
+  API_REPORT_ID,
+  API_REPORT_METHOD,
+  API_REPORT_RESOURCE_ID,
+  API_REPORT_STATUS,
+  API_REPORT_SUBMISSION_DATE,
+  API_REPORT_TREATMENT_DATE,
+  API_REPORT_VERSION,
+  DB_PUBLISHED_AT,
+  DB_UPDATED_AT,
+  LOCAL_REPORT_ERROR,
+  LOCAL_REPORT_ERROR_MSG,
+  LOCAL_REPORT_ERROR_TYPE,
+} from '../db/dbFields.js'
 // -------------------------------------------------------------------------------------------------
 // Data models
 // -------------------------------------------------------------------------------------------------
-import { Report, IntegrationStatus } from '../definitions/models/Report.js'
+import { IntegrationStatus, Report } from '../definitions/models/Report.js'
 
-import { removeMetadataFromWaitingList } from './portalController.js'
-import { setFlagIntegrationKO } from './metadataController.js'
-import { cleanDate } from '../utils/parseRequest.js'
 import mongoose from 'mongoose'
+import { cleanDate } from '../utils/parseRequest.js'
+import { setFlagIntegrationKO } from './metadataController.js'
+import { removeMetadataFromWaitingList } from './portalController.js'
 
 // -------------------------------------------------------------------------------------------------
 // Conformity functions

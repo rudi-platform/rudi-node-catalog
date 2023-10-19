@@ -18,75 +18,84 @@ const { pick } = _
 // Constants
 // -------------------------------------------------------------------------------------------------
 import {
-  DB_ID,
-  API_METADATA_ID,
-  API_ORGANIZATION_ID,
+  API_ACCESS_CONDITION,
   API_CONTACT_ID,
-  API_DATA_PRODUCER_PROPERTY,
   API_DATA_CONTACTS_PROPERTY,
-  API_MEDIA_PROPERTY,
-  API_METAINFO_PROPERTY,
-  API_METAINFO_PROVIDER_PROPERTY,
-  API_METAINFO_CONTACTS_PROPERTY,
-  API_GEOGRAPHY,
-  API_GEO_GEOJSON_PROPERTY,
-  API_GEO_BBOX_PROPERTY,
-  API_GEO_BBOX_WEST,
-  API_GEO_BBOX_EAST,
-  API_GEO_BBOX_NORTH,
-  API_GEO_BBOX_SOUTH,
-  API_MEDIA_ID,
-  API_PURPOSE,
-  API_LANGUAGES_PROPERTY,
   API_DATA_DESCRIPTION_PROPERTY,
   API_DATA_DETAILS_PROPERTY,
-  DB_CREATED_AT,
-  DB_UPDATED_AT,
-  DICT_LANG,
+  API_DATA_PRODUCER_PROPERTY,
   API_FILE_STATUS_UPDATE,
   API_FILE_STORAGE_STATUS,
-  API_STORAGE_STATUS,
-  API_METAINFO_VERSION_PROPERTY,
-  API_MEDIA_TYPE,
+  API_GEO_BBOX_EAST,
+  API_GEO_BBOX_NORTH,
+  API_GEO_BBOX_PROPERTY,
+  API_GEO_BBOX_SOUTH,
+  API_GEO_BBOX_WEST,
+  API_GEO_GEOJSON_PROPERTY,
+  API_GEOGRAPHY,
   API_INTEGRATION_ERROR_ID,
-  API_ACCESS_CONDITION,
+  API_LANGUAGES_PROPERTY,
   API_LICENCE,
-  API_LICENCE_TYPE,
-  LicenceTypes,
-  API_LICENCE_CUSTOM_URI,
   API_LICENCE_CUSTOM_LABEL,
+  API_LICENCE_CUSTOM_URI,
+  API_LICENCE_TYPE,
+  API_MEDIA_ID,
+  API_MEDIA_PROPERTY,
+  API_MEDIA_TYPE,
+  API_METADATA_ID,
+  API_METAINFO_CONTACTS_PROPERTY,
+  API_METAINFO_PROPERTY,
+  API_METAINFO_PROVIDER_PROPERTY,
+  API_METAINFO_VERSION_PROPERTY,
+  API_ORGANIZATION_ID,
+  API_PURPOSE,
+  API_STORAGE_STATUS,
+  DB_CREATED_AT,
+  DB_ID,
+  DB_UPDATED_AT,
+  DICT_LANG,
+  LicenceTypes,
 } from '../db/dbFields.js'
 
 import {
-  URL_PREFIX_PUBLIC,
-  URL_PUB_METADATA,
-  OBJ_METADATA,
-  OBJ_MEDIA,
-  PARAM_ID,
   ACT_INIT,
-  MONGO_ERROR,
-  QUERY_FIELDS,
+  API_VERSION,
   COUNT_LABEL,
   LIST_LABEL,
+  MONGO_ERROR,
+  OBJ_MEDIA,
+  OBJ_METADATA,
+  PARAM_ID,
+  QUERY_COUNT_BY,
+  QUERY_FIELDS,
+  QUERY_FILTER,
   QUERY_LIMIT,
   QUERY_OFFSET,
-  QUERY_SORT_BY,
-  QUERY_FILTER,
   QUERY_SEARCH_TERMS,
-  QUERY_COUNT_BY,
+  QUERY_SORT_BY,
   STATUS_CODE,
-  API_VERSION,
-} from '../config/confApi.js'
+  URL_PREFIX_PUBLIC,
+  URL_PUB_METADATA,
+} from '../config/constApi.js'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
+import {
+  BadRequestError,
+  InternalServerError,
+  NotFoundError,
+  ObjectNotFoundError,
+  ParameterExpectedError,
+  RudiError,
+} from '../utils/errors.js'
 import { bboxToGeoJsonPolygon } from '../utils/geo.js'
+import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
 import {
   beautify,
   deepClone,
-  isNotEmptyArray,
   isEmptyArray,
+  isNotEmptyArray,
   isNothing,
   nowISO,
 } from '../utils/jsUtils.js'
@@ -97,28 +106,19 @@ import {
   organizationNotFound,
   parameterExpected,
 } from '../utils/msg.js'
-import {
-  NotFoundError,
-  BadRequestError,
-  InternalServerError,
-  ParameterExpectedError,
-  ObjectNotFoundError,
-  RudiError,
-} from '../utils/errors.js'
-import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
 
 // -------------------------------------------------------------------------------------------------
 // Data models
 // -------------------------------------------------------------------------------------------------
-import { isEveryMediaAvailable, Metadata } from '../definitions/models/Metadata.js'
 import { Media, MediaStorageStatus, MediaTypes } from '../definitions/models/Media.js'
+import { isEveryMediaAvailable, Metadata } from '../definitions/models/Metadata.js'
 
 // -------------------------------------------------------------------------------------------------
 // Controllers
 // -------------------------------------------------------------------------------------------------
-import { newOrganization } from './organizationController.js'
 import { newContact } from './contactController.js'
 import { initializeLicences } from './licenceController.js'
+import { newOrganization } from './organizationController.js'
 import { sendMetadataToPortal } from './portalController.js'
 
 import { CallContext } from '../definitions/constructors/callContext.js'
@@ -127,26 +127,26 @@ import Themes from '../definitions/thesaurus/Themes.js'
 import {
   doesObjectExistWithRudiId,
   getContactDbIdWithJson,
+  getDbObjectListAndCount,
   getEnsuredContactWithDbId,
   getEnsuredMediaWithDbId,
   getEnsuredMetadataWithRudiId,
   getEnsuredOrganizationWithDbId,
   getMediaDbIdWithJson,
-  getDbObjectListAndCount,
+  getMetadataWithJson,
+  getObjectWithRudiId,
   getOrganizationDbIdWithJson,
   listThemesInMetadata,
   overwriteDbObject,
   searchDbObjects,
-  getObjectWithRudiId,
-  getMetadataWithJson,
 } from '../db/dbQueries.js'
 
-import { parseQueryParameters } from '../utils/parseRequest.js'
-import { readJsonFile } from '../utils/fileActions.js'
+import { isPortalConnectionDisabled, NO_PORTAL_MSG } from '../config/confPortal.js'
 import Contact from '../definitions/models/Contact.js'
 import Organization from '../definitions/models/Organization.js'
 import { StorageStatus } from '../definitions/thesaurus/StorageStatus.js'
-import { isPortalConnectionDisabled, NO_PORTAL_MSG } from '../config/confPortal.js'
+import { readJsonFile } from '../utils/fileActions.js'
+import { parseQueryParameters } from '../utils/parseRequest.js'
 
 // -------------------------------------------------------------------------------------------------
 // Atomic treatments of properties: RUDI -> DB

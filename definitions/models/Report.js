@@ -10,7 +10,7 @@ const { omit } = _
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 
-import { HTTP_METHODS } from '../../config/confApi.js'
+import { HTTP_METHODS } from '../../config/constApi.js'
 import { UuidSchema, UuidV4Schema } from '../schemas/Identifiers.js'
 
 import { makeSearchable } from '../../db/dbActions.js'

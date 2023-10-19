@@ -15,12 +15,12 @@ import axios from 'axios'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { USER_AGENT } from '../config/confApi.js'
+import { USER_AGENT } from '../config/constApi.js'
 // import { ENV_LOCAL } from '../config/appOptions.js'
 import { beautify } from './jsUtils.js'
 // import { getEnvironment } from '../controllers/sysController.js'
-import { logD, logHttpAnswer, logT } from './logging.js'
-import { RudiError, BadRequestError } from './errors.js'
+import { BadRequestError, RudiError } from './errors.js'
+import { logD, logT } from './logging.js'
 
 // -------------------------------------------------------------------------------------------------
 // Functions: header treatments

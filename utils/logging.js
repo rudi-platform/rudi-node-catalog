@@ -10,23 +10,23 @@ const { pick } = _
 // -------------------------------------------------------------------------------------------------
 // Constants
 // -------------------------------------------------------------------------------------------------
-import { API_METADATA_ID, API_DATA_NAME_PROPERTY } from '../db/dbFields.js'
-import { HEADERS, HD_URL, HD_METHOD, HD_AUTH } from '../config/headers.js'
+import { HD_METHOD, HD_URL } from '../config/constHeaders.js'
+import { API_DATA_NAME_PROPERTY, API_METADATA_ID } from '../db/dbFields.js'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { displayStr, logWhere, beautify, shorten, consoleErr } from './jsUtils.js'
+import { beautify, consoleErr, displayStr, logWhere, shorten } from './jsUtils.js'
 
 import {
-  wConsoleLogger as wLogger,
-  sysLogger,
-  getLogLevel,
-  SHOULD_SYSLOG,
   SHOULD_LOG_CONSOLE,
+  SHOULD_SYSLOG,
+  getLogLevel,
+  sysLogger,
+  wConsoleLogger as wLogger,
 } from '../config/confLogs.js'
 
-import { makeLogInfo, LogEntry } from '../definitions/models/LogEntry.js'
+import { LogEntry, makeLogInfo } from '../definitions/models/LogEntry.js'
 
 // -------------------------------------------------------------------------------------------------
 // Constants
@@ -252,12 +252,10 @@ export const logHttpAnswer = (loggedMod, loggedFun, httpAnswer) => {
     logT(mod, fun, ``)
     // d(mod, fun, `${loggedMod}.${loggedFun} : ${httpAnswer}`)
     if (httpAnswer.config) {
-      const resExtract = pick(httpAnswer.config, [HD_METHOD, HEADERS, HD_URL])
+      const resExtract = pick(httpAnswer.config, [HD_METHOD, 'headers', HD_URL])
       resExtract[HD_URL] = resExtract.url ? shorten(resExtract[HD_URL], 70) : undefined
-      resExtract[HEADERS][HD_AUTH] =
-        resExtract[HEADERS] && resExtract[HEADERS][HD_AUTH]
-          ? shorten(resExtract[HEADERS][HD_AUTH], 30)
-          : undefined
+      if (resExtract?.headers?.Authorization)
+        resExtract.headers.Authorization = shorten(resExtract.headers.Authorization, 30)
       const redactedRes = `HTTP answer: ${beautify(resExtract)}`
       logD(loggedMod, loggedFun, redactedRes)
       // sysInfo(redactedRes) // TODO ?
