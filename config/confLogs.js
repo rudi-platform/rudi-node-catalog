@@ -6,7 +6,7 @@ const fun = 'init'
 // -------------------------------------------------------------------------------------------------
 import { existsSync, mkdirSync } from 'fs'
 
-import rudiLogger from '@aqmo.org/rudi_logger'
+import rudiLogger, { Facility, Transport } from '@aqmo.org/rudi_logger'
 import winston from 'winston'
 import 'winston-daily-rotate-file'
 
@@ -126,17 +126,6 @@ if (SHOULD_SYSLOG_IN_FILE) {
 // Winston logger creation : LOG FILE
 // -------------------------------------------------------------------------------------------------
 
-// datedRotatingFile.on('rotate', function (oldFilename, newFilename) {
-//   // perform an action when rotation takes place
-// })
-/*
-// - New transport : MongoDB
-const options ={
-  db: `${DB_LOGS_URL}`,
-  collection: 'logs'
-}
-const transportMongoDb = new winston.transports.MongoDB(options)
- */
 winston.addColors({
   error: 'bold red',
   warn: 'italic magenta',
@@ -327,23 +316,25 @@ export const initFFLogger = () => {
 
 // export const sysLogger = winston.createLogger(syslogOpts)
 function getRudiLoggerOptions() {
-  var facility = 20
+  let facility = Facility.Local4
   if (SYSLOG_FACILITY.substr(0, 5) === 'local') {
-    facility = 16 + Number(SYSLOG_FACILITY.substr(5, 1))
+    facility = Facility.Local0 + Number(SYSLOG_FACILITY.substr(5, 1))
   }
-  var transports = 2
-  var path = SYSLOG_HOST
+  let transports
+  let path = SYSLOG_HOST
   switch (SYSLOG_PROTOCOL) {
     case 'tcp':
-      transports = 1
+      transports = Transport.Tcp
       break
     case 'udp':
-      transports = 2
+      transports = Transport.Udp
       break
     case 'unix':
-      transports = 4
+      transports = Transport.Unix
       path = SYSLOG_SOCKET
       break
+    default:
+      transports = Transport.Udp
   }
   const rudiLoggerOpts = {
     log_server: { path: path, port: SYSLOG_PORT, facility: facility, transport: transports },

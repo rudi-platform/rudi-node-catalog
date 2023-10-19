@@ -43,11 +43,17 @@ export const separateLogs = (insertStr, shouldDisplayDate) => {
 separateLogs('Booting', true)
 
 // -------------------------------------------------------------------------------------------------
+// Integer
+// -------------------------------------------------------------------------------------------------
+export const isInt = (n) => Number.isInteger(n)
+export const isPositiveInt = (n) => isInt(n) && n >= 0
+
+// -------------------------------------------------------------------------------------------------
 // String
 // -------------------------------------------------------------------------------------------------
 export const isString = (str) => typeof str === 'string'
 
-export const padWithEqualSignBase4 = (str) => pad(str, 4, '=')
+export const padWithEqualSignBase4 = (str) => padEndModulo(str, 4, '=')
 export const toBase64 = (str) => convertEncoding(str, 'utf-8', 'base64')
 export const toBase64url = (str) => convertEncoding(str, 'utf-8', 'base64url')
 export const toPaddedBase64url = (str) => padWithEqualSignBase4(toBase64url(str))
@@ -66,20 +72,13 @@ export const convertEncoding = (data, fromEncoding, toEncoding) =>
  * @param {String} padSign The character used for the padding
  * @returns
  */
-export const pad = (str, base, padSign) => {
+export const padEndModulo = (str, base, padSign) => {
   const fun = 'pad'
   // consoleLog(mod, fun, `base = ${base}, sign = '${padSign}'`)
   try {
     padSign = padSign?.substring(0, 1)
     const modulo = str.length % base
-    if (modulo === 0) return str
-
-    let padding = padSign
-    for (let i = modulo; i > base; i++) {
-      padding = `${padding}${padSign}`
-    }
-    // consoleLog(mod, fun, `padding: ${padding}`)
-    return `${str}${padding}`
+    return modulo === 0 ? str : str.padEnd(str.length + base - modulo, padSign)
   } catch (err) {
     consoleErr(mod, fun, err)
     throw err
@@ -93,11 +92,11 @@ export const shorten = (str, len) => {
 }
 
 export const padA1 = (num) => {
-  var norm = Math.floor(Math.abs(num))
+  const norm = Math.floor(Math.abs(num))
   return (norm < 10 ? '0' : '') + norm
 }
 
-export const padZerosLeft = (number, nbZeros = 2) => String(number).padStart(nbZeros, '0')
+export const padZerosLeft = (number, nbZeros = 2) => `${number}`.padStart(nbZeros, '0')
 
 // -------------------------------------------------------------------------------------------------
 // Dates
@@ -178,11 +177,11 @@ export const multiSplit = (inputStr, singleCharDelimiterArray, shouldTrim) => {
   // Examine input string, one character at a time
   const result = []
   let chunk = ''
-  for (let i = 0; i < inputStr.length; i++) {
+  for (const c of inputStr) {
     let isDelimiter = false
     // Check if the current input character is a delimiter
-    for (let j = 0; j < delimiters.length; j++) {
-      if (inputStr[i] === delimiters[j]) {
+    for (const d of delimiters) {
+      if (c === d) {
         // Current input character is a delimiter
         if (shouldTrim) chunk = chunk.trim()
         if (chunk.length > 0) result.push(chunk)
@@ -191,7 +190,7 @@ export const multiSplit = (inputStr, singleCharDelimiterArray, shouldTrim) => {
         break
       }
     }
-    if (!isDelimiter) chunk += inputStr[i]
+    if (!isDelimiter) chunk += c
   }
   if (shouldTrim) chunk = chunk.trim()
   if (chunk.length > 0) result.push(chunk)
@@ -282,16 +281,6 @@ export const isEmpty = (prop) => {
   return prop == '' || prop == '{}' || prop == '[]' || strProp == '{}' || strProp == '[]'
 }
 
-/*
-  TRUE:
-    !null
-    !undefined
-    !''
-
-  FALSE:
-    !{}
-    ![]
-*/
 export const isNothing = (prop) => {
   return !prop || isEmpty(prop)
 }
@@ -319,9 +308,7 @@ export const beautify = (jsonObject, option) => {
  * @returns {JSON} The deep (dissociated) clone of the input object
  * @throws parameter 'jsonObject' is undefined, null or empty
  */
-export const deepClone = (jsonObject) => {
-  return JSON.parse(JSON.stringify(jsonObject))
-}
+export const deepClone = (jsonObject) => JSON.parse(JSON.stringify(jsonObject))
 
 export const logWhere = (srcMod, srcFun) =>
   !srcMod ? srcFun : !srcFun ? srcMod : `${srcMod} . ${srcFun}`
