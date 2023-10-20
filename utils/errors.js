@@ -266,20 +266,12 @@ export class RudiError extends Error {
         }
       } else if (comError.message) {
         const errMsg = comError.message
-        if (errMsg === 'Request failed with status code 400') {
-          logT(mod, fun, `${errFlag}error message 400: ${beautify(comError)}`)
-          error = new BadRequestError(errMsg)
-        } else if (errMsg === 'Request failed with status code 401') {
-          logT(mod, fun, `${errFlag}error message 401: ${beautify(comError)}`)
-          error = new UnauthorizedError(errMsg)
-        } else if (errMsg === 'Request failed with status code 403') {
-          logT(mod, fun, `${errFlag}error message 403: ${beautify(comError)}`)
-          error = new ForbiddenError(errMsg)
-        } else if (errMsg === 'Request failed with status code 404') {
-          logT(mod, fun, `${errFlag}error message 404: ${beautify(comError)}`)
-          error = new NotFoundError(errMsg)
+        if (errMsg.startsWith('Request failed with status code ')) {
+          const errCode = `${errMsg}`.substring(32, 35)
+          logT(mod, fun, `${errFlag}error message ${errCode}: ${beautify(comError)}`)
+          error = RudiError.createRudiHttpError(errCode, errMsg)
         } else {
-          logT(mod, fun, `${errFlag}error message: ${beautify(comError)}`)
+          logT(mod, fun, `${errFlag}error message: ${beautify(errMsg)}`)
           error = new RudiError(errMsg)
         }
       } else {
@@ -292,7 +284,7 @@ export class RudiError extends Error {
             error = new BadRequestError(comError)
           } else if (comError === 'Error 401: Request failed with status code 401') {
             error = new UnauthorizedError(comError)
-          } else if (comError === 'Error 403: Request failed with status code 401') {
+          } else if (comError === 'Error 403: Request failed with status code 403') {
             error = new ForbiddenError(comError)
           } else {
             error = new RudiError(comError)

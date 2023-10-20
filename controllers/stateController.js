@@ -44,7 +44,7 @@ import { getPortalMetadataListWithToken, getPortalToken } from './portalControll
 // -------------------------------------------------------------------------------------------------
 
 const SLICE = 100
-const DEFAULT_CACHE_PERIOD = 3600
+const DEFAULT_CACHE_PERIOD = 300
 
 let cachedPortalMetadataList = {}
 export const getPortalCachedMetadataList = async (
@@ -56,10 +56,7 @@ export const getPortalCachedMetadataList = async (
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     // Check cache date
-    if (
-      cachedPortalMetadataList[TIME_LABEL] &&
-      cachedPortalMetadataList[TIME_LABEL] + maxCacheTimeS > nowEpochS()
-    )
+    if ((cachedPortalMetadataList[TIME_LABEL] || 0) + maxCacheTimeS > nowEpochS())
       // Cache still valid, let's return it
       return cachedPortalMetadataList
 
@@ -80,14 +77,10 @@ export const getPortalCachedMetadataList = async (
     )
 
     // 4. Recreate the cache of portal metadata
-    let portalMetadataList = []
-    metadataPackets.map((packet) => {
-      portalMetadataList = portalMetadataList.concat(packet.items)
-    })
     cachedPortalMetadataList = {
       [TIME_LABEL]: nowEpochS(),
       [COUNT_LABEL]: portalMetadataNb,
-      [LIST_LABEL]: portalMetadataList,
+      [LIST_LABEL]: metadataPackets.map((packet) => packet.items),
     }
     // logD(mod, fun, cachedPortalMetadataList.items.length)
     return cachedPortalMetadataList
@@ -105,10 +98,7 @@ export const getNodeCachedMetadataList = async (
   const fun = 'getNodeCachedMetadataList'
   try {
     // Check cache date
-    if (
-      cachedNodeMetadataList[TIME_LABEL] &&
-      cachedNodeMetadataList[TIME_LABEL] + maxCacheTimeS > nowEpochS()
-    )
+    if ((cachedNodeMetadataList[TIME_LABEL] || 0) + maxCacheTimeS > nowEpochS())
       // Cache still valid, let's return it
       return cachedNodeMetadataList
 

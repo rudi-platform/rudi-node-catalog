@@ -14,21 +14,21 @@ import https from 'node:https'
 // -------------------------------------------------------------------------------------------------
 import { OBJ_METADATA, PARAM_ID, PORTAL_API_VERSION, USER_AGENT } from '../config/constApi.js'
 import {
-    API_COLLECTION_TAG,
-    API_FILE_STATUS_UPDATE,
-    API_FILE_STORAGE_STATUS,
-    API_INTEGRATION_ERROR_ID,
-    API_MEDIA_PROPERTY,
-    API_METADATA_ID,
-    API_METAINFO_PROPERTY,
-    API_METAINFO_SOURCE_PROPERTY,
-    API_METAINFO_VERSION_PROPERTY,
-    API_REPORT_ID,
-    API_RESTRICTED_ACCESS,
-    API_STATUS_PROPERTY,
-    API_STORAGE_STATUS,
-    DB_UPDATED_AT,
-    getUpdatedDate,
+  API_COLLECTION_TAG,
+  API_FILE_STATUS_UPDATE,
+  API_FILE_STORAGE_STATUS,
+  API_INTEGRATION_ERROR_ID,
+  API_MEDIA_PROPERTY,
+  API_METADATA_ID,
+  API_METAINFO_PROPERTY,
+  API_METAINFO_SOURCE_PROPERTY,
+  API_METAINFO_VERSION_PROPERTY,
+  API_REPORT_ID,
+  API_RESTRICTED_ACCESS,
+  API_STATUS_PROPERTY,
+  API_STORAGE_STATUS,
+  DB_UPDATED_AT,
+  getUpdatedDate,
 } from '../db/dbFields.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -36,30 +36,30 @@ import {
 // -------------------------------------------------------------------------------------------------
 import { JWT_EXP, REQ_MTD } from '../config/constJwt.js'
 import {
-    beautify,
-    dateEpochSToIso,
-    decodeBase64,
-    deepClone,
-    nowEpochS,
-    padWithEqualSignBase4,
-    toBase64,
+  beautify,
+  dateEpochSToIso,
+  decodeBase64,
+  deepClone,
+  nowEpochS,
+  padWithEqualSignBase4,
+  toBase64,
 } from '../utils/jsUtils.js'
 import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
 import { logD, logE, logT, logV, logW } from '../utils/logging.js'
 
 import {
-    FIELD_TOKEN,
-    JWT_USER,
-    NO_PORTAL_MSG,
-    PARAM_TOKEN,
-    getAuthUrl,
-    getCheckAuthUrl,
-    getCredentials,
-    getPortalCryptPubUrl,
-    getPortalJwtPubKeyUrl,
-    getPortalMetaUrl,
-    isPortalConnectionDisabled,
-    postPortalMetaUrl,
+  FIELD_TOKEN,
+  JWT_USER,
+  NO_PORTAL_MSG,
+  PARAM_TOKEN,
+  getAuthUrl,
+  getCheckAuthUrl,
+  getCredentials,
+  getPortalCryptPubUrl,
+  getPortalJwtPubKeyUrl,
+  getPortalMetaUrl,
+  isPortalConnectionDisabled,
+  postPortalMetaUrl,
 } from '../config/confPortal.js'
 import { directPost, httpDelete, httpGet, httpPost, httpPut } from '../utils/httpReq.js'
 
@@ -67,20 +67,20 @@ import { isUUID } from '../definitions/schemaValidators.js'
 import { StorageStatus } from '../definitions/thesaurus/StorageStatus.js'
 
 import {
-    getLatestStoredPortalToken,
-    getObjectWithRudiId,
-    storePortalToken,
+  getLatestStoredPortalToken,
+  getObjectWithRudiId,
+  storePortalToken,
 } from '../db/dbQueries.js'
 
 import { isEveryMediaAvailable } from '../definitions/models/Metadata.js'
 import {
-    BadRequestError,
-    ForbiddenError,
-    InternalServerError,
-    NotAcceptableError,
-    NotFoundError,
-    RudiError,
-    UnauthorizedError,
+  BadRequestError,
+  ForbiddenError,
+  InternalServerError,
+  NotAcceptableError,
+  NotFoundError,
+  RudiError,
+  UnauthorizedError,
 } from '../utils/errors.js'
 
 // -------------------------------------------------------------------------------------------------

@@ -95,8 +95,8 @@ const LOCAL_CONF = getLocalConf()
 //    if null get default value
 export const getIniValue = (section, field, defaultVal, customConf, defaultConf) => {
   try {
-    const userConf = customConf ? customConf : USER_CONF
-    const localConf = defaultConf ? defaultConf : LOCAL_CONF
+    const userConf = customConf || USER_CONF
+    const localConf = defaultConf || LOCAL_CONF
 
     const userValue = quietAccess(userConf[section], field)
     const localValue = quietAccess(localConf[section], field)
@@ -148,10 +148,9 @@ const API_URL = apiUrl.endsWith('/') ? apiUrl.slice(0, -1) : apiUrl
 export const getAppName = () => APP_NAME
 export const getServerAddress = () => LISTENING_ADDR
 export const getServerPort = () => LISTENING_PORT
-export const getHost = (suffix) =>
-  `http://${LISTENING_ADDR}:${LISTENING_PORT}${suffix ? suffix : ''}`
+export const getHost = (suffix) => `http://${LISTENING_ADDR}:${LISTENING_PORT}${suffix || ''}`
 
-export const getApiUrl = (suffix) => `${API_URL}${suffix ? suffix : ''}`
+export const getApiUrl = (suffix) => `${API_URL}${suffix || ''}`
 
 // ----- DB section
 const DB_SECTION = 'database'
@@ -171,9 +170,17 @@ const PROFILES = readIniFile(profilesConfFile)
 
 export const getProfile = (subject) => {
   if (!subject)
-    throw { code: 403, name: 'Forbidden', message: `No subject provided for profile access` }
+    throw new Error({
+      code: 403,
+      name: 'Forbidden',
+      message: `No subject provided for profile access`,
+    })
   if (!PROFILES[subject])
-    throw { code: 403, name: 'Forbidden', message: `Profile not found for subject: ${subject}` }
+    throw new Error({
+      code: 403,
+      name: 'Forbidden',
+      message: `Profile not found for subject: ${subject}`,
+    })
   return PROFILES[subject]
 }
 

@@ -126,13 +126,7 @@ export const displaySyslog = (srcMod, srcFun, msg) => {
 function sysLog(level, msg, location, context, cid, info) {
   try {
     if (SHOULD_SYSLOG)
-      sysLogger[level](
-        msg,
-        location,
-        context,
-        cid ? cid : context ? context.id : null,
-        info ? info : context ? context.detailsStr : null
-      )
+      sysLogger[level](msg, location, context, cid || context?.id, info || context?.detailsStr)
     else () => null
   } catch (err) {
     logE(mod, 'sysLog', err)
