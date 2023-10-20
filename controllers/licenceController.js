@@ -79,7 +79,7 @@ export const initializeLicences = async () => {
     if (!reply) throw new InternalServerError(`Licence integration failed`)
 
     const newLicenceCodeList = await getLicenceCodes()
-    setLicenceCodes(newLicenceCodeList.sort())
+    setLicenceCodes(newLicenceCodeList.toSorted())
     logD(mod, fun, `Licences initialized`)
     return getLicenceCodeList()
   } catch (err) {

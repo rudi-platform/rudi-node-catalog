@@ -842,7 +842,7 @@ const latinMap = {
   ₓ: 'x',
 }
 
-export const latiniseString = (str) => str.replace(/[^-_A-Za-z0-9\[\] ]/g, (a) => latinMap[a] || a)
+export const latiniseString = (str) => str.replace(/[^\w-\[\] ]/g, (a) => latinMap[a] || a)
 export const isLatinString = (str) => str === latiniseString(str)
 
 // String.prototype.latinise = () => latiniseString(this)

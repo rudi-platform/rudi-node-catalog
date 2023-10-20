@@ -36,11 +36,6 @@ let CURRENT_APP_HASH
 //   consoleLog(mod, 'commandLineOptions', utils.beautify(appOptions))
 
 // -------------------------------------------------------------------------------------------------
-// Extract environment variables
-// -------------------------------------------------------------------------------------------------
-const RUDI_API_USER_ENV = process.env[ENV_USER_CONF]
-
-// -------------------------------------------------------------------------------------------------
 // Constants
 // -------------------------------------------------------------------------------------------------
 
@@ -65,7 +60,9 @@ const getUserConf = () => {
     consoleLog(
       mod,
       fun,
-      getAppOptions(OPT_USER_CONF) ? 'cli' : `Conf file: ${RUDI_API_USER_ENV ? 'env' : 'ini'}`
+      getAppOptions(OPT_USER_CONF)
+        ? 'cli'
+        : `Conf file: ${process.env[ENV_USER_CONF] ? 'env' : 'ini'}`
     )
     return readIniFile(USER_CONF_FILE)
   } catch (err) {
