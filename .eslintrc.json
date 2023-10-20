@@ -40,7 +40,7 @@
         "vars": "all",
         "varsIgnorePattern": "^_",
         "args": "after-used",
-        "argsIgnorePattern": "^(_|req|reply|res|next)$"
+        "argsIgnorePattern": "^(_|req|reply|res|next|fun)$"
       }
     ]
   },

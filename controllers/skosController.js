@@ -479,8 +479,8 @@ export const dbConceptListToRudiRecursive = async (dbConceptList) => {
 export const getThesaurusList = async (lang) => {
   const fun = 'getThesaurusList'
   try {
-    const keywords = await Keywords.get(lang)
-    const themes = await Themes.get(lang)
+    const keywords = Keywords.get(lang)
+    const themes = Themes.get(lang)
     const licences = await getLicenceCodes()
 
     const thesauri = {

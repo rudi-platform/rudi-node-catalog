@@ -35,8 +35,7 @@ export const getCollections = async (req, reply) => {
   const fun = 'getCollections'
   logT(mod, fun, `< GET ${URL_PV_DB_ACCESS}`)
   try {
-    const dbActionResult = await daGetCollections()
-    return map(dbActionResult, 'name').sort()
+    return map(await daGetCollections(), 'name').sort()
   } catch (err) {
     const error = err.name === MONGO_ERROR ? new BadRequestError(err) : new NotFoundError(err)
     throw RudiError.treatError(mod, fun, error)

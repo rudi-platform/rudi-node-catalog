@@ -370,7 +370,7 @@ export const getSearchableProperties = (req, reply) => {
     // logD(mod, fun, `rudiObjectList: ${beautify(rudiObjectList)}`)
     Object.keys(rudiObjectList).forEach((objectType) => {
       try {
-        getSearchableFields[objectType] = rudiObjectList[objectType].Model.getSearchableFields()
+        getSearchableFields[objectType] = rudiObjectList[objectType].ObjModel.getSearchableFields()
       } catch (err) {
         logD(mod, fun, `${objectType}: not searchable`)
       }
@@ -594,9 +594,6 @@ export const deleteObjectList = async (req, reply) => {
     logT(mod, fun, `< POST ${URL_PV_OBJECT_GENERIC}/${ACT_DELETION}`)
     // retrieve url parameters: object type, object id
     const objectType = getObjectParam(req)
-
-    // identify object model
-    // const { Model, idField } = getObjectAccesses(objectType)
 
     // TODO: retrieve the metadata ids, DELETE on portal side with
     // deletePortalMetadata(id)
