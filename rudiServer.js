@@ -142,7 +142,7 @@ const start = async () => {
     const appVer = getAppHash()
     const curEnv = getEnvironment()
     separateLogs('Start', true) //////////////////////////////////////////////////////////////
-    const startMsg = `API v${API_VERSION} ` + `| App version: '${appVer}' ` + `| '${curEnv}' env`
+    const startMsg = `API v${API_VERSION} | App version: '${appVer}' | '${curEnv}' env`
     logI(mod, fun, startMsg)
     sysInfo(startMsg, '', '', ' ')
     logI(mod, 'server', 'Ready')

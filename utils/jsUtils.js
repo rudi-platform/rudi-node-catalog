@@ -101,7 +101,6 @@ export const padZerosLeft = (number, nbZeros = 2) => `${number}`.padStart(nbZero
 // -------------------------------------------------------------------------------------------------
 // Dates
 // -------------------------------------------------------------------------------------------------
-export const nowISO = () => new Date().toISOString()
 
 export const toISOLocale = (date) => {
   if (!date) date = new Date()
@@ -127,14 +126,14 @@ export const toISOLocale = (date) => {
     padA1(isoTimezoneOffset % 60)
   )
 }
-
+export const nowISO = () => new Date().toISOString()
 export const nowEpochMs = () => new Date().getTime()
 export const nowEpochS = () => floor(nowEpochMs() / 1000)
 
 export const dateEpochSToIso = (utcSeconds) => {
   const fun = 'dateEpochSToIso'
   try {
-    return dateEpochMsToIso(utcSeconds * 1000)
+    return utcSeconds ? dateEpochMsToIso(utcSeconds * 1000) : nowISO()
   } catch (err) {
     consoleErr(mod, fun, `input: ${utcSeconds} -> err: ${err}`)
   }
@@ -143,7 +142,7 @@ export const dateEpochSToIso = (utcSeconds) => {
 export const dateEpochMsToIso = (utcMs) => {
   const fun = 'dateEpochMsToIso'
   try {
-    return new Date(utcMs).toISOString()
+    return utcMs ? new Date(utcMs).toISOString() : nowISO()
   } catch (err) {
     consoleErr(mod, fun, `input: ${utcMs} -> err: ${err}`)
   }
@@ -174,6 +173,7 @@ export const isArray = (anArray) => Array.isArray(anArray)
 export const isNotEmptyArray = (anArray) => Array.isArray(anArray) && anArray.length > 0
 export const isEmptyArray = (anArray) => Array.isArray(anArray) && anArray.length === 0
 export const getLast = (array) => (Array.isArray(array) ? array[array.length - 1] : null)
+
 // -------------------------------------------------------------------------------------------------
 // Objects
 // -------------------------------------------------------------------------------------------------

@@ -11,16 +11,12 @@ import winston from 'winston'
 import 'winston-daily-rotate-file'
 
 const { combine, timestamp, printf, colorize, simple } = winston.format
-const syslogLevels = winston.config.syslog.levels
-Object.assign(
-  {
-    fatal: 0,
-    warn: 4,
-    trace: 7,
-  },
-  syslogLevels
-)
-
+const syslogLevels = {
+  fatal: 0,
+  warn: 4,
+  trace: 7,
+  ...winston.config.syslog.levels,
+}
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
@@ -81,7 +77,7 @@ const SYSLOG_SECTION = 'syslog'
 
 // const SYSLOG_LVL = getIniValue(SYSLOG_SECTION, '◊log_level', 'info')
 // const SYSLOG_NODE_NAME = getIniValue(SYSLOG_SECTION, 'syslog_node_name')
-const SYSLOG_PROTOCOL = getIniValue(SYSLOG_SECTION, 'syslog_protocol', 'unix')
+export const SYSLOG_PROTOCOL = getIniValue(SYSLOG_SECTION, 'syslog_protocol', 'unix')
 const SYSLOG_FACILITY = getIniValue(SYSLOG_SECTION, 'syslog_facility', 'local4')
 const SYSLOG_HOST = getIniValue(SYSLOG_SECTION, 'syslog_host')
 const SYSLOG_PORT = getIniValue(SYSLOG_SECTION, 'syslog_port', 514) // default: 514

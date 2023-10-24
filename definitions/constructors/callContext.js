@@ -148,7 +148,7 @@ export const CallContext = class CallContext {
   }
 
   addObjId(type, id) {
-    if (!this[OP] || !this[OP][OP_ID]) this[OP][OP_ID] = []
+    if (!this[OP]?.[OP_ID]) this[OP][OP_ID] = []
     this[OP][OP_ID].push(`${type}:${id}`)
   }
 
@@ -169,7 +169,7 @@ export const CallContext = class CallContext {
     return this[OP]?.[OP_TYPE]
   }
   set routeName(route) {
-    return (this[OP][OP_TYPE] = route)
+    this[OP][OP_TYPE] = route
   }
   get reqMethod() {
     return this[DETAILS][REQ][REQ_MTD]
@@ -178,9 +178,10 @@ export const CallContext = class CallContext {
     return this[DETAILS][REQ][REQ_URL]
   }
 
-  addDetails(key, val) {
+  addDetails = (key, val) => {
     this[DETAILS][key] = val
   }
+
   getDetails = () => this[DETAILS]
   get details() {
     return this.getDetails()
@@ -191,15 +192,13 @@ export const CallContext = class CallContext {
     return this.getDetailsStr()
   }
 
-  getReqDetails() {
+  getReqDetails = () => {
     if (!this[DETAILS][REQ]) this[DETAILS][REQ] = {}
     return this[DETAILS][REQ]
   }
 
-  formatReqDetails = () => {
-    // const reqDetails = this.getReqDetails()
-    return `${dateEpochMsToIso(this.timestamp)} [${this.id}] ${this.reqMethod} ${this.reqUrl}`
-  }
+  formatReqDetails = () =>
+    `${dateEpochMsToIso(this.timestamp)} [${this.id}] ${this.reqMethod} ${this.reqUrl}`
 
   get apiCallMsg() {
     const fun = 'apiCallMsg'
@@ -258,7 +257,7 @@ export const CallContext = class CallContext {
       logT(mod, fun, ``)
       if (RudiError.isRudiError(error)) {
         if (ACTIVATE_LOG) logT(mod, fun, `rudi error`)
-        if (ACTIVATE_LOG) logT(mod, fun, `this[DETAILS]: ${beautify(this[DETAILS])}`)
+        // if (ACTIVATE_LOG) logT(mod, fun, `this[DETAILS]: ${beautify(this[DETAILS])}`)
         if (!this[DETAILS][ERROR]) this[DETAILS][ERROR] = error
         else {
           logW(mod, fun, `Error already added: ${beautify(this[DETAILS][ERROR])}`)
@@ -429,10 +428,7 @@ export const CallContext = class CallContext {
     return redirections && isNotEmptyArray(redirections) ? ` <- ${redirections.join(' <- ')} ` : ''
   }
 
-  static createIpsMsg(req) {
-    const ip = req.ip
-    return `${ip}${CallContext.createIpRedirectionsMsg(req)}`
-  }
+  static createIpsMsg = (req) => `${req.ip}${CallContext.createIpRedirectionsMsg(req)}`
 
   static createApiCallMsg(req) {
     const fun = 'createApiCallMsg'

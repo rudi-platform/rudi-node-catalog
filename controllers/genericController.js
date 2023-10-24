@@ -305,7 +305,7 @@ export const searchObjects = async (req, reply) => {
     // retrieve url parameters: object type, object id
     const objectType = getObjectParam(req)
     logV(mod, fun, req.routeOptions?.config)
-    logV(mod, fun, req.routeSchema)
+    logV(mod, fun, req.routeOptions.schema)
     const opt = req.routeOptions?.config ? req.routeOptions?.config[ROUTE_OPT] : undefined
     logD(mod, fun, `opt: ${beautify(opt)}`)
 
@@ -530,6 +530,7 @@ export const upsertSingleObject = async (req, reply) => {
     const existsObject = await doesObjectExistWithRudiId(objectType, rudiId)
 
     const context = CallContext.getCallContextFromReq(req)
+
     if (context) context.addObjId(objectType, rudiId)
 
     if (!existsObject) return await newObject(objectType, updateData)
@@ -537,6 +538,7 @@ export const upsertSingleObject = async (req, reply) => {
     switch (objectType) {
       case OBJ_METADATA:
         return await overwriteMetadata(updateData)
+
       case OBJ_PUB_KEYS:
         return await overwritePubKey(updateData)
       default:

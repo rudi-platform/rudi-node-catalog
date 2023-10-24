@@ -1159,6 +1159,43 @@
 					"response": []
 				},
 				{
+					"name": "Get org 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Producer 2 edition correctly saved\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    const orgId = pm.variables.get('softOrg1Id');",
+									"    pm.expect(responseJson.organization_id).to.eq(orgId);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/api/admin/organizations/{{softOrg1Id}}",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"organizations",
+								"{{softOrg1Id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Add org 2",
 					"event": [
 						{
@@ -4244,7 +4281,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Delete metadata 1 & 2\", () => {",
+									"pm.test(\"Delete metadata 1, 2 & 4\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    // pm.expect(responseJson.n).to.eq(2);",
@@ -6518,8 +6555,8 @@
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    if (pm.collectionVariables.get('skipPortalConnection')) return true",
 									"    const res = pm.response.json()",
-									"    pm.expect(res.time).to.be.not.undefined",
-									"    pm.expect(res.total).to.be.not.undefined",
+									"    pm.expect(res.time).to.be.gt(0)",
+									"    pm.expect(res.total).to.be.gt(0)",
 									"    pm.expect(res.items?.length).to.eq(res.total)",
 									"});",
 									""
@@ -6994,10 +7031,6 @@
 			"value": ""
 		},
 		{
-			"key": "skipPortalConnection",
-			"value": ""
-		},
-		{
 			"key": "gitHash",
 			"value": ""
 		},
@@ -7186,11 +7219,11 @@
 			"value": ""
 		},
 		{
-			"key": "portalKeyName",
+			"key": "portalUrl",
 			"value": ""
 		},
 		{
-			"key": "portalUrl",
+			"key": "portalKeyName",
 			"value": ""
 		}
 	]

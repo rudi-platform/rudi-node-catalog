@@ -164,7 +164,7 @@ export const organizationRudiToDbFormat = async (rudiProducer, path, shouldCreat
       if (e[STATUS_CODE] === 400) throw new BadRequestError(e.message, mod, 'org.get', path)
       throw e
     }
-    // logD(mod, fun, `organizationDbId: -> ${organizationDbId} `)
+    logD(mod, fun, `organizationDbId: -> ${organizationDbId} `)
 
     if (!organizationDbId) {
       if (!shouldCreateIfNotFound) {
@@ -665,7 +665,7 @@ export const newMetadata = async (rudiMetadata) => {
 
     // Special treatment!
     const dbReadyObject = await rudiToDbFormat(rudiMetadata, true)
-    // logI(mod, fun, `dbReadyObject: ${beautify(dbReadyObject)}`)
+    logI(mod, fun, `dbReadyObject: ${beautify(dbReadyObject)}`)
     const dbMetadata = new Metadata(dbReadyObject)
     await dbMetadata.save()
 
@@ -716,7 +716,7 @@ const updateMetadataState = async (dbMetadata, newState = StorageStatus.Online) 
     logT(mod, fun, ``)
     const metadata = await getMetadataWithJson(dbMetadata)
 
-    const areAllMediaAvailable = await isEveryMediaAvailable(metadata)
+    const areAllMediaAvailable = isEveryMediaAvailable(metadata)
     if (areAllMediaAvailable) {
       metadata[API_STORAGE_STATUS] = newState
     } else {

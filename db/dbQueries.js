@@ -76,7 +76,7 @@ import {
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { beautify, deepClone, isEmptyArray, listPick } from '../utils/jsUtils.js'
-import { logD, logI, logMetadata, logT, logV, logW } from '../utils/logging.js'
+import { logD, logE, logI, logMetadata, logT, logV, logW } from '../utils/logging.js'
 import {
   contactDeleted,
   contactUpdated,
@@ -289,9 +289,9 @@ export const listThemesInMetadata = () =>
 // -------------------------------------------------------------------------------------------------
 // Helper functions
 // -------------------------------------------------------------------------------------------------
-export const getModelPropertyNames = (Model) => Object.keys(Model.schema.paths) // paths|tree
+export const getModelPropertyNames = (ObjModel) => Object.keys(ObjModel.schema.paths) // paths|tree
 
-export const isProperty = (Model, prop) => getModelPropertyNames(Model).includes(prop)
+export const isProperty = (ObjModel, prop) => getModelPropertyNames(ObjModel).includes(prop)
 
 // -------------------------------------------------------------------------------------------------
 // Actions on DB tables
@@ -325,15 +325,14 @@ export const getObject = (objectType, filter, shouldSkipPopulate) => {
   const fun = `getObject`
   const ObjModel = getObjectModel(objectType)
   const populateOpts = shouldSkipPopulate ? [] : getPopulateOptions(objectType)
-  return (
-    isEmptyArray(populateOpts)
+  return new Promise((resolve, reject) =>
+    (isEmptyArray(populateOpts)
       ? ObjModel.findOne(filter)
       : ObjModel.findOne(filter).populate(populateOpts)
+    )
+      .then((res) => resolve(res))
+      .catch((err) => reject(RudiError.treatError(mod, fun, err)))
   )
-    .exec()
-    .catch((err) => {
-      throw RudiError.treatError(mod, fun, err)
-    })
 }
 
 /**
@@ -480,26 +479,26 @@ export const getObjectPropertiesWithDbId = async (objectType, dbId, propertyList
     })
 }
 
-export const getObjectPropertiesWithRudiId = (objectType, rudiId, propertyList) => {
+export const getObjectPropertiesWithRudiId = async (objectType, rudiId, propertyList) => {
   const fun = `getObjectPropertiesWithRudiId`
   // logD(mod, fun, `type '${objectType}': ${rudiId}`)
-  const { ObjModel, idField } = getObjectAccesses(objectType)
-  const filter = { [idField]: rudiId }
-  const fields = propertyList.join(' ')
-  const populateFields = getPopulateFields(objectType)
-  return (
-    !populateFields
-      ? ObjModel.findOne(filter, fields)
-      : ObjModel.findOne(filter, fields).populate(populateFields)
-  )
-    .exec()
-    .catch((err) => {
-      throw RudiError.treatError(mod, fun, err)
-    })
+  try {
+    const { ObjModel, idField } = getObjectAccesses(objectType)
+    const filter = { [idField]: rudiId }
+    const fields = propertyList.join(' ')
+    const populateFields = getPopulateFields(objectType)
+
+    return await (isEmptyArray(populateFields)
+      ? ObjModel.findOne(filter)
+      : ObjModel.findOne(filter, fields).populate(populateFields))
+  } catch (err) {
+    logE(mod, fun, beautify(err))
+    throw RudiError.treatError(mod, fun, err)
+  }
 }
 
-export const getDbIdWithRudiId = (objectType, rudiId) =>
-  getObjectPropertiesWithRudiId(objectType, rudiId, [DB_ID])?.[DB_ID]
+export const getDbIdWithRudiId = async (objectType, rudiId) =>
+  (await getObjectPropertiesWithRudiId(objectType, rudiId, [DB_ID]))?.[DB_ID]
 
 export const getEnsuredDbIdWithRudiId = async (objectType, rudiId) => {
   const fun = `getEnsuredDbIdWithRudiId`
@@ -513,17 +512,8 @@ export const getEnsuredDbIdWithRudiId = async (objectType, rudiId) => {
   }
 }
 
-export const getDbIdWithJson = async (objectType, rudiObject) => {
-  const fun = `getDbIdWithJson`
-  // logT(mod, fun, ``)
-  try {
-    const idField = getObjectIdField(objectType)
-    const rudiId = accessProperty(rudiObject, idField)
-    return await getDbIdWithRudiId(objectType, rudiId)
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
+export const getDbIdWithJson = async (objectType, rudiObject) =>
+  getDbIdWithRudiId(objectType, accessProperty(rudiObject, getObjectIdField(objectType)))
 
 export const getEnsuredDbIdWithJson = async (objectType, rudiObject) => {
   const fun = `getEnsuredDbIdWithJson`
@@ -1001,17 +991,15 @@ export const updateDbObject = async (objectType, updateData) => {
 
     logD(mod, fun, `objectType: ${objectType}`)
 
-    const { Model, idField } = getObjectAccesses(objectType)
+    const { ObjModel, idField } = getObjectAccesses(objectType)
     const rudiId = accessProperty(updateData, idField)
     const filter = { [idField]: rudiId }
     const updateOpts = { new: true }
 
     const populateOptions = getPopulateOptions(objectType)
-    if (isEmptyArray(populateOptions)) {
-      return await Model.findOneAndUpdate(filter, updateData, updateOpts)
-    } else {
-      return await Model.findOneAndUpdate(filter, updateData, updateOpts).populate(populateOptions)
-    }
+    return isEmptyArray(populateOptions)
+      ? await ObjModel.findOneAndUpdate(filter, updateData, updateOpts)
+      : await ObjModel.findOneAndUpdate(filter, updateData, updateOpts).populate(populateOptions)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -1025,7 +1013,7 @@ export const overwriteDbObject = async (objectType, updateData) => {
   try {
     assertIsString(fun, objectType)
 
-    const { Model, idField } = getObjectAccesses(objectType)
+    const { ObjModel, idField } = getObjectAccesses(objectType)
     const rudiId = accessProperty(updateData, idField)
     const filter = { [idField]: rudiId }
     const updateOpts = {
@@ -1034,26 +1022,22 @@ export const overwriteDbObject = async (objectType, updateData) => {
       upsert: true, // creates the document if it wasn't found
     }
 
-    const existingObject = await Model.findOne(filter).exec()
-    logD(mod, fun, beautify(existingObject))
-    if (!!existingObject) {
+    const existingObject = await ObjModel.findOne(filter).exec()
+    // logD(mod, fun, beautify(existingObject))
+    if (existingObject) {
       // document exists in DB, we preserve the creation date
       updateData[DB_CREATED_AT] = existingObject[DB_CREATED_AT]
     }
-    const dbObject = await Model.findOneAndUpdate(filter, updateData, updateOpts)
-    // logD(mod, fun, beautify(dbObject))
-
+    const dbObject = await ObjModel.findOneAndUpdate(filter, updateData, updateOpts)
     // logD(mod, fun, `dbObject: ${beautify(dbObject)}`)
+
     await dbObject.save()
-
-    // logD(mod, fun, `dbObject: ${beautify(dbObject)}`)
     return dbObject
   } catch (err) {
-    logV(mod, fun, beautify(err))
+    // logV(mod, fun, beautify(err))
     const path = Object.keys(err.errors || err.error)[0]?.split('.')
     throw RudiError.treatError(mod, fun, err, path)
   }
-  // logD(mod, fun, `updatedObject: ${beautify(updatedObject)}`)
 }
 
 /**
@@ -1091,15 +1075,13 @@ export const deleteDbObject = async (objectType, rudiId) => {
   const fun = `deleteDbObject`
   logT(mod, fun, ``)
   try {
-    const { Model, idField } = getObjectAccesses(objectType)
+    const { ObjModel, idField } = getObjectAccesses(objectType)
     const filter = { [idField]: rudiId }
 
     const populateFields = getPopulateFields(objectType)
-    if (isEmptyArray(populateFields)) {
-      return await Model.findOneAndRemove(filter)
-    } else {
-      return await Model.findOneAndRemove(filter).populate(populateFields)
-    }
+    return isEmptyArray(populateFields)
+      ? ObjModel.findOneAndRemove(filter)
+      : ObjModel.findOneAndRemove(filter).populate(populateFields)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -1107,7 +1089,6 @@ export const deleteDbObject = async (objectType, rudiId) => {
 
 export const deleteAllDbObjectsWithType = async (objectType) => {
   const fun = `deleteAllDbObjectsWithType`
-  // logD(mod, fun, `Model: ${Model}`)
   const ObjModel = getObjectModel(objectType)
   try {
     return await ObjModel.deleteMany()
@@ -1130,13 +1111,13 @@ export const deleteManyDbObjectsWithRudiIds = async (objectType, rudiIdList) => 
     }
   }
 
-  const { Model, idField } = getObjectAccesses(objectType)
+  const { ObjModel, idField } = getObjectAccesses(objectType)
   const filter = { [idField]: { $in: rudiIdList } }
 
   logD(mod, fun, beautify(filter))
 
   try {
-    const deletionInfo = await Model.deleteMany(filter)
+    const deletionInfo = await ObjModel.deleteMany(filter)
     return deletionInfo
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -1285,33 +1266,16 @@ export const getOrganizationWithDbId = async (id) => {
   return await getObjectWithDbId(OBJ_ORGANIZATIONS, id)
 }
 
-export const getEnsuredOrganizationWithDbId = async (dbId) => {
-  // const fun = `getOrganizationWithDbId`
-  // logT(mod, fun, ``)
-  return await getEnsuredObjectWithDbId(OBJ_ORGANIZATIONS, dbId)
-}
+export const getEnsuredOrganizationWithDbId = (dbId) =>
+  getEnsuredObjectWithDbId(OBJ_ORGANIZATIONS, dbId)
 
-export const getEnsuredOrganizationDbIdWithJson = async (organizationJson) => {
-  // const fun = `getEnsuredOrganizationDbIdWithJson`
-  // logT(mod, fun, ``)
-  return await getEnsuredDbIdWithJson(OBJ_ORGANIZATIONS, organizationJson)
-}
+export const getEnsuredOrganizationDbIdWithJson = (organizationJson) =>
+  getEnsuredDbIdWithJson(OBJ_ORGANIZATIONS, organizationJson)
 
-export const getOrganizationDbIdWithJson = async (organizationJson) => {
-  // const fun = `getEnsuredOrganizationDbIdWithJson`
-  // logT(mod, fun, ``)
-  return await getDbIdWithJson(OBJ_ORGANIZATIONS, organizationJson)
-}
+export const getOrganizationDbIdWithJson = (organizationJson) =>
+  getDbIdWithJson(OBJ_ORGANIZATIONS, organizationJson)
 
-export const getAllOrganizations = async () => {
-  // const fun = `getAllOrganizations`
-  // logT(mod, fun, ``)
-
-  const organizationList = await Organization.find({})
-  // logD(mod, fun, `metadataList: ${metadataList}`)
-
-  return organizationList
-}
+export const getAllOrganizations = () => Organization.find({})
 
 export const updateOrganization = async (jsonOrganization) => {
   const fun = `updateOrganization`
