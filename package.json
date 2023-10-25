@@ -31,7 +31,7 @@
   "homepage": "https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER",
   "license": "EUPL-1.2",
   "dependencies": {
-    "@aqmo.org/jwt-lib": "^1.1.10",
+    "@aqmo.org/jwt-lib": "^1.1.11",
     "@aqmo.org/rudi_logger": "^1.1.5",
     "axios": "^1.5.1",
     "date-and-time": "^3.0.3",
