@@ -17,15 +17,15 @@ import { shouldShowErrorPile, shouldShowRoutes } from '../config/confLogs.js'
 import { JWT_USER, isPortalConnectionDisabled } from '../config/confPortal.js'
 
 import {
-    logE,
-    logI,
-    logLine,
-    logT,
-    logV,
-    logW,
-    sysCrit,
-    sysNotice,
-    sysOnError,
+  logE,
+  logI,
+  logLine,
+  logT,
+  logV,
+  logW,
+  sysCrit,
+  sysNotice,
+  sysOnError,
 } from '../utils/logging.js'
 
 import { JWT_CLIENT, JWT_SUB } from '../config/constJwt.js'
@@ -35,11 +35,11 @@ import { RudiError } from '../utils/errors.js'
 import { CallContext } from '../definitions/constructors/callContext.js'
 
 import {
-    backOfficeRoutes,
-    devRoutes,
-    portalRoutes,
-    publicRoutes,
-    unrestrictedPrivateRoutes,
+  backOfficeRoutes,
+  devRoutes,
+  portalRoutes,
+  publicRoutes,
+  unrestrictedPrivateRoutes,
 } from './routes.js'
 
 import { checkPortalTokenInHeader } from '../controllers/portalController.js'

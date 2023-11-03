@@ -32,6 +32,7 @@ import { addLogEntry, logE, logI, logT, sysAlert, sysCrit, sysInfo } from './uti
 // Prerequisites
 // -------------------------------------------------------------------------------------------------
 // Fixing Regexp display as a string
+// eslint-disable-next-line no-extend-native
 RegExp.prototype.toJSON = RegExp.prototype.toString
 
 // -------------------------------------------------------------------------------------------------
