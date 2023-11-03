@@ -1080,8 +1080,8 @@ export const deleteDbObject = async (objectType, rudiId) => {
 
     const populateFields = getPopulateFields(objectType)
     return isEmptyArray(populateFields)
-      ? ObjModel.findOneAndRemove(filter)
-      : ObjModel.findOneAndRemove(filter).populate(populateFields)
+      ? ObjModel.findOneAndDelete(filter)
+      : ObjModel.findOneAndDelete(filter).populate(populateFields)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
