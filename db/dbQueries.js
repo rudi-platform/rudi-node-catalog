@@ -788,7 +788,7 @@ export const groupDbObjectList = async (objectType, unionField, options) => {
   const fun = `groupDbObjectList`
 
   try {
-    logT(mod, fun, `options: ${options}`)
+    // logT(mod, fun, `options: ${options}`)
     //--- Parameters
     // Identify object type characteristics
     const ObjModel = getObjectModel(objectType)
@@ -1016,17 +1016,17 @@ export const overwriteDbObject = async (objectType, updateData) => {
     const { ObjModel, idField } = getObjectAccesses(objectType)
     const rudiId = accessProperty(updateData, idField)
     const filter = { [idField]: rudiId }
-    const updateOpts = {
-      new: true, // returns the updated document
-      // overwrite: true,
-      upsert: true, // creates the document if it wasn't found
-    }
 
     const existingObject = await ObjModel.findOne(filter).exec()
     // logD(mod, fun, beautify(existingObject))
     if (existingObject) {
       // document exists in DB, we preserve the creation date
       updateData[DB_CREATED_AT] = existingObject[DB_CREATED_AT]
+    }
+    const updateOpts = {
+      new: true, // returns the updated document
+      // overwrite: true,
+      upsert: true, // creates the document if it wasn't found
     }
     const dbObject = await ObjModel.findOneAndUpdate(filter, updateData, updateOpts)
     // logD(mod, fun, `dbObject: ${beautify(dbObject)}`)

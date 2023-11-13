@@ -299,15 +299,13 @@ export const parseQueryParameters = async (objectType, fullUrl) => {
                 [EXT_OBJ_VAL]: value,
               })
           }
+        } else if (searching) {
+          logD(mod, fun, `Search term found: ${beautify(key)}`)
+          key.split(',').map((term) => returnedFilter[QUERY_SEARCH_TERMS].push(term))
         } else {
-          if (searching) {
-            logD(mod, fun, `Search term found: ${beautify(key)}`)
-            key.split(',').map((term) => returnedFilter[QUERY_SEARCH_TERMS].push(term))
-          } else {
-            logW(mod, fun, `Key is not a property of ${objectType}: ${beautify(key)}`)
-          }
-          // logW(mod, fun, `Model properties: ${beautify(modelProperties)}`)
+          logW(mod, fun, `Key is not a property of ${objectType}: ${beautify(key)}`)
         }
+        // logW(mod, fun, `Model properties: ${beautify(modelProperties)}`)
       }
     }
     // logD(mod, fun, `filterReturn: ${beautify(filterReturn)}`)

@@ -33,7 +33,7 @@
   "dependencies": {
     "@aqmo.org/jwt-lib": "^1.1.11",
     "@aqmo.org/rudi_logger": "^1.1.5",
-    "axios": "^1.6.0",
+    "axios": "^1.6.1",
     "date-and-time": "^3.0.3",
     "fastify": "^4.24.3",
     "ini": "^4.1.1",
@@ -41,7 +41,7 @@
     "mongoose": "^8.0.0",
     "mongoose-geojson-schema": "^2.2.5",
     "mongoose-int32": "^0.6.0",
-    "nanoid": "^5.0.2",
+    "nanoid": "^5.0.3",
     "object-path": "^0.11.8",
     "sanitize-filename": "^1.6.3",
     "sshpk": "^1.18.0",
@@ -50,14 +50,14 @@
     "winston-daily-rotate-file": "^4.7.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.23.2",
-    "@babel/eslint-parser": "^7.22.15",
-    "@babel/preset-env": "^7.23.2",
-    "eslint": "^8.52.0",
+    "@babel/core": "^7.23.3",
+    "@babel/eslint-parser": "^7.23.3",
+    "@babel/preset-env": "^7.23.3",
+    "eslint": "^8.53.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-unused-imports": "^3.0.0",
     "nodemon": "^3.0.1",
-    "prettier": "^3.0.3"
+    "prettier": "^3.1.0"
   }
 }

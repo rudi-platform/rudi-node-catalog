@@ -9,7 +9,7 @@ import objectPath from 'object-path'
 import { inspect } from 'util'
 
 import _ from 'lodash'
-const { floor, pick } = _
+const { pick } = _
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
@@ -128,7 +128,7 @@ export const toISOLocale = (date) => {
 }
 export const nowISO = () => new Date().toISOString()
 export const nowEpochMs = () => new Date().getTime()
-export const nowEpochS = () => floor(nowEpochMs() / 1000)
+export const nowEpochS = () => Math.floor(nowEpochMs() / 1000)
 
 export const dateEpochSToIso = (utcSeconds) => {
   const fun = 'dateEpochSToIso'
@@ -282,7 +282,7 @@ export const beautify = (jsonObject, option) => {
 export const deepClone = (jsonObject) => JSON.parse(JSON.stringify(jsonObject))
 
 export const logWhere = (srcMod, srcFun) =>
-  !srcMod ? srcFun : !srcFun ? srcMod : `${srcMod} . ${srcFun}`
+  srcMod && srcFun ? `${srcMod} . ${srcFun}` : srcMod || srcFun
 
 export const displayStr = (srcMod, srcFun, msg) =>
   `[ ${logWhere(srcMod, srcFun)} ] ${msg !== '' ? msg : '<-'}`
