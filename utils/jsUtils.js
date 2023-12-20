@@ -265,9 +265,11 @@ export const isNothing = (prop) => {
  */
 export const beautify = (jsonObject, option) => {
   try {
-    return `${JSON.stringify(jsonObject, null, option).replace(/\\"/g, '"')}${
-      option != null ? '\n' : ''
-    }`
+    return isString(jsonObject)
+      ? jsonObject
+      : `${JSON.stringify(jsonObject, null, option).replace(/\\"/g, '"')}${
+          option != null ? '\n' : ''
+        }`
   } catch (err) {
     return `${inspect(jsonObject)}`
   }

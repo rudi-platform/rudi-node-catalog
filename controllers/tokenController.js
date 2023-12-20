@@ -4,17 +4,17 @@ const mod = 'jwtCtrl'
 // External dependencies
 // -------------------------------------------------------------------------------------------------
 import {
-    extractJwt,
-    readPublicKeyFile,
-    tokenStringToJwtObject,
-    verifyToken,
+  extractJwt,
+  readPublicKeyFile,
+  tokenStringToJwtObject,
+  verifyToken,
 } from '@aqmo.org/jwt-lib'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 
-import { decodeBase64url } from '../utils/jsUtils.js'
+import { beautify, decodeBase64url } from '../utils/jsUtils.js'
 import { accessProperty } from '../utils/jsonAccess.js'
 
 import { logT } from '../utils/logging.js'
@@ -195,7 +195,9 @@ export const verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
     return { subject, clientId }
   } catch (err) {
     // logW(mod, fun, err)
-    const error = new ForbiddenError(`JWT is not a valid RUDI Producer JWT: ${err.message}`)
+    const error = new ForbiddenError(
+      `JWT is not a valid RUDI Producer JWT: ${beautify(err.message)}`
+    )
     throw RudiError.treatError(mod, fun, error)
   }
 }
