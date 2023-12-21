@@ -25,7 +25,7 @@ import {
 } from '../db/dbFields.js'
 import { getDbObjectListAndCount } from '../db/dbQueries.js'
 import { RudiError } from '../utils/errors.js'
-import { beautify, nowEpochS } from '../utils/jsUtils.js'
+import { beautify, timeEpochS } from '../utils/jsUtils.js'
 import { logD } from '../utils/logging.js'
 import { parseQueryParameters } from '../utils/parseRequest.js'
 // -------------------------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ export const getPortalCachedMetadataList = async (maxCacheTimeS = DEFAULT_CACHE_
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     // Check cache date
-    if ((cachedPortalMetadataList[TIME_LABEL] || 0) + maxCacheTimeS > nowEpochS())
+    if ((cachedPortalMetadataList[TIME_LABEL] || 0) + maxCacheTimeS > timeEpochS())
       // Cache still valid, let's return it
       return cachedPortalMetadataList
 
@@ -75,7 +75,7 @@ export const getPortalCachedMetadataList = async (maxCacheTimeS = DEFAULT_CACHE_
     metadataPackets.forEach((packet) => portalMetadataList.push(...packet.items))
     // 4. Recreate the cache of portal metadata
     cachedPortalMetadataList = {
-      [TIME_LABEL]: nowEpochS(),
+      [TIME_LABEL]: timeEpochS(),
       [COUNT_LABEL]: portalMetadataNb,
       [LIST_LABEL]: portalMetadataList,
     }
@@ -91,13 +91,13 @@ export const getNodeCachedMetadataList = async (maxCacheTimeS = DEFAULT_CACHE_PE
   const fun = 'getNodeCachedMetadataList'
   try {
     // Check cache date
-    if ((cachedNodeMetadataList[TIME_LABEL] || 0) + maxCacheTimeS > nowEpochS())
+    if ((cachedNodeMetadataList[TIME_LABEL] || 0) + maxCacheTimeS > timeEpochS())
       // Cache still valid, let's return it
       return cachedNodeMetadataList
 
     // Cache is too old, we have to retrieve the data
     cachedNodeMetadataList = await getDbObjectListAndCount(OBJ_METADATA)
-    cachedNodeMetadataList[TIME_LABEL] = nowEpochS()
+    cachedNodeMetadataList[TIME_LABEL] = timeEpochS()
 
     return cachedNodeMetadataList
   } catch (err) {

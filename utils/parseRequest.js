@@ -1,12 +1,12 @@
 const mod = 'parseUrl'
-import mongoose from 'mongoose'
 
 // -------------------------------------------------------------------------------------------------
 // External dependencies
 // -------------------------------------------------------------------------------------------------
+import mongoose from 'mongoose'
 
 // -------------------------------------------------------------------------------------------------
-// Constants
+// Imported Constants
 // -------------------------------------------------------------------------------------------------
 import {
   ACT_EXT_SEARCH,
@@ -56,6 +56,20 @@ import {
   DB_UPDATED_AT,
 } from '../db/dbFields.js'
 
+// -------------------------------------------------------------------------------------------------
+// Internal dependencies
+// -------------------------------------------------------------------------------------------------
+import { beautify, isNotEmptyArray } from './jsUtils.js'
+
+import { logD, logT, logW } from './logging.js'
+
+import { BadRequestError, RudiError } from './errors.js'
+
+import { getModelPropertyNames, getNestedObject, getObjectModel } from '../db/dbQueries.js'
+
+// -------------------------------------------------------------------------------------------------
+// Local constants
+// -------------------------------------------------------------------------------------------------
 const QUERY_RESERVED_WORDS = [
   QUERY_CONFIRM,
   QUERY_COUNT_BY,
@@ -85,14 +99,6 @@ const EXT_OBJ_VAL = 'refObjVal'
 
 const DATA_DATES = `${API_DATA_DATES_PROPERTY}.`
 const META_DATES = `${API_METAINFO_PROPERTY}.${API_METAINFO_DATES}.`
-
-// -------------------------------------------------------------------------------------------------
-// Internal dependencies
-// -------------------------------------------------------------------------------------------------
-import { getModelPropertyNames, getNestedObject, getObjectModel } from '../db/dbQueries.js'
-import { BadRequestError, RudiError } from './errors.js'
-import { beautify, isNotEmptyArray } from './jsUtils.js'
-import { logD, logT, logW } from './logging.js'
 
 // -------------------------------------------------------------------------------------------------
 // Functions

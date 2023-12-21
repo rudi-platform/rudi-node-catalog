@@ -8,7 +8,7 @@ import { ROUTE_NAME, STATUS_CODE } from '../config/constApi.js'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { beautify, nowEpochMs, padA1, separateLogs } from '../utils/jsUtils.js'
+import { beautify, timeEpochMs, padA1, separateLogs } from '../utils/jsUtils.js'
 
 import { shouldControlPrivateRequests, shouldControlPublicRequests } from '../config/confSystem.js'
 
@@ -171,7 +171,7 @@ fastifyConf.addHook('onRequest', (req, res, next) => {
     const context = new CallContext()
     logV(mod, fun, `----- Rcv req #${context.id} -----vvv---`)
     // logV(mod, fun, req.url)
-    const now = nowEpochMs()
+    const now = timeEpochMs()
     context.setIpsFromRequest(req)
     context.timestamp = now
     try {
@@ -200,7 +200,7 @@ fastifyConf.addHook('onSend', (request, reply, payload, next) => {
   const fun = 'onSend'
   try {
     // logT(mod, fun, ``)
-    const now = nowEpochMs()
+    const now = timeEpochMs()
     const context = CallContext.getCallContextFromReq(request)
     if (context) {
       context.duration = now - context.timestamp

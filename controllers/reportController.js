@@ -8,30 +8,9 @@ const mod = 'repCtrl'
 // -------------------------------------------------------------------------------------------------
 // External dependencies
 // -------------------------------------------------------------------------------------------------
+import { v4 as uuidv4 } from 'uuid'
 
-// -------------------------------------------------------------------------------------------------
-// Internal dependencies
-// -------------------------------------------------------------------------------------------------
-import {
-  deleteAllDbObjectsWithType,
-  deleteManyDbObjectsWithFilter,
-  doesObjectExistWithRudiId,
-  getDbObjectList,
-  getEnsuredObjectWithRudiId,
-  getObjectWithRudiId,
-  overwriteDbObject,
-} from '../db/dbQueries.js'
-import {
-  BadRequestError,
-  MethodNotAllowedError,
-  ObjectNotFoundError,
-  ParameterExpectedError,
-  RudiError,
-} from '../utils/errors.js'
-import { beautify, isEmptyObject, nowISO, padZerosLeft as pad0 } from '../utils/jsUtils.js'
-import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
-import { logD, logI, logMetadata, logT, logW } from '../utils/logging.js'
-import { objectAlreadyExists, parametersMismatch } from '../utils/msg.js'
+import mongoose from 'mongoose'
 
 // -------------------------------------------------------------------------------------------------
 // Constants
@@ -60,7 +39,12 @@ import {
 } from '../config/constApi.js'
 import {
   API_COLLECTION_TAG,
+  API_DATA_NAME_PROPERTY,
+  API_METADATA_ID,
+  API_REPORT_COMMENT,
   API_REPORT_ERRORS,
+  API_REPORT_ERROR_CODE,
+  API_REPORT_ERROR_MSG,
   API_REPORT_ID,
   API_REPORT_METHOD,
   API_REPORT_RESOURCE_ID,
@@ -74,13 +58,42 @@ import {
   LOCAL_REPORT_ERROR_MSG,
   LOCAL_REPORT_ERROR_TYPE,
 } from '../db/dbFields.js'
+
+// -------------------------------------------------------------------------------------------------
+// Internal dependencies
+// -------------------------------------------------------------------------------------------------
+import { beautify, isEmptyObject, nowISO, padZerosLeft as pad0 } from '../utils/jsUtils.js'
+
+import {
+  BadRequestError,
+  InternalServerError,
+  MethodNotAllowedError,
+  ObjectNotFoundError,
+  ParameterExpectedError,
+  RudiError,
+} from '../utils/errors.js'
+import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
+
+import { cleanDate } from '../utils/parseRequest.js'
+
+import {
+  deleteAllDbObjectsWithType,
+  deleteManyDbObjectsWithFilter,
+  doesObjectExistWithRudiId,
+  getDbObjectList,
+  getEnsuredObjectWithRudiId,
+  getObjectWithRudiId,
+  overwriteDbObject,
+} from '../db/dbQueries.js'
+
+import { logD, logI, logMetadata, logT, logW } from '../utils/logging.js'
+import { objectAlreadyExists, parametersMismatch } from '../utils/msg.js'
+
 // -------------------------------------------------------------------------------------------------
 // Data models
 // -------------------------------------------------------------------------------------------------
 import { IntegrationStatus, Report } from '../definitions/models/Report.js'
 
-import mongoose from 'mongoose'
-import { cleanDate } from '../utils/parseRequest.js'
 import { setFlagIntegrationKO } from './metadataController.js'
 import { removeMetadataFromWaitingList } from './portalController.js'
 
@@ -240,31 +253,7 @@ export const addOrEditSingleReport = async (objectType, req, reply) => {
       }
     }
 
-    // check if the report exists
-    const dbReport = await getObjectWithRudiId(OBJ_REPORTS, reportId)
-
-    let dbReadyReport
-    if (!dbReport) {
-      // adding new report
-      // logD(mod, fun, `Adding new report`)
-      // add new integration report
-      try {
-        dbReadyReport = new Report(reportBody)
-        await dbReadyReport.save()
-        logI(mod, fun, `Report created: ${beautify(dbReadyReport)}`)
-      } catch (er) {
-        const errMsg = `Couldn't create a new report with incoming data: ${beautify(
-          reportBody
-        )}. Cause: ${er}`
-        logW(mod, fun, errMsg)
-        throw new BadRequestError(errMsg)
-      }
-    } else {
-      // updating existing report
-      logD(mod, fun, `Updating existing report`)
-      dbReadyReport = await overwriteDbObject(OBJ_REPORTS, reportBody)
-      logI(mod, fun, `Report edited: ${beautify(dbReadyReport)}`)
-    }
+    const dbReadyReport = putReport(reportBody)
 
     if (dbObject) {
       if (reportBody[API_REPORT_STATUS] === IntegrationStatus.OK) {
@@ -465,6 +454,69 @@ export const getReportListForObjectType = async (req, reply) => {
   try {
     // delete every integration report for all objects
     return `Function '${fun}' still needs to be implemented in module ${mod}`
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+/**
+ * Creates an internal report, e.g. for errors happening during a transmission to the portal
+ * @param {MetadataSchema} metadata
+ * @param {HTTP_METHODS} httpMethod
+ */
+export const createErrorReport = async (err, actionStep, actionDescription, req, metadata) => {
+  const fun = 'createErrorReport'
+  if (!req) throw new InternalServerError('Input request should not be null', mod, fun)
+  try {
+    const body = {
+      [API_REPORT_ID]: uuidv4(),
+      [API_REPORT_RESOURCE_ID]: metadata?.[API_METADATA_ID],
+      [API_DATA_NAME_PROPERTY]: metadata?.[API_DATA_NAME_PROPERTY] || actionDescription,
+      [API_REPORT_SUBMISSION_DATE]: nowISO(),
+      [API_REPORT_METHOD]: req?.method?.toUpperCase(),
+      [API_REPORT_VERSION]: API_VERSION,
+      [API_REPORT_STATUS]: IntegrationStatus.KO,
+      [API_REPORT_COMMENT]: `While ${actionStep}`,
+      [API_REPORT_ERRORS]: {
+        [API_REPORT_ERROR_CODE]: err?.statusCode || 500,
+        [API_REPORT_ERROR_MSG]: `${actionDescription}: ${err.message || err}`,
+      },
+    }
+    await putReport(body)
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+export const putReport = async (reportBody) => {
+  const fun = 'putReport'
+  try {
+    // check if the report exists
+    const dbReport = await getObjectWithRudiId(OBJ_REPORTS, reportBody[API_REPORT_ID])
+
+    let dbReadyReport
+    if (!dbReport) {
+      // adding new report
+      // logD(mod, fun, `Adding new report`)
+      // add new integration report
+      try {
+        dbReadyReport = new Report(reportBody)
+        await dbReadyReport.save()
+        logI(mod, fun, `Report created: ${beautify(dbReadyReport)}`)
+      } catch (er) {
+        const errMsg = `Couldn't create a new report with incoming data: ${beautify(
+          reportBody
+        )}. Cause: ${er}`
+        logW(mod, fun, errMsg)
+        throw new BadRequestError(errMsg, mod, fun)
+      }
+    } else {
+      // updating existing report
+      logD(mod, fun, `Updating existing report`)
+      dbReadyReport = await overwriteDbObject(OBJ_REPORTS, reportBody)
+      logI(mod, fun, `Report edited: ${beautify(dbReadyReport)}`)
+    }
+    return dbReadyReport
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
