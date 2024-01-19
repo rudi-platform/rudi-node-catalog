@@ -13,7 +13,8 @@
     "devstart": "nodemon ./rudiServer.js --conf=./0-ini/conf_custom.ini",
     "tracestart": "nodemon --inspect ./rudiServer.js --conf=./0-ini/conf_custom.ini",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint \"**/*.js\""
+    "lint": "prettier -c \"**/*.js\"; eslint \"**/*.js\"",
+    "prettify": "prettier  -w \"**/*.js\""
   },
   "nodemonConfig": {
     "execMap": {
@@ -33,12 +34,12 @@
   "dependencies": {
     "@aqmo.org/jwt-lib": "^1.1.11",
     "@aqmo.org/rudi_logger": "^1.1.5",
-    "axios": "^1.6.2",
-    "date-and-time": "^3.0.3",
-    "fastify": "^4.25.1",
+    "axios": "^1.6.5",
+    "date-and-time": "^3.1.1",
+    "fastify": "^4.25.2",
     "ini": "^4.1.1",
     "lodash": "^4.17.21",
-    "mongoose": "^8.0.3",
+    "mongoose": "^8.1.0",
     "mongoose-geojson-schema": "^2.2.5",
     "mongoose-int32": "^0.6.0",
     "nanoid": "^5.0.4",
@@ -50,14 +51,14 @@
     "winston-daily-rotate-file": "^4.7.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.23.6",
+    "@babel/core": "^7.23.7",
     "@babel/eslint-parser": "^7.23.3",
-    "@babel/preset-env": "^7.23.6",
+    "@babel/preset-env": "^7.23.8",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
     "eslint-plugin-unused-imports": "^3.0.0",
-    "nodemon": "^3.0.2",
-    "prettier": "^3.1.1"
+    "nodemon": "^3.0.3",
+    "prettier": "^3.2.4"
   }
 }

@@ -1,10 +1,36 @@
+# --------------------------------------------------------------------------------------------------
+# Notes:
+# - jobs are executed in the order indicated at root "stages" property
+# - "needs" property needs an array of job names (not stages names)
+# - linter needs install:dev as eslint and prettier are dev dependencies
+# --------------------------------------------------------------------------------------------------
+
 stages:
+  - quality
   - install
 
 #---------------------------------------------------------------------------------------------------
-# BACK: INSTALL
+# QUALITY (LINTER)
 #---------------------------------------------------------------------------------------------------
-install_back:
+quality:dev:
+  stage: quality
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+      when: always
+    - if: '$CI_PIPELINE_SOURCE != "push"'
+      when: manual
+  tags:
+    - nodejs-20
+  variables:
+    NODE_ENV: development
+  script:
+    - npm i
+    - npm run lint
+
+#---------------------------------------------------------------------------------------------------
+# INSTALL
+#---------------------------------------------------------------------------------------------------
+install:prod:
   stage: install
   rules:
     - if: $CI_COMMIT_BRANCH == "release"
@@ -13,10 +39,6 @@ install_back:
       when: manual
   tags:
     - nodejs-20
-  cache:
-    - key:
-        files: [ ./package-lock.json ]
-      paths:   [ ./node_modules/ ]
   variables:
     NODE_ENV: production
   script:

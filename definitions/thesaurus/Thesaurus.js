@@ -182,9 +182,7 @@ export class Thesaurus {
           const keys = Object.keys(newThesaurusValue)
           if (keys.length !== 1) {
             throw new BadRequestError(
-              `Adding a value to '${
-                this.#code
-              }' should be done with an object {thesaurusValue: {lang1: label1, lang2: label2}}`,
+              `Adding a value to '${this.#code}' should be done with an object {thesaurusValue: {lang1: label1, lang2: label2}}`,
               mod,
               fun
             )

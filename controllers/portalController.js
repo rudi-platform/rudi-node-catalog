@@ -1,5 +1,3 @@
-/* eslint-disable quote-props */
-
 const mod = 'portalCtrl'
 
 // -------------------------------------------------------------------------------------------------
@@ -8,6 +6,9 @@ const mod = 'portalCtrl'
 import { extractJwt, readPublicKeyPem, verifyToken } from '@aqmo.org/jwt-lib'
 import axios from 'axios'
 import https from 'node:https'
+
+import _ from 'lodash'
+const { pick } = _
 
 // -------------------------------------------------------------------------------------------------
 // Constants
@@ -21,6 +22,7 @@ import {
 } from '../config/constApi.js'
 import {
   API_COLLECTION_TAG,
+  API_DATA_NAME_PROPERTY,
   API_FILE_STATUS_UPDATE,
   API_FILE_STORAGE_STATUS,
   API_INTEGRATION_ERROR_ID,
