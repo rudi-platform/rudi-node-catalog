@@ -17,7 +17,7 @@ import axios from 'axios'
 // -------------------------------------------------------------------------------------------------
 import { USER_AGENT } from '../config/constApi.js'
 // import { ENV_LOCAL } from '../config/appOptions.js'
-import { beautify } from './jsUtils.js'
+import { beautify, isNotEmptyArray } from './jsUtils.js'
 // import { getEnvironment } from '../controllers/sysController.js'
 import { BadRequestError, RudiError } from './errors.js'
 import { logD, logT } from './logging.js'
@@ -196,3 +196,31 @@ export const directPut = async (destUrl, dataToSend, reqOpts) => {
     throw RudiError.treatCommunicationError(mod, fun, err)
   }
 }
+
+// -------------------------------------------------------------------------------------------------
+// IP Redirections display
+// -------------------------------------------------------------------------------------------------
+
+export const extractIpRedirections = (req) => {
+  const headers = req.headers
+  const redirections = headers['x-forwarded-for'] || headers['X-Forwarded-For']
+  if (!redirections) return
+  if (Array.isArray(redirections)) return redirections
+  if (typeof redirections === 'string') return redirections.split(',')
+  logD(mod, 'extractIpRedirections', `redirections: ${beautify(redirections)}`)
+}
+
+export const extractIpAndRedirections = (req) => {
+  const ip = req.ip
+  const redirections = extractIpRedirections(req)
+  return redirections && isNotEmptyArray(redirections) ? [ip, ...redirections] : [ip]
+}
+
+export const createIpRedirectionsMsg = (req) => {
+  const headers = req?.headers
+  if (!headers) return ''
+  const redirections = extractIpRedirections(req)
+  return redirections && isNotEmptyArray(redirections) ? ` <- ${redirections.join(' <- ')} ` : ''
+}
+
+export const createIpsMsg = (req) => `${req?.ip}${createIpRedirectionsMsg(req)}`

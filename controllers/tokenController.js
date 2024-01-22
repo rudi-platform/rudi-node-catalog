@@ -31,6 +31,7 @@ const REQ_ROUTE_ALL = 'all'
 
 import { ROUTE_NAME } from '../config/constApi.js'
 import { JWT_CLIENT, JWT_SUB, REQ_MTD, REQ_URL } from '../config/constJwt.js'
+import { createIpsMsg } from '../utils/httpReq.js'
 // -------------------------------------------------------------------------------------------------
 // Controllers
 // -------------------------------------------------------------------------------------------------
@@ -112,7 +113,9 @@ export const checkRudiProdPermission = async (req, isCheckOptional) => {
       if (isCheckOptional) throw err
       const msgStr = `${err.message}`
       const msg = msgStr.endsWith('.') ? msgStr.slice(0, -1) : msgStr
-      const error = new UnauthorizedError(`${msg} when requesting ${req.url}`)
+      const error = new UnauthorizedError(
+        `${msg} when requesting ${req.url} from IP ${createIpsMsg(req)}`
+      )
       throw RudiError.treatError(mod, fun, error)
     }
     // logD(mod, fun, `token: ${token}`)

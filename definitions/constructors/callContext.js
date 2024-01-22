@@ -9,7 +9,7 @@ import { nanoid } from 'nanoid'
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { RudiError } from '../../utils/errors.js'
-import { beautify, dateEpochMsToIso, isNotEmptyArray } from '../../utils/jsUtils.js'
+import { beautify, dateEpochMsToIso } from '../../utils/jsUtils.js'
 import { logD, logI, logT, logV, logW, sysInfo, sysOnError } from '../../utils/logging.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -25,6 +25,7 @@ import {
   TRACE_FUN,
   TRACE_MOD,
 } from '../../config/constApi.js'
+import { createIpsMsg } from '../../utils/httpReq.js'
 import { protectHeaderAuth, protectHeaderMethod, protectHeaderUrl } from '../../utils/protection.js'
 // -------------------------------------------------------------------------------------------------
 // Internal constants
@@ -405,31 +406,6 @@ export const CallContext = class CallContext {
   // -------------------------------------------------------------------------------------------------
   // IP Redirections display
   // -------------------------------------------------------------------------------------------------
-
-  static extractIpRedirections(req) {
-    const headers = req.headers
-    const redirections = headers['x-forwarded-for'] || headers['X-Forwarded-For']
-    if (!redirections) return
-    if (Array.isArray(redirections)) return redirections
-    if (typeof redirections === 'string') return redirections.split(',')
-    logD(mod, 'extractIpRedirections', `redirections: ${beautify(redirections)}`)
-  }
-
-  static extractIpAndRedirections(req) {
-    const ip = req.ip
-    const redirections = CallContext.extractIpRedirections(req)
-    return redirections && isNotEmptyArray(redirections) ? [ip, ...redirections] : [ip]
-  }
-
-  static createIpRedirectionsMsg(req) {
-    const headers = req.headers
-    if (!headers) return ''
-    const redirections = CallContext.extractIpRedirections(req)
-    return redirections && isNotEmptyArray(redirections) ? ` <- ${redirections.join(' <- ')} ` : ''
-  }
-
-  static createIpsMsg = (req) => `${req.ip}${CallContext.createIpRedirectionsMsg(req)}`
-
   static createApiCallMsg(req) {
     const fun = 'createApiCallMsg'
     try {
@@ -439,7 +415,7 @@ export const CallContext = class CallContext {
         if (ACTIVATE_LOG) logT(mod, fun, 'No context set yet')
         return (
           `${req.method} ${req.url} (${req.routeOptions.config[ROUTE_NAME]})` +
-          ` <- ${CallContext.createIpsMsg(req)}`
+          ` <- ${createIpsMsg(req)}`
         )
       } else {
         if (ACTIVATE_LOG) logT(mod, fun, 'A context was found')
