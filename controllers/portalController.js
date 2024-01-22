@@ -635,7 +635,7 @@ export const sendMetadataToPortal = async (metadataId) => {
       reportRequestDetails = { method: HTTP_METHODS.GET, url: getPortalMetaUrl(metadataId) }
       logD(mod, fun, reportActionStep)
 
-      portalAnswer = await httpGet(getPortalMetaUrl(metadataId), portalToken)
+      portalAnswer = await axios.get(getPortalMetaUrl(metadataId), portalToken)
     } catch (err) {
       // logV(mod, fun, err)
       reportActionStep = `sending a metadata that is not on the portal: '${metadataId}'`
@@ -648,6 +648,7 @@ export const sendMetadataToPortal = async (metadataId) => {
       return postAnswer
     }
     const portalMetadata = portalAnswer.data
+    logW(mod, fun, `Portal's answer to get: ${portalMetadata}`)
 
     if (getUpdatedDate(portalMetadata) < getUpdatedDate(metadataClean)) {
       reportActionStep = `updating a metadata that is on the portal and older: '${metadataId}'`
