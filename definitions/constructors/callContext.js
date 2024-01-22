@@ -25,7 +25,7 @@ import {
   TRACE_FUN,
   TRACE_MOD,
 } from '../../config/constApi.js'
-import { createIpsMsg, extractIpAndRedirections } from '../../utils/httpReq.js'
+import { extractIpAndRedirections } from '../../utils/httpReq.js'
 import { protectHeaderAuth, protectHeaderMethod, protectHeaderUrl } from '../../utils/protection.js'
 // -------------------------------------------------------------------------------------------------
 // Internal constants
@@ -413,10 +413,7 @@ export const CallContext = class CallContext {
       const context = CallContext.getCallContextFromReq(req)
       if (!context) {
         if (ACTIVATE_LOG) logT(mod, fun, 'No context set yet')
-        return (
-          `${req.method} ${req.url} (${req.routeOptions.config[ROUTE_NAME]})` +
-          ` <- ${createIpsMsg(req)}`
-        )
+        return `${req.method} ${req.url} (${req.routeOptions.config[ROUTE_NAME]})`
       } else {
         if (ACTIVATE_LOG) logT(mod, fun, 'A context was found')
         return context.apiCallMsg
