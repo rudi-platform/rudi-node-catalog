@@ -383,8 +383,6 @@ export const deleteReportsBefore = async (req, reply) => {
   try {
     logT(mod, fun, ``)
     const queryParams = req.query
-    // logT(mod, fun + '.queryParams', beautify(queryParams))
-    // if (isEmptyObject(queryParams)) return { status: 'OK', message: 'No request parameter found' }
     if (isEmptyObject(queryParams)) return await deleteAllDbObjectsWithType(OBJ_REPORTS)
 
     // logT(mod, fun, `reqParams: ${beautify(queryParams)}`)
@@ -477,10 +475,13 @@ export const createErrorReport = async (
 ) => {
   const fun = 'createErrorReport'
   if (!req) throw new InternalServerError('Input request should not be null', mod, fun)
+
+  const metaId = metadata?.[API_METADATA_ID]
+  const reportId = uuidv4()
   try {
     const body = {
-      [API_REPORT_ID]: uuidv4(),
-      [API_REPORT_RESOURCE_ID]: metadata?.[API_METADATA_ID],
+      [API_REPORT_ID]: reportId,
+      [API_REPORT_RESOURCE_ID]: metaId,
       [API_DATA_NAME_PROPERTY]: metadata?.[API_DATA_NAME_PROPERTY] || actionDescription,
       [API_REPORT_SUBMISSION_DATE]: nowISO(),
       [API_REPORT_METHOD]: req?.method?.toUpperCase(),
@@ -494,9 +495,13 @@ export const createErrorReport = async (
     }
     await putReport(body)
 
-    if (shouldUpdateMetadataStatus && metadata?.[API_METADATA_ID]) {
-      const dbMeta = await getMetadataWithRudiId(API_METADATA_ID)
-      dbMeta[API_INTEGRATION_ERROR_ID] = body[API_REPORT_ID]
+    if (shouldUpdateMetadataStatus && metaId) {
+      const dbMeta = await getMetadataWithRudiId(metaId)
+      if (!dbMeta) {
+        logW(mod, fun, `Metadata was not found with id ${metaId}`)
+        return
+      }
+      dbMeta[API_INTEGRATION_ERROR_ID] = reportId
       updateMetadataStatus(dbMeta)
       await dbMeta.save()
     }
