@@ -8,7 +8,7 @@ import { ROUTE_NAME, STATUS_CODE } from '../config/constApi.js'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { beautify, timeEpochMs, padA1, separateLogs } from '../utils/jsUtils.js'
+import { beautify, padA1, separateLogs, timeEpochMs } from '../utils/jsUtils.js'
 
 import { shouldControlPrivateRequests, shouldControlPublicRequests } from '../config/confSystem.js'
 
@@ -51,6 +51,7 @@ import { getUrlMaxLength } from '../utils/protection.js'
 // -------------------------------------------------------------------------------------------------
 // Require the fastify framework and instantiate it
 import fastify from 'fastify'
+import { createIpsMsg } from '../utils/httpReq.js'
 
 // const fastifyLogger = new FFLogger('warn')
 export const fastifyConf = fastify({
@@ -169,7 +170,7 @@ fastifyConf.addHook('onRequest', (req, res, next) => {
   const fun = 'onRequest'
   try {
     const context = new CallContext()
-    logV(mod, fun, `----- Rcv req #${context.id} -----vvv---`)
+    logV(mod, fun, `----- Rcv req #${context.id} from ${createIpsMsg(req)} -----vvv---`)
     // logV(mod, fun, req.url)
     const now = timeEpochMs()
     context.setIpsFromRequest(req)

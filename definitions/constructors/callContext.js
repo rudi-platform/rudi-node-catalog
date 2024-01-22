@@ -25,7 +25,7 @@ import {
   TRACE_FUN,
   TRACE_MOD,
 } from '../../config/constApi.js'
-import { createIpsMsg } from '../../utils/httpReq.js'
+import { createIpsMsg, extractIpAndRedirections } from '../../utils/httpReq.js'
 import { protectHeaderAuth, protectHeaderMethod, protectHeaderUrl } from '../../utils/protection.js'
 // -------------------------------------------------------------------------------------------------
 // Internal constants
@@ -122,7 +122,7 @@ export const CallContext = class CallContext {
 
   setIpsFromRequest(req) {
     if (ACTIVATE_LOG) logT(mod, 'setIpsFromRequest', ``)
-    this.ips = CallContext.extractIpAndRedirections(req)
+    this.ips = extractIpAndRedirections(req)
   }
 
   set clientApp(clientApp) {
