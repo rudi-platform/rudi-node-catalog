@@ -133,6 +133,14 @@ export const setPublishedDate = (metadata, datePublished) => {
   } else throw new Error(`Not found: '${API_DATES_PUBLISHED}`)
 }
 
+export const delPublishedDate = (metadata) => {
+  if (metadata?.[DB_PUBLISHED_AT]) delete metadata[DB_PUBLISHED_AT]
+  if (metadata?.[API_METAINFO_PROPERTY]?.[API_METAINFO_DATES]?.[API_DATES_PUBLISHED]) {
+    delete metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES][API_DATES_PUBLISHED]
+  }
+  return metadata
+}
+
 // -------------------------------------------------------------------------------------------------
 // Specific fields
 // -------------------------------------------------------------------------------------------------

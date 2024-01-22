@@ -36,6 +36,7 @@ import {
   API_STATUS_PROPERTY,
   API_STORAGE_STATUS,
   DB_UPDATED_AT,
+  delPublishedDate,
   getUpdatedDate,
 } from '../db/dbFields.js'
 
@@ -532,6 +533,9 @@ const isMetadataSendableToPortal = async (metadataId) => {
       return false
     }
 
+    //--- Removing the publication date as we're about to send it again
+    delPublishedDate(metadata)
+
     //--- Purging the waiting room / buffer of metadatas waiting for an integration report
     try {
       for (let i = metadatasWaitingForPortalFeedback.length - 1; i >= 0; i--)
@@ -647,8 +651,8 @@ export const sendMetadataToPortal = async (metadataId) => {
       // console.log('T (sendMetadataToPortal.post) waiting room', metadatasWaitingForPortalFeedback)
       return postAnswer
     }
-    const portalMetadata = portalAnswer.data
-    logW(mod, fun, `Portal's answer to get: ${portalMetadata}`)
+    const portalMetadata = portalAnswer?.data
+    // logW(mod, fun, `Portal's answer to get: ${portalMetadata}`)
 
     if (getUpdatedDate(portalMetadata) < getUpdatedDate(metadataClean)) {
       reportActionStep = `updating a metadata that is on the portal and older: '${metadataId}'`
