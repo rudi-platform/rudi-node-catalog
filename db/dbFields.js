@@ -135,6 +135,12 @@ export const setPublishedDate = (metadata, datePublished) => {
 
 export const delPublishedDate = (metadata) => {
   if (metadata?.[DB_PUBLISHED_AT]) delete metadata[DB_PUBLISHED_AT]
+<<<<<<< HEAD
+=======
+  if (metadata?.[API_METAINFO_PROPERTY]?.[API_METAINFO_DATES]?.[API_DATES_PUBLISHED]) {
+    delete metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES][API_DATES_PUBLISHED]
+  }
+>>>>>>> 253d308c36a11716a01c179cfe013b3eae663e66
   return metadata
 }
 
