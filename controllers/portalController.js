@@ -35,8 +35,8 @@ import {
   API_RESTRICTED_ACCESS,
   API_STATUS_PROPERTY,
   API_STORAGE_STATUS,
+  DB_PUBLISHED_AT,
   DB_UPDATED_AT,
-  delPublishedDate,
   getUpdatedDate,
 } from '../db/dbFields.js'
 
@@ -534,7 +534,7 @@ const isMetadataSendableToPortal = async (metadataId) => {
     }
 
     //--- Removing the publication date as we're about to send it again
-    delPublishedDate(metadata)
+    delete metadata[DB_PUBLISHED_AT]
     metadata.save()
 
     //--- Purging the waiting room / buffer of metadatas waiting for an integration report
