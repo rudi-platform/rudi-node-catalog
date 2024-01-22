@@ -40,6 +40,7 @@ import {
 import {
   API_COLLECTION_TAG,
   API_DATA_NAME_PROPERTY,
+  API_INTEGRATION_ERROR_ID,
   API_METADATA_ID,
   API_REPORT_COMMENT,
   API_REPORT_ERRORS,
@@ -82,6 +83,7 @@ import {
   doesObjectExistWithRudiId,
   getDbObjectList,
   getEnsuredObjectWithRudiId,
+  getMetadataWithRudiId,
   getObjectWithRudiId,
   overwriteDbObject,
 } from '../db/dbQueries.js'
@@ -94,6 +96,7 @@ import { objectAlreadyExists, parametersMismatch } from '../utils/msg.js'
 // -------------------------------------------------------------------------------------------------
 import { IntegrationStatus, Report } from '../definitions/models/Report.js'
 
+import { updateMetadataStatus } from '../definitions/models/Metadata.js'
 import { setFlagIntegrationKO } from './metadataController.js'
 import { removeMetadataFromWaitingList } from './portalController.js'
 
@@ -464,7 +467,14 @@ export const getReportListForObjectType = async (req, reply) => {
  * @param {MetadataSchema} metadata
  * @param {HTTP_METHODS} httpMethod
  */
-export const createErrorReport = async (err, actionStep, actionDescription, req, metadata) => {
+export const createErrorReport = async (
+  err,
+  actionStep,
+  actionDescription,
+  req,
+  metadata,
+  shouldUpdateMetadataStatus
+) => {
   const fun = 'createErrorReport'
   if (!req) throw new InternalServerError('Input request should not be null', mod, fun)
   try {
@@ -483,6 +493,13 @@ export const createErrorReport = async (err, actionStep, actionDescription, req,
       },
     }
     await putReport(body)
+
+    if (shouldUpdateMetadataStatus && metadata?.[API_METADATA_ID]) {
+      const dbMeta = await getMetadataWithRudiId(API_METADATA_ID)
+      dbMeta[API_INTEGRATION_ERROR_ID] = body[API_REPORT_ID]
+      updateMetadataStatus(dbMeta)
+      await dbMeta.save()
+    }
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }

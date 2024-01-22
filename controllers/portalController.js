@@ -628,20 +628,14 @@ export const sendMetadataToPortal = async (metadataId) => {
 
     reportActionStep = 'retrieving Portal token'
     const portalToken = await getPortalToken()
-    const reqOpts = {
-      headers: {
-        'User-Agent': USER_AGENT,
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${portalToken}`,
-      },
-    }
+
     let portalAnswer
     try {
       reportActionStep = 'checking if the metadata is on the portal'
       reportRequestDetails = { method: HTTP_METHODS.GET, url: getPortalMetaUrl(metadataId) }
       logD(mod, fun, reportActionStep)
 
-      portalAnswer = await axios.get(getPortalMetaUrl(metadataId), reqOpts)
+      portalAnswer = await httpGet(getPortalMetaUrl(metadataId), portalToken)
     } catch (err) {
       // logV(mod, fun, err)
       reportActionStep = `sending a metadata that is not on the portal: '${metadataId}'`
@@ -675,7 +669,8 @@ export const sendMetadataToPortal = async (metadataId) => {
       reportActionStep,
       'An error occurred while sending the metadata to the Portal',
       reportRequestDetails,
-      reportMetadataInfo
+      reportMetadataInfo,
+      'update metadata status'
     )
     throw RudiError.treatError(mod, fun, err)
   }

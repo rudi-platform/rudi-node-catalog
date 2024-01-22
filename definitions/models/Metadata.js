@@ -761,7 +761,7 @@ const reckonMetadataStatus = (metadata) => {
   }
 }
 
-const updateMetadataStatus = (metadata) => {
+export const updateMetadataStatus = (metadata) => {
   metadata[API_STATUS_PROPERTY] = reckonMetadataStatus(metadata)
 }
 
