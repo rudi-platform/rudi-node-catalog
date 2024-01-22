@@ -110,7 +110,9 @@ export const checkRudiProdPermission = async (req, isCheckOptional) => {
     } catch (err) {
       // logE(mod, fun, `err: ${err}`)
       if (isCheckOptional) throw err
-      const error = new UnauthorizedError(`${err.message} when requesting ${req.url}`)
+      const msgStr = `${err.message}`
+      const msg = msgStr.endsWith('.') ? msgStr.slice(0, -1) : msgStr
+      const error = new UnauthorizedError(`${msg} when requesting ${req.url}`)
       throw RudiError.treatError(mod, fun, error)
     }
     // logD(mod, fun, `token: ${token}`)
