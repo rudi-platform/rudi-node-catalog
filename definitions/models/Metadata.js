@@ -748,11 +748,11 @@ const reckonMetadataStatus = (metadata) => {
   const fun = 'reckonMetadataStatus'
   logT(mod, fun)
   try {
-    if (metadata[API_STORAGE_STATUS] === StorageStatus.Pending) return MetadataStatus.Incomplete
-    if (metadata[API_INTEGRATION_ERROR_ID]) return MetadataStatus.Refused
     if (metadata[API_METAINFO_PROPERTY]?.[API_METAINFO_DATES]?.[API_DATES_DELETED])
       return MetadataStatus.Deleted
+    if (metadata[API_STORAGE_STATUS] === StorageStatus.Pending) return MetadataStatus.Incomplete
     if (metadata[API_COLLECTION_TAG] || isPortalConnectionDisabled()) return MetadataStatus.Local
+    if (metadata[API_INTEGRATION_ERROR_ID]) return MetadataStatus.Refused
     if (metadata[DB_PUBLISHED_AT]) return MetadataStatus.Published
     if (!isPortalConnectionDisabled()) return MetadataStatus.Sent
     return MetadataStatus.Unset
