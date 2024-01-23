@@ -35,9 +35,7 @@ import {
   API_RESTRICTED_ACCESS,
   API_STATUS_PROPERTY,
   API_STORAGE_STATUS,
-  DB_PUBLISHED_AT,
   DB_UPDATED_AT,
-  MetadataStatus,
   getUpdatedDate,
 } from '../db/dbFields.js'
 
@@ -82,7 +80,7 @@ import {
   storePortalToken,
 } from '../db/dbQueries.js'
 
-import { isEveryMediaAvailable } from '../definitions/models/Metadata.js'
+import { isEveryMediaAvailable, setMetadataStatusToSent } from '../definitions/models/Metadata.js'
 import {
   BadRequestError,
   ForbiddenError,
@@ -535,9 +533,7 @@ const isMetadataSendableToPortal = async (metadataId) => {
     }
 
     //--- Removing the publication date as we're about to send it again
-    delete metadata[DB_PUBLISHED_AT]
-    metadata[API_STATUS_PROPERTY] = MetadataStatus.Sent
-    metadata.save()
+    setMetadataStatusToSent(metadata)
 
     //--- Purging the waiting room / buffer of metadatas waiting for an integration report
     try {
@@ -548,7 +544,7 @@ const isMetadataSendableToPortal = async (metadataId) => {
         )
           metadatasWaitingForPortalFeedback.splice(i, 1)
     } catch (e) {
-      logE(mod, fun + '.purgeWaitBuffer', e)
+      logE(mod, `${fun}.purgeWaitBuffer`, e)
     }
 
     //--- Check if the metadata has already been sent to portal
@@ -613,71 +609,63 @@ export const cleanMetadataForPortal = (metadata) => {
 const PORTAL_POST_URL = postPortalMetaUrl()
 export const sendMetadataToPortal = async (metadataId) => {
   const fun = 'sendMetadataToPortal'
-  let reportRequestDetails, reportMetadataInfo
-  let reportActionStep = 'initializing'
+  const report = { actionStep: 'initializing' }
+
   try {
     logT(mod, fun, ``)
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
 
     const sendableData = await isMetadataSendableToPortal(metadataId)
     if (!sendableData) return
-    // console.log(`T (sendMetadataToPortal) sendableData`, sendableData)
     const { metadata, waitIndex } = sendableData
     const waitingMetadata = metadatasWaitingForPortalFeedback[waitIndex]
-    // console.log(`T (sendMetadataToPortal) waitingMetadata [${waitIndex}]`, waitingMetadata)
     //--- Ensuring compatibility with portal
     const metadataClean = cleanMetadataForPortal(metadata)
 
-    // console.debug('T (sendMetadataToPortal) metadata', metadataClean[API_MEDIA_PROPERTY][0])
     //--- Sending to portal
     logV(mod, fun, `Initiating the metadata sending to portal: ${beautify(metadataClean)}`)
-    reportMetadataInfo = pick(metadataClean, [API_METADATA_ID, API_DATA_NAME_PROPERTY])
 
-    reportActionStep = 'retrieving Portal token'
+    report.metadataInfo = pick(metadataClean, [API_METADATA_ID, API_DATA_NAME_PROPERTY])
+    report.actionStep = 'retrieving Portal token'
+
     const portalToken = await getPortalToken()
 
     let portalAnswer
     try {
-      reportActionStep = 'checking if the metadata is on the portal'
-      reportRequestDetails = { method: HTTP_METHODS.GET, url: getPortalMetaUrl(metadataId) }
-      logD(mod, fun, reportActionStep)
+      report.actionStep = 'checking if the metadata is on the portal'
+      report.requestDetails = { method: HTTP_METHODS.GET, url: getPortalMetaUrl(metadataId) }
+      logD(mod, fun, report.actionStep)
 
       portalAnswer = await axios.get(getPortalMetaUrl(metadataId), portalToken)
     } catch (err) {
-      // logV(mod, fun, err)
-      reportActionStep = `sending a metadata that is not on the portal: '${metadataId}'`
-      reportRequestDetails = { method: HTTP_METHODS.POST, url: PORTAL_POST_URL }
-      logD(mod, fun, reportActionStep)
+      report.actionStep = `sending a metadata that is not on the portal: '${metadataId}'`
+      report.requestDetails = { method: HTTP_METHODS.POST, url: PORTAL_POST_URL }
+      logD(mod, fun, report.actionStep)
 
       const postAnswer = await httpPost(PORTAL_POST_URL, metadataClean, portalToken)
       waitingMetadata[API_REPORT_ID] = isUUID(postAnswer) ? postAnswer : postAnswer.data
-      // console.log('T (sendMetadataToPortal.post) waiting room', metadatasWaitingForPortalFeedback)
       return postAnswer
     }
     const portalMetadata = portalAnswer?.data
-    // logW(mod, fun, `Portal's answer to get: ${portalMetadata}`)
 
     if (getUpdatedDate(portalMetadata) < getUpdatedDate(metadataClean)) {
-      reportActionStep = `updating a metadata that is on the portal and older: '${metadataId}'`
-      reportRequestDetails = { method: HTTP_METHODS.PUT, url: PORTAL_POST_URL }
-      logD(mod, fun, reportActionStep)
+      report.actionStep = `updating a metadata that is on the portal and older: '${metadataId}'`
+      report.requestDetails = { method: HTTP_METHODS.PUT, url: PORTAL_POST_URL }
+      logD(mod, fun, report.actionStep)
       const putAnswer = await httpPut(PORTAL_POST_URL, metadataClean, portalToken)
       waitingMetadata[API_REPORT_ID] = isUUID(putAnswer) ? putAnswer : putAnswer.data
-      // console.log('T (sendMetadataToPortal.put) putAnswer', putAnswer)
-      // console.log('T (sendMetadataToPortal.put) waiting room', metadatasWaitingForPortalFeedback)
       return putAnswer
     } else {
       metadatasWaitingForPortalFeedback.splice(waitIndex, 1)
       logD(mod, fun, `Metadata is on the portal and same: not updating '${metadataId}'`)
-      // console.log('T (sendMetadataToPortal.none) waiting room', metadatasWaitingForPortalFeedback)
     }
   } catch (err) {
     await createErrorReport(
       err,
-      reportActionStep,
+      report.actionStep,
       'An error occurred while sending the metadata to the Portal',
-      reportRequestDetails,
-      reportMetadataInfo,
+      report.requestDetails,
+      report.metadataInfo,
       'update metadata status'
     )
     throw RudiError.treatError(mod, fun, err)
@@ -690,27 +678,27 @@ export const getPortalMetadataListWithToken = (token, additionalParameters) =>
 export const getMetadataFromPortal = async (metadataId, additionalParameters) => {
   const fun = 'getMetadataFromPortal'
   logT(mod, fun, ``)
-  let reportComment, reportRequestDetails, reportMetadataInfo
+  const report = {}
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
-    reportComment = 'Retrieving Portal token'
+    report.comment = 'Retrieving Portal token'
     const token = await getPortalToken()
 
-    reportComment = 'Getting the metadata'
-    reportRequestDetails = {
+    report.comment = 'Getting the metadata'
+    report.requestDetails = {
       method: HTTP_METHODS.GET,
       url: getPortalMetaUrl(metadataId, additionalParameters),
     }
-    reportMetadataInfo = { [API_METADATA_ID]: metadataId }
+    report.metadataInfo = { [API_METADATA_ID]: metadataId }
     if (!metadataId) return httpGet(getPortalMetaUrl(null, additionalParameters), token)
     else return httpGet(getPortalMetaUrl(metadataId, additionalParameters), token)
   } catch (err) {
     await createErrorReport(
       err,
-      reportComment,
+      report.comment,
       'An error occurred while getting a metadata from the Portal',
-      reportRequestDetails,
-      reportMetadataInfo
+      report.requestDetails,
+      report.metadataInfo
     )
     throw RudiError.treatError(mod, fun, err)
   }

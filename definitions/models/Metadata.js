@@ -765,6 +765,13 @@ export const updateMetadataStatus = (metadata) => {
   metadata[API_STATUS_PROPERTY] = reckonMetadataStatus(metadata)
 }
 
+export const setMetadataStatusToSent = (metadata) => {
+  delete metadata[DB_PUBLISHED_AT]
+  delete metadata[API_INTEGRATION_ERROR_ID]
+  metadata[API_STATUS_PROPERTY] = MetadataStatus.Sent
+  metadata.save()
+}
+
 // -------------------------------------------------------------------------------------------------
 // Schema refinements
 // -------------------------------------------------------------------------------------------------
