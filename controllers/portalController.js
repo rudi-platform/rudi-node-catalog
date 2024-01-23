@@ -533,7 +533,7 @@ const isMetadataSendableToPortal = async (metadataId) => {
     }
 
     //--- Removing the publication date as we're about to send it again
-    setMetadataStatusToSent(metadata)
+    await setMetadataStatusToSent(metadata)
 
     //--- Purging the waiting room / buffer of metadatas waiting for an integration report
     try {

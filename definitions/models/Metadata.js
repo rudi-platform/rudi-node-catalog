@@ -765,11 +765,16 @@ export const updateMetadataStatus = (metadata) => {
   metadata[API_STATUS_PROPERTY] = reckonMetadataStatus(metadata)
 }
 
-export const setMetadataStatusToSent = (metadata) => {
-  delete metadata[DB_PUBLISHED_AT]
-  delete metadata[API_INTEGRATION_ERROR_ID]
-  metadata[API_STATUS_PROPERTY] = MetadataStatus.Sent
-  metadata.save()
+export const setMetadataStatusToSent = async (metadata) => {
+  const fun = 'setMetadataStatusToSent'
+  try {
+    delete metadata[DB_PUBLISHED_AT]
+    delete metadata[API_INTEGRATION_ERROR_ID]
+    metadata[API_STATUS_PROPERTY] = MetadataStatus.Sent
+    await metadata.save()
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -897,14 +902,14 @@ MetadataSchema.post('save', async function (doc, next) {
   // next()
 })
 
-MetadataSchema.post('find', async function (docs, next) {
+MetadataSchema.post('find', async function (metadata_list, next) {
   const fun = 'post find hook'
   // logT(mod, fun, ``)
 
-  for (const doc of docs) {
-    if (!doc[API_STATUS_PROPERTY]) {
-      updateMetadataStatus(doc)
-      doc.save().catch((err) => {
+  for (const metadata of metadata_list) {
+    if (!metadata[API_STATUS_PROPERTY]) {
+      updateMetadataStatus(metadata)
+      metadata.save().catch((err) => {
         logE(mod, fun + '.updateMetadataStatus', beautify(err))
         next(err)
       })
