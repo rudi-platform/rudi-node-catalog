@@ -53,7 +53,7 @@ import {
   toBase64,
 } from '../utils/jsUtils.js'
 import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
-import { logD, logE, logT, logV, logW } from '../utils/logging.js'
+import { logD, logE, logI, logT, logV, logW } from '../utils/logging.js'
 
 import {
   FIELD_TOKEN,
@@ -532,9 +532,6 @@ const isMetadataSendableToPortal = async (metadataId) => {
       return false
     }
 
-    //--- Removing the publication date as we're about to send it again
-    await setMetadataStatusToSent(metadata)
-
     //--- Purging the waiting room / buffer of metadatas waiting for an integration report
     try {
       for (let i = metadatasWaitingForPortalFeedback.length - 1; i >= 0; i--)
@@ -562,9 +559,14 @@ const isMetadataSendableToPortal = async (metadataId) => {
       logD(mod, fun, `Metadata is already waiting to be sent: ${metadataId}`)
       return false
     }
+
+    //--- Removing the publication date as we're about to send it again
+    const updatedMetadata = await setMetadataStatusToSent(metadata)
+
+    //--- Puting the metadata in the waiting list
     const waitingMetadata = {
-      [API_METADATA_ID]: metadata[API_METADATA_ID],
-      [DB_UPDATED_AT]: metadata[DB_UPDATED_AT],
+      [API_METADATA_ID]: updatedMetadata[API_METADATA_ID],
+      [DB_UPDATED_AT]: updatedMetadata[DB_UPDATED_AT],
       [WAIT_DATE]: timeEpochS(),
     }
     // console.log(
@@ -575,7 +577,7 @@ const isMetadataSendableToPortal = async (metadataId) => {
     //--- If a media is restricted, metadata is not sent to the Portal
     // if( metadata[API_RESTRICTED_ACCESS]&&metadata[API_MEDIA_PROPERTY][0][API_MEDIA_CONNECTOR]
 
-    return { metadata, waitIndex: metadatasWaitingForPortalFeedback.length - 1 }
+    return { updatedMetadata, waitIndex: metadatasWaitingForPortalFeedback.length - 1 }
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -618,6 +620,8 @@ export const sendMetadataToPortal = async (metadataId) => {
     const sendableData = await isMetadataSendableToPortal(metadataId)
     if (!sendableData) return
     const { metadata, waitIndex } = sendableData
+    logI(mod, `${fun}.metadataSent`, metadata)
+
     const waitingMetadata = metadatasWaitingForPortalFeedback[waitIndex]
     //--- Ensuring compatibility with portal
     const metadataClean = cleanMetadataForPortal(metadata)

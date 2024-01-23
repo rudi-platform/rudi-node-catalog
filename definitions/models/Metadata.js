@@ -772,6 +772,7 @@ export const setMetadataStatusToSent = async (metadata) => {
     delete metadata[API_INTEGRATION_ERROR_ID]
     metadata[API_STATUS_PROPERTY] = MetadataStatus.Sent
     await metadata.save()
+    return metadata
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
