@@ -96,7 +96,6 @@ import { objectAlreadyExists, parametersMismatch } from '../utils/msg.js'
 // -------------------------------------------------------------------------------------------------
 import { IntegrationStatus, Report } from '../definitions/models/Report.js'
 
-import { updateMetadataStatus } from '../definitions/models/Metadata.js'
 import { setFlagIntegrationKO } from './metadataController.js'
 import { removeMetadataFromWaitingList } from './portalController.js'
 
@@ -502,7 +501,7 @@ export const createErrorReport = async (
         return
       }
       dbMeta[API_INTEGRATION_ERROR_ID] = reportId
-      updateMetadataStatus(dbMeta)
+      // updateMetadataStatus(dbMeta) // Done in metadata.save()
       await dbMeta.save()
     }
   } catch (err) {

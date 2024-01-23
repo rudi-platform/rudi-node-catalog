@@ -761,7 +761,7 @@ const reckonMetadataStatus = (metadata) => {
   }
 }
 
-export const updateMetadataStatus = (metadata) => {
+const updateMetadataStatus = (metadata) => {
   metadata[API_STATUS_PROPERTY] = reckonMetadataStatus(metadata)
 }
 
@@ -909,9 +909,9 @@ MetadataSchema.post('find', async function (metadata_list, next) {
 
   for (const metadata of metadata_list) {
     if (!metadata[API_STATUS_PROPERTY]) {
-      updateMetadataStatus(metadata)
+      // updateMetadataStatus(metadata) // Done in metadata.save()
       metadata.save().catch((err) => {
-        logE(mod, fun + '.updateMetadataStatus', beautify(err))
+        logE(mod, `${fun}.updateMetadataStatus`, beautify(err))
         next(err)
       })
     }

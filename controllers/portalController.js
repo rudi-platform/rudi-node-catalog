@@ -621,6 +621,7 @@ export const sendMetadataToPortal = async (metadataId) => {
     if (!sendableData) return
     const { metadata, waitIndex } = sendableData
     logI(mod, `${fun}.metadataSent`, metadata)
+    logI(mod, `${fun}.waitIndex`, waitIndex)
 
     const waitingMetadata = metadatasWaitingForPortalFeedback[waitIndex]
     //--- Ensuring compatibility with portal
