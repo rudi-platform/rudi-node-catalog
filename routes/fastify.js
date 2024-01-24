@@ -100,7 +100,7 @@ fastifyConf.addHook('onError', (request, reply, error, done) => {
 fastifyConf.setErrorHandler((error, request, reply) => {
   const fun = 'finalErrorHandler'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     // logD(mod, fun, RudiError.isRudiError(error))
     let rudiHttpError
     if (RudiError.isRudiError(error)) {
@@ -200,7 +200,7 @@ fastifyConf.addHook('onRequest', (req, res, next) => {
 fastifyConf.addHook('onSend', (request, reply, payload, next) => {
   const fun = 'onSend'
   try {
-    // logT(mod, fun, ``)
+    // logT(mod, fun)
     const now = timeEpochMs()
     const context = CallContext.getCallContextFromReq(request)
     if (context) {

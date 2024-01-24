@@ -2,8 +2,9 @@
 // API version
 // -------------------------------------------------------------------------------------------------
 export const API_VERSION = '1.3.0'
-export const USER_AGENT = `Rudi-Producer ${API_VERSION}`
 export const PORTAL_API_VERSION = '1.3.0'
+
+export const USER_AGENT = `Rudi-Producer ${API_VERSION}`
 
 // -------------------------------------------------------------------------------------------------
 // REQ methods

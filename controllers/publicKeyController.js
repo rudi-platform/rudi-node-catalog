@@ -70,7 +70,7 @@ export const checkKeyName = (pubKeyName) => {
 const checkKeyPem = (keyPem) => {
   const fun = 'checkKeyPem'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     // logV(mod, fun, keyPem)
     const key = parseKey(keyPem)
     // logV(mod, fun, key)
@@ -94,7 +94,7 @@ const normalizeKeyData = async (pubKeyJson) => {
   const fun = 'normalizeKeyData'
 
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     // Latinize pubKey name
     pubKeyJson[API_PUB_NAME] = latiniseString(pubKeyJson[API_PUB_NAME])
       .replace(/\s/g, '_')
@@ -166,7 +166,7 @@ const normalizeKeyData = async (pubKeyJson) => {
 export const getSinglePubKey = async (req, reply) => {
   const fun = 'getSinglePubKey'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     const objectId = accessReqParam(req, PARAM_ID)
     const objectProp = req.params[PARAM_PROP] // Could be null
     const dbObject = await getEnsuredObjectWithRudiId(OBJ_PUB_KEYS, objectId)
@@ -194,7 +194,7 @@ export const getSinglePubKey = async (req, reply) => {
 export const newPublicKey = async (pubKeyJson) => {
   const fun = 'newPublicKey'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     await normalizeKeyData(pubKeyJson)
     const pubKeyId = pubKeyJson[API_PUB_ID]
     const existsPubKey = await doesObjectExistWithRudiId(OBJ_PUB_KEYS, pubKeyId)
@@ -212,7 +212,7 @@ export const newPublicKey = async (pubKeyJson) => {
 export const overwritePubKey = async (pubKeyJson) => {
   const fun = 'overwritePubKey'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     await normalizeKeyData(pubKeyJson)
 
     const dbPubKey = await overwriteDbObject(OBJ_PUB_KEYS, pubKeyJson)

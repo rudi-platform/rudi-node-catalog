@@ -287,15 +287,10 @@ export const deepClone = (jsonObject) => JSON.parse(JSON.stringify(jsonObject))
 export const logWhere = (srcMod, srcFun) =>
   srcMod && srcFun ? `${srcMod} . ${srcFun}` : srcMod || srcFun
 
-export const displayStr = (srcMod, srcFun, msg) =>
-  `[ ${logWhere(srcMod, srcFun)} ] ${msg !== '' ? msg : '<-'}`
+export const displayStr = (srcMod, srcFun, msg = '<-') => `[ ${logWhere(srcMod, srcFun)} ] ${msg}`
 
-export const consoleLog = (srcMod, srcFun, msg) =>
+export const consoleLog = (srcMod, srcFun, msg = '<-') =>
   console.log('D', nowLocaleFormatted(), displayStr(srcMod, srcFun, msg))
 
-export const consoleErr = (srcMod, srcFun, msg) =>
-  console.error(
-    'E',
-    nowLocaleFormatted(),
-    displayStr(srcMod, srcFun, !msg ? undefined : msg[TRACE] || msg)
-  )
+export const consoleErr = (srcMod, srcFun, msg = 'No error message :(') =>
+  console.error('E', nowLocaleFormatted(), displayStr(srcMod, srcFun, msg[TRACE] || msg))

@@ -101,7 +101,7 @@ export const getHashAlgo = (algo) => {
 
 export const checkRudiProdPermission = async (req, isCheckOptional) => {
   const fun = 'checkRudiProdPermission'
-  logT(mod, fun, ``)
+  logT(mod, fun)
   try {
     let token
     try {
@@ -133,7 +133,7 @@ export const checkRudiProdPermission = async (req, isCheckOptional) => {
 
 function checkSubjPermission(subject, reqRouteName) {
   const fun = 'checkSubjPermission'
-  logT(mod, fun, ``)
+  logT(mod, fun)
 
   const subjProfile = getProfile(subject)
   const subjAcl = accessProperty(subjProfile, SUB_ACL)
@@ -164,8 +164,6 @@ const getPubKey = (subject) => {
 export const verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
   const fun = 'verifyRudiProdToken'
   try {
-    // logD(mod, fun, ``)
-
     // Retrieve the public key
     const { payload } = tokenStringToJwtObject(token)
     // logD(mod, fun, beautify(payload))

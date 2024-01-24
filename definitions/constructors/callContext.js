@@ -203,7 +203,7 @@ export const CallContext = class CallContext {
 
   get apiCallMsg() {
     const fun = 'apiCallMsg'
-    if (ACTIVATE_LOG) logT(mod, fun, ``)
+    if (ACTIVATE_LOG) logT(mod, fun)
     try {
       return (
         this.reqDetailsMsg +
@@ -218,7 +218,7 @@ export const CallContext = class CallContext {
 
   get reqDetailsMsg() {
     const fun = 'reqDetailsMsg'
-    if (ACTIVATE_LOG) logT(mod, fun, ``)
+    if (ACTIVATE_LOG) logT(mod, fun)
     try {
       return `${this.reqMethod} ${this.reqUrl} (${this.routeName})`
     } catch (err) {
@@ -255,7 +255,7 @@ export const CallContext = class CallContext {
   addError = (ctxMod, ctxFun, error) => {
     const fun = 'addError'
     try {
-      logT(mod, fun, ``)
+      logT(mod, fun)
       if (RudiError.isRudiError(error)) {
         if (ACTIVATE_LOG) logT(mod, fun, `rudi error`)
         // if (ACTIVATE_LOG) logT(mod, fun, `this[DETAILS]: ${beautify(this[DETAILS])}`)
@@ -283,7 +283,7 @@ export const CallContext = class CallContext {
 
   logErr = (ctxMod, ctxFun, err) => {
     const fun = 'logErr'
-    logT(mod, fun, ``)
+    logT(mod, fun)
     try {
       if (!err && !this.getError()) throw new RudiError('No error found in current context')
 
@@ -306,7 +306,7 @@ export const CallContext = class CallContext {
 
   get errorLocation() {
     const fun = 'getErrorLocation'
-    logT(mod, fun, ``)
+    logT(mod, fun)
     const err = this.getError()
     logD(mod, fun, `${beautify(err)}`)
     if (err) {
@@ -339,7 +339,7 @@ export const CallContext = class CallContext {
   static getCallContextFromReq(req) {
     const fun = 'getCallContextFromReq'
     try {
-      if (ACTIVATE_LOG) logT(mod, fun, ``)
+      if (ACTIVATE_LOG) logT(mod, fun)
       const reqContext = CallContext.getReqContext(req)
       if (!reqContext) return undefined
 
@@ -362,7 +362,7 @@ export const CallContext = class CallContext {
     const fun = 'setAsReqContext'
 
     try {
-      if (ACTIVATE_LOG) logT(mod, fun, ``)
+      if (ACTIVATE_LOG) logT(mod, fun)
       if (req[CALL_CONTEXT]) throw new Error('Call context already set')
       req[CALL_CONTEXT] = callContext
       // {[AUTH]: callContext[AUTH],[OP]: callContext[OP],[DETAILS]: callContext[DETAILS],}
@@ -375,7 +375,7 @@ export const CallContext = class CallContext {
   static preventCodeInjection(req) {
     const fun = 'preventCodeInjection'
     try {
-      if (ACTIVATE_LOG) logT(mod, fun, ``)
+      if (ACTIVATE_LOG) logT(mod, fun)
       protectHeaderMethod(req)
       protectHeaderUrl(req)
       protectHeaderAuth(req)
@@ -393,7 +393,7 @@ export const CallContext = class CallContext {
     const fun = 'getReqContext'
 
     try {
-      if (ACTIVATE_LOG) logT(mod, fun, ``)
+      if (ACTIVATE_LOG) logT(mod, fun)
       const context = req[CALL_CONTEXT]
       if (!context) return undefined
       return context
@@ -409,7 +409,7 @@ export const CallContext = class CallContext {
   static createApiCallMsg(req) {
     const fun = 'createApiCallMsg'
     try {
-      if (ACTIVATE_LOG) logT(mod, fun, ``)
+      if (ACTIVATE_LOG) logT(mod, fun)
       const context = CallContext.getCallContextFromReq(req)
       if (!context) {
         if (ACTIVATE_LOG) logT(mod, fun, 'No context set yet')

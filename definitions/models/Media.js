@@ -188,7 +188,7 @@ const MediaSchema = new mongoose.Schema(
 MediaSchema.pre('save', function (next) {
   const mod = 'MediaSchema'
   const fun = 'pre save hook'
-  // logT(mod, fun, ``)
+  // logT(mod, fun)
   try {
     const connector = this[API_MEDIA_CONNECTOR]
     if (!connector?.url)
@@ -386,7 +386,7 @@ MediaSchema.pre('save', async function (next) {
 
   const media = this
   try {
-    // logT(mod, fun, ``)
+    // logT(mod, fun)
     if (!media[API_MEDIA_NAME]) media[API_MEDIA_NAME] = media[API_MEDIA_ID]
   } catch (err) {
     logV(mod, fun, `pre save checks KO: ${err}`)

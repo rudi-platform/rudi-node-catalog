@@ -48,7 +48,7 @@ export const daGetCollections = async () => {
 export const daDropDB = async (req, reply) => {
   const fun = `daDropDB`
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     /* Drop the whole DB !!! */
     // const dbActionResult = await connection.db.dropDatabase()
     // logD(mod, fun, 'DB dropped')
@@ -116,7 +116,7 @@ const SEARCH_INDEX = 'searchIndex'
 export const makeSearchable = async (ObjModel) => {
   const fun = 'makeSearchable'
   try {
-    // logT(mod, fun, ``)
+    // logT(mod, fun)
     let collection
     try {
       collection = ObjModel.collection

@@ -108,7 +108,7 @@ import SkosScheme from '../definitions/models/SkosScheme.js'
 export const newSkosScheme = async (rudiScheme) => {
   const fun = 'newScheme'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
 
     if (!rudiScheme) throw new ParameterExpectedError('rudiScheme', mod, fun)
 
@@ -137,7 +137,7 @@ const CONCEPT_HIERARCHY_DISPLAY = `${API_SKOS_CONCEPT_ID} ${API_SKOS_CONCEPT_COD
 
 export const dbSchemeToRudi = async (dbScheme) => {
   const fun = 'dbSchemeToRudi'
-  logT(mod, fun, ``)
+  logT(mod, fun)
 
   // logD(mod, fun, `dbScheme: ${beautify(dbScheme)}`)
 
@@ -170,7 +170,7 @@ export const dbSchemeToRudi = async (dbScheme) => {
 export const createConceptHierarchy = async (listConcepts, schemeDbId, parentConcept) => {
   const fun = 'createConceptHierarchy'
   try {
-    // logT(mod, fun, ``)
+    // logT(mod, fun)
     // Check input parameters
     if (!listConcepts) throw new ParameterExpectedError('listConcepts', mod, fun)
     if (!schemeDbId) throw new ParameterExpectedError('schemeDbId', mod, fun)
@@ -263,7 +263,7 @@ export const createConceptHierarchy = async (listConcepts, schemeDbId, parentCon
 export const newSkosConcept = async (rudiConcept, inSchemeDbId) => {
   const fun = 'newConcept'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
 
     await setDbScheme(rudiConcept, inSchemeDbId)
 
@@ -296,7 +296,7 @@ export const newSkosConcept = async (rudiConcept, inSchemeDbId) => {
 export const setDbScheme = async (rudiConcept, inSchemeDbId) => {
   const fun = 'setDbScheme'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
 
     let schemeDbId
     if (!inSchemeDbId) {
@@ -321,7 +321,7 @@ export const setDbScheme = async (rudiConcept, inSchemeDbId) => {
 export const getDbIdForConceptCode = async (conceptRudiId) => {
   const fun = 'getDbIdForConceptCode'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     const conceptDbId = await getConceptDbIdWithRudiId(conceptRudiId)
     return conceptDbId
   } catch (err) {
@@ -332,7 +332,7 @@ export const getDbIdForConceptCode = async (conceptRudiId) => {
 export const setDbConceptRefs = async (rudiConcept, prop) => {
   const fun = 'setDbConceptRefs'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     const listConceptsReferences = rudiConcept[prop]
 
     // logD(mod, fun, `listConceptsReferences: ${beautify(listConceptsReferences)}`)
@@ -374,7 +374,7 @@ const CONCEPT_SHORT_DISPLAY = `${API_SKOS_CONCEPT_ID} ${API_SKOS_CONCEPT_CODE}` 
 export const dbConceptToRudiMinimal = async (dbConcept) => {
   const fun = 'dbConceptToRudi'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
 
     const rudiConcept = await dbConcept.populate([
       {
@@ -410,7 +410,7 @@ export const dbConceptToRudiMinimal = async (dbConcept) => {
 export const dbConceptToRudiRecursive = async (dbConcept) => {
   const fun = 'dbConceptToRudiRecursive'
   try {
-    // logT(mod, fun, ``)
+    // logT(mod, fun)
 
     // logD(mod, fun, `dbConcept: ${beautify(dbConcept)}`)
     if (!dbConcept) return
@@ -454,7 +454,7 @@ export const dbConceptToRudiRecursive = async (dbConcept) => {
 export const dbConceptListToRudiRecursive = async (dbConceptList) => {
   const fun = 'dbConceptListToRudiRecursive'
   try {
-    // logT(mod, fun, ``)
+    // logT(mod, fun)
 
     // logD(mod, fun, `dbConceptList: ${beautify(dbConceptList)}`)
     if (!dbConceptList) return
@@ -571,7 +571,7 @@ export const getEveryThesaurus = async (req, reply) => {
   const fun = 'getEveryThesaurus'
   try {
     logT(mod, fun, `< GET ${URL_PV_THESAURUS_ACCESS}`)
-    logT(mod, fun, ``)
+    logT(mod, fun)
 
     const lang = req.query[PARAM_THESAURUS_LANG]
     // logD(mod, fun, `lang: ${lang}`)
@@ -634,7 +634,7 @@ export const getSingleThesaurusLabels = async (req, reply) => {
 export const widenSearch = async (searchTerms, lang) => {
   const fun = 'widenSearch'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     if (!searchTerms || !getSkosmosConf()) return searchTerms
 
     const widenedSearchTerms = []

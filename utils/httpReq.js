@@ -36,7 +36,7 @@ export const getHeaderRedirectUrls = (req) => {
 export const getUrlParameters = (reqUrl) => {
   const fun = 'getUrlParameters'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     const splitUrl = reqUrl.split('?')
     if ((splitUrl.length = 1 || !splitUrl[1])) return // No parameters found
     if (splitUrl.length > 2)
@@ -63,7 +63,7 @@ export const getUrlParameters = (reqUrl) => {
 
 export const httpGet = async (destUrl, authorizationToken) => {
   const fun = 'httpGet'
-  logT(mod, fun, ``)
+  logT(mod, fun)
   try {
     const reqOpts = {
       headers: {
@@ -84,7 +84,7 @@ export const httpGet = async (destUrl, authorizationToken) => {
 export const httpDelete = async (destUrl, authorizationToken) => {
   const fun = 'httpDelete'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
 
     const reqOpts = {
       headers: {
@@ -104,7 +104,7 @@ export const httpDelete = async (destUrl, authorizationToken) => {
 
 export const getWithOpts = async (options, authorizationToken) => {
   const fun = 'getWithOpts'
-  logT(mod, fun, ``)
+  logT(mod, fun)
   try {
     const destUrl = `${options.protocol}://${options.hostname}/${options.path}`
     const answer = await httpGet(destUrl, authorizationToken)
@@ -117,7 +117,7 @@ export const getWithOpts = async (options, authorizationToken) => {
 export const httpPost = async (destUrl, dataToSend, authorizationToken) => {
   const fun = 'httpPost'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     const reqOpts = {
       headers: {
         'User-Agent': USER_AGENT,
@@ -138,7 +138,7 @@ export const httpPost = async (destUrl, dataToSend, authorizationToken) => {
 export const httpPut = async (destUrl, dataToSend, authorizationToken) => {
   const fun = 'httpPut'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     const reqOpts = {
       headers: {
         'User-Agent': USER_AGENT,
@@ -159,7 +159,7 @@ export const httpPut = async (destUrl, dataToSend, authorizationToken) => {
 export const directGet = async (destUrl, reqOpts) => {
   const fun = 'directGet'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
 
     const answer = await axios.get(destUrl, reqOpts)
 
@@ -172,7 +172,7 @@ export const directGet = async (destUrl, reqOpts) => {
 
 export const directPost = async (destUrl, dataToSend, reqOpts) => {
   const fun = 'directPost'
-  logT(mod, fun, ``)
+  logT(mod, fun)
 
   try {
     const answer = await axios.post(destUrl, dataToSend, reqOpts)
@@ -186,7 +186,7 @@ export const directPost = async (destUrl, dataToSend, reqOpts) => {
 
 export const directPut = async (destUrl, dataToSend, reqOpts) => {
   const fun = 'directPut'
-  logT(mod, fun, ``)
+  logT(mod, fun)
   try {
     const answer = await axios.put(destUrl, dataToSend, reqOpts)
     // logHttpAnswer(mod, fun, answer)

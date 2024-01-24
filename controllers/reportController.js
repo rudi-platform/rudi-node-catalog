@@ -225,7 +225,7 @@ export const addOrEditSingleReportForObject = async (req, reply) => {
 export const addOrEditSingleReport = async (objectType, req, reply) => {
   const fun = 'addOrEditSingleReport'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     // retrieve url parameters: object type, object id
     const urlObjectId = accessReqParam(req, PARAM_ID)
     const reportBody = fromPortalToRudiFormat(req.body)
@@ -290,7 +290,7 @@ export const getReportListForObject = async (req, reply) => {
 
 export const getReportList = async (objectType, req, reply) => {
   const fun = 'getReportList'
-  logT(mod, fun, ``)
+  logT(mod, fun)
   try {
     // retrieve url parameters: object id
     const urlObjectId = accessReqParam(req, PARAM_ID)
@@ -380,7 +380,7 @@ export const deleteSingleReportForObject = async (req, reply) => {
 export const deleteReportsBefore = async (req, reply) => {
   const fun = 'deleteReportsBefore'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     const queryParams = req.query
     if (isEmptyObject(queryParams)) return await deleteAllDbObjectsWithType(OBJ_REPORTS)
 
@@ -464,16 +464,10 @@ export const getReportListForObjectType = async (req, reply) => {
  * @param {MetadataSchema} metadata
  * @param {HTTP_METHODS} httpMethod
  */
-export const createErrorReport = async (
-  err,
-  actionStep,
-  actionDescription,
-  req,
-  metadata,
-  shouldUpdateMetadataStatus
-) => {
+export const createErrorReport = async (err, details, shouldUpdateMetadataStatus) => {
   const fun = 'createErrorReport'
-  if (!req) throw new InternalServerError('Input request should not be null', mod, fun)
+  if (!details) throw new InternalServerError('Input details should not be null', mod, fun)
+  const { step, description, method, url, metadata } = details
 
   const metaId = metadata?.[API_METADATA_ID]
   const reportId = uuidv4()
@@ -481,15 +475,16 @@ export const createErrorReport = async (
     const body = {
       [API_REPORT_ID]: reportId,
       [API_REPORT_RESOURCE_ID]: metaId,
-      [API_DATA_NAME_PROPERTY]: metadata?.[API_DATA_NAME_PROPERTY] || actionDescription,
+      [API_DATA_NAME_PROPERTY]:
+        metadata?.[API_DATA_NAME_PROPERTY] || description || `An error occurred while ${step}`,
       [API_REPORT_SUBMISSION_DATE]: nowISO(),
-      [API_REPORT_METHOD]: req?.method?.toUpperCase(),
+      [API_REPORT_METHOD]: method?.toUpperCase(),
       [API_REPORT_VERSION]: API_VERSION,
       [API_REPORT_STATUS]: IntegrationStatus.KO,
-      [API_REPORT_COMMENT]: `While ${actionStep}`,
+      [API_REPORT_COMMENT]: `While ${step}` + url ? `on ${url}` : '',
       [API_REPORT_ERRORS]: {
         [API_REPORT_ERROR_CODE]: err?.statusCode || 500,
-        [API_REPORT_ERROR_MSG]: `${actionDescription}: ${err.message || err}`,
+        [API_REPORT_ERROR_MSG]: `${description}: ${err.message || err}`,
       },
     }
     await putReport(body)

@@ -107,7 +107,7 @@ const META_DATES = `${API_METAINFO_PROPERTY}.${API_METAINFO_DATES}.`
 export const parseQueryParameters = async (objectType, fullUrl) => {
   const fun = 'parseQueryParameters'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     // identify object model
     const ObjModel = getObjectModel(objectType)
     const modelProperties = getModelPropertyNames(ObjModel)

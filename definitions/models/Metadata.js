@@ -13,7 +13,12 @@ const Int32 = mongooseInt32.loadType(mongoose)
 // -------------------------------------------------------------------------------------------------
 // Fields
 // -------------------------------------------------------------------------------------------------
-import { DEFAULT_LANG, OBJ_METADATA, URL_PREFIX_PUBLIC } from '../../config/constApi.js'
+import {
+  DEFAULT_LANG,
+  OBJ_METADATA,
+  PORTAL_API_VERSION,
+  URL_PREFIX_PUBLIC,
+} from '../../config/constApi.js'
 
 import {
   API_ACCESS_CONDITION,
@@ -33,6 +38,8 @@ import {
   API_DATES_VALIDATED,
   API_END_DATE_PROPERTY,
   API_FILE_MIME,
+  API_FILE_STATUS_UPDATE,
+  API_FILE_STORAGE_STATUS,
   API_GEO_BBOX_EAST,
   API_GEO_BBOX_NORTH,
   API_GEO_BBOX_PROPERTY,
@@ -92,7 +99,7 @@ const validArrayNotNull = {
 // -------------------------------------------------------------------------------------------------
 import { beautify, isNotEmptyArray, isNothing, multiSplit } from '../../utils/jsUtils.js'
 
-import { logD, logE, logT, logV } from '../../utils/logging.js'
+import { logD, logE, logI, logT, logV } from '../../utils/logging.js'
 
 import { makeSearchable } from '../../db/dbActions.js'
 import { BadRequestError, NotFoundError, RudiError } from '../../utils/errors.js'
@@ -165,11 +172,9 @@ export const listMissingMedia = (rudiMetadata) => {
 export const isEveryMediaAvailable = (rudiMetadata) => {
   const fun = 'isEveryMediaAvailable'
   try {
-    logT(mod, fun, ``)
-    // console.log('T (isEveryMediaAvailable) metadata:', rudiMetadata)
+    logT(mod, fun)
 
     const metadataMediaList = rudiMetadata[API_MEDIA_PROPERTY]
-    // console.log('T (isEveryMediaAvailable) metadataMediaList:', metadataMediaList)
     let isOneMediaMissing = false
     for (const media of metadataMediaList) {
       if (isMediaMissing(media)) {
@@ -528,7 +533,7 @@ MetadataSchema.virtual(API_RESTRICTED_ACCESS).get(function () {
 async function checkLicence(metadata) {
   const fun = 'checkLicence'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     const accessCondition = accessProperty(metadata, API_ACCESS_CONDITION)
     const licence = requireSubProperty(metadata, API_ACCESS_CONDITION, API_LICENCE)
     const licenceType = requireSubProperty(accessCondition, API_LICENCE, API_LICENCE_TYPE)
@@ -602,7 +607,7 @@ async function checkLicence(metadata) {
 async function checkFileTypes(metadata) {
   const fun = 'checkFileTypes'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     const medias = metadata[API_MEDIA_PROPERTY]
     medias.map((media, i) => {
       if (media[API_MEDIA_TYPE] !== MediaTypes.File) return
@@ -629,7 +634,7 @@ async function checkFileTypes(metadata) {
 async function checkThesaurus(metadata) {
   const fun = 'checkThesaurus'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     if (metadata.init) logD(mod, fun, `init`)
     const shouldInit = metadata[API_COLLECTION_TAG] === 'init'
     const dataTheme = metadata[API_THEME_PROPERTY]
@@ -765,27 +770,73 @@ const updateMetadataStatus = (metadata) => {
   metadata[API_STATUS_PROPERTY] = reckonMetadataStatus(metadata)
 }
 
-export const setMetadataStatusToSent = async (metadata) => {
-  const fun = 'setMetadataStatusToSent'
+export const toRudiPortalJSON = (metadata) => {
+  const fun = 'toRudiPortalJSON'
   try {
-    delete metadata[DB_PUBLISHED_AT]
-    delete metadata[API_INTEGRATION_ERROR_ID]
-    metadata[API_STATUS_PROPERTY] = MetadataStatus.Sent
-    await metadata.save()
-    logV(mod, fun, metadata)
-    return metadata
+    const portalReadyMetadata = metadata.toJSON()
+
+    //--- Latest API version
+    portalReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = PORTAL_API_VERSION
+
+    //--- Removing media fields that are node specific
+    portalReadyMetadata[API_MEDIA_PROPERTY].forEach((media) => {
+      delete media[API_FILE_STORAGE_STATUS]
+      delete media[API_FILE_STATUS_UPDATE]
+
+      // delete media[API_MEDIA_THUMBNAIL]
+      // delete media[API_MEDIA_SATELLITES]
+    })
+
+    //--- Removing metadata fields that are node specific (e.g. virtual properties)
+    delete portalReadyMetadata[API_INTEGRATION_ERROR_ID]
+    delete portalReadyMetadata[API_STATUS_PROPERTY]
+    delete portalReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_SOURCE_PROPERTY]
+
+    return portalReadyMetadata
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
 }
 
+export const setMetadataStatusToSent = (metadata) => {
+  const fun = 'setMetadataStatusToSent'
+  try {
+    logI(mod, `${fun}.metadata_status before`, metadata.metadata_status)
+    delete metadata[DB_PUBLISHED_AT]
+    delete metadata[API_INTEGRATION_ERROR_ID]
+    metadata[API_STATUS_PROPERTY] = MetadataStatus.Sent
+    logI(mod, `${fun}.metadata_status after`, metadata.metadata_status)
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
 // -------------------------------------------------------------------------------------------------
 // Schema refinements
 // -------------------------------------------------------------------------------------------------
 
-// ----- toJSON cleanup
+/**
+ * toJSON cleanup
+ * @returns the metadata information as a JSON object
+ */
 MetadataSchema.methods.toJSON = function () {
+  logT(mod, 'MetadataSchema.toJSON')
   return omit(this.toObject(), FIELDS_TO_SKIP)
+}
+
+/**
+ * @returns a RUDI portal compatible metadata as a JSON
+ */
+MetadataSchema.methods.toRudiPortalJSON = function () {
+  logT(mod, 'MetadataSchema.toRudiPortalJSON')
+  return toRudiPortalJSON(this)
+}
+
+/**
+ *
+ */
+MetadataSchema.methods.setStatusToSent = function () {
+  logT(mod, 'MetadataSchema.setStatusToSent')
+  return setMetadataStatusToSent(this)
 }
 
 // ----- Virtuals
@@ -819,7 +870,7 @@ MetadataSchema.pre('save', async function (next) {
   const fun = 'pre save hook'
 
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     const metadata = this
     // logD(mod, fun, metadata[API_GEOGRAPHY])
     // If 'geography' field is defined, the field 'geography.bbox' is required
@@ -892,7 +943,7 @@ MetadataSchema.pre('save', async function (next) {
 
 MetadataSchema.post('save', async function (doc, next) {
   const fun = 'post save hook'
-  logT(mod, fun, ``)
+  logT(mod, fun)
 
   try {
     await doc.populate(POPULATE_OPTS) //.execPopulate()
@@ -906,7 +957,7 @@ MetadataSchema.post('save', async function (doc, next) {
 
 MetadataSchema.post('find', async function (metadata_list, next) {
   const fun = 'post find hook'
-  // logT(mod, fun, ``)
+  // logT(mod, fun)
 
   for (const metadata of metadata_list) {
     if (!metadata[API_STATUS_PROPERTY]) {
@@ -944,4 +995,20 @@ Metadata.initialize = async () => {
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
+}
+
+/**
+ * @returns a RUDI portal compatible metadata as a JSON
+ */
+Metadata.toRudiPortalJSON = function () {
+  logT(mod, 'Metadata.toRudiPortalJSON')
+  return toRudiPortalJSON(this)
+}
+
+/**
+ *
+ */
+Metadata.setStatusToSent = function () {
+  logT(mod, 'Metadata.setStatusToSent')
+  return setMetadataStatusToSent(this)
 }

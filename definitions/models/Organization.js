@@ -99,7 +99,7 @@ Organization.getSearchableFields = () => [API_ORGANIZATION_ID, API_ORGANIZATION_
 Organization.initialize = async () => {
   const fun = 'initOrganization'
   try {
-    // logT(mod, fun, ``)
+    // logT(mod, fun)
     await makeSearchable(Organization)
     return `Organization indexes created`
   } catch (err) {

@@ -8,22 +8,22 @@ import { DICT_LANG, DICT_TEXT } from '../../db/dbFields.js'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { isObject, isString } from '../../utils/jsUtils.js'
-import { logD, logT, logW } from '../../utils/logging.js'
-import { parameterExpected } from '../../utils/msg.js'
 import {
-  MethodNotAllowedError,
   BadRequestError,
+  MethodNotAllowedError,
   NotFoundError,
   RudiError,
 } from '../../utils/errors.js'
+import { isObject, isString } from '../../utils/jsUtils.js'
+import { logD, logT, logW } from '../../utils/logging.js'
+import { parameterExpected } from '../../utils/msg.js'
 
 import {
   DynamicEnum,
-  ENUM_KEY,
-  ENUM_LABELS,
   ENUM_CODE,
+  ENUM_KEY,
   ENUM_LABELLED_VALUES,
+  ENUM_LABELS,
   ENUM_VALUES,
 } from '../models/DynamicEnum.js'
 
@@ -130,7 +130,7 @@ export class Thesaurus {
   getLabels(lang) {
     const fun = 'getLabels'
     try {
-      logT(mod, fun, ``)
+      logT(mod, fun)
 
       if (!this.#isInit) {
         const errMsg = 'Init first'
@@ -265,7 +265,7 @@ export class Thesaurus {
 
   #getEnum = async () => {
     const fun = '#getEnum'
-    // logT(mod, fun, ``)
+    // logT(mod, fun)
 
     try {
       const dbEnum = await DynamicEnum.findOne({ code: this.#code })
@@ -294,7 +294,7 @@ export class Thesaurus {
   #storeEnum = async (thesaurusValues) => {
     const fun = '#storeEnum'
     try {
-      logT(mod, fun, ``)
+      logT(mod, fun)
       if (!this.#hasLabels) {
         // case where thesaurusValues = [value1, value2]
         return await DynamicEnum.findOneAndUpdate(

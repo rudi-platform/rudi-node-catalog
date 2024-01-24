@@ -117,7 +117,7 @@ Contact.getSearchableFields = () => [
 Contact.initialize = async () => {
   const fun = 'initContact'
   try {
-    // logT(mod, fun, ``)
+    // logT(mod, fun)
     await makeSearchable(Contact)
     return `Contact indexes created`
   } catch (err) {

@@ -39,7 +39,7 @@ import { logT } from './logging.js'
 export const protectHeaderAuth = (req) => {
   const fun = 'protectHeaderAuth'
   try {
-    if (ACTIVATE_LOG) logT(mod, fun, ``)
+    if (ACTIVATE_LOG) logT(mod, fun)
     const auth = req?.headers?.Authorization || req?.headers?.authorization
     if (!auth) return
     if (auth.length > REQ_AUTH_MAX_LENGTH)
@@ -58,7 +58,7 @@ export const protectHeaderAuth = (req) => {
 export const protectHeaderUrl = (req) => {
   const fun = 'protectHeaderUrl'
   try {
-    if (ACTIVATE_LOG) logT(mod, fun, ``)
+    if (ACTIVATE_LOG) logT(mod, fun)
     const url = accessProperty(req, HD_URL)
     if (url.length > REQ_URL_MAX_LENGTH)
       throw new BadRequestError(`Request URL is too long (${url.length} characters)`)
@@ -72,7 +72,7 @@ const httpMethods = Object.values(HTTP_METHODS)
 export const protectHeaderMethod = (req) => {
   const fun = 'protectHeaderMethod'
   try {
-    if (ACTIVATE_LOG) logT(mod, fun, ``)
+    if (ACTIVATE_LOG) logT(mod, fun)
     const method = accessProperty(req, HD_METHOD)
     if (httpMethods.indexOf(method) < 0) throw new BadRequestError(`Incorrect request method`)
   } catch (err) {

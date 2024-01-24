@@ -32,7 +32,7 @@ import { logT, logW } from '../utils/logging.js'
 export const getGitHash = () => {
   const fun = 'getGitHash'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     return getGitHashOpt()
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -43,7 +43,7 @@ export const getGitHash = () => {
 export const getAppHash = () => {
   const fun = 'getCurrentAppId'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     return getAppHashOpt()
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)

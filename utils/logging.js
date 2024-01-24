@@ -222,7 +222,7 @@ export class FFLogger {
 export const sysOnError = (statusCode, errMsg, context, details) => {
   const fun = 'sysOnError'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     logE(mod, fun, errMsg) //`Error ${err.statusCode} (${err.name}): ${err.message}`)
     const errCode = parseInt(statusCode)
     let sysLogErr = isNaN(errCode) || errCode >= 500 ? sysCrit : sysError
@@ -243,7 +243,7 @@ export const sysOnError = (statusCode, errMsg, context, details) => {
 export const logHttpAnswer = (loggedMod, loggedFun, httpAnswer) => {
   const fun = 'logHttpAnswer'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     // d(mod, fun, `${loggedMod}.${loggedFun} : ${httpAnswer}`)
     if (httpAnswer.config) {
       const resExtract = pick(httpAnswer.config, [HD_METHOD, 'headers', HD_URL])

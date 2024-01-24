@@ -36,7 +36,7 @@ let LICENCE_LIST
 export const getLicences = async () => {
   const fun = 'getLicenceList'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     if (!LICENCE_LIST) {
       logD(mod, fun, `Init LICENCE_LIST`)
       let dbLicenceList = await getAllConceptsWithRole(LICENCE_CONCEPT_ROLE)
@@ -55,7 +55,7 @@ export const getLicences = async () => {
 export const getLicenceCodes = async () => {
   const fun = `getLicenceCodes`
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     if (getLicenceCodeList().length === 0) {
       const licenceList = await getLicences()
       const licenceCodeList = licenceList.map((obj) => obj[API_SKOS_CONCEPT_CODE])
@@ -97,7 +97,7 @@ export const getLicenceWithCode = async (licenceCode) => {
 export const getAllLicences = async (req, reply) => {
   const fun = `getAllLicences`
   logT(mod, fun, `< ${req?.method} ${req?.url}`)
-  // logT(mod, fun, ``)
+  // logT(mod, fun)
 
   return await getLicences()
 }
@@ -105,7 +105,7 @@ export const getAllLicences = async (req, reply) => {
 export const getAllLicenceCodes = async (req, reply) => {
   const fun = `getAllLicenceCodes`
   logT(mod, fun, `< ${req?.method} ${req?.url}`)
-  // logT(mod, fun, ``)
+  // logT(mod, fun)
 
   return await getLicenceCodes()
 }

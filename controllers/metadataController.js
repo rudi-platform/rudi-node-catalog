@@ -155,7 +155,7 @@ import { parseQueryParameters } from '../utils/parseRequest.js'
 export const organizationRudiToDbFormat = async (rudiProducer, path, shouldCreateIfNotFound) => {
   const fun = 'organizationRudiToDbFormat'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     if (!rudiProducer) throw new ParameterExpectedError('rudiProducer', mod, fun)
     let organizationDbId
     try {
@@ -191,7 +191,7 @@ export const organizationRudiToDbFormat = async (rudiProducer, path, shouldCreat
 export const contactListRudiToDbFormat = async (rudiContactList, path, shouldCreateIfNotFound) => {
   const fun = 'contactListRudiToDbFormat'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     if (!rudiContactList) throw new ParameterExpectedError('rudiContactList', mod, fun)
 
     const contactDbIds = []
@@ -235,7 +235,7 @@ export const contactListRudiToDbFormat = async (rudiContactList, path, shouldCre
 export const mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFound) => {
   const fun = 'mediaListRudiToDbFormat'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     // logD(mod, fun, `rudiMediaList: ${beautify(rudiMediaList)}`)
     if (!rudiMediaList) throw new ParameterExpectedError('rudiMediaList', mod, fun)
 
@@ -316,7 +316,7 @@ export const mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFo
 
 export const organizationDbToRudiFormat = async (producerDbId) => {
   const fun = 'organizationDbToRudiFormat'
-  logT(mod, fun, ``)
+  logT(mod, fun)
   if (!producerDbId) throw new ParameterExpectedError('producerDbId', mod, fun)
 
   const dbOrganization = await getEnsuredOrganizationWithDbId(producerDbId)
@@ -326,7 +326,7 @@ export const organizationDbToRudiFormat = async (producerDbId) => {
 
 export const contactListDbToRudiFormat = async (contactsDbIds) => {
   const fun = 'contactListDbToRudiFormat'
-  logT(mod, fun, ``)
+  logT(mod, fun)
   logD(mod, fun, `contactsDbIds: ${beautify(contactsDbIds)}`)
   if (!contactsDbIds) throw new ParameterExpectedError('contactsDbIds', mod, fun)
 
@@ -343,7 +343,7 @@ export const contactListDbToRudiFormat = async (contactsDbIds) => {
 
 export const mediaListDbToRudiFormat = async (mediaDbIds) => {
   const fun = 'mediaListDbToRudiFormat'
-  logT(mod, fun, ``)
+  logT(mod, fun)
   logD(mod, fun, `mediaDbIds: ${beautify(mediaDbIds)}`)
   if (!mediaDbIds) throw new ParameterExpectedError('mediaDbIds', mod, fun)
 
@@ -374,7 +374,7 @@ const SHOULD_CREATE_IF_NOT_FOUND = true
  */
 export const rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) => {
   const fun = 'rudiToDbFormat'
-  logT(mod, fun, ``)
+  logT(mod, fun)
 
   if (!rudiMetadata) throw new InternalServerError(parameterExpected(fun, 'rudiMetadata'))
 
@@ -533,7 +533,7 @@ function checkLicence(metadata) {
 function stripTimestamps(metadata) {
   const fun = 'stripTimestamps'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     metadata[DB_CREATED_AT] = undefined
     metadata[DB_UPDATED_AT] = undefined
   } catch (err) {
@@ -543,7 +543,7 @@ function stripTimestamps(metadata) {
 function toMDBLanguage(metadata, field) {
   const fun = 'toMDBLanguage'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     const prop = metadata[field]
     if (!Array.isArray(prop)) {
       logW(mod, fun, `Field '${field}' should be an array: ${beautify(prop)}`)
@@ -570,7 +570,7 @@ function toMDBLanguage(metadata, field) {
  */
 export const setGeography = (metadata) => {
   const fun = 'setGeography'
-  // logT(mod, fun, ``)
+  // logT(mod, fun)
   const geography = metadata[API_GEOGRAPHY]
   if (isNothing(geography)) {
     // No 'geography' property => exit
@@ -641,7 +641,7 @@ export const setGeography = (metadata) => {
 export const upsertMetadata = async (rudiMetadata) => {
   const fun = 'upsertMetadata'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     const rudiId = accessProperty(rudiMetadata, API_METADATA_ID)
     const existsMetadata = await doesObjectExistWithRudiId(OBJ_METADATA, rudiId)
 
@@ -659,7 +659,7 @@ export const upsertMetadata = async (rudiMetadata) => {
 export const newMetadata = async (rudiMetadata) => {
   const fun = 'newMetadata'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     // logD(mod, fun, `incoming object: ${beautify(rudiMetadata)}`)
     if (!rudiMetadata) throw new ParameterExpectedError('rudiMetadata', mod, fun)
 
@@ -684,7 +684,7 @@ export const newMetadata = async (rudiMetadata) => {
 export const overwriteMetadata = async (incomingRudiMetadata) => {
   const fun = 'overwriteMetadata'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
 
     if (!incomingRudiMetadata) throw new ParameterExpectedError('incomingRudiMetadata', mod, fun)
     // logD(mod, fun, `edited metadata: ${beautify(incomingRudiMetadata)}\n`)
@@ -713,7 +713,7 @@ export const overwriteMetadata = async (incomingRudiMetadata) => {
 const updateMetadataState = async (dbMetadata, newState = StorageStatus.Online) => {
   const fun = 'updateMetadataState'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     const metadata = await getMetadataWithJson(dbMetadata)
 
     const areAllMediaAvailable = isEveryMediaAvailable(metadata)
@@ -752,7 +752,7 @@ const updateMetadataState = async (dbMetadata, newState = StorageStatus.Online) 
 export const commitMedia = async (req, res) => {
   const fun = 'commitMedia'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     const mediaId = accessReqParam(req, PARAM_ID)
     const { metadataId, commitId } = req.body
     logD(mod, fun, `commitId: ${commitId}`)
@@ -806,7 +806,7 @@ export const commitMedia = async (req, res) => {
 export const sendManyMetadataToPortal = async (req) => {
   const fun = 'sendAllMetadataToPortal'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     const listIds = req.body
 
@@ -868,7 +868,7 @@ export const sendToPortal = (metadata) => {
 export const searchMetadata = async (req, reply) => {
   const fun = 'searchMetadata'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
 
     let parsedParameters
     try {
@@ -974,7 +974,7 @@ export const getSingleMetadata = async (req, reply) => {
 export const initThemes = async (req, reply) => {
   const fun = 'initThemes'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     const valuesInStoredData = await listThemesInMetadata()
     logD(mod, fun, beautify(valuesInStoredData))
     await Promise.all(valuesInStoredData.map((val) => Themes.isValid(val, true)))

@@ -41,7 +41,7 @@ export class RudiError extends Error {
     // logT(mod, fun, `${beautify(errTrace)}`)
     // const lastTrace = getLast(errTrace)
     // if (lastTrace) logD(lastTrace.mod, lastTrace.fun, lastTrace.err)
-    // else logT(mod, fun, ``)
+    // else logT(mod, fun)
     super(message || DEFAULT_MESSAGE)
     this[IS_RUDI_ERROR] = true
     this[STATUS_CODE] = code || 500
@@ -207,7 +207,7 @@ export class RudiError extends Error {
   static treatCommunicationError(ctxMod, ctxFun, comError, errPrefix) {
     const fun = 'treatCommunicationError'
     try {
-      logT(mod, fun, ``)
+      logT(mod, fun)
 
       let error
       const errFlag = `${errPrefix ? errPrefix + ' ' : ''}`

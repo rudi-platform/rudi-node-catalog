@@ -13,27 +13,12 @@ const { pick } = _
 // -------------------------------------------------------------------------------------------------
 // Constants
 // -------------------------------------------------------------------------------------------------
-import {
-  HTTP_METHODS,
-  OBJ_METADATA,
-  PARAM_ID,
-  PORTAL_API_VERSION,
-  USER_AGENT,
-} from '../config/constApi.js'
+import { HTTP_METHODS, OBJ_METADATA, PARAM_ID, USER_AGENT } from '../config/constApi.js'
 import {
   API_COLLECTION_TAG,
   API_DATA_NAME_PROPERTY,
-  API_FILE_STATUS_UPDATE,
-  API_FILE_STORAGE_STATUS,
-  API_INTEGRATION_ERROR_ID,
-  API_MEDIA_PROPERTY,
   API_METADATA_ID,
-  API_METAINFO_PROPERTY,
-  API_METAINFO_SOURCE_PROPERTY,
-  API_METAINFO_VERSION_PROPERTY,
   API_REPORT_ID,
-  API_RESTRICTED_ACCESS,
-  API_STATUS_PROPERTY,
   API_STORAGE_STATUS,
   DB_UPDATED_AT,
   getUpdatedDate,
@@ -47,7 +32,6 @@ import {
   beautify,
   dateEpochSToIso,
   decodeBase64,
-  deepClone,
   padWithEqualSignBase4,
   timeEpochS,
   toBase64,
@@ -76,6 +60,7 @@ import { StorageStatus } from '../definitions/thesaurus/StorageStatus.js'
 
 import {
   getLatestStoredPortalToken,
+  getMetadataWithRudiId,
   getObjectWithRudiId,
   storePortalToken,
 } from '../db/dbQueries.js'
@@ -102,7 +87,7 @@ const portalHttpsAgent = new https.Agent({
 export const getPortalAuthHeaderBasic = () => {
   const fun = 'getPortalAuthHeaderBasic'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     if (isPortalConnectionDisabled()) return
     const [usr, pwdb64] = getCredentials()
     const pwd = decodeBase64(pwdb64)
@@ -120,7 +105,7 @@ export const getPortalAuthHeaderBasic = () => {
 export const getPortalAuthHeaderBearer = async () => {
   const fun = 'getPortalAuthHeaderBearer'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     return {
       headers: {
         'User-Agent': USER_AGENT,
@@ -165,7 +150,7 @@ export const exposedGetPortalToken = async (req, reply) => {
 
 export const checkPortalTokenInHeader = async (req, isCheckOptional) => {
   const fun = 'checkPortalTokenInHeader'
-  logT(mod, fun, ``)
+  logT(mod, fun)
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     const token = extractJwt(req)
@@ -188,7 +173,7 @@ export const checkPortalTokenInHeader = async (req, isCheckOptional) => {
  */
 export const getPortalToken = async () => {
   const fun = 'getPortalToken'
-  logT(mod, fun, ``)
+  logT(mod, fun)
   let token, rmToken
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
@@ -218,7 +203,7 @@ export const getPortalToken = async () => {
  */
 export const checkStoredToken = async (req, reply) => {
   const fun = 'checkStoredToken'
-  logT(mod, fun, ``)
+  logT(mod, fun)
   // logT(mod, fun, `< GET portal check token`)
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
@@ -232,7 +217,7 @@ export const checkStoredToken = async (req, reply) => {
 
 export const checkInputToken = async (req, reply) => {
   const fun = 'checkInputToken'
-  logT(mod, fun, ``)
+  logT(mod, fun)
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     const token = accessReqParam(req.params, PARAM_TOKEN)
@@ -244,7 +229,7 @@ export const checkInputToken = async (req, reply) => {
 
 export const getMetadata = async (req, reply) => {
   const fun = 'getMetadata'
-  logT(mod, fun, ``)
+  logT(mod, fun)
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     let metadataId = req.params[PARAM_ID]
@@ -261,7 +246,7 @@ export const getMetadata = async (req, reply) => {
 
 export const sendMetadata = async (req, reply) => {
   const fun = 'sendMetadata'
-  logT(mod, fun, ``)
+  logT(mod, fun)
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     let metadataId = req.params[PARAM_ID]
@@ -277,7 +262,7 @@ export const sendMetadata = async (req, reply) => {
 
 export const deleteMetadata = async (req, reply) => {
   const fun = 'deleteMetadata'
-  logT(mod, fun, ``)
+  logT(mod, fun)
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     let metadataId = req.params[PARAM_ID]
@@ -296,7 +281,7 @@ export const deleteMetadata = async (req, reply) => {
 let CACHED_PORTAL_PUB
 export const getPortalJwtPubKey = async () => {
   const fun = 'getPortalJwtPubKey'
-  logT(mod, fun, ``)
+  logT(mod, fun)
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     if (CACHED_PORTAL_PUB) return CACHED_PORTAL_PUB
@@ -317,7 +302,7 @@ export const getPortalJwtPubKey = async () => {
 
 export const getPortalEncryptPubKey = async () => {
   const fun = 'getPortalEncryptPubKey'
-  logT(mod, fun, ``)
+  logT(mod, fun)
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     const portalCryptPubData = await axios.get(getPortalCryptPubUrl(), {
@@ -338,7 +323,7 @@ export const getPortalEncryptPubKey = async () => {
 // -------------------------------------------------------------------------------------------------
 export const getNewTokenFromPortal = async () => {
   const fun = 'getNewTokenFromPortal'
-  logT(mod, fun, ``)
+  logT(mod, fun)
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     const [usr, pwdb64] = getCredentials()
@@ -363,12 +348,12 @@ export const getNewTokenFromPortal = async () => {
     try {
       answer = await directPost(portalAuthUrl, body, getPortalAuthHeaderBasic())
     } catch (err) {
-      await createErrorReport(
-        err,
-        'posting the node credentials to Portal',
-        'An error occurred while getting a new token from the Portal',
-        { method: HTTP_METHODS.POST, url: portalAuthUrl }
-      )
+      await createErrorReport(err, {
+        step: 'posting the node credentials to Portal',
+        description: 'An error occurred while getting a new token from the Portal',
+        method: HTTP_METHODS.POST,
+        url: portalAuthUrl,
+      })
       if (RudiError.isRudiError(err)) throw RudiError.treatError(mod, fun, err)
       else {
         const error = new InternalServerError(`Post to portal failed: ${beautify(err)}`)
@@ -414,7 +399,7 @@ export const getNewTokenFromPortal = async () => {
 
 export const getTokenCheckedByPortal = async (token) => {
   const fun = 'getTokenCheckedByPortal'
-  logT(mod, fun, ``)
+  logT(mod, fun)
   if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
   if (!token) throw new BadRequestError('No token to check!', mod, fun)
   let portalResponse
@@ -423,12 +408,12 @@ export const getTokenCheckedByPortal = async (token) => {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     })
   } catch (err) {
-    await createErrorReport(
-      err,
-      'submitting the token to Portal checks',
-      'An error occurred while having the token checked by the Portal',
-      { method: HTTP_METHODS.POST, url: getCheckAuthUrl() }
-    )
+    await createErrorReport(err, {
+      step: 'submitting the token to Portal checks',
+      description: 'An error occurred while having the token checked by the Portal',
+      method: HTTP_METHODS.POST,
+      url: getCheckAuthUrl(),
+    })
     throw RudiError.treatError(mod, fun, err)
   }
   if (portalResponse?.status === 200) {
@@ -439,7 +424,7 @@ export const getTokenCheckedByPortal = async (token) => {
 
 export const verifyPortalToken = async (accessToken) => {
   const fun = 'verifyPortalToken'
-  logT(mod, fun, ``)
+  logT(mod, fun)
 
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
@@ -509,15 +494,15 @@ const isMetadataSendableToPortal = async (metadataId) => {
     if (!isUUID(metadataId)) throw new BadRequestError(`Badly formatted UUID: ${metadataId}`)
 
     //--- Get local metadata from ID
-    const metadata = await getObjectWithRudiId(OBJ_METADATA, metadataId)
-    if (!metadata) {
+    const dbMetadata = await getObjectWithRudiId(OBJ_METADATA, metadataId)
+    if (!dbMetadata) {
       const errMsg = `No data found locally for id '${metadataId}'`
       logW(mod, fun, errMsg)
       throw new NotFoundError(errMsg)
     }
 
     //--- If 'collection_tag' is set (ie for tests), metadata is not sent to the Portal
-    const collectionTag = metadata[API_COLLECTION_TAG]
+    const collectionTag = dbMetadata[API_COLLECTION_TAG]
     if (collectionTag) {
       logD(mod, fun, `Not sending to portal: ${metadataId} (${collectionTag})`)
       return false
@@ -525,139 +510,114 @@ const isMetadataSendableToPortal = async (metadataId) => {
 
     //--- If media still need to be uploaded, metadata is not sent to the Portal
     if (
-      metadata[API_STORAGE_STATUS] === StorageStatus.Pending ||
-      !isEveryMediaAvailable(metadata)
+      dbMetadata[API_STORAGE_STATUS] === StorageStatus.Pending ||
+      !isEveryMediaAvailable(dbMetadata)
     ) {
       logD(mod, fun, `Waiting for other media to get uploaded: ${metadataId}`)
       return false
     }
 
-    //--- Purging the waiting room / buffer of metadatas waiting for an integration report
+    //--- Checking the waiting room for
+    //      - metadatas waiting for an integration report for too long to get purged from the list
+    //      - the same metadata if it has already been sent to portal
+    let isMetadataAlreadyWaitingToBeSent = false
     try {
-      for (let i = metadatasWaitingForPortalFeedback.length - 1; i >= 0; i--)
-        if (
-          metadatasWaitingForPortalFeedback[i] &&
-          metadatasWaitingForPortalFeedback[i][WAIT_DATE] < timeEpochS() + WAITING_ROOM_TIMEOUT_S
-        )
+      for (let i = metadatasWaitingForPortalFeedback.length - 1; i >= 0; i--) {
+        const waitingMeta = metadatasWaitingForPortalFeedback[i]
+        if (waitingMeta?.[WAIT_DATE] < timeEpochS() + WAITING_ROOM_TIMEOUT_S) {
           metadatasWaitingForPortalFeedback.splice(i, 1)
+        } else if (
+          !isMetadataAlreadyWaitingToBeSent &&
+          waitingMeta[API_METADATA_ID] === dbMetadata[API_METADATA_ID] &&
+          waitingMeta[DB_UPDATED_AT] >= dbMetadata[DB_UPDATED_AT]
+        ) {
+          isMetadataAlreadyWaitingToBeSent = true
+        }
+      }
     } catch (e) {
       logE(mod, `${fun}.purgeWaitBuffer`, e)
-    }
-
-    //--- Check if the metadata has already been sent to portal
-    let isMetadataAlreadyWaitingToBeSent = false
-    for (const sentMetadata of metadatasWaitingForPortalFeedback) {
-      if (
-        sentMetadata[API_METADATA_ID] === metadata[API_METADATA_ID] &&
-        sentMetadata[DB_UPDATED_AT] >= metadata[DB_UPDATED_AT]
-      ) {
-        isMetadataAlreadyWaitingToBeSent = true
-        break
-      }
     }
     if (isMetadataAlreadyWaitingToBeSent) {
       logD(mod, fun, `Metadata is already waiting to be sent: ${metadataId}`)
       return false
     }
 
-    //--- Removing the publication date as we're about to send it again
-    const updatedMetadata = await setMetadataStatusToSent(metadata)
-
     //--- Puting the metadata in the waiting list
     const waitingMetadata = {
-      [API_METADATA_ID]: updatedMetadata[API_METADATA_ID],
-      [DB_UPDATED_AT]: updatedMetadata[DB_UPDATED_AT],
+      [API_METADATA_ID]: dbMetadata[API_METADATA_ID],
+      [DB_UPDATED_AT]: dbMetadata[DB_UPDATED_AT],
       [WAIT_DATE]: timeEpochS(),
     }
-    // console.log(
-    //   `T (isMetadataSendableToPortal) waitingMetadata ${metadatasWaitingForPortalFeedback.length}`,
-    //   waitingMetadata
-    // )
-    metadatasWaitingForPortalFeedback.push(waitingMetadata)
+    const waitIndex = metadatasWaitingForPortalFeedback.push(waitingMetadata) - 1
+
     //--- If a media is restricted, metadata is not sent to the Portal
     // if( metadata[API_RESTRICTED_ACCESS]&&metadata[API_MEDIA_PROPERTY][0][API_MEDIA_CONNECTOR]
 
-    return { updatedMetadata, waitIndex: metadatasWaitingForPortalFeedback.length - 1 }
+    //--- Ensuring we respect the format the Portal accepts
+    const portalReadyMetadata = dbMetadata.toRudiPortalJSON()
+
+    //--- Updating the DB metadata status
+    setMetadataStatusToSent(dbMetadata)
+    await dbMetadata.save()
+
+    return { portalReadyMetadata, waitIndex }
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
 }
 
-export const cleanMetadataForPortal = (metadata) => {
-  const metadataClean = deepClone(metadata)
-
-  //--- Latest API version
-  metadataClean[API_METAINFO_PROPERTY][API_METAINFO_VERSION_PROPERTY] = PORTAL_API_VERSION
-
-  //--- Removing media fields that are node specific
-  metadataClean[API_MEDIA_PROPERTY].map((media) => {
-    delete media[API_FILE_STORAGE_STATUS]
-    delete media[API_FILE_STATUS_UPDATE]
-
-    // delete media[API_MEDIA_THUMBNAIL]
-    // delete media[API_MEDIA_SATELLITES]
-  })
-
-  //--- Removing metadata fields that are node specific (e.g. virtual properties)
-  delete metadataClean[API_INTEGRATION_ERROR_ID]
-  delete metadataClean[API_STATUS_PROPERTY]
-  delete metadataClean[API_RESTRICTED_ACCESS]
-  delete metadataClean[DB_UPDATED_AT]
-  delete metadataClean[API_METAINFO_PROPERTY][API_METAINFO_SOURCE_PROPERTY]
-
-  return metadataClean
-}
-
 const PORTAL_POST_URL = postPortalMetaUrl()
 export const sendMetadataToPortal = async (metadataId) => {
   const fun = 'sendMetadataToPortal'
-  const report = { actionStep: 'initializing' }
+  const report = { step: 'initializing' }
 
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
 
+    // Checking if the metadata is ok to be sent
+    // If so, a portal ready metadata JSON is retrieved
     const sendableData = await isMetadataSendableToPortal(metadataId)
     if (!sendableData) return
-    const { metadata, waitIndex } = sendableData
-    logI(mod, `${fun}.metadataSent`, metadata)
-    logI(mod, `${fun}.waitIndex`, waitIndex)
+    const { portalReadyMetadata, waitIndex } = sendableData
 
     const waitingMetadata = metadatasWaitingForPortalFeedback[waitIndex]
-    //--- Ensuring compatibility with portal
-    const metadataClean = cleanMetadataForPortal(metadata)
+
+    //--- Just a test
+    const dbMetadata = await getMetadataWithRudiId(metadataId)
+    logI(mod, `${fun}.dbMetadata`, dbMetadata)
 
     //--- Sending to portal
-    logV(mod, fun, `Initiating the metadata sending to portal: ${beautify(metadataClean)}`)
+    logV(mod, fun, `Initiating the metadata sending to portal: ${beautify(portalReadyMetadata)}`)
 
-    report.metadataInfo = pick(metadataClean, [API_METADATA_ID, API_DATA_NAME_PROPERTY])
-    report.actionStep = 'retrieving Portal token'
+    report.metadata = pick(portalReadyMetadata, [API_METADATA_ID, API_DATA_NAME_PROPERTY])
+    report.step = 'retrieving Portal token'
 
     const portalToken = await getPortalToken()
 
     let portalAnswer
     try {
-      report.actionStep = 'checking if the metadata is on the portal'
+      report.step = 'checking if the metadata is on the portal'
       report.requestDetails = { method: HTTP_METHODS.GET, url: getPortalMetaUrl(metadataId) }
-      logD(mod, fun, report.actionStep)
+      logD(mod, fun, report.step)
 
       portalAnswer = await axios.get(getPortalMetaUrl(metadataId), portalToken)
     } catch (err) {
-      report.actionStep = `sending a metadata that is not on the portal: '${metadataId}'`
+      report.step = `sending a metadata that is not on the portal: '${metadataId}'`
       report.requestDetails = { method: HTTP_METHODS.POST, url: PORTAL_POST_URL }
-      logD(mod, fun, report.actionStep)
+      logD(mod, fun, report.step)
 
-      const postAnswer = await httpPost(PORTAL_POST_URL, metadataClean, portalToken)
+      const postAnswer = await httpPost(PORTAL_POST_URL, portalReadyMetadata, portalToken)
       waitingMetadata[API_REPORT_ID] = isUUID(postAnswer) ? postAnswer : postAnswer.data
       return postAnswer
     }
     const portalMetadata = portalAnswer?.data
 
-    if (getUpdatedDate(portalMetadata) < getUpdatedDate(metadataClean)) {
-      report.actionStep = `updating a metadata that is on the portal and older: '${metadataId}'`
+    if (getUpdatedDate(portalMetadata) < getUpdatedDate(portalReadyMetadata)) {
+      report.step = `updating a metadata that is on the portal and older: '${metadataId}'`
       report.requestDetails = { method: HTTP_METHODS.PUT, url: PORTAL_POST_URL }
-      logD(mod, fun, report.actionStep)
-      const putAnswer = await httpPut(PORTAL_POST_URL, metadataClean, portalToken)
+      logD(mod, fun, report.step)
+      const putAnswer = await httpPut(PORTAL_POST_URL, portalReadyMetadata, portalToken)
       waitingMetadata[API_REPORT_ID] = isUUID(putAnswer) ? putAnswer : putAnswer.data
       return putAnswer
     } else {
@@ -665,14 +625,8 @@ export const sendMetadataToPortal = async (metadataId) => {
       logD(mod, fun, `Metadata is on the portal and same: not updating '${metadataId}'`)
     }
   } catch (err) {
-    await createErrorReport(
-      err,
-      report.actionStep,
-      'An error occurred while sending the metadata to the Portal',
-      report.requestDetails,
-      report.metadataInfo,
-      'update metadata status'
-    )
+    report.description = 'An error occurred while sending the metadata to the Portal'
+    await createErrorReport(err, report, 'update metadata status')
     throw RudiError.treatError(mod, fun, err)
   }
 }
@@ -682,36 +636,31 @@ export const getPortalMetadataListWithToken = (token, additionalParameters) =>
 
 export const getMetadataFromPortal = async (metadataId, additionalParameters) => {
   const fun = 'getMetadataFromPortal'
-  logT(mod, fun, ``)
+  logT(mod, fun)
   const report = {}
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
-    report.comment = 'Retrieving Portal token'
+
+    report.step = 'retrieving Portal token'
     const token = await getPortalToken()
 
-    report.comment = 'Getting the metadata'
-    report.requestDetails = {
-      method: HTTP_METHODS.GET,
-      url: getPortalMetaUrl(metadataId, additionalParameters),
-    }
-    report.metadataInfo = { [API_METADATA_ID]: metadataId }
+    report.step = 'getting the metadata'
+    report.method = HTTP_METHODS.GET
+    report.url = getPortalMetaUrl(metadataId, additionalParameters)
+    report.metadata = { [API_METADATA_ID]: metadataId }
+    report.description = 'An error occurred while getting a metadata from the Portal'
+
     if (!metadataId) return httpGet(getPortalMetaUrl(null, additionalParameters), token)
     else return httpGet(getPortalMetaUrl(metadataId, additionalParameters), token)
   } catch (err) {
-    await createErrorReport(
-      err,
-      report.comment,
-      'An error occurred while getting a metadata from the Portal',
-      report.requestDetails,
-      report.metadataInfo
-    )
+    await createErrorReport(err, report)
     throw RudiError.treatError(mod, fun, err)
   }
 }
 
 export const deletePortalMetadata = async (metadataId) => {
   const fun = 'deletePortalMetadata'
-  logT(mod, fun, ``)
+  logT(mod, fun)
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     if (!metadataId) throw new BadRequestError('Metadata id required') // Can't get the resources list yet.

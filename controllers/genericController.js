@@ -364,7 +364,7 @@ export const searchObjects = async (req, reply) => {
 export const getSearchableProperties = (req, reply) => {
   const fun = 'getSearchableProperties'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     const rudiObjectList = getRudiObjectList()
     const getSearchableFields = {}
     // logD(mod, fun, `rudiObjectList: ${beautify(rudiObjectList)}`)
@@ -387,7 +387,7 @@ export const getSearchableProperties = (req, reply) => {
 export const getManyObjects = async (objectType, req) => {
   const fun = 'getManyObjects'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     let parsedParameters
     try {
       parsedParameters = await parseQueryParameters(objectType, req.url)
@@ -448,7 +448,7 @@ export const getManyObjects = async (objectType, req) => {
 export const countObjects = async (req, reply) => {
   const fun = 'countObjects'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     const objectType = getObjectParam(req)
     const count = await countDbObjects(objectType)
     return count
@@ -503,7 +503,7 @@ export const getMetadataListAndCount = async (req, reply) => {
 export const getManyPubKeys = async (req, reply) => {
   const fun = 'getPubKeys'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     return await getManyObjects(OBJ_PUB_KEYS, req)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -668,7 +668,7 @@ export const getOrphans = async (objectType) => {
 export const generateUUID = async (req, reply) => {
   const fun = 'generateUUID'
   try {
-    logT(mod, fun, ``)
+    logT(mod, fun)
     return UUIDv4()
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
