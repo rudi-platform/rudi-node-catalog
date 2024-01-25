@@ -99,7 +99,7 @@ const validArrayNotNull = {
 // -------------------------------------------------------------------------------------------------
 import { beautify, isNotEmptyArray, isNothing, multiSplit } from '../../utils/jsUtils.js'
 
-import { logD, logE, logI, logT, logV } from '../../utils/logging.js'
+import { logD, logE, logT, logV } from '../../utils/logging.js'
 
 import { makeSearchable } from '../../db/dbActions.js'
 import { BadRequestError, NotFoundError, RudiError } from '../../utils/errors.js'
@@ -146,10 +146,10 @@ export const METADATA_FIELDS_TO_POPULATE = [
   API_MEDIA_PROPERTY,
 ].join(' ')
 
-const POPULATE_OPTS = {
-  path: METADATA_FIELDS_TO_POPULATE,
-  select: `-${FIELDS_TO_SKIP.concat(API_RESTRICTED_ACCESS).join(' -')}`,
-}
+// const POPULATE_OPTS = {
+//   path: METADATA_FIELDS_TO_POPULATE,
+//   select: `-${FIELDS_TO_SKIP.concat(API_RESTRICTED_ACCESS).join(' -')}`,
+// }
 
 // -------------------------------------------------------------------------------------------------
 // Helper functions
@@ -801,11 +801,10 @@ export const toRudiPortalJSON = (metadata) => {
 export const setMetadataStatusToSent = (metadata) => {
   const fun = 'setMetadataStatusToSent'
   try {
-    logI(mod, `${fun}.metadata_status before`, metadata.metadata_status)
-    delete metadata[DB_PUBLISHED_AT]
-    delete metadata[API_INTEGRATION_ERROR_ID]
+    metadata[DB_PUBLISHED_AT] = null // `delete mongooseDocument.field` doesn't work!!!!
+    metadata[API_INTEGRATION_ERROR_ID] = null
     metadata[API_STATUS_PROPERTY] = MetadataStatus.Sent
-    logI(mod, `${fun}.metadata_status after`, metadata.metadata_status)
+    return MetadataStatus.Sent
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -941,35 +940,37 @@ MetadataSchema.pre('save', async function (next) {
   // next()
 })
 
-MetadataSchema.post('save', async function (doc, next) {
-  const fun = 'post save hook'
-  logT(mod, fun)
+// MetadataSchema.post('save', async function (metadata, next) {
+//   const fun = 'post save hook'
+//   logT(mod, fun)
 
-  try {
-    await doc.populate(POPULATE_OPTS) //.execPopulate()
-    next()
-  } catch (err) {
-    // next(err)
-    throw RudiError.treatError(mod, fun, err)
-  }
-  // next()
-})
+//   try {
+//     // logI(mod, fun, metadata)
+//     // await metadata.populate(POPULATE_OPTS) //.execPopulate()
+//     logV(mod, fun, metadata.producer)
+//     next()
+//   } catch (err) {
+//     // next(err)
+//     throw RudiError.treatError(mod, fun, err)
+//   }
+//   // next()
+// })
 
-MetadataSchema.post('find', async function (metadata_list, next) {
-  const fun = 'post find hook'
-  // logT(mod, fun)
+// MetadataSchema.post('find', async function (metadata_list, next) {
+//   const fun = 'post find hook'
+//   // logT(mod, fun)
 
-  for (const metadata of metadata_list) {
-    if (!metadata[API_STATUS_PROPERTY]) {
-      // updateMetadataStatus(metadata) // Done in metadata.save()
-      metadata.save().catch((err) => {
-        logE(mod, `${fun}.updateMetadataStatus`, beautify(err))
-        next(err)
-      })
-    }
-  }
-  next()
-})
+//   for (const metadata of metadata_list) {
+//     if (!metadata[API_STATUS_PROPERTY]) {
+//       // updateMetadataStatus(metadata) // Done in metadata.save()
+//       metadata.save().catch((err) => {
+//         logE(mod, `${fun}.updateMetadataStatus`, beautify(err))
+//         next(err)
+//       })
+//     }
+//   }
+//   next()
+// })
 
 // -------------------------------------------------------------------------------------------------
 // Models definition

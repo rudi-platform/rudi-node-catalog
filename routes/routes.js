@@ -86,6 +86,7 @@ import {
   initWithODR,
   searchMetadata,
   sendManyMetadataToPortal,
+  updateAllMetadataStatus,
 } from '../controllers/metadataController.js'
 import {
   addOrEditSingleReportForMetadata,
@@ -164,6 +165,7 @@ const PORTAL_GET_ONE_OBJ_REPORT = 'portal_get_one_obj_report'
 
 const PRV_ADD_ONE = 'prv_add_one'
 const PRV_UPSERT_ONE = 'prv_upsert_one'
+const PRV_SAVE_ALL = 'prv_save_all'
 const PRV_GET_ALL = 'prv_get_all'
 const PRV_GET_ONE = 'prv_get_one'
 const PRV_DEL_ONE = 'prv_del_one'
@@ -592,6 +594,16 @@ export const backOfficeRoutes = [
     url: `${URL_PV_OBJECT_GENERIC}/count`,
     handler: countObjects,
     config: { [ROUTE_NAME]: PRV_OBJ_COUNT },
+  },
+
+  // -------------------------------------------------------------------------------------------------
+  // Metadata
+  // -------------------------------------------------------------------------------------------------
+  {
+    method: HTTP_METHODS.PUT,
+    url: `${URL_PREFIX_PRIVATE}/${OBJ_METADATA}/save`,
+    handler: updateAllMetadataStatus,
+    config: { [ROUTE_NAME]: PRV_SAVE_ALL },
   },
   // -------------------------------------------------------------------------------------------------
   // Media

@@ -559,6 +559,7 @@ const isMetadataSendableToPortal = async (metadataId) => {
     //--- Updating the DB metadata status
     setMetadataStatusToSent(dbMetadata)
     await dbMetadata.save()
+    logV(mod, `${fun}.metadata_status saved`, dbMetadata.metadata_status)
 
     return { portalReadyMetadata, waitIndex }
   } catch (err) {

@@ -49,6 +49,7 @@ import {
   API_METAINFO_VERSION_PROPERTY,
   API_ORGANIZATION_ID,
   API_PURPOSE,
+  API_STATUS_PROPERTY,
   API_STORAGE_STATUS,
   DB_CREATED_AT,
   DB_ID,
@@ -99,7 +100,7 @@ import {
   isNothing,
   nowISO,
 } from '../utils/jsUtils.js'
-import { logD, logE, logI, logT, logW } from '../utils/logging.js'
+import { logD, logE, logI, logT, logV, logW } from '../utils/logging.js'
 import {
   contactNotFound,
   missingObjectProperty,
@@ -127,6 +128,7 @@ import Themes from '../definitions/thesaurus/Themes.js'
 import {
   doesObjectExistWithRudiId,
   getContactDbIdWithJson,
+  getDbObjectList,
   getDbObjectListAndCount,
   getEnsuredContactWithDbId,
   getEnsuredMediaWithDbId,
@@ -669,7 +671,8 @@ export const newMetadata = async (rudiMetadata) => {
     const dbMetadata = new Metadata(dbReadyObject)
     await dbMetadata.save()
 
-    const { metadata: finalMetadata, areAllMediaAvailable } = await updateMetadataState(dbMetadata)
+    const { metadata: finalMetadata, areAllMediaAvailable } =
+      await updateMetadataStorageState(dbMetadata)
 
     logI(mod, fun, `finalMetadata: ${beautify(finalMetadata)}`)
     if (areAllMediaAvailable) sendToPortal(finalMetadata)
@@ -692,7 +695,8 @@ export const overwriteMetadata = async (incomingRudiMetadata) => {
     const dbReadyEditedMetadata = await rudiToDbFormat(incomingRudiMetadata, true)
     const dbMetadata = await overwriteDbObject(OBJ_METADATA, dbReadyEditedMetadata)
 
-    const { metadata: finalMetadata, areAllMediaAvailable } = await updateMetadataState(dbMetadata)
+    const { metadata: finalMetadata, areAllMediaAvailable } =
+      await updateMetadataStorageState(dbMetadata)
     if (areAllMediaAvailable) sendToPortal(finalMetadata)
 
     return finalMetadata
@@ -710,8 +714,8 @@ export const overwriteMetadata = async (incomingRudiMetadata) => {
  * @param {string?} newState
  * @return {Boolean} True if all media were commited and metadata can be sent to Portal
  */
-const updateMetadataState = async (dbMetadata, newState = StorageStatus.Online) => {
-  const fun = 'updateMetadataState'
+const updateMetadataStorageState = async (dbMetadata, newState = StorageStatus.Online) => {
+  const fun = 'updateMetadataStorageState'
   try {
     logT(mod, fun)
     const metadata = await getMetadataWithJson(dbMetadata)
@@ -722,7 +726,6 @@ const updateMetadataState = async (dbMetadata, newState = StorageStatus.Online) 
     } else {
       metadata[API_STORAGE_STATUS] = StorageStatus.Pending
     }
-    // console.log('T (updateMetadataState) API_STORAGE_STATUS:', metadata[API_STORAGE_STATUS])
     if (dbMetadata[API_STORAGE_STATUS] !== metadata[API_STORAGE_STATUS]) {
       dbMetadata[API_STORAGE_STATUS] = metadata[API_STORAGE_STATUS]
       if (!dbMetadata[API_INTEGRATION_ERROR_ID]) await dbMetadata.save()
@@ -732,11 +735,8 @@ const updateMetadataState = async (dbMetadata, newState = StorageStatus.Online) 
       await dbMetadata.save()
       logD(mod, fun, 'Integration error flag removed')
     }
-    logD(
-      mod,
-      fun,
-      `Metadata is ${areAllMediaAvailable ? '' : 'not '}sendable: ${dbMetadata[API_METADATA_ID]}`
-    )
+    const msg = `Metadata is ${areAllMediaAvailable ? '' : 'not '}sendable: ${dbMetadata[API_METADATA_ID]}`
+    logD(mod, fun, msg)
     return { metadata, areAllMediaAvailable } // OK to send
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -778,7 +778,8 @@ export const commitMedia = async (req, res) => {
 
     await dbMedia.save()
 
-    const { metadata: finalMetadata, areAllMediaAvailable } = await updateMetadataState(dbMetadata)
+    const { metadata: finalMetadata, areAllMediaAvailable } =
+      await updateMetadataStorageState(dbMetadata)
 
     const result = {
       media: pick(dbMedia, [API_MEDIA_ID, API_FILE_STORAGE_STATUS, API_FILE_STATUS_UPDATE]),
@@ -990,4 +991,19 @@ export const setFlagIntegrationKO = async (metadata, reportId) => {
   await metadata.save()
   // metadata = await getObjectWithJson(OBJ_METADATA, metadata)
   // return metadata
+}
+
+export const updateAllMetadataStatus = async (req, reply) => {
+  const fun = 'updateAllMetadataStatus'
+  const filter = req?.query?.status == 'empty' ? { [API_STATUS_PROPERTY]: null } : {}
+  logI(mod, `${fun}.filter`, beautify(filter))
+  const metadataList = await getDbObjectList(OBJ_METADATA, { [QUERY_FILTER]: filter })
+  for (const metadata of metadataList) {
+    logI(mod, `${fun}.metadata`, metadata)
+    metadata.save().catch((err) => {
+      throw RudiError.treatError(mod, fun, err)
+    })
+    logV(mod, `${fun}.metadata`, metadata)
+  }
+  return { updated: metadataList.length }
 }
