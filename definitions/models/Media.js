@@ -79,9 +79,9 @@ export const InterfaceContract = {
   Dwnld: 'dwnl',
   Page: 'page',
   Api: 'api',
-  Wms: 'wms',
-  Wfs: 'wfs',
-  Wmts: 'wmts',
+  // Wms: 'wms',
+  // Wfs: 'wfs',
+  // Wmts: 'wmts',
   Geo: 'geoservice',
 }
 
