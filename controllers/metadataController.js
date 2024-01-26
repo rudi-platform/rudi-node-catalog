@@ -840,7 +840,7 @@ export const sendManyMetadataToPortal = async (req) => {
     } else {
       listIds.map((id) =>
         sendMetadataToPortal(id).then((res) => {
-          if (res) logI(mod, fun, `'Update request received by the portal for metadata '${id}'`)
+          if (res) logI(mod, fun, `Update request received by the portal for metadata '${id}'`)
         })
       )
     }
@@ -857,7 +857,7 @@ export const sendToPortal = (metadata) => {
     logT(mod, fun, `${metaId}`)
     return sendMetadataToPortal(metaId)
       .then((res) => {
-        if (res) logI(mod, fun, `'Update request received by the portal for metadata '${metaId}'`)
+        if (res) logI(mod, fun, `Update request received by the portal for metadata '${metaId}'`)
       })
       .catch((err) => logE(mod, fun, `Sending to portal failed for metadata '${metaId}': ${err}`))
     // logV(mod, fun, `Sent request to portal: ${metaId}`)

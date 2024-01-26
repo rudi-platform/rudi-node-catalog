@@ -41,7 +41,7 @@ import {
   toBase64,
 } from '../utils/jsUtils.js'
 import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
-import { logD, logE, logI, logT, logV, logW } from '../utils/logging.js'
+import { logD, logE, logT, logV, logW } from '../utils/logging.js'
 
 import {
   FIELD_TOKEN,
@@ -590,7 +590,7 @@ export const sendMetadataToPortal = async (metadataId) => {
 
     //--- Just a test
     const dbMetadata = await getMetadataWithRudiId(metadataId)
-    logI(mod, `${fun}.dbMetadata`, dbMetadata)
+    // logI(mod, `${fun}.dbMetadata`, dbMetadata)
 
     //--- Sending to portal
     logV(mod, fun, `Initiating the metadata sending to portal: ${beautify(portalReadyMetadata)}`)
