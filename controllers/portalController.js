@@ -17,7 +17,10 @@ import { HTTP_METHODS, OBJ_METADATA, PARAM_ID, USER_AGENT } from '../config/cons
 import {
   API_COLLECTION_TAG,
   API_DATA_NAME_PROPERTY,
+  API_DATES_PUBLISHED,
   API_METADATA_ID,
+  API_METAINFO_DATES,
+  API_METAINFO_PROPERTY,
   API_REPORT_ID,
   API_STORAGE_STATUS,
   DB_UPDATED_AT,
@@ -32,6 +35,7 @@ import {
   beautify,
   dateEpochSToIso,
   decodeBase64,
+  nowISO,
   padWithEqualSignBase4,
   timeEpochS,
   toBase64,
@@ -560,7 +564,7 @@ const isMetadataSendableToPortal = async (metadataId) => {
     setMetadataStatusToSent(dbMetadata)
     await dbMetadata.save()
     logV(mod, `${fun}.metadata_status saved`, dbMetadata.metadata_status)
-
+    portalReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES][API_DATES_PUBLISHED] = nowISO()
     return { portalReadyMetadata, waitIndex }
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
