@@ -77,6 +77,7 @@ export const MediaStorageStatus = {
 
 export const InterfaceContract = {
   Dwnld: 'dwnl',
+  External: 'external',
 }
 
 const commonSchemaOptions = {
@@ -201,8 +202,8 @@ MediaSchema.pre('save', function (next) {
       this[API_FILE_STORAGE_STATUS] = this[API_FILE_STORAGE_STATUS] || MediaStorageStatus.Available
       // Set status_update date
       this[API_FILE_STATUS_UPDATE] = this[API_FILE_STATUS_UPDATE] || nowISO()
-      // Set connector interface_contract to 'external'
-      this[API_MEDIA_CONNECTOR][API_MEDIA_INTERFACE_CONTRACT] = 'external'
+      // Set connector interface_contract to 'dwnl'
+      this[API_MEDIA_CONNECTOR][API_MEDIA_INTERFACE_CONTRACT] = InterfaceContract.Dwnld
     }
     if (this[API_MEDIA_NAME]) {
       const nameBefore = this[API_MEDIA_NAME]
