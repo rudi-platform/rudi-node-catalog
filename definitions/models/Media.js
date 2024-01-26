@@ -77,7 +77,12 @@ export const MediaStorageStatus = {
 
 export const InterfaceContract = {
   Dwnld: 'dwnl',
-  External: 'external',
+  Page: 'page',
+  Api: 'api',
+  Wms: 'wms',
+  Wfs: 'wfs',
+  Wmts: 'wmts',
+  Geo: 'geoservice',
 }
 
 const commonSchemaOptions = {

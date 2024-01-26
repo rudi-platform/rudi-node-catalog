@@ -90,6 +90,7 @@ import { getLicenceCodes } from './licenceController.js'
 // -------------------------------------------------------------------------------------------------
 // Data models
 // -------------------------------------------------------------------------------------------------
+import { InterfaceContract } from '../definitions/models/Media.js'
 import SkosConcept from '../definitions/models/SkosConcept.js'
 import SkosScheme from '../definitions/models/SkosScheme.js'
 
@@ -485,9 +486,10 @@ export const getThesaurusList = async (lang) => {
 
     const thesauri = {
       encodings: getEncodings(),
-      filetypes: getFileTypes(),
       fileextensions: getExtensions(),
+      filetypes: getFileTypes(),
       hashalgorithms: getHashAlgorithms(),
+      interfacecontracts: Object.values(InterfaceContract),
       keywords: keywords,
       languages: getLanguages(),
       licences: licences,
@@ -508,9 +510,10 @@ export const getThesaurus = async (thesaurusCode) => {
   try {
     const code = thesaurusCode.toLowerCase()
 
-    if (code === 'keywords') return await Keywords.get()
-    if (code === 'themes') return await Themes.get()
+    if (code === 'keywords') return Keywords.get()
+    if (code === 'themes') return Themes.get()
     if (code === 'licences') return await getLicenceCodes()
+    if (code === 'interfacecontracts') return Object.values(InterfaceContract)
 
     switch (code) {
       case 'encodings':
@@ -538,27 +541,9 @@ export const getThesaurusLabel = async (thesaurusCode, lang) => {
   try {
     const code = thesaurusCode.toLowerCase()
 
-    if (code === 'themes') return await Themes.getLabels(lang)
+    if (code === 'themes') return Themes.getLabels(lang)
 
-    if (code === 'keywords') return await Keywords.get()
-    if (code === 'licences') return await getLicenceCodes()
-
-    switch (code) {
-      case 'encodings':
-        return getEncodings()
-      case 'filetypes':
-        return getFileTypes()
-      case 'fileextensions':
-        return getExtensions()
-      case 'hashalgorithms':
-        return getHashAlgorithms()
-      case 'languages':
-        return getLanguages()
-      case 'projections':
-        return getProjections()
-      default:
-        throw new BadRequestError(`This is not a valid thesaurus code: '${thesaurusCode}'`)
-    }
+    return await getThesaurus(thesaurusCode)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
