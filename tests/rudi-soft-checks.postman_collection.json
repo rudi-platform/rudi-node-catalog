@@ -6513,47 +6513,6 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "GET portal public key direct",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Portal key added\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const pem = pm.response.stream.toString('utf8');",
-									"    pm.expect(pem).to.be.not.null",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "https://rudi-qualif.open-groupe.com/konsult/v1/encryption-key",
-							"protocol": "https",
-							"host": [
-								"rudi-qualif",
-								"open-groupe",
-								"com"
-							],
-							"path": [
-								"konsult",
-								"v1",
-								"encryption-key"
-							]
-						}
-					},
-					"response": []
 				}
 			]
 		},

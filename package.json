@@ -12,7 +12,7 @@
     "rudiapp": "npm install && node rudiServer.js",
     "devstart": "nodemon ./rudiServer.js --conf=./0-ini/conf_custom.ini",
     "tracestart": "nodemon --inspect ./rudiServer.js --conf=./0-ini/conf_custom.ini",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node ./tests/restApiTests.js",
     "lint": "prettier -c \"**/*.js\"; eslint \"**/*.js\"",
     "prettify": "prettier  -w \"**/*.js\""
   },
@@ -58,6 +58,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
     "eslint-plugin-unused-imports": "^3.0.0",
+    "newman": "^6.1.0",
     "nodemon": "^3.0.3",
     "prettier": "^3.2.4"
   }
