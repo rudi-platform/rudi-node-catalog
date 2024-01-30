@@ -51,6 +51,23 @@ export const isPositiveInt = (n) => isInt(n) && n >= 0
 // -------------------------------------------------------------------------------------------------
 // String
 // -------------------------------------------------------------------------------------------------
+/* eslint no-extend-native: ["error", { "exceptions": ["String"] }] */
+String.prototype.merge = function (...args) {
+  const argNb = args.length
+  if (argNb == 0) return ''
+  let finalString = `${args[0]}`
+  for (let i = 1; i < argNb; i++) {
+    const str = `${args[i]}`
+    const mergableStr = str.startsWith(this) ? str : `${this}${str}`
+    finalString = !finalString.endsWith(this)
+      ? finalString + mergableStr
+      : finalString.substring(0, finalString.length - 1) + mergableStr
+  }
+  return finalString
+}
+
+export const pathJoin = (...args) => '/'.merge(...args)
+
 export const isString = (str) => typeof str === 'string'
 
 export const padWithEqualSignBase4 = (str) => padEndModulo(str, 4, '=')
@@ -98,6 +115,18 @@ export const padA1 = (num) => {
 
 export const padZerosLeft = (number, nbZeros = 2) => `${number}`.padStart(nbZeros, '0')
 
+/**
+ * Split an input string with an array of single characters
+ * @param {string} inputStr the input string
+ * @param {string[]} splitterArray an array of single characters
+ * @param {boolean} shouldTrim true if each chunk should be trimmed
+ * @returns the splitted string
+ */
+export const multiSplit = (inputStr, splitterArray, shouldTrim = true) => {
+  const splitters = splitterArray.map((d) => d[0]).join('')
+  const rgxStr = shouldTrim ? `(?:\\s*[${splitters}]\\s*)+` : `[${splitters}]+`
+  return `${inputStr}`.split(RegExp(rgxStr))
+}
 // -------------------------------------------------------------------------------------------------
 // Dates
 // -------------------------------------------------------------------------------------------------
@@ -152,21 +181,6 @@ export const dateEpochMsToIso = (utcMs) => {
 // const [h, m, s] = new Date().toLocaleTimeString('fr-FR').split(/:| /)
 // return `${year}/${month}/${date} ${h}:${m}:${s}`
 
-// -------------------------------------------------------------------------------------------------
-// Strings
-// -------------------------------------------------------------------------------------------------
-/**
- * Split an input string with an array of single characters
- * @param {string} inputStr the input string
- * @param {string[]} splitterArray an array of single characters
- * @param {boolean} shouldTrim true if each chunk should be trimmed
- * @returns the splitted string
- */
-export const multiSplit = (inputStr, splitterArray, shouldTrim = true) => {
-  const splitters = splitterArray.map((d) => d[0]).join('')
-  const rgxStr = shouldTrim ? `(?:\\s*[${splitters}]\\s*)+` : `[${splitters}]+`
-  return `${inputStr}`.split(RegExp(rgxStr))
-}
 // -------------------------------------------------------------------------------------------------
 // Arrays
 // -------------------------------------------------------------------------------------------------
