@@ -6,15 +6,16 @@
 # --------------------------------------------------------------------------------------------------
 
 stages:
+  - install
   - quality
   - tests
   - build
 
 #---------------------------------------------------------------------------------------------------
-# QUALITY (LINTER)
+# INSTALL
 #---------------------------------------------------------------------------------------------------
-quality:dev:
-  stage: quality
+install:
+  stage: install
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
       when: always
@@ -32,6 +33,29 @@ quality:dev:
     NODE_ENV: development
   script:
     - npm i
+
+#---------------------------------------------------------------------------------------------------
+# QUALITY (LINTER)
+#---------------------------------------------------------------------------------------------------
+quality:
+  stage: quality
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+      when: on_success
+    - if: '$CI_PIPELINE_SOURCE != "push"'
+      when: manual
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - node_modules/
+    policy: pull
+  tags:
+    - nodejs-20
+  variables:
+    NODE_ENV: development
+  script:
     - npm run lint
 
 #---------------------------------------------------------------------------------------------------
@@ -61,7 +85,7 @@ tests:
 #---------------------------------------------------------------------------------------------------
 # INSTALL
 #---------------------------------------------------------------------------------------------------
-install:prod:
+build:
   stage: build
   rules:
     - if: $CI_COMMIT_BRANCH == "release"
