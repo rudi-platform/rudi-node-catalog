@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "eeb8c2b3-7c12-4a10-9504-706ec732fa5b",
-		"name": "rudi-soft-checks",
+		"name": "01. RUDI API soft checks",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "13557783"
 	},
@@ -841,7 +841,7 @@
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    const listEnums = Object.keys(responseJson);",
-									"    pm.expect(listEnums.length).to.eq(11);",
+									"    pm.expect(listEnums.length).to.eq(12);",
 									"    pm.expect(typeof responseJson.themes[0]).to.eq('string')",
 									"",
 									"    pm.collectionVariables.set('keywords', responseJson.keywords);",
@@ -882,11 +882,11 @@
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    const listEnums = Object.keys(responseJson);",
-									"    pm.expect(listEnums.length).to.eq(11);",
+									"    pm.expect(listEnums.length).to.eq(12);",
 									"    pm.expect(Object.keys(responseJson.fileextensions).length).to.gt(0)",
 									"    pm.expect(responseJson.fileextensions.aac).to.eq(\"audio/aac\")",
 									"    const themeKeys = Object.keys(responseJson.themes)",
-									"    pm.expect(typeof responseJson.themes[themeKeys[0]]).to.eq('string')",
+									"    pm.expect(responseJson.themes.environment).to.eq('Environnement')",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1025,7 +1025,7 @@
 					"response": []
 				},
 				{
-					"name": "Get theme labels",
+					"name": "Get theme labels FR",
 					"event": [
 						{
 							"listen": "test",
@@ -1033,10 +1033,11 @@
 								"exec": [
 									"pm.test(\"Theme labels received\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200)",
-									"    const responseJson = pm.response.json()",
-									"    const keys = Object.keys(responseJson)",
+									"    const res = pm.response.json()",
+									"    const keys = Object.keys(res)",
 									"    pm.expect(keys.length).to.gt(0)",
-									"    pm.expect(typeof responseJson[keys[0]]).to.eq('string')",
+									"    pm.expect(typeof res[keys[0]]).to.eq('string')",
+									"    pm.expect(res['environment']).to.eq('Environnement')",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1057,6 +1058,45 @@
 								"enum",
 								"Themes",
 								"fr"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get theme labels EN",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Theme labels received\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200)",
+									"    const res = pm.response.json()",
+									"    const keys = Object.keys(res)",
+									"    pm.expect(keys.length).to.gt(0)",
+									"    pm.expect(typeof res[keys[0]]).to.eq('string')",
+									"    pm.expect(res['environment']).to.eq('Environment')",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/api/admin/enum/Themes/en",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"enum",
+								"Themes",
+								"en"
 							]
 						}
 					},
@@ -3616,6 +3656,56 @@
 								"portal",
 								"resources",
 								"send"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update status field",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Update metadata_status field\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    pm.expect(res.updated).to.be.gte(0)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/api/admin/resources/save?status=empty",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"resources",
+								"save"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "empty"
+								}
 							]
 						}
 					},
@@ -6695,7 +6785,7 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
-					"const DEBUG_LVL = 0",
+					"const DEBUG_LVL = 2",
 					"const TRACE = DEBUG_LVL > 3",
 					"const DEBUG = DEBUG_LVL > 2",
 					"const ERROR = DEBUG_LVL > 1",
@@ -6873,7 +6963,7 @@
 					"                    // error.throwNotFound(`Crypto module unreachable on ${reqUrl}`)",
 					"                }",
 					"                const token = codec.streamToString(res)",
-					"                // log.d('rudiProdToken : ' + token)",
+					"                log.d('rudiProdToken : ' + token)",
 					"                try {",
 					"                    pm.expect(res).to.have.property('code', 200);",
 					"                    pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
@@ -7019,11 +7109,211 @@
 			"value": ""
 		},
 		{
+			"key": "noPortalMsg",
+			"value": ""
+		},
+		{
+			"key": "gitHash",
+			"value": ""
+		},
+		{
 			"key": "apiJwt",
 			"value": ""
 		},
 		{
 			"key": "portalJwt",
+			"value": ""
+		},
+		{
+			"key": "apiVersion",
+			"value": ""
+		},
+		{
+			"key": "softOrg1Id",
+			"value": ""
+		},
+		{
+			"key": "softOrg1Name",
+			"value": ""
+		},
+		{
+			"key": "softOrg1Address",
+			"value": ""
+		},
+		{
+			"key": "softOrg2Id",
+			"value": ""
+		},
+		{
+			"key": "softOrg2Name",
+			"value": ""
+		},
+		{
+			"key": "softOrg2Address",
+			"value": ""
+		},
+		{
+			"key": "softContact1Id",
+			"value": ""
+		},
+		{
+			"key": "softContact1Name",
+			"value": ""
+		},
+		{
+			"key": "softContact1Email",
+			"value": ""
+		},
+		{
+			"key": "softContact2Id",
+			"value": ""
+		},
+		{
+			"key": "softContact2Name",
+			"value": ""
+		},
+		{
+			"key": "softContact2Email",
+			"value": ""
+		},
+		{
+			"key": "softContact3Id",
+			"value": ""
+		},
+		{
+			"key": "softContact3Name",
+			"value": ""
+		},
+		{
+			"key": "softContact3Email",
+			"value": ""
+		},
+		{
+			"key": "now",
+			"value": ""
+		},
+		{
+			"key": "softMeta1Id",
+			"value": ""
+		},
+		{
+			"key": "softMedia1Id",
+			"value": ""
+		},
+		{
+			"key": "keywords",
+			"value": ""
+		},
+		{
+			"key": "themes",
+			"value": ""
+		},
+		{
+			"key": "sanityLicence",
+			"value": ""
+		},
+		{
+			"key": "licences",
+			"value": ""
+		},
+		{
+			"key": "randomTheme",
+			"value": ""
+		},
+		{
+			"key": "randomKeyword1",
+			"value": ""
+		},
+		{
+			"key": "randomKeyword2",
+			"value": ""
+		},
+		{
+			"key": "softLicence",
+			"value": ""
+		},
+		{
+			"key": "randomOrgId",
+			"value": ""
+		},
+		{
+			"key": "randomContact1",
+			"value": ""
+		},
+		{
+			"key": "randomContact2",
+			"value": ""
+		},
+		{
+			"key": "randomTitle",
+			"value": ""
+		},
+		{
+			"key": "randomSynopsis",
+			"value": ""
+		},
+		{
+			"key": "randomSummary",
+			"value": ""
+		},
+		{
+			"key": "softMeta2Id",
+			"value": ""
+		},
+		{
+			"key": "mediaId2",
+			"value": ""
+		},
+		{
+			"key": "softMedia2Id",
+			"value": ""
+		},
+		{
+			"key": "softMedia11Id",
+			"value": ""
+		},
+		{
+			"key": "countWithOrg1",
+			"value": ""
+		},
+		{
+			"key": "softMeta4Id",
+			"value": ""
+		},
+		{
+			"key": "softMedia4Id",
+			"value": ""
+		},
+		{
+			"key": "softReport1Id",
+			"value": ""
+		},
+		{
+			"key": "dateReport",
+			"value": ""
+		},
+		{
+			"key": "softReport2Id",
+			"value": ""
+		},
+		{
+			"key": "unkownMetaId",
+			"value": ""
+		},
+		{
+			"key": "softReport3Id",
+			"value": ""
+		},
+		{
+			"key": "pubKeyName",
+			"value": ""
+		},
+		{
+			"key": "portalUrl",
+			"value": ""
+		},
+		{
+			"key": "portalKeyName",
 			"value": ""
 		}
 	]
