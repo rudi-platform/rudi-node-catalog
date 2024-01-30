@@ -27,6 +27,7 @@ install:
         - package-lock.json
     paths:
       - node_modules/
+    policy: push
   tags:
     - nodejs-20
   variables:
