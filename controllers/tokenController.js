@@ -174,7 +174,7 @@ export const verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
     try {
       verifyToken(pubKey, token)
     } catch (e) {
-      throw new ForbiddenError(e.message)
+      throw new ForbiddenError(beautify(e.message || e))
     }
 
     // Check the current route
@@ -196,7 +196,7 @@ export const verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
   } catch (err) {
     // logW(mod, fun, err)
     const error = new ForbiddenError(
-      `JWT is not a valid RUDI Producer JWT: ${beautify(err.message)}`
+      `JWT is not a valid RUDI Producer JWT: ${beautify(err.message || err)}`
     )
     throw RudiError.treatError(mod, fun, error)
   }
