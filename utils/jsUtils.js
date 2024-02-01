@@ -282,13 +282,13 @@ export const beautify = (jsonObject, option) => {
   try {
     return isString(jsonObject)
       ? jsonObject
-      : `${JSON.stringify(jsonObject, null, option).replace(/\\"/g, '"')}${
-          option != null ? '\n' : ''
-        }`
+      : `${JSON.stringify(jsonObject, null, option).replace(/\\"/g, '"')}${option != null ? '\n' : ''}`
   } catch (err) {
-    return `${inspect(jsonObject)}`
+    return `${jsonToString(jsonObject)}`
   }
 }
+
+export const jsonToString = (jsonObject) => inspect(jsonObject, false, 5, true)
 
 /**
  * Clone a (JSON) object through JSON.stringify then JSON.parse (beware, it can be slow)
