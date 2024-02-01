@@ -607,7 +607,7 @@ export const sendMetadataToPortal = async (metadataId) => {
       logD(mod, fun, report.step)
       logD(mod, fun, report.requestDetails)
 
-      portalAnswer = await axios.get(getPortalMetaUrl(metadataId), portalToken)
+      portalAnswer = await httpGet(getPortalMetaUrl(metadataId), portalToken)
       logI(mod, fun + ' portalAnswer', portalAnswer)
     } catch (err) {
       report.step = `sending a metadata that is not on the portal: '${metadataId}'`
@@ -618,7 +618,7 @@ export const sendMetadataToPortal = async (metadataId) => {
       waitingMetadata[API_REPORT_ID] = isUUID(postAnswer) ? postAnswer : postAnswer.data
       return postAnswer
     }
-    const portalMetadata = portalAnswer?.data
+    const portalMetadata = portalAnswer
 
     if (getUpdatedDate(portalMetadata) < getUpdatedDate(portalReadyMetadata)) {
       report.step = `updating a metadata that is on the portal and older: '${metadataId}'`
