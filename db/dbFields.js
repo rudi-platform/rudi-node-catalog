@@ -108,21 +108,21 @@ export const getCreatedDate = (metadata) => {
   if (metadata?.[DB_CREATED_AT]) return metadata[DB_CREATED_AT]
   if (metadata?.[API_METAINFO_PROPERTY]?.[API_METAINFO_DATES])
     return metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES][API_DATES_CREATED]
-  throw new Error(`Not found: '${API_DATES_CREATED}`)
+  throw new Error(`Property not found: '${API_DATES_CREATED}'`)
 }
 
 export const getUpdatedDate = (metadata) => {
   if (metadata?.[DB_UPDATED_AT]) return metadata[DB_UPDATED_AT]
   if (metadata?.[API_METAINFO_PROPERTY]?.[API_METAINFO_DATES])
     return metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES][API_DATES_EDITED]
-  throw new Error(`Not found: '${API_DATES_EDITED}`)
+  throw new Error(`Property not found: '${API_DATES_EDITED}'`)
 }
 
 export const getPublishedDate = (metadata) => {
   if (metadata?.[DB_PUBLISHED_AT]) return metadata[DB_PUBLISHED_AT]
   if (metadata?.[API_METAINFO_PROPERTY]?.[API_METAINFO_DATES])
     return metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES][API_DATES_PUBLISHED]
-  throw new Error(`Not found: '${API_DATES_PUBLISHED}`)
+  throw new Error(`Property not found: '${API_DATES_PUBLISHED}'`)
 }
 
 export const setPublishedDate = (metadata, datePublished) => {
@@ -130,7 +130,7 @@ export const setPublishedDate = (metadata, datePublished) => {
   if (metadata?.[API_METAINFO_PROPERTY]?.[API_METAINFO_DATES]) {
     metadata[API_METAINFO_PROPERTY][API_METAINFO_DATES][API_DATES_PUBLISHED] = datePublished
     return metadata
-  } else throw new Error(`Not found: '${API_DATES_PUBLISHED}`)
+  } else throw new Error(`Property not found: '${API_DATES_PUBLISHED}'`)
 }
 
 export const delPublishedDate = (metadata) => {
