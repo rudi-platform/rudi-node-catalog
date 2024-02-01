@@ -605,10 +605,10 @@ export const sendMetadataToPortal = async (metadataId) => {
       report.step = 'checking if the metadata is on the portal'
       report.requestDetails = { method: HTTP_METHODS.GET, url: getPortalMetaUrl(metadataId) }
       logD(mod, fun, report.step)
-      logD(mod, fun, report.requestDetails)
+      logD(mod, fun, beautify(report.requestDetails))
 
       portalAnswer = await httpGet(getPortalMetaUrl(metadataId), portalToken)
-      logI(mod, fun + ' portalAnswer', portalAnswer)
+      logI(mod, fun + ' portalAnswer', beautify(portalAnswer))
     } catch (err) {
       report.step = `sending a metadata that is not on the portal: '${metadataId}'`
       report.requestDetails = { method: HTTP_METHODS.POST, url: PORTAL_POST_URL }
@@ -618,7 +618,7 @@ export const sendMetadataToPortal = async (metadataId) => {
       waitingMetadata[API_REPORT_ID] = isUUID(postAnswer) ? postAnswer : postAnswer.data
       return postAnswer
     }
-    const portalMetadata = portalAnswer
+    const portalMetadata = portalAnswer?.data
 
     if (getUpdatedDate(portalMetadata) < getUpdatedDate(portalReadyMetadata)) {
       report.step = `updating a metadata that is on the portal and older: '${metadataId}'`
