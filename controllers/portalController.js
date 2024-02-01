@@ -41,7 +41,7 @@ import {
   toBase64,
 } from '../utils/jsUtils.js'
 import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
-import { logD, logE, logT, logV, logW } from '../utils/logging.js'
+import { logD, logE, logI, logT, logV, logW } from '../utils/logging.js'
 
 import {
   FIELD_TOKEN,
@@ -605,8 +605,10 @@ export const sendMetadataToPortal = async (metadataId) => {
       report.step = 'checking if the metadata is on the portal'
       report.requestDetails = { method: HTTP_METHODS.GET, url: getPortalMetaUrl(metadataId) }
       logD(mod, fun, report.step)
+      logD(mod, fun, report.requestDetails)
 
       portalAnswer = await axios.get(getPortalMetaUrl(metadataId), portalToken)
+      logI(mod, fun + ' portalAnswer', portalAnswer)
     } catch (err) {
       report.step = `sending a metadata that is not on the portal: '${metadataId}'`
       report.requestDetails = { method: HTTP_METHODS.POST, url: PORTAL_POST_URL }
