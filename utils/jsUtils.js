@@ -155,10 +155,20 @@ export const toISOLocale = (date) => {
     padA1(isoTimezoneOffset % 60)
   )
 }
-export const nowISO = () => new Date().toISOString()
 
 export const timeEpochMs = (delayMs = 0) => new Date().getTime() + delayMs
 export const timeEpochS = (delayS = 0) => Math.floor(new Date().getTime() / 1000) + delayS
+
+export const dateToIso = (date) => {
+  const fun = 'dateToIso'
+  try {
+    return (date ? new Date(date) : new Date()).toISOString()
+  } catch (err) {
+    consoleErr(mod, fun, `input: ${date} -> err: ${err}`)
+    throw new Error(`input: ${date} -> err: ${err}`)
+  }
+}
+export const nowISO = () => dateToIso()
 
 export const dateEpochSToIso = (utcSeconds) => {
   const fun = 'dateEpochSToIso'
@@ -166,6 +176,7 @@ export const dateEpochSToIso = (utcSeconds) => {
     return utcSeconds ? dateEpochMsToIso(utcSeconds * 1000) : nowISO()
   } catch (err) {
     consoleErr(mod, fun, `input: ${utcSeconds} -> err: ${err}`)
+    throw new Error(`input: ${utcSeconds} -> err: ${err}`)
   }
 }
 
@@ -175,11 +186,15 @@ export const dateEpochMsToIso = (utcMs) => {
     return utcMs ? new Date(utcMs).toISOString() : nowISO()
   } catch (err) {
     consoleErr(mod, fun, `input: ${utcMs} -> err: ${err}`)
+    throw new Error(`input: ${utcMs} -> err: ${err}`)
   }
 }
+
 // const [date, month, year] = new Date().toLocaleDateString('fr-FR').split('/')
 // const [h, m, s] = new Date().toLocaleTimeString('fr-FR').split(/:| /)
 // return `${year}/${month}/${date} ${h}:${m}:${s}`
+
+export const dateToEpochMs = (date) => new Date(date).getUTCMilliseconds()
 
 // -------------------------------------------------------------------------------------------------
 // Arrays

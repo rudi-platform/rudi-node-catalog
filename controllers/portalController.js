@@ -35,14 +35,13 @@ import {
   beautify,
   dateEpochSToIso,
   decodeBase64,
-  jsonToString,
   nowISO,
   padWithEqualSignBase4,
   timeEpochS,
   toBase64,
 } from '../utils/jsUtils.js'
 import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
-import { logD, logE, logI, logT, logV, logW } from '../utils/logging.js'
+import { logD, logE, logT, logV, logW } from '../utils/logging.js'
 
 import {
   FIELD_TOKEN,
@@ -617,13 +616,13 @@ export const sendMetadataToPortal = async (metadataId) => {
       waitingMetadata[API_REPORT_ID] = isUUID(postAnswer) ? postAnswer : postAnswer.data
       return postAnswer
     }
-    logI(mod, fun + ' portalAnswer', jsonToString(portalAnswer))
     const portalMetadata = portalAnswer
 
     if (getUpdatedDate(portalMetadata) < getUpdatedDate(portalReadyMetadata)) {
       report.step = `updating a metadata that is on the portal and older: '${metadataId}'`
       report.requestDetails = { method: HTTP_METHODS.PUT, url: PORTAL_POST_URL }
       logD(mod, fun, report.step)
+
       const putAnswer = await httpPut(PORTAL_POST_URL, portalReadyMetadata, portalToken)
       waitingMetadata[API_REPORT_ID] = isUUID(putAnswer) ? putAnswer : putAnswer.data
       return putAnswer
