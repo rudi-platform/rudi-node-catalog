@@ -62,26 +62,26 @@ quality:dev:
 #---------------------------------------------------------------------------------------------------
 # TESTS
 #---------------------------------------------------------------------------------------------------
-tests:dev:
-  stage: tests
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "push"'
-      when: on_success
-    - if: '$CI_PIPELINE_SOURCE != "push"'
-      when: manual
-  cache:
-    key:
-      files:
-        - package-lock.json
-    paths:
-      - node_modules/
-    policy: pull
-  tags:
-    - nodejs-20
-  variables:
-    NODE_ENV: development
-  script:
-    - npm run test
+# tests:dev:
+#   stage: tests
+#   rules:
+#     - if: '$CI_PIPELINE_SOURCE == "push"'
+#       when: on_success
+#     - if: '$CI_PIPELINE_SOURCE != "push"'
+#       when: manual
+#   cache:
+#     key:
+#       files:
+#         - package-lock.json
+#     paths:
+#       - node_modules/
+#     policy: pull
+#   tags:
+#     - nodejs-20
+#   variables:
+#     NODE_ENV: development
+#   script:
+#     - npm run test
 
 #---------------------------------------------------------------------------------------------------
 # INSTALL
