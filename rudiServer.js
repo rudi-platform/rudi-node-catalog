@@ -3,30 +3,33 @@ const mod = 'main'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { API_VERSION } from './config/constApi.js'
+import { API_VERSION } from './src/config/constApi.js'
 
 // 1. Utils
-import { beautify, consoleErr, consoleLog, separateLogs } from './utils/jsUtils.js'
+import { beautify, consoleErr, consoleLog, separateLogs } from './src/utils/jsUtils.js'
 
 // 2. Sys conf
-import { getAppName, getDbUrl, getServerAddress, getServerPort } from './config/confSystem.js'
+import { getAppName, getDbUrl, getServerAddress, getServerPort } from './src/config/confSystem.js'
 
 // 3. Log conf
-import './config/confLogs.js'
+import './src/config/confLogs.js'
 
 // 4. Anything, now
 import mongoose from 'mongoose'
-import { getLicenceCodes } from './controllers/licenceController.js'
-import { getAppHash, getEnvironment } from './controllers/sysController.js'
-import { Contact } from './definitions/models/Contact.js'
-import { LogEntry } from './definitions/models/LogEntry.js'
-import { Media } from './definitions/models/Media.js'
-import { Metadata } from './definitions/models/Metadata.js'
-import { Organization } from './definitions/models/Organization.js'
-import Keywords from './definitions/thesaurus/Keywords.js'
-import Themes from './definitions/thesaurus/Themes.js'
-import { declareRoutes, fastifyConf } from './routes/fastify.js'
-import { addLogEntry, logE, logI, logT, sysAlert, sysCrit, sysInfo } from './utils/logging.js'
+import { getLicenceCodes } from './src/controllers/licenceController.js'
+import { getAppHash, getEnvironment } from './src/controllers/sysController.js'
+import { Contact } from './src/definitions/models/Contact.js'
+import { LogEntry } from './src/definitions/models/LogEntry.js'
+import { Media } from './src/definitions/models/Media.js'
+import { Metadata } from './src/definitions/models/Metadata.js'
+import { Organization } from './src/definitions/models/Organization.js'
+import Keywords from './src/definitions/thesaurus/Keywords.js'
+import Themes from './src/definitions/thesaurus/Themes.js'
+import { declareRoutes, fastifyConf } from './src/routes/fastify.js'
+import { addLogEntry, logE, logI, logT, sysAlert, sysCrit, sysInfo } from './src/utils/logging.js'
+
+import './src/config/confPortal.js'
+import { RudiError } from './src/utils/errors.js'
 
 // -------------------------------------------------------------------------------------------------
 // Prerequisites
@@ -39,10 +42,9 @@ RegExp.prototype.toJSON = RegExp.prototype.toString
 // External dependencies / init
 // -------------------------------------------------------------------------------------------------
 // Require external modules
-separateLogs('Connecting to DB', true) ///////////////////////////////////////////////////////
 
 // Import Swagger Options
-// import swagger from './config/swagger'
+// import swagger from './src/config/swagger'
 
 // Register Swagger
 // fastify.register(require('fastify-swagger'), swagger.options)
@@ -52,26 +54,33 @@ separateLogs('Connecting to DB', true) /////////////////////////////////////////
 // -------------------------------------------------------------------------------------------------
 
 // Setting flags to avoid deprecation warnings
-mongoose.set('strictQuery', false)
+const mongoConnect = async () => {
+  mongoose.set('strictQuery', false)
+  consoleLog(mod, 'mongo', `Connecting to [${getDbUrl()}]`)
 
-consoleLog(mod, 'mongo', `Connecting to [${getDbUrl()}]`)
-
-mongoose
-  .connect(getDbUrl())
-  .then(() => {
+  try {
+    await mongoose.connect(getDbUrl())
     logI(mod, 'mongo', `MongoDB connected`)
-
-    start().catch((err) => {
-      logE(mod, 'server', `Crashed: ${err}`)
-      sysCrit(`Server crashed: ${err}`, 'rudiServer.running', {}, { error: err })
-    })
-  })
-  .catch((err) => {
+  } catch (err) {
     logE(mod, 'mongoConnection', err)
     sysCrit(`Mongo connection: ${err}`, 'rudiServer.dbConnect', {}, { error: err })
-    process.exit(1)
+    throw new RudiError('Could not connect to MongoDB')
     // throw RudiError.treatError(mod, 'mongoConnection', err)
-  })
+  }
+}
+
+const fastifyLaunch = async () => {
+  try {
+    await fastifyConf.listen({ port: getServerPort(), host: getServerAddress() })
+  } catch (err) {
+    logE(mod, 'Fastify listen', `${err}`)
+    sysCrit(`Fastify launch: ${err}`, 'rudiServer.routeListener', {}, { error: err })
+    throw new RudiError('Could not launch fastify server')
+  }
+  // fastify.swagger()
+  // fastify.info(`Listening on ${fastify.server.address().address}:${fastify.server.address().port}`)
+  declareRoutes()
+}
 
 // -------------------------------------------------------------------------------------------------
 // SERVER
@@ -79,10 +88,11 @@ mongoose
 const start = async () => {
   const fun = 'start'
   try {
-    separateLogs('Handling rejections', true) ////////////////////////////////////////////////
+    separateLogs('Connecting to MongoDB', true) ////////////////////////////////////////////////////
+    await mongoConnect()
 
+    separateLogs('Handling rejections', true) //////////////////////////////////////////////////////
     process.title = getAppName()
-
     process.on('uncaughtException', (err) => {
       logE(mod, 'process', `Uncaught exception: ${err}`)
       sysCrit(`Uncaught exception: ${err}`, 'rudiServer.uncaughtException', {}, { error: err })
@@ -104,17 +114,10 @@ const start = async () => {
       )
       sysCrit(`Promise rejection error: ${beautify(err)}`, 'rudiServer.on', {}, { error: err })
     })
+    separateLogs('Launching Fastify route listener', true) /////////////////////////////////////////
+    await fastifyLaunch()
 
-    import('./config/confPortal.js')
-
-    fastifyConf
-      .listen({ port: getServerPort(), host: getServerAddress() })
-      .catch((err) => logE(mod, 'Fastify listen', `${err}`))
-    // fastify.swagger()
-    // fastify.info(`Listening on ${fastify.server.address().address}:${fastify.server.address().port}`)
-    declareRoutes()
-
-    separateLogs('Models', true) /////////////////////////////////////////////////////////////
+    separateLogs('Models', true) ///////////////////////////////////////////////////////////////////
     try {
       await Promise.all(
         [LogEntry, Contact, Organization, Media, Metadata].map(
@@ -136,14 +139,13 @@ const start = async () => {
     } catch (e) {
       throw new Error(`Model index initialization failed: ${e}`)
     }
+    separateLogs('Thesauri init', true) ////////////////////////////////////////////////////////////
     await Keywords.initialize()
     await Themes.initialize()
     await getLicenceCodes()
 
-    const appVer = getAppHash()
-    const curEnv = getEnvironment()
-    separateLogs('Start', true) //////////////////////////////////////////////////////////////
-    const startMsg = `API v${API_VERSION} | App version: '${appVer}' | '${curEnv}' env`
+    separateLogs('Start', true) ////////////////////////////////////////////////////////////////////
+    const startMsg = `API v${API_VERSION} | App version: '${getAppHash()}' | '${getEnvironment()}' env`
     logI(mod, fun, startMsg)
     sysInfo(startMsg, '', '', ' ')
     logI(mod, 'server', 'Ready')
@@ -160,3 +162,8 @@ const start = async () => {
     process.exit(1)
   }
 }
+
+start().catch((err) => {
+  logE(mod, 'server', `Crashed: ${err}`)
+  sysCrit(`Server crashed: ${err}`, 'rudiServer.running', {}, { error: err })
+})

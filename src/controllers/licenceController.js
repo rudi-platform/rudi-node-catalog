@@ -25,7 +25,7 @@ import {
   setAll as setLicenceCodes,
 } from '../definitions/thesaurus/LicenceCodes.js'
 
-import licenceScheme from '../doc/api/licences.js'
+import licenceScheme from '../../doc/api/licences.js'
 
 // -------------------------------------------------------------------------------------------------
 // Controller
