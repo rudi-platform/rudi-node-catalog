@@ -33,8 +33,6 @@ install:dev:
   variables:
     NODE_ENV: development
   script:
-    - npm i https://registry.npmjs.org/jwt-lib
-    - npm i https://registry.npmjs.org/jwt-lib
     - npm i
 
 #---------------------------------------------------------------------------------------------------
