@@ -59,6 +59,7 @@ checkOption('Log in file', SHOULD_FILELOG)
 checkOption('Show error pile', SHOULD_SHOW_ERROR_PILE)
 checkOption('Sent syslogs', SHOULD_SYSLOG)
 checkOption('Backup syslogs in file', SHOULD_SYSLOG_IN_FILE)
+checkOption('Should log routes', SHOULD_SHOW_ROUTES)
 
 // ----- Logs section
 const LOG_SECTION = 'logging'

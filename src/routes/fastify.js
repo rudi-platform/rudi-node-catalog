@@ -8,9 +8,14 @@ import { ROUTE_NAME, STATUS_CODE } from '../config/constApi.js'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { beautify, padA1, separateLogs, timeEpochMs } from '../utils/jsUtils.js'
+import { beautify, padA1, timeEpochMs } from '../utils/jsUtils.js'
 
-import { shouldControlPrivateRequests, shouldControlPublicRequests } from '../config/confSystem.js'
+import {
+  getServerAddress,
+  getServerPort,
+  shouldControlPrivateRequests,
+  shouldControlPublicRequests,
+} from '../config/confSystem.js'
 
 import { shouldShowErrorPile, shouldShowRoutes } from '../config/confLogs.js'
 
@@ -54,7 +59,7 @@ import fastify from 'fastify'
 import { createIpsMsg } from '../utils/httpReq.js'
 
 // const fastifyLogger = new FFLogger('warn')
-export const fastifyConf = fastify({
+const routeListener = fastify({
   // logger: fastifyLogger,
   // logger: initFFLogger(),
   // logger: {
@@ -69,9 +74,26 @@ export const fastifyConf = fastify({
 // -------------------------------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------------------------------
+// Fastify conf: declare routes
+// -------------------------------------------------------------------------------------------------
+
+export const launchRouteListener = async () => {
+  try {
+    declareRoutes()
+    await routeListener.listen({ port: getServerPort(), host: getServerAddress() })
+    await routeListener.ready()
+  } catch (err) {
+    logE(mod, 'Fastify listen', `${err}`)
+    sysCrit(`Fastify launch: ${err}`, 'rudiServer.routeListener', {}, { error: err })
+    throw new RudiError('Could not launch fastify server')
+  }
+  // fastify.swagger()
+  // fastify.info(`Listening on ${fastify.server.address().address}:${fastify.server.address().port}`)
+}
+// -------------------------------------------------------------------------------------------------
 // Fastify hooks: errors
 // -------------------------------------------------------------------------------------------------
-fastifyConf.addHook('onError', (request, reply, error, done) => {
+routeListener.addHook('onError', (request, reply, error, done) => {
   const fun = 'onError'
   try {
     logV(mod, fun, ``)
@@ -97,7 +119,7 @@ fastifyConf.addHook('onError', (request, reply, error, done) => {
   done()
 })
 
-fastifyConf.setErrorHandler((error, request, reply) => {
+routeListener.setErrorHandler((error, request, reply) => {
   const fun = 'finalErrorHandler'
   try {
     logT(mod, fun)
@@ -144,7 +166,7 @@ fastifyConf.setErrorHandler((error, request, reply) => {
   logT(mod, fun, 'done')
 })
 
-fastifyConf.decorate('notFound', (req, reply) => {
+routeListener.decorate('notFound', (req, reply) => {
   const fun = 'route404'
   // const ip = req.ip
 
@@ -161,12 +183,12 @@ fastifyConf.decorate('notFound', (req, reply) => {
   reply.code(404).send(response)
 })
 
-fastifyConf.setNotFoundHandler(fastifyConf.notFound)
+routeListener.setNotFoundHandler(routeListener.notFound)
 
 // -------------------------------------------------------------------------------------------------
 // Fastify hooks: request receive / send
 // -------------------------------------------------------------------------------------------------
-fastifyConf.addHook('onRequest', (req, res, next) => {
+routeListener.addHook('onRequest', (req, res, next) => {
   const fun = 'onRequest'
   try {
     const context = new CallContext()
@@ -197,7 +219,7 @@ fastifyConf.addHook('onRequest', (req, res, next) => {
   }
 })
 
-fastifyConf.addHook('onSend', (request, reply, payload, next) => {
+routeListener.addHook('onSend', (request, reply, payload, next) => {
   const fun = 'onSend'
   try {
     // logT(mod, fun)
@@ -354,14 +376,20 @@ async function onUnrestrictedPrivateRoute(req, reply) {
 // ROUTES
 // -------------------------------------------------------------------------------------------------
 function declareRouteGroup(routeGroup, preHandler, routeGroupName, logLevel) {
+  const fun = 'declareRouteGroup'
+  // logT(mod, 'declareRouteGroup', routeGroupName)
+
   try {
     routeGroup.map((route, index) => {
+      // logT(mod, 'declareRouteGroup', `${routeGroupName} ${index}`)
       route.preHandler = preHandler
-      fastifyConf.route(route)
+      routeListener.route(route)
       if (shouldShowRoutes())
         logLine(logLevel, routeGroupName, 'routes', `${padA1(index)}: ${route.method} ${route.url}`)
+      // logT(mod, fun, beautify(route))
     })
   } catch (err) {
+    logE(mod, fun, err)
     RudiError.treatError(mod, 'declareRouteGroup', err)
   }
 }
@@ -369,9 +397,9 @@ function declareRouteGroup(routeGroup, preHandler, routeGroupName, logLevel) {
 /**
  * Pre-handler function assignments
  */
-export const declareRoutes = () => {
+const declareRoutes = () => {
+  // logT(mod, 'declareRoutes')
   // declareRouteGroup(redirectRoutes, onPortalRoute, 'Redirect', 'd')
-  separateLogs('Routes', true) /////////////////////////////////////////////////////////////
   declareRouteGroup(publicRoutes, onPublicRoute, 'Public', 'info')
   declareRouteGroup(portalRoutes, onPortalRoute, 'Portal', 'verbose')
   declareRouteGroup(unrestrictedPrivateRoutes, onUnrestrictedPrivateRoute, 'Unrestricted', 'info')

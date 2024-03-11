@@ -9,7 +9,7 @@ import { API_VERSION } from './src/config/constApi.js'
 import { beautify, consoleErr, consoleLog, separateLogs } from './src/utils/jsUtils.js'
 
 // 2. Sys conf
-import { getAppName, getDbUrl, getServerAddress, getServerPort } from './src/config/confSystem.js'
+import { getAppName, getDbUrl } from './src/config/confSystem.js'
 
 // 3. Log conf
 import './src/config/confLogs.js'
@@ -25,7 +25,7 @@ import { Metadata } from './src/definitions/models/Metadata.js'
 import { Organization } from './src/definitions/models/Organization.js'
 import Keywords from './src/definitions/thesaurus/Keywords.js'
 import Themes from './src/definitions/thesaurus/Themes.js'
-import { declareRoutes, fastifyConf } from './src/routes/fastify.js'
+import { launchRouteListener } from './src/routes/fastify.js'
 import { addLogEntry, logE, logI, logT, sysAlert, sysCrit, sysInfo } from './src/utils/logging.js'
 
 import './src/config/confPortal.js'
@@ -69,17 +69,29 @@ const mongoConnect = async () => {
   }
 }
 
-const fastifyLaunch = async () => {
+const initilizeModelIndexes = async () => {
   try {
-    await fastifyConf.listen({ port: getServerPort(), host: getServerAddress() })
+    await Promise.all(
+      [LogEntry, Contact, Organization, Media, Metadata].map(
+        (model) =>
+          new Promise((resolve, reject) => {
+            model
+              .initialize()
+              .then((res) => {
+                logT(mod, `Init model ${model?.collection?.name}`, res)
+                resolve(res)
+              })
+              .catch((err) => {
+                logE(mod, `Init model ${model?.collection?.name}`, err)
+                reject(err)
+              })
+          })
+      )
+    )
   } catch (err) {
-    logE(mod, 'Fastify listen', `${err}`)
-    sysCrit(`Fastify launch: ${err}`, 'rudiServer.routeListener', {}, { error: err })
-    throw new RudiError('Could not launch fastify server')
+    logE(mod, 'initilizeModelIndexes', err)
+    throw new Error(`Model index initialization failed: ${err}`)
   }
-  // fastify.swagger()
-  // fastify.info(`Listening on ${fastify.server.address().address}:${fastify.server.address().port}`)
-  declareRoutes()
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -114,31 +126,12 @@ const start = async () => {
       )
       sysCrit(`Promise rejection error: ${beautify(err)}`, 'rudiServer.on', {}, { error: err })
     })
-    separateLogs('Launching Fastify route listener', true) /////////////////////////////////////////
-    await fastifyLaunch()
+    separateLogs('Routes listener', true) //////////////////////////////////////////////////////////
+    await launchRouteListener()
 
-    separateLogs('Models', true) ///////////////////////////////////////////////////////////////////
-    try {
-      await Promise.all(
-        [LogEntry, Contact, Organization, Media, Metadata].map(
-          (model) =>
-            new Promise((resolve, reject) => {
-              model
-                .initialize()
-                .then((res) => {
-                  logT(mod, `Init model ${model?.collection?.name}`, res)
-                  resolve(res)
-                })
-                .catch((err) => {
-                  logE(mod, `Init model ${model?.collection?.name}`, err)
-                  reject(err)
-                })
-            })
-        )
-      )
-    } catch (e) {
-      throw new Error(`Model index initialization failed: ${e}`)
-    }
+    separateLogs('Indexing models', true) //////////////////////////////////////////////////////////
+    await initilizeModelIndexes()
+
     separateLogs('Thesauri init', true) ////////////////////////////////////////////////////////////
     await Keywords.initialize()
     await Themes.initialize()
