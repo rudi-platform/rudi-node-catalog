@@ -33,6 +33,7 @@ install:dev:
   variables:
     NODE_ENV: development
   script:
+    - npm config set @aqmo.org:registry https://repository.aqmo.org/npm/
     - npm i
 
 #---------------------------------------------------------------------------------------------------
