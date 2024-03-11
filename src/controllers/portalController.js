@@ -15,16 +15,16 @@ const { pick } = _
 // -------------------------------------------------------------------------------------------------
 import { HTTP_METHODS, OBJ_METADATA, PARAM_ID, USER_AGENT } from '../config/constApi.js'
 import {
-  API_COLLECTION_TAG,
-  API_DATA_NAME_PROPERTY,
-  API_DATES_PUBLISHED,
-  API_METADATA_ID,
-  API_METAINFO_DATES,
-  API_METAINFO_PROPERTY,
-  API_REPORT_ID,
-  API_STORAGE_STATUS,
-  DB_UPDATED_AT,
-  getUpdatedDate,
+    API_COLLECTION_TAG,
+    API_DATA_NAME_PROPERTY,
+    API_DATES_PUBLISHED,
+    API_METADATA_ID,
+    API_METAINFO_DATES,
+    API_METAINFO_PROPERTY,
+    API_REPORT_ID,
+    API_STORAGE_STATUS,
+    DB_UPDATED_AT,
+    getUpdatedDate,
 } from '../db/dbFields.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -32,30 +32,30 @@ import {
 // -------------------------------------------------------------------------------------------------
 import { JWT_EXP, REQ_MTD } from '../config/constJwt.js'
 import {
-  beautify,
-  dateEpochSToIso,
-  decodeBase64,
-  nowISO,
-  padWithEqualSignBase4,
-  timeEpochS,
-  toBase64,
+    beautify,
+    dateEpochSToIso,
+    decodeBase64,
+    nowISO,
+    padWithEqualSignBase4,
+    timeEpochS,
+    toBase64,
 } from '../utils/jsUtils.js'
 import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
 import { logD, logE, logT, logV, logW } from '../utils/logging.js'
 
 import {
-  FIELD_TOKEN,
-  JWT_USER,
-  NO_PORTAL_MSG,
-  PARAM_TOKEN,
-  getAuthUrl,
-  getCheckAuthUrl,
-  getCredentials,
-  getPortalCryptPubUrl,
-  getPortalJwtPubKeyUrl,
-  getPortalMetaUrl,
-  isPortalConnectionDisabled,
-  postPortalMetaUrl,
+    FIELD_TOKEN,
+    JWT_USER,
+    NO_PORTAL_MSG,
+    PARAM_TOKEN,
+    getAuthUrl,
+    getCheckAuthUrl,
+    getCredentials,
+    getPortalCryptPubUrl,
+    getPortalJwtPubKeyUrl,
+    getPortalMetaUrl,
+    isPortalConnectionDisabled,
+    postPortalMetaUrl,
 } from '../config/confPortal.js'
 import { directPost, httpDelete, httpGet, httpPost, httpPut } from '../utils/httpReq.js'
 
@@ -63,21 +63,21 @@ import { isUUID } from '../definitions/schemaValidators.js'
 import { StorageStatus } from '../definitions/thesaurus/StorageStatus.js'
 
 import {
-  getLatestStoredPortalToken,
-  getMetadataWithRudiId,
-  getObjectWithRudiId,
-  storePortalToken,
+    getLatestStoredPortalToken,
+    getMetadataWithRudiId,
+    getObjectWithRudiId,
+    storePortalToken,
 } from '../db/dbQueries.js'
 
 import { isEveryMediaAvailable, setMetadataStatusToSent } from '../definitions/models/Metadata.js'
 import {
-  BadRequestError,
-  ForbiddenError,
-  InternalServerError,
-  NotAcceptableError,
-  NotFoundError,
-  RudiError,
-  UnauthorizedError,
+    BadRequestError,
+    ForbiddenError,
+    InternalServerError,
+    NotAcceptableError,
+    NotFoundError,
+    RudiError,
+    UnauthorizedError,
 } from '../utils/errors.js'
 import { createErrorReport } from './reportController.js'
 

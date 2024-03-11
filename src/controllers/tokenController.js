@@ -4,10 +4,10 @@ const mod = 'jwtCtrl'
 // External dependencies
 // -------------------------------------------------------------------------------------------------
 import {
-  extractJwt,
-  readPublicKeyFile,
-  tokenStringToJwtObject,
-  verifyToken,
+    extractJwt,
+    readPublicKeyFile,
+    tokenStringToJwtObject,
+    verifyToken,
 } from '@aqmo.org/jwt-lib'
 
 // -------------------------------------------------------------------------------------------------
