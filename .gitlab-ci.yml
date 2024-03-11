@@ -33,6 +33,7 @@ install:dev:
   variables:
     NODE_ENV: development
   script:
+    - echo @aqmo.org:registry="https://repository.aqmo.org/npm/" >> .npmrc
     - npm i
 
 #---------------------------------------------------------------------------------------------------

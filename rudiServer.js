@@ -156,7 +156,11 @@ const start = async () => {
   }
 }
 
+// -------------------------------------------------------------------------------------------------
+// RUN SERVER
+// -------------------------------------------------------------------------------------------------
 start().catch((err) => {
   logE(mod, 'server', `Crashed: ${err}`)
   sysCrit(`Server crashed: ${err}`, 'rudiServer.running', {}, { error: err })
+  process.exit(1)
 })

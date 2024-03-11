@@ -81,7 +81,7 @@ export const launchRouteListener = async () => {
   try {
     declareRoutes()
     await routeListener.listen({ port: getServerPort(), host: getServerAddress() })
-    await routeListener.ready()
+    // await routeListener.ready()
   } catch (err) {
     logE(mod, 'Fastify listen', `${err}`)
     sysCrit(`Fastify launch: ${err}`, 'rudiServer.routeListener', {}, { error: err })
