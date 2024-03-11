@@ -9,6 +9,10 @@ import { execSync } from 'child_process'
 // -------------------------------------------------------------------------------------------------
 export const OPT_GIT_HASH = 'hash'
 
+export const OPT_DB_DUMP_URI = 'dbDumpUri'
+export const OPT_DB_CONNECT_URI = 'dbConnectionUri'
+export const OPT_DB_NAME = 'dbName'
+
 export const OPT_NODE_ENV = 'nodeEnv'
 export const OPT_APP_ENV = 'appEnv'
 
@@ -29,6 +33,21 @@ export const ENV_DEVELOPMENT = 'development'
 // App options
 // -------------------------------------------------------------------------------------------------
 export const OPTIONS = {
+  [OPT_DB_DUMP_URI]: {
+    text: 'URI of the file used to restore and dump the DB',
+    env: 'DB_DUMP_URL',
+    cli: '--db_dump_url',
+  },
+  [OPT_DB_CONNECT_URI]: {
+    text: 'DB connection URI (ex: mongodb://rudi-node.org/db_name)',
+    env: 'DB_CONNECT',
+    cli: '--db_connect',
+  },
+  [OPT_DB_NAME]: {
+    text: 'Name of the DB (ex: rudi_api)',
+    env: 'DB_NAME',
+    cli: '--db_name',
+  },
   [OPT_NODE_ENV]: {
     text: `Node environment: ${ENV_PRODUCTION}|${ENV_DEVELOPMENT}`,
     env: 'NODE_ENV',
@@ -66,31 +85,35 @@ let longestCliOpt = 0
 let longestEnvOpt = 0
 let longestText = 0
 Object.keys(OPTIONS).forEach((key) => {
-  longestOptName = Math.max([longestOptName, key.length])
-  longestCliOpt = Math.max([longestCliOpt, OPTIONS[key].cli.length])
-  longestEnvOpt = Math.max([longestEnvOpt, OPTIONS[key].env.length])
-  longestText = Math.max([longestText, OPTIONS[key].text.length])
+  longestOptName = Math.max(longestOptName, key.length)
+  longestCliOpt = Math.max(longestCliOpt, OPTIONS[key].cli.length)
+  longestEnvOpt = Math.max(longestEnvOpt, OPTIONS[key].env.length)
+  longestText = Math.max(longestText, OPTIONS[key].text.length)
 })
 
 let ARE_APP_OPTIONS_LOADED = false
 const APP_OPTIONS = {}
 
-export const loadAppOptions = () => {
-  if (ARE_APP_OPTIONS_LOADED) return
-  const SEP_LINE =
-    '------------------------------------------------------' +
-    '------------------------------------------------------'
-  console.log('\n' + SEP_LINE) ///////////////////////////////////////////////////////////////////////
+const SEP_LINE =
+  '------------------------------------------------------' +
+  '------------------------------------------------------'
 
-  console.log(' Options to run this app: ')
+export function optionsToString() {
+  const optionStrParts = ['', SEP_LINE, ' Options to run this app: ']
   Object.keys(OPTIONS).forEach((opt) =>
-    console.log(
+    optionStrParts.push(
       `    cli: ${OPTIONS[opt].cli.padEnd(longestCliOpt, ' ')}` +
         ` | env: ${OPTIONS[opt].env.padEnd(longestEnvOpt, ' ')}` +
         ` # ${OPTIONS[opt].text.padEnd(longestText, ' ')}`
     )
   )
-  console.log(SEP_LINE) //////////////////////////////////////////////////////////////////////////////
+  optionStrParts.push(SEP_LINE)
+  return optionStrParts.join('\n')
+}
+
+export const loadAppOptions = () => {
+  if (ARE_APP_OPTIONS_LOADED) return
+  console.log(optionsToString())
   // -------------------------------------------------------------------------------------------------
   // Extract command line arguments
   // -------------------------------------------------------------------------------------------------

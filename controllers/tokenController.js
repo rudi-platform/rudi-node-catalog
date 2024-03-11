@@ -176,7 +176,7 @@ export const verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
     } catch (e) {
       throw new ForbiddenError(beautify(e.message || e))
     }
-
+    logT(mod, fun, 'Token s OK')
     // Check the current route
     const jwtMtd = accessProperty(payload, REQ_MTD)
     if (jwtMtd !== reqMethod && jwtMtd !== REQ_ROUTE_ALL)

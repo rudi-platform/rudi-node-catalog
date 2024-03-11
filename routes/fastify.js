@@ -306,7 +306,14 @@ async function onPrivateRoute(req, reply) {
   const fun = 'onPrivateRoute'
   try {
     logT(mod, fun, `${req.method} ${req.url} `)
-    if (!shouldControlPrivateRequests()) return true
+    if (!shouldControlPrivateRequests()) {
+      logW(
+        mod,
+        fun,
+        'Not checking incoming JWT, set "should_control_public_requests = true" to enforce checking'
+      )
+      return true
+    }
 
     const { subject, clientId } = await checkRudiProdPermission(req, false)
 
