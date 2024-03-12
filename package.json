@@ -14,7 +14,7 @@
     "devstart": "nodemon ./rudiServer.js --conf=./0-ini/conf_custom.ini",
     "tracestart": "nodemon --inspect ./rudiServer.js --conf=./0-ini/conf_custom.ini",
     "test": "node ./tests/restApiTests.js",
-    "lint": "prettier -c \"**/*.js\"; eslint \"**/*.js\"",
+    "lint": "prettier -c \"src/**/*.js\"; eslint \"**/*.js\"",
     "prettify": "prettier  -w \"src/**/*.js\""
   },
   "nodemonConfig": {
