@@ -10,6 +10,7 @@
 
 # Logs
 **/logs
+**/*log
 
 # Tests
 **/actions
@@ -30,3 +31,4 @@
 features
 notes
 z_notes
+wip

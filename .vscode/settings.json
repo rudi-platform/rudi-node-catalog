@@ -34,5 +34,10 @@
     "spreadsheetml",
     "Thes",
     "weba"
-  ]
+  ],
+  "prettier.configPath": ".prettierrc",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "always"
+  }
 }
