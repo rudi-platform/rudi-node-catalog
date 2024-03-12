@@ -15,7 +15,7 @@
     "tracestart": "nodemon --inspect ./rudiServer.js --conf=./0-ini/conf_custom.ini",
     "test": "node ./tests/restApiTests.js",
     "lint": "prettier -c \"**/*.js\"; eslint \"**/*.js\"",
-    "prettify": "prettier  -w \"**/*.js\""
+    "prettify": "prettier  -w \"src/**/*.js\""
   },
   "nodemonConfig": {
     "execMap": {

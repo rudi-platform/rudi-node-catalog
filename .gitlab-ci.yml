@@ -99,4 +99,5 @@ install:prod:
   variables:
     NODE_ENV: production
   script:
+    - npm config set @aqmo.org:registry https://repository.aqmo.org/npm/
     - npm i

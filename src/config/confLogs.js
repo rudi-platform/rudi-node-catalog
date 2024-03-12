@@ -23,10 +23,10 @@ const syslogLevels = {
 import { LOG_DATE_FORMAT, consoleErr, consoleLog, separateLogs } from '../utils/jsUtils.js'
 import { OPT_NODE_ENV, getAppOptions, getGitHash } from './appOptions.js'
 import {
-    getAppName,
-    getIniValue,
-    shouldControlPrivateRequests,
-    shouldControlPublicRequests,
+  getAppName,
+  getIniValue,
+  shouldControlPrivateRequests,
+  shouldControlPublicRequests,
 } from './confSystem.js'
 
 separateLogs('Loading log conf', true) ///////////////////////////////////////////////////////////
