@@ -7,8 +7,6 @@
 
 stages:
   - install_dev
-  - quality
-  # - tests
   - install_prod
 
 #---------------------------------------------------------------------------------------------------
@@ -17,71 +15,18 @@ stages:
 install:dev:
   stage: install_dev
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: $CI_COMMIT_BRANCH == "release"
       when: always
-    - if: '$CI_PIPELINE_SOURCE != "push"'
+    - if: $CI_COMMIT_BRANCH != "release"
       when: manual
-  cache:
-    key:
-      files:
-        - package-lock.json
-    paths:
-      - node_modules/
-    policy: push
   tags:
     - nodejs-20
   variables:
     NODE_ENV: development
   script:
+    - npm config set @aqmo.org:registry https://repository.aqmo.org/npm/
     - npm i
-
-#---------------------------------------------------------------------------------------------------
-# QUALITY (LINTER)
-#---------------------------------------------------------------------------------------------------
-quality:dev:
-  stage: quality
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "push"'
-      when: on_success
-    - if: '$CI_PIPELINE_SOURCE != "push"'
-      when: manual
-  cache:
-    key:
-      files:
-        - package-lock.json
-    paths:
-      - node_modules/
-    policy: pull
-  tags:
-    - nodejs-20
-  variables:
-    NODE_ENV: development
-  script:
     - npm run lint
-
-#---------------------------------------------------------------------------------------------------
-# TESTS
-#---------------------------------------------------------------------------------------------------
-# tests:dev:
-#   stage: tests
-#   rules:
-#     - if: '$CI_PIPELINE_SOURCE == "push"'
-#       when: on_success
-#     - if: '$CI_PIPELINE_SOURCE != "push"'
-#       when: manual
-#   cache:
-#     key:
-#       files:
-#         - package-lock.json
-#     paths:
-#       - node_modules/
-#     policy: pull
-#   tags:
-#     - nodejs-20
-#   variables:
-#     NODE_ENV: development
-#   script:
-#     - npm run test
 
 #---------------------------------------------------------------------------------------------------
 # INSTALL
@@ -98,4 +43,5 @@ install:prod:
   variables:
     NODE_ENV: production
   script:
+    - npm config set @aqmo.org:registry https://repository.aqmo.org/npm/
     - npm i

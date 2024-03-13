@@ -1,6 +1,7 @@
 # Config
 **/custom.ini
 **/*custom.ini
+**/.env
 
 # Generated
 *-lock.json
@@ -14,6 +15,8 @@ dump
 
 # Tests
 **/actions
+**/jest
+tests/doc
 
 # Zip
 **/*.zip
@@ -30,4 +33,8 @@ dump
 # Idz
 features
 notes
-z_notes
+demo
+z_*
+
+# Dev
+.vscode

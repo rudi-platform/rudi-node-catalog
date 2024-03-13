@@ -64,7 +64,6 @@ import { StorageStatus } from '../definitions/thesaurus/StorageStatus.js'
 
 import {
   getLatestStoredPortalToken,
-  getMetadataWithRudiId,
   getObjectWithRudiId,
   storePortalToken,
 } from '../db/dbQueries.js'
@@ -589,7 +588,7 @@ export const sendMetadataToPortal = async (metadataId) => {
     const waitingMetadata = metadatasWaitingForPortalFeedback[waitIndex]
 
     //--- Just a test
-    const dbMetadata = await getMetadataWithRudiId(metadataId)
+    // await getMetadataWithRudiId(metadataId)
     // logI(mod, `${fun}.dbMetadata`, dbMetadata)
 
     //--- Sending to portal
