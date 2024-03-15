@@ -2,23 +2,27 @@ const mod = 'sysConf'
 // -------------------------------------------------------------------------------------------------
 // External dependencies
 // -------------------------------------------------------------------------------------------------
+import { execSync } from 'child_process'
 
 // -------------------------------------------------------------------------------------------------
 // Constants
 // -------------------------------------------------------------------------------------------------
 import {
-  ENV_USER_CONF,
-  OPT_API_URL,
-  OPT_USER_CONF,
-  getAppOptions,
-  getGitHash,
+  OPT_APP_ENV,
+  OPT_DB_CONNECT_URI,
+  OPT_GIT_HASH,
+  OPT_NODE_ENV,
+  OPT_PROFILES_CONF,
+  OPT_PUBLIC_URL,
+  getCliEnvOpt,
+  getConf,
 } from './appOptions.js'
 import { TRACE, TRACE_ERR, TRACE_FUN, TRACE_MOD } from './constApi.js'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { NOT_FOUND, consoleErr, consoleLog, quietAccess, separateLogs } from '../utils/jsUtils.js'
+import { consoleErr, consoleLog, pathJoin, separateLogs } from '../utils/jsUtils.js'
 
 import { readIniFile } from '../utils/fileActions.js'
 
@@ -39,77 +43,16 @@ let CURRENT_APP_HASH
 // Constants
 // -------------------------------------------------------------------------------------------------
 
-// Conf files name
-// - directory
-const INI_DIR = './0-ini'
-// - user conf path
-const USER_CONF_FILE = getAppOptions(OPT_USER_CONF) || `${INI_DIR}/conf_custom.ini`
-// consoleLog(mod, 'init', USER_CONF_FILE)
-// - default conf path
-const DEFT_CONF_FILE = `${INI_DIR}/conf_default.ini`
-
 // -------------------------------------------------------------------------------------------------
 // Constants: user and local configuration
 // -------------------------------------------------------------------------------------------------
 // Getting user conf file value
 // if null, local conf file value
 // if null , default value
-const getUserConf = () => {
-  const fun = 'getUserConf'
-  try {
-    consoleLog(
-      mod,
-      fun,
-      getAppOptions(OPT_USER_CONF)
-        ? 'cli'
-        : `Conf file: ${process.env[ENV_USER_CONF] ? 'env' : 'ini'}`
-    )
-    return readIniFile(USER_CONF_FILE)
-  } catch (err) {
-    consoleErr(mod, fun, err)
-    throw err
-  }
-}
-const getLocalConf = () => {
-  try {
-    return readIniFile(DEFT_CONF_FILE)
-  } catch (err) {
-    consoleErr(mod, 'getLocalConf', err)
-    throw err
-  }
-}
-
-const USER_CONF = getUserConf()
-const LOCAL_CONF = getLocalConf()
 
 // -------------------------------------------------------------------------------------------------
 // Helper functions
 // -------------------------------------------------------------------------------------------------
-
-// Get values from global constants
-// -> gets user conf file value
-//    if null get local conf file value
-//    if null get default value
-export const getIniValue = (section, field, defaultVal, customConf, defaultConf) => {
-  try {
-    const userConf = customConf || USER_CONF
-    const localConf = defaultConf || LOCAL_CONF
-
-    const userValue = quietAccess(userConf[section], field)
-    const localValue = quietAccess(localConf[section], field)
-
-    if (userValue != NOT_FOUND) return userValue
-    if (localValue != NOT_FOUND) return localValue
-    if (typeof defaultVal === 'undefined')
-      throw new Error(
-        `The parameter '${section}.${field}' is incorrectly set in file '${USER_CONF_FILE}'`
-      )
-    else return defaultVal
-  } catch (err) {
-    consoleErr(mod, 'getIniValue', err)
-    throw err
-  }
-}
 
 // -------------------------------------------------------------------------------------------------
 // Extracting and exporting sys configuration
@@ -118,16 +61,8 @@ export const getIniValue = (section, field, defaultVal, customConf, defaultConf)
 // ----- Flags section
 const FLAGS_SECTION = 'flags'
 
-const SHOULD_CONTROL_PRIVATE_REQUESTS = getIniValue(
-  FLAGS_SECTION,
-  'should_control_private_requests',
-  true
-)
-const SHOULD_CONTROL_PUBLIC_REQUESTS = getIniValue(
-  FLAGS_SECTION,
-  'should_control_public_requests',
-  false
-)
+const SHOULD_CONTROL_PRIVATE_REQUESTS = getConf(FLAGS_SECTION, 'should_control_private_requests')
+const SHOULD_CONTROL_PUBLIC_REQUESTS = getConf(FLAGS_SECTION, 'should_control_public_requests')
 
 export const shouldControlPrivateRequests = () => SHOULD_CONTROL_PRIVATE_REQUESTS
 export const shouldControlPublicRequests = () => SHOULD_CONTROL_PUBLIC_REQUESTS
@@ -135,35 +70,51 @@ export const shouldControlPublicRequests = () => SHOULD_CONTROL_PUBLIC_REQUESTS
 // ----- Node Server section
 const SERVER_SECTION = 'server'
 
-const APP_NAME = getIniValue(SERVER_SECTION, 'app_name', 'rudiprod.api')
-const LISTENING_ADDR = getIniValue(SERVER_SECTION, 'listening_address')
-const LISTENING_PORT = getIniValue(SERVER_SECTION, 'listening_port')
+const APP_NAME = getConf(SERVER_SECTION, 'app_name')
+const LISTENING_ADDR = getConf(SERVER_SECTION, 'listening_address')
+const LISTENING_PORT = getConf(SERVER_SECTION, 'listening_port')
 
-const apiUrl = `${getAppOptions(OPT_API_URL) || getIniValue(SERVER_SECTION, 'server_url')}`
-const API_URL = apiUrl.endsWith('/') ? apiUrl.slice(0, -1) : apiUrl
+const publicUrl = getCliEnvOpt(OPT_PUBLIC_URL) || getConf(SERVER_SECTION, 'server_url')
+const PUBLIC_URL = publicUrl.endsWith('/') ? publicUrl.slice(0, -1) : publicUrl
 
 export const getAppName = () => APP_NAME
 export const getServerAddress = () => LISTENING_ADDR
 export const getServerPort = () => LISTENING_PORT
-export const getHost = (suffix) => `http://${LISTENING_ADDR}:${LISTENING_PORT}${suffix || ''}`
+export const getHost = (suffix) => `http://${LISTENING_ADDR}:${LISTENING_PORT}/${suffix || ''}`
 
-export const getApiUrl = (suffix) => `${API_URL}${suffix || ''}`
+export const getPublicUrl = (suffix) => `${PUBLIC_URL}${suffix || ''}`
+
+// ----- App environment
+const NODE_ENV = getCliEnvOpt(OPT_NODE_ENV) || 'dev'
+export const getNodeEnv = () => NODE_ENV
+
+const APP_ENV = getCliEnvOpt(OPT_APP_ENV)
+export const getAppEnv = () => APP_ENV
+
+let GIT_HASH
+try {
+  GIT_HASH = getCliEnvOpt(OPT_GIT_HASH) || `${execSync('git rev-parse --short HEAD')}`.trim()
+} catch (err) {
+  consoleErr(mod, 'getGitHash', err)
+  throw err
+}
+
+export const getGitHash = () => GIT_HASH
 
 // ----- DB section
 const DB_SECTION = 'database'
 
-const DB_NAME = getIniValue(DB_SECTION, 'db_name')
-const DB_URL_PREFIX = getIniValue(DB_SECTION, 'db_url')
-const DB_URL = `${DB_URL_PREFIX}${DB_NAME}`
+const DB_URI =
+  getCliEnvOpt(OPT_DB_CONNECT_URI) ||
+  pathJoin(
+    getConf(DB_SECTION, 'db_url') || 'mongodb://127.0.0.1',
+    getConf(DB_SECTION, 'db_name') || 'rudi_api'
+  )
 
-export const getDbName = () => DB_NAME
-export const getDbUrl = () => DB_URL
+export const getDbFullUri = () => DB_URI
 
 // ----- Security section
-const SECURITY_SECTION = 'security'
-
-const profilesConfFile = getIniValue(SECURITY_SECTION, 'profiles')
-const PROFILES = readIniFile(profilesConfFile)
+const PROFILES = readIniFile(getCliEnvOpt(OPT_PROFILES_CONF) || getConf('security', 'profiles'))
 
 export const getProfile = (subject) => {
   if (!subject)
@@ -184,19 +135,18 @@ export const getProfile = (subject) => {
 // const now = utils.nowLocaleFormatted()
 const appMsg = `App '${APP_NAME}' listening on: ${getHost()}`
 consoleLog(mod, 'init', appMsg)
-consoleLog(mod, 'init', `DB: ${DB_URL}`)
+consoleLog(mod, 'init', `DB: ${DB_URI}`)
 
 // ----- SKOSMOS section
 const SKOSMOS_SECTION = 'skosmos'
-const skosmosConfFile = getIniValue(SKOSMOS_SECTION, 'skosmos_conf')
+const skosmosConfFile = getConf(SKOSMOS_SECTION, 'skosmos_conf')
 let SKOSMOS_CONF
 try {
   if (skosmosConfFile) SKOSMOS_CONF = readIniFile(skosmosConfFile)
 } catch (e) {
   consoleErr(mod, 'skosmosConfFile', e)
 }
-export const getSkosmosConf = (prop) =>
-  !SKOSMOS_CONF ? null : prop ? SKOSMOS_CONF[prop] : SKOSMOS_CONF
+export const getSkosmosConf = (prop) => (prop ? SKOSMOS_CONF?.[prop] : SKOSMOS_CONF)
 
 // -------------------------------------------------------------------------------------------------
 // App ID

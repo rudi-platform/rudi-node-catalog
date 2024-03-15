@@ -9,13 +9,21 @@ import { API_VERSION } from './src/config/constApi.js'
 import { beautify, consoleErr, consoleLog, separateLogs } from './src/utils/jsUtils.js'
 
 // 2. Sys conf
-import { getAppName, getDbUrl } from './src/config/confSystem.js'
+import { getAppName, getDbFullUri } from './src/config/confSystem.js'
 
 // 3. Log conf
 import './src/config/confLogs.js'
 
 // 4. Anything, now
+
+// -------------------------------------------------------------------------------------------------
+// External dependencies
+// -------------------------------------------------------------------------------------------------
 import mongoose from 'mongoose'
+
+// -------------------------------------------------------------------------------------------------
+// Internal dependencies
+// -------------------------------------------------------------------------------------------------
 import { getLicenceCodes } from './src/controllers/licenceController.js'
 import { getAppHash, getEnvironment } from './src/controllers/sysController.js'
 import { Contact } from './src/definitions/models/Contact.js'
@@ -56,10 +64,10 @@ RegExp.prototype.toJSON = RegExp.prototype.toString
 // Setting flags to avoid deprecation warnings
 const mongoConnect = async () => {
   mongoose.set('strictQuery', false)
-  consoleLog(mod, 'mongo', `Connecting to [${getDbUrl()}]`)
+  consoleLog(mod, 'mongo', `Connecting to MongoDB`)
 
   try {
-    await mongoose.connect(getDbUrl())
+    await mongoose.connect(getDbFullUri())
     logI(mod, 'mongo', `MongoDB connected`)
   } catch (err) {
     logE(mod, 'mongoConnection', err)

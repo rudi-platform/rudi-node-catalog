@@ -638,7 +638,7 @@ let SKOSMOS_URL, SKOSMOS_AUTH // cache
  * @param {String} term A term to look for in SKOSMOS server vocabularies
  * @returns List of neighbor terms to expand the search
  */
-export const askSkosmos = async (term, lang = 'fr', vocabulary) => {
+export const askSkosmos = async (term, lang = 'fr', vocabulary = null) => {
   const fun = 'askSkosmos'
   try {
     logT(mod, fun, `term: ${term}`)

@@ -27,7 +27,7 @@ import { logT } from '../utils/logging.js'
 // import { beautify } from '../utils/jsUtils.js'
 import { httpGet } from '../utils/httpReq.js'
 
-import { getApiUrl } from '../config/confSystem.js'
+import { getPublicUrl } from '../config/confSystem.js'
 import { OBJ_PUB_KEYS, PARAM_ID, PARAM_PROP, URL_PREFIX_PUBLIC } from '../config/constApi.js'
 import {
   doesObjectExistWithRudiId,
@@ -117,7 +117,7 @@ const normalizeKeyData = async (pubKeyJson) => {
       pubKeyJson[API_PUB_KEY] = `${key}`
       // As the URL was not provided, we provide the URL at which the public key will be available
       // on the producer node
-      pubKeyJson[API_PUB_URL] = getApiUrl(
+      pubKeyJson[API_PUB_URL] = getPublicUrl(
         `${URL_PREFIX_PUBLIC}/${OBJ_PUB_KEYS}/${pubKeyJson[API_PUB_NAME]}/${API_PUB_PEM}`
       )
     } else {

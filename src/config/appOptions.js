@@ -1,82 +1,74 @@
 /* eslint-disable no-console */
+
+const mod = 'appOpts'
+
 // -------------------------------------------------------------------------------------------------
 // External dependencies
 // -------------------------------------------------------------------------------------------------
-import { execSync } from 'child_process'
+import minimist from 'minimist'
+const _argv = minimist(process.argv.slice(2))
 
 // -------------------------------------------------------------------------------------------------
-// App options: environment variables
+// Internal dependencies
 // -------------------------------------------------------------------------------------------------
+import { readIniFile } from '../utils/fileActions.js'
+import { SEP_LINE, consoleErr, isDefined } from '../utils/jsUtils.js'
+
+// -------------------------------------------------------------------------------------------------
+// App options / environment variables
+// -------------------------------------------------------------------------------------------------
+export const OPT_PUBLIC_URL = 'publicUrl'
 export const OPT_GIT_HASH = 'hash'
-
-export const OPT_DB_DUMP_URI = 'dbDumpUri'
 export const OPT_DB_CONNECT_URI = 'dbConnectionUri'
-export const OPT_DB_NAME = 'dbName'
-
 export const OPT_NODE_ENV = 'nodeEnv'
 export const OPT_APP_ENV = 'appEnv'
-
 export const OPT_USER_CONF = 'conf'
+export const OPT_PROFILES_CONF = 'profiles'
 export const OPT_PORTAL_CONF = 'portalConf'
 
-export const OPT_API_URL = 'apiUrl'
-
-export const ENV_USER_CONF = 'RUDI_API_USER_CONF'
-
-export const ENV_LOCAL = 'local'
-export const ENV_TEST = 'test'
-export const ENV_SHARED = 'shared'
-export const ENV_RELEASE = 'release'
-export const ENV_PRODUCTION = 'production'
-export const ENV_DEVELOPMENT = 'development'
 // -------------------------------------------------------------------------------------------------
-// App options
+// Loading app options
 // -------------------------------------------------------------------------------------------------
 export const OPTIONS = {
-  [OPT_DB_DUMP_URI]: {
-    text: 'URI of the file used to restore and dump the DB',
-    env: 'DB_DUMP_URL',
-    cli: '--db_dump_url',
-  },
   [OPT_DB_CONNECT_URI]: {
     text: 'DB connection URI (ex: mongodb://rudi-node.org/db_name)',
-    env: 'DB_CONNECT',
-    cli: '--db_connect',
-  },
-  [OPT_DB_NAME]: {
-    text: 'Name of the DB (ex: rudi_api)',
-    env: 'DB_NAME',
-    cli: '--db_name',
+    cli: 'db_uri',
+    env: 'RUDI_API_DB_URI',
   },
   [OPT_NODE_ENV]: {
-    text: `Node environment: ${ENV_PRODUCTION}|${ENV_DEVELOPMENT}`,
+    text: `Node environment: 'production'|'development'`,
+    cli: 'node_env',
     env: 'NODE_ENV',
-    cli: '--node_env',
   },
   [OPT_APP_ENV]: {
-    text: `Module environment type: ${ENV_PRODUCTION}|${ENV_RELEASE}|${ENV_SHARED}|${ENV_TEST}`,
-    cli: '--app_env',
+    text: `Module environment type: 'production'|'release'|'shared'|'test'`,
+    cli: 'app_env',
     env: 'RUDI_API_ENV',
   },
   [OPT_GIT_HASH]: {
     text: 'Git hash',
-    cli: '--hash',
+    cli: 'hash',
     env: 'RUDI_API_GIT_REV',
+  },
+  [OPT_PUBLIC_URL]: {
+    text: 'API server public URL',
+    cli: 'api_url',
+    env: 'RUDI_API_URL',
   },
   [OPT_USER_CONF]: {
     text: 'User conf file',
-    cli: '--conf',
-    env: ENV_USER_CONF,
+    cli: 'conf',
+    env: 'RUDI_API_USER_CONF',
+  },
+  [OPT_PROFILES_CONF]: {
+    text: 'Profiles conf file',
+    cli: 'profiles',
+    env: 'RUDI_API_PROFILES_CONF',
   },
   [OPT_PORTAL_CONF]: {
     text: 'Portal conf file',
-    cli: '--portal_conf',
+    cli: 'portal_conf',
     env: 'RUDI_API_PORTAL_CONF',
-  },
-  [OPT_API_URL]: {
-    text: 'API server URL',
-    cli: '--api_url',
-    env: 'RUDI_API_URL',
   },
 }
 
@@ -91,18 +83,11 @@ Object.keys(OPTIONS).forEach((key) => {
   longestText = Math.max(longestText, OPTIONS[key].text.length)
 })
 
-let ARE_APP_OPTIONS_LOADED = false
-const APP_OPTIONS = {}
-
-const SEP_LINE =
-  '------------------------------------------------------' +
-  '------------------------------------------------------'
-
 export function optionsToString() {
   const optionStrParts = ['', SEP_LINE, ' Options to run this app: ']
   Object.keys(OPTIONS).forEach((opt) =>
     optionStrParts.push(
-      `    cli: ${OPTIONS[opt].cli.padEnd(longestCliOpt, ' ')}` +
+      `    cli: --${OPTIONS[opt].cli.padEnd(longestCliOpt, ' ')}` +
         ` | env: ${OPTIONS[opt].env.padEnd(longestEnvOpt, ' ')}` +
         ` # ${OPTIONS[opt].text.padEnd(longestText, ' ')}`
     )
@@ -111,54 +96,122 @@ export function optionsToString() {
   return optionStrParts.join('\n')
 }
 
-export const loadAppOptions = () => {
-  if (ARE_APP_OPTIONS_LOADED) return
-  console.log(optionsToString())
-  // -------------------------------------------------------------------------------------------------
-  // Extract command line arguments
-  // -------------------------------------------------------------------------------------------------
-  const cliOptionsValues = {}
-  process.argv.forEach((cliArg) => {
-    Object.keys(OPTIONS).forEach((appOpt) => {
-      const appOptForCli = OPTIONS[appOpt].cli + '='
-      if (OPTIONS[appOpt].cli && cliArg.startsWith(appOptForCli))
-        cliOptionsValues[appOpt] = cliArg.substring(appOptForCli.length)
-    })
-  })
+const CLI_OPTS = {}
+let wereAppOptsLoaded = false
+export const getCliOpt = (opt) => {
+  if (!wereAppOptsLoaded) {
+    Object.keys(_argv).forEach((cliOpt) => {
+      if (cliOpt == '_' || cliOpt == '') return
+      let found = false
 
-  // -------------------------------------------------------------------------------------------------
-  // Definitive conf values
-  // -------------------------------------------------------------------------------------------------
-  console.log(' Extracted conf values:')
-  Object.keys(OPTIONS).forEach((opt) => {
-    if (cliOptionsValues[opt]) {
-      APP_OPTIONS[opt] = cliOptionsValues[opt]
-      console.log('    (cli) ' + opt.padEnd(longestOptName) + ' => ' + APP_OPTIONS[opt])
-    } else {
-      const envVar = OPTIONS[opt].env
-      if (process.env[envVar]) {
-        APP_OPTIONS[opt] = process.env[envVar]
-        console.log('    (env) ' + opt.padEnd(longestOptName) + ' => ' + APP_OPTIONS[opt])
+      for (const appOpt of Object.keys(OPTIONS)) {
+        if (OPTIONS[appOpt].cli == cliOpt) {
+          CLI_OPTS[cliOpt] = _argv[cliOpt]
+          found = true
+          // console.log('Command Line option recognized:', cliOption, '=', _argv[cliOption])
+          break
+        }
       }
-    }
-  })
-  console.log(SEP_LINE + '\n') ///////////////////////////////////////////////////////////////////////
-
-  // conf: CLI_OPTIONS.conf.cli || process.env[RUDI_API_USER_CONF],
-  // portal_conf: CLI_OPTIONS.portal_conf || process.env[RUDI_API_USER_CONF],
-  // }
-  ARE_APP_OPTIONS_LOADED = true
-}
-
-export const getAppOptions = (opt, altValue) => (opt ? APP_OPTIONS[opt] || altValue : APP_OPTIONS)
-
-export const getGitHash = () => {
-  try {
-    return getAppOptions(OPT_GIT_HASH) || `${execSync('git rev-parse --short HEAD')}`.trim()
-  } catch (err) {
-    console.error(err)
-    throw err
+      if (!found) {
+        throw new Error(`!!! ERR Command Line option not recognized: --${cliOpt}=${_argv[cliOpt]}`)
+      }
+    })
+    wereAppOptsLoaded = true
   }
+  return opt ? CLI_OPTS[opt] : CLI_OPTS
 }
 
-loadAppOptions()
+const CLI_ENV_OPTIONS = {}
+export const getCliEnvOpt = (opt) => {
+  if (!wereAppOptsLoaded) {
+    console.log(optionsToString())
+
+    console.log(' Extracted conf values:')
+    Object.keys(OPTIONS).forEach((opt) => {
+      const cliOpt = getCliOpt(opt)
+      if (cliOpt) {
+        CLI_ENV_OPTIONS[opt] = cliOpt
+        console.log('    (cli) ' + opt.padEnd(longestOptName) + ' => ' + cliOpt)
+      } else {
+        const envVar = OPTIONS[opt].env
+        const envVal = process.env[envVar]
+        if (envVal) {
+          CLI_ENV_OPTIONS[opt] = envVal
+          console.log('    (env) ' + opt.padEnd(longestOptName) + ' => ' + envVal)
+        }
+      }
+    })
+    console.log(SEP_LINE + '\n') /////////////////////////////////////////////////////////////////////
+
+    // conf: CLI_OPTIONS.conf.cli || process.env[RUDI_API_USER_CONF],
+    // portal_conf: CLI_OPTIONS.portal_conf || process.env[RUDI_API_USER_CONF],
+    // }
+    wereAppOptsLoaded = true
+  }
+  return opt ? CLI_ENV_OPTIONS[opt] : CLI_ENV_OPTIONS
+}
+
+// -------------------------------------------------------------------------------------------------
+// Extracting configuration files information
+// -------------------------------------------------------------------------------------------------
+
+// Conf files name
+// - directory
+const INI_DIR = './0-ini'
+// - user conf path
+const userConfPath = getCliEnvOpt(OPT_USER_CONF)
+const USER_CONF_FILE = userConfPath || `${INI_DIR}/conf_custom.ini`
+// - default conf path
+const DEFT_CONF_FILE = `${INI_DIR}/conf_default.ini`
+
+if (!userConfPath) {
+  consoleErr(
+    mod,
+    'Extract conf file path',
+    'No path has been given for the conf file, check your configuration!' +
+      ` Now loading file from path '${USER_CONF_FILE}'`
+  )
+}
+// consoleLog(mod, 'init', USER_CONF_FILE)
+
+export const readConf = (conf, section, opt, file) => {
+  const fun = 'readConf'
+  if (!conf) {
+    try {
+      conf = readIniFile(file)
+    } catch (err) {
+      consoleErr(mod, fun, err)
+      throw err
+    }
+  }
+  return opt ? conf[section]?.[opt] : conf[section]
+}
+
+// -------------------------------------------------------------------------------------------------
+// Extracting user configuration
+// -------------------------------------------------------------------------------------------------
+
+let userConf
+const getUserConf = (section, opt) => readConf(userConf, section, opt, USER_CONF_FILE)
+
+// -------------------------------------------------------------------------------------------------
+// Extracting default configuration
+// -------------------------------------------------------------------------------------------------
+
+let defaultConf
+const getDefaultConf = (section, opt) => readConf(defaultConf, section, opt, DEFT_CONF_FILE)
+
+// -------------------------------------------------------------------------------------------------
+// Accessing configuration
+// -------------------------------------------------------------------------------------------------
+
+export const getConf = (section, opt) => {
+  if (!section) throw new Error(`Can't get empty conf section`)
+  const userConf = getUserConf(section, opt)
+  if (isDefined(userConf)) return userConf
+  const defaultConf = getDefaultConf(section, opt)
+  if (isDefined(defaultConf)) return defaultConf
+  throw new Error(
+    `Configuration not found:' ${section}.${opt}' -> userConf=${userConf}, defaultConf=${defaultConf}`
+  )
+}

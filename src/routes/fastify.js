@@ -78,17 +78,21 @@ const routeListener = fastify({
 // -------------------------------------------------------------------------------------------------
 
 export const launchRouteListener = async () => {
+  const fun = 'launchRouteListener'
   try {
     declareRoutes()
-    await routeListener.listen({ port: getServerPort(), host: getServerAddress() })
+    await routeListener.listen({
+      port: getServerPort(),
+      host: getServerAddress(),
+      listenTextResolver: (address) => logI(mod, fun, `App listening on ${address}`),
+    })
     // await routeListener.ready()
   } catch (err) {
-    logE(mod, 'Fastify listen', `${err}`)
+    logE(mod, fun, `${err}`)
     sysCrit(`Fastify launch: ${err}`, 'rudiServer.routeListener', {}, { error: err })
     throw new RudiError('Could not launch fastify server')
   }
   // fastify.swagger()
-  // fastify.info(`Listening on ${fastify.server.address().address}:${fastify.server.address().port}`)
 }
 // -------------------------------------------------------------------------------------------------
 // Fastify hooks: errors

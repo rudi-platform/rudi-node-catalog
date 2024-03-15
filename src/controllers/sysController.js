@@ -15,8 +15,11 @@ import mongoose from 'mongoose'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { OPT_APP_ENV, getAppOptions, getGitHash as getGitHashOpt } from '../config/appOptions.js'
-import { getAppHash as getAppHashOpt } from '../config/confSystem.js'
+import {
+  getAppEnv,
+  getAppHash as getAppHashOpt,
+  getGitHash as getGitHashOpt,
+} from '../config/confSystem.js'
 import { API_VERSION } from '../config/constApi.js'
 import { RudiError } from '../utils/errors.js'
 import { NOT_FOUND } from '../utils/jsUtils.js'
@@ -55,15 +58,15 @@ export const getApiVersion = () => API_VERSION
 export const getEnvironment = () => {
   const fun = 'getEnvironment'
   try {
-    logT(mod, fun, getAppOptions(OPT_APP_ENV))
-    const appEnv = getAppOptions(OPT_APP_ENV)
-    const env = appEnv || NOT_FOUND
+    logT(mod, fun, getAppEnv())
+    const env = getAppEnv() || NOT_FOUND
     return env
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
 }
 
+let nVersions = {}
 /** Returns the node and npm versions */
 export const getNodeVersion = async () => {
   const fun = 'getNodeVersion'
@@ -94,7 +97,7 @@ export const getNodeVersion = async () => {
     logW(mod, fun, `Couldn't get MongoDB version: ${err}`)
   }
 
-  const nVersions = {
+  nVersions = {
     node: `${nodeVersion}`.trim(),
     npm: `${npmVersion}`.trim(),
     mongoose: `${mongooseVersion}`.trim(),

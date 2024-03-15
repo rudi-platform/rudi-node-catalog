@@ -126,7 +126,7 @@ import {
 } from '../controllers/skosController.js'
 
 import { getPortalBaseUrl } from '../config/confPortal.js'
-import { getApiUrl } from '../config/confSystem.js'
+import { getPublicUrl } from '../config/confSystem.js'
 import {
   checkStoredToken,
   deleteMetadata,
@@ -831,7 +831,7 @@ export const devRoutes = [
   {
     method: HTTP_METHODS.GET,
     url: `${URL_PREFIX_CHECK}/${URL_SUFFIX_NODE}/url`,
-    handler: () => getApiUrl(),
+    handler: () => getPublicUrl(),
     config: { [ROUTE_NAME]: DEV_CHECK_NODE_URL },
   },
   {

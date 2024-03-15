@@ -25,12 +25,12 @@ export const nowLocaleFormatted = () =>
   new Date().toISOString().replace(/T\./, ' ').replace('Z', '')
 // datetime.format(new Date(), LOG_DATE_FORMAT)
 
-const BASE_LINE =
-  '=====================================================' +
-  '====================================================='
+const logLineSize = 110
+export const SEP_LINE = ''.padEnd(logLineSize + 2, '-')
+const BASE_LINE = ''.padEnd(logLineSize, '=')
 export const separateLogs = (insertStr, shouldDisplayDate) => {
   const dateStr = shouldDisplayDate ? `${nowLocaleFormatted()} ` : ''
-  const inputStr = `${insertStr}` ? `[ ${insertStr} ]==` : ''
+  const inputStr = insertStr ? `[ ${insertStr} ]==` : ''
   const eatenCharacters = dateStr.length + inputStr.length
   // const line = inputStr.padStart(BASE_LINE.length - eatenCharacters, '=')
   const line = BASE_LINE.substring(eatenCharacters)
@@ -40,6 +40,7 @@ export const separateLogs = (insertStr, shouldDisplayDate) => {
   console.log('D ' + logSeparator)
   return logSeparator
 }
+console.log()
 separateLogs('Booting', true)
 
 // -------------------------------------------------------------------------------------------------
@@ -277,6 +278,10 @@ export const setSubProp = (obj, propArray, value) => objectPath.set(obj, propArr
 // -------------------------------------------------------------------------------------------------
 // JSON
 // -------------------------------------------------------------------------------------------------
+export const isDefined = (val) => typeof val !== 'undefined'
+
+export const isPropDefined = (obj, prop) => obj?.hasOwnProperty(prop)
+
 export const isEmpty = (prop) => {
   const strProp = JSON.stringify(prop)
   return prop == '' || prop == '{}' || prop == '[]' || strProp == '{}' || strProp == '[]'

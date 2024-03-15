@@ -131,7 +131,7 @@ import { checkDates, ReferenceDatesSchema } from '../schemas/ReferenceDates.js'
 // Model definitions
 // -------------------------------------------------------------------------------------------------
 import { isPortalConnectionDisabled } from '../../config/confPortal.js'
-import { getApiUrl } from '../../config/confSystem.js'
+import { getPublicUrl } from '../../config/confSystem.js'
 import { VALID_API_VERSION, VALID_URI } from '../schemaValidators.js'
 import { isMediaMissing, MediaTypes } from './Media.js'
 
@@ -518,7 +518,7 @@ async function checkMetadataSource(metadata) {
   const fun = 'checkMetadataSource'
   try {
     if (!metadata[API_METAINFO_PROPERTY][API_METAINFO_SOURCE_PROPERTY])
-      metadata[API_METAINFO_PROPERTY][API_METAINFO_SOURCE_PROPERTY] = getApiUrl(
+      metadata[API_METAINFO_PROPERTY][API_METAINFO_SOURCE_PROPERTY] = getPublicUrl(
         `${URL_PREFIX_PUBLIC}/${OBJ_METADATA}/${metadata[API_METADATA_ID]}`
       )
   } catch (err) {

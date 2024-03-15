@@ -21,10 +21,11 @@ const syslogLevels = {
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { LOG_DATE_FORMAT, consoleErr, consoleLog, separateLogs } from '../utils/jsUtils.js'
-import { OPT_NODE_ENV, getAppOptions, getGitHash } from './appOptions.js'
+import { getConf } from './appOptions.js'
 import {
   getAppName,
-  getIniValue,
+  getGitHash,
+  getNodeEnv,
   shouldControlPrivateRequests,
   shouldControlPublicRequests,
 } from './confSystem.js'
@@ -39,13 +40,13 @@ const APP_NAME = getAppName()
 // ----- Flags section
 const FLAGS_SECTION = 'flags'
 
-export const SHOULD_LOG_CONSOLE = getIniValue(FLAGS_SECTION, 'should_log_console', false)
-const SHOULD_FILELOG = getIniValue(FLAGS_SECTION, 'should_log_in_file', false)
-const SHOULD_SHOW_ERROR_PILE = getIniValue(FLAGS_SECTION, 'should_show_error_pile', false)
-const SHOULD_SHOW_ROUTES = getIniValue(FLAGS_SECTION, 'should_show_routes', true)
-export const SHOULD_SYSLOG = getIniValue(FLAGS_SECTION, 'should_syslog')
-const SHOULD_SYSLOG_IN_CONSOLE = getIniValue(FLAGS_SECTION, 'should_syslog_in_console')
-const SHOULD_SYSLOG_IN_FILE = getIniValue(FLAGS_SECTION, 'should_syslog_in_file')
+export const SHOULD_LOG_CONSOLE = getConf(FLAGS_SECTION, 'should_log_console')
+const SHOULD_FILELOG = getConf(FLAGS_SECTION, 'should_log_in_file')
+const SHOULD_SHOW_ERROR_PILE = getConf(FLAGS_SECTION, 'should_show_error_pile')
+const SHOULD_SHOW_ROUTES = getConf(FLAGS_SECTION, 'should_show_routes')
+export const SHOULD_SYSLOG = getConf(FLAGS_SECTION, 'should_syslog')
+const SHOULD_SYSLOG_IN_CONSOLE = getConf(FLAGS_SECTION, 'should_syslog_in_console')
+const SHOULD_SYSLOG_IN_FILE = getConf(FLAGS_SECTION, 'should_syslog_in_file')
 
 export const shouldShowErrorPile = () => SHOULD_SHOW_ERROR_PILE
 export const shouldShowRoutes = () => SHOULD_SHOW_ROUTES
@@ -64,27 +65,27 @@ checkOption('Should log routes', SHOULD_SHOW_ROUTES)
 // ----- Logs section
 const LOG_SECTION = 'logging'
 
-const LOG_LVL = getIniValue(LOG_SECTION, 'log_level', 'debug')
+const LOG_LVL = getConf(LOG_SECTION, 'log_level', 'debug')
 consoleLog(mod, fun, `Log level set to '${LOG_LVL.toUpperCase()}'`)
 
-const LOG_DIR = getIniValue(LOG_SECTION, 'log_dir')
-const LOG_FILE = getIniValue(LOG_SECTION, 'log_file')
+const LOG_DIR = getConf(LOG_SECTION, 'log_dir')
+const LOG_FILE = getConf(LOG_SECTION, 'log_file')
 
-export const LOG_EXP = getIniValue(LOG_SECTION, 'expires', '7d')
+export const LOG_EXP = getConf(LOG_SECTION, 'expires', '7d')
 export const getLogLevel = () => LOG_LVL
 
 // ----- Syslog
 const SYSLOG_SECTION = 'syslog'
 
-// const SYSLOG_LVL = getIniValue(SYSLOG_SECTION, '◊log_level', 'info')
-// const SYSLOG_NODE_NAME = getIniValue(SYSLOG_SECTION, 'syslog_node_name')
-export const SYSLOG_PROTOCOL = getIniValue(SYSLOG_SECTION, 'syslog_protocol', 'unix')
-const SYSLOG_FACILITY = getIniValue(SYSLOG_SECTION, 'syslog_facility', 'local4')
-const SYSLOG_HOST = getIniValue(SYSLOG_SECTION, 'syslog_host')
-const SYSLOG_PORT = getIniValue(SYSLOG_SECTION, 'syslog_port', 514) // default: 514
-// const SYSLOG_TYPE = getIniValue(SYSLOG_SECTION, 'syslog_type', 'RFC5424') // bsd | 5424
-const SYSLOG_SOCKET = getIniValue(SYSLOG_SECTION, 'syslog_socket') // the socket for sending syslog diagrams
-const SYSLOG_DIR = getIniValue(SYSLOG_SECTION, 'syslog_dir') // path of the syslog backup file
+// const SYSLOG_LVL = getConf(SYSLOG_SECTION, '◊log_level', 'info')
+// const SYSLOG_NODE_NAME = getConf(SYSLOG_SECTION, 'syslog_node_name')
+export const SYSLOG_PROTOCOL = getConf(SYSLOG_SECTION, 'syslog_protocol', 'unix')
+const SYSLOG_FACILITY = getConf(SYSLOG_SECTION, 'syslog_facility', 'local4')
+const SYSLOG_HOST = getConf(SYSLOG_SECTION, 'syslog_host')
+const SYSLOG_PORT = getConf(SYSLOG_SECTION, 'syslog_port', 514) // default: 514
+// const SYSLOG_TYPE = getConf(SYSLOG_SECTION, 'syslog_type', 'RFC5424') // bsd | 5424
+const SYSLOG_SOCKET = getConf(SYSLOG_SECTION, 'syslog_socket') // the socket for sending syslog diagrams
+const SYSLOG_DIR = getConf(SYSLOG_SECTION, 'syslog_dir') // path of the syslog backup file
 
 // -------------------------------------------------------------------------------------------------
 // Creating local log dir
@@ -233,7 +234,7 @@ export const initFFLogger = () => {
     levels: syslogLevels,
     // format: format.combine(format.splat(), format.json()),
     defaultMeta: {
-      service: getAppName() + '_' + (getAppOptions(OPT_NODE_ENV) || 'dev'),
+      service: getAppName() + '_' + getNodeEnv(),
     },
     transports: [logOutputs.ffError],
   })
@@ -250,66 +251,6 @@ export const initFFLogger = () => {
 
   return ffLogger
 }
-
-// -------------------------------------------------------------------------------------------------
-// Winston logger creation : SYSLOG
-// -------------------------------------------------------------------------------------------------
-
-// const SYSLOGS_FORMAT_PRINTF = (info) =>
-//   `${info.level} ${utils.toISOLocale()} ${info.message}` +
-//   ` ${info.meta ? utils.beautify(info.meta) : ''}`
-
-// const formatConsoleSyslogs = combine(timestamp(), printf(SYSLOGS_FORMAT_PRINTF))
-
-// const syslogOpts = {
-//   levels: syslogLevels,
-//   transports: [
-//     new winston.transports.Console({
-//       name: 'consoleSysLogs',
-//       levels: syslogLevels,
-//       format: formatConsoleSyslogs,
-//     }),
-//   ],
-// }
-
-// if (SHOULD_SYSLOG) {
-//   // Push to syslog socket
-//   syslogOpts.transports.push(
-//     new winston.transports.Syslog({
-//       name: 'syslogSocket',
-//       localhost: SYSLOG_NODE_NAME,
-//       facility: SYSLOG_FACILITY,
-//       protocol: SYSLOG_PROTOCOL,
-//       host: SYSLOG_HOST,
-//       port: SYSLOG_PORT,
-//       path: SYSLOG_SOCKET,
-//       type: SYSLOG_TYPE,
-//       app_name: APP_NAME,
-//       level: SYSLOG_LVL,
-//     })
-//   )
-//   // syslogOpts.transports.push(logOutputs.console)
-//   // } else {
-//   //   syslogOpts.transports.push(logOutputs.console)
-// }
-
-// if (SHOULD_SYSLOG_IN_FILE) {
-//   // Write in a dedicated syslog file
-//   syslogOpts.transports.push(
-//     new winston.transports.DailyRotateFile({
-//       name: 'syslogFile',
-//       dirname: SYSLOG_DIR,
-//       filename: `syslog-${APP_NAME}-%DATE%`,
-//       datePattern: 'YYYY-MM-DD-HH',
-//       createSymlink: true,
-//       symlinkName: `syslog-${APP_NAME}-current.log`,
-//       maxSize: '75m',
-//       maxFiles: '7d',
-//       extension: '.log',
-//       format: formatFileLogs,
-//     })
-//   )
-// }
 
 // export const sysLogger = winston.createLogger(syslogOpts)
 function getRudiLoggerOptions() {

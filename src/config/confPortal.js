@@ -3,12 +3,10 @@ const mod = 'confPortal'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { NOT_FOUND, quietAccess, separateLogs, toBase64 } from '../utils/jsUtils.js'
+import { consoleErr, isDefined, separateLogs, toBase64 } from '../utils/jsUtils.js'
 
-import { ConfigurationError, RudiError } from '../utils/errors.js'
-
-import { readIniFile } from '../utils/fileActions.js'
 import { logD } from '../utils/logging.js'
+import { OPT_PORTAL_CONF, getCliEnvOpt, readConf } from './appOptions.js'
 
 separateLogs('Portal conf', true) ////////////////////////////////////////////////////////
 
@@ -28,10 +26,19 @@ export const NO_PORTAL_MSG = 'No portal connected'
 // - directory
 const INI_DIR = './0-ini'
 // - user conf path
-const PORTAL_CONF_ENV = process.env.RUDI_API_PORTAL_CONF
-const PORTAL_CUSTOM_CONF_FILE = PORTAL_CONF_ENV || `${INI_DIR}/portal_conf_custom.ini`
+const portalConfUserFile = getCliEnvOpt(OPT_PORTAL_CONF)
+const PORTAL_CUSTOM_CONF_FILE = portalConfUserFile || `${INI_DIR}/portal_conf_custom.ini`
 // - default conf path
 const PORTAL_DEFT_CONF_FILE = `${INI_DIR}/portal_conf_default.ini`
+
+if (!portalConfUserFile) {
+  consoleErr(
+    mod,
+    'Extract portal conf file path',
+    'No path has been given for this conf file, check your configuration!' +
+      ` Now loading file from path '${PORTAL_CUSTOM_CONF_FILE}'`
+  )
+}
 
 // -------------------------------------------------------------------------------------------------
 // Constants: user and local configuration
@@ -39,54 +46,32 @@ const PORTAL_DEFT_CONF_FILE = `${INI_DIR}/portal_conf_default.ini`
 // Getting user conf file value
 // if null, local conf file value
 // if null , default value
-const getPortalCustomConf = () => {
-  const fun = 'getPortalCustomConf'
-  try {
-    logD(mod, fun, `Conf file: ${PORTAL_CONF_ENV ? 'env' : 'ini'}`)
-    return readIniFile(PORTAL_CUSTOM_CONF_FILE)
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
-const getPortalDefaultConf = () => {
-  try {
-    return readIniFile(PORTAL_DEFT_CONF_FILE)
-  } catch (err) {
-    throw RudiError.treatError(mod, 'getPortalDefaultConf', err)
-  }
+let portalUserConf
+const getPortalUserConf = (opt) => readConf(portalUserConf, 'portal', opt, PORTAL_CUSTOM_CONF_FILE)
+let defaultUserConf
+const getPortalDefaultConf = (opt) =>
+  readConf(defaultUserConf, 'portal', opt, PORTAL_DEFT_CONF_FILE)
+
+export const getPortalConf = (opt) => {
+  const userConf = getPortalUserConf(opt)
+  if (isDefined(userConf)) return userConf
+  const defaultConf = getPortalDefaultConf(opt)
+  if (isDefined(defaultConf)) return defaultConf
+  throw new Error(
+    `Configuration not found: '${opt}' -> portalUserConf=${userConf}, portalDefaultConf=${defaultConf}`
+  )
 }
 
-const PORTAL_CUSTOM_CONF = getPortalCustomConf()
-const PORTAL_LOCAL_CONF = getPortalDefaultConf()
-
-// -------------------------------------------------------------------------------------------------
-// Helper functions
-// -------------------------------------------------------------------------------------------------
-const getPortalIniValue = (section, field, defaultVal) => {
-  try {
-    const userValue = quietAccess(PORTAL_CUSTOM_CONF[section], field)
-    const localValue = quietAccess(PORTAL_LOCAL_CONF[section], field)
-
-    if (userValue != NOT_FOUND) return userValue
-    if (localValue != NOT_FOUND) return localValue
-    if (typeof defaultVal === 'undefined') {
-      throw new ConfigurationError(`${section}.${field}`, PORTAL_CUSTOM_CONF_FILE)
-    } else return defaultVal
-  } catch (err) {
-    throw RudiError.treatError(mod, 'getPortalIniValue', err)
-  }
-}
 // -------------------------------------------------------------------------------------------------
 // Extracting and exporting sys configuration
 // -------------------------------------------------------------------------------------------------
-const PORTAL_SECTION = 'portal'
 
 // ----- Auth
-const AUTH_URL = getPortalIniValue(PORTAL_SECTION, 'auth_url')
-const AUTH_GET = getPortalIniValue(PORTAL_SECTION, 'auth_get')
-const AUTH_CHK = getPortalIniValue(PORTAL_SECTION, 'auth_chk')
-const JWT_PUB_KEY_URL = getPortalIniValue(PORTAL_SECTION, 'auth_pub')
-const CRYPT_PUB_KEY_URL = getPortalIniValue(PORTAL_SECTION, 'encrypt_pub')
+const AUTH_URL = getPortalConf('auth_url')
+const AUTH_GET = getPortalConf('auth_get')
+const AUTH_CHK = getPortalConf('auth_chk')
+const JWT_PUB_KEY_URL = getPortalConf('auth_pub')
+const CRYPT_PUB_KEY_URL = getPortalConf('encrypt_pub')
 
 export const getAuthUrl = () => `${AUTH_URL}/${AUTH_GET}`
 export const getCheckAuthUrl = () => `${AUTH_URL}/${AUTH_CHK}`
@@ -94,9 +79,9 @@ export const getPortalJwtPubKeyUrl = () => `${AUTH_URL}/${JWT_PUB_KEY_URL}`
 export const getPortalCryptPubUrl = () => `${AUTH_URL}/${CRYPT_PUB_KEY_URL}`
 
 // ----- Creds
-const isPwdB64 = getPortalIniValue(PORTAL_SECTION, 'is_pwd_b64')
-const LOGIN = getPortalIniValue(PORTAL_SECTION, 'login')
-const READ_PASSW = getPortalIniValue(PORTAL_SECTION, 'passw')
+const isPwdB64 = getPortalConf('is_pwd_b64')
+const LOGIN = getPortalConf('login')
+const READ_PASSW = getPortalConf('passw')
 // consoleLog(mod, 'readPortalConf',`READ_PASSW: ${READ_PASSW}` )
 const PASSW_B64 =
   isPwdB64 == 1 ||
@@ -105,22 +90,16 @@ const PASSW_B64 =
     ? READ_PASSW
     : toBase64(READ_PASSW)
 // consoleLog(mod, 'readPortalConf', `PASSW_B64: ${PASSW_B64}`)
-const SHOULD_CONTROL_EXT_REQUESTS = getPortalIniValue(
-  PORTAL_SECTION,
-  'should_control_public_requests',
-  false
-)
 
 export const getCredentials = () => [LOGIN, PASSW_B64]
-export const shouldControlExtRequest = () => SHOULD_CONTROL_EXT_REQUESTS
 
 // ----- API
-const API_PORTAL_URL = PORTAL_CUSTOM_CONF?.[PORTAL_SECTION]?.portal_url
+const API_PORTAL_URL = getPortalConf('portal_url')
 export const isPortalConnectionDisabled = () => !API_PORTAL_URL
 export const getPortalBaseUrl = () => API_PORTAL_URL || NO_PORTAL_MSG
 
-const API_GET_URL = getPortalIniValue(PORTAL_SECTION, 'get_url', '')
-const API_SEND_URL = getPortalIniValue(PORTAL_SECTION, 'put_url', '')
+const API_GET_URL = getPortalConf('get_url', '')
+const API_SEND_URL = getPortalConf('put_url', '')
 
 export const getPortalMetaUrl = (id, additionalParameters) => {
   if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
