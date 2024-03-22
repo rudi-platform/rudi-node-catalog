@@ -26,6 +26,7 @@ export const PARAM_OBJECT = 'object'
 export const PARAM_ID = 'id'
 export const PARAM_PROP = 'prop'
 export const PARAM_REPORT_ID = 'irid'
+export const PARAM_METADATA_STANDARD = 'std'
 
 // --- "Objects" parameters
 export const OBJ_METADATA = 'resources'
@@ -98,6 +99,7 @@ export const ACT_SEARCH = 'search'
 export const ACT_EXT_SEARCH = 'ext_search'
 export const ACT_SEND = 'send'
 export const ACT_COMMIT = 'commit'
+export const ACT_STANDARD = 'std'
 
 export const ACT_CHECK = 'check'
 

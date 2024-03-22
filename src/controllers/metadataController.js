@@ -60,6 +60,7 @@ import {
 
 import {
   ACT_INIT,
+  ACT_STANDARD,
   API_VERSION,
   COUNT_LABEL,
   LIST_LABEL,
@@ -67,6 +68,7 @@ import {
   OBJ_MEDIA,
   OBJ_METADATA,
   PARAM_ID,
+  PARAM_METADATA_STANDARD,
   QUERY_COUNT_BY,
   QUERY_FIELDS,
   QUERY_FILTER,
@@ -75,6 +77,7 @@ import {
   QUERY_SEARCH_TERMS,
   QUERY_SORT_BY,
   STATUS_CODE,
+  URL_PREFIX_PRIVATE,
   URL_PREFIX_PUBLIC,
   URL_PUB_METADATA,
 } from '../config/constApi.js'
@@ -86,6 +89,7 @@ import {
   BadRequestError,
   InternalServerError,
   NotFoundError,
+  NotImplementedError,
   ObjectNotFoundError,
   ParameterExpectedError,
   RudiError,
@@ -107,6 +111,7 @@ import {
   organizationNotFound,
   parameterExpected,
 } from '../utils/msg.js'
+import { isAvailableMetadataStandard, translateXMLMetadata } from '../utils/translator.js'
 
 // -------------------------------------------------------------------------------------------------
 // Data models
@@ -680,6 +685,26 @@ export const newMetadata = async (rudiMetadata) => {
     return finalMetadata
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+export const postMetadataFromOtherStandard = async (req, reply) => {
+  const fun = 'postMetadataFromOtherStandard'
+  const inputStandard = accessReqParam(req, PARAM_METADATA_STANDARD)
+  logT(
+    mod,
+    fun,
+    `< POST ${URL_PREFIX_PRIVATE}/${OBJ_METADATA}/${ACT_STANDARD}/:${PARAM_METADATA_STANDARD}`
+  )
+  const originMetadata = req.body
+
+  if (isAvailableMetadataStandard(inputStandard)) {
+    const rudiMetadata = await translateXMLMetadata(originMetadata, inputStandard)
+    logI(mod, fun, rudiMetadata['resource_title'])
+  } else {
+    throw new NotImplementedError(
+      `Translation from ${inputStandard} to rudi metadata is not yet supported.`
+    )
   }
 }
 

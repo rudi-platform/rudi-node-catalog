@@ -15,6 +15,7 @@ import {
   ACT_REPORT,
   ACT_SEARCH,
   ACT_SEND,
+  ACT_STANDARD,
   ACT_UUID_GEN,
   HTTP_METHODS,
   OBJ_MEDIA,
@@ -22,6 +23,7 @@ import {
   OBJ_PUB_KEYS,
   OBJ_REPORTS,
   PARAM_ID,
+  PARAM_METADATA_STANDARD,
   PARAM_OBJECT,
   PARAM_PROP,
   PARAM_REPORT_ID,
@@ -84,6 +86,7 @@ import {
   getSingleMetadata,
   initThemes,
   initWithODR,
+  postMetadataFromOtherStandard,
   searchMetadata,
   sendManyMetadataToPortal,
   updateAllMetadataStatus,
@@ -172,6 +175,7 @@ const PRV_DEL_ONE = 'prv_del_one'
 const PRV_DEL_MANY = 'prv_del_many'
 const PRV_DEL_LIST = 'prv_del_list'
 const PRV_MEDIA_COMMIT = 'prv_media_commit'
+const PRV_POST_METADATA = 'prv_metadata_post'
 
 const PRV_OBJ_SEARCH = 'prv_obj_search'
 const PRV_OBJ_COUNT = 'prv_obj_count'
@@ -604,6 +608,13 @@ export const backOfficeRoutes = [
     url: `${URL_PREFIX_PRIVATE}/${OBJ_METADATA}/save`,
     handler: updateAllMetadataStatus,
     config: { [ROUTE_NAME]: PRV_SAVE_ALL },
+  },
+  // Post a metadata from an other format
+  {
+    method: HTTP_METHODS.POST,
+    url: `${URL_PREFIX_PRIVATE}/${OBJ_METADATA}/${ACT_STANDARD}/:${PARAM_METADATA_STANDARD}`,
+    handler: postMetadataFromOtherStandard,
+    config: { [ROUTE_NAME]: PRV_POST_METADATA },
   },
   // -------------------------------------------------------------------------------------------------
   // Media
