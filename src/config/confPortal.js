@@ -1,5 +1,6 @@
 const mod = 'confPortal'
 
+import { readIniFile } from '../utils/fileActions.js'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
@@ -46,11 +47,10 @@ if (!portalConfUserFile) {
 // Getting user conf file value
 // if null, local conf file value
 // if null , default value
-let portalUserConf
-const getPortalUserConf = (opt) => readConf(portalUserConf, 'portal', opt, PORTAL_CUSTOM_CONF_FILE)
-let defaultUserConf
-const getPortalDefaultConf = (opt) =>
-  readConf(defaultUserConf, 'portal', opt, PORTAL_DEFT_CONF_FILE)
+const portalUserConf = readIniFile(PORTAL_CUSTOM_CONF_FILE)
+const getPortalUserConf = (opt) => readConf(portalUserConf, 'portal', opt)
+const defaultUserConf = readIniFile(PORTAL_DEFT_CONF_FILE)
+const getPortalDefaultConf = (opt) => readConf(defaultUserConf, 'portal', opt)
 
 export const getPortalConf = (opt) => {
   const userConf = getPortalUserConf(opt)

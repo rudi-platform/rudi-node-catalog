@@ -162,7 +162,7 @@ const INI_DIR = './0-ini'
 const userConfPath = getCliEnvOpt(OPT_USER_CONF)
 const USER_CONF_FILE = userConfPath || `${INI_DIR}/conf_custom.ini`
 // - default conf path
-const DEFT_CONF_FILE = `${INI_DIR}/conf_default.ini`
+const DEFAULT_CONF_FILE = `${INI_DIR}/conf_default.ini`
 
 if (!userConfPath) {
   consoleErr(
@@ -174,16 +174,17 @@ if (!userConfPath) {
 }
 // consoleLog(mod, 'init', USER_CONF_FILE)
 
-export const readConf = (conf, section, opt, file) => {
-  const fun = 'readConf'
-  if (!conf) {
-    try {
-      conf = readIniFile(file)
-    } catch (err) {
-      consoleErr(mod, fun, err)
-      throw err
-    }
-  }
+export const readConf = (conf, section, opt) => {
+  // const fun = 'readConf'
+  // if (Object.keys(conf).length == 0) {
+  //   // consoleLog(mod, fun, file)
+  //   try {
+  //     conf = readIniFile(file)
+  //   } catch (err) {
+  //     consoleErr(mod, fun, err)
+  //     throw err
+  //   }
+  // }
   return opt ? conf[section]?.[opt] : conf[section]
 }
 
@@ -191,26 +192,27 @@ export const readConf = (conf, section, opt, file) => {
 // Extracting user configuration
 // -------------------------------------------------------------------------------------------------
 
-let userConf
-const getUserConf = (section, opt) => readConf(userConf, section, opt, USER_CONF_FILE)
+const USER_CONF = readIniFile(USER_CONF_FILE)
+const getUserConf = (section, opt) => readConf(USER_CONF, section, opt)
 
 // -------------------------------------------------------------------------------------------------
 // Extracting default configuration
 // -------------------------------------------------------------------------------------------------
 
-let defaultConf
-const getDefaultConf = (section, opt) => readConf(defaultConf, section, opt, DEFT_CONF_FILE)
+const DEFAULT_CONF = readIniFile(DEFAULT_CONF_FILE)
+const getDefaultConf = (section, opt) => readConf(DEFAULT_CONF, section, opt, DEFAULT_CONF_FILE)
 
 // -------------------------------------------------------------------------------------------------
 // Accessing configuration
 // -------------------------------------------------------------------------------------------------
 
-export const getConf = (section, opt) => {
+export const getConf = (section, opt, altValue) => {
   if (!section) throw new Error(`Can't get empty conf section`)
   const userConf = getUserConf(section, opt)
   if (isDefined(userConf)) return userConf
   const defaultConf = getDefaultConf(section, opt)
   if (isDefined(defaultConf)) return defaultConf
+  if (isDefined(altValue)) return altValue
   throw new Error(
     `Configuration not found:' ${section}.${opt}' -> userConf=${userConf}, defaultConf=${defaultConf}`
   )

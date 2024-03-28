@@ -20,6 +20,7 @@ const syslogLevels = {
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
+import { resolve } from 'path'
 import { LOG_DATE_FORMAT, consoleErr, consoleLog, separateLogs } from '../utils/jsUtils.js'
 import { getConf } from './appOptions.js'
 import {
@@ -77,7 +78,7 @@ export const getLogLevel = () => LOG_LVL
 // ----- Syslog
 const SYSLOG_SECTION = 'syslog'
 
-// const SYSLOG_LVL = getConf(SYSLOG_SECTION, '◊log_level', 'info')
+const SYSLOG_LVL = getConf(SYSLOG_SECTION, 'log_level', 'info')
 // const SYSLOG_NODE_NAME = getConf(SYSLOG_SECTION, 'syslog_node_name')
 export const SYSLOG_PROTOCOL = getConf(SYSLOG_SECTION, 'syslog_protocol', 'unix')
 const SYSLOG_FACILITY = getConf(SYSLOG_SECTION, 'syslog_facility', 'local4')
@@ -85,7 +86,7 @@ const SYSLOG_HOST = getConf(SYSLOG_SECTION, 'syslog_host')
 const SYSLOG_PORT = getConf(SYSLOG_SECTION, 'syslog_port', 514) // default: 514
 // const SYSLOG_TYPE = getConf(SYSLOG_SECTION, 'syslog_type', 'RFC5424') // bsd | 5424
 const SYSLOG_SOCKET = getConf(SYSLOG_SECTION, 'syslog_socket') // the socket for sending syslog diagrams
-const SYSLOG_DIR = getConf(SYSLOG_SECTION, 'syslog_dir') // path of the syslog backup file
+const SYSLOG_DIR = `${getConf(SYSLOG_SECTION, 'syslog_dir')}/` // path of the syslog backup file
 
 // -------------------------------------------------------------------------------------------------
 // Creating local log dir
@@ -95,9 +96,9 @@ if (SHOULD_FILELOG) {
     // first check if directory already exists
     if (!existsSync(LOG_DIR)) {
       mkdirSync(LOG_DIR, { recursive: true })
-      consoleLog(mod, fun, 'Log directory has been created')
+      consoleLog(mod, fun, `Log directory created: '${LOG_DIR}'`)
     } else {
-      consoleLog(mod, fun, 'Log directory exists')
+      consoleLog(mod, fun, `Log directory: '${LOG_DIR}'`)
     }
   } catch (err) {
     consoleErr(mod, fun, `Log directory creation failed: ${err}`)
@@ -110,9 +111,9 @@ if (SHOULD_SYSLOG_IN_FILE) {
     // first check if directory already exists
     if (!existsSync(SYSLOG_DIR)) {
       mkdirSync(SYSLOG_DIR, { recursive: true })
-      consoleLog(mod, fun, 'Syslog directory has been created.')
+      consoleLog(mod, fun, `Syslog directory created: '${SYSLOG_DIR}'`)
     } else {
-      consoleLog(mod, fun, 'Syslog directory exists.')
+      consoleLog(mod, fun, `Syslog directory: '${SYSLOG_DIR}'`)
     }
   } catch (err) {
     consoleErr(mod, fun, `Log directory creation failed: ${err}`)
@@ -258,32 +259,33 @@ function getRudiLoggerOptions() {
   if (SYSLOG_FACILITY.substr(0, 5) === 'local') {
     facility = Facility.Local0 + Number(SYSLOG_FACILITY.substr(5, 1))
   }
-  let transports
+  let transport
   let path = SYSLOG_HOST
   switch (SYSLOG_PROTOCOL) {
     case 'tcp':
-      transports = Transport.Tcp
+      transport = Transport.Tcp
       break
     case 'udp':
-      transports = Transport.Udp
+      transport = Transport.Udp
       break
     case 'unix':
-      transports = Transport.Unix
+      transport = Transport.Unix
       path = SYSLOG_SOCKET
       break
     default:
-      transports = Transport.Udp
+      transport = Transport.Udp
   }
   const rudiLoggerOpts = {
-    log_server: { path: path, port: SYSLOG_PORT, facility: facility, transport: transports },
+    log_server: { path, port: SYSLOG_PORT, facility, transport },
+    log_local: {
+      directory: resolve(SYSLOG_DIR),
+      prefix: 'rudiProdApi',
+      console: !!SHOULD_SYSLOG_IN_CONSOLE,
+      consoleData: !!SHOULD_SYSLOG_IN_CONSOLE,
+      level: SYSLOG_LVL,
+    },
   }
 
-  rudiLoggerOpts.log_local = {
-    console: !!SHOULD_SYSLOG_IN_CONSOLE,
-    consoleData: !!SHOULD_SYSLOG_IN_CONSOLE,
-    directory: LOG_DIR,
-    prefix: 'rudiProd.api.syslog',
-  }
   return rudiLoggerOpts
 }
 

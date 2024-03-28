@@ -34,7 +34,7 @@
   "license": "EUPL-1.2",
   "dependencies": {
     "@aqmo.org/jwt-lib": "^1.1.12",
-    "@aqmo.org/rudi_logger": "^1.1.5",
+    "@aqmo.org/rudi_logger": "^1.1.6",
     "axios": "^1.6.8",
     "date-and-time": "^3.1.1",
     "fastify": "^4.26.2",
