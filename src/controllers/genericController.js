@@ -43,6 +43,8 @@ import {
   QUERY_GROUP_OFFSET,
   QUERY_LANG,
   QUERY_LIMIT,
+  QUERY_OBJECT_FORMAT,
+  QUERY_OBJECT_STANDARD,
   QUERY_OFFSET,
   QUERY_SEARCH_TERMS,
   QUERY_SORT_BY,
@@ -53,6 +55,10 @@ import {
   URL_PV_OBJECT_GENERIC,
 } from '../config/constApi.js'
 
+import {
+  DEFAULT_OBJECT_FORMAT,
+  DEFAULT_OBJECT_STANDARD,
+} from '../config/confTranslation/gmd/confGmdXml.js'
 import {
   countDbObjectList,
   countDbObjects,
@@ -88,10 +94,18 @@ import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
 
 import { beautify, isEmptyArray, isEmptyObject } from '../utils/jsUtils.js'
 
-import { BadRequestError, ForbiddenError, NotFoundError, RudiError } from '../utils/errors.js'
+import {
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+  NotImplementedError,
+  RudiError,
+} from '../utils/errors.js'
 
 import { CallContext } from '../definitions/constructors/callContext.js'
 import { parseQueryParameters } from '../utils/parseRequest.js'
+
+import { isTranslatable, translate } from '../translators/translationTools.js'
 
 // -------------------------------------------------------------------------------------------------
 // Specific controllers
@@ -208,25 +222,15 @@ function overrideFilter(filterList, field, value) {
   return filterList
 }
 
-// -------------------------------------------------------------------------------------------------
-// Controllers
-// -------------------------------------------------------------------------------------------------
-
 /**
- * Add a new object
- * => POST /{object}/{id}
+ * Add a new rudi objectobject
+ *
  */
-export const addSingleObject = async (req, reply) => {
-  const fun = 'addSingleObject'
+async function addSingleRudiObject(rudiObject, objectType, context) {
+  const fun = 'addSingleRudiObject'
   try {
-    logT(mod, fun, `< POST ${URL_PV_OBJECT_GENERIC}`)
-    // retrieve url parameters: object type
-    const objectType = getObjectParam(req)
-
     // get the rudiId field for this object type
     const idField = getObjectIdField(objectType)
-    // accessing the request body
-    const rudiObject = req.body
 
     // retrieving the id
     // logD(mod, fun, `objectType: '${objectType}', incomingData: '${beautify(rudiObject)}' `)
@@ -241,10 +245,88 @@ export const addSingleObject = async (req, reply) => {
     // logV(mod, fun, beautify(createdObject, 2))
     logI(mod, fun, `${objectAdded(objectType, rudiId)}`)
 
-    const context = CallContext.getCallContextFromReq(req)
     if (context) context.addObjId(objectType, rudiId)
-
     return createdObject
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+/**
+ * Translate and add an object
+ * @param {*} object the source object
+ * @param {String} objectType the rudi type (ex: resources, contacts, ...)
+ * @param {String} idField the field of the id in the rudi metadata
+ * @param {String} objectStandard the standard of the source object (ex: dcat, gmd). default : rudi
+ * @param {String} objectFormat the format of the source object (ex: xml, json)
+ * @param {*} context
+ * @returns
+ */
+async function addSingleObject(object, objectType, objectStandard, objectFormat, context) {
+  const fun = 'addSingleObject'
+  let rudiObject
+
+  if (objectFormat === DEFAULT_OBJECT_FORMAT || objectStandard === DEFAULT_OBJECT_STANDARD) {
+    rudiObject = object
+    return addSingleRudiObject(rudiObject, objectType, context)
+  }
+
+  if (isTranslatable(objectType, objectStandard, objectFormat)) {
+    try {
+      rudiObject = await translate(object, objectType, objectStandard, objectFormat)
+    } catch (e) {
+      throw new RudiError(e)
+    }
+    return rudiObject
+    // return addSingleRudiObject(rudiObject, objectType, context)
+  } else {
+    throw new NotImplementedError(
+      `Object of type ${objectType}, at standard ${objectStandard} and format ${objectFormat} can not yet be uploaded.`
+    )
+  }
+}
+
+// -------------------------------------------------------------------------------------------------
+// Controllers
+// -------------------------------------------------------------------------------------------------
+
+/**
+ * Add one or many object
+ * => POST /{object}
+ */
+export const addObjects = async (req, reply) => {
+  const fun = 'addObjects'
+  try {
+    logT(mod, fun, `< POST ${URL_PV_OBJECT_GENERIC}`)
+
+    // get the objectStandard query param, default=rudi
+    let objectStandard = req.query[QUERY_OBJECT_STANDARD]
+    if (!objectStandard) {
+      objectStandard = DEFAULT_OBJECT_STANDARD
+    }
+
+    // get the objectFormat query param, default=json
+    let objectFormat = req.query[QUERY_OBJECT_FORMAT]
+    if (!objectFormat) {
+      objectFormat = DEFAULT_OBJECT_FORMAT
+    }
+
+    const objectType = getObjectParam(req)
+
+    // accessing the request body
+    const objects = req.body
+
+    const context = CallContext.getCallContextFromReq(req)
+
+    let createdObjects
+    if (Array.isArray(objects)) {
+      createdObjects = objects.map((object) => {
+        addSingleObject(object, objectType, objectStandard, objectFormat, context)
+      })
+    } else {
+      createdObjects = addSingleObject(objects, objectType, objectStandard, objectFormat, context)
+    }
+    return createdObjects
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
