@@ -81,7 +81,29 @@ const SYSLOG_SECTION = 'syslog'
 const SYSLOG_LVL = getConf(SYSLOG_SECTION, 'log_level', 'info')
 // const SYSLOG_NODE_NAME = getConf(SYSLOG_SECTION, 'syslog_node_name')
 export const SYSLOG_PROTOCOL = getConf(SYSLOG_SECTION, 'syslog_protocol', 'unix')
-const SYSLOG_FACILITY = getConf(SYSLOG_SECTION, 'syslog_facility', 'local4')
+
+const getFacilityConf = () => {
+  const facilityConf = getConf(SYSLOG_SECTION, 'syslog_facility')
+  let facility = 'none'
+  if (facilityConf.substr(0, 5) === 'local') {
+    const localNb = Number(facilityConf.substr(5, 1))
+    if (0 <= localNb && localNb <= 7) {
+      facility = Facility.Local0 + localNb
+    }
+  } else {
+    const facilityNb = Number(facilityConf)
+    if (!isNaN(facilityNb) && 0 <= facilityNb && facilityNb <= 23) {
+      facility = facilityNb
+    }
+  }
+  if (facility == 'none')
+    throw new Error(
+      `Incorrect value for parameter syslog.syslog_facility. Should be a number between 0 and 23 or a string from "local0" to "local7", got: ${SYSLOG_FACILITY}`
+    )
+  return facility
+}
+
+const SYSLOG_FACILITY = getFacilityConf()
 const SYSLOG_HOST = getConf(SYSLOG_SECTION, 'syslog_host')
 const SYSLOG_PORT = getConf(SYSLOG_SECTION, 'syslog_port', 514) // default: 514
 // const SYSLOG_TYPE = getConf(SYSLOG_SECTION, 'syslog_type', 'RFC5424') // bsd | 5424
@@ -255,10 +277,6 @@ export const initFFLogger = () => {
 
 // export const sysLogger = winston.createLogger(syslogOpts)
 function getRudiLoggerOptions() {
-  let facility = Facility.Local4
-  if (SYSLOG_FACILITY.substr(0, 5) === 'local') {
-    facility = Facility.Local0 + Number(SYSLOG_FACILITY.substr(5, 1))
-  }
   let transport
   let path = SYSLOG_HOST
   switch (SYSLOG_PROTOCOL) {
@@ -276,7 +294,7 @@ function getRudiLoggerOptions() {
       transport = Transport.Udp
   }
   const rudiLoggerOpts = {
-    log_server: { path, port: SYSLOG_PORT, facility, transport },
+    log_server: { path, port: SYSLOG_PORT, facility: SYSLOG_FACILITY, transport },
     log_local: {
       directory: resolve(SYSLOG_DIR),
       prefix: 'rudiProdApi',

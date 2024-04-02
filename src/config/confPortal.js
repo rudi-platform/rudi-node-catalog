@@ -67,7 +67,7 @@ export const getPortalConf = (opt) => {
 // -------------------------------------------------------------------------------------------------
 
 // ----- Auth
-const AUTH_URL = getPortalConf('auth_url')
+const AUTH_URL = getPortalConf('auth_url') || API_PORTAL_URL
 const AUTH_GET = getPortalConf('auth_get')
 const AUTH_CHK = getPortalConf('auth_chk')
 const JWT_PUB_KEY_URL = getPortalConf('auth_pub')
