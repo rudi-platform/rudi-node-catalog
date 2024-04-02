@@ -41,7 +41,7 @@
     "ini": "^4.1.2",
     "lodash": "^4.17.21",
     "minimist": "^1.2.8",
-    "mongoose": "^8.2.3",
+    "mongoose": "^8.2.4",
     "mongoose-geojson-schema": "^2.2.5",
     "mongoose-int32": "^0.6.0",
     "nanoid": "^5.0.6",

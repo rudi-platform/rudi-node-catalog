@@ -174,19 +174,7 @@ if (!userConfPath) {
 }
 // consoleLog(mod, 'init', USER_CONF_FILE)
 
-export const readConf = (conf, section, opt) => {
-  // const fun = 'readConf'
-  // if (Object.keys(conf).length == 0) {
-  //   // consoleLog(mod, fun, file)
-  //   try {
-  //     conf = readIniFile(file)
-  //   } catch (err) {
-  //     consoleErr(mod, fun, err)
-  //     throw err
-  //   }
-  // }
-  return opt ? conf[section]?.[opt] : conf[section]
-}
+export const readConf = (conf, section, opt) => (opt ? conf[section]?.[opt] : conf[section])
 
 // -------------------------------------------------------------------------------------------------
 // Extracting user configuration
@@ -200,7 +188,7 @@ const getUserConf = (section, opt) => readConf(USER_CONF, section, opt)
 // -------------------------------------------------------------------------------------------------
 
 const DEFAULT_CONF = readIniFile(DEFAULT_CONF_FILE)
-const getDefaultConf = (section, opt) => readConf(DEFAULT_CONF, section, opt, DEFAULT_CONF_FILE)
+const getDefaultConf = (section, opt) => readConf(DEFAULT_CONF, section, opt)
 
 // -------------------------------------------------------------------------------------------------
 // Accessing configuration

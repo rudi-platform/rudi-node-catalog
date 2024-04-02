@@ -139,7 +139,8 @@ consoleLog(mod, 'init', `DB: ${DB_URI}`)
 
 // ----- SKOSMOS section
 const SKOSMOS_SECTION = 'skosmos'
-const skosmosConfFile = getConf(SKOSMOS_SECTION, 'skosmos_conf')
+const skosmosConfFile = getConf(SKOSMOS_SECTION, 'skosmos_conf', false)
+
 let SKOSMOS_CONF
 try {
   if (skosmosConfFile) SKOSMOS_CONF = readIniFile(skosmosConfFile)

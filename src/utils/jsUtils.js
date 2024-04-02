@@ -49,6 +49,13 @@ separateLogs('Booting', true)
 export const isInt = (n) => Number.isInteger(n)
 export const isPositiveInt = (n) => isInt(n) && n >= 0
 
+// Clean parseInt implementation
+// https://stackoverflow.com/a/52720865/1563072
+export const parseIntClean = (x) => {
+  x = Number(x)
+  return x >= 0 ? Math.floor(x) : Math.ceil(x)
+}
+
 // -------------------------------------------------------------------------------------------------
 // String
 // -------------------------------------------------------------------------------------------------
@@ -210,9 +217,8 @@ export const getLast = (array) => (Array.isArray(array) ? array[array.length - 1
 // -------------------------------------------------------------------------------------------------
 export const isObject = (obj) => Object.prototype.toString.call(obj) === '[object Object]'
 //Object.keys(obj).length > 0
-export const isEmptyObject = (obj) =>
-  !isString(obj) && !Array.isArray(obj) && Object.keys(obj).length === 0
-export const isNotEmptyObject = (obj) => obj && Object.keys(obj).length > 0
+export const isEmptyObject = (obj) => isObject(obj) && Object.keys(obj).length === 0
+export const isNotEmptyObject = (obj) => isObject(obj) && Object.keys(obj).length > 0
 
 export const NOT_FOUND = '!_not_found_!'
 export const quietAccess = (obj, prop) => {
