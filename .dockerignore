@@ -39,9 +39,6 @@ z_*
 # Dev
 .vscode
 
-# Doc
-**/doc
-
 # Docker
 Dockerfile
 
