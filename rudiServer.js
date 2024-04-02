@@ -34,7 +34,16 @@ import { Organization } from './src/definitions/models/Organization.js'
 import Keywords from './src/definitions/thesaurus/Keywords.js'
 import Themes from './src/definitions/thesaurus/Themes.js'
 import { launchRouteListener } from './src/routes/fastify.js'
-import { addLogEntry, logE, logI, logT, sysAlert, sysCrit, sysInfo } from './src/utils/logging.js'
+import {
+  addLogEntry,
+  logE,
+  logI,
+  logT,
+  logW,
+  sysAlert,
+  sysCrit,
+  sysInfo,
+} from './src/utils/logging.js'
 
 import './src/config/confPortal.js'
 import { RudiError } from './src/utils/errors.js'
@@ -63,17 +72,31 @@ RegExp.prototype.toJSON = RegExp.prototype.toString
 
 // Setting flags to avoid deprecation warnings
 const mongoConnect = async () => {
+  const fun = 'mongoConnect'
   mongoose.set('strictQuery', false)
-  consoleLog(mod, 'mongo', `Connecting to MongoDB`)
+  consoleLog(mod, fun, `Connecting to MongoDB`)
 
+  await mongoConnectWithRetry()
+  logI(mod, fun, `MongoDB connected`)
+}
+const MAX_DB_CONNECT_RETRIES = 5
+let currentRetry = 0
+
+const mongoConnectWithRetry = async () => {
+  const fun = 'mongoConnectWithRetry'
   try {
     await mongoose.connect(getDbFullUri())
-    logI(mod, 'mongo', `MongoDB connected`)
   } catch (err) {
-    logE(mod, 'mongoConnection', err)
-    sysCrit(`Mongo connection: ${err}`, 'rudiServer.dbConnect', {}, { error: err })
-    throw new RudiError('Could not connect to MongoDB')
-    // throw RudiError.treatError(mod, 'mongoConnection', err)
+    logW(mod, fun, `Database connection failed, retrying... ${err}`)
+    currentRetry++
+    if (currentRetry <= MAX_DB_CONNECT_RETRIES) {
+      // Wait 5 seconds before retrying
+      setTimeout(() => mongoConnectWithRetry(), 5000)
+    } else {
+      logE(mod, fun, `Failed to connect to database after ${MAX_DB_CONNECT_RETRIES}retries: ${err}`)
+      sysCrit(`Mongo connection: ${err}`, 'rudiServer.dbConnect', {}, { error: err })
+      throw new RudiError('Could not connect to MongoDB')
+    }
   }
 }
 
