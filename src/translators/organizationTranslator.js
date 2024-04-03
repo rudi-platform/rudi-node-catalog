@@ -3,7 +3,11 @@ const mod = 'orgTrsltr'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { PATHS_GMD_TO_RUDI } from '../config/confTranslation/gmd/confGmdXml.js'
+import {
+  FORMAT_XML,
+  PATHS_GMD_TO_RUDI,
+  STANDARD_GMD,
+} from '../config/confTranslation/gmd/confGmdXml.js'
 import {
   API_DATA_PRODUCER_PROPERTY,
   API_ORGANIZATION_ADDRESS,
@@ -12,15 +16,17 @@ import {
 import { RudiError } from '../utils/errors.js'
 import {
   arrayCheck,
+  getArgs,
   getElementWithPath,
+  getPath,
   translateStraightFromPath,
 } from './genericTranslationFunctions.js'
-import { FieldTranslator } from './genericTranslator.js'
+import { FieldTranslator, ObjectTranslator } from './genericTranslator.js'
 import {} from './translationTools.js'
 
 // -------------------------------------------------------------------------------------------------
 // Translation functions for organizations.
-// !!! All these functions must have the same parameters structure : (metadata, path, ...args) !!!
+// !!! All these functions must have the same parameters structure : (inputObject, path, ...args) !!!
 // -------------------------------------------------------------------------------------------------
 
 const translateOrgAddress = async function (metadata, path, args) {
@@ -34,7 +40,7 @@ const translateOrgAddress = async function (metadata, path, args) {
       )
       result += addressField + ', '
     } catch (err) {
-      throw new RudiError(err)
+      throw RudiError.treatError(mod, fun, err)
     }
   }
   return result.substring(0, result.length - 2)
@@ -44,15 +50,30 @@ const translateOrgAddress = async function (metadata, path, args) {
 // Fields Translators for organizations
 // -------------------------------------------------------------------------------------------------
 
-const argsGmdOrgs = PATHS_GMD_TO_RUDI[API_DATA_PRODUCER_PROPERTY].args
+const pathOrgGmdXml = getPath(PATHS_GMD_TO_RUDI, API_DATA_PRODUCER_PROPERTY)
+const argsOrgGmdXml = getArgs(PATHS_GMD_TO_RUDI, API_DATA_PRODUCER_PROPERTY)
 
-export const fieldTranslatorsOrgsGmdXml = [
-  new FieldTranslator(API_ORGANIZATION_NAME, translateStraightFromPath, {
-    path: argsGmdOrgs[API_ORGANIZATION_NAME].path,
-    args: argsGmdOrgs[API_ORGANIZATION_NAME].args,
-  }),
-  new FieldTranslator(API_ORGANIZATION_ADDRESS, translateOrgAddress, {
-    path: argsGmdOrgs[API_ORGANIZATION_ADDRESS].path,
-    args: argsGmdOrgs[API_ORGANIZATION_ADDRESS].args,
-  }),
-]
+export const GmdXmlToRudiOrgaTranslator = new ObjectTranslator(
+  API_DATA_PRODUCER_PROPERTY,
+  STANDARD_GMD,
+  FORMAT_XML,
+  true,
+  pathOrgGmdXml,
+  argsOrgGmdXml,
+  [
+    new FieldTranslator(
+      API_ORGANIZATION_NAME,
+      translateStraightFromPath,
+      false,
+      pathOrgGmdXml.concat(getPath(argsOrgGmdXml, API_ORGANIZATION_NAME))
+      // getArgs(argsOrgGmdXml, API_ORGANIZATION_NAME)
+    ),
+    new FieldTranslator(
+      API_ORGANIZATION_ADDRESS,
+      translateOrgAddress,
+      false,
+      pathOrgGmdXml.concat(getPath(argsOrgGmdXml, API_ORGANIZATION_ADDRESS)),
+      getArgs(argsOrgGmdXml, API_ORGANIZATION_ADDRESS)
+    ),
+  ]
+)

@@ -68,7 +68,7 @@ export const QUERY_TREATED_BEFORE_CAML = 'treatedBefore'
 export const QUERY_SUBMITTED_BEFORE = 'submitted_before'
 export const QUERY_SUBMITTED_BEFORE_CAML = 'submittedBefore'
 export const QUERY_CONFIRM = 'confirm'
-export const QUERY_OBJECT_STANDARD = 'objectStandard'
+export const QUERY_OBJECT_STANDARD = 'standard'
 export const QUERY_OBJECT_FORMAT = 'format'
 
 export const QUERY_SEARCH_TERMS = 'searchTerms'

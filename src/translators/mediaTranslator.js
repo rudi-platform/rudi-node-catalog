@@ -8,7 +8,6 @@ import {
   PATHS_GMD_TO_RUDI,
   STANDARD_GMD,
 } from '../config/confTranslation/gmd/confGmdXml.js'
-import { OBJ_MEDIA } from '../config/constApi.js'
 import {
   API_MEDIA_CAPTION,
   API_MEDIA_CONNECTOR,
@@ -17,7 +16,7 @@ import {
   API_MEDIA_PROPERTY,
   API_PUB_URL,
 } from '../db/dbFields.js'
-import { getPath, translateStraightFromPath } from './genericTranslationFunctions.js'
+import { getArgs, getPath, translateStraightFromPath } from './genericTranslationFunctions.js'
 import { FieldTranslator, ObjectTranslator } from './genericTranslator.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -26,50 +25,62 @@ import { FieldTranslator, ObjectTranslator } from './genericTranslator.js'
 // -------------------------------------------------------------------------------------------------
 
 export const translateOneMedia = async function (inputObject, path, args) {
-  return await mediaTranslator.translate(inputObject)
+  const fun = 'translateOneMedia'
+  let mediaTranslated = await GmdXmlToRudiMediaTranslator.translateInputObject(inputObject)
+  return mediaTranslated
 }
+
 // -------------------------------------------------------------------------------------------------
 // Fields Translators
 // -------------------------------------------------------------------------------------------------
 
-const argsGmdMedia = PATHS_GMD_TO_RUDI[API_MEDIA_PROPERTY].args
+const argsMediaGmdXml = getArgs(PATHS_GMD_TO_RUDI, API_MEDIA_PROPERTY)
+const pathMediaGmdXml = getPath(PATHS_GMD_TO_RUDI, API_MEDIA_PROPERTY)
 
-//translators for Media
-const fieldTranslatorsMediaGmdXml = [
-  new FieldTranslator(API_MEDIA_NAME, translateStraightFromPath, {
-    path: getPath(argsGmdMedia, API_MEDIA_NAME),
-  }),
-  new FieldTranslator(API_MEDIA_CAPTION, translateStraightFromPath, {
-    path: getPath(argsGmdMedia, API_MEDIA_CAPTION),
-  }),
-  new FieldTranslator(
-    API_MEDIA_CONNECTOR,
-    async (inputObject, path, args) => {
-      return await connectorTranslator.translate(inputObject)
-    },
-    {}
-  ),
-]
+const pathConnectorGmdXml = getPath(argsMediaGmdXml, API_MEDIA_CONNECTOR)
+const argsConnnectorGmdXml = getArgs(argsMediaGmdXml, API_MEDIA_CONNECTOR)
 
-//translators for the Connector object
-const fieldTranslatorsConnectorGmdXml = [
-  new FieldTranslator(API_PUB_URL, translateStraightFromPath, {
-    path: getPath(argsGmdMedia, API_PUB_URL),
-  }),
-  new FieldTranslator(API_MEDIA_INTERFACE_CONTRACT, translateStraightFromPath, {
-    path: getPath(argsGmdMedia, API_MEDIA_INTERFACE_CONTRACT),
-  }),
-]
-
-const mediaTranslator = new ObjectTranslator(
-  OBJ_MEDIA,
+export const GmdXmlToRudiMediaTranslator = new ObjectTranslator(
+  API_MEDIA_PROPERTY,
   STANDARD_GMD,
   FORMAT_XML,
-  fieldTranslatorsMediaGmdXml
-)
-const connectorTranslator = new ObjectTranslator(
-  API_MEDIA_CONNECTOR,
-  STANDARD_GMD,
-  FORMAT_XML,
-  fieldTranslatorsConnectorGmdXml
+  true,
+  pathMediaGmdXml,
+  argsMediaGmdXml,
+  [
+    new FieldTranslator(
+      API_MEDIA_NAME,
+      translateStraightFromPath,
+      false,
+      getPath(argsMediaGmdXml, API_MEDIA_NAME)
+    ),
+    new FieldTranslator(
+      API_MEDIA_CAPTION,
+      translateStraightFromPath,
+      false,
+      getPath(argsMediaGmdXml, API_MEDIA_CAPTION)
+    ),
+    new ObjectTranslator(
+      API_MEDIA_CONNECTOR,
+      STANDARD_GMD,
+      FORMAT_XML,
+      true,
+      pathConnectorGmdXml,
+      argsConnnectorGmdXml,
+      [
+        new FieldTranslator(
+          API_PUB_URL,
+          translateStraightFromPath,
+          false,
+          getPath(argsConnnectorGmdXml, API_PUB_URL)
+        ),
+        new FieldTranslator(
+          API_MEDIA_INTERFACE_CONTRACT,
+          translateStraightFromPath,
+          false,
+          getPath(argsConnnectorGmdXml, API_MEDIA_INTERFACE_CONTRACT)
+        ),
+      ]
+    ),
+  ]
 )

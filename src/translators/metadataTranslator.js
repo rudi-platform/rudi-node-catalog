@@ -1,4 +1,36 @@
 const mod = 'metadataTrslat'
+// -------------------------------------------------------------------------------------------------
+// External dependencies
+// -------------------------------------------------------------------------------------------------
+import { parseStringPromise as xml2jsonParser } from 'xml2js'
+
+// -------------------------------------------------------------------------------------------------
+// Constants
+// -------------------------------------------------------------------------------------------------
+import {
+  API_ACCESS_CONDITION,
+  API_DATA_CONTACTS_PROPERTY,
+  API_DATA_DATES_PROPERTY,
+  API_DATA_DESCRIPTION_PROPERTY,
+  API_DATA_DETAILS_PROPERTY,
+  API_DATA_NAME_PROPERTY,
+  API_DATES_CREATED,
+  API_DATES_EDITED,
+  API_KEYWORDS_PROPERTY,
+  API_LANGUAGES_PROPERTY,
+  API_LICENCE,
+  API_LICENCE_CUSTOM_LABEL,
+  API_LICENCE_CUSTOM_URI,
+  API_LICENCE_LABEL,
+  API_LICENCE_TYPE,
+  API_MEDIA_PROPERTY,
+  API_METADATA_LOCAL_ID,
+  API_THEME_PROPERTY,
+  DICT_LANG,
+  DICT_TEXT,
+  LicenceTypes,
+} from '../db/dbFields.js'
+import { logD } from '../utils/logging.js'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
@@ -8,43 +40,26 @@ import {
   PATHS_GMD_TO_RUDI,
   STANDARD_GMD,
 } from '../config/confTranslation/gmd/confGmdXml.js'
-import { OBJ_CONTACTS, OBJ_ORGANIZATIONS } from '../config/constApi.js'
-
-import {
-  API_DATA_CONTACTS_PROPERTY,
-  API_DATA_DATES_PROPERTY,
-  API_DATA_DESCRIPTION_PROPERTY,
-  API_DATA_DETAILS_PROPERTY,
-  API_DATA_NAME_PROPERTY,
-  API_DATA_PRODUCER_PROPERTY,
-  API_DATES_CREATED,
-  API_DATES_EDITED,
-  API_KEYWORDS_PROPERTY,
-  API_LANGUAGES_PROPERTY,
-  API_MEDIA_PROPERTY,
-  API_METADATA_LOCAL_ID,
-  API_THEME_PROPERTY,
-  DICT_LANG,
-  DICT_TEXT,
-} from '../db/dbFields.js'
-
+import { OBJ_METADATA } from '../config/constApi.js'
+import { getLicenceLabels } from '../controllers/licenceController.js'
 import { BadRequestError, RudiError } from '../utils/errors.js'
-
+import { beautify, filterOnValue, isEmpty } from '../utils/jsUtils.js'
+import { logI } from '../utils/logging.js'
+import { GmdXmlToRudiContactTranslator } from './contactTranslator.js'
 import {
   arrayCheck,
   findXmlParam,
   getArgs,
   getElementWithPath,
+  getFirstElementWithPath,
   getPath,
   getXmlParam,
   translateStraightFromPath,
 } from './genericTranslationFunctions.js'
-import { FieldTranslator } from './genericTranslator.js'
-import { translatorObjects } from './translationTools.js'
-
-import { logI } from '../utils/logging.js'
+import { FieldTranslator, ObjectTranslator } from './genericTranslator.js'
+import { GmdXmlToRudiGeoTranslator } from './geographyTranslator.js'
 import { translateOneMedia } from './mediaTranslator.js'
-
+import { GmdXmlToRudiOrgaTranslator } from './organizationTranslator.js'
 // -------------------------------------------------------------------------------------------------
 // Translation functions for metadata.
 // !!! All these functions must have the same parameters structure : (metadata, path, ...args) !!!
@@ -52,24 +67,19 @@ import { translateOneMedia } from './mediaTranslator.js'
 
 const translateSummary = async function (metadata, path, args) {
   const fun = 'translateSummary'
-  let text
-  try {
-    text = arrayCheck(await getElementWithPath(metadata, path))
-  } catch (err) {
-    throw new RudiError(err, null, null, null, null, mod, fun)
-  }
-  let lang
-  try {
-    const path_lang = args[0].path
-    const param_lang = args[0].args.paramName
-    lang = await getXmlParam(metadata, path_lang, param_lang)
-  } catch (err) {
-    throw new RudiError(err, null, null, null, null, mod, fun)
-  }
   let result = {}
-  result[DICT_LANG] = lang
-  result[DICT_TEXT] = text
-  return result
+
+  try {
+    const text = await getFirstElementWithPath(metadata, path)
+    const path_lang = getPath(args, API_LANGUAGES_PROPERTY)
+    const param_lang = getArgs(args, API_LANGUAGES_PROPERTY).paramName
+    const lang = await getXmlParam(metadata, path_lang, param_lang)
+    result[DICT_LANG] = lang
+    result[DICT_TEXT] = text
+    return result
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
 }
 
 const translateSynopsis = async function (metadata, path, args) {
@@ -96,7 +106,7 @@ const translateTheme = async function (metadata, path, args) {
     try {
       paramValue = await findXmlParam(elem, relativePathCondition, paramCondition)
     } catch (err) {
-      throw new RudiError(err, null, null, null, null, mod, fun)
+      throw RudiError.treatError(mod, fun, err)
     }
     if (paramValue === paramExpectedValue) {
       let elemThemes = await getElementWithPath(elem, relativePathKeyword)
@@ -124,57 +134,22 @@ const translateKeywords = async function (metadata, path, args) {
       const elemKeywords = await getElementWithPath(elem, relativePathKeyword)
       for await (const elemKeyword of elemKeywords) {
         keywords = keywords.concat(
-          arrayCheck(await getElementWithPath(elemKeyword, relativePathCharacter))
+          await getFirstElementWithPath(elemKeyword, relativePathCharacter)
         )
       }
     } catch (err) {
-      throw new RudiError(err, null, null, null, null, mod, fun)
+      throw RudiError.treatError(mod, fun, err)
     }
   }
   if (keywords.length === 0) {
-    throw new BadRequestError(`No keyword was found in origin Metadata`, mod, fun)
+    throw RudiError.treatError(mod, fun, `No keyword was found in origin Metadata`)
   } else {
     return keywords
   }
 }
 
-const translateOrg = async function (metadata, path, args) {
-  const fun = 'translateOrg'
-
-  let orgs = []
-  try {
-    const potentialOrgs = await getElementWithPath(metadata, path) //get all possible organizations of the metadata
-    for await (const org of potentialOrgs) {
-      let paramValue = await findXmlParam(org, args.relativePathCondition, args.paramCondition)
-      if (paramValue === args.paramExpectedValue) {
-        orgs.push(org)
-      }
-    }
-  } catch (e) {
-    throw new RudiError(e)
-  }
-  if (orgs.length === 0) {
-    throw new BadRequestError(
-      `No valid producer/organization was found. Reminder : a valid producer/organization must have ${args.paramCondition} set to ${args.paramExpectedValue}`
-    )
-  }
-
-  let orgTranslator
-  try {
-    orgTranslator = translatorObjects[OBJ_ORGANIZATIONS][STANDARD_GMD][FORMAT_XML]
-  } catch (e) {
-    throw new RudiError('!!! No organization translator was found !!!')
-  }
-
-  if (orgs.length > 1) {
-    logI(mod, fun, 'Several producer were found, first is taken.')
-  }
-
-  return await orgTranslator.translate(orgs[0])
-}
-
-const translateContact = async function (metadata, path, args) {
-  const fun = 'translateContact'
+const translateContacts = async function (metadata, path, args) {
+  const fun = 'translateContacts'
 
   let relativePathCondition = args.relativePathCondition
   let paramCondition = args.paramCondition
@@ -191,33 +166,29 @@ const translateContact = async function (metadata, path, args) {
       }
     }
   } catch (e) {
-    throw new RudiError(e)
+    throw RudiError.treatError(mod, fun, e)
   }
-
   if (allContacts.length === 0) {
     throw new BadRequestError(
-      `No valid contact was found. Reminder : a valid contact must have ${args.paramCondition} set to ${args.paramExpectedValue}`
+      `No valid contact was found. Reminder : a valid contact must have ${args.paramCondition} set to ${args.paramExpectedValue}`,
+      mod,
+      fun
     )
-  }
-  let contactTranslator
-  try {
-    contactTranslator = translatorObjects[OBJ_CONTACTS][STANDARD_GMD][FORMAT_XML]
-  } catch (e) {
-    throw new RudiError('!!! No contact translator was found !!!')
   }
 
   let result = []
   try {
     for await (const newContact of allContacts) {
-      result.push(await contactTranslator.translate(newContact))
+      let translatedContact = await GmdXmlToRudiContactTranslator.translateInputObject(newContact)
+      result.push(translatedContact)
     }
   } catch (e) {
-    throw new RudiError(e)
+    throw RudiError.treatError(mod, fun, e)
   }
   return result
 }
 
-const translateAvailableFormats = async function (metadata, path, args) {
+const translateAvailableFormats = async (metadata, path, args) => {
   const fun = 'translateAvailableFormats'
 
   let result = []
@@ -227,19 +198,22 @@ const translateAvailableFormats = async function (metadata, path, args) {
       result.push(await translateOneMedia(media))
     }
   } catch (e) {
-    throw new RudiError(e)
+    throw RudiError.treatError(mod, fun, e)
   }
 
   if (result.length === 0) {
     throw new BadRequestError(
-      `No Media was found in the metada, can't fill the rudi field ${API_MEDIA_PROPERTY}`
+      `No Media was found in the metada, can't fill the rudi field ${API_MEDIA_PROPERTY}.`,
+      mod,
+      fun
     )
   }
   return result
 }
 
-const translateDataDates = async function (metadata, path, args) {
+const translateDataDates = async (metadata, path, args) => {
   const fun = 'translateDataDates'
+  logD(mod, fun, beautify(args))
   const argsCreated = getArgs(args, API_DATES_CREATED)
   const argsEdited = getArgs(args, API_DATES_EDITED)
   const pathCreated = getPath(args, API_DATES_CREATED)
@@ -256,72 +230,201 @@ const translateDataDates = async function (metadata, path, args) {
       )
 
       if (paramValueCreated !== undefined && paramValueCreated === argsCreated.paramExpectedValue) {
-        result[API_DATES_CREATED] = arrayCheck(await getElementWithPath(date, pathCreated))
+        result[API_DATES_CREATED] = await getFirstElementWithPath(date, pathCreated)
       }
 
       if (paramValueEdited !== undefined && paramValueEdited === argsEdited.paramExpectedValue) {
-        result[API_DATES_EDITED] = arrayCheck(await getElementWithPath(date, pathEdited))
+        result[API_DATES_EDITED] = await getFirstElementWithPath(date, pathEdited)
       }
     }
   } catch (e) {
-    throw new RudiError(e)
+    throw RudiError.treatError(mod, fun, e)
   }
   if (!(API_DATES_CREATED in result)) {
-    throw new BadRequestError(`Rudi field ${API_DATES_CREATED} can not be filled !`)
+    throw new BadRequestError(`Rudi field ${API_DATES_CREATED} can not be filled !`, mod, fun)
   }
   if (!(API_DATES_EDITED in result)) {
-    throw new BadRequestError(`Rudi field ${API_DATES_EDITED} can not be filled !`)
+    throw new BadRequestError(`Rudi field ${API_DATES_EDITED} can not be filled !`, mod, fun)
   }
   return result
 }
 
+const translateAccessCondition = async function (metadata, path, args) {
+  const fun = 'translateAccessCondition'
+
+  let result = {}
+  try {
+    const inputObject = await getFirstElementWithPath(metadata, path)
+    const licence = await translateLicence(
+      inputObject,
+      getPath(args, API_LICENCE),
+      getArgs(args, API_LICENCE)
+    )
+    result[API_LICENCE] = licence
+    return result
+  } catch (e) {
+    throw RudiError.treatError(mod, fun, e)
+  }
+}
+
+const translateLicence = async function (inputObject, path, args) {
+  const fun = 'translateLicence'
+  let relativePathCharacter = args.relativePathCharacter
+  let result = {}
+  try {
+    const objLicenceLabel = await getElementWithPath(inputObject, path)
+    let labelsLicences = await getLicenceLabels()
+
+    let correspondingRudiLicenceCode = []
+    for await (const objLicenceCode of objLicenceLabel) {
+      let licenceCode = await getFirstElementWithPath(objLicenceCode, relativePathCharacter)
+      let result = await filterOnValue(labelsLicences, (elem) => {
+        return elem.includes(licenceCode)
+      }) // object with keys: Rudi Licence Codes that have licence labels in inputObject and values: corresponding labels for this Rudi Licence
+      if (!isEmpty(result)) {
+        correspondingRudiLicenceCode = correspondingRudiLicenceCode.concat(Object.keys(result))
+      }
+    }
+    // logD(mod, fun, beautify(correspondingRudiLicenceCode))
+    if (correspondingRudiLicenceCode.length === 0) {
+      let pathToDefaultLabel = path.concat(relativePathCharacter)
+      let defaultLabel = await getFirstElementWithPath(inputObject, pathToDefaultLabel)
+      logI(mod, fun, 'No corresponding Rudi Licence was found.')
+      return createCustomLicence(defaultLabel)
+    } else if (correspondingRudiLicenceCode.length > 1) {
+      logI(
+        mod,
+        fun,
+        `Several corresponding Rudi Licences were found : ${beautify(correspondingRudiLicenceCode)}. First is taken.`
+      )
+    }
+    result[API_LICENCE_TYPE] = LicenceTypes.Standard
+    result[API_LICENCE_LABEL] = correspondingRudiLicenceCode[0]
+    return result
+  } catch (e) {
+    throw RudiError.treatError(mod, fun, e)
+  }
+}
+
+// const translateGeography = async function (inputObject, path, args) {
+//   let geoTranslator = new FieldTranslator(
+//     API_GEOGRAPHY,
+//     STANDARD_GMD,
+//     FORMAT_XML,
+//     fieldTranslatorsGeoGmdXml
+//   )
+//   try {
+//     let geoObject = await getFirstElementWithPath(inputObject, path)
+//     return await geoTranslator.translate(geoObject)
+//   } catch (e) {
+//     throw RudiError.treatError(e)
+//   }
+// }
 // -------------------------------------------------------------------------------------------------
-// Translators from gmd-xml metadata to rudi.
+// FieldTranslators from gmd-xml metadata to rudi.
 // -------------------------------------------------------------------------------------------------
 
-export const fieldTranslatorsMetadataGmdXml = [
-  // new FieldTranslator(API_METADATA_ID, translateStraightFromPath, {
-  //   path: getPath(PATHS_GMD_TO_RUDI, API_METADATA_ID),
-  // }),
-  new FieldTranslator(API_METADATA_LOCAL_ID, translateStraightFromPath, {
-    path: getPath(PATHS_GMD_TO_RUDI, API_METADATA_LOCAL_ID),
-  }),
-  new FieldTranslator(API_DATA_NAME_PROPERTY, translateStraightFromPath, {
-    path: getPath(PATHS_GMD_TO_RUDI, API_DATA_NAME_PROPERTY),
-  }),
-  new FieldTranslator(API_DATA_DETAILS_PROPERTY, translateSynopsis, {
-    path: getPath(PATHS_GMD_TO_RUDI, API_DATA_DETAILS_PROPERTY),
-    args: [PATHS_GMD_TO_RUDI[API_LANGUAGES_PROPERTY]],
-  }),
-  new FieldTranslator(API_DATA_DESCRIPTION_PROPERTY, translateSummary, {
-    path: getPath(PATHS_GMD_TO_RUDI, API_DATA_DESCRIPTION_PROPERTY),
-    args: [PATHS_GMD_TO_RUDI[API_LANGUAGES_PROPERTY]],
-  }),
-  new FieldTranslator(API_THEME_PROPERTY, translateTheme, {
-    path: getPath(PATHS_GMD_TO_RUDI, API_THEME_PROPERTY),
-    args: getArgs(PATHS_GMD_TO_RUDI, API_THEME_PROPERTY),
-  }),
-  new FieldTranslator(API_KEYWORDS_PROPERTY, translateKeywords, {
-    path: getPath(PATHS_GMD_TO_RUDI, API_THEME_PROPERTY),
-    args: getArgs(PATHS_GMD_TO_RUDI, API_THEME_PROPERTY),
-  }),
-  new FieldTranslator(API_DATA_PRODUCER_PROPERTY, translateOrg, {
-    path: getPath(PATHS_GMD_TO_RUDI, API_DATA_PRODUCER_PROPERTY),
-    args: getArgs(PATHS_GMD_TO_RUDI, API_DATA_PRODUCER_PROPERTY),
-  }),
-  new FieldTranslator(API_DATA_CONTACTS_PROPERTY, translateContact, {
-    path: getPath(PATHS_GMD_TO_RUDI, API_DATA_CONTACTS_PROPERTY),
-    args: getArgs(PATHS_GMD_TO_RUDI, API_DATA_CONTACTS_PROPERTY),
-  }),
-  new FieldTranslator(API_MEDIA_PROPERTY, translateAvailableFormats, {
-    path: getPath(PATHS_GMD_TO_RUDI, API_MEDIA_PROPERTY),
-  }),
-  new FieldTranslator(API_DATA_DATES_PROPERTY, translateDataDates, {
-    path: getPath(PATHS_GMD_TO_RUDI, API_DATA_DATES_PROPERTY),
-    args: getArgs(PATHS_GMD_TO_RUDI, API_DATA_DATES_PROPERTY),
-  }),
-]
+export const GmdXmlToRudiMetadataTranslator = new ObjectTranslator(
+  OBJ_METADATA,
+  STANDARD_GMD,
+  FORMAT_XML,
+  true,
+  [],
+  {},
+  [
+    new FieldTranslator(
+      API_METADATA_LOCAL_ID,
+      translateStraightFromPath,
+      true,
+      getPath(PATHS_GMD_TO_RUDI, API_METADATA_LOCAL_ID)
+    ),
+    new FieldTranslator(
+      API_DATA_NAME_PROPERTY,
+      translateStraightFromPath,
+      true,
+      getPath(PATHS_GMD_TO_RUDI, API_DATA_NAME_PROPERTY)
+    ),
+    new FieldTranslator(
+      API_DATA_DETAILS_PROPERTY,
+      translateSynopsis,
+      true,
+      getPath(PATHS_GMD_TO_RUDI, API_DATA_DESCRIPTION_PROPERTY),
+      {
+        [API_LANGUAGES_PROPERTY]: {
+          path: getPath(PATHS_GMD_TO_RUDI, API_LANGUAGES_PROPERTY),
+          args: getArgs(PATHS_GMD_TO_RUDI, API_LANGUAGES_PROPERTY),
+        },
+      }
+    ),
+    new FieldTranslator(
+      API_DATA_DESCRIPTION_PROPERTY,
+      translateSummary,
+      true,
+      getPath(PATHS_GMD_TO_RUDI, API_DATA_DESCRIPTION_PROPERTY),
+      {
+        [API_LANGUAGES_PROPERTY]: {
+          path: getPath(PATHS_GMD_TO_RUDI, API_LANGUAGES_PROPERTY),
+          args: getArgs(PATHS_GMD_TO_RUDI, API_LANGUAGES_PROPERTY),
+        },
+      }
+    ),
+    new FieldTranslator(
+      API_THEME_PROPERTY,
+      translateTheme,
+      true,
+      getPath(PATHS_GMD_TO_RUDI, API_THEME_PROPERTY),
+      getArgs(PATHS_GMD_TO_RUDI, API_THEME_PROPERTY)
+    ),
+    new FieldTranslator(
+      API_KEYWORDS_PROPERTY,
+      translateKeywords,
+      true,
+      getPath(PATHS_GMD_TO_RUDI, API_THEME_PROPERTY),
+      getArgs(PATHS_GMD_TO_RUDI, API_THEME_PROPERTY)
+    ),
+    GmdXmlToRudiOrgaTranslator,
+    new FieldTranslator(
+      API_DATA_CONTACTS_PROPERTY,
+      translateContacts,
+      true,
+      getPath(PATHS_GMD_TO_RUDI, API_DATA_CONTACTS_PROPERTY),
+      getArgs(PATHS_GMD_TO_RUDI, API_DATA_CONTACTS_PROPERTY)
+    ),
+    new FieldTranslator(
+      API_MEDIA_PROPERTY,
+      translateAvailableFormats,
+      true,
+      getPath(PATHS_GMD_TO_RUDI, API_MEDIA_PROPERTY),
+      getArgs(PATHS_GMD_TO_RUDI, API_MEDIA_PROPERTY)
+    ),
+    new FieldTranslator(
+      API_DATA_DATES_PROPERTY,
+      translateDataDates,
+      true,
+      getPath(PATHS_GMD_TO_RUDI, API_DATA_DATES_PROPERTY),
+      getArgs(PATHS_GMD_TO_RUDI, API_DATA_DATES_PROPERTY)
+    ),
+    new FieldTranslator(
+      API_ACCESS_CONDITION,
+      translateAccessCondition,
+      true,
+      getPath(PATHS_GMD_TO_RUDI, API_ACCESS_CONDITION),
+      getArgs(PATHS_GMD_TO_RUDI, API_ACCESS_CONDITION)
+    ),
+    GmdXmlToRudiGeoTranslator,
+  ],
+  xml2jsonParser
+)
 
 // -------------------------------------------------------------------------------------------------
 // Tools
 // -------------------------------------------------------------------------------------------------
+const createCustomLicence = function (label) {
+  // const fun = 'createCustomLicence'
+  let result = {
+    [API_LICENCE_TYPE]: LicenceTypes.Custom,
+    [API_LICENCE_CUSTOM_LABEL]: label,
+    [API_LICENCE_CUSTOM_URI]: label, // !! no available custom URI ?
+  }
+  return result
+}

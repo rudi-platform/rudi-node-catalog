@@ -4,106 +4,160 @@ const mod = 'genericTrsltr'
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { BadRequestError, RudiError } from '../utils/errors.js'
-
 // -------------------------------------------------------------------------------------------------
-// Classes that deals with translation of objects
+// Classes that deals with translations of objects and rudi fields.
 // -------------------------------------------------------------------------------------------------
-export class ObjectTranslator {
+export class Translator {
   /**
-   * Class dealing with translation to different rudi objects.
-   * @param {String} objectType Rudi type of the object to translate into. (ex: contact, organization, metadata)
+   * Abstract class dealing with translation to different rudi objects, and fields
+   * @param {String} rudiObjectName Rudi type of the object to translate into. (ex: contact, organization, metadata). Can also be a rudi field. (ex: resource_title)
+   * @param {Boolean} isMandatory true if the rudi field is mandatory, else false
+   * @param {Array[String]} path path in the inputObject to the corresponding rudiObject
+   * @param {Object} args args used in translation of the inputObject into rudiObject
+   */
+  constructor(rudiObjectName, isMandatory = false, path = [], args = {}) {
+    this.rudiObjectName = rudiObjectName
+    this.isMandatory = isMandatory
+    this.path = path
+    this.args = args
+  }
+}
+
+export class FieldTranslator extends Translator {
+  /**
+   *  Class dealing with translation. Objects of this class translates a particular object field to RUDI. (ex: local_id)
+   * @param {String} rudiField the rudi field it translates to
+   * @param {AsyncFunction} translationFunc function used to translat atomic rudi fields (i.e. fields that are note objects : e.g. resource_title)
+   * @param {Boolean} isMandatory true if the rudi field is mandatory, else false
+   * @param {Array[String]} path path in the inputObject to the corresponding rudiObject
+   * @param {Object} args args used in translation of the inputObject into rudiObject
+   */
+  constructor(rudiField, translationFunc, isMandatory = false, path = [], args = {}) {
+    super(rudiField, isMandatory, path, args)
+    this.translationFunc = translationFunc
+  }
+
+  /**
+   * Translate the rudi Field this.rudiObjectName with appropriate translation function.
+   * @param {*} inputObject the object we want to translate the rudi field from.
+   * @returns the translated field
+   */
+  async translateInputObject(inputObject) {
+    const fun = 'FieldTranslator.translateInputObject'
+
+    let result
+    try {
+      result = await this.translationFunc(inputObject, this.path, this.args)
+      return result
+    } catch (e) {
+      if (this.isMandatory) {
+        throw RudiError.treatError(mod, fun, e)
+      } else {
+        return ''
+      }
+    }
+  }
+}
+// export class MediaTranslator extends ObjectTranslator {
+//   constructor(
+//     inputStandard,
+//     inputFormat,
+//     path,
+//     args,
+//     subTranslators,
+//     parser = async (elem) => {
+//       elem
+//     }
+//   ) {
+//     super()
+//   }
+// }
+
+export class ObjectTranslator extends Translator {
+  /**
+   * Class dealing with translation of Objects (like RudiContact, RudiMetadata,... ).
+   * @param {String} rudiObjectName The name of the object that an instance of this class translate into. (ex: organization, contacts)
    * @param {String} inputStandard standard of the input object (ex: dcat, rudi)
    * @param {String} inputFormat format of the input object (ex: xml, json)
-   * @param {Array[FieldTranslator]} fieldsTranslators translators for each field of the rudi object
-   * @param {Function} parser function used to parse. Default is identity function
+   * @param {Boolean} isMandatory true if the rudi field is mandatory, else false
+   * @param {Array[String]} path path in the inputObject to the corresponding rudiObject
+   * @param {Object} args args used in translation of the inputObject into rudiObject
+   * @param {Array[Translator]} subTranslators translators for each sub property of the object (ex: rudi object Metadata has a translator with a subTranslator rudi resource_title)
+   * @param {Async Function} parser a function that parse an inputObject to js Object before translating it
    */
   constructor(
-    objectType,
+    rudiObjectName,
     inputStandard,
     inputFormat,
-    fieldsTranslators,
-    parser = async (inputObject) => {
-      inputObject
+    isMandatory,
+    path,
+    args,
+    subTranslators,
+    parser = async (elem) => {
+      elem
     }
   ) {
-    this.objectType = objectType
-    this.inputStandard = inputStandard
+    super(rudiObjectName, isMandatory, path, args)
     this.inputFormat = inputFormat
-    this.fieldsTranslators = fieldsTranslators
+    this.inputStandard = inputStandard
+    this.subTranslators = subTranslators
     this.parser = parser
   }
 
   /**
-   * Translate the inputObject. If parse===true, the translator starts by parsing the object.
-   * @param {String || Object} inputObject
-   * @param {Boolean} parse
-   * @returns the translated object
+   * Translates this.rudiObjectName from inputObject
+   * @param {*} inputObject the object to translate
+   * @param {Boolean} parse default false, if true the translator parses the inputObject with this.parser before translation.
+   * @returns a js object, with fields of this.subTranslators
    */
-  async translate(inputObject, parse = false) {
-    const fun = 'translate'
-    let oldObject = inputObject
-    if (parse) {
-      try {
-        oldObject = await this.parse(inputObject)
-      } catch (e) {
-        throw new RudiError(e)
+  async translateInputObject(inputObject, parse = false) {
+    const fun = 'ObjectTranslator.translateInputObject'
+    try {
+      if (parse) {
+        inputObject = await this.parse(inputObject)
+      }
+      const translatedObject = {}
+      await Promise.all(
+        this.subTranslators.map((subTranslator) => {
+          const translatedFieldPromise = subTranslator.translateInputObject(inputObject)
+          translatedFieldPromise
+            .then((result) => {
+              translatedObject[subTranslator.rudiObjectName] = result
+            })
+            .catch((err) => {
+              err.message = `Problem in translation of field ${subTranslator.rudiObjectName}. ${err.message}`
+            })
+          return translatedFieldPromise
+        })
+      ).catch((e) => {
+        throw RudiError.treatError(mod, fun, e)
+      })
+      return translatedObject
+    } catch (e) {
+      if (this.isMandatory) {
+        throw RudiError.treatError(mod, fun, e)
+      } else {
+        return ''
       }
     }
-    const newObject = {}
-    for await (const elem of this.fieldsTranslators) {
-      newObject[elem.rudiField] = await elem.translate(oldObject)
-      // logI(mod, fun, await elem.translate(oldObject))
-    }
-    // await this.fieldsTranslators.forEach((elem) => {
-    //   newObject[elem.rudiField] = elem.translate(oldObject)
-    // })
-    return newObject
   }
 
+  /**
+   * Parse an inputObject into js object.
+   * @param {*} inputObject The object to parse
+   * @returns a js Object, parsed with this.parser
+   */
   async parse(inputObject) {
     const fun = 'ObjectTranslator.parse'
-    let inputObjectParsed
     try {
-      inputObjectParsed = await this.parser(inputObject) // parse from xml to js Object
-      // logI(mod, fun, 'success parsing')
+      return await this.parser(inputObject)
     } catch (e) {
       throw new BadRequestError(
-        `Translation to rudi failed. Problem with parsing the object : ${this.objectType}, at standard ${this.inputStandard} and format ${this.inputFormat}. Error: ${e}`,
+        `Translation to rudi failed. Problem with parsing the object of type : ${this.objectType}, at standard ${this.inputStandard} and format ${this.inputFormat}. ${e}`,
         mod,
-        fun
+        fun,
+        this.path
       )
     }
-    return inputObjectParsed
-  }
-}
-
-export class FieldTranslator {
-  /**
-   *  Class dealing with translation. Objects of this class translates a particular object field to RUDI. (ex: local_id)
-   * @param {String} rudiField the rudi field it translates to
-   * @param {Function} translationFunc the function to use for translation. It must take 3 args. 1st is origin Object, second is path, third is other args in an array.
-   * @param {Object} params parameters (like path) to use to translate object field. Must have property path.
-   */
-  constructor(rudiField, translationFunc, params) {
-    this.rudiField = rudiField
-    this.translationFunc = translationFunc
-    this.params = params
-  }
-  async translate(inputObject) {
-    const fun = 'translate'
-
-    const path = this.params.path // !! potentially === undefined
-    const args = this.params.args // !! potentially === undefined
-    let result
-    try {
-      result = await this.translationFunc(inputObject, path, args)
-    } catch (err) {
-      throw new BadRequestError(
-        `Problem in translation of field: ${this.rudiField}. Error : ${err}`,
-        mod,
-        fun
-      )
-    }
-    return result
   }
 }

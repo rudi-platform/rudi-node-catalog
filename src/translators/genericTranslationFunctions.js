@@ -4,7 +4,7 @@ const mod = 'genTrslatFun'
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { BadRequestError, RudiError } from '../utils/errors.js'
-import { logI } from '../utils/logging.js'
+import { accessProperty } from '../utils/jsonAccess.js'
 // -------------------------------------------------------------------------------------------------
 // Generic Translation functions.
 // !!! All these functions must have the same parameters structure : (metadata, path, ...args) !!!
@@ -21,25 +21,28 @@ export const translateStraightFromPath = async function (inputObject, path, args
   const fun = 'translateStraightFromPath'
   let result
   try {
-    result = arrayCheck(await getElementWithPath(inputObject, path))
+    result = await getFirstElementWithPath(inputObject, path)
   } catch (err) {
-    throw new RudiError(err, null, null, null, null, mod, fun)
+    throw RudiError.treatError(mod, fun, err)
   }
   return result
 }
 
 export const translateStraightFromXmlParam = async function (inputObject, path, args) {
   const fun = 'translateStraightFromXmlParam'
-  logI(mod, fun, args)
   if (!('paramName' in args)) {
-    throw new RudiError(`Function ${fun} must have parameter args with property paramName !`)
+    throw RudiError.treatError(
+      mod,
+      fun,
+      `Function ${fun} must have parameter args with property paramName !`
+    )
   }
   const paramName = args.paramName
   let result
   try {
     result = await getXmlParam(inputObject, path, paramName)
   } catch (e) {
-    throw new RudiError(e)
+    throw RudiError.treatError(mod, fun, e)
   }
   return result
 }
@@ -63,9 +66,9 @@ export const getElementWithPath = async (object, path, depth = 0) => {
       // logI(mod, fun, result + '        ' + depth)
       return await getElementWithPath(arrayCheck(result), path, depth + 1)
     }
-  } catch {
+  } catch (e) {
     throw new BadRequestError(
-      `Element not reachable at path ${path}, in depth ${depth + 1}`,
+      `Element not reachable at path ${path}}, in depth ${depth + 1}`,
       mod,
       fun
     )
@@ -102,6 +105,10 @@ export const arrayCheck = (obj) => {
   }
 }
 
+export const getFirstElementWithPath = async (object, path) => {
+  return arrayCheck(await getElementWithPath(object, path))
+}
+
 // -------------------------------------------------------------------------------------------------
 // Specific functions to help translation from XML format, parsed with xml2js parser
 // -------------------------------------------------------------------------------------------------
@@ -119,17 +126,22 @@ export const getXmlParam = async (inputObject, path, paramName) => {
   try {
     result = tag['$']
   } catch {
-    throw new BadRequestError(
-      `It seems there is no parameters for the tag located at path ${path}. Parameters of a tag must be at key '$'.`,
+    throw RudiError.treatError(
       mod,
       fun,
+      `It seems there is no parameters for the tag located at path ${path}. Parameters of a tag must be at key '$'.`,
       path
     )
   }
   if (paramName in result) {
     return result[paramName]
   } else {
-    throw new BadRequestError(`Parameter ${paramName} is not available at path ${path}`)
+    throw RudiError.treatError(
+      mod,
+      fun,
+      `Parameter ${paramName} is not available at path ${path}`,
+      path
+    )
   }
 }
 
@@ -152,45 +164,14 @@ export const findXmlParam = async function (inputObject, path, paramName) {
   }
   return undefined
 }
-
 // -------------------------------------------------------------------------------------------------
 // Tools to access safely to params of Object.
 // -------------------------------------------------------------------------------------------------
 
 export const getPath = function (pathsDict, rudiField) {
-  const fun = 'getPath'
-  let result
-  try {
-    result = pathsDict[rudiField].path
-  } catch {
-    throw new RudiError(
-      `Field ${rudiField} not available in dict ${pathsDict}`,
-      null,
-      null,
-      null,
-      null,
-      mod,
-      fun
-    )
-  }
-  return result
+  return accessProperty(accessProperty(pathsDict, rudiField), 'path')
 }
 
 export const getArgs = function (pathsDict, rudiField) {
-  const fun = 'getArgs'
-  let result
-  try {
-    result = pathsDict[rudiField].args
-  } catch {
-    throw new RudiError(
-      `Field ${rudiField} not available in dict ${pathsDict}`,
-      null,
-      null,
-      null,
-      null,
-      mod,
-      fun
-    )
-  }
-  return result
+  return accessProperty(accessProperty(pathsDict, rudiField), 'args')
 }

@@ -105,7 +105,7 @@ import {
 import { CallContext } from '../definitions/constructors/callContext.js'
 import { parseQueryParameters } from '../utils/parseRequest.js'
 
-import { isTranslatable, translate } from '../translators/translationTools.js'
+import { isTranslatable } from '../translators/translationTools.js'
 
 // -------------------------------------------------------------------------------------------------
 // Specific controllers
@@ -254,7 +254,7 @@ async function addSingleRudiObject(rudiObject, objectType, context) {
 
 /**
  * Translate and add an object
- * @param {*} object the source object
+ * @param {*} inputObject the source object
  * @param {String} objectType the rudi type (ex: resources, contacts, ...)
  * @param {String} idField the field of the id in the rudi metadata
  * @param {String} objectStandard the standard of the source object (ex: dcat, gmd). default : rudi
@@ -262,28 +262,34 @@ async function addSingleRudiObject(rudiObject, objectType, context) {
  * @param {*} context
  * @returns
  */
-async function addSingleObject(object, objectType, objectStandard, objectFormat, context) {
+async function addSingleObject(inputObject, objectType, objectStandard, objectFormat, context) {
   const fun = 'addSingleObject'
   let rudiObject
 
-  if (objectFormat === DEFAULT_OBJECT_FORMAT || objectStandard === DEFAULT_OBJECT_STANDARD) {
-    rudiObject = object
+  if (objectFormat === DEFAULT_OBJECT_FORMAT && objectStandard === DEFAULT_OBJECT_STANDARD) {
+    rudiObject = inputObject
     return addSingleRudiObject(rudiObject, objectType, context)
   }
 
-  if (isTranslatable(objectType, objectStandard, objectFormat)) {
-    try {
-      rudiObject = await translate(object, objectType, objectStandard, objectFormat)
-    } catch (e) {
-      throw new RudiError(e)
-    }
-    return rudiObject
-    // return addSingleRudiObject(rudiObject, objectType, context)
-  } else {
+  const objectTranslator = isTranslatable(objectType, objectStandard, objectFormat)
+  if (!objectTranslator) {
     throw new NotImplementedError(
       `Object of type ${objectType}, at standard ${objectStandard} and format ${objectFormat} can not yet be uploaded.`
     )
   }
+
+  try {
+    rudiObject = await objectTranslator.translateInputObject(
+      inputObject,
+      objectType,
+      objectStandard,
+      objectFormat
+    )
+  } catch (e) {
+    throw RudiError.treatError(mod, fun, e)
+  }
+  return rudiObject
+  // return addSingleRudiObject(rudiObject, objectType, context)
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -300,31 +306,32 @@ export const addObjects = async (req, reply) => {
     logT(mod, fun, `< POST ${URL_PV_OBJECT_GENERIC}`)
 
     // get the objectStandard query param, default=rudi
-    let objectStandard = req.query[QUERY_OBJECT_STANDARD]
-    if (!objectStandard) {
-      objectStandard = DEFAULT_OBJECT_STANDARD
-    }
+    const objectStandard = req.query?.[QUERY_OBJECT_STANDARD] || DEFAULT_OBJECT_STANDARD
 
     // get the objectFormat query param, default=json
-    let objectFormat = req.query[QUERY_OBJECT_FORMAT]
-    if (!objectFormat) {
-      objectFormat = DEFAULT_OBJECT_FORMAT
-    }
+    const objectFormat = req.query?.[QUERY_OBJECT_FORMAT] || DEFAULT_OBJECT_FORMAT
 
     const objectType = getObjectParam(req)
 
     // accessing the request body
-    const objects = req.body
+    const inputObjects = req.body
 
     const context = CallContext.getCallContextFromReq(req)
 
     let createdObjects
-    if (Array.isArray(objects)) {
-      createdObjects = objects.map((object) => {
-        addSingleObject(object, objectType, objectStandard, objectFormat, context)
+    if (Array.isArray(inputObjects)) {
+      const creationPromises = inputObjects.map((inputObject) => {
+        addSingleObject(inputObject, objectType, objectStandard, objectFormat, context)
       })
+      createdObjects = await Promise.all(creationPromises)
     } else {
-      createdObjects = addSingleObject(objects, objectType, objectStandard, objectFormat, context)
+      createdObjects = await addSingleObject(
+        inputObjects,
+        objectType,
+        objectStandard,
+        objectFormat,
+        context
+      )
     }
     return createdObjects
   } catch (err) {

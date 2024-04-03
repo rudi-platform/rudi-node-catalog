@@ -49,6 +49,7 @@ export class RudiError extends Error {
     this.error = description || 'An unexpected error occurred'
     this.type = this.constructor.name
     this[TRACE] = errTrace || []
+    // logD(mod, 'ici', beautify(this[TRACE]) + beautify(message))
     this.setId()
     this[TRACE_MOD] = ctxMod
     this[TRACE_FUN] = ctxFun

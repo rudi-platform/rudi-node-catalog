@@ -1,4 +1,5 @@
 import {
+  API_ACCESS_CONDITION,
   API_CONTACT_MAIL,
   API_CONTACT_NAME,
   API_CONTACT_ROLE,
@@ -10,8 +11,16 @@ import {
   API_DATA_PRODUCER_PROPERTY,
   API_DATES_CREATED,
   API_DATES_EDITED,
+  API_GEOGRAPHY,
+  API_GEO_BBOX_EAST,
+  API_GEO_BBOX_NORTH,
+  API_GEO_BBOX_PROPERTY,
+  API_GEO_BBOX_SOUTH,
+  API_GEO_BBOX_WEST,
   API_LANGUAGES_PROPERTY,
+  API_LICENCE,
   API_MEDIA_CAPTION,
+  API_MEDIA_CONNECTOR,
   API_MEDIA_INTERFACE_CONTRACT,
   API_MEDIA_NAME,
   API_MEDIA_PROPERTY,
@@ -42,20 +51,6 @@ export const DEFAULT_OBJECT_FORMAT = FORMAT_JSON
 // -------------------------------------------------------------------------------------------------
 
 export const PATHS_GMD_TO_RUDI = {
-  // [API_METADATA_LOCAL_ID]: {
-  //   path: [
-  //     'gmd:MD_Metadata',
-  //     'gmd:identificationInfo',
-  //     'gmd:MD_DataIdentification',
-  //     'gmd:citation',
-  //     'gmd:CI_Citation',
-  //     'gmd:identifier',
-  //     'gmd:MD_Identifier',
-  //     'gmd:code',
-  //     'gco:CharacterString',
-  //   ],
-  // },
-
   [API_METADATA_LOCAL_ID]: {
     path: ['gmd:MD_Metadata', 'gmd:fileIdentifier', 'gco:CharacterString'],
   },
@@ -186,26 +181,48 @@ export const PATHS_GMD_TO_RUDI = {
   },
 
   [API_MEDIA_PROPERTY]: {
-    path: [
-      'gmd:MD_Metadata',
-      'gmd:distributionInfo',
-      'gmd:MD_Distribution',
-      'gmd:transferOptions',
-      'gmd:MD_DigitalTransferOptions',
-      'gmd:onLine',
-    ],
+    path: ['gmd:MD_Metadata', 'gmd:distributionInfo', 'gmd:MD_Distribution', 'gmd:transferOptions'],
     args: {
       [API_MEDIA_NAME]: {
-        path: ['gmd:CI_OnlineResource', 'gmd:name', 'gco:CharacterString'],
+        path: [
+          'gmd:MD_DigitalTransferOptions',
+          'gmd:onLine',
+          'gmd:CI_OnlineResource',
+          'gmd:name',
+          'gco:CharacterString',
+        ],
       },
       [API_MEDIA_CAPTION]: {
-        path: ['gmd:CI_OnlineResource', 'gmd:description', 'gco:CharacterString'],
+        path: [
+          'gmd:MD_DigitalTransferOptions',
+          'gmd:onLine',
+          'gmd:CI_OnlineResource',
+          'gmd:description',
+          'gco:CharacterString',
+        ],
       },
-      [API_PUB_URL]: {
-        path: ['gmd:CI_OnlineResource', 'gmd:linkage', 'gmd:URL'],
-      },
-      [API_MEDIA_INTERFACE_CONTRACT]: {
-        path: ['gmd:CI_OnlineResource', 'gmd:protocol', 'gco:CharacterString'],
+      [API_MEDIA_CONNECTOR]: {
+        path: [],
+        args: {
+          [API_PUB_URL]: {
+            path: [
+              'gmd:MD_DigitalTransferOptions',
+              'gmd:onLine',
+              'gmd:CI_OnlineResource',
+              'gmd:linkage',
+              'gmd:URL',
+            ],
+          },
+          [API_MEDIA_INTERFACE_CONTRACT]: {
+            path: [
+              'gmd:MD_DigitalTransferOptions',
+              'gmd:onLine',
+              'gmd:CI_OnlineResource',
+              'gmd:protocol',
+              'gco:CharacterString',
+            ],
+          },
+        },
       },
     },
   },
@@ -234,6 +251,53 @@ export const PATHS_GMD_TO_RUDI = {
           relativePathCondition: ['gmd:CI_Date', 'gmd:dateType', 'gmd:CI_DateTypeCode'],
           paramCondition: 'codeListValue',
           paramExpectedValue: 'revision',
+        },
+      },
+    },
+  },
+
+  [API_ACCESS_CONDITION]: {
+    path: [
+      'gmd:MD_Metadata',
+      'gmd:identificationInfo',
+      'gmd:MD_DataIdentification',
+      'gmd:resourceConstraints',
+    ],
+    args: {
+      [API_LICENCE]: {
+        path: ['gmd:MD_LegalConstraints', 'gmd:useLimitation'],
+        args: {
+          relativePathCharacter: ['gco:CharacterString'],
+        },
+      },
+    },
+  },
+
+  [API_GEOGRAPHY]: {
+    path: [
+      'gmd:MD_Metadata',
+      'gmd:identificationInfo',
+      'gmd:MD_DataIdentification',
+      'gmd:extent',
+      'gmd:EX_Extent',
+      'gmd:geographicElement',
+    ],
+    args: {
+      [API_GEO_BBOX_PROPERTY]: {
+        path: ['gmd:EX_GeographicBoundingBox'],
+        args: {
+          [API_GEO_BBOX_WEST]: {
+            path: ['gmd:westBoundLongitude', 'gco:Decimal'],
+          },
+          [API_GEO_BBOX_EAST]: {
+            path: ['gmd:eastBoundLongitude', 'gco:Decimal'],
+          },
+          [API_GEO_BBOX_SOUTH]: {
+            path: ['gmd:southBoundLatitude', 'gco:Decimal'],
+          },
+          [API_GEO_BBOX_NORTH]: {
+            path: ['gmd:northBoundLatitude', 'gco:Decimal'],
+          },
         },
       },
     },
