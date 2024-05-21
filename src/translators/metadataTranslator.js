@@ -77,6 +77,13 @@ import { GmdXmlToRudiOrgaTranslator } from './organizationTranslator.js'
 // !!! All these functions must be async and have the same parameters structure : (inputObject, path, ...args) !!!
 // -------------------------------------------------------------------------------------------------
 
+/**
+ * Translates rudi field 'summary' from xml gmd.
+ * @param {Object} inputObject
+ * @param {Array[String]} path
+ * @param {*} args
+ * @returns
+ */
 const translateSummary = async (inputObject, path, args) => {
   const fun = 'translateSummary'
   let result = {}
@@ -93,6 +100,13 @@ const translateSummary = async (inputObject, path, args) => {
   }
 }
 
+/**
+ * Translates rudi field 'synopsis' from xml gmd.
+ * @param {Object} inputObject
+ * @param {Array[String]} path
+ * @param {*} args
+ * @returns
+ */
 const translateSynopsis = async (inputObject, path, args) => {
   const fun = 'translateSynopsis'
   try {
@@ -106,6 +120,13 @@ const translateSynopsis = async (inputObject, path, args) => {
   }
 }
 
+/**
+ * Translates rudi field 'theme' from xml gmd. Takes the first theme.
+ * @param {Object} inputObject
+ * @param {Array[String]} path
+ * @param {*} args
+ * @returns
+ */
 const translateTheme = async (inputObject, path, args) => {
   const fun = 'translateTheme'
   let result
@@ -138,6 +159,13 @@ const translateTheme = async (inputObject, path, args) => {
   }
 }
 
+/**
+ * Translates rudi field 'keywords' from xml gmd.
+ * @param {Object} inputObject
+ * @param {Array[String]} path
+ * @param {*} args
+ * @returns
+ */
 const translateKeywords = async (inputObject, path, args) => {
   const fun = 'translateKeywords'
   let result
@@ -163,6 +191,13 @@ const translateKeywords = async (inputObject, path, args) => {
   }
 }
 
+/**
+ * Translates rudi field 'contacts' from xml gmd. Gives all contacts.
+ * @param {Object} inputObject
+ * @param {Array[String]} path
+ * @param {*} args
+ * @returns
+ */
 const translateContacts = async (inputObject, path, args) => {
   const fun = 'translateContacts'
   let result = []
@@ -184,7 +219,7 @@ const translateContacts = async (inputObject, path, args) => {
 
     if (allContacts.length === 0) {
       throw new BadRequestError(
-        `No valid contact was found. Reminder : a valid contact must have ${args.paramCondition} set to ${args.paramExpectedValue}`,
+        `No valid contact was found. Reminder : a valid contact in xml-gmd must have ${args.paramCondition} set to ${args.paramExpectedValue}`,
         mod,
         fun
       )
@@ -202,6 +237,13 @@ const translateContacts = async (inputObject, path, args) => {
   }
 }
 
+/**
+ * Translates rudi field 'available_formats' from xml gmd.
+ * @param {Object} inputObject
+ * @param {Array[String]} path
+ * @param {*} args
+ * @returns
+ */
 const translateAvailableFormats = async (inputObject, path, args) => {
   const fun = 'translateAvailableFormats'
 
@@ -243,14 +285,22 @@ const translateAvailableFormats = async (inputObject, path, args) => {
   }
 }
 
+/**
+ * Translates rudi field 'data_dates' from xml gmd.
+ * @param {Object} inputObject
+ * @param {Array[String]} path
+ * @param {*} args
+ * @returns
+ */
+
 const translateDataDates = async (inputObject, path, args) => {
   const fun = 'translateDataDates'
-  const argsCreated = getArgs(args, API_DATES_CREATED)
-  const argsEdited = getArgs(args, API_DATES_EDITED)
-  const pathCreated = getPath(args, API_DATES_CREATED)
-  const pathEdited = getPath(args, API_DATES_EDITED)
   let result = {}
   try {
+    const argsCreated = getArgs(args, API_DATES_CREATED)
+    const argsEdited = getArgs(args, API_DATES_EDITED)
+    const pathCreated = getPath(args, API_DATES_CREATED)
+    const pathEdited = getPath(args, API_DATES_EDITED)
     const datesList = getElementWithPath(inputObject, path)
     for (const date of datesList) {
       let paramValueCreated = arrayCheck(
@@ -268,18 +318,25 @@ const translateDataDates = async (inputObject, path, args) => {
         result[API_DATES_EDITED] = getFirstElementWithPath(date, pathEdited)
       }
     }
+    if (!(API_DATES_CREATED in result)) {
+      throw new BadRequestError(`Rudi field ${API_DATES_CREATED} can not be filled !`, mod, fun)
+    }
+    if (!(API_DATES_EDITED in result)) {
+      throw new BadRequestError(`Rudi field ${API_DATES_EDITED} can not be filled !`, mod, fun)
+    }
+    return result
   } catch (e) {
     throw RudiError.treatError(mod, fun, e)
   }
-  if (!(API_DATES_CREATED in result)) {
-    throw new BadRequestError(`Rudi field ${API_DATES_CREATED} can not be filled !`, mod, fun)
-  }
-  if (!(API_DATES_EDITED in result)) {
-    throw new BadRequestError(`Rudi field ${API_DATES_EDITED} can not be filled !`, mod, fun)
-  }
-  return result
 }
 
+/**
+ * Translates rudi field 'access_condition' from xml gmd. Tries to match a licence from RUDI.
+ * @param {Object} inputObject
+ * @param {Array[String]} path
+ * @param {*} args
+ * @returns
+ */
 const translateAccessCondition = async (inputObject, path, args) => {
   const fun = 'translateAccessCondition'
   let result = {}
@@ -297,11 +354,18 @@ const translateAccessCondition = async (inputObject, path, args) => {
   }
 }
 
+/**
+ * Translates rudi 'licence' from xml gmd. Tries to match with existing licence label. If no matching licence label is found, creates a custom licence.
+ * @param {Object} inputObject
+ * @param {Array[String]} path
+ * @param {*} args
+ * @returns
+ */
 const translateLicence = async (inputObject, path, args) => {
   const fun = 'translateLicence'
-  let relativePathCharacter = args.relativePathCharacter
   let result = {}
   try {
+    let relativePathCharacter = args.relativePathCharacter
     const objLicenceLabel = getElementWithPath(inputObject, path)
     let labelsLicences = await getLicenceLabels()
 
@@ -336,6 +400,13 @@ const translateLicence = async (inputObject, path, args) => {
   }
 }
 
+/**
+ * Translates rudi field 'global_id' from xml gmd. Tries to find existing global_id with matching field 'local_id'. If no matching 'local_id' is found, returns undefined.
+ * @param {Object} inputObject
+ * @param {Array[String]} path
+ * @param {*} args
+ * @returns global_id corresponding to field local_id if an existing metadata with this local_id is found. Else returns undefined.
+ */
 export const translateGlobalId = async (inputObject, path, args) => {
   const fun = 'translateGlobalId'
   try {
@@ -351,15 +422,42 @@ export const translateGlobalId = async (inputObject, path, args) => {
   }
 }
 
+/**
+ * Translates rudi field 'producer' from xml gmd. Uses Translator Object GmdXmlToRudiOrgaTranslator.
+ * @param {Object} inputObject
+ * @param {Array[String]} path
+ * @param {*} args
+ * @returns organization at rudi format.
+ */
 export const translateOrganization = async (inputObject, path, args) => {
   const fun = 'translateOrganization'
   try {
-    const organization = getElementWithPath(inputObject, path)
-    return await GmdXmlToRudiOrgaTranslator.translateInputObject(organization)
+    const allContacts = getElementWithPath(inputObject, path)
+    const relativePathCondition = args?.relativePathCondition
+    const paramCondition = args?.paramCondition
+    const paramExpectedValue = args?.paramExpectedValue
+    const allOrgs = []
+    allContacts.forEach((element) => {
+      const xmlParamValue = getXmlParam(element, relativePathCondition, paramCondition)
+      if (xmlParamValue === paramExpectedValue) {
+        allOrgs.push(element)
+      }
+    })
+
+    if (allOrgs.length === 0) {
+      throw new BadRequestError(
+        `No organization was found. Reminder, a valid xml-gmd org must have a tag '${paramCondition}' with value ${paramExpectedValue}.`,
+        mod,
+        fun
+      )
+    } else {
+      return await GmdXmlToRudiOrgaTranslator.translateInputObject(allOrgs[0])
+    }
   } catch (e) {
     throw RudiError.treatError(mod, fun, e)
   }
 }
+
 // -------------------------------------------------------------------------------------------------
 // Metadata Translator Objects
 // -------------------------------------------------------------------------------------------------
@@ -433,7 +531,8 @@ export const GmdXmlToRudiMetadataTranslator = new ObjectTranslator(
       API_DATA_PRODUCER_PROPERTY,
       translateOrganization,
       true,
-      getPath(PATHS_GMD_TO_RUDI, API_DATA_PRODUCER_PROPERTY)
+      getPath(PATHS_GMD_TO_RUDI, API_DATA_PRODUCER_PROPERTY),
+      getArgs(PATHS_GMD_TO_RUDI, API_DATA_PRODUCER_PROPERTY)
     ),
     new FieldTranslator(
       API_DATA_CONTACTS_PROPERTY,

@@ -99,7 +99,6 @@ export const getElementWithPath = (object, path, depth = 0) => {
  * @returns the element if it exists, else undefined
  */
 export const findElementWithPath = (object, path) => {
-  const fun = 'findElementWithPath'
   let result
   try {
     result = getElementWithPath(object, path)
@@ -107,6 +106,16 @@ export const findElementWithPath = (object, path) => {
   } catch {
     return result
   }
+}
+
+/**
+ * Finds the first element located at path in the object.
+ * @param {Object} object
+ * @param {Array[String]} path
+ * @returns
+ */
+export const findFirstElementWithPath = (object, path) => {
+  return arrayCheck(findElementWithPath(object, path))
 }
 
 /**
@@ -149,27 +158,24 @@ export const getFirstElementWithPath = (object, path) => {
 export const getXmlParam = (inputObject, path, paramName) => {
   const fun = 'getXmlParam'
   let result
-  let tag
   try {
-    tag = getFirstElementWithPath(inputObject, path)
-    result = tag['$']
-  } catch {
-    throw RudiError.treatError(
-      mod,
-      fun,
-      `It seems there is no parameters for the tag located at path ${path}. Parameters of a tag must be at key '$'.`,
-      path
-    )
-  }
-  if (paramName in result) {
-    return result[paramName]
-  } else {
-    throw RudiError.treatError(
-      mod,
-      fun,
-      `Parameter ${paramName} is not available at path ${path}`,
-      path
-    )
+    try {
+      const tag = getFirstElementWithPath(inputObject, path)
+      result = tag['$']
+    } catch {
+      throw new BadRequestError(
+        `It seems there is no parameters for the tag located at path ${path}. Parameters of a tag must be at key '$'.`,
+        mod,
+        fun
+      )
+    }
+    if (paramName in result) {
+      return result[paramName]
+    } else {
+      throw new BadRequestError(`Parameter ${paramName} is not available at path ${path}`, mod, fun)
+    }
+  } catch (e) {
+    throw RudiError.treatError(mod, fun, e)
   }
 }
 

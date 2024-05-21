@@ -20,7 +20,7 @@ import { getArgs, getPath, translateStraightFromPath } from './genericTranslatio
 import { FieldTranslator, ObjectTranslator } from './genericTranslator.js'
 
 // -------------------------------------------------------------------------------------------------
-// Fields Translators for organizations
+// Geography Translator Object
 // -------------------------------------------------------------------------------------------------
 
 const argsGeoGmdXml = getArgs(PATHS_GMD_TO_RUDI, API_GEOGRAPHY)

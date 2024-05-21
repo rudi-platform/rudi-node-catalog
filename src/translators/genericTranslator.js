@@ -123,7 +123,7 @@ export class ObjectTranslator extends Translator {
       return translatedObject
     } catch (e) {
       if (this.isMandatory) {
-        // e.message = `Problem in translation of object '${this.rudiObjectName}'. ${e.message}`
+        e.message = `Problem in translation of object '${this.rudiObjectName}'. ${e.message}`
         throw RudiError.treatError(mod, fun, e)
       } else {
         logI(

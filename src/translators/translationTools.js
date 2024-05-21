@@ -11,6 +11,7 @@ import {
 import { OBJ_CONTACTS, OBJ_METADATA, OBJ_ORGANIZATIONS } from '../config/constApi.js'
 import { GmdXmlToRudiContactTranslator } from './contactTranslator.js'
 import { GmdXmlToRudiMetadataTranslator } from './metadataTranslator.js'
+import { GmdXmlToRudiOrgaTranslator } from './organizationTranslator.js'
 
 // -------------------------------------------------------------------------------------------------
 // Constants used in translation, i.e. translators objects.
@@ -33,7 +34,7 @@ export const translatorObjects = {
   [OBJ_ORGANIZATIONS]: {
     [STANDARD_DCAT]: [],
     [STANDARD_GMD]: {
-      [FORMAT_XML]: {},
+      [FORMAT_XML]: GmdXmlToRudiOrgaTranslator,
     },
   },
 }

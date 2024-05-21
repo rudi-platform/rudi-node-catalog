@@ -28,6 +28,7 @@ import {
   API_METADATA_LOCAL_ID,
   API_METAINFO_CONTACTS_PROPERTY,
   API_ORGANIZATION_ADDRESS,
+  API_ORGANIZATION_ID,
   API_ORGANIZATION_NAME,
   API_PUB_URL,
   API_THEME_PROPERTY,
@@ -130,6 +131,10 @@ export const PATHS_GMD_TO_RUDI = {
       relativePathCondition: ['gmd:CI_ResponsibleParty', 'gmd:role', 'gmd:CI_RoleCode'],
       paramCondition: 'codeListValue',
       paramExpectedValue: 'custodian',
+      [API_ORGANIZATION_ID]: {
+        // !!! relative path from PATHS_GMD_TO_RUDI[API_DATA_PRODUCER_PROPERTY].path !!!
+        path: ['gmd:CI_ResponsibleParty', 'gmd:organisationId', 'gco:CharacterString'],
+      },
       [API_ORGANIZATION_NAME]: {
         // !!! relative path from PATHS_GMD_TO_RUDI[API_DATA_PRODUCER_PROPERTY].path !!!
         path: ['gmd:CI_ResponsibleParty', 'gmd:organisationName', 'gco:CharacterString'],
