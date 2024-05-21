@@ -15,9 +15,8 @@ import {
 } from '../db/dbFields.js'
 import { RudiError } from '../utils/errors.js'
 import {
-  arrayCheck,
   getArgs,
-  getElementWithPath,
+  getFirstElementWithPath,
   getPath,
   translateStraightFromPath,
 } from './genericTranslationFunctions.js'
@@ -29,28 +28,28 @@ import {} from './translationTools.js'
 // !!! All these functions must have the same parameters structure : (inputObject, path, ...args) !!!
 // -------------------------------------------------------------------------------------------------
 
-const translateOrgAddress = async function (metadata, path, args) {
+const translateOrgAddress = async (metadata, path, args) => {
   const fun = 'translateOrgAddress'
-  let relativePathCharacter = args.relativePathCharacter
-  let result = ''
-  for await (const elem of args.fieldsToConcat) {
-    try {
-      let addressField = arrayCheck(
-        await getElementWithPath(metadata, path.concat([elem, relativePathCharacter]))
+  try {
+    let relativePathCharacter = args.relativePathCharacter
+    let result = ''
+    for (const elem of args.fieldsToConcat) {
+      let addressField = getFirstElementWithPath(
+        metadata,
+        path.concat([elem, relativePathCharacter])
       )
       result += addressField + ', '
-    } catch (err) {
-      throw RudiError.treatError(mod, fun, err)
     }
+    return result.substring(0, result.length - 2)
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
   }
-  return result.substring(0, result.length - 2)
 }
 
 // -------------------------------------------------------------------------------------------------
 // Fields Translators for organizations
 // -------------------------------------------------------------------------------------------------
 
-const pathOrgGmdXml = getPath(PATHS_GMD_TO_RUDI, API_DATA_PRODUCER_PROPERTY)
 const argsOrgGmdXml = getArgs(PATHS_GMD_TO_RUDI, API_DATA_PRODUCER_PROPERTY)
 
 export const GmdXmlToRudiOrgaTranslator = new ObjectTranslator(
@@ -58,21 +57,21 @@ export const GmdXmlToRudiOrgaTranslator = new ObjectTranslator(
   STANDARD_GMD,
   FORMAT_XML,
   true,
-  pathOrgGmdXml,
+  [],
   argsOrgGmdXml,
   [
     new FieldTranslator(
       API_ORGANIZATION_NAME,
       translateStraightFromPath,
       false,
-      pathOrgGmdXml.concat(getPath(argsOrgGmdXml, API_ORGANIZATION_NAME))
+      getPath(argsOrgGmdXml, API_ORGANIZATION_NAME)
       // getArgs(argsOrgGmdXml, API_ORGANIZATION_NAME)
     ),
     new FieldTranslator(
       API_ORGANIZATION_ADDRESS,
       translateOrgAddress,
       false,
-      pathOrgGmdXml.concat(getPath(argsOrgGmdXml, API_ORGANIZATION_ADDRESS)),
+      getPath(argsOrgGmdXml, API_ORGANIZATION_ADDRESS),
       getArgs(argsOrgGmdXml, API_ORGANIZATION_ADDRESS)
     ),
   ]

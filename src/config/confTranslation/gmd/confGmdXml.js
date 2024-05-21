@@ -1,5 +1,6 @@
 import {
   API_ACCESS_CONDITION,
+  API_CONTACT_ID,
   API_CONTACT_MAIL,
   API_CONTACT_NAME,
   API_CONTACT_ROLE,
@@ -25,6 +26,7 @@ import {
   API_MEDIA_NAME,
   API_MEDIA_PROPERTY,
   API_METADATA_LOCAL_ID,
+  API_METAINFO_CONTACTS_PROPERTY,
   API_ORGANIZATION_ADDRESS,
   API_ORGANIZATION_NAME,
   API_PUB_URL,
@@ -45,6 +47,12 @@ export const DEFAULT_OBJECT_STANDARD = STANDARD_RUDI
 export const FORMAT_XML = 'xml'
 export const FORMAT_JSON = 'json'
 export const DEFAULT_OBJECT_FORMAT = FORMAT_JSON
+
+// -------------------------------------------------------------------------------------------------
+// Const
+// -------------------------------------------------------------------------------------------------
+
+export const AVAILABLE_SERVICE_PROTOCOL = ['OGC:WMS', 'OGC:WFS', 'OGC:GML']
 
 // -------------------------------------------------------------------------------------------------
 // Paths in GMD metadata to rudi
@@ -177,6 +185,9 @@ export const PATHS_GMD_TO_RUDI = {
           'gco:CharacterString',
         ],
       },
+      [API_CONTACT_ID]: {
+        path: ['gmd:CI_ResponsibleParty', 'gmd:localId', 'gco:CharacterString'],
+      },
     },
   },
 
@@ -224,6 +235,17 @@ export const PATHS_GMD_TO_RUDI = {
           },
         },
       },
+      pathToSourceMetadata: [
+        'gmd:MD_Metadata',
+        'gmd:identificationInfo',
+        'gmd:MD_DataIdentification',
+        'gmd:citation',
+        'gmd:CI_Citation',
+        'gmd:identifier',
+        'gmd:MD_Identifier',
+        'gmd:code',
+        'gco:CharacterString',
+      ],
     },
   },
 
@@ -299,6 +321,37 @@ export const PATHS_GMD_TO_RUDI = {
             path: ['gmd:northBoundLatitude', 'gco:Decimal'],
           },
         },
+      },
+    },
+  },
+  [API_METAINFO_CONTACTS_PROPERTY]: {
+    path: ['gmd:MD_Metadata', 'gmd:contact'],
+    args: {
+      relativePathCondition: ['gmd:CI_ResponsibleParty', 'gmd:role', 'gmd:CI_RoleCode'],
+      paramCondition: 'codeListValue',
+      paramExpectedValue: 'pointOfContact',
+      [API_CONTACT_NAME]: {
+        path: ['gmd:CI_ResponsibleParty', 'gmd:individualName', 'gco:CharacterString'],
+      },
+      [API_ORGANIZATION_NAME]: {
+        path: ['gmd:CI_ResponsibleParty', 'gmd:organisationName', 'gco:CharacterString'],
+      },
+      [API_CONTACT_ROLE]: {
+        path: ['gmd:CI_ResponsibleParty', 'gmd:role', 'gmd:CI_RoleCode'],
+        args: {
+          paramName: 'codeListValue',
+        },
+      },
+      [API_CONTACT_MAIL]: {
+        path: [
+          'gmd:CI_ResponsibleParty',
+          'gmd:contactInfo',
+          'gmd:CI_Contact',
+          'gmd:address',
+          'gmd:CI_Address',
+          'gmd:electronicMailAddress',
+          'gco:CharacterString',
+        ],
       },
     },
   },

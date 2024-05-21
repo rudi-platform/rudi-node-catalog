@@ -20,11 +20,6 @@ import { getArgs, getPath, translateStraightFromPath } from './genericTranslatio
 import { FieldTranslator, ObjectTranslator } from './genericTranslator.js'
 
 // -------------------------------------------------------------------------------------------------
-// Translation functions for geography.
-// !!! All these functions must have the same parameters structure : (inputObject, path, ...args) !!!
-// -------------------------------------------------------------------------------------------------
-
-// -------------------------------------------------------------------------------------------------
 // Fields Translators for organizations
 // -------------------------------------------------------------------------------------------------
 

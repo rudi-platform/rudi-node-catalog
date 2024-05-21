@@ -77,7 +77,7 @@ import {
   getSearchableProperties,
   getSingleObject,
   searchObjects,
-  upsertSingleObject,
+  upsertObjects,
 } from '../controllers/genericController.js'
 import {
   commitMedia,
@@ -514,7 +514,7 @@ export const backOfficeRoutes = [
   {
     method: HTTP_METHODS.PUT,
     url: URL_PV_OBJECT_GENERIC,
-    handler: upsertSingleObject,
+    handler: upsertObjects,
     config: { [ROUTE_NAME]: PRV_UPSERT_ONE },
   },
   // Get all

@@ -1,48 +1,63 @@
 const mod = 'genTrslatFun'
 
+import {
+  API_LICENCE_CUSTOM_LABEL,
+  API_LICENCE_CUSTOM_URI,
+  API_LICENCE_TYPE,
+  LicenceTypes,
+} from '../db/dbFields.js'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { BadRequestError, RudiError } from '../utils/errors.js'
 import { accessProperty } from '../utils/jsonAccess.js'
+
 // -------------------------------------------------------------------------------------------------
 // Generic Translation functions.
-// !!! All these functions must have the same parameters structure : (metadata, path, ...args) !!!
+// !!! All these functions must be async functions, and have the same parameters structure : (metadata, path, ...args) !!!
 // -------------------------------------------------------------------------------------------------
 
 /**
- * Get the element located at path in the object
+ * Get the element located at path in the object. If element is an array, returns the first element.
  * @param {Object} inputObject origin object to pick information in
  * @param {Array[String]} path the path to the field in the origin object
  * @param {Array} args other arguments
  * @returns  the element located at path in the inputObject
  */
-export const translateStraightFromPath = async function (inputObject, path, args = []) {
-  const fun = 'translateStraightFromPath'
-  let result
-  try {
-    result = await getFirstElementWithPath(inputObject, path)
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
-  return result
+export const translateStraightFromPath = async (inputObject, path, args) => {
+  return getFirstElementWithPath(inputObject, path)
 }
 
-export const translateStraightFromXmlParam = async function (inputObject, path, args) {
+/**
+ * Gives the parameter in the XML's tag located at path.
+ * @param {Object} inputObject origin object to pick info in
+ * @param {Array[String]} path path to the
+ * @param {*} args
+ * @returns
+ */
+export const translateStraightFromXmlParam = async (inputObject, path, args) => {
   const fun = 'translateStraightFromXmlParam'
-  if (!('paramName' in args)) {
-    throw RudiError.treatError(
-      mod,
-      fun,
-      `Function ${fun} must have parameter args with property paramName !`
-    )
-  }
-  const paramName = args.paramName
-  let result
   try {
-    result = await getXmlParam(inputObject, path, paramName)
+    if (!('paramName' in args)) {
+      throw Error(`Function ${fun} must have parameter args with property paramName !`)
+    }
+    const paramName = args.paramName
+    return getXmlParam(inputObject, path, paramName)
   } catch (e) {
     throw RudiError.treatError(mod, fun, e)
+  }
+}
+
+// -------------------------------------------------------------------------------------------------
+// Specific functions to help translation from XML format, parsed with xml2js parser.
+// -------------------------------------------------------------------------------------------------
+
+export const createCustomLicence = (label) => {
+  // const fun = 'createCustomLicence'
+  let result = {
+    [API_LICENCE_TYPE]: LicenceTypes.Custom,
+    [API_LICENCE_CUSTOM_LABEL]: label,
+    [API_LICENCE_CUSTOM_URI]: label, // !! no available custom URI ?
   }
   return result
 }
@@ -50,68 +65,80 @@ export const translateStraightFromXmlParam = async function (inputObject, path, 
 /**
  * Recursive function to get the element of object located at a path.
  * @param {Object} object the object we want to get an element from
- * @param {Array[String]} path the path to the element in the metadata
+ * @param {Array[String]} path the path to the element in the object
  * @param {Number} depth recursive parameter, represent the depth of the recursion in the tree
  * @returns the element, throw error if it can't be accessed
  */
-export const getElementWithPath = async (object, path, depth = 0) => {
+export const getElementWithPath = (object, path, depth = 0) => {
   const fun = 'getElementWithPath'
   try {
-    const ind = path[depth]
-    const result = object[ind]
+    const ind = path?.[depth]
+    const result = object?.[ind]
+    if (result === undefined) {
+      throw new BadRequestError(
+        `Element not reachable at path [${path}], in depth ${depth}`,
+        mod,
+        fun
+      )
+    }
     if (depth + 1 === path.length) {
       // logI(mod, fun, result + '  -final step-      ' + depth)
       return result
-    } else {
-      // logI(mod, fun, result + '        ' + depth)
-      return await getElementWithPath(arrayCheck(result), path, depth + 1)
     }
+    return getElementWithPath(arrayCheck(result), path, depth + 1)
   } catch (e) {
-    throw new BadRequestError(
-      `Element not reachable at path ${path}}, in depth ${depth + 1}`,
-      mod,
-      fun
-    )
+    throw RudiError.treatError(mod, fun, e)
   }
+  // logI(mod, fun, result + '        ' + depth)
 }
 
 /**
  * Find an element at path of object. If it doesn't exist, return undefined.
+ * @param {Object} object the object we want to get an element from
+ * @param {Array[String]} path the path to the element in the object
+ * @returns the element if it exists, else undefined
+ */
+export const findElementWithPath = (object, path) => {
+  const fun = 'findElementWithPath'
+  let result
+  try {
+    result = getElementWithPath(object, path)
+    return result
+  } catch {
+    return result
+  }
+}
+
+/**
+ * Returns the first element of x if it is an array, else x itself
+ * @param {*} x array or other
+ * @returns first element of obj if is Array, else obj
+ */
+export const arrayCheck = (x) => {
+  const fun = 'arrayCheck'
+  let result
+  try {
+    if (Array.isArray(x) && x.length > 0) {
+      result = x[0]
+    } else {
+      result = x
+    }
+    return result
+  } catch (e) {
+    throw RudiError.treatError(mod, fun, e)
+  }
+}
+
+/**
+ * Gives the first element located at path in the object. If the element is not an array, returns the element.
  * @param {Object} object
  * @param {Array[String]} path
  * @returns
  */
-export const findElementWithPath = async (object, path) => {
-  const fun = 'findElementWithPath'
-  let result
-  try {
-    result = await getElementWithPath(object, path)
-  } catch {
-    return result
-  }
-  return result
+export const getFirstElementWithPath = (object, path) => {
+  const fun = 'getFirstElementWithPath'
+  return arrayCheck(getElementWithPath(object, path))
 }
-
-/**
- * Returns first element of obj if it is an array, else obj
- * @param {*} obj array or other
- * @returns first element of obj if is Array, else obj
- */
-export const arrayCheck = (obj) => {
-  if (Array.isArray(obj) && obj.length > 0) {
-    return obj[0]
-  } else {
-    return obj
-  }
-}
-
-export const getFirstElementWithPath = async (object, path) => {
-  return arrayCheck(await getElementWithPath(object, path))
-}
-
-// -------------------------------------------------------------------------------------------------
-// Specific functions to help translation from XML format, parsed with xml2js parser
-// -------------------------------------------------------------------------------------------------
 
 /**
  * Get an XML tag's parameter value (e.g. : tag <gmd:MD_Metadata xmlns="http://www.isotc211.org/2005/gmd"> has parameter xmlns with value "http://www.isotc211.org/2005/gmd")
@@ -119,11 +146,12 @@ export const getFirstElementWithPath = async (object, path) => {
  * @param {Array[String]} path the path to the parameter
  * @param {String} paramName the name of the parameter
  */
-export const getXmlParam = async (inputObject, path, paramName) => {
+export const getXmlParam = (inputObject, path, paramName) => {
   const fun = 'getXmlParam'
-  let tag = arrayCheck(await getElementWithPath(inputObject, path))
   let result
+  let tag
   try {
+    tag = getFirstElementWithPath(inputObject, path)
     result = tag['$']
   } catch {
     throw RudiError.treatError(
@@ -152,26 +180,32 @@ export const getXmlParam = async (inputObject, path, paramName) => {
  * @param {String} paramName the name of the parameter
  * @returns the param if found, else undefined
  */
-export const findXmlParam = async function (inputObject, path, paramName) {
+export const findXmlParam = (inputObject, path, paramName) => {
   const fun = 'findXmlParam'
-  let tag = arrayCheck(await getElementWithPath(inputObject, path))
-  let result
-  if ('$' in tag) {
-    result = tag['$']
+  try {
+    const tag = getFirstElementWithPath(inputObject, path)
+    return tag?.['$']?.[paramName]
+  } catch (e) {
+    throw RudiError.treatError(mod, fun, e)
   }
-  if (paramName in result) {
-    return result[paramName]
-  }
-  return undefined
 }
-// -------------------------------------------------------------------------------------------------
-// Tools to access safely to params of Object.
-// -------------------------------------------------------------------------------------------------
 
-export const getPath = function (pathsDict, rudiField) {
+/**
+ * Shortcut of accessProperty for path.
+ * @param {Object} pathsDict
+ * @param {String} rudiField
+ * @returns
+ */
+export const getPath = (pathsDict, rudiField) => {
   return accessProperty(accessProperty(pathsDict, rudiField), 'path')
 }
 
-export const getArgs = function (pathsDict, rudiField) {
+/**
+ * Shortcut of accessProperty for args.
+ * @param {Object} pathsDict
+ * @param {String} rudiField
+ * @returns
+ */
+export const getArgs = (pathsDict, rudiField) => {
   return accessProperty(accessProperty(pathsDict, rudiField), 'args')
 }

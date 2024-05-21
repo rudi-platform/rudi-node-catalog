@@ -4,6 +4,7 @@ const mod = 'genericTrsltr'
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { BadRequestError, RudiError } from '../utils/errors.js'
+import { logI } from '../utils/logging.js'
 // -------------------------------------------------------------------------------------------------
 // Classes that deals with translations of objects and rudi fields.
 // -------------------------------------------------------------------------------------------------
@@ -26,14 +27,14 @@ export class Translator {
 export class FieldTranslator extends Translator {
   /**
    *  Class dealing with translation. Objects of this class translates a particular object field to RUDI. (ex: local_id)
-   * @param {String} rudiField the rudi field it translates to
+   * @param {String} rudiObjectName the rudi field it translates to
    * @param {AsyncFunction} translationFunc function used to translat atomic rudi fields (i.e. fields that are note objects : e.g. resource_title)
    * @param {Boolean} isMandatory true if the rudi field is mandatory, else false
    * @param {Array[String]} path path in the inputObject to the corresponding rudiObject
    * @param {Object} args args used in translation of the inputObject into rudiObject
    */
-  constructor(rudiField, translationFunc, isMandatory = false, path = [], args = {}) {
-    super(rudiField, isMandatory, path, args)
+  constructor(rudiObjectName, translationFunc, isMandatory = false, path = [], args = {}) {
+    super(rudiObjectName, isMandatory, path, args)
     this.translationFunc = translationFunc
   }
 
@@ -44,34 +45,24 @@ export class FieldTranslator extends Translator {
    */
   async translateInputObject(inputObject) {
     const fun = 'FieldTranslator.translateInputObject'
-
     let result
     try {
       result = await this.translationFunc(inputObject, this.path, this.args)
       return result
     } catch (e) {
       if (this.isMandatory) {
+        e.message = `Problem in translation of field '${this.rudiObjectName}'. ${e.message}`
         throw RudiError.treatError(mod, fun, e)
       } else {
-        return ''
+        logI(
+          mod,
+          fun,
+          `Non mandatory field ${this.rudiObjectName} was not translated. Following error was raised : '${e}'`
+        )
       }
     }
   }
 }
-// export class MediaTranslator extends ObjectTranslator {
-//   constructor(
-//     inputStandard,
-//     inputFormat,
-//     path,
-//     args,
-//     subTranslators,
-//     parser = async (elem) => {
-//       elem
-//     }
-//   ) {
-//     super()
-//   }
-// }
 
 export class ObjectTranslator extends Translator {
   /**
@@ -112,32 +103,34 @@ export class ObjectTranslator extends Translator {
    */
   async translateInputObject(inputObject, parse = false) {
     const fun = 'ObjectTranslator.translateInputObject'
+    let translatedObject = {}
     try {
       if (parse) {
         inputObject = await this.parse(inputObject)
       }
-      const translatedObject = {}
       await Promise.all(
-        this.subTranslators.map((subTranslator) => {
-          const translatedFieldPromise = subTranslator.translateInputObject(inputObject)
-          translatedFieldPromise
+        this.subTranslators.map((subTranslator) =>
+          subTranslator
+            .translateInputObject(inputObject)
             .then((result) => {
               translatedObject[subTranslator.rudiObjectName] = result
             })
-            .catch((err) => {
-              err.message = `Problem in translation of field ${subTranslator.rudiObjectName}. ${err.message}`
+            .catch((e) => {
+              throw e
             })
-          return translatedFieldPromise
-        })
-      ).catch((e) => {
-        throw RudiError.treatError(mod, fun, e)
-      })
+        )
+      )
       return translatedObject
     } catch (e) {
       if (this.isMandatory) {
+        // e.message = `Problem in translation of object '${this.rudiObjectName}'. ${e.message}`
         throw RudiError.treatError(mod, fun, e)
       } else {
-        return ''
+        logI(
+          mod,
+          fun,
+          `Non mandatory object ${this.rudiObjectName} was not translated. Following error was raised : '${e}'`
+        )
       }
     }
   }
@@ -149,11 +142,13 @@ export class ObjectTranslator extends Translator {
    */
   async parse(inputObject) {
     const fun = 'ObjectTranslator.parse'
+    let result
     try {
-      return await this.parser(inputObject)
+      result = await this.parser(inputObject)
+      return result
     } catch (e) {
       throw new BadRequestError(
-        `Translation to rudi failed. Problem with parsing the object of type : ${this.objectType}, at standard ${this.inputStandard} and format ${this.inputFormat}. ${e}`,
+        `Translation to rudi failed. Problem with parsing the object of type : '${this.objectType}', at standard '${this.inputStandard}' and format '${this.inputFormat}'. ${e}`,
         mod,
         fun,
         this.path

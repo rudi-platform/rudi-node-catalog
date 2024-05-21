@@ -1,6 +1,11 @@
 const mod = 'contTrsltr'
 
 // -------------------------------------------------------------------------------------------------
+// External dependencies
+// -------------------------------------------------------------------------------------------------
+import { parseStringPromise as xml2jsonParser } from 'xml2js'
+
+// -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import {
@@ -9,6 +14,7 @@ import {
   STANDARD_GMD,
 } from '../config/confTranslation/gmd/confGmdXml.js'
 import {
+  API_CONTACT_ID,
   API_CONTACT_MAIL,
   API_CONTACT_NAME,
   API_CONTACT_ROLE,
@@ -22,11 +28,6 @@ import {
   translateStraightFromXmlParam,
 } from './genericTranslationFunctions.js'
 import { FieldTranslator, ObjectTranslator } from './genericTranslator.js'
-
-// -------------------------------------------------------------------------------------------------
-// Translation functions for contacts.
-// !!! All these functions must have the same parameters structure : (inputObject, path, args) !!!
-// -------------------------------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------------------------------
 // Fields Translators for organizations
@@ -44,9 +45,15 @@ export const GmdXmlToRudiContactTranslator = new ObjectTranslator(
   argsContGmdXml,
   [
     new FieldTranslator(
+      API_CONTACT_ID,
+      translateStraightFromPath,
+      true,
+      getPath(argsContGmdXml, API_CONTACT_ID)
+    ),
+    new FieldTranslator(
       API_CONTACT_NAME,
       translateStraightFromPath,
-      false,
+      true,
       getPath(argsContGmdXml, API_CONTACT_NAME)
     ),
     new FieldTranslator(
@@ -65,8 +72,9 @@ export const GmdXmlToRudiContactTranslator = new ObjectTranslator(
     new FieldTranslator(
       API_CONTACT_MAIL,
       translateStraightFromPath,
-      false,
+      true,
       getPath(argsContGmdXml, API_CONTACT_MAIL)
     ),
-  ]
+  ],
+  xml2jsonParser
 )

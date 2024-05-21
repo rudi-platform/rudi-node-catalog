@@ -223,7 +223,7 @@ function overrideFilter(filterList, field, value) {
 }
 
 /**
- * Add a new rudi objectobject
+ * Add a new rudi object
  *
  */
 async function addSingleRudiObject(rudiObject, objectType, context) {
@@ -253,7 +253,7 @@ async function addSingleRudiObject(rudiObject, objectType, context) {
 }
 
 /**
- * Translate and add an object
+ * Check if object need translation. If so, translates and add the object, else add the object.
  * @param {*} inputObject the source object
  * @param {String} objectType the rudi type (ex: resources, contacts, ...)
  * @param {String} idField the field of the id in the rudi metadata
@@ -264,32 +264,26 @@ async function addSingleRudiObject(rudiObject, objectType, context) {
  */
 async function addSingleObject(inputObject, objectType, objectStandard, objectFormat, context) {
   const fun = 'addSingleObject'
-  let rudiObject
-
-  if (objectFormat === DEFAULT_OBJECT_FORMAT && objectStandard === DEFAULT_OBJECT_STANDARD) {
-    rudiObject = inputObject
-    return addSingleRudiObject(rudiObject, objectType, context)
-  }
-
-  const objectTranslator = isTranslatable(objectType, objectStandard, objectFormat)
-  if (!objectTranslator) {
-    throw new NotImplementedError(
-      `Object of type ${objectType}, at standard ${objectStandard} and format ${objectFormat} can not yet be uploaded.`
-    )
-  }
-
   try {
-    rudiObject = await objectTranslator.translateInputObject(
-      inputObject,
-      objectType,
-      objectStandard,
-      objectFormat
-    )
+    let rudiObject
+    if (objectFormat === DEFAULT_OBJECT_FORMAT && objectStandard === DEFAULT_OBJECT_STANDARD) {
+      rudiObject = inputObject
+    } else {
+      const objectTranslator = isTranslatable(objectType, objectStandard, objectFormat)
+      if (!objectTranslator) {
+        throw new NotImplementedError(
+          `Object of type ${objectType}, at standard ${objectStandard} and format ${objectFormat} can not yet be uploaded.`
+        )
+      }
+      rudiObject = await objectTranslator.translateInputObject(inputObject, true).catch((e) => {
+        throw RudiError.treatError(mod, fun, e)
+      })
+    }
+    return rudiObject
+    // return await addSingleRudiObject(rudiObject, objectType, context)
   } catch (e) {
     throw RudiError.treatError(mod, fun, e)
   }
-  return rudiObject
-  // return addSingleRudiObject(rudiObject, objectType, context)
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -603,36 +597,111 @@ export const getManyPubKeys = async (req, reply) => {
  * Update an existing object or creates it if it doesn't exist
  * => PUT /{object}
  */
-export const upsertSingleObject = async (req, reply) => {
+export const upsertSingleRudiObject = async (rudiObject, objectType, context) => {
   const fun = 'upsertSingleObject'
   try {
     logT(mod, fun, `< PUT ${URL_PV_OBJECT_GENERIC}`)
     // retrieve url parameters: object type, object id
-    const objectType = getObjectParam(req)
     const idField = getObjectIdField(objectType)
 
-    const updateData = req.body
-
     // retrieve url parameters: object type, object id
-    const rudiId = accessProperty(updateData, idField)
+    const rudiId = accessProperty(rudiObject, idField)
 
     const existsObject = await doesObjectExistWithRudiId(objectType, rudiId)
 
-    const context = CallContext.getCallContextFromReq(req)
-
     if (context) context.addObjId(objectType, rudiId)
 
-    if (!existsObject) return await newObject(objectType, updateData)
+    if (!existsObject) return await newObject(objectType, rudiObject)
 
     switch (objectType) {
       case OBJ_METADATA:
-        return await overwriteMetadata(updateData)
+        return await overwriteMetadata(rudiObject)
 
       case OBJ_PUB_KEYS:
-        return await overwritePubKey(updateData)
+        return await overwritePubKey(rudiObject)
       default:
-        return await overwriteDbObject(objectType, updateData)
+        return await overwriteDbObject(objectType, rudiObject)
     }
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+/**
+ * Translate and upsert an object
+ * @param {*} inputObject the source object
+ * @param {String} objectType the rudi type (ex: resources, contacts, ...)
+ * @param {String} idField the field of the id in the rudi metadata
+ * @param {String} objectStandard the standard of the source object (ex: dcat, gmd). default : rudi
+ * @param {String} objectFormat the format of the source object (ex: xml, json)
+ * @param {*} context
+ * @returns
+ */
+async function upsertSingleObject(inputObject, objectType, objectStandard, objectFormat, context) {
+  const fun = 'upsertSingleObject'
+  let rudiObject
+
+  if (objectFormat === DEFAULT_OBJECT_FORMAT && objectStandard === DEFAULT_OBJECT_STANDARD) {
+    rudiObject = inputObject
+    return upsertSingleRudiObject(rudiObject, objectType, context)
+  }
+
+  const objectTranslator = isTranslatable(objectType, objectStandard, objectFormat)
+  if (!objectTranslator) {
+    throw new NotImplementedError(
+      `Object of type ${objectType}, at standard ${objectStandard} and format ${objectFormat} can not yet be uploaded.`
+    )
+  }
+
+  try {
+    rudiObject = await objectTranslator.translateInputObject(inputObject, true)
+  } catch (e) {
+    throw RudiError.treatError(mod, fun, e)
+  }
+  // return rudiObject
+  return upsertSingleRudiObject(rudiObject, objectType, context)
+}
+
+/**
+ * Upsert a list of objects, or a single object. Route PUT /object/[objects] || /object/id
+ * @param {*} req
+ * @param {*} reply
+ * @returns
+ */
+export const upsertObjects = async (req, reply) => {
+  const fun = 'upsertObjects'
+  try {
+    logT(mod, fun, `< PUT ${URL_PV_OBJECT_GENERIC}`)
+
+    // get the objectStandard query param, default=rudi
+    const objectStandard = req.query?.[QUERY_OBJECT_STANDARD] || DEFAULT_OBJECT_STANDARD
+
+    // get the objectFormat query param, default=json
+    const objectFormat = req.query?.[QUERY_OBJECT_FORMAT] || DEFAULT_OBJECT_FORMAT
+
+    const objectType = getObjectParam(req)
+
+    // accessing the request body
+    const inputObjects = req.body
+
+    const context = CallContext.getCallContextFromReq(req)
+
+    let createdObjects
+    if (Array.isArray(inputObjects)) {
+      const creationPromises = inputObjects.map((inputObject) => {
+        upsertSingleObject(inputObject, objectType, objectStandard, objectFormat, context)
+      })
+      createdObjects = await Promise.all(creationPromises)
+    } else {
+      createdObjects = await upsertSingleObject(
+        inputObjects,
+        objectType,
+        objectStandard,
+        objectFormat,
+        context
+      )
+    }
+    return createdObjects
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
