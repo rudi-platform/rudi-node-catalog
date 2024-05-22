@@ -3,16 +3,10 @@
 const mod = 'appOpts'
 
 // -------------------------------------------------------------------------------------------------
-// External dependencies
-// -------------------------------------------------------------------------------------------------
-import minimist from 'minimist'
-const _argv = minimist(process.argv.slice(2))
-
-// -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { readIniFile } from '../utils/fileActions.js'
-import { SEP_LINE, consoleErr, isDefined } from '../utils/jsUtils.js'
+import { SEP_LINE, consoleErr, getArgv, isDefined } from '../utils/jsUtils.js'
 
 // -------------------------------------------------------------------------------------------------
 // App options / environment variables
@@ -96,6 +90,7 @@ export function optionsToString() {
   return optionStrParts.join('\n')
 }
 
+const _argv = getArgv()
 const CLI_OPTS = {}
 let wereAppOptsLoaded = false
 export const getCliOpt = (opt) => {

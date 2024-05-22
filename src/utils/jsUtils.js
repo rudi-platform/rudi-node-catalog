@@ -14,6 +14,7 @@ const { pick } = _
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
+import minimist from 'minimist'
 import { TRACE } from '../config/constApi.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -284,6 +285,22 @@ export const setSubProp = (obj, propArray, value) => objectPath.set(obj, propArr
 // -------------------------------------------------------------------------------------------------
 // JSON
 // -------------------------------------------------------------------------------------------------
+
+/**
+ *
+ * @param {Object} obj a source object
+ * @param {string} key the name of a property to omit in the source object
+ * @returns An object without the named property
+ */
+export const omit = (obj, key) => {
+  // eslint-disable-next-line no-unused-vars, unused-imports/no-unused-vars
+  const { [key]: omitted, ...rest } = obj // NOSONAR
+  return rest
+}
+const ARGV = omit(minimist(process.argv), '_')
+console.log('CLI options:', ARGV)
+export const getArgv = (opt) => (opt ? ARGV[opt] : ARGV)
+
 export const isDefined = (val) => typeof val !== 'undefined'
 
 export const isPropDefined = (obj, prop) => obj?.hasOwnProperty(prop)
