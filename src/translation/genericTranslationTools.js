@@ -7,7 +7,7 @@ import {
   FORMAT_XML,
   STANDARD_DCAT,
   STANDARD_GMD,
-} from '../config/confTranslation/gmd/confGmdXml.js'
+} from '../config/confTranslation/GMD_XML/confGMDXML.js'
 import { OBJ_CONTACTS, OBJ_METADATA, OBJ_ORGANIZATIONS } from '../config/constApi.js'
 import { GmdXmlToRudiContactTranslator } from './GMD_XML/contactTranslator.js'
 import { GmdXmlToRudiMetadataTranslator } from './GMD_XML/metadataTranslator.js'

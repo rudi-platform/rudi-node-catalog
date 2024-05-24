@@ -58,7 +58,7 @@ import {
 import {
   DEFAULT_OBJECT_FORMAT,
   DEFAULT_OBJECT_STANDARD,
-} from '../config/confTranslation/gmd/confGmdXml.js'
+} from '../config/confTranslation/GMD_XML/confGMDXML.js'
 import {
   countDbObjectList,
   countDbObjects,
@@ -105,7 +105,7 @@ import {
 import { CallContext } from '../definitions/constructors/callContext.js'
 import { parseQueryParameters } from '../utils/parseRequest.js'
 
-import { isTranslatable } from '../translators/genericTranslationTools.js'
+import { isTranslatable } from '../translation/genericTranslationTools.js'
 
 // -------------------------------------------------------------------------------------------------
 // Specific controllers

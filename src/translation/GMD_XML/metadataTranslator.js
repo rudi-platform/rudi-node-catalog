@@ -52,7 +52,7 @@ import {
   FORMAT_XML,
   PATHS_GMD_TO_RUDI,
   STANDARD_GMD,
-} from '../../config/confTranslation/gmd/confGmdXml.js'
+} from '../../config/confTranslation/GMD_XML/confGMDXML.js'
 import { API_VERSION, OBJ_METADATA } from '../../config/constApi.js'
 import { getLicenceLabels } from '../../controllers/licenceController.js'
 import { getObject } from '../../db/dbQueries.js'

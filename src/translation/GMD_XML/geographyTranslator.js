@@ -7,7 +7,7 @@ import {
   FORMAT_XML,
   PATHS_GMD_TO_RUDI,
   STANDARD_GMD,
-} from '../../config/confTranslation/gmd/confGmdXml.js'
+} from '../../config/confTranslation/GMD_XML/confGMDXML.js'
 import {
   API_GEOGRAPHY,
   API_GEO_BBOX_EAST,
