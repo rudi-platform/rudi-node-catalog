@@ -12,8 +12,8 @@ import {
   FORMAT_XML,
   PATHS_GMD_TO_RUDI,
   STANDARD_GMD,
-} from '../config/confTranslation/gmd/confGmdXml.js'
-import { OBJ_CONTACTS } from '../config/constApi.js'
+} from '../../config/confTranslation/gmd/confGmdXml.js'
+import { OBJ_CONTACTS } from '../../config/constApi.js'
 import {
   API_CONTACT_ID,
   API_CONTACT_MAIL,
@@ -21,9 +21,10 @@ import {
   API_CONTACT_ROLE,
   API_DATA_CONTACTS_PROPERTY,
   API_ORGANIZATION_NAME,
-} from '../db/dbFields.js'
-import { getObject } from '../db/dbQueries.js'
-import { BadRequestError, RudiError } from '../utils/errors.js'
+} from '../../db/dbFields.js'
+import { getObject } from '../../db/dbQueries.js'
+import { BadRequestError, RudiError } from '../../utils/errors.js'
+import { FieldTranslator, ObjectTranslator } from '../translators.js'
 import {
   getArgs,
   getFirstElementWithPath,
@@ -31,7 +32,6 @@ import {
   translateStraightFromPath,
   translateStraightFromXmlParam,
 } from './genericTranslationFunctions.js'
-import { FieldTranslator, ObjectTranslator } from './genericTranslator.js'
 
 // -------------------------------------------------------------------------------------------------
 // Translation functions for contacts.

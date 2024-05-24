@@ -13,8 +13,8 @@ import {
   FORMAT_XML,
   PATHS_GMD_TO_RUDI,
   STANDARD_GMD,
-} from '../config/confTranslation/gmd/confGmdXml.js'
-import { OBJ_MEDIA } from '../config/constApi.js'
+} from '../../config/confTranslation/gmd/confGmdXml.js'
+import { OBJ_MEDIA } from '../../config/constApi.js'
 import {
   API_MEDIA_CAPTION,
   API_MEDIA_CONNECTOR,
@@ -24,19 +24,19 @@ import {
   API_MEDIA_PROPERTY,
   API_MEDIA_TYPE,
   API_PUB_URL,
-} from '../db/dbFields.js'
-import { getObject } from '../db/dbQueries.js'
-import { MediaTypes } from '../definitions/models/Media.js'
-import { BadRequestError, RudiError } from '../utils/errors.js'
-import { beautify } from '../utils/jsUtils.js'
-import { logI } from '../utils/logging.js'
+} from '../../db/dbFields.js'
+import { getObject } from '../../db/dbQueries.js'
+import { MediaTypes } from '../../definitions/models/Media.js'
+import { BadRequestError, RudiError } from '../../utils/errors.js'
+import { beautify } from '../../utils/jsUtils.js'
+import { logI } from '../../utils/logging.js'
+import { FieldTranslator, ObjectTranslator } from '../translators.js'
 import {
   getArgs,
   getFirstElementWithPath,
   getPath,
   translateStraightFromPath,
 } from './genericTranslationFunctions.js'
-import { FieldTranslator, ObjectTranslator } from './genericTranslator.js'
 
 // -------------------------------------------------------------------------------------------------
 // Translation functions for Media.

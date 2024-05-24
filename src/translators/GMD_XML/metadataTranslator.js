@@ -42,7 +42,7 @@ import {
   DICT_LANG,
   DICT_TEXT,
   LicenceTypes,
-} from '../db/dbFields.js'
+} from '../../db/dbFields.js'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
@@ -52,16 +52,17 @@ import {
   FORMAT_XML,
   PATHS_GMD_TO_RUDI,
   STANDARD_GMD,
-} from '../config/confTranslation/gmd/confGmdXml.js'
-import { API_VERSION, OBJ_METADATA } from '../config/constApi.js'
-import { getLicenceLabels } from '../controllers/licenceController.js'
-import { getObject } from '../db/dbQueries.js'
-import { MediaTypes } from '../definitions/models/Media.js'
-import { get as getLanguages } from '../definitions/thesaurus/Languages.js'
-import { StorageStatus } from '../definitions/thesaurus/StorageStatus.js'
-import { BadRequestError, RudiError } from '../utils/errors.js'
-import { beautify, filterOnValue } from '../utils/jsUtils.js'
-import { logI } from '../utils/logging.js'
+} from '../../config/confTranslation/gmd/confGmdXml.js'
+import { API_VERSION, OBJ_METADATA } from '../../config/constApi.js'
+import { getLicenceLabels } from '../../controllers/licenceController.js'
+import { getObject } from '../../db/dbQueries.js'
+import { MediaTypes } from '../../definitions/models/Media.js'
+import { get as getLanguages } from '../../definitions/thesaurus/Languages.js'
+import { StorageStatus } from '../../definitions/thesaurus/StorageStatus.js'
+import { BadRequestError, RudiError } from '../../utils/errors.js'
+import { beautify, filterOnValue } from '../../utils/jsUtils.js'
+import { logI } from '../../utils/logging.js'
+import { FieldTranslator, ObjectTranslator } from '../translators.js'
 import { GmdXmlToRudiContactTranslator } from './contactTranslator.js'
 import {
   arrayCheck,
@@ -74,7 +75,6 @@ import {
   getXmlParam,
   translateStraightFromPath,
 } from './genericTranslationFunctions.js'
-import { FieldTranslator, ObjectTranslator } from './genericTranslator.js'
 import { GmdXmlToRudiGeoTranslator } from './geographyTranslator.js'
 import { GmdXmlToRudiMediaTranslator, findMediaIdWithURL } from './mediaTranslator.js'
 import { GmdXmlToRudiOrgaTranslator } from './organizationTranslator.js'

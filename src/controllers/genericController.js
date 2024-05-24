@@ -105,7 +105,7 @@ import {
 import { CallContext } from '../definitions/constructors/callContext.js'
 import { parseQueryParameters } from '../utils/parseRequest.js'
 
-import { isTranslatable } from '../translators/translationTools.js'
+import { isTranslatable } from '../translators/genericTranslationTools.js'
 
 // -------------------------------------------------------------------------------------------------
 // Specific controllers

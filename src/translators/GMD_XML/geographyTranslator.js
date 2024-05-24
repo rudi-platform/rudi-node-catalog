@@ -7,7 +7,7 @@ import {
   FORMAT_XML,
   PATHS_GMD_TO_RUDI,
   STANDARD_GMD,
-} from '../config/confTranslation/gmd/confGmdXml.js'
+} from '../../config/confTranslation/gmd/confGmdXml.js'
 import {
   API_GEOGRAPHY,
   API_GEO_BBOX_EAST,
@@ -15,9 +15,9 @@ import {
   API_GEO_BBOX_PROPERTY,
   API_GEO_BBOX_SOUTH,
   API_GEO_BBOX_WEST,
-} from '../db/dbFields.js'
+} from '../../db/dbFields.js'
+import { FieldTranslator, ObjectTranslator } from '../translators.js'
 import { getArgs, getPath, translateStraightFromPath } from './genericTranslationFunctions.js'
-import { FieldTranslator, ObjectTranslator } from './genericTranslator.js'
 
 // -------------------------------------------------------------------------------------------------
 // Geography Translator Object

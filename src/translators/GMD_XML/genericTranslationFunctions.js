@@ -5,12 +5,12 @@ import {
   API_LICENCE_CUSTOM_URI,
   API_LICENCE_TYPE,
   LicenceTypes,
-} from '../db/dbFields.js'
+} from '../../db/dbFields.js'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { BadRequestError, RudiError } from '../utils/errors.js'
-import { accessProperty } from '../utils/jsonAccess.js'
+import { BadRequestError, RudiError } from '../../utils/errors.js'
+import { accessProperty } from '../../utils/jsonAccess.js'
 
 // -------------------------------------------------------------------------------------------------
 // Generic Translation functions.

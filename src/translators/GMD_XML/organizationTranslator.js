@@ -8,16 +8,17 @@ import {
   FORMAT_XML,
   PATHS_GMD_TO_RUDI,
   STANDARD_GMD,
-} from '../config/confTranslation/gmd/confGmdXml.js'
-import { OBJ_ORGANIZATIONS } from '../config/constApi.js'
+} from '../../config/confTranslation/gmd/confGmdXml.js'
+import { OBJ_ORGANIZATIONS } from '../../config/constApi.js'
 import {
   API_DATA_PRODUCER_PROPERTY,
   API_ORGANIZATION_ADDRESS,
   API_ORGANIZATION_ID,
   API_ORGANIZATION_NAME,
-} from '../db/dbFields.js'
-import { getObject } from '../db/dbQueries.js'
-import { BadRequestError, RudiError } from '../utils/errors.js'
+} from '../../db/dbFields.js'
+import { getObject } from '../../db/dbQueries.js'
+import { BadRequestError, RudiError } from '../../utils/errors.js'
+import { FieldTranslator, ObjectTranslator } from '../translators.js'
 import {
   findFirstElementWithPath,
   getArgs,
@@ -25,7 +26,6 @@ import {
   getPath,
   translateStraightFromPath,
 } from './genericTranslationFunctions.js'
-import { FieldTranslator, ObjectTranslator } from './genericTranslator.js'
 
 // -------------------------------------------------------------------------------------------------
 // Translation functions for organizations.

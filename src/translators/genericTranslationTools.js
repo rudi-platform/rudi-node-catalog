@@ -9,16 +9,16 @@ import {
   STANDARD_GMD,
 } from '../config/confTranslation/gmd/confGmdXml.js'
 import { OBJ_CONTACTS, OBJ_METADATA, OBJ_ORGANIZATIONS } from '../config/constApi.js'
-import { GmdXmlToRudiContactTranslator } from './contactTranslator.js'
-import { GmdXmlToRudiMetadataTranslator } from './metadataTranslator.js'
-import { GmdXmlToRudiOrgaTranslator } from './organizationTranslator.js'
+import { GmdXmlToRudiContactTranslator } from './GMD_XML/contactTranslator.js'
+import { GmdXmlToRudiMetadataTranslator } from './GMD_XML/metadataTranslator.js'
+import { GmdXmlToRudiOrgaTranslator } from './GMD_XML/organizationTranslator.js'
 
 // -------------------------------------------------------------------------------------------------
 // Constants used in translation, i.e. translators objects.
 // -------------------------------------------------------------------------------------------------
 
 // list of all translators
-export const translatorObjects = {
+const translatorObjects = {
   [OBJ_METADATA]: {
     [STANDARD_DCAT]: [],
     [STANDARD_GMD]: {
