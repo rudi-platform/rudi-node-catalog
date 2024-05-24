@@ -54,7 +54,15 @@ export const DEFAULT_OBJECT_FORMAT = FORMAT_JSON
 // -------------------------------------------------------------------------------------------------
 
 export const AVAILABLE_SERVICE_PROTOCOL = ['OGC:WMS', 'OGC:WFS', 'OGC:GML']
+export const AVAILABLE_DOWNLOAD_PROTOCOL = [
+  'WWW:LINK-1.0-http--link',
+  'WWW:DOWNLOAD-1.0-http--download',
+]
 
+export const DICT_LANGUAGES_TO_RUDI = {
+  fre: 'fr',
+}
+export const DICT_THEMES_TO_RUDI = {}
 // -------------------------------------------------------------------------------------------------
 // Paths in GMD metadata to rudi
 // -------------------------------------------------------------------------------------------------
@@ -133,7 +141,13 @@ export const PATHS_GMD_TO_RUDI = {
       paramExpectedValue: 'custodian',
       [API_ORGANIZATION_ID]: {
         // !!! relative path from PATHS_GMD_TO_RUDI[API_DATA_PRODUCER_PROPERTY].path !!!
-        path: ['gmd:CI_ResponsibleParty', 'gmd:organisationId', 'gco:CharacterString'],
+        path: [
+          'gmd:CI_ResponsibleParty',
+          'gmd:identifier',
+          'gmd:MD_Identifier',
+          'gmd:code',
+          'gco:CharacterString',
+        ],
       },
       [API_ORGANIZATION_NAME]: {
         // !!! relative path from PATHS_GMD_TO_RUDI[API_DATA_PRODUCER_PROPERTY].path !!!
@@ -191,7 +205,13 @@ export const PATHS_GMD_TO_RUDI = {
         ],
       },
       [API_CONTACT_ID]: {
-        path: ['gmd:CI_ResponsibleParty', 'gmd:localId', 'gco:CharacterString'],
+        path: [
+          'gmd:CI_ResponsibleParty',
+          'gmd:identifier',
+          'gmd:MD_Identifier',
+          'gmd:code',
+          'gco:CharacterString',
+        ],
       },
     },
   },

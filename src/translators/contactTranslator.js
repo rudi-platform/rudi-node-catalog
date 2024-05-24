@@ -4,7 +4,7 @@ const mod = 'contTrsltr'
 // External dependencies
 // -------------------------------------------------------------------------------------------------
 import { parseStringPromise as xml2jsonParser } from 'xml2js'
-import { findFirstElementWithPath, getElementWithPath } from './genericTranslationFunctions.js'
+import { findFirstElementWithPath } from './genericTranslationFunctions.js'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
@@ -23,9 +23,10 @@ import {
   API_ORGANIZATION_NAME,
 } from '../db/dbFields.js'
 import { getObject } from '../db/dbQueries.js'
-import { RudiError } from '../utils/errors.js'
+import { BadRequestError, RudiError } from '../utils/errors.js'
 import {
   getArgs,
+  getFirstElementWithPath,
   getPath,
   translateStraightFromPath,
   translateStraightFromXmlParam,
@@ -39,8 +40,8 @@ import { FieldTranslator, ObjectTranslator } from './genericTranslator.js'
 
 /**
  * Tries to fetch contact_id in Rudi Db from the id field in gmd, and then from the contact name.
- * @param {*} inputObject
- * @param {*} path
+ * @param {Object} inputObject
+ * @param {Array[String]} path
  * @param {*} args
  * @returns rudi_id matching with contact_name if a match is found, else undefined
  */
@@ -50,9 +51,14 @@ const translateContactId = async (inputObject, path, args) => {
   try {
     const contactId = findFirstElementWithPath(inputObject, path)
     if (contactId === undefined) {
-      const contactName = getElementWithPath(inputObject, args?.[API_CONTACT_NAME]?.path)
+      const contactName = getFirstElementWithPath(inputObject, args?.[API_CONTACT_NAME]?.path)
       const rudiObj = await getObject(OBJ_CONTACTS, { [API_CONTACT_NAME]: contactName }, false)
       result = rudiObj?.[API_CONTACT_ID]
+      if (result == undefined) {
+        throw new BadRequestError(
+          `No contact with name '${contactName}' was found in database. Please add it.`
+        )
+      }
     } else {
       result = contactId
     }

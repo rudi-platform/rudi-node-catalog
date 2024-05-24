@@ -184,6 +184,10 @@ export default {
               lang: 'en',
               text: 'Etalab Open License 2.0',
             },
+            {
+              lang: 'fr',
+              text: 'Licence Ouverte 2.0',
+            },
           ],
         },
         {

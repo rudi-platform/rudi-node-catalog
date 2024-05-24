@@ -275,12 +275,10 @@ async function addSingleObject(inputObject, objectType, objectStandard, objectFo
           `Object of type ${objectType}, at standard ${objectStandard} and format ${objectFormat} can not yet be uploaded.`
         )
       }
-      rudiObject = await objectTranslator.translateInputObject(inputObject, true).catch((e) => {
-        throw RudiError.treatError(mod, fun, e)
-      })
+      rudiObject = await objectTranslator.translateInputObject(inputObject, true)
     }
-    return rudiObject
-    // return await addSingleRudiObject(rudiObject, objectType, context)
+    // return rudiObject
+    return await addSingleRudiObject(rudiObject, objectType, context)
   } catch (e) {
     throw RudiError.treatError(mod, fun, e)
   }

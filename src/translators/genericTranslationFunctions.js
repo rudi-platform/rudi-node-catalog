@@ -82,7 +82,7 @@ export const getElementWithPath = (object, path, depth = 0) => {
       )
     }
     if (depth + 1 === path.length) {
-      // logI(mod, fun, result + '  -final step-      ' + depth)
+      // logI(mod, fun, result + '  -final step-      ' + depth))
       return result
     }
     return getElementWithPath(arrayCheck(result), path, depth + 1)

@@ -17,11 +17,10 @@ import {
   API_ORGANIZATION_NAME,
 } from '../db/dbFields.js'
 import { getObject } from '../db/dbQueries.js'
-import { RudiError } from '../utils/errors.js'
+import { BadRequestError, RudiError } from '../utils/errors.js'
 import {
   findFirstElementWithPath,
   getArgs,
-  getElementWithPath,
   getFirstElementWithPath,
   getPath,
   translateStraightFromPath,
@@ -64,13 +63,18 @@ const translateOrgId = async (inputObject, path, args) => {
   try {
     const orgId = findFirstElementWithPath(inputObject, path)
     if (orgId === undefined) {
-      const orgName = getElementWithPath(inputObject, args?.[API_ORGANIZATION_NAME]?.path)
+      const orgName = getFirstElementWithPath(inputObject, args?.[API_ORGANIZATION_NAME]?.path)
       const rudiObj = await getObject(
         OBJ_ORGANIZATIONS,
         { [API_ORGANIZATION_NAME]: orgName },
         false
       )
       result = rudiObj?.[API_ORGANIZATION_ID]
+      if (result == undefined) {
+        throw new BadRequestError(
+          `No organization with name '${orgName}' was found in database. Please add it.`
+        )
+      }
     } else {
       result = orgId
     }
