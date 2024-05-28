@@ -1,5 +1,7 @@
 const mod = 'orgTrsltr'
 
+import { v4 as UUIDv4 } from 'uuid'
+
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
@@ -17,7 +19,8 @@ import {
   API_ORGANIZATION_NAME,
 } from '../../db/dbFields.js'
 import { getObject } from '../../db/dbQueries.js'
-import { BadRequestError, RudiError } from '../../utils/errors.js'
+import { RudiError } from '../../utils/errors.js'
+import { logI } from '../../utils/logging.js'
 import { FieldTranslator, ObjectTranslator } from '../translators.js'
 import {
   findFirstElementWithPath,
@@ -51,7 +54,7 @@ const translateOrgAddress = async (inputObject, path, args) => {
 }
 
 /**
- * Tries to fetch org_id in Rudi Db from the id field in gmd, and then from the organization name.
+ * Tries to fetch org_id in Rudi DB from the id field in gmd, and then from the organization name.
  * @param {*} inputObject
  * @param {*} path
  * @param {*} args
@@ -70,10 +73,13 @@ const translateOrgId = async (inputObject, path, args) => {
         false
       )
       result = rudiObj?.[API_ORGANIZATION_ID]
-      if (result == undefined) {
-        throw new BadRequestError(
-          `No organization with name '${orgName}' was found in database. Please add it.`
+      if (result === undefined) {
+        logI(
+          mod,
+          fun,
+          `No organization with name '${orgName}' was found in database. New organization is created.`
         )
+        result = UUIDv4()
       }
     } else {
       result = orgId

@@ -1,16 +1,17 @@
 const mod = 'genTrslatFun'
 
+// -------------------------------------------------------------------------------------------------
+// Internal dependencies
+// -------------------------------------------------------------------------------------------------
 import {
   API_LICENCE_CUSTOM_LABEL,
   API_LICENCE_CUSTOM_URI,
   API_LICENCE_TYPE,
   LicenceTypes,
 } from '../../db/dbFields.js'
-// -------------------------------------------------------------------------------------------------
-// Internal dependencies
-// -------------------------------------------------------------------------------------------------
 import { BadRequestError, RudiError } from '../../utils/errors.js'
 import { accessProperty } from '../../utils/jsonAccess.js'
+import { logI } from '../../utils/logging.js'
 
 // -------------------------------------------------------------------------------------------------
 // Generic Translation functions.
@@ -99,11 +100,13 @@ export const getElementWithPath = (object, path, depth = 0) => {
  * @returns the element if it exists, else undefined
  */
 export const findElementWithPath = (object, path) => {
+  const fun = 'findElementWithPath'
   let result
   try {
     result = getElementWithPath(object, path)
     return result
-  } catch {
+  } catch (e) {
+    logI(mod, fun, `The following error was intentionnaly skipped : ${e}.`)
     return result
   }
 }
@@ -145,7 +148,7 @@ export const arrayCheck = (x) => {
  * @returns
  */
 export const getFirstElementWithPath = (object, path) => {
-  const fun = 'getFirstElementWithPath'
+  // const fun = 'getFirstElementWithPath'
   return arrayCheck(getElementWithPath(object, path))
 }
 
@@ -161,7 +164,7 @@ export const getXmlParam = (inputObject, path, paramName) => {
   try {
     try {
       const tag = getFirstElementWithPath(inputObject, path)
-      result = tag['$']
+      result = tag?.['$']
     } catch {
       throw new BadRequestError(
         `It seems there is no parameters for the tag located at path ${path}. Parameters of a tag must be at key '$'.`,

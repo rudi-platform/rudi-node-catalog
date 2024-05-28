@@ -8,8 +8,6 @@ import { v4 as UUIDv4 } from 'uuid'
 // -------------------------------------------------------------------------------------------------
 
 import {
-  AVAILABLE_DOWNLOAD_PROTOCOL,
-  AVAILABLE_SERVICE_PROTOCOL,
   FORMAT_XML,
   PATHS_GMD_TO_RUDI,
   STANDARD_GMD,
@@ -27,47 +25,40 @@ import {
 } from '../../db/dbFields.js'
 import { getObject } from '../../db/dbQueries.js'
 import { MediaTypes } from '../../definitions/models/Media.js'
-import { BadRequestError, RudiError } from '../../utils/errors.js'
-import { beautify } from '../../utils/jsUtils.js'
+import { RudiError } from '../../utils/errors.js'
 import { logI } from '../../utils/logging.js'
 import { FieldTranslator, ObjectTranslator } from '../translators.js'
-import {
-  getArgs,
-  getFirstElementWithPath,
-  getPath,
-  translateStraightFromPath,
-} from './genericTranslationFunctions.js'
+import { getArgs, getPath, translateStraightFromPath } from './genericTranslationFunctions.js'
 
 // -------------------------------------------------------------------------------------------------
 // Translation functions for Media.
 // !!! All these functions must be async and have the same parameters structure : (inputObject, path, args) !!!
 // -------------------------------------------------------------------------------------------------
 
+// TODO : deal with the case where inputMedia is of type FILE (it is therefore needed to add 'checksum' and 'size' fields)
+/**
+ * Translates rudi field 'media_type' from xml gmd.
+ * @param {Object} inputObject
+ * @param {Array[String]} path
+ * @param {*} args
+ * @returns
+ */
 const translateMediaType = async (inputObject, path, args) => {
   const fun = 'translateMediaType'
-  let result
   try {
-    const protocol = getFirstElementWithPath(
-      inputObject,
-      getPath(args, API_MEDIA_INTERFACE_CONTRACT)
-    )
-    if (AVAILABLE_SERVICE_PROTOCOL.includes(protocol)) {
-      result = MediaTypes.Service
-    } else if (AVAILABLE_DOWNLOAD_PROTOCOL.includes(protocol)) {
-      result = MediaTypes.Service
-    } else {
-      throw new BadRequestError(
-        `Protocol '${protocol}' was not recognized for media ${beautify(inputObject)}'. Available SERVICE protocols are [${AVAILABLE_SERVICE_PROTOCOL}]. Available FILE protocols are [${AVAILABLE_DOWNLOAD_PROTOCOL}]`,
-        mod,
-        fun
-      )
-    }
-    return result
+    return MediaTypes.Service
   } catch (e) {
     throw RudiError.treatError(mod, fun, e)
   }
 }
 
+/**
+ * Translates rudi field 'connector' from xml gmd. Uses translator object GmdXmlToRudiMediaConnectorTranslator
+ * @param {Object} inputObject
+ * @param {Array[String]} path
+ * @param {*} args
+ * @returns
+ */
 const translateMediaConnector = async (inputObject, path, args) => {
   const fun = 'translateMediaConnector'
   try {
@@ -77,15 +68,40 @@ const translateMediaConnector = async (inputObject, path, args) => {
   }
 }
 
+/**
+ * Translates rudi field 'media_id' from xml gmd. Tries to find an existing ID with the same URL. If no such media exists, creates a new UUIDV4.
+ * @param {Object} inputObject
+ * @param {Array[String]} path
+ * @param {*} args
+ * @returns
+ */
 const translateMediaId = async (inputObject, path, args) => {
   const fun = 'translateMediaId'
-  let result
   try {
     const mediaConnector = await translateMediaConnector(inputObject, path, args)
     const mediaURL = mediaConnector?.[API_PUB_URL]
+    return await findMediaIdWithURL(mediaURL)
+  } catch (e) {
+    throw RudiError.treatError(mod, fun, e)
+  }
+}
+
+// -------------------------------------------------------------------------------------------------
+// Tools for media translations
+// -------------------------------------------------------------------------------------------------
+
+/**
+ * Try to find a media id whose media has the same url as mediaURL. If no such media exists, returns a new UUIDV4
+ * @param {String} mediaURL The URL we want to find the corresponding ID.
+ * @returns the matching UUID, or a new one.
+ */
+export const findMediaIdWithURL = async (mediaURL) => {
+  const fun = 'findMediaWithURL'
+  let result
+  try {
     const rudiObj = await getObject(
       OBJ_MEDIA,
-      { [API_MEDIA_CONNECTOR]: { [API_PUB_URL]: mediaURL } },
+      { [`${API_MEDIA_CONNECTOR}.${API_PUB_URL}`]: mediaURL },
       false
     )
     result = rudiObj?.[API_MEDIA_ID]
@@ -99,25 +115,6 @@ const translateMediaId = async (inputObject, path, args) => {
   }
 }
 
-export const findMediaIdWithURL = async (mediaURL) => {
-  const fun = 'findMediaWithURL'
-  let result
-  try {
-    const rudiObj = await getObject(
-      OBJ_MEDIA,
-      { [API_MEDIA_CONNECTOR]: { [API_PUB_URL]: mediaURL } },
-      false
-    )
-    result = rudiObj?.[API_MEDIA_ID]
-    if (result == undefined) {
-      logI(mod, fun, `No media with url '${mediaURL}' was found in database. New id is created.`)
-      result = UUIDv4()
-    }
-    return result
-  } catch (e) {
-    throw RudiError.treatError(mod, fun, e)
-  }
-}
 // -------------------------------------------------------------------------------------------------
 // Media Translator Object
 // -------------------------------------------------------------------------------------------------

@@ -53,8 +53,10 @@ export const DEFAULT_OBJECT_FORMAT = FORMAT_JSON
 // Const
 // -------------------------------------------------------------------------------------------------
 
-export const AVAILABLE_SERVICE_PROTOCOL = ['OGC:WMS', 'OGC:WFS', 'OGC:GML']
-export const AVAILABLE_DOWNLOAD_PROTOCOL = [
+export const AVAILABLE_GMD_PROTOCOLS = [
+  'OGC:WMS',
+  'OGC:WFS',
+  'OGC:GML',
   'WWW:LINK-1.0-http--link',
   'WWW:DOWNLOAD-1.0-http--download',
 ]
@@ -62,7 +64,7 @@ export const AVAILABLE_DOWNLOAD_PROTOCOL = [
 export const DICT_LANGUAGES_TO_RUDI = {
   fre: 'fr',
 }
-export const DICT_THEMES_TO_RUDI = {}
+export const DICT_THEMES_GMD_TO_RUDI = {}
 // -------------------------------------------------------------------------------------------------
 // Paths in GMD metadata to rudi
 // -------------------------------------------------------------------------------------------------

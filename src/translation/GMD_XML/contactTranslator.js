@@ -3,8 +3,9 @@ const mod = 'contTrsltr'
 // -------------------------------------------------------------------------------------------------
 // External dependencies
 // -------------------------------------------------------------------------------------------------
+import { v4 as UUIDv4 } from 'uuid'
 import { parseStringPromise as xml2jsonParser } from 'xml2js'
-import { findFirstElementWithPath } from './genericTranslationFunctions.js'
+
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
@@ -23,9 +24,11 @@ import {
   API_ORGANIZATION_NAME,
 } from '../../db/dbFields.js'
 import { getObject } from '../../db/dbQueries.js'
-import { BadRequestError, RudiError } from '../../utils/errors.js'
+import { RudiError } from '../../utils/errors.js'
+import { logI } from '../../utils/logging.js'
 import { FieldTranslator, ObjectTranslator } from '../translators.js'
 import {
+  findFirstElementWithPath,
   getArgs,
   getFirstElementWithPath,
   getPath,
@@ -39,7 +42,7 @@ import {
 // -------------------------------------------------------------------------------------------------
 
 /**
- * Tries to fetch contact_id in Rudi Db from the id field in gmd, and then from the contact name.
+ * Tries to fetch contact_id in Rudi Db from the id field in gmd, and then from the contact name. If no RUDI contact is found, a new one is created.
  * @param {Object} inputObject
  * @param {Array[String]} path
  * @param {*} args
@@ -54,10 +57,13 @@ const translateContactId = async (inputObject, path, args) => {
       const contactName = getFirstElementWithPath(inputObject, args?.[API_CONTACT_NAME]?.path)
       const rudiObj = await getObject(OBJ_CONTACTS, { [API_CONTACT_NAME]: contactName }, false)
       result = rudiObj?.[API_CONTACT_ID]
-      if (result == undefined) {
-        throw new BadRequestError(
-          `No contact with name '${contactName}' was found in database. Please add it.`
+      if (result === undefined) {
+        logI(
+          mod,
+          fun,
+          `No contact with name '${contactName}' was found in database. New contact is created.`
         )
+        result = UUIDv4()
       }
     } else {
       result = contactId

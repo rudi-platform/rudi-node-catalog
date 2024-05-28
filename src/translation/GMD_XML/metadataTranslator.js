@@ -110,7 +110,7 @@ const translateSummary = async (inputObject, path, args) => {
     }
     result[DICT_LANG] = dictLang
     result[DICT_TEXT] = text
-    return result
+    return [result]
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -126,16 +126,17 @@ const translateSummary = async (inputObject, path, args) => {
 const translateSynopsis = async (inputObject, path, args) => {
   const fun = 'translateSynopsis'
   try {
-    let result = await translateSummary(inputObject, path, args)
+    let result = arrayCheck(await translateSummary(inputObject, path, args))
     if (result[DICT_TEXT].length > 150) {
       result[DICT_TEXT] = result[DICT_TEXT].substring(0, 149)
     }
-    return result
+    return [result]
   } catch (e) {
     throw RudiError.treatError(mod, fun, e)
   }
 }
 
+// TODO : deal with external theme that are not recognized by RUDI
 /**
  * Translates rudi field 'theme' from xml gmd. Takes the first theme.
  * @param {Object} inputObject
@@ -169,7 +170,6 @@ const translateTheme = async (inputObject, path, args) => {
     } else {
       result = themes[0]
     }
-    result = 'society'
     return result
   } catch (e) {
     throw RudiError.treatError(mod, fun, e)
@@ -385,7 +385,7 @@ const translateLicence = async (inputObject, path, args) => {
     let relativePathCharacter = args.relativePathCharacter
     const objLicenceLabel = getElementWithPath(inputObject, path)
     let labelsLicences = await getLicenceLabels()
-    logI(mod, fun, beautify(labelsLicences))
+
     let arrayCorrespondingRudiLicenceCode
     if (Array.isArray(objLicenceLabel)) {
       let promiseResult = await Promise.all(
@@ -403,12 +403,12 @@ const translateLicence = async (inputObject, path, args) => {
     }
 
     let correspondingRudiLicenceCode
-    if (arrayCorrespondingRudiLicenceCode.length == 0) {
+    if (arrayCorrespondingRudiLicenceCode.length === 0) {
       let pathToDefaultLabel = path.concat(relativePathCharacter)
       let defaultLabel = getFirstElementWithPath(inputObject, pathToDefaultLabel)
       logI(mod, fun, 'No corresponding Rudi Licence was found. Custom licence is created.')
       return createCustomLicence(defaultLabel)
-    } else if (arrayCorrespondingRudiLicenceCode.length == 1) {
+    } else if (arrayCorrespondingRudiLicenceCode.length === 1) {
       correspondingRudiLicenceCode = Object.keys(arrayCorrespondingRudiLicenceCode[0])
     } else if (arrayCorrespondingRudiLicenceCode.length > 1) {
       correspondingRudiLicenceCode = Object.keys(arrayCorrespondingRudiLicenceCode[0])
@@ -446,7 +446,7 @@ export const translateGlobalId = async (inputObject, path, args) => {
     result = objectInRudiDb?.[API_METADATA_ID]
     if (result == undefined) {
       result = UUIDv4()
-      logI(mod, fun, 'No matching local_id was found; new UUIDv4 was created for metadata.')
+      logI(mod, fun, `No matching 'local_id' was found; new UUIDv4 was created for metadata.`)
     } else {
       logI(mod, fun, `Matching 'local_id' was found in RUDI database.`)
     }

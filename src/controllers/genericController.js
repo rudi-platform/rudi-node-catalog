@@ -277,7 +277,6 @@ async function addSingleObject(inputObject, objectType, objectStandard, objectFo
       }
       rudiObject = await objectTranslator.translateInputObject(inputObject, true)
     }
-    // return rudiObject
     return await addSingleRudiObject(rudiObject, objectType, context)
   } catch (e) {
     throw RudiError.treatError(mod, fun, e)
@@ -312,10 +311,12 @@ export const addObjects = async (req, reply) => {
 
     let createdObjects
     if (Array.isArray(inputObjects)) {
-      const creationPromises = inputObjects.map((inputObject) => {
-        addSingleObject(inputObject, objectType, objectStandard, objectFormat, context)
-      })
-      createdObjects = await Promise.all(creationPromises)
+      createdObjects = []
+      for await (const inputObject of inputObjects) {
+        createdObjects.push(
+          await addSingleObject(inputObject, objectType, objectStandard, objectFormat, context)
+        )
+      }
     } else {
       createdObjects = await addSingleObject(
         inputObjects,
@@ -638,26 +639,22 @@ export const upsertSingleRudiObject = async (rudiObject, objectType, context) =>
 async function upsertSingleObject(inputObject, objectType, objectStandard, objectFormat, context) {
   const fun = 'upsertSingleObject'
   let rudiObject
-
-  if (objectFormat === DEFAULT_OBJECT_FORMAT && objectStandard === DEFAULT_OBJECT_STANDARD) {
-    rudiObject = inputObject
-    return upsertSingleRudiObject(rudiObject, objectType, context)
-  }
-
-  const objectTranslator = isTranslatable(objectType, objectStandard, objectFormat)
-  if (!objectTranslator) {
-    throw new NotImplementedError(
-      `Object of type ${objectType}, at standard ${objectStandard} and format ${objectFormat} can not yet be uploaded.`
-    )
-  }
-
   try {
-    rudiObject = await objectTranslator.translateInputObject(inputObject, true)
+    if (objectFormat === DEFAULT_OBJECT_FORMAT && objectStandard === DEFAULT_OBJECT_STANDARD) {
+      rudiObject = inputObject
+    } else {
+      const objectTranslator = isTranslatable(objectType, objectStandard, objectFormat)
+      if (!objectTranslator) {
+        throw new NotImplementedError(
+          `Object of type ${objectType}, at standard ${objectStandard} and format ${objectFormat} can not yet be uploaded.`
+        )
+      }
+      rudiObject = await objectTranslator.translateInputObject(inputObject, true)
+    }
+    return await upsertSingleRudiObject(rudiObject, objectType, context)
   } catch (e) {
     throw RudiError.treatError(mod, fun, e)
   }
-  // return rudiObject
-  return upsertSingleRudiObject(rudiObject, objectType, context)
 }
 
 /**
@@ -686,10 +683,12 @@ export const upsertObjects = async (req, reply) => {
 
     let createdObjects
     if (Array.isArray(inputObjects)) {
-      const creationPromises = inputObjects.map((inputObject) => {
-        upsertSingleObject(inputObject, objectType, objectStandard, objectFormat, context)
-      })
-      createdObjects = await Promise.all(creationPromises)
+      createdObjects = []
+      for await (const inputObject of inputObjects) {
+        createdObjects.push(
+          await upsertSingleObject(inputObject, objectType, objectStandard, objectFormat, context)
+        )
+      }
     } else {
       createdObjects = await upsertSingleObject(
         inputObjects,
