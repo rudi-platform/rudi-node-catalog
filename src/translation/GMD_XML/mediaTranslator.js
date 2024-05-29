@@ -26,9 +26,15 @@ import {
 import { getObject } from '../../db/dbQueries.js'
 import { MediaTypes } from '../../definitions/models/Media.js'
 import { RudiError } from '../../utils/errors.js'
+import { beautify } from '../../utils/jsUtils.js'
 import { logI } from '../../utils/logging.js'
 import { FieldTranslator, ObjectTranslator } from '../translators.js'
-import { getArgs, getPath, translateStraightFromPath } from './genericTranslationFunctions.js'
+import {
+  findFirstElementWithPath,
+  getArgs,
+  getPath,
+  translateStraightFromPath,
+} from './genericTranslationFunctions.js'
 
 // -------------------------------------------------------------------------------------------------
 // Translation functions for Media.
@@ -69,7 +75,7 @@ const translateMediaConnector = async (inputObject, path, args) => {
 }
 
 /**
- * Translates rudi field 'media_id' from xml gmd. Tries to find an existing ID with the same URL. If no such media exists, creates a new UUIDV4.
+ * Translates rudi field 'media_id' from xml gmd. Tries first to find the ID field in the media. If it is not found, tries to find an existing ID with the same URL. If no such media exists, creates a new UUIDV4.
  * @param {Object} inputObject
  * @param {Array[String]} path
  * @param {*} args
@@ -78,9 +84,27 @@ const translateMediaConnector = async (inputObject, path, args) => {
 const translateMediaId = async (inputObject, path, args) => {
   const fun = 'translateMediaId'
   try {
-    const mediaConnector = await translateMediaConnector(inputObject, path, args)
-    const mediaURL = mediaConnector?.[API_PUB_URL]
-    return await findMediaIdWithURL(mediaURL)
+    const pathMediaID = getPath(args, API_MEDIA_ID)
+    const argsConnnectorGmdXml = getArgs(argsMediaGmdXml, API_MEDIA_CONNECTOR)
+    const pathConnectorGmdXml = getPath(args, API_MEDIA_CONNECTOR)
+
+    let mediaID = findFirstElementWithPath(inputObject, pathMediaID)
+
+    if (mediaID === undefined) {
+      logI(
+        mod,
+        fun,
+        `No ID was found for media ${beautify(inputObject)}. Tries to find an existing media with the same URL.`
+      )
+      const mediaConnector = await translateMediaConnector(
+        inputObject,
+        pathConnectorGmdXml,
+        argsConnnectorGmdXml
+      )
+      const mediaURL = mediaConnector?.[API_PUB_URL]
+      mediaID = await findMediaIdWithURL(mediaURL)
+    }
+    return mediaID
   } catch (e) {
     throw RudiError.treatError(mod, fun, e)
   }
@@ -105,7 +129,7 @@ export const findMediaIdWithURL = async (mediaURL) => {
       false
     )
     result = rudiObj?.[API_MEDIA_ID]
-    if (result == undefined) {
+    if (result === undefined) {
       logI(mod, fun, `No media with url '${mediaURL}' was found in database. New id is created.`)
       result = UUIDv4()
     }
@@ -133,13 +157,7 @@ export const GmdXmlToRudiMediaTranslator = new ObjectTranslator(
   pathMediaGmdXml,
   argsMediaGmdXml,
   [
-    new FieldTranslator(
-      API_MEDIA_ID,
-      translateMediaId,
-      true,
-      pathConnectorGmdXml,
-      argsConnnectorGmdXml
-    ),
+    new FieldTranslator(API_MEDIA_ID, translateMediaId, true, pathMediaGmdXml, argsMediaGmdXml),
     new FieldTranslator(
       API_MEDIA_NAME,
       translateStraightFromPath,
@@ -180,7 +198,7 @@ const GmdXmlToRudiMediaConnectorTranslator = new ObjectTranslator(
     new FieldTranslator(
       API_PUB_URL,
       translateStraightFromPath,
-      false,
+      true,
       getPath(argsConnnectorGmdXml, API_PUB_URL)
     ),
     new FieldTranslator(

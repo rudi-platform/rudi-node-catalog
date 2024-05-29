@@ -6,7 +6,7 @@ This document explains how the importation of objects in GMD-XML is done in RUDI
 
 Contacts (resp. organizations) importation at GMD-XML can be done either with POST/PUT routes api/admin/contacts/?inputStandard=gmd&format=xml (resp. api/admin/organizations?/inputStandard=gmd&format=xml), or either through metadata importation (see below). It is recommended to first import contacts (resp. organizations) through the dedicated routes (api/admin/contacts and api/admin/organizations), and to give them an ID before the importation.
 
-Contacts and organizations are translated with **Object Translators** [GmdXmlToRudiContactTranslator](./contactTranslator.js) and [GmdXmlToRudiOrgaTranslator](./organizationTranslator.js). It searchs first for an ID in the incoming metadata (see [configuration file](../../config/confTranslation/GMD_XML/confGMDXML.js)). If an ID is found, the contact (resp. organization) is uploaded in RUDI with this ID; else, it searches a contact (resp. organization) in RUDI with the same **name**. If such a RUDI contact (resp. organization) is found, its ID is taken for the importation. Else, a new UUIDV4 is created, and the contact (resp. organization) is uploaded.
+Contacts and organizations are translated with **Object Translators** [GmdXmlToRudiContactTranslator](./contactTranslator.js) and [GmdXmlToRudiOrgaTranslator](./organizationTranslator.js). It searches first for an ID in the incoming metadata (see [configuration file](../../config/confTranslation/GMD_XML/confGMDXML.js)). If an ID is found, the contact (resp. organization) is uploaded in RUDI with this ID; else, it searches a contact (resp. organization) in RUDI with the same **name**. If such a RUDI contact (resp. organization) is found, its ID is taken for the importation. Else, a new UUIDV4 is created, and the contact (resp. organization) is uploaded.
 
 ## Metadata translations :
 
@@ -18,4 +18,4 @@ Contacts are translated with [GmdXmlToRudiContactTranslator](./contactTranslator
 
 Organizations are translated with [GmdXmlToRudiOrgaTranslator](./organizationTranslator.js).
 
-Media are translated with [GmdXmlToRudiMediaTranslator](./mediaTranslator.js) : it searches for a RUDI media with the same URL as the incoming one. If such a RUDI media is found, its ID is taken. Else, a new UUIDV4 is created
+Media are translated with [GmdXmlToRudiMediaTranslator](./mediaTranslator.js). It first searches to fill the field 'media_id' with an existing ID in the input Metadata. If it is not found, it searches for an existing RUDI media with the same URL as the incoming one. If such a RUDI media is found, its ID is taken. Else, a new UUIDV4 is created

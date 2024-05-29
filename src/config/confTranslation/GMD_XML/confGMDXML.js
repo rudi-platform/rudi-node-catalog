@@ -22,6 +22,7 @@ import {
   API_LICENCE,
   API_MEDIA_CAPTION,
   API_MEDIA_CONNECTOR,
+  API_MEDIA_ID,
   API_MEDIA_INTERFACE_CONTRACT,
   API_MEDIA_NAME,
   API_MEDIA_PROPERTY,
@@ -53,18 +54,10 @@ export const DEFAULT_OBJECT_FORMAT = FORMAT_JSON
 // Const
 // -------------------------------------------------------------------------------------------------
 
-export const AVAILABLE_GMD_PROTOCOLS = [
-  'OGC:WMS',
-  'OGC:WFS',
-  'OGC:GML',
-  'WWW:LINK-1.0-http--link',
-  'WWW:DOWNLOAD-1.0-http--download',
-]
-
 export const DICT_LANGUAGES_TO_RUDI = {
   fre: 'fr',
 }
-export const DICT_THEMES_GMD_TO_RUDI = {}
+
 // -------------------------------------------------------------------------------------------------
 // Paths in GMD metadata to rudi
 // -------------------------------------------------------------------------------------------------
@@ -221,6 +214,17 @@ export const PATHS_GMD_TO_RUDI = {
   [API_MEDIA_PROPERTY]: {
     path: ['gmd:MD_Metadata', 'gmd:distributionInfo', 'gmd:MD_Distribution', 'gmd:transferOptions'],
     args: {
+      [API_MEDIA_ID]: {
+        path: [
+          'gmd:MD_DigitalTransferOptions',
+          'gmd:onLine',
+          'gmd:CI_OnlineResource',
+          'gmd:identifier',
+          'gmd:MD_Identifier',
+          'gmd:code',
+          'gco:CharacterString',
+        ],
+      },
       [API_MEDIA_NAME]: {
         path: [
           'gmd:MD_DigitalTransferOptions',
