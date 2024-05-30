@@ -2635,12 +2635,15 @@
 									"pm.test(\"Metadata 2 created\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.length).to.eq(2);",
 									"    // console.log(responseJson);",
-									"    const metaId = pm.variables.get('softMeta2Id');",
-									"    const orgId = pm.variables.get('softOrg1Id');",
-									"    pm.expect(responseJson.global_id).to.eq(metaId);",
-									"    pm.expect(responseJson.contacts.length).to.eq(1);",
-									"    pm.expect(responseJson.producer.organization_id).to.eq(orgId);",
+									"    const firstResponse = responseJson[0];",
+									"    const secondResponse = responseJson[1];",
+									"    const firstId = pm.collectionVariables.get('softMeta3Id')",
+									"    const secondId = pm.collectionVariables.get('softMeta4Id')",
+									"",
+									"    pm.expect(firstResponse.global_id).to.eq(firstId);",
+									"    pm.expect(secondResponse.global_id).to.eq(secondId);",
 									"});"
 								],
 								"type": "text/javascript",
@@ -4279,12 +4282,9 @@
 								"exec": [
 									"pm.collectionVariables.set('softMetaGmdXml1LocalId', rand.get('{{$randomUUID}}'))",
 									"pm.collectionVariables.set('softOrgGmdXml1Name', rand.get('{{$randomCompanyName}}'))",
-									"pm.collectionVariables.set('softMediaGmdXml1Id', \"02747206-54aa-4d2c-aa77-96849c6ea731\")",
-									"pm.collectionVariables.set('softMediaGmdXml2Id', \"44b3786e-dc8d-4706-9f24-d6514ffd456c\")",
-									"pm.collectionVariables.set('softMediaGmdXml3Id', \"f14cf1d3-48ab-46b1-ba2a-2b52bb57f4f8\")",
-									"//pm.collectionVariables.set('softMediaGmdXml1Id', rand.get('{{$randomUUID}}'))",
-									"//pm.collectionVariables.set('softMediaGmdXml2Id', rand.get('{{$randomUUID}}'))",
-									"//pm.collectionVariables.set('softMediaGmdXml3Id', rand.get('{{$randomUUID}}'))",
+									"pm.collectionVariables.set('softMediaGmdXml1Id', rand.get('{{$randomUUID}}'))",
+									"pm.collectionVariables.set('softMediaGmdXml2Id', rand.get('{{$randomUUID}}'))",
+									"pm.collectionVariables.set('softMediaGmdXml3Id', rand.get('{{$randomUUID}}'))",
 									""
 								],
 								"type": "text/javascript",
@@ -6085,7 +6085,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n    \"{{softMeta1Id}}\",\n    \"{{softMeta2Id}}\",\n    \"{{softMetaGmdXml1Id}}\"\n]",
+							"raw": "[\n    \"{{softMeta1Id}}\",\n    \"{{softMeta2Id}}\"\n]",
 							"options": {
 								"raw": {
 									"language": "json"
