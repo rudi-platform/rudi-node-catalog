@@ -18,6 +18,7 @@ dump
 **/actions
 **/jest
 tests/doc
+**bak
 
 # Zip
 **/*.zip

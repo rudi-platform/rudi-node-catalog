@@ -18,24 +18,18 @@ import { GmdXmlToRudiOrgaTranslator } from './GMD_XML/organizationTranslator.js'
 // -------------------------------------------------------------------------------------------------
 
 // list of all translators
-const translatorObjects = {
+const OBJECT_TRANSLATOR = {
   [OBJ_METADATA]: {
     [STANDARD_DCAT]: [],
-    [STANDARD_GMD]: {
-      [FORMAT_XML]: GmdXmlToRudiMetadataTranslator,
-    },
+    [STANDARD_GMD]: { [FORMAT_XML]: GmdXmlToRudiMetadataTranslator },
   },
   [OBJ_CONTACTS]: {
     [STANDARD_DCAT]: [],
-    [STANDARD_GMD]: {
-      [FORMAT_XML]: GmdXmlToRudiContactTranslator,
-    },
+    [STANDARD_GMD]: { [FORMAT_XML]: GmdXmlToRudiContactTranslator },
   },
   [OBJ_ORGANIZATIONS]: {
     [STANDARD_DCAT]: [],
-    [STANDARD_GMD]: {
-      [FORMAT_XML]: GmdXmlToRudiOrgaTranslator,
-    },
+    [STANDARD_GMD]: { [FORMAT_XML]: GmdXmlToRudiOrgaTranslator },
   },
 }
 
@@ -50,6 +44,5 @@ const translatorObjects = {
  * @param {String} objectFormat the format of the inputObject (ex: xml)
  * @returns returns undefined if no translator is available, else the translator
  */
-export const isTranslatable = (objectType, objectStandard, objectFormat) => {
-  return translatorObjects?.[objectType]?.[objectStandard]?.[objectFormat]
-}
+export const getTranslator = (objectType, objectStandard, objectFormat) =>
+  OBJECT_TRANSLATOR?.[objectType]?.[objectStandard]?.[objectFormat]

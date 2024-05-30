@@ -1463,9 +1463,7 @@ export const isReferencedInMetadata = async (objectType, rudiId) => {
         metadataFilter = {
           $or: [
             { [API_DATA_PRODUCER_PROPERTY]: dbId },
-            {
-              [`${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`]: dbId,
-            },
+            { [`${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`]: dbId },
           ],
         }
         break
@@ -1473,16 +1471,12 @@ export const isReferencedInMetadata = async (objectType, rudiId) => {
         metadataFilter = {
           $or: [
             { [API_DATA_CONTACTS_PROPERTY]: dbId },
-            {
-              [`${API_METAINFO_PROPERTY}.${API_METAINFO_CONTACTS_PROPERTY}`]: dbId,
-            },
+            { [`${API_METAINFO_PROPERTY}.${API_METAINFO_CONTACTS_PROPERTY}`]: dbId },
           ],
         }
         break
       case OBJ_MEDIA:
-        metadataFilter = {
-          [`${API_MEDIA_PROPERTY}`]: dbId,
-        }
+        metadataFilter = { [`${API_MEDIA_PROPERTY}`]: dbId }
         break
       default:
         throw new NotFoundError(objectTypeNotFound(objectType))

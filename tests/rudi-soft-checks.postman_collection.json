@@ -1,50 +1,11 @@
 {
 	"info": {
-		"_postman_id": "2dbebcad-f1ff-4db8-90a2-7cc227de8be9",
+		"_postman_id": "eeb8c2b3-7c12-4a10-9504-706ec732fa5b",
 		"name": "01. RUDI API soft checks",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "33400273"
+		"_exporter_id": "13557783"
 	},
 	"item": [
-		{
-			"name": "test",
-			"item": [
-				{
-					"name": "Check portal connection Copy",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Testing portal connection\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    pm.expect(codec.streamToString(pm.response) === pm.collectionVariables.get('noPortalMsg') || !!match.jwt(pm.response.json().access_token)).to.be.true",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{apiUrl}}/api/admin/portal/token",
-							"host": [
-								"{{apiUrl}}"
-							],
-							"path": [
-								"api",
-								"admin",
-								"portal",
-								"token"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
 		{
 			"name": "00. Tokens",
 			"item": [
@@ -418,7 +379,8 @@
 									"    // responseJson.map(coll => console.log(coll))",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -426,15 +388,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{apiUrl}}/api/admin/db/",
+							"raw": "{{apiUrl}}/api/admin/db",
 							"host": [
 								"{{apiUrl}}"
 							],
 							"path": [
 								"api",
 								"admin",
-								"db",
-								""
+								"db"
 							]
 						}
 					},
@@ -892,7 +853,8 @@
 									"    pm.expect(responseJson.themes.environment).to.eq('Environnement')",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -1148,20 +1110,6 @@
 					"name": "Add org 1",
 					"event": [
 						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"pm.collectionVariables.set('softOrg1Id', rand.get('{{$randomUUID}}'))",
-									"pm.collectionVariables.set('softOrg1Name', rand.get('{{$randomCompanyName}}'))",
-									"const orgAddress = `${rand.get('{{$randomStreetAddress}}')}, ${rand.get('{{$randomCity}}')}`",
-									"pm.collectionVariables.set('softOrg1Address', orgAddress)",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
 							"listen": "test",
 							"script": {
 								"exec": [
@@ -1172,8 +1120,20 @@
 									"    pm.expect(responseJson.organization_id).to.eq(orgId);",
 									"});"
 								],
-								"type": "text/javascript",
-								"packages": {}
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set('softOrg1Id', rand.get('{{$randomUUID}}'))",
+									"pm.collectionVariables.set('softOrg1Name', rand.get('{{$randomCompanyName}}'))",
+									"const orgAddress = `${rand.get('{{$randomStreetAddress}}')}, ${rand.get('{{$randomCity}}')}`",
+									"pm.collectionVariables.set('softOrg1Address', orgAddress)",
+									""
+								],
+								"type": "text/javascript"
 							}
 						}
 					],
@@ -1880,7 +1840,114 @@
 			]
 		},
 		{
-			"name": "05. Add/edit/get metadata",
+			"name": "05. Media",
+			"item": [
+				{
+					"name": "GET media list",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"List of existing media\", () => {",
+									"    const mediaList = pm.response.json()",
+									"    pm.expect(Array.isArray(mediaList))",
+									"    pm.collectionVariables.set('media1', mediaList[0])",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiUrl}}/api/admin/media",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"media"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT media",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Creation of a new media\", () => {",
+									"    pm.expect(pm.response.code).to.eq(200)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const media1 = pm.collectionVariables.get('media1')",
+									"console.log('media1:', media1)",
+									"const media2 = { ...media1, media_id: rand.uuid(), collection_tag: pm.variables.get('stamp') }",
+									"console.log(media2)",
+									"pm.collectionVariables.set('media2', JSON.stringify(media2))",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{{media2}}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/api/admin/media",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"media"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "06. Add/edit/get metadata",
 			"item": [
 				{
 					"name": "Add meta 1",
@@ -1889,17 +1956,20 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
+									"//log.lvl = 3",
 									"pm.collectionVariables.set('now', time.now())",
 									"",
 									"//————— Id",
 									"log.d('Ids')",
-									"pm.collectionVariables.set('softMeta1Id', rand.get('{{$randomUUID}}'));",
-									"pm.collectionVariables.set('softMedia1Id', rand.get('{{$randomUUID}}'));",
+									"pm.collectionVariables.set('softMeta1Id', rand.uuid())",
+									"pm.collectionVariables.set('softMedia1Id', rand.uuid())",
 									"",
+									"log.d('Ids', 'softMedia1Id', mem.get('softMedia1Id'))",
 									"",
 									"//————— Thesauri",
 									"log.d('Thesaurus: themes')",
 									"pm.collectionVariables.set('randomTheme', rand.pick('themes'));",
+									"",
 									"log.d('Thesaurus: keywords')",
 									"pm.collectionVariables.set('randomKeyword1', rand.pick('keywords'));",
 									"pm.collectionVariables.set('randomKeyword2', rand.pick('keywords'));",
@@ -1910,18 +1980,23 @@
 									"//————— Producer",
 									"log.d('Producer')",
 									"const orgs = [",
-									"    pm.collectionVariables.get('softOrg1Id'), ",
-									"    pm.collectionVariables.get('softOrg2Id')]",
+									"    mem.get('softOrg1Id'),",
+									"    mem.get('softOrg2Id')]",
 									"const randomOrgId = rand.pickInList(orgs)",
-									"//console.log(`randomOrgId: ${randomOrgId}`)",
+									"",
 									"pm.collectionVariables.set('randomOrgId', randomOrgId);",
+									"console.log(`randomOrgId: ${mem.get('randomOrgId')}`)",
+									"console.log(`mem.randomOrgId: ${mem.get('randomOrgId')}`)",
+									"console.log(`collectionVariables.randomOrgId: ${pm.collectionVariables.get('randomOrgId')}`)",
+									"console.log(`variables.randomOrgId: ${pm.variables.get('randomOrgId')}`)",
+									"console.log(`globals.randomOrgId: ${pm.globals.get('randomOrgId')}`)",
 									"",
 									"//————— Contact 1",
 									"log.d('Contact 1')",
-									"const contacts = [ ",
-									"    pm.collectionVariables.get('softContact1Id'), ",
-									"    pm.collectionVariables.get('softContact2Id'), ",
-									"    pm.collectionVariables.get('softContact3Id')];",
+									"const contacts = [",
+									"    mem.get('softContact1Id'),",
+									"    mem.get('softContact2Id'),",
+									"    mem.get('softContact3Id')];",
 									"//console.log(`contacts: ${contacts}`)",
 									"",
 									"",
@@ -1933,7 +2008,7 @@
 									"//————— Contact 2",
 									"log.d('Contact 2')",
 									"const contactsLeft = contacts",
-									"    .filter(function(value, index, arr){ return value != randomContId1 });",
+									"    .filter(function (value, index, arr) { return value != randomContId1 });",
 									"",
 									"const randomContId2 = rand.pickInList(contactsLeft)",
 									"//console.log(`randomContId2: ${randomContId2}`)",
@@ -1944,8 +2019,10 @@
 									"log.d('Description')",
 									"pm.collectionVariables.set('randomTitle', rand.get('{{$randomCatchPhrase}}'));",
 									"pm.collectionVariables.set('randomSynopsis', `${rand.get('{{$randomProductAdjective}}')} ${rand.get('{{$randomBs}}')}`);",
-									"pm.collectionVariables.set('randomSummary', `${rand.get('{{$randomPhrase}}')} ${rand.get('{{$randomPhrase}}')} ${rand.get('{{$randomLoremParagraph}}')}`);",
-									""
+									"pm.collectionVariables.set('randomSummary',",
+									"    `${rand.get('{{$randomPhrase}}')} ${rand.get('{{$randomPhrase}}')} ${rand.get('{{$randomLoremParagraph}}')}`)",
+									"",
+									"// log.d('Description', 'randomSummary', mem.get('randomSummary'))"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -1959,15 +2036,15 @@
 									"    try {",
 									"        pm.expect(pm.response.code).to.eql(200);",
 									"    } catch (err) {",
-									"        // console.log(pm.response)",
+									"        console.log(pm.response)",
 									"        throw err",
 									"    }",
-									"    const responseJson = pm.response.json();",
+									"    const meta = pm.response.json();",
 									"    const metaId = pm.collectionVariables.get('softMeta1Id');",
 									"    const orgId = pm.collectionVariables.get('softOrg1Id');",
-									"    pm.expect(responseJson.global_id).to.eq(metaId);",
-									"    pm.expect(responseJson.producer.organization_id).to.eq(orgId);",
-									"    pm.expect(!!match.uuid(responseJson.contacts[0]));",
+									"    pm.expect(meta.global_id).to.eq(metaId);",
+									"    pm.expect(meta.producer.organization_id).to.eq(orgId);",
+									"    pm.expect(!!match.uuid(meta.contacts[0]));",
 									"});"
 								],
 								"type": "text/javascript",
@@ -2682,7 +2759,8 @@
 									"    pm.expect(publicMetadataList.total).to.eq(1);",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -3721,7 +3799,7 @@
 			]
 		},
 		{
-			"name": "05b. GMD-XML upload",
+			"name": "07. GMD-XML upload",
 			"item": [
 				{
 					"name": "Add org GMD-XML 1",
@@ -3771,8 +3849,7 @@
 						"header": [
 							{
 								"key": "Content-Type",
-								"value": "text/plain",
-								"type": "text"
+								"value": "text/plain"
 							}
 						],
 						"body": {
@@ -3854,8 +3931,7 @@
 						"header": [
 							{
 								"key": "Content-Type",
-								"value": "text/plain",
-								"type": "text"
+								"value": "text/plain"
 							}
 						],
 						"body": {
@@ -3937,8 +4013,7 @@
 						"header": [
 							{
 								"key": "Content-Type",
-								"value": "text/plain",
-								"type": "text"
+								"value": "text/plain"
 							}
 						],
 						"body": {
@@ -4027,8 +4102,7 @@
 						"header": [
 							{
 								"key": "Content-Type",
-								"value": "text/plain",
-								"type": "text"
+								"value": "text/plain"
 							}
 						],
 						"body": {
@@ -4113,8 +4187,7 @@
 						"header": [
 							{
 								"key": "Content-Type",
-								"value": "text/plain",
-								"type": "text"
+								"value": "text/plain"
 							}
 						],
 						"body": {
@@ -4212,8 +4285,7 @@
 						"header": [
 							{
 								"key": "Content-Type",
-								"value": "text/plain",
-								"type": "text"
+								"value": "text/plain"
 							}
 						],
 						"body": {
@@ -4285,8 +4357,7 @@
 						"header": [
 							{
 								"key": "Content-Type",
-								"value": "text/plain",
-								"type": "text"
+								"value": "text/plain"
 							}
 						],
 						"body": {
@@ -4358,8 +4429,7 @@
 						"header": [
 							{
 								"key": "Content-Type",
-								"value": "text/plain",
-								"type": "text"
+								"value": "text/plain"
 							}
 						],
 						"body": {
@@ -4433,8 +4503,7 @@
 						"header": [
 							{
 								"key": "Content-Type",
-								"value": "text/plain",
-								"type": "text"
+								"value": "text/plain"
 							}
 						],
 						"body": {
@@ -4662,7 +4731,7 @@
 			]
 		},
 		{
-			"name": "06. Add/edit/get reports",
+			"name": "08. Add/edit/get reports",
 			"item": [
 				{
 					"name": "[PUB] Add report 1 (meta 1)",
@@ -5198,7 +5267,7 @@
 			]
 		},
 		{
-			"name": "07. Clean",
+			"name": "09. Clean",
 			"item": [
 				{
 					"name": "Delete org 1 prevented",
@@ -5546,7 +5615,7 @@
 					"response": []
 				},
 				{
-					"name": "Delete org 1, 2, 3",
+					"name": "Delete org 1 & 2",
 					"event": [
 						{
 							"listen": "test",
@@ -5560,8 +5629,7 @@
 									"    pm.expect(responseJson.deletedCount).to.eq(2);",
 									"});"
 								],
-								"type": "text/javascript",
-								"packages": {}
+								"type": "text/javascript"
 							}
 						}
 					],
@@ -5570,7 +5638,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n    \"{{softOrg1Id}}\",\n    \"{{softOrg2Id}}\",\n    \"{{softOrg3Id}}\"\n]",
+							"raw": "[\n    \"{{softOrg1Id}}\",\n    \"{{softOrg2Id}}\"\n]",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -5593,7 +5661,7 @@
 					"response": []
 				},
 				{
-					"name": "Delete contact 1, 2, 3",
+					"name": "Delete contact 1, 2 & 3",
 					"event": [
 						{
 							"listen": "test",
@@ -5607,8 +5675,7 @@
 									"    pm.expect(responseJson.deletedCount).to.eq(3);",
 									"});"
 								],
-								"type": "text/javascript",
-								"packages": {}
+								"type": "text/javascript"
 							}
 						}
 					],
@@ -5795,8 +5862,7 @@
 									"    pm.expect(responseJson.deletedCount).to.eq(1);",
 									"});"
 								],
-								"type": "text/javascript",
-								"packages": {}
+								"type": "text/javascript"
 							}
 						}
 					],
@@ -5848,8 +5914,7 @@
 									"    pm.expect(responseJson.deletedCount).to.eq(1);",
 									"});"
 								],
-								"type": "text/javascript",
-								"packages": {}
+								"type": "text/javascript"
 							}
 						}
 					],
@@ -5950,7 +6015,7 @@
 									"    const responseJson = pm.response.json();",
 									"    // pm.expect(responseJson.n).to.eq(2);",
 									"    // pm.expect(responseJson.ok).to.eq(1);",
-									"    pm.expect(responseJson.deletedCount).to.eq(4);",
+									"    pm.expect(responseJson.deletedCount).to.eq(5);",
 									"});"
 								],
 								"type": "text/javascript",
@@ -6205,19 +6270,11 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "Delete Meta3",
-					"request": {
-						"method": "GET",
-						"header": []
-					},
-					"response": []
 				}
 			]
 		},
 		{
-			"name": "08. Public keys",
+			"name": "10. Public keys",
 			"item": [
 				{
 					"name": "CLEAN previous tests",
@@ -7478,7 +7535,7 @@
 			]
 		},
 		{
-			"name": "09. Functional checks",
+			"name": "11. Functional checks",
 			"item": [
 				{
 					"name": "Check node URL",
@@ -7704,44 +7761,48 @@
 			"listen": "prerequest",
 			"script": {
 				"type": "text/javascript",
+				"packages": {},
 				"exec": [
-					"const DEBUG_LVL = 2",
-					"const TRACE = DEBUG_LVL >= 3",
-					"const DEBUG = DEBUG_LVL >= 2",
-					"const ERROR = DEBUG_LVL >= 1",
+					"// --------------------------------------------------------------------------------------------------------------",
+					"// Libs",
+					"// --------------------------------------------------------------------------------------------------------------",
 					"",
-					"const WAIT_TIME = 50",
+					"",
+					"log = {",
+					"    lvl: 3,",
+					"    e: (here, ...args) => log.lvl >= 1 && console.error(`E (${here}) ERROR:`, ...args),",
+					"    d: (here, ...args) => log.lvl >= 2 && console.log(`D (${here})`, ...args),",
+					"    t: (here, msg = '<', ...args) => log.lvl >= 3 && console.log(`T (${here})`, msg, ...args),",
+					"}",
+					"",
+					"mem = {",
+					"    get: (name) => pm.variables.get(name),",
+					"    set: (name, val) => pm.collectionVariables.set(name, val),",
+					"",
+					"    initStoredVar: (name, defaultVal) => {",
+					"        const here = 'initStoredVar'",
+					"        const storedVal = mem.get(name)",
+					"        if (!storedVal) {",
+					"            log.t(here, 'No value stored for', name)",
+					"            mem.set(name, defaultVal)",
+					"        }",
+					"        return storedVal || defaultVal",
+					"    }",
+					"}",
+					"",
 					"const TOKEN_DURATION_S = 4147200",
 					"",
 					"const NO_PORTAL_MSG = 'No portal connected'",
-					"pm.collectionVariables.set('noPortalMsg', NO_PORTAL_MSG)",
+					"mem.set('noPortalMsg', NO_PORTAL_MSG)",
 					"let skipPortalConnection",
 					"",
-					"log = {",
-					"    e: (fun, msg = '', ...args) => ERROR && console.error(`E (${fun}) ERROR:`, msg, ...args),",
-					"    d: (fun, msg = '', ...args) => DEBUG && console.log(`D (${fun})`, msg, ...args),",
-					"    t: (fun, msg = '<', ...args) => TRACE && console.log(`T (${fun})`, msg, ...args),",
-					"}",
-					"",
-					"const initStoredVar = (name, defaultVal) => {",
-					"    const fun = 'initStoredVar'",
-					"    const storedVal = pm.variables.get(name)",
-					"    if (!storedVal) {",
-					"        log.t(fun, 'No value stored for', name)",
-					"        pm.variables.set(name, defaultVal)",
-					"    }",
-					"    // log.t('[initStoredVar] val for ' + name + ' is: ' + storedVal || defaultVal)",
-					"    return storedVal || defaultVal",
-					"}",
-					"",
-					"const API_TOKEN_NAME = initStoredVar('apiTokenName', 'apiJwt')",
-					"const PORTAL_TOKEN_NAME = initStoredVar('portalTokenName', 'portalJwt')",
-					"",
-					"const ADMIN_URL = pm.variables.get('apiUrl') + '/api/admin'",
-					"",
-					"log.t('const', 'API_TOKEN_NAME:', API_TOKEN_NAME)",
-					"log.t('const', 'PORTAL_TOKEN_NAME:', PORTAL_TOKEN_NAME)",
-					"log.t('const', 'ADMIN_URL:', ADMIN_URL)",
+					"const API_TOKEN_NAME = mem.initStoredVar('apiTokenName', 'apiJwt')",
+					"const PORTAL_TOKEN_NAME = mem.initStoredVar('portalTokenName', 'portalJwt')",
+					"const PM_TOKEN_NAME = mem.initStoredVar('pmTokenName', 'pmJwt')",
+					"const MEDIA_TOKEN_NAME = mem.initStoredVar('mediaTokenName', 'mediaJwt')",
+					"const PM_COOKIE_NAME = 'consoleToken'",
+					"mem.initStoredVar('pmCookieName', PM_COOKIE_NAME)",
+					"mem.initStoredVar('mediaUrl', `${mem.get('pmBackUrl')}`.replace('prodmanager', 'media'))",
 					"",
 					"const REGEX_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i",
 					"const REGEX_JWT = /^[\\w-]+\\.[\\w-]+\\.([\\w-]+={0,3})$/",
@@ -7750,6 +7811,7 @@
 					"const REGEX_GIT_HASH_SHORT = /^[a-z0-9]{7}/",
 					"",
 					"const regexCheck = (regex, str) => str ? regex.exec(`${str}`) : regex",
+					"",
 					"match = {",
 					"    uuid: (str) => regexCheck(REGEX_UUID, str),",
 					"    jwt: (str) => regexCheck(REGEX_JWT, str),",
@@ -7765,33 +7827,34 @@
 					"time = {",
 					"    now: () => new Date().toISOString(),",
 					"    nowEpochMS: () => new Date().getTime(),",
-					"    nowEpochS: () => _.floor(new Date().getTime() / 1000),",
+					"    nowEpochS: () => Math.floor(new Date().getTime() / 1000),",
 					"    timezone: () => new Date().getTimezoneOffset(),",
 					"    wait: (delayMs, doSomething) => {",
 					"        log.t('wait', `Waiting ${delayMs / 1000}s...`)",
 					"        setTimeout(doSomething ? doSomething : () => { log.t('wait', `Waited ${delayMs / 1000}s`) }, delayMs)",
 					"    },",
 					"}",
+					"",
 					"codec = {",
 					"    streamToString: (data) => data?.stream?.toString('utf8'),",
+					"    getResJson: (res, prop) => {",
+					"        const resJson = JSON.parse(codec.streamToString(res))",
+					"        return prop ? resJson?.[prop] : resJson",
+					"    },",
 					"",
 					"    fromBase64: (data) => Buffer.from(data, 'base64')?.toString('utf-8'),",
 					"",
 					"    fromBase64Url: (base64UrlStr) => {",
-					"        const fun = 'fromBase64Url'",
-					"        log.t(fun)",
+					"        const here = 'fromBase64Url'",
+					"        log.t(here)",
 					"        if (!base64UrlStr) return ''",
-					"        //        log.d('base64UrlStr: ' + base64UrlStr)",
-					"        //        log.d('base64UrlStr.length: ' + base64UrlStr.length)",
 					"        const paddedStr = (base64UrlStr.length % 4 == 0)",
 					"            ? base64UrlStr",
-					"            : base64UrlStr + \"====\".substring(base64UrlStr.length % 4);",
-					"        // log.d('paddedStr: ' + paddedStr)",
+					"            : base64UrlStr + \"====\".substring(base64UrlStr.length % 4)",
 					"        const base64Str = paddedStr",
 					"            .replace(\"_\", \"/\")",
-					"            .replace(\"-\", \"+\");",
-					"        // log.d('base64Str: ' + base64Str)",
-					"        return codec.fromBase64(base64Str);",
+					"            .replace(\"-\", \"+\")",
+					"        return codec.fromBase64(base64Str)",
 					"    }",
 					"}",
 					"",
@@ -7800,16 +7863,16 @@
 					"",
 					"    uuid: () => rand.get('{{$randomUUID}}'),",
 					"",
-					"    pickInList: (list) => list[_.random(0, list.length - 1)],",
+					"    pickInList: (list) => list[(require('lodash')).random(0, list.length - 1)],",
 					"",
-					"    pick: (listName) => rand.pickInList(pm.collectionVariables.get(listName)),",
+					"    pick: (listName) => rand.pickInList(mem.get(listName)),",
 					"",
 					"    initVal: (field) => {",
-					"        const val = pm.collectionVariables.get(field);",
-					"        if (val) return val;",
-					"        const randVal = rand.uuid();",
-					"        pm.collectionVariables.set(field, randVal, 'string');",
-					"        return randVal;",
+					"        const val = mem.get(field)",
+					"        if (val) return val",
+					"        const randVal = rand.uuid()",
+					"        mem.set(field, randVal, 'string')",
+					"        return randVal",
 					"    },",
 					"",
 					"    getContactEmail: (contactName) => `${contactName",
@@ -7820,187 +7883,181 @@
 					"        }@irisa.fr`,",
 					"",
 					"    randomize: (field) => {",
-					"        const randVal = rand.uuid();",
-					"        pm.collectionVariables.set(field, randVal);",
-					"        return randVal;",
+					"        const randVal = rand.uuid()",
+					"        mem.set(field, randVal)",
+					"        return randVal",
 					"    },",
+					"}",
 					"",
-					"};",
+					"co = {",
+					"    reqToStr: (req) => `${req.method} ${req.url}`,",
+					"    sendRequest: (req) => {",
+					"        const here = 'sendRequest'",
+					"        log.t(here, co.reqToStr(req))",
+					"        return new Promise(",
+					"            (resolve, reject) => pm.sendRequest(req, (err, res) => {",
+					"                if (!err && res.code / 100 < 4) {",
+					"                    log.t(`Request ${co.reqToStr(req)} succeeded with code ${res.code}`)",
+					"                    return resolve(res)",
+					"                }",
+					"                log.t(`Request ${co.reqToStr(req)} failed with code ${res.code}`)",
+					"                let message = `Request \"${req.url || req}\" failed (${res.code})`",
+					"                if (err?.message) message += `: ${err.message}`",
+					"                return reject({ message })",
+					"            })",
+					"        )",
+					"    },",
+					"}",
 					"",
 					"secu = {",
-					"    isTokenValid: (tokenName) => {",
-					"        const fun = `isTokenValid`",
-					"        log.t(fun, tokenName)",
-					"        const token = pm.collectionVariables.get(tokenName)",
-					"        // console.log('typeof token: ' + typeof token)",
-					"        if (!token || typeof token !== 'string') {",
-					"            log.d(fun, `Token ${tokenName} is invalid: `, JSON.stringify(token))",
+					"    isTokenValid: (token) => {",
+					"        const here = 'isTokenValid'",
+					"        log.t(here, 'Checking token', token)",
+					"        if (!token || typeof token !== 'string' || !match.jwt(token)) {",
+					"            log.d(here, `Token is invalid:`, JSON.stringify(token))",
 					"            return false",
 					"        }",
-					"        // log.d('splitting token: ' + token)",
 					"        const jwtBodyEncoded = token.split('.')[1]",
-					"        // log.d('split token: ' + jwtBodyEncoded)",
-					"",
 					"        const jwtBody = JSON.parse(codec.fromBase64Url(jwtBodyEncoded))",
-					"        // log.d('decoded body: ' + jwtBody)",
 					"        if (!jwtBody.exp) {",
-					"            log.d(fun, 'No expiration time was found')",
+					"            log.d(here, 'No expiration time was found')",
 					"            return false",
 					"        }",
-					"        log.t(fun, 'is token valid?', jwtBody.exp, '?>', time.nowEpochS())",
 					"        const isValid = jwtBody.exp > time.nowEpochS()",
-					"        log.d(fun, tokenName + ' is ' + (isValid ? '' : 'not ') + 'valid')",
+					"        log.d(here, `Token is ${(isValid ? '' : 'not ')}valid`)",
 					"        return isValid",
 					"    },",
 					"",
-					"    renewApiToken: (tokenName) => {",
-					"        const fun = 'renewApiToken'",
-					"        log.t(fun)",
-					"        const reqUrl = pm.variables.get('cryptoJwtUrl') + '/forge'",
-					"        // log.d('reqUrl: ' + reqUrl)",
-					"        const reqNewToken = {",
-					"            url: reqUrl,",
+					"    renewToken: async (req, extractToken, tokenName) => {",
+					"        const here = 'renewToken'",
+					"        let res",
+					"        try {",
+					"            res = await co.sendRequest(req)",
+					"            log.d(here, 'reply received:', res)",
+					"        } catch (err) {",
+					"            log.e(here, `Cannot reach ${req.url}`)",
+					"            throw new Error(`Cannot reach ${req.url}`)",
+					"        }",
+					"        pm.expect(res).to.have.property('code', 200)",
+					"        if (!extractToken) return",
+					"        const token = extractToken(res)",
+					"        log.d(here, 'extractedToken:', token)",
+					"        if (!token) {",
+					"            log.e(here, 'Could not extract token from', res)",
+					"            throw new Error(`Could not extract token from ${res}`)",
+					"        }",
+					"        if (!secu.isTokenValid(token)) {",
+					"            log.e(here, `Token not vaild: ${token}`)",
+					"            throw new Error(`Token not vaild: ${token}`)",
+					"        }",
+					"        mem.set(tokenName, token)",
+					"        log.d(here, 'Token stored')",
+					"        return token",
+					"    },",
+					"",
+					"    getApiToken: async () => {",
+					"        const token = mem.get(API_TOKEN_NAME)",
+					"        if (secu.isTokenValid(token)) return token",
+					"",
+					"        const req = {",
+					"            url: mem.get('cryptoJwtUrl') + '/forge',",
 					"            method: 'POST',",
-					"            header: { \"Content-Type\": \"application/json\" },",
+					"            header: { 'Content-Type': 'application/json' },",
 					"            body: {",
 					"                mode: 'raw',",
 					"                raw: JSON.stringify({",
 					"                    'exp': time.nowEpochS() + TOKEN_DURATION_S,",
 					"                    'jti': rand.get('{{$randomUUID}}'),",
-					"                    'sub': pm.variables.get('pmClientName') || 'rudi_api_pm',",
-					"                    'client_id': pm.variables.get('pm_client_id') || 'pm',",
+					"                    'sub': mem.get('pmClientName') || 'rudi_api_pm',",
+					"                    'client_id': mem.get('pm_client_id') || 'pm',",
 					"                    'req_mtd': 'all',",
 					"                    'req_url': 'all'",
 					"                })",
 					"            }",
 					"        }",
-					"        return new Promise((resolve, reject) => {",
-					"            pm.sendRequest(reqNewToken, (err, res) => {",
-					"                if (err || res.code > 399 || res.statusCode > 399) {",
-					"                    log.e(fun, `'Crypto' module unreachable on ${reqUrl}`)",
-					"                    return reject(`Crypto module unreachable on ${reqUrl}`)",
-					"                    // error.throwNotFound(`Crypto module unreachable on ${reqUrl}`)",
-					"                }",
-					"                const token = codec.streamToString(res)",
-					"                log.d('rudiProdToken : ' + token)",
-					"                try {",
-					"                    pm.expect(res).to.have.property('code', 200);",
-					"                    pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
-					"                } catch (err) {",
-					"                    console.error('[renewApiToken]: ' + err)",
-					"                    return reject('[renewApiToken]: ' + err)",
-					"                    // throw new Error('[renewApiToken]: ' + err)",
-					"                }",
-					"                pm.collectionVariables.set(tokenName, token)",
-					"                log.d(fun, 'API token stored')",
-					"",
-					"                return resolve(token)",
-					"            })",
-					"        })",
+					"        return await secu.renewToken(req, (res) => codec.streamToString(res), API_TOKEN_NAME)",
 					"    },",
 					"",
-					"    renewPortalToken: (tokenName, rudiProdToken) => {",
-					"        const fun = 'renewPortalToken'",
-					"        log.t(fun)",
-					"        if (pm.collectionVariables.get('skipPortalConnection')) return Promise.resolve(NO_PORTAL_MSG)",
-					"        const reqUrl = `${ADMIN_URL}/portal/token`",
-					"        // log.d('reqUrl: ' + reqUrl)",
-					"        const reqNewToken = {",
-					"            url: reqUrl,",
+					"    getPortalToken: async () => {",
+					"        if (mem.get('skipPortalConnection')) return NO_PORTAL_MSG",
+					"",
+					"        const token = mem.get(PORTAL_TOKEN_NAME)",
+					"        if (secu.isTokenValid(token)) return token",
+					"",
+					"        const rudiApiToken = await secu.getApiToken()",
+					"        const req = {",
+					"            url: mem.get('apiUrl') + '/api/admin/portal/token',",
 					"            method: 'GET',",
 					"            header: {",
-					"                'Content-Type': \"application/json\",",
-					"                'Authorization': `Bearer ${rudiProdToken}`",
+					"                'Content-Type': 'application/json',",
+					"                'Authorization': `Bearer ${rudiApiToken}`",
 					"            },",
 					"        }",
-					"        return new Promise((resolve, reject) => {",
-					"            pm.sendRequest(reqNewToken, (err, res) => {",
-					"                if (err) {",
-					"                    log.e(fun, 'RUDI API unreachable on', reqUrl)",
-					"                    // error.throwNotFound(`RUDI API unreachable on ${reqUrl}`)",
-					"                    return reject(`RUDI API unreachable on ${reqUrl}`)",
-					"                }",
-					"                try {",
-					"                    pm.expect(res).to.have.property('code', 200);",
-					"                } catch (error) {",
-					"                    log.e(fun, codec.streamToString(res), error)",
-					"                    //log.d('[renewPortalToken] Response to Postman req: ' + codec.streamToString(res))",
-					"                    return reject('[renewPortalToken]: ' + codec.streamToString(res))",
-					"                    // throw new Error('[renewPortalToken]: ' + codec.streamToString(res))",
-					"                }",
-					"                //log.d('renewPortalToken res: ' + JSON.stringify(res))",
-					"                resStr = codec.streamToString(res)",
-					"                log.d(fun, 'response:', resStr)",
-					"                if (resStr == NO_PORTAL_MSG) {",
-					"                    log.d(fun, 'No portal connection')",
-					"",
-					"                    pm.collectionVariables.set('skipPortalConnection', true)",
-					"                    return resolve(NO_PORTAL_MSG)",
-					"                }",
-					"                const token = JSON.parse(codec.streamToString(res))?.access_token",
-					"                log.d(fun, 'Portal token:', token)",
-					"                try {",
-					"                    pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
-					"                } catch (error) {",
-					"                    log.e(fun, codec.streamToString(res), error)",
-					"                    //log.d('[renewPortalToken] Response to Postman req: ' + codec.streamToString(res))",
-					"                    return reject('[renewPortalToken]: ' + codec.streamToString(res))",
-					"                    // throw new Error('[renewPortalToken]: ' + codec.streamToString(res))",
-					"                }",
-					"",
-					"                pm.collectionVariables.set(tokenName, token)",
-					"                log.d(fun, 'Portal token stored')",
-					"                return resolve(token)",
-					"            })",
-					"        })",
+					"        return await secu.renewToken(req, (res) => codec.getResJson(res, 'access_token'), PORTAL_TOKEN_NAME)",
 					"    },",
 					"",
-					"    getRudiProdToken: async () => {",
-					"        log.t('-- getRudiProdToken --')",
-					"        const tokenName = API_TOKEN_NAME",
-					"        if (!secu.isTokenValid(tokenName)) await secu.renewApiToken(tokenName)",
-					"        log.t('API token stored')",
-					"        return pm.collectionVariables.get(tokenName)",
-					"    },",
+					"    getPmToken: async () => {",
+					"        const here = 'getPmToken'",
+					"        log.t(here)",
 					"",
-					"    getPortalToken: async (apiToken) => {",
-					"        log.t('-- getPortalToken --')",
-					"        if (pm.collectionVariables.get('skipPortalConnection')) return NO_PORTAL_MSG",
-					"        const tokenName = PORTAL_TOKEN_NAME",
-					"        if (!secu.isTokenValid(tokenName)) await secu.renewPortalToken(tokenName, apiToken)",
-					"        log.t('Portal token stored')",
-					"        if (pm.collectionVariables.get('skipPortalConnection')) return NO_PORTAL_MSG",
-					"        return pm.collectionVariables.get(tokenName)",
-					"    }",
+					"        const token = mem.get(PM_TOKEN_NAME)",
+					"        if (secu.isTokenValid(token)) return token",
 					"",
-					"}",
-					"",
-					"const fun = 'init'",
-					"const init = async () => {",
-					"    let rudiProdToken",
-					"    try {",
-					"        rudiProdToken = await secu.getRudiProdToken()",
-					"        log.t(fun, 'rudiProd token Received')",
-					"    } catch (e) {",
-					"        log.e(fun, 'Failed to get rudiProd token', `${e}`)",
-					"    }",
-					"    skipPortalConnection = pm.collectionVariables.get('skipPortalConnection')",
-					"    log.t(fun, 'skipPortalConnection:', skipPortalConnection)",
-					"    if (rudiProdToken && !skipPortalConnection) {",
-					"        try {",
-					"            portalToken = await secu.getPortalToken(rudiProdToken)",
-					"            if (portalToken == NO_PORTAL_MSG)",
-					"                log.d(fun, NO_PORTAL_MSG)",
-					"            else",
-					"                log.d(fun, 'Portal token received')",
-					"        } catch (e) {",
-					"            log.e(fun, 'Failed to get portal token', `${e}`)",
+					"        const req = {",
+					"            url: mem.get('pmBackUrl') + '/api/front/login',",
+					"            method: 'POST',",
+					"            header: { 'Content-Type': 'application/json' },",
+					"            body: {",
+					"                mode: 'raw',",
+					"                raw: JSON.stringify({",
+					"                    'username': mem.get('pmAdminUsr'),",
+					"                    'password': mem.get('pmAdminPwd')",
+					"                })",
+					"            }",
 					"        }",
+					"        return await secu.renewToken(req)",
+					"    },",
+					"",
+					"    getMediaToken: async () => {",
+					"        const here = 'getMediaToken'",
+					"        log.t(here)",
+					"        const token = mem.get(MEDIA_TOKEN_NAME)",
+					"        log.t(here, 'token:', token)",
+					"",
+					"        if (secu.isTokenValid(token)) {",
+					"            log.t(here, 'Media token is valid')",
+					"            return token",
+					"        }",
+					"        log.t(here, 'Renewing media token')",
+					"        await secu.getPmToken()",
+					"",
+					"        const req = {",
+					"            url: mem.get('pmBackUrl') + '/api/media/jwt',",
+					"            method: 'GET',",
+					"            header: { 'Content-Type': 'application/json' },",
+					"        }",
+					"        return await secu.renewToken(req, (res) => codec.getResJson(res, 'token'), MEDIA_TOKEN_NAME)",
 					"    }",
 					"}",
 					"",
-					"// init()",
-					"time.wait(WAIT_TIME, () => log.t(fun, 'Pre-request Scripts loaded'))",
+					"log.lvl = 1",
+					"",
+					"// --------------------------------------------------------------------------------------------------------------",
+					"// Init function",
+					"// --------------------------------------------------------------------------------------------------------------",
+					"const init = async () => {",
+					"    await secu.getApiToken()",
+					"    if (mem.get('portalUsr')) {",
+					"        const portalJwt = await secu.getPortalToken()",
+					"        log.d('portalJwt', portalJwt)",
+					"    }",
+					"}",
+					"",
+					"// --------------------------------------------------------------------------------------------------------------",
+					"// Launch",
+					"// --------------------------------------------------------------------------------------------------------------",
+					"init().then(() => log.t('run', 'Init completed'))",
+					"time.wait(50, () => log.t('run', 'Pre-request Scripts loaded'))",
 					""
 				]
 			}
@@ -8009,6 +8066,7 @@
 			"listen": "test",
 			"script": {
 				"type": "text/javascript",
+				"packages": {},
 				"exec": [
 					""
 				]
@@ -8034,6 +8092,18 @@
 		},
 		{
 			"key": "noPortalMsg",
+			"value": ""
+		},
+		{
+			"key": "pmTokenName",
+			"value": ""
+		},
+		{
+			"key": "mediaTokenName",
+			"value": ""
+		},
+		{
+			"key": "pmCookieName",
 			"value": ""
 		},
 		{
@@ -8121,6 +8191,14 @@
 			"value": ""
 		},
 		{
+			"key": "media1",
+			"value": ""
+		},
+		{
+			"key": "media2",
+			"value": ""
+		},
+		{
 			"key": "now",
 			"value": ""
 		},
@@ -8185,19 +8263,15 @@
 			"value": ""
 		},
 		{
-			"key": "softMeta3Id",
-			"value": ""
-		},
-		{
-			"key": "softMeta4Id",
-			"value": ""
-		},
-		{
 			"key": "softMedia11Id",
 			"value": ""
 		},
 		{
 			"key": "countWithOrg1",
+			"value": ""
+		},
+		{
+			"key": "softMeta4Id",
 			"value": ""
 		},
 		{
@@ -8298,6 +8372,18 @@
 		},
 		{
 			"key": "softReport3Id",
+			"value": ""
+		},
+		{
+			"key": "pubKeyName",
+			"value": ""
+		},
+		{
+			"key": "portalUrl",
+			"value": ""
+		},
+		{
+			"key": "portalKeyName",
 			"value": ""
 		}
 	]
