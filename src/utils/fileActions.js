@@ -21,7 +21,7 @@ export const readIniFile = (confFile) => {
   try {
     consoleLog(mod, fun, confFile)
     const fileContent = readFileSync(`${confFile}`, 'utf-8')
-    const conf = JSON.parse(JSON.stringify(parse(fileContent)))
+    const conf = parse(fileContent)
     return conf
   } catch (err) {
     consoleErr(mod, fun, `Couldn't read file '${confFile}': ${err}`)

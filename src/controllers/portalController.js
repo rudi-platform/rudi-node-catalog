@@ -31,15 +31,7 @@ import {
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { JWT_EXP, REQ_MTD } from '../config/constJwt.js'
-import {
-  beautify,
-  dateEpochSToIso,
-  decodeBase64,
-  nowISO,
-  padWithEqualSignBase4,
-  timeEpochS,
-  toBase64,
-} from '../utils/jsUtils.js'
+import { beautify, dateEpochSToIso, nowISO, timeEpochS } from '../utils/jsUtils.js'
 import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
 import { logD, logE, logT, logV, logW } from '../utils/logging.js'
 
@@ -87,24 +79,6 @@ const portalHttpsAgent = new https.Agent({
   rejectUnauthorized: false,
 })
 
-export const getPortalAuthHeaderBasic = () => {
-  const fun = 'getPortalAuthHeaderBasic'
-  try {
-    logT(mod, fun)
-    if (isPortalConnectionDisabled()) return
-    const [usr, pwdb64] = getCredentials()
-    const pwd = decodeBase64(pwdb64)
-    const basicAuth = padWithEqualSignBase4(toBase64(`${usr}:${pwd}`))
-    return {
-      headers: {
-        'User-Agent': USER_AGENT,
-        Authorization: `Basic ${basicAuth}`,
-      },
-    }
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
 export const getPortalAuthHeaderBearer = async () => {
   const fun = 'getPortalAuthHeaderBearer'
   try {
@@ -292,7 +266,7 @@ export const getPortalJwtPubKey = async () => {
     const publicKeyUrl = getPortalJwtPubKeyUrl()
     // logD(mod, fun, 'publicKeyUrl: ' + publicKeyUrl)
 
-    const publicKeyObj = await axios.get(publicKeyUrl, getPortalAuthHeaderBasic())
+    const publicKeyObj = await axios.get(publicKeyUrl, getCredentials(1))
     // logD(mod, fun, 'publicKeyObj: ' + beautify(publicKeyObj))
     const cachedPortalJwtPubKeyPem = publicKeyObj?.data?.value
     // logD(mod, fun, `portalJwtPubKey: ${cachedPortalJwtPubKey}`)
@@ -329,10 +303,7 @@ export const getNewTokenFromPortal = async () => {
   logT(mod, fun)
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
-    const [usr, pwdb64] = getCredentials()
-    const pwd = decodeBase64(pwdb64)
-    // consoleLog(mod, fun, pwdb64)
-    // consoleLog(mod, fun, pwd)
+    const [basicAuthHeaders, portalRequestBody] = getCredentials()
     const portalAuthUrl = getAuthUrl()
     // LM -- the password is now provided in base64
     // logD(mod, fun, `pwdb64: ${pwdb64}`)
@@ -344,12 +315,9 @@ export const getNewTokenFromPortal = async () => {
     //   password: pwd,
     // }
     // const body = `grant_type=password&scope=read&username=${usr}&password=${pwd}`
-    const body =
-      `grant_type=password&scope=read&username=${encodeURIComponent(usr)}&` +
-      `password=${encodeURIComponent(pwd)}`
     let answer
     try {
-      answer = await directPost(portalAuthUrl, body, getPortalAuthHeaderBasic())
+      answer = await directPost(portalAuthUrl, portalRequestBody, basicAuthHeaders)
     } catch (err) {
       await createErrorReport(err, {
         step: 'posting the node credentials to Portal',

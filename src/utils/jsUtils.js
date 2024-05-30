@@ -90,6 +90,17 @@ export const convertEncoding = (data, fromEncoding, toEncoding) =>
   Buffer.from(typeof data === 'object' ? JSON.stringify(data) : data, fromEncoding).toString(
     toEncoding
   )
+export const joinBuffers = (buffers, delimiter = ':') =>
+  buffers.reduce((prev, b) => Buffer.concat([prev, Buffer.from(delimiter, 'utf-8'), b]))
+
+export const createBasicAuth = (usr, pwd, usrEncoding = 'utf-8', pwdEncoding = 'base64') =>
+  padWithEqualSignBase4(
+    Buffer.concat([
+      Buffer.from(usr, usrEncoding),
+      Buffer.from(':', 'utf-8'),
+      Buffer.from(pwd, pwdEncoding),
+    ]).toString('base64')
+  )
 
 /**
  * Adds a sign at the end of a string so that the padded string has a length that is a multiple of a given base.

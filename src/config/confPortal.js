@@ -4,10 +4,17 @@ import { readIniFile } from '../utils/fileActions.js'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { consoleErr, isDefined, separateLogs, toBase64 } from '../utils/jsUtils.js'
+import {
+  consoleErr,
+  createBasicAuth,
+  decodeBase64url,
+  isDefined,
+  separateLogs,
+} from '../utils/jsUtils.js'
 
 import { logD } from '../utils/logging.js'
 import { OPT_PORTAL_CONF, getCliEnvOpt, readConf } from './appOptions.js'
+import { USER_AGENT } from './constApi.js'
 
 separateLogs('Portal conf', true) ////////////////////////////////////////////////////////
 
@@ -79,19 +86,26 @@ export const getPortalJwtPubKeyUrl = () => `${AUTH_URL}/${JWT_PUB_KEY_URL}`
 export const getPortalCryptPubUrl = () => `${AUTH_URL}/${CRYPT_PUB_KEY_URL}`
 
 // ----- Creds
+const uname = getPortalConf('login')
+const passw = getPortalConf('passw')
+console.log(passw)
 const isPwdB64 = getPortalConf('is_pwd_b64')
-const LOGIN = getPortalConf('login')
-const READ_PASSW = getPortalConf('passw')
-// consoleLog(mod, 'readPortalConf',`READ_PASSW: ${READ_PASSW}` )
-const PASSW_B64 =
-  isPwdB64 == 1 ||
-  `${isPwdB64}`.toLocaleLowerCase() === 'true' ||
-  `${isPwdB64}`.toLocaleLowerCase() === 'yes'
-    ? READ_PASSW
-    : toBase64(READ_PASSW)
-// consoleLog(mod, 'readPortalConf', `PASSW_B64: ${PASSW_B64}`)
+const pwdEncoding = isPwdB64 ? 'base64' : 'utf-8'
 
-export const getCredentials = () => [LOGIN, PASSW_B64]
+const BAUTH = createBasicAuth(uname, passw, 'utf-8', pwdEncoding)
+console.log(BAUTH)
+const BAUTH_HEADERS_BASIC = {
+  headers: { 'User-Agent': USER_AGENT, Authorization: `Basic ${BAUTH}` },
+}
+const PORTAL_TOKEN_REQ_BODY =
+  `grant_type=password&scope=read&username=${encodeURIComponent(uname)}&` +
+  `password=${encodeURIComponent(isPwdB64 ? decodeBase64url(passw) : passw)}`
+console.log(PORTAL_TOKEN_REQ_BODY)
+
+// consoleLog(mod, 'readPortalConf',`READ_PASSW: ${READ_PASSW}` )
+
+export const getCredentials = (headersOnly) =>
+  headersOnly ? BAUTH_HEADERS_BASIC : [BAUTH_HEADERS_BASIC, PORTAL_TOKEN_REQ_BODY]
 
 // ----- API
 const API_PORTAL_URL = getPortalConf('portal_url')
