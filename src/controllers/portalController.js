@@ -574,7 +574,7 @@ export const sendMetadataToPortal = async (metadataId) => {
       logD(mod, fun, report.step)
 
       portalAnswer = await httpGet(getPortalMetaUrl(metadataId), portalToken)
-    } catch (err) {
+    } catch {
       report.step = `sending a metadata that is not on the portal: '${metadataId}'`
       report.requestDetails = { method: 'POST', url: PORTAL_POST_URL }
       logD(mod, fun, report.step)

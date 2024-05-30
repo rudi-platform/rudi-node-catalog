@@ -276,7 +276,7 @@ async function onPublicRoute(req, reply) {
         // logD(mod, fun, `Payload: ${beautify(jwtPayload)}`)
         context.clientApp = jwtPayload[JWT_SUB] || 'RUDI Portal'
         context.reqUser = jwtPayload[JWT_USER] || jwtPayload[JWT_CLIENT]
-      } catch (er) {
+      } catch {
         try {
           const { subject, clientId } = await checkRudiProdPermission(req, true)
           context.clientApp = subject
@@ -372,7 +372,7 @@ async function onUnrestrictedPrivateRoute(req, reply) {
       const { subject, clientId } = await checkRudiProdPermission(req, true)
       context.clientApp = subject
       context.reqUser = clientId
-    } catch (er) {
+    } catch {
       // It's OK to have no token
       logT(mod, fun, `Token-less call to ${req.method} ${req.url} `)
     } finally {

@@ -304,8 +304,7 @@ export const setSubProp = (obj, propArray, value) => objectPath.set(obj, propArr
  * @returns An object without the named property
  */
 export const omit = (obj, key) => {
-  // eslint-disable-next-line no-unused-vars, unused-imports/no-unused-vars
-  const { [key]: omitted, ...rest } = obj // NOSONAR
+  const { [key]: _, ...rest } = obj // NOSONAR
   return rest
 }
 const ARGV = omit(minimist(process.argv), '_')
@@ -337,7 +336,7 @@ export const beautify = (jsonObject, option) => {
     return isString(jsonObject)
       ? jsonObject
       : `${JSON.stringify(jsonObject, null, option).replace(/\\"/g, '"')}${option != null ? '\n' : ''}`
-  } catch (err) {
+  } catch {
     return `${jsonToString(jsonObject, false)}`
   }
 }

@@ -135,7 +135,7 @@ function getObjectParam(req) {
     const objectType = accessReqParam(req, PARAM_OBJECT)
     try {
       checkIsUrlObject(objectType)
-    } catch (err) {
+    } catch {
       const error = new NotFoundError(`Route '${req.method} ${req.url}' not found `)
       throw RudiError.treatError(mod, fun, error)
     }
@@ -433,7 +433,7 @@ export const searchObjects = async (req, reply) => {
         )
         logD(mod, fun, `extendedSearchTerms: ${extendedSearchTerms}`)
         options[QUERY_SEARCH_TERMS].push(extendedSearchTerms)
-      } catch (e) {
+      } catch {
         // logE(mod, fun, `SKOSMOS down!: ERR ${e}`)
       }
     }
@@ -460,7 +460,7 @@ export const getSearchableProperties = (req, reply) => {
     Object.keys(rudiObjectList).forEach((objectType) => {
       try {
         getSearchableFields[objectType] = rudiObjectList[objectType].ObjModel.getSearchableFields()
-      } catch (err) {
+      } catch {
         logD(mod, fun, `${objectType}: not searchable`)
       }
     })

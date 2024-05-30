@@ -189,7 +189,7 @@ export const getSearchableFields = (objectType) => {
 
     try {
       return ObjModel.getSearchableFields()
-    } catch (err) {
+    } catch {
       throw new NotImplementedError(`Object '${objectType}' is not searchable yet.`)
     }
   } catch (err) {
@@ -1450,7 +1450,7 @@ export const isReferencedInMetadata = async (objectType, rudiId) => {
     let dbId
     try {
       dbId = (await getObjectPropertiesWithRudiId(objectType, rudiId, [DB_ID]))[DB_ID]
-    } catch (err) {
+    } catch {
       logW(mod, fun, objectNotFound(objectType, rudiId))
       throw new ObjectNotFoundError(objectType, rudiId)
     }

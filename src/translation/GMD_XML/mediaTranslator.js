@@ -49,14 +49,7 @@ import {
  * @param {*} args
  * @returns
  */
-const translateMediaType = async (inputObject, path, args) => {
-  const fun = 'translateMediaType'
-  try {
-    return MediaTypes.Service
-  } catch (e) {
-    throw RudiError.treatError(mod, fun, e)
-  }
-}
+const translateMediaType = () => MediaTypes.Service
 
 /**
  * Translates rudi field 'connector' from xml gmd. Uses translator object GmdXmlToRudiMediaConnectorTranslator
@@ -65,7 +58,7 @@ const translateMediaType = async (inputObject, path, args) => {
  * @param {*} args
  * @returns
  */
-const translateMediaConnector = async (inputObject, path, args) => {
+const translateMediaConnector = async (inputObject) => {
   const fun = 'translateMediaConnector'
   try {
     return await GmdXmlToRudiMediaConnectorTranslator.translateInputObject(inputObject)

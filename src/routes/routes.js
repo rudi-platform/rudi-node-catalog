@@ -503,7 +503,7 @@ export const backOfficeRoutes = [
     method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/${ACT_EXT_SEARCH}`,
     handler: searchObjects,
-    config: { [ROUTE_NAME]: PRV_OBJ_SEARCH, [ROUTE_OPT]: ACT_EXT_SEARCH },
+    config: { [ROUTE_NAME]: 'prv_obj_search', [ROUTE_OPT]: ACT_EXT_SEARCH },
   },
   // Get searchable fields for an object type
   {

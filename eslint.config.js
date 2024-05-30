@@ -1,16 +1,20 @@
 import babelParser from '@babel/eslint-parser'
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
+import globals from 'globals'
+
+import unusedImports from 'eslint-plugin-unused-imports'
+
 export default [
   {
-    ignores: ['**/node_modules', '**/*.pub', '**/tests'],
-    env: {
-      node: true,
-      browser: true,
-      commonjs: true,
-      es2021: true,
-    },
-    parser: babelParser,
-    parserOptions: {
+    ignores: ['**/node_modules/**', '**/tests/**', '**/*.pub'],
+    languageOptions: {
+      globals: { ...globals.node },
       ecmaVersion: 'latest',
+      parser: babelParser,
+      parserOptions: {
+        requireConfigFile: false,
+        presets: [['@babel/preset-env', { shippedProposals: true, targets: { node: 'current' } }]],
+      },
     },
     rules: {
       'arrow-body-style': 'off',
@@ -30,7 +34,7 @@ export default [
       'no-undef': 'error',
       'no-unused-vars': 'off',
       quotes: ['error', 'single', { allowTemplateLiterals: true }],
-      'prefer-arrow-callback': 'off',
+      'prefer-arrow-callback': 'warn',
       'prettier/prettier': 'warn',
       'space-before-function-paren': [
         'error',
@@ -41,13 +45,13 @@ export default [
         'warn',
         {
           vars: 'all',
-          varsIgnorePattern: '^_',
+          varsIgnorePattern: '^_|fun|mod|err',
           args: 'after-used',
-          argsIgnorePattern: '^(_|req|reply|res|next|fun)$',
+          argsIgnorePattern: '^(_|req|reply|res|next|fun|mod|err)$',
         },
       ],
     },
-    extends: ['prettier'],
-    plugins: { 'unused-imports': 'unused-imports', prettier: 'prettier' },
+    plugins: { 'unused-imports': unusedImports },
   },
+  eslintPluginPrettierRecommended,
 ]

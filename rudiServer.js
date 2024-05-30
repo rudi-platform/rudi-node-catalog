@@ -52,7 +52,6 @@ import { RudiError } from './src/utils/errors.js'
 // Prerequisites
 // -------------------------------------------------------------------------------------------------
 // Fixing Regexp display as a string
-// eslint-disable-next-line no-extend-native
 RegExp.prototype.toJSON = RegExp.prototype.toString
 
 // -------------------------------------------------------------------------------------------------
@@ -90,7 +89,7 @@ const mongoConnectWithRetry = async () => {
     logW(mod, fun, `Database connection failed, retrying... ${err}`)
     currentRetry++
     if (currentRetry <= MAX_DB_CONNECT_RETRIES) {
-      // Wait 5 seconds before retrying
+      // Wait 5 seconds before retryingut
       setTimeout(() => mongoConnectWithRetry(), 5000)
     } else {
       logE(mod, fun, `Failed to connect to database after ${MAX_DB_CONNECT_RETRIES}retries: ${err}`)

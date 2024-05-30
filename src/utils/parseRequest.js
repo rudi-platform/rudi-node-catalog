@@ -245,7 +245,7 @@ export const parseQueryParameters = async (objectType, fullUrl) => {
               default:
                 filters.push({ [key]: obj })
             }
-          } catch (err) {
+          } catch {
             // logD(mod, fun, `Error while parsing: '${beautify(val)}': ${err}}`)
             switch (key) {
               case `${DB_CREATED_AT}`:
@@ -294,7 +294,7 @@ export const parseQueryParameters = async (objectType, fullUrl) => {
               [EXT_OBJ_PROP]: nestedFieldProp,
               [EXT_OBJ_VAL]: obj,
             })
-          } catch (err) {
+          } catch {
             // const errMsg = `Couldn't parse: '${beautify(value)}': ${err}}`
             // logW(mod, fun, errMsg)
             if (!value) returnedFilter[QUERY_SEARCH_TERMS].push(nestedField)

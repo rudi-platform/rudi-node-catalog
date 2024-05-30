@@ -43,7 +43,7 @@ export const accessProperty = (jsonObject, jsonProperty) => {
   let value
   try {
     value = jsonObject[jsonProperty]
-  } catch (e) {
+  } catch {
     throw new BadRequestError(`This should be an object: ${beautify(jsonObject)}`)
   }
   if (!value) throw new BadRequestError(`${missingObjectProperty(jsonObject, jsonProperty)}`)

@@ -144,7 +144,7 @@ const translateSynopsis = async (inputObject, path, args) => {
  * @param {*} args
  * @returns
  */
-const translateTheme = async (inputObject, path, args) => {
+const translateTheme = (inputObject, path, args) => {
   const fun = 'translateTheme'
   let result
   try {
@@ -183,7 +183,7 @@ const translateTheme = async (inputObject, path, args) => {
  * @param {*} args
  * @returns
  */
-const translateKeywords = async (inputObject, path, args) => {
+const translateKeywords = (inputObject, path, args) => {
   const fun = 'translateKeywords'
   let result
   try {
@@ -310,7 +310,7 @@ const translateAvailableFormats = async (inputObject, path, args) => {
  * @returns
  */
 
-const translateDataDates = async (inputObject, path, args) => {
+const translateDataDates = (inputObject, path, args) => {
   const fun = 'translateDataDates'
   let result = {}
   try {
@@ -499,7 +499,7 @@ export const translateOrganization = async (inputObject, path, args) => {
  * @param {*} args
  * @returns a Rudi Media
  */
-const translateOneMedia = async (inputObject, path, args) => {
+const translateOneMedia = async (inputObject) => {
   const fun = 'translateOneMedia'
   try {
     return await GmdXmlToRudiMediaTranslator.translateInputObject(inputObject)
@@ -614,25 +614,15 @@ export const GmdXmlToRudiMetadataTranslator = new ObjectTranslator(
     ),
     new FieldTranslator(
       API_GEOGRAPHY,
-      async (inputObject, path, args) => {
-        return GmdXmlToRudiGeoTranslator.translateInputObject(inputObject)
-      },
+      (inputObject) => GmdXmlToRudiGeoTranslator.translateInputObject(inputObject),
       false
     ),
     new FieldTranslator(
       API_METAINFO_PROPERTY,
-      async (inputObject, path, args) => {
-        return GmdXmlToRudiMetaInfoTranslator.translateInputObject(inputObject)
-      },
+      (inputObject) => GmdXmlToRudiMetaInfoTranslator.translateInputObject(inputObject),
       true
     ),
-    new FieldTranslator(
-      API_STORAGE_STATUS,
-      async (inputObject, path, args) => {
-        return StorageStatus.Online
-      },
-      true
-    ),
+    new FieldTranslator(API_STORAGE_STATUS, () => StorageStatus.Online, true),
   ],
   xml2jsonParser
 )
@@ -645,13 +635,7 @@ const GmdXmlToRudiMetaInfoTranslator = new ObjectTranslator(
   [],
   {},
   [
-    new FieldTranslator(
-      API_METAINFO_VERSION_PROPERTY,
-      async (inputObject, path, args) => {
-        return API_VERSION
-      },
-      true
-    ),
+    new FieldTranslator(API_METAINFO_VERSION_PROPERTY, () => API_VERSION, true),
     new FieldTranslator(
       API_METAINFO_CONTACTS_PROPERTY,
       translateContacts,

@@ -77,13 +77,13 @@ export class Thesaurus {
       } else {
         try {
           await this.#retrieveDbValues()
-        } catch (err) {
+        } catch {
           logT(mod, fun, 'No values found in DB')
           this.#currentValues = this.#initValues
           try {
             await this.#storeCurrentValues()
             logT(mod, fun, 'Current values stored in DB')
-          } catch (err) {
+          } catch {
             logW(mod, fun, 'Failed to store current enum values')
           }
         }

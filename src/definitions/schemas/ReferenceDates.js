@@ -37,7 +37,7 @@ export const ReferenceDatesSchema = {
 function toISOString(dateStr) {
   try {
     return new Date(dateStr).toISOString()
-  } catch (err) {
+  } catch {
     throw new BadRequestError(`This is not a date: '${dateStr}'`)
   }
 }
@@ -45,7 +45,7 @@ function toISOString(dateStr) {
 function toEpoch(dateStr) {
   try {
     return new Date(dateStr).getTime()
-  } catch (err) {
+  } catch {
     throw new BadRequestError(`This is not a date: '${dateStr}'`)
   }
 }
