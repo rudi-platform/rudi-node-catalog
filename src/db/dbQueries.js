@@ -321,18 +321,18 @@ export const cleanLicences = async () => {
  * in the resulting object
  * @returns {Promise}
  */
-export const getObject = (objectType, filter, shouldSkipPopulate) => {
+export const getObject = async (objectType, filter, shouldSkipPopulate) => {
   const fun = `getObject`
-  const ObjModel = getObjectModel(objectType)
-  const populateOpts = shouldSkipPopulate ? [] : getPopulateOptions(objectType)
-  return new Promise((resolve, reject) =>
-    (isEmptyArray(populateOpts)
-      ? ObjModel.findOne(filter)
-      : ObjModel.findOne(filter).populate(populateOpts)
-    )
-      .then((res) => resolve(res))
-      .catch((err) => reject(RudiError.treatError(mod, fun, err)))
-  )
+  try {
+    const ObjModel = getObjectModel(objectType)
+
+    const populateOpts = shouldSkipPopulate ? [] : getPopulateOptions(objectType)
+    return isEmptyArray(populateOpts)
+      ? await ObjModel.findOne(filter)
+      : await ObjModel.findOne(filter).populate(populateOpts)
+  } catch (e) {
+    throw RudiError.treatError(mod, fun, e)
+  }
 }
 
 /**

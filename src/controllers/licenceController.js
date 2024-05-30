@@ -26,6 +26,7 @@ import {
 } from '../definitions/thesaurus/LicenceCodes.js'
 
 import licenceScheme from '../../doc/api/licences.js'
+import { accessProperty } from '../utils/jsonAccess.js'
 
 // -------------------------------------------------------------------------------------------------
 // Controller
@@ -65,6 +66,41 @@ export const getLicenceCodes = async () => {
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
+}
+
+/**
+ * Returns all possibles labels for all licences available
+ * @returns an Object with keys: licenceCodes and elements: all possible labels for this code
+ */
+export const getLicenceLabels = async () => {
+  const fun = 'getLicenceLabels'
+
+  let result = {}
+  try {
+    const licenceList = await getLicences()
+    for (const licence of licenceList) {
+      let licenceId = accessProperty(licence, API_SKOS_CONCEPT_CODE)
+      let licenceNames = getLicenceNames(licence)
+      // logD(mod, fun, beautify(licenceNames))
+      result[licenceId] = licenceNames
+    }
+    return result
+  } catch (e) {
+    throw RudiError.treatError(mod, fun, e)
+  }
+}
+
+/**
+ * Return all possibles names for one licence
+ * @param {*} obj the licence at json format, coming from getLicences
+ */
+export const getLicenceNames = (obj) => {
+  // const fun = 'getLicenceNames'
+  const labelList = accessProperty(obj, 'pref_label')
+  const result = labelList.map((element) => {
+    return accessProperty(element, 'text')
+  })
+  return result
 }
 
 export const initializeLicences = async () => {

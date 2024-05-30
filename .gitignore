@@ -12,6 +12,7 @@ dump
 
 # Logs
 **/logs
+**/*log
 
 # Tests
 **/actions
@@ -38,3 +39,5 @@ z_*
 
 # Dev
 .vscode
+z_notes
+wip

@@ -65,7 +65,7 @@ import { logD } from '../utils/logging.js'
 // Controllers
 // -------------------------------------------------------------------------------------------------
 import {
-  addSingleObject,
+  addObjects,
   countObjects,
   deleteManyObjects,
   deleteObjectList,
@@ -77,7 +77,7 @@ import {
   getSearchableProperties,
   getSingleObject,
   searchObjects,
-  upsertSingleObject,
+  upsertObjects,
 } from '../controllers/genericController.js'
 import {
   commitMedia,
@@ -172,6 +172,7 @@ const PRV_DEL_ONE = 'prv_del_one'
 const PRV_DEL_MANY = 'prv_del_many'
 const PRV_DEL_LIST = 'prv_del_list'
 const PRV_MEDIA_COMMIT = 'prv_media_commit'
+const PRV_POST_METADATA = 'prv_metadata_post'
 
 const PRV_OBJ_SEARCH = 'prv_obj_search'
 const PRV_OBJ_COUNT = 'prv_obj_count'
@@ -500,11 +501,11 @@ export const backOfficeRoutes = [
   // ('Metadata', 'Organizations' and 'Contacts')
   // -------------------------------------------------------------------------------------------------
 
-  // Add 1
+  // Add one or many objects
   {
     method: HTTP_METHODS.POST,
     url: URL_PV_OBJECT_GENERIC,
-    handler: addSingleObject,
+    handler: addObjects,
     config: { [ROUTE_NAME]: PRV_ADD_ONE },
 
     // schema: documentation.addMetadataSchema
@@ -513,7 +514,7 @@ export const backOfficeRoutes = [
   {
     method: HTTP_METHODS.PUT,
     url: URL_PV_OBJECT_GENERIC,
-    handler: upsertSingleObject,
+    handler: upsertObjects,
     config: { [ROUTE_NAME]: PRV_UPSERT_ONE },
   },
   // Get all

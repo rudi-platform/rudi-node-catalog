@@ -34,5 +34,14 @@
     "spreadsheetml",
     "Thes",
     "weba"
-  ]
+  ],
+  "prettier.configPath": ".prettierrc",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "always"
+  },
+  "eslint.format.enable": true,
+  "eslint.run": "onSave",
+  "eslint.codeActionsOnSave.rules": null,
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
 }
