@@ -13,7 +13,7 @@ const { pick } = _
 // -------------------------------------------------------------------------------------------------
 // Constants
 // -------------------------------------------------------------------------------------------------
-import { HTTP_METHODS, OBJ_METADATA, PARAM_ID, USER_AGENT } from '../config/constApi.js'
+import { OBJ_METADATA, PARAM_ID, USER_AGENT } from '../config/constApi.js'
 import {
   API_COLLECTION_TAG,
   API_DATA_NAME_PROPERTY,
@@ -322,7 +322,7 @@ export const getNewTokenFromPortal = async () => {
       await createErrorReport(err, {
         step: 'posting the node credentials to Portal',
         description: 'An error occurred while getting a new token from the Portal',
-        method: HTTP_METHODS.POST,
+        method: 'POST',
         url: portalAuthUrl,
       })
       if (RudiError.isRudiError(err)) throw RudiError.treatError(mod, fun, err)
@@ -382,7 +382,7 @@ export const getTokenCheckedByPortal = async (token) => {
     await createErrorReport(err, {
       step: 'submitting the token to Portal checks',
       description: 'An error occurred while having the token checked by the Portal',
-      method: HTTP_METHODS.POST,
+      method: 'POST',
       url: getCheckAuthUrl(),
     })
     throw RudiError.treatError(mod, fun, err)
@@ -570,13 +570,13 @@ export const sendMetadataToPortal = async (metadataId) => {
     let portalAnswer
     try {
       report.step = 'checking if the metadata is on the portal'
-      report.requestDetails = { method: HTTP_METHODS.GET, url: getPortalMetaUrl(metadataId) }
+      report.requestDetails = { method: 'GET', url: getPortalMetaUrl(metadataId) }
       logD(mod, fun, report.step)
 
       portalAnswer = await httpGet(getPortalMetaUrl(metadataId), portalToken)
     } catch (err) {
       report.step = `sending a metadata that is not on the portal: '${metadataId}'`
-      report.requestDetails = { method: HTTP_METHODS.POST, url: PORTAL_POST_URL }
+      report.requestDetails = { method: 'POST', url: PORTAL_POST_URL }
       logD(mod, fun, report.step)
 
       const postAnswer = await httpPost(PORTAL_POST_URL, portalReadyMetadata, portalToken)
@@ -587,7 +587,7 @@ export const sendMetadataToPortal = async (metadataId) => {
 
     if (getUpdatedDate(portalMetadata) < getUpdatedDate(portalReadyMetadata)) {
       report.step = `updating a metadata that is on the portal and older: '${metadataId}'`
-      report.requestDetails = { method: HTTP_METHODS.PUT, url: PORTAL_POST_URL }
+      report.requestDetails = { method: 'PUT', url: PORTAL_POST_URL }
       logD(mod, fun, report.step)
 
       const putAnswer = await httpPut(PORTAL_POST_URL, portalReadyMetadata, portalToken)
@@ -618,7 +618,7 @@ export const getMetadataFromPortal = async (metadataId, additionalParameters) =>
     const token = await getPortalToken()
 
     report.step = 'getting the metadata'
-    report.method = HTTP_METHODS.GET
+    report.method = 'GET'
     report.url = getPortalMetaUrl(metadataId, additionalParameters)
     report.metadata = { [API_METADATA_ID]: metadataId }
     report.description = 'An error occurred while getting a metadata from the Portal'

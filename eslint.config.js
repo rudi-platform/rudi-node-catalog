@@ -1,0 +1,53 @@
+import babelParser from '@babel/eslint-parser'
+export default [
+  {
+    ignores: ['**/node_modules', '**/*.pub', '**/tests'],
+    env: {
+      node: true,
+      browser: true,
+      commonjs: true,
+      es2021: true,
+    },
+    parser: babelParser,
+    parserOptions: {
+      ecmaVersion: 'latest',
+    },
+    rules: {
+      'arrow-body-style': 'off',
+      'comma-dangle': ['error', 'only-multiline'],
+      complexity: ['warn', { max: 20 }],
+      indent: 'off',
+      'no-await-in-loop': 'error',
+      'no-console': 'warn',
+      'no-dupe-keys': 'error',
+      'no-empty': 'error',
+      'no-extend-native': ['error', { exceptions: ['RegExp'] }],
+      'no-invalid-regexp': 'error',
+      'no-redeclare': 'error',
+      'no-return-assign': 'error',
+      'no-self-assign': 'warn',
+      'no-self-compare': 'warn',
+      'no-undef': 'error',
+      'no-unused-vars': 'off',
+      quotes: ['error', 'single', { allowTemplateLiterals: true }],
+      'prefer-arrow-callback': 'off',
+      'prettier/prettier': 'warn',
+      'space-before-function-paren': [
+        'error',
+        { anonymous: 'always', named: 'never', asyncArrow: 'always' },
+      ],
+      'unused-imports/no-unused-imports': 'error',
+      'unused-imports/no-unused-vars': [
+        'warn',
+        {
+          vars: 'all',
+          varsIgnorePattern: '^_',
+          args: 'after-used',
+          argsIgnorePattern: '^(_|req|reply|res|next|fun)$',
+        },
+      ],
+    },
+    extends: ['prettier'],
+    plugins: { 'unused-imports': 'unused-imports', prettier: 'prettier' },
+  },
+]
