@@ -88,19 +88,16 @@ export const getPortalCryptPubUrl = () => `${AUTH_URL}/${CRYPT_PUB_KEY_URL}`
 // ----- Creds
 const uname = getPortalConf('login')
 const passw = getPortalConf('passw')
-console.log(passw)
 const isPwdB64 = getPortalConf('is_pwd_b64')
 const pwdEncoding = isPwdB64 ? 'base64' : 'utf-8'
 
 const BAUTH = createBasicAuth(uname, passw, 'utf-8', pwdEncoding)
-console.log(BAUTH)
 const BAUTH_HEADERS_BASIC = {
   headers: { 'User-Agent': USER_AGENT, Authorization: `Basic ${BAUTH}` },
 }
 const PORTAL_TOKEN_REQ_BODY =
   `grant_type=password&scope=read&username=${encodeURIComponent(uname)}&` +
   `password=${encodeURIComponent(isPwdB64 ? decodeBase64url(passw) : passw)}`
-console.log(PORTAL_TOKEN_REQ_BODY)
 
 // consoleLog(mod, 'readPortalConf',`READ_PASSW: ${READ_PASSW}` )
 
