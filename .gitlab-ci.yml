@@ -25,6 +25,7 @@ install:dev:
     NODE_ENV: development
   script:
     - npm config set @aqmo.org:registry https://repository.aqmo.org/npm/
+    - npm cache clean
     - npm i
     - npm run lint
 
