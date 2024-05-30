@@ -26,6 +26,7 @@ export const PARAM_OBJECT = 'object'
 export const PARAM_ID = 'id'
 export const PARAM_PROP = 'prop'
 export const PARAM_REPORT_ID = 'irid'
+export const PARAM_METADATA_STANDARD = 'std'
 
 // --- "Objects" parameters
 export const OBJ_METADATA = 'resources'
@@ -67,6 +68,8 @@ export const QUERY_TREATED_BEFORE_CAML = 'treatedBefore'
 export const QUERY_SUBMITTED_BEFORE = 'submitted_before'
 export const QUERY_SUBMITTED_BEFORE_CAML = 'submittedBefore'
 export const QUERY_CONFIRM = 'confirm'
+export const QUERY_OBJECT_STANDARD = 'objectStandard'
+export const QUERY_OBJECT_FORMAT = 'format'
 
 export const QUERY_SEARCH_TERMS = 'searchTerms'
 
@@ -98,6 +101,7 @@ export const ACT_SEARCH = 'search'
 export const ACT_EXT_SEARCH = 'ext_search'
 export const ACT_SEND = 'send'
 export const ACT_COMMIT = 'commit'
+export const ACT_STANDARD = 'std'
 
 export const ACT_CHECK = 'check'
 
