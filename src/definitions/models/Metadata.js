@@ -83,7 +83,13 @@ import {
 } from '../../db/dbFields.js'
 
 import { Latitude, Longitude } from '../schemas/GpsCoordinates.js'
-import { get as getFileTypes, MIME_YAML, MIME_YAML_ALT } from '../thesaurus/FileTypes.js'
+import {
+  ALT_MIME_MARKDOWN,
+  get as getFileTypes,
+  MIME_MARKDOWN,
+  MIME_YAML,
+  MIME_YAML_ALT,
+} from '../thesaurus/FileTypes.js'
 
 // -------------------------------------------------------------------------------------------------
 // Validators
@@ -782,7 +788,8 @@ export const toRudiPortalJSON = (metadata) => {
     portalReadyMetadata[API_MEDIA_PROPERTY].forEach((media) => {
       delete media[API_FILE_STORAGE_STATUS]
       delete media[API_FILE_STATUS_UPDATE]
-
+      if (media[API_FILE_MIME] == MIME_MARKDOWN || media[API_FILE_MIME] == ALT_MIME_MARKDOWN)
+        media[API_FILE_MIME] = 'text/plain'
       // delete media[API_MEDIA_THUMBNAIL]
       // delete media[API_MEDIA_SATELLITES]
     })

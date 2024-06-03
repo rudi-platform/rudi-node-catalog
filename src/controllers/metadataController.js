@@ -759,10 +759,10 @@ export const commitMedia = async (req, res) => {
 
     // --- Checks
     // Check mediaId exists
-    const dbMedia = await getObjectWithRudiId(OBJ_MEDIA, mediaId)
+    const dbMedia = await getObjectWithRudiId(OBJ_MEDIA, mediaId) // NOSONAR
     if (!dbMedia) throw new NotFoundError(`Media not found for id '${mediaId}'`)
     // Check metadataId exists
-    const dbMetadata = await getObjectWithRudiId(OBJ_METADATA, metadataId)
+    const dbMetadata = await getObjectWithRudiId(OBJ_METADATA, metadataId) // NOSONAR
     if (!dbMetadata) throw new NotFoundError(`Metadata not found for id '${metadataId}'`)
     // Check metadata is bound to media
     const metadataMediaList = dbMetadata[API_MEDIA_PROPERTY]

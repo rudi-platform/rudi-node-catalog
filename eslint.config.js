@@ -45,7 +45,7 @@ export default [
         'warn',
         {
           vars: 'all',
-          varsIgnorePattern: '^_|fun|mod|err',
+          varsIgnorePattern: '^(_|fun|mod|err)$',
           args: 'after-used',
           argsIgnorePattern: '^(_|req|reply|res|next|fun|mod|err)$',
         },
