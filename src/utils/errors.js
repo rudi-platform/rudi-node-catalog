@@ -208,7 +208,7 @@ export class RudiError extends Error {
   static treatCommunicationError(ctxMod, ctxFun, comError, errPrefix) {
     const fun = 'treatCommunicationError'
     try {
-      logT(mod, fun)
+      logT(mod, fun, `(issued at ${ctxMod}.${ctxFun})`)
 
       let error
       const errFlag = `${errPrefix ? errPrefix + ' ' : ''}`

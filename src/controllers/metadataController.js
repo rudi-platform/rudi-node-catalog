@@ -7,12 +7,8 @@ const mod = 'metaCtrl'
 // -------------------------------------------------------------------------------------------------
 // External dependencies
 // -------------------------------------------------------------------------------------------------
-import mongoose from 'mongoose'
-const { Types: MongooseTypes } = mongoose
-
 import _ from 'lodash'
 const { pick } = _
-// const { mergeWith } = _
 
 // -------------------------------------------------------------------------------------------------
 // Constants
@@ -184,7 +180,7 @@ export const organizationRudiToDbFormat = async (rudiProducer, path, shouldCreat
       organizationDbId = newOrg[DB_ID]
     }
     // logD(mod, fun, `${beautify(rudiProducer)} -> ${organizationDbId} `)
-    return new MongooseTypes.ObjectId(organizationDbId)
+    return organizationDbId
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -224,7 +220,7 @@ export const contactListRudiToDbFormat = async (rudiContactList, path, shouldCre
 
           contactDbId = dbContact[DB_ID]
         }
-        contactDbIds.push(new MongooseTypes.ObjectId(contactDbId))
+        contactDbIds.push(contactDbId)
         // logD(mod, fun, `${beautify(rudiContact)} -> ${contactDbId}`)
       })
     )
@@ -302,7 +298,7 @@ export const mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFo
             throw new BadRequestError(e.message, mod, 'media.overwrite', [API_MEDIA_PROPERTY, i])
           }
         }
-        mediaDbIds.push(new MongooseTypes.ObjectId(mediaDbId))
+        mediaDbIds.push(mediaDbId)
         // logD(mod, fun, `${beautify(rudiMedia)} -> ${mediaDbId} `)
       })
     )
@@ -759,10 +755,10 @@ export const commitMedia = async (req, res) => {
 
     // --- Checks
     // Check mediaId exists
-    const dbMedia = await getObjectWithRudiId(OBJ_MEDIA, mediaId) // NOSONAR
+    const dbMedia = await getObjectWithRudiId(OBJ_MEDIA, mediaId)
     if (!dbMedia) throw new NotFoundError(`Media not found for id '${mediaId}'`)
     // Check metadataId exists
-    const dbMetadata = await getObjectWithRudiId(OBJ_METADATA, metadataId) // NOSONAR
+    const dbMetadata = await getObjectWithRudiId(OBJ_METADATA, metadataId)
     if (!dbMetadata) throw new NotFoundError(`Metadata not found for id '${metadataId}'`)
     // Check metadata is bound to media
     const metadataMediaList = dbMetadata[API_MEDIA_PROPERTY]

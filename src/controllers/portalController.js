@@ -454,7 +454,7 @@ const WAIT_DATE = 'wait_date'
 /**
  * Check a metadata
  * @param {String} metadataId UUID v4 (global_id) that identifies a metadata in this system
- * @return {Object} The metadata
+ * @return {Promise<Object>} The metadata
  */
 const isMetadataSendableToPortal = async (metadataId) => {
   const fun = 'isMetadataAcceptableByPortal'

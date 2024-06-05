@@ -109,8 +109,8 @@ const API_PORTAL_URL = getPortalConf('portal_url')
 export const isPortalConnectionDisabled = () => !API_PORTAL_URL
 export const getPortalBaseUrl = () => API_PORTAL_URL || NO_PORTAL_MSG
 
-const API_GET_URL = getPortalConf('get_url', '')
-const API_SEND_URL = getPortalConf('put_url', '')
+const API_GET_URL = getPortalConf('get_url')
+const API_SEND_URL = getPortalConf('put_url')
 
 export const getPortalMetaUrl = (id, additionalParameters) => {
   if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
