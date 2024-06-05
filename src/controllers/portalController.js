@@ -450,6 +450,7 @@ export const removeMetadataFromWaitingList = (metadataId, reportId) => {
 
 const WAITING_ROOM_TIMEOUT_S = 3600
 const WAIT_DATE = 'wait_date'
+
 /**
  * Check a metadata
  * @param {String} metadataId UUID v4 (global_id) that identifies a metadata in this system
