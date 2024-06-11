@@ -207,7 +207,7 @@ export const CallContext = class CallContext {
     try {
       return (
         this.reqDetailsMsg +
-        ` <- ${this.clientApp}${this.reqUser}${
+        ` <- ${this.clientApp}${this.clientApp && this.reqUser ? ':' : ''}${this.reqUser}${
           this.clientApp || this.reqUser ? ' @ ' : ''
         }${this.ips.join(' <- ')}`
       )

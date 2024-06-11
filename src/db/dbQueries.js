@@ -549,6 +549,7 @@ export const getDbObjectList = async (objectType, options) => {
     //--- Parameters
     // Identify object type characteristics
     const ObjModel = getObjectModel(objectType)
+    logD(mod, fun, `options: ${beautify(options)}`)
 
     // Extract options
     const limit = getParamValue(options, QUERY_LIMIT, DEFAULT_QUERY_LIMIT, MAX_QUERY_LIMIT)

@@ -179,16 +179,8 @@ export const isEveryMediaAvailable = (rudiMetadata) => {
   const fun = 'isEveryMediaAvailable'
   try {
     logT(mod, fun)
-
-    const metadataMediaList = rudiMetadata[API_MEDIA_PROPERTY]
-    let isOneMediaMissing = false
-    for (const media of metadataMediaList) {
-      if (isMediaMissing(media)) {
-        isOneMediaMissing = true
-        break
-      }
-    }
-    return !isOneMediaMissing
+    for (const media of rudiMetadata[API_MEDIA_PROPERTY]) if (isMediaMissing(media)) return false
+    return true
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -777,7 +769,7 @@ const updateMetadataStatus = (metadata) => {
 }
 
 const PORTAL_MIMES = [
-  'application/x-executable',
+  'application/geo+json',
   'application/graphql',
   'application/javascript',
   'application/json',
@@ -792,28 +784,28 @@ const PORTAL_MIMES = [
   'application/vnd.openxmlformats-officedocument.presentationml.presentation',
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/x-executable',
   'application/x-www-form-urlencoded',
   'application/xml',
   'application/zip',
   'application/zstd',
   'audio/mpeg',
   'audio/ogg',
-  'image/gif',
   'image/apng',
   'image/flif',
-  'image/webp',
-  'image/x-mng',
+  'image/gif',
   'image/jpeg',
   'image/png',
+  'image/webp',
+  'image/x-mng',
   'multipart/form-data',
   'text/css',
   'text/csv',
   'text/html',
   'text/php',
   'text/plain',
-  'text/xml',
   'text/x-yaml',
-  'application/x-executable+crypt',
+  'text/xml',
   'application/graphql+crypt',
   'application/javascript+crypt',
   'application/json+crypt',
@@ -828,27 +820,28 @@ const PORTAL_MIMES = [
   'application/vnd.openxmlformats-officedocument.presentationml.presentation+crypt',
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet+crypt',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document+crypt',
+  'application/x-executable+crypt',
   'application/x-www-form-urlencoded+crypt',
   'application/xml+crypt',
   'application/zip+crypt',
   'application/zstd+crypt',
   'audio/mpeg+crypt',
   'audio/ogg+crypt',
-  'image/gif+crypt',
   'image/apng+crypt',
   'image/flif+crypt',
-  'image/webp+crypt',
-  'image/x-mng+crypt',
+  'image/gif+crypt',
   'image/jpeg+crypt',
   'image/png+crypt',
+  'image/webp+crypt',
+  'image/x-mng+crypt',
   'multipart/form-data+crypt',
   'text/css+crypt',
   'text/csv+crypt',
   'text/html+crypt',
   'text/php+crypt',
   'text/plain+crypt',
-  'text/xml+crypt',
   'text/x-yaml+crypt',
+  'text/xml+crypt',
 ]
 export const toRudiPortalJSON = (metadata) => {
   const fun = 'toRudiPortalJSON'

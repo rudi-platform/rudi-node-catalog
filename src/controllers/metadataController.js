@@ -36,6 +36,7 @@ import {
   API_LICENCE_CUSTOM_URI,
   API_LICENCE_TYPE,
   API_MEDIA_ID,
+  API_MEDIA_NAME,
   API_MEDIA_PROPERTY,
   API_MEDIA_TYPE,
   API_METADATA_ID,
@@ -715,6 +716,7 @@ const updateMetadataStorageState = async (dbMetadata, newState = StorageStatus.O
   try {
     logT(mod, fun)
     const metadata = await getMetadataWithJson(dbMetadata)
+    logT(mod, fun, `metadata: ${metadata[API_METADATA_ID]}`)
 
     const areAllMediaAvailable = isEveryMediaAvailable(metadata)
     if (areAllMediaAvailable) {
@@ -722,18 +724,66 @@ const updateMetadataStorageState = async (dbMetadata, newState = StorageStatus.O
     } else {
       metadata[API_STORAGE_STATUS] = StorageStatus.Pending
     }
+    logT(mod, fun, `areAllMediaAvailable: ${areAllMediaAvailable}`)
+
     if (dbMetadata[API_STORAGE_STATUS] !== metadata[API_STORAGE_STATUS]) {
       dbMetadata[API_STORAGE_STATUS] = metadata[API_STORAGE_STATUS]
       if (!dbMetadata[API_INTEGRATION_ERROR_ID]) await dbMetadata.save()
     }
+
     if (metadata[API_INTEGRATION_ERROR_ID]) {
       delete metadata[API_INTEGRATION_ERROR_ID]
       await dbMetadata.save()
       logD(mod, fun, 'Integration error flag removed')
     }
+    logT(mod, fun, `dbMetadata: ${dbMetadata}`)
+
     const msg = `Metadata is ${areAllMediaAvailable ? '' : 'not '}sendable: ${dbMetadata[API_METADATA_ID]}`
     logD(mod, fun, msg)
     return { metadata, areAllMediaAvailable } // OK to send
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+export const commitMedia = async (req, res) => {
+  const fun = 'commitMedia'
+  try {
+    logT(mod, fun)
+    const mediaId = accessReqParam(req, PARAM_ID)
+    const { commitId } = req.body
+
+    const dbMedia = await getObjectWithRudiId(OBJ_MEDIA, mediaId)
+    if (!dbMedia) throw new NotFoundError(`Media not found for id '${mediaId}'`)
+
+    // Set media storage_status to 'available'
+    dbMedia[API_FILE_STORAGE_STATUS] = MediaStorageStatus.Available
+    // Set status_update date
+    dbMedia[API_FILE_STATUS_UPDATE] = nowISO()
+    const savedMedia = await dbMedia.save()
+
+    const filter = { [QUERY_FILTER]: { $and: [{ available_formats: { $in: [savedMedia._id] } }] } }
+    const metadataList = await getDbObjectList(OBJ_METADATA, filter)
+
+    // Updating metadata global storage state
+    const metadataIdList = []
+    const promiseList = []
+    metadataList.forEach((dbMetadata) => {
+      metadataIdList.push(dbMetadata[API_METADATA_ID])
+      promiseList.push(updateMetadataStorageState(dbMetadata))
+    })
+    await Promise.all(promiseList)
+
+    return {
+      media: pick(savedMedia, [
+        API_MEDIA_ID,
+        API_MEDIA_NAME,
+        API_FILE_STORAGE_STATUS,
+        API_FILE_STATUS_UPDATE,
+      ]),
+      metadataList: metadataIdList,
+      commitId,
+    }
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -745,8 +795,8 @@ const updateMetadataStorageState = async (dbMetadata, newState = StorageStatus.O
  * @param {*} res
  * @returns
  */
-export const commitMedia = async (req, res) => {
-  const fun = 'commitMedia'
+export const commitMediaForMetadata = async (req, res) => {
+  const fun = 'commitMediaForMetadata'
   try {
     logT(mod, fun)
     const mediaId = accessReqParam(req, PARAM_ID)
