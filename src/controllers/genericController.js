@@ -319,11 +319,12 @@ export const addObjects = async (req, reply) => {
     let createdObjects
     if (Array.isArray(inputObjects)) {
       createdObjects = []
-      for await (const inputObject of inputObjects) {
+      for (const inputObject of inputObjects) {
         createdObjects.push(
-          await addSingleObject(inputObject, objectType, objectStandard, objectFormat, context)
+          addSingleObject(inputObject, objectType, objectStandard, objectFormat, context)
         )
       }
+      await Promise.all(createdObjects)
     } else {
       createdObjects = await addSingleObject(
         inputObjects,
@@ -703,11 +704,12 @@ export const upsertObjects = async (req, reply) => {
     let createdObjects
     if (Array.isArray(inputObjects)) {
       createdObjects = []
-      for await (const inputObject of inputObjects) {
+      for (const inputObject of inputObjects) {
         createdObjects.push(
-          await upsertSingleObject(inputObject, objectType, objectStandard, objectFormat, context)
+          upsertSingleObject(inputObject, objectType, objectStandard, objectFormat, context)
         )
       }
+      await Promise.all(createdObjects)
     } else {
       createdObjects = await upsertSingleObject(
         inputObjects,

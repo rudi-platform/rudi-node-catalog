@@ -751,7 +751,7 @@ export const commitMedia = async (req, res) => {
   try {
     logT(mod, fun)
     const mediaId = accessReqParam(req, PARAM_ID)
-    const { commitId } = req.body
+    const commitId = req.body?.commitId
 
     const dbMedia = await getObjectWithRudiId(OBJ_MEDIA, mediaId)
     if (!dbMedia) throw new NotFoundError(`Media not found for id '${mediaId}'`)
@@ -763,12 +763,12 @@ export const commitMedia = async (req, res) => {
     const savedMedia = await dbMedia.save()
 
     const filter = { [QUERY_FILTER]: { $and: [{ available_formats: { $in: [savedMedia._id] } }] } }
-    const metadataList = await getDbObjectList(OBJ_METADATA, filter)
+    const dbMetadataList = await getDbObjectList(OBJ_METADATA, filter)
 
     // Updating metadata global storage state
     const metadataIdList = []
     const promiseList = []
-    metadataList.forEach((dbMetadata) => {
+    dbMetadataList.forEach((dbMetadata) => {
       metadataIdList.push(dbMetadata[API_METADATA_ID])
       promiseList.push(updateMetadataStorageState(dbMetadata))
     })
