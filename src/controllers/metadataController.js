@@ -775,14 +775,15 @@ export const commitMedia = async (req, res) => {
     await Promise.all(promiseList)
 
     return {
+      status: 'OK',
       media: pick(savedMedia, [
         API_MEDIA_ID,
         API_MEDIA_NAME,
         API_FILE_STORAGE_STATUS,
         API_FILE_STATUS_UPDATE,
       ]),
-      metadataList: metadataIdList,
-      commitId,
+      metadata_list: metadataIdList,
+      commit_id: commitId,
     }
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
