@@ -66,6 +66,7 @@ import { logD, logT, logW } from './logging.js'
 import { BadRequestError, RudiError } from './errors.js'
 
 import { getModelPropertyNames, getNestedObject, getObjectModel } from '../db/dbQueries.js'
+import { Media, MediaFile, MediaService } from '../definitions/models/Media.js'
 
 // -------------------------------------------------------------------------------------------------
 // Local constants
@@ -111,6 +112,10 @@ export const parseQueryParameters = async (objectType, fullUrl) => {
     // identify object model
     const ObjModel = getObjectModel(objectType)
     const modelProperties = getModelPropertyNames(ObjModel)
+    if (ObjModel == Media) {
+      modelProperties.push(getModelPropertyNames(MediaFile))
+      modelProperties.push(getModelPropertyNames(MediaService))
+    }
     // logD(mod, fun, beautify(modelProperties))
     const returnedFilter = {
       [QUERY_LIMIT]: DEFAULT_QUERY_LIMIT,
