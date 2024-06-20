@@ -61,21 +61,35 @@ export const parseIntClean = (x) => {
 // String
 // -------------------------------------------------------------------------------------------------
 /* eslint no-extend-native: ["error", { "exceptions": ["String"] }] */
-String.prototype.merge = function (...args) {
+String.prototype.merge_defined = function (...args) {
   const argNb = args.length
   if (argNb == 0) return ''
   let finalString = `${args[0]}`
   for (let i = 1; i < argNb; i++) {
+    if (args[i] === undefined || args[i] === null) continue // <- we continue to see if there are some non-null arguments left
     const str = `${args[i]}`
     const mergableStr = str.startsWith(this) ? str : `${this}${str}`
-    finalString = !finalString.endsWith(this)
-      ? finalString + mergableStr
-      : finalString.substring(0, finalString.length - 1) + mergableStr
+    finalString = removeFinalSlash(finalString) + mergableStr
   }
   return finalString
 }
-
+String.prototype.merge = function (...args) {
+  const argNb = args.length
+  if (argNb == 0 || args[0] === undefined || args[0] === null) return ''
+  let finalString = `${args[0]}`
+  for (let i = 1; i < argNb; i++) {
+    if (args[i] === undefined || args[i] === null) break // <- we stop at the first non-defined argument
+    const str = `${args[i]}`
+    const mergableStr = str.startsWith(this) ? str : `${this}${str}`
+    finalString = removeFinalSlash(finalString) + mergableStr
+  }
+  return finalString
+}
 export const pathJoin = (...args) => '/'.merge(...args)
+
+export const removeFinalChar = (str, char = '/') =>
+  str.endsWith(char) ? str.substring(0, str.length - char.length) : str
+export const removeFinalSlash = (str) => removeFinalChar(str)
 
 export const isString = (str) => typeof str === 'string'
 

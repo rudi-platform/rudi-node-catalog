@@ -14,10 +14,10 @@ import {
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 
-import { beautify, decodeBase64url } from '../utils/jsUtils.js'
+import { beautify, decodeBase64url, removeFinalChar } from '../utils/jsUtils.js'
 import { accessProperty } from '../utils/jsonAccess.js'
 
-import { logT } from '../utils/logging.js'
+import { logE, logT, logW } from '../utils/logging.js'
 
 import { getProfile } from '../config/confSystem.js'
 import { ForbiddenError, RudiError, UnauthorizedError } from '../utils/errors.js'
@@ -111,7 +111,7 @@ export const checkRudiProdPermission = async (req, isCheckOptional) => {
       // logE(mod, fun, `err: ${err}`)
       if (isCheckOptional) throw err
       const msgStr = `${err.message}`
-      const msg = msgStr.endsWith('.') ? msgStr.slice(0, -1) : msgStr
+      const msg = removeFinalChar(msgStr, '.')
       const error = new UnauthorizedError(`${msg} when requesting ${req.url}`)
       throw RudiError.treatError(mod, fun, error)
     }
@@ -174,6 +174,8 @@ export const verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
     try {
       verifyToken(pubKey, token)
     } catch (e) {
+      logE(mod, fun, e)
+      logE(mod, fun, token)
       throw new ForbiddenError(beautify(e.message || e))
     }
     logT(mod, fun, 'Token s OK')
@@ -193,11 +195,9 @@ export const verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
     const clientId = payload[JWT_CLIENT]
 
     return { subject, clientId }
-  } catch (err) {
-    // logW(mod, fun, err)
-    const error = new ForbiddenError(
-      `JWT is not a valid RUDI Producer JWT: ${beautify(err.message || err)}`
-    )
+  } catch {
+    logW(mod, fun, `The JWT could not be validated: ${token}`)
+    const error = new ForbiddenError(`The JWT could not be validated`)
     throw RudiError.treatError(mod, fun, error)
   }
 }

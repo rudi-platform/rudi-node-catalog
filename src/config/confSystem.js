@@ -22,7 +22,13 @@ import { TRACE, TRACE_ERR, TRACE_FUN, TRACE_MOD } from './constApi.js'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { consoleErr, consoleLog, pathJoin, separateLogs } from '../utils/jsUtils.js'
+import {
+  consoleErr,
+  consoleLog,
+  pathJoin,
+  removeFinalSlash,
+  separateLogs,
+} from '../utils/jsUtils.js'
 
 import { readIniFile } from '../utils/fileActions.js'
 
@@ -75,14 +81,14 @@ const LISTENING_ADDR = getConf(SERVER_SECTION, 'listening_address')
 const LISTENING_PORT = getConf(SERVER_SECTION, 'listening_port')
 
 const publicUrl = getCliEnvOpt(OPT_PUBLIC_URL) || getConf(SERVER_SECTION, 'server_url')
-const PUBLIC_URL = publicUrl.endsWith('/') ? publicUrl.slice(0, -1) : publicUrl
+const PUBLIC_URL = removeFinalSlash(publicUrl)
 
 export const getAppName = () => APP_NAME
 export const getServerAddress = () => LISTENING_ADDR
 export const getServerPort = () => LISTENING_PORT
-export const getHost = (suffix) => `http://${LISTENING_ADDR}:${LISTENING_PORT}/${suffix || ''}`
+export const getHost = (suffix) => pathJoin(`http://${LISTENING_ADDR}:${LISTENING_PORT}`, suffix)
 
-export const getPublicUrl = (suffix) => `${PUBLIC_URL}${suffix || ''}`
+export const getPublicUrl = (suffix) => pathJoin(PUBLIC_URL, suffix)
 
 // ----- App environment
 const NODE_ENV = getCliEnvOpt(OPT_NODE_ENV) || 'dev'
@@ -135,6 +141,7 @@ export const getProfile = (subject) => {
 // const now = utils.nowLocaleFormatted()
 const appMsg = `App '${APP_NAME}' listening on: ${getHost()}`
 consoleLog(mod, 'init', appMsg)
+consoleLog(mod, 'init', `Public URL: ${getPublicUrl()}`)
 consoleLog(mod, 'init', `DB: ${DB_URI}`)
 
 // ----- SKOSMOS section

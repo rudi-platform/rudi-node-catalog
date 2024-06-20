@@ -9,6 +9,7 @@ import {
   createBasicAuth,
   decodeBase64url,
   isDefined,
+  pathJoin,
   separateLogs,
 } from '../utils/jsUtils.js'
 
@@ -115,8 +116,8 @@ const API_SEND_URL = getPortalConf('put_url')
 export const getPortalMetaUrl = (id, additionalParameters) => {
   if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
   const reqUrl = !id
-    ? `${API_PORTAL_URL}/${API_GET_URL.replace('/{{id}}', '')}`
-    : `${API_PORTAL_URL}/${API_GET_URL.replace('{{id}}', id)}`
+    ? pathJoin(API_PORTAL_URL, API_GET_URL.replace('/{{id}}', ''))
+    : pathJoin(API_PORTAL_URL, API_GET_URL.replace('{{id}}', id))
   const options = additionalParameters ? `?${additionalParameters}` : ''
   return `${reqUrl}${options}`
 }
