@@ -53,6 +53,7 @@ import {
   DB_UPDATED_AT,
   DICT_LANG,
   LicenceTypes,
+  MetadataStatus,
 } from '../db/dbFields.js'
 
 import {
@@ -852,44 +853,56 @@ export const commitMediaForMetadata = async (req, res) => {
 }
 
 export const sendManyMetadataToPortal = async (req) => {
-  const fun = 'sendAllMetadataToPortal'
+  const fun = 'sendManyMetadataToPortal'
   try {
     logT(mod, fun)
+
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     const listIds = req.body
-
-    if (!!listIds && !Array.isArray(listIds)) {
-      throw new BadRequestError(
-        'The body of the request should be empty (to send every metadata) or a list of ids',
-        mod,
-        fun
+    const FORCE_ALL = 'force=all'
+    if (Array.isArray(listIds)) {
+      logD(mod, fun, 'Sending a list of metadata')
+      listIds.forEach((metaId) =>
+        sendMetadataToPortal(metaId)
+          .then((res) => {
+            if (res)
+              logI(mod, fun, `Update request received by the portal for metadata '${metaId}'`)
+          })
+          .catch((err) =>
+            logE(mod, fun, `Sending to portal failed for metadata '${metaId}': ${err}`)
+          )
       )
-    }
-
-    if (!listIds || isEmptyArray(listIds)) {
-      logD(mod, fun, 'Getting the list of metadata ids')
-      let metadataListAndCount = await getDbObjectListAndCount(OBJ_METADATA, {
-        [QUERY_FIELDS]: [API_METADATA_ID],
-      })
+    } else {
+      let metadataListAndCount
+      let filter
+      if (req.url.endsWith(FORCE_ALL)) {
+        logD(mod, fun, 'Forcing the sending of every metadata')
+        filter = { [QUERY_FIELDS]: [API_METADATA_ID] }
+      } else if (!listIds) {
+        logD(mod, fun, 'Sending the refused metadata')
+        filter = {
+          [QUERY_FIELDS]: [API_METADATA_ID],
+          [QUERY_FILTER]: { [API_STATUS_PROPERTY]: MetadataStatus.Refused },
+        }
+      } else {
+        throw new BadRequestError(
+          'The body of the request should be empty (to send every refused metadata), ' +
+            'or a list of ids to be sent, ' +
+            `or the query should be "${FORCE_ALL}" to force the sending of every metadata`
+        )
+      }
+      metadataListAndCount = await getDbObjectListAndCount(OBJ_METADATA, filter)
       const metadataCount = metadataListAndCount[COUNT_LABEL]
       let metadataList = metadataListAndCount[LIST_LABEL]
       const currentCount = metadataList ? metadataList.length : 0
 
       if (currentCount < metadataCount) {
         logD(mod, fun, 'Getting the whole list of metadata ids')
-        metadataListAndCount = await getDbObjectListAndCount(OBJ_METADATA, {
-          [QUERY_FIELDS]: [API_METADATA_ID],
-          [QUERY_LIMIT]: metadataCount,
-        })
+        filter = { ...filter, [QUERY_LIMIT]: metadataCount }
+        metadataListAndCount = await getDbObjectListAndCount(OBJ_METADATA, { filter })
         metadataList = metadataListAndCount[LIST_LABEL]
       }
       metadataList.map((meta) => sendToPortal(meta))
-    } else {
-      listIds.map((id) =>
-        sendMetadataToPortal(id).then((res) => {
-          if (res) logI(mod, fun, `Update request received by the portal for metadata '${id}'`)
-        })
-      )
     }
     return 'Sending metadata to portal'
   } catch (err) {
