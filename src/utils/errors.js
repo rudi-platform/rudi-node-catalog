@@ -8,7 +8,7 @@ import { nanoid } from 'nanoid'
 // -------------------------------------------------------------------------------------------------
 // Constants
 // -------------------------------------------------------------------------------------------------
-const DEFAULT_MESSAGE = 'Rudi producer node - API Server Error'
+const DEFAULT_MESSAGE = 'Rudi producer node - RUDI Catalog server Error'
 const IS_RUDI_ERROR = 'is_rudi_error'
 const ERR_ID = 'errId'
 

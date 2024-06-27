@@ -19,6 +19,7 @@ export const OPT_APP_ENV = 'appEnv'
 export const OPT_USER_CONF = 'conf'
 export const OPT_PROFILES_CONF = 'profiles'
 export const OPT_PORTAL_CONF = 'portalConf'
+export const OPT_PORT = 'listeningPort'
 
 // -------------------------------------------------------------------------------------------------
 // Loading app options
@@ -47,8 +48,14 @@ export const OPTIONS = {
     env: 'RUDI_API_GIT_REV',
     alt: 'RUDI_CATALOG_GIT_REV',
   },
+  [OPT_PORT]: {
+    text: 'RUDI Catalog server listening port',
+    cli: 'port',
+    env: 'RUDI_API_PORT',
+    alt: 'RUDI_CATALOG_PORT',
+  },
   [OPT_PUBLIC_URL]: {
-    text: 'API server public URL',
+    text: 'RUDI Catalog server public URL',
     cli: 'api_url',
     env: 'RUDI_API_URL',
     alt: 'RUDI_CATALOG_URL',

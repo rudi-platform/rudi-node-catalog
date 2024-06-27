@@ -12,6 +12,7 @@ import {
   OPT_DB_CONNECT_URI,
   OPT_GIT_HASH,
   OPT_NODE_ENV,
+  OPT_PORT,
   OPT_PROFILES_CONF,
   OPT_PUBLIC_URL,
   getCliEnvOpt,
@@ -78,7 +79,7 @@ const SERVER_SECTION = 'server'
 
 const APP_NAME = getConf(SERVER_SECTION, 'app_name')
 const LISTENING_ADDR = getConf(SERVER_SECTION, 'listening_address')
-const LISTENING_PORT = getConf(SERVER_SECTION, 'listening_port')
+const LISTENING_PORT = getCliEnvOpt(OPT_PORT) || getConf(SERVER_SECTION, 'listening_port')
 
 const publicUrl = getCliEnvOpt(OPT_PUBLIC_URL) || getConf(SERVER_SECTION, 'server_url')
 const PUBLIC_URL = removeFinalSlash(publicUrl)

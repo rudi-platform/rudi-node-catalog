@@ -9,7 +9,12 @@ import { API_VERSION } from './src/config/constApi.js'
 import { beautify, consoleErr, consoleLog, separateLogs } from './src/utils/jsUtils.js'
 
 // 2. Sys conf
-import { getAppName, getDbFullUri } from './src/config/confSystem.js'
+import {
+  getAppName,
+  getDbFullUri,
+  getServerAddress,
+  getServerPort,
+} from './src/config/confSystem.js'
 
 // 3. Log conf
 import './src/config/confLogs.js'
@@ -171,7 +176,7 @@ const start = async () => {
     const startMsg = `API v${API_VERSION} | App version: '${getAppHash()}' | '${getEnvironment()}' env`
     logI(mod, fun, startMsg)
     sysInfo(startMsg, '', '', ' ')
-    logI(mod, 'server', 'Ready')
+    logI(mod, 'server', `Ready, listening on ${getServerAddress()}:${getServerPort()}`)
 
     const logSeparatorEnd = separateLogs('Init OK', true) //////////////////////////////////////////
 
