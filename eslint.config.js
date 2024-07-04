@@ -1,7 +1,7 @@
-import babelParser from '@babel/eslint-parser'
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 import globals from 'globals'
 
+import babelParser from '@babel/eslint-parser'
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 import unusedImports from 'eslint-plugin-unused-imports'
 
 export default [
