@@ -60,36 +60,34 @@ export const parseIntClean = (x) => {
 // -------------------------------------------------------------------------------------------------
 // String
 // -------------------------------------------------------------------------------------------------
-/* eslint no-extend-native: ["error", { "exceptions": ["String"] }] */
-String.prototype.merge_defined = function (...args) {
-  const argNb = args.length
-  if (argNb == 0) return ''
-  let finalString = `${args[0]}`
-  for (let i = 1; i < argNb; i++) {
-    if (args[i] === undefined || args[i] === null) continue // <- we continue to see if there are some non-null arguments left
-    const str = `${args[i]}`
-    const mergableStr = str.startsWith(this) ? str : `${this}${str}`
-    finalString = removeFinalSlash(finalString) + mergableStr
-  }
-  return finalString
-}
-String.prototype.merge = function (...args) {
+
+/**
+ * Joins several string chunks with the first argument the function is called with.
+ * This is basically the reverse of the String split function, with the difference that we make sure
+ * the merging character is not duplicated
+ * @param {string} sep separator we want to merge the string chunks with
+ * @param {...string} args string chunks to be joined
+ * @return {string}
+ */
+const mergeStrings = (sep, ...args) => {
   const argNb = args.length
   if (argNb == 0 || args[0] === undefined || args[0] === null) return ''
-  let finalString = `${args[0]}`
+  let accumulatedStr = `${args[0]}`
   for (let i = 1; i < argNb; i++) {
-    if (args[i] === undefined || args[i] === null) break // <- we stop at the first non-defined argument
-    const str = `${args[i]}`
-    const mergableStr = str.startsWith(this) ? str : `${this}${str}`
-    finalString = removeFinalSlash(finalString) + mergableStr
+    if (args[i] === undefined || args[i] === null) break
+    const newChunk = `${args[i]}`
+    const cleanChunk = newChunk.startsWith(sep) ? newChunk.slice(1) : newChunk
+    accumulatedStr = accumulatedStr.endsWith(sep)
+      ? accumulatedStr + cleanChunk
+      : accumulatedStr + sep + cleanChunk
   }
-  return finalString
+  return accumulatedStr
 }
-export const pathJoin = (...args) => '/'.merge(...args)
+export const pathJoin = (...args) => mergeStrings('/', ...args)
 
-export const removeFinalChar = (str, char = '/') =>
+export const removeTrailingChar = (str, char = '/') =>
   str.endsWith(char) ? str.substring(0, str.length - char.length) : str
-export const removeFinalSlash = (str) => removeFinalChar(str)
+export const removeTrailingSlash = (str) => removeTrailingChar(str, '/')
 
 export const isString = (str) => typeof str === 'string'
 

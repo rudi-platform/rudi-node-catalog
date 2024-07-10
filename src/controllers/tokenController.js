@@ -14,7 +14,7 @@ import {
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 
-import { beautify, decodeBase64url, removeFinalChar } from '../utils/jsUtils.js'
+import { beautify, decodeBase64url, removeTrailingChar } from '../utils/jsUtils.js'
 import { accessProperty } from '../utils/jsonAccess.js'
 
 import { logE, logT, logW } from '../utils/logging.js'
@@ -111,7 +111,7 @@ export const checkRudiProdPermission = async (req, isCheckOptional) => {
       // logE(mod, fun, `err: ${err}`)
       if (isCheckOptional) throw err
       const msgStr = `${err.message}`
-      const msg = removeFinalChar(msgStr, '.')
+      const msg = removeTrailingChar(msgStr, '.')
       const error = new UnauthorizedError(`${msg} when requesting ${req.url}`)
       throw RudiError.treatError(mod, fun, error)
     }

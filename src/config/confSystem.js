@@ -27,7 +27,7 @@ import {
   consoleErr,
   consoleLog,
   pathJoin,
-  removeFinalSlash,
+  removeTrailingSlash,
   separateLogs,
 } from '../utils/jsUtils.js'
 
@@ -82,7 +82,7 @@ const LISTENING_ADDR = getConf(SERVER_SECTION, 'listening_address')
 const LISTENING_PORT = getCliEnvOpt(OPT_PORT) || getConf(SERVER_SECTION, 'listening_port')
 
 const publicUrl = getCliEnvOpt(OPT_PUBLIC_URL) || getConf(SERVER_SECTION, 'server_url')
-const PUBLIC_URL = removeFinalSlash(publicUrl)
+const PUBLIC_URL = removeTrailingSlash(publicUrl)
 
 export const getAppName = () => APP_NAME
 export const getServerAddress = () => LISTENING_ADDR
