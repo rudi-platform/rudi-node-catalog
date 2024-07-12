@@ -73,6 +73,8 @@ export const getPortalConf = (opt) => {
 // -------------------------------------------------------------------------------------------------
 // Extracting and exporting sys configuration
 // -------------------------------------------------------------------------------------------------
+const API_PORTAL_URL = getPortalUserConf('portal_url')
+export const isPortalConnectionDisabled = () => !API_PORTAL_URL
 
 // ----- Auth
 const AUTH_URL = getPortalUserConf('auth_url') || API_PORTAL_URL
@@ -106,8 +108,6 @@ export const getCredentials = (headersOnly) =>
   headersOnly ? BAUTH_HEADERS_BASIC : [BAUTH_HEADERS_BASIC, PORTAL_TOKEN_REQ_BODY]
 
 // ----- API
-const API_PORTAL_URL = getPortalUserConf('portal_url')
-export const isPortalConnectionDisabled = () => !API_PORTAL_URL
 export const getPortalBaseUrl = () => API_PORTAL_URL || NO_PORTAL_MSG
 
 const API_GET_URL = getPortalConf('get_url')
