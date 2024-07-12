@@ -158,6 +158,9 @@ export const apiSendOptions = () => {
 }
 
 // ----- Feedback
-if (isPortalConnectionDisabled()) logD(mod, '', NO_PORTAL_MSG)
-else logD(mod, '', `Portal - Data: '${API_PORTAL_URL}'`)
-logD(mod, '', `Portal - Auth: '${AUTH_URL}'`)
+if (isPortalConnectionDisabled()) {
+  logD(mod, '', NO_PORTAL_MSG)
+} else {
+  logD(mod, '', `Portal - Data: '${API_PORTAL_URL}'`)
+  logD(mod, '', `Portal - Auth: '${AUTH_URL}'`)
+}
