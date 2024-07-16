@@ -47,7 +47,7 @@ const translateOrgAddress = async (inputObject, path, args) => {
       )
       result += addressField + ', '
     }
-    return result.substring(0, result.length - 2)
+    return result.slice(0, result.length - 2)
   } catch (e) {
     throw RudiError.treatError(mod, fun, e)
   }

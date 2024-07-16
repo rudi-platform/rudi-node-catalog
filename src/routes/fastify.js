@@ -206,7 +206,7 @@ routeListener.addHook('onRequest', (req, res, next) => {
     } catch (err) {
       context.setReqDescription(
         req.method,
-        req.url.substring(0, getUrlMaxLength()),
+        req.url.slice(0, getUrlMaxLength()),
         req.routeOptions?.config[ROUTE_NAME]
       )
       CallContext.setAsReqContext(req, context)

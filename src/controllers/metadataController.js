@@ -550,7 +550,7 @@ function toMDBLanguage(metadata, field) {
       return
     }
     prop.forEach((entry) => {
-      if (entry[DICT_LANG]) entry[DICT_LANG] = entry[DICT_LANG].substring(0, 2)
+      if (entry[DICT_LANG]) entry[DICT_LANG] = entry[DICT_LANG].slice(0, 2)
     })
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)

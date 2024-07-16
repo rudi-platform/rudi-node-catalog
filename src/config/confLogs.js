@@ -85,8 +85,8 @@ export const SYSLOG_PROTOCOL = getConf(SYSLOG_SECTION, 'syslog_protocol', 'unix'
 const getFacilityConf = () => {
   const facilityConf = getConf(SYSLOG_SECTION, 'syslog_facility')
   let facility = 'none'
-  if (facilityConf.substr(0, 5) === 'local') {
-    const localNb = Number(facilityConf.substr(5, 1))
+  if (facilityConf.slice(0, 5) === 'local') {
+    const localNb = Number(facilityConf.slice(5, 1))
     if (0 <= localNb && localNb <= 7) {
       facility = Facility.Local0 + localNb
     }
@@ -157,7 +157,7 @@ winston.addColors({
 
 const FORMAT_TIMESTAMP = { format: LOG_DATE_FORMAT }
 const LOGS_FORMAT_PRINTF = (info) =>
-  `${info.level}`.substring(0, 1).toUpperCase() + ` ${info.timestamp} ${info.message}`
+  `${info.level}`.slice(0, 1).toUpperCase() + ` ${info.timestamp} ${info.message}`
 
 const formatConsoleLogs = combine(
   timestamp(FORMAT_TIMESTAMP),

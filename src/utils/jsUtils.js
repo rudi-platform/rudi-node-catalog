@@ -34,7 +34,7 @@ export const separateLogs = (insertStr, shouldDisplayDate) => {
   const inputStr = insertStr ? `[ ${insertStr} ]==` : ''
   const eatenCharacters = dateStr.length + inputStr.length
   // const line = inputStr.padStart(BASE_LINE.length - eatenCharacters, '=')
-  const line = BASE_LINE.substring(eatenCharacters)
+  const line = BASE_LINE.slice(eatenCharacters)
 
   const logSeparator = `${dateStr}${line}${inputStr}`
 
@@ -86,7 +86,7 @@ const mergeStrings = (sep, ...args) => {
 export const pathJoin = (...args) => mergeStrings('/', ...args)
 
 export const removeTrailingChar = (str, char = '/') =>
-  str.endsWith(char) ? str.substring(0, str.length - char.length) : str
+  str.endsWith(char) ? str.slice(0, str.length - char.length) : str
 export const removeTrailingSlash = (str) => removeTrailingChar(str, '/')
 
 export const isString = (str) => typeof str === 'string'
@@ -125,7 +125,7 @@ export const padEndModulo = (str, base, padSign) => {
   const fun = 'pad'
   // consoleLog(mod, fun, `base = ${base}, sign = '${padSign}'`)
   try {
-    padSign = padSign?.substring(0, 1)
+    padSign = padSign?.slice(0, 1)
     const modulo = str.length % base
     return modulo === 0 ? str : str.padEnd(str.length + base - modulo, padSign)
   } catch (err) {
@@ -137,7 +137,7 @@ export const padEndModulo = (str, base, padSign) => {
 export const shorten = (str, len) => {
   if (!str) return
   if (str.length < len) return str
-  return str.substring(0, len) + '[...]'
+  return str.slice(0, len) + '[...]'
 }
 
 export const padA1 = (num) => {

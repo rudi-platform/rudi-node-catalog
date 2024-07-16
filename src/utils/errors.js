@@ -268,7 +268,7 @@ export class RudiError extends Error {
       } else if (comError.message) {
         const errMsg = comError.message
         if (errMsg.startsWith('Request failed with status code ')) {
-          const errCode = `${errMsg}`.substring(32, 35)
+          const errCode = `${errMsg}`.slice(32, 35)
           logT(mod, fun, `${errFlag}error message ${errCode}: ${beautify(comError)}`)
           error = RudiError.createRudiHttpError(errCode, errMsg)
         } else {

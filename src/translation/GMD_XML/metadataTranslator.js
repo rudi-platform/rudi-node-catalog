@@ -128,7 +128,7 @@ const translateSynopsis = async (inputObject, path, args) => {
   try {
     let result = arrayCheck(await translateSummary(inputObject, path, args))
     if (result[DICT_TEXT].length > 150) {
-      result[DICT_TEXT] = result[DICT_TEXT].substring(0, 149)
+      result[DICT_TEXT] = result[DICT_TEXT].slice(0, 149)
     }
     return [result]
   } catch (e) {

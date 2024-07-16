@@ -571,7 +571,7 @@ export const getDbObjectList = async (objectType, options) => {
     if (sortByFields) {
       sortByFields.map((field) => {
         if (field[0] === '-') {
-          sortOptions[field.substring(1)] = -1
+          sortOptions[field.slice(1)] = -1
         } else {
           sortOptions[field] = 1
         }
@@ -641,7 +641,7 @@ export const getDbObjectListAndCount = async (objectType, options) => {
     if (sortByFields) {
       sortByFields.map((field) => {
         if (field[0] === '-') {
-          sortOptions[field.substring(1)] = -1
+          sortOptions[field.slice(1)] = -1
         } else {
           sortOptions[field] = 1
         }
@@ -725,7 +725,7 @@ export const searchDbObjects = async (objectType, options) => {
 
     logD(mod, fun, `searching: ${searchTermsList}`)
 
-    const lang = options[QUERY_LANG]?.substring(0, 2) || 'fr'
+    const lang = options[QUERY_LANG]?.slice(0, 2) || 'fr'
     options[QUERY_FILTER].$text = {
       $search: searchTermsList.join(' '),
       $language: lang,
@@ -745,8 +745,8 @@ export const searchDbObjects = async (objectType, options) => {
         return await getDbObjectListAndCount(objectType, options)
       }
     } catch (err) {
-      // logV(mod, fun, beautify(err.message.substring(0, MDB_ERR_MSG_NO_INDEX.length)))
-      if (err.message?.substring(0, MDB_ERR_MSG_NO_INDEX.length) === MDB_ERR_MSG_NO_INDEX) {
+      // logV(mod, fun, beautify(err.message.slice(0, MDB_ERR_MSG_NO_INDEX.length)))
+      if (err.message?.slice(0, MDB_ERR_MSG_NO_INDEX.length) === MDB_ERR_MSG_NO_INDEX) {
         logV(mod, fun, `No search index: let's recreate them`)
         const ObjModel = getObjectModel(objectType)
         try {
@@ -768,7 +768,7 @@ export const searchDbObjects = async (objectType, options) => {
         logW(mod, fun, err)
         return { total: 0, items: [] }
       } else {
-        logW(mod, fun, `${err}`.substring(0, MDB_ERR_NO_INDEX.length))
+        logW(mod, fun, `${err}`.slice(0, MDB_ERR_NO_INDEX.length))
         throw err
       }
     }
@@ -833,7 +833,7 @@ export const groupDbObjectList = async (objectType, unionField, options) => {
         const genericName = `${field}${i}`
         const genericField = `${groupList}.${genericName}`
         if (field[0] === '-') {
-          absoluteField = field.substring(1)
+          absoluteField = field.slice(1)
           sortOptions[genericField] = -1
         } else {
           absoluteField = field

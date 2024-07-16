@@ -135,7 +135,7 @@ export const parseQueryParameters = async (objectType, fullUrl) => {
       // logD(mod, fun, `No question mark in url: ${reqUrl}`)
       return returnedFilter
     }
-    // const reqArgs = reqUrl.substring(reqUrl.indexOf('?'))
+    // const reqArgs = reqUrl.slice(reqUrl.indexOf('?'))
     const splitUrl = fullUrl.split('?')
     const reqUrl = splitUrl[0]
     const reqArgs = splitUrl[1]
@@ -197,7 +197,7 @@ export const parseQueryParameters = async (objectType, fullUrl) => {
               let absoluteField = trimmedField
               if (trimmedField[0] === '-') {
                 minus = '-'
-                absoluteField = trimmedField.substring(1)
+                absoluteField = trimmedField.slice(1)
               }
               // Dealing with virtual fields
               switch (absoluteField) {
@@ -287,8 +287,8 @@ export const parseQueryParameters = async (objectType, fullUrl) => {
         }
       } else {
         const indexSeparator = key.indexOf('.')
-        const nestedField = key.substring(0, indexSeparator)
-        const nestedFieldProp = key.substring(indexSeparator + 1)
+        const nestedField = key.slice(0, indexSeparator)
+        const nestedFieldProp = key.slice(indexSeparator + 1)
 
         if (modelProperties.includes(nestedField)) {
           try {
