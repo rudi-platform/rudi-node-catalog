@@ -201,6 +201,11 @@ export const dateToIso = (date) => {
   }
 }
 export const nowISO = () => dateToIso()
+export const nowFileDate = () =>
+  new Date()
+    .toISOString()
+    .replace('T', '_')
+    .replace(/([:]|\..*)/g, '')
 
 export const dateEpochSToIso = (utcSeconds) => {
   const fun = 'dateEpochSToIso'

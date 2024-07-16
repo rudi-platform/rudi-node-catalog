@@ -120,6 +120,9 @@ const DB_URI =
 
 export const getDbFullUri = () => DB_URI
 
+// const DB_DUMP_DIR = getConf(DB_SECTION, 'db_dump_dir')
+// export const getDbDumpDir = () => DB_DUMP_DIR
+
 // ----- Security section
 const PROFILES = readIniFile(getCliEnvOpt(OPT_PROFILES_CONF) || getConf('security', 'profiles'))
 

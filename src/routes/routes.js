@@ -102,7 +102,13 @@ import {
   getSingleReportForObject,
 } from '../controllers/reportController.js'
 
-import { dropCollection, dropDB, getCollections } from '../controllers/dbController.js'
+import {
+  dropCollection,
+  dropDB,
+  dumpDB,
+  getCollections,
+  restoreDB,
+} from '../controllers/dbController.js'
 import { getLogs, searchLogs } from '../controllers/logController.js'
 import {
   getApiVersion,
@@ -816,12 +822,26 @@ export const devRoutes = [
     handler: dropCollection,
     config: { [ROUTE_NAME]: 'dev_drop_collection' },
   },
-  /** Drop DB */
+  /** Drop DB = delete all collections! */
   {
     method: 'DELETE',
     url: `${URL_PV_DB_ACCESS}`,
     handler: dropDB,
     config: { [ROUTE_NAME]: 'dev_drop_db' },
+  },
+  /** Dump DB = save collections in a zip file */
+  {
+    method: 'POST',
+    url: `${URL_PV_DB_ACCESS}/dump`,
+    handler: dumpDB,
+    config: { [ROUTE_NAME]: 'dev_db_dump' },
+  },
+  /** Dump DB = restore collections from a local zip file */
+  {
+    method: 'POST',
+    url: `${URL_PV_DB_ACCESS}/restore`,
+    handler: restoreDB,
+    config: { [ROUTE_NAME]: 'dev_db_restore' },
   },
   // -------------------------------------------------------------------------------------------------
   // Tests entry
