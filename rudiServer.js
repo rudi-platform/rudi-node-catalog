@@ -104,7 +104,7 @@ const mongoConnectWithRetry = async () => {
   }
 }
 
-const initilizeModelIndexes = async () => {
+const initializeModelIndexes = async () => {
   try {
     await Promise.all(
       [LogEntry, Contact, Organization, Media, Metadata].map(
@@ -124,7 +124,7 @@ const initilizeModelIndexes = async () => {
       )
     )
   } catch (err) {
-    logE(mod, 'initilizeModelIndexes', err)
+    logE(mod, 'initializeModelIndexes', err)
     throw new Error(`Model index initialization failed: ${err}`)
   }
 }
@@ -165,7 +165,7 @@ const start = async () => {
     await launchRouteListener()
 
     separateLogs('Indexing models', true) //////////////////////////////////////////////////////////
-    await initilizeModelIndexes()
+    await initializeModelIndexes()
 
     separateLogs('Thesauri init', true) ////////////////////////////////////////////////////////////
     await Keywords.initialize()

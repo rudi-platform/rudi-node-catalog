@@ -492,7 +492,7 @@ const MetadataSchema = new mongoose.Schema(
   {
     id: false,
     strict: true,
-    timestamps: true,
+    timestamps: true, // Adds mongoose fields 'updatedAt' and 'createdAt'
     optimisticConcurrency: true,
     useNestedStrict: true,
     toObject: {

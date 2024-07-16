@@ -40,7 +40,9 @@ import {
   QUERY_FILTER,
   QUERY_GROUP_BY,
   QUERY_GROUP_LIMIT,
+  QUERY_GROUP_LIMIT_CAML,
   QUERY_GROUP_OFFSET,
+  QUERY_GROUP_OFFSET_CAML,
   QUERY_LANG,
   QUERY_LIMIT,
   QUERY_OBJECT_FORMAT,
@@ -48,6 +50,7 @@ import {
   QUERY_OFFSET,
   QUERY_SEARCH_TERMS,
   QUERY_SORT_BY,
+  QUERY_SORT_BY_CAML,
   ROUTE_OPT,
   STATUS_CODE,
   URL_OBJECTS,
@@ -485,7 +488,7 @@ export const getManyObjects = async (objectType, req) => {
       logW(mod, fun, err)
       return []
     }
-    // logD(mod, fun, beautify(parsedParameters))
+    logD(mod, fun, beautify(parsedParameters))
 
     const countBy = parsedParameters[QUERY_COUNT_BY]
     const groupBy = parsedParameters[QUERY_GROUP_BY]
@@ -497,6 +500,7 @@ export const getManyObjects = async (objectType, req) => {
         QUERY_LIMIT,
         QUERY_OFFSET,
         QUERY_SORT_BY,
+        QUERY_SORT_BY_CAML,
         QUERY_FILTER,
         QUERY_FIELDS,
       ])
@@ -512,8 +516,11 @@ export const getManyObjects = async (objectType, req) => {
         QUERY_FILTER,
         QUERY_FIELDS,
         QUERY_SORT_BY,
+        QUERY_SORT_BY_CAML,
         QUERY_GROUP_LIMIT,
+        QUERY_GROUP_LIMIT_CAML,
         QUERY_GROUP_OFFSET,
+        QUERY_GROUP_OFFSET_CAML,
       ])
       objectList = await groupDbObjectList(objectType, groupBy, options)
     } else {

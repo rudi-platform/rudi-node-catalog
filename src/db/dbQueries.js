@@ -45,6 +45,7 @@ import {
   QUERY_OFFSET,
   QUERY_SEARCH_TERMS,
   QUERY_SORT_BY,
+  QUERY_SORT_BY_CAML,
 } from '../config/constApi.js'
 import { JWT_EXP } from '../config/constJwt.js'
 // Fields from the JSON as defined in the API
@@ -556,11 +557,12 @@ export const getDbObjectList = async (objectType, options) => {
     const offset = getParamValue(options, QUERY_OFFSET, DEFAULT_QUERY_OFFSET)
     const filter = getParamValue(options, QUERY_FILTER)
     const fields = getParamValue(options, QUERY_FIELDS)
-    const sortByFields = getParamValue(options, QUERY_SORT_BY)
+    const sortByFields =
+      getParamValue(options, QUERY_SORT_BY) || getParamValue(options, QUERY_SORT_BY_CAML)
 
     const populateFields = getPopulateFields(objectType)
 
-    // logD(mod, fun, `options: ${beautify(options)}`)
+    logD(mod, fun, `options: ${beautify(options)}`)
 
     // logD(mod, fun, `filter: ${beautify(filter)}`)
 
@@ -577,11 +579,12 @@ export const getDbObjectList = async (objectType, options) => {
     }
     sortOptions[DB_ID] = 1 // Default sort to get consistent offset/limit results
 
-    // logD(mod, fun, `sortOptions: ${beautify(sortOptions)}`)
+    logD(mod, fun, `sortOptions: ${beautify(sortOptions)}`)
 
     //--- Find
+    const fieldsToKeep = fields ? fields.join(' ') : ``
+
     if (isEmptyArray(populateFields)) {
-      const fieldsToKeep = fields ? fields.join(' ') : ``
       return await ObjModel.find(filter, fieldsToKeep)
         .sort(sortOptions)
         .limit(limit)
@@ -589,7 +592,7 @@ export const getDbObjectList = async (objectType, options) => {
         .exec()
     } else {
       // Populate
-      const objectList = await ObjModel.find(filter)
+      const objectList = await ObjModel.find(filter, fieldsToKeep)
         .sort(sortOptions)
         .skip(offset)
         .limit(limit)
@@ -626,7 +629,8 @@ export const getDbObjectListAndCount = async (objectType, options) => {
     const offset = getParamValue(options, QUERY_OFFSET, DEFAULT_QUERY_OFFSET)
     const filter = getParamValue(options, QUERY_FILTER, {})
     const fieldsToKeep = getParamValue(options, QUERY_FIELDS)
-    const sortByFields = getParamValue(options, QUERY_SORT_BY)
+    const sortByFields =
+      getParamValue(options, QUERY_SORT_BY) || getParamValue(options, QUERY_SORT_BY_CAML)
 
     logD(mod, fun, `options: ${beautify(options)}`)
 
@@ -811,7 +815,8 @@ export const groupDbObjectList = async (objectType, unionField, options) => {
     const groupOffset = getParamValue(options, QUERY_GROUP_OFFSET, DEFAULT_QUERY_OFFSET)
     const filter = getParamValue(options, QUERY_FILTER, {})
     const fieldsToKeep = getParamValue(options, QUERY_FIELDS)
-    const sortByFields = getParamValue(options, QUERY_SORT_BY)
+    const sortByFields =
+      getParamValue(options, QUERY_SORT_BY) || getParamValue(options, QUERY_SORT_BY_CAML)
 
     // Prepare sortBy options for MongoDB
     const groupList = 'list'

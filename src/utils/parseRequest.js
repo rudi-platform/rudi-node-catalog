@@ -191,6 +191,7 @@ export const parseQueryParameters = async (objectType, fullUrl) => {
           case QUERY_SORT_BY:
           case QUERY_SORT_BY_CAML:
             returnedFilter[key] = value.split(',').map((field) => {
+              logD(mod, fun, `field=${field}`)
               let trimmedField = field.trim()
               let minus = ''
               let absoluteField = trimmedField
@@ -207,6 +208,7 @@ export const parseQueryParameters = async (objectType, fullUrl) => {
                 case `${META_DATES}${API_DATES_PUBLISHED}`:
                   return `${minus}${DB_PUBLISHED_AT}`
                 default:
+                  logD(mod, fun, `field=${trimmedField}`)
                   return trimmedField
               }
             })
