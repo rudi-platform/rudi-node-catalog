@@ -9,6 +9,7 @@ import {
   createBasicAuth,
   decodeBase64url,
   isDefined,
+  pathJoin,
   separateLogs,
 } from '../utils/jsUtils.js'
 
@@ -72,23 +73,25 @@ export const getPortalConf = (opt) => {
 // -------------------------------------------------------------------------------------------------
 // Extracting and exporting sys configuration
 // -------------------------------------------------------------------------------------------------
+const API_PORTAL_URL = getPortalUserConf('portal_url')
+export const isPortalConnectionDisabled = () => !API_PORTAL_URL
 
 // ----- Auth
-const AUTH_URL = getPortalConf('auth_url') || API_PORTAL_URL
+const AUTH_URL = getPortalUserConf('auth_url') || API_PORTAL_URL
 const AUTH_GET = getPortalConf('auth_get')
 const AUTH_CHK = getPortalConf('auth_chk')
 const JWT_PUB_KEY_URL = getPortalConf('auth_pub')
 const CRYPT_PUB_KEY_URL = getPortalConf('encrypt_pub')
 
-export const getAuthUrl = () => `${AUTH_URL}/${AUTH_GET}`
-export const getCheckAuthUrl = () => `${AUTH_URL}/${AUTH_CHK}`
-export const getPortalJwtPubKeyUrl = () => `${AUTH_URL}/${JWT_PUB_KEY_URL}`
-export const getPortalCryptPubUrl = () => `${AUTH_URL}/${CRYPT_PUB_KEY_URL}`
+export const getAuthUrl = () => pathJoin(AUTH_URL, AUTH_GET)
+export const getCheckAuthUrl = () => pathJoin(AUTH_URL, AUTH_CHK)
+export const getPortalJwtPubKeyUrl = () => pathJoin(AUTH_URL, JWT_PUB_KEY_URL)
+export const getPortalCryptPubUrl = () => pathJoin(AUTH_URL, CRYPT_PUB_KEY_URL)
 
 // ----- Creds
-const uname = getPortalConf('login')
-const passw = getPortalConf('passw')
-const isPwdB64 = getPortalConf('is_pwd_b64')
+const uname = getPortalUserConf('login')
+const passw = getPortalUserConf('passw')
+const isPwdB64 = getPortalUserConf('is_pwd_b64')
 const pwdEncoding = isPwdB64 ? 'base64' : 'utf-8'
 
 const BAUTH = createBasicAuth(uname, passw, 'utf-8', pwdEncoding)
@@ -105,23 +108,20 @@ export const getCredentials = (headersOnly) =>
   headersOnly ? BAUTH_HEADERS_BASIC : [BAUTH_HEADERS_BASIC, PORTAL_TOKEN_REQ_BODY]
 
 // ----- API
-const API_PORTAL_URL = getPortalConf('portal_url')
-export const isPortalConnectionDisabled = () => !API_PORTAL_URL
 export const getPortalBaseUrl = () => API_PORTAL_URL || NO_PORTAL_MSG
 
-const API_GET_URL = getPortalConf('get_url', '')
-const API_SEND_URL = getPortalConf('put_url', '')
+const API_GET_URL = getPortalConf('get_url')
+const API_SEND_URL = getPortalConf('put_url')
 
 export const getPortalMetaUrl = (id, additionalParameters) => {
   if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
   const reqUrl = !id
-    ? `${API_PORTAL_URL}/${API_GET_URL.replace('/{{id}}', '')}`
-    : `${API_PORTAL_URL}/${API_GET_URL.replace('{{id}}', id)}`
+    ? pathJoin(API_PORTAL_URL, API_GET_URL.replace('/{{id}}', ''))
+    : pathJoin(API_PORTAL_URL, API_GET_URL.replace('{{id}}', id))
   const options = additionalParameters ? `?${additionalParameters}` : ''
   return `${reqUrl}${options}`
 }
-export const postPortalMetaUrl = (id) =>
-  !id ? `${API_PORTAL_URL}/${API_SEND_URL}` : `${API_PORTAL_URL}/${API_SEND_URL}/${id}`
+export const postPortalMetaUrl = (id) => pathJoin(API_PORTAL_URL, API_SEND_URL, id)
 
 const apiGetUrlElements = getPortalMetaUrl().split('/')
 const API_GET_PROTOCOL = apiGetUrlElements[0].replace(/:/, '')
@@ -158,5 +158,9 @@ export const apiSendOptions = () => {
 }
 
 // ----- Feedback
-logD(mod, '', `Portal - Data: '${API_PORTAL_URL}'`)
-logD(mod, '', `Portal - Auth: '${AUTH_URL}'`)
+if (isPortalConnectionDisabled()) {
+  logD(mod, '', NO_PORTAL_MSG)
+} else {
+  logD(mod, '', `Portal - Data: '${API_PORTAL_URL}'`)
+  logD(mod, '', `Portal - Auth: '${AUTH_URL}'`)
+}

@@ -3,9 +3,9 @@ const mod = 'fileTypeThes'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
+import { BadRequestError, RudiError } from '../../utils/errors.js'
 import { logW } from '../../utils/logging.js'
 import { parameterExpected } from '../../utils/msg.js'
-import { BadRequestError, RudiError } from '../../utils/errors.js'
 
 // -------------------------------------------------------------------------------------------------
 // Custom schema definition
@@ -16,6 +16,8 @@ import { BadRequestError, RudiError } from '../../utils/errors.js'
 
 export const MIME_YAML = 'text/x-yaml'
 export const MIME_YAML_ALT = 'application/x-yaml'
+export const MIME_MARKDOWN = 'text/x-markdown'
+export const ALT_MIME_MARKDOWN = 'text/markdown'
 
 export const FileTypes = [
   'application/epub+zip', // (.epub)
@@ -70,6 +72,8 @@ export const FileTypes = [
   'text/css', // (.css)
   'text/csv', // (.csv)
   'text/html', // (.htm, .html)
+  MIME_MARKDOWN, // (.md)
+  ALT_MIME_MARKDOWN, // (.md)
   'text/php', // (.php)
   'text/plain', // (.txt)
   'text/xml', // (.xml)
@@ -118,6 +122,7 @@ export const Extensions = {
   json: 'application/json',
   jsonld: 'application/ld+json',
   m4a: 'audio/m4a',
+  md: MIME_MARKDOWN,
   mkv: 'video/x-matroska',
   mng: 'image/x-mng',
   mov: 'video/quicktime',
@@ -170,17 +175,12 @@ export const initialize = (arg) => {
   if (arg) Thesaurus = []
 }
 
-export const get = (prop) => {
-  return prop ? Thesaurus[prop] : Thesaurus
-}
+export const get = (prop) => (prop ? Thesaurus[prop] : Thesaurus)
 
-export const getFileTypesWithCrypt = (prop) => {
-  return prop ? FileTypesAndEncrypted[prop] : FileTypesAndEncrypted
-}
+export const getFileTypesWithCrypt = (prop) =>
+  prop ? FileTypesAndEncrypted[prop] : FileTypesAndEncrypted
 
-export const getExtensions = () => {
-  return Extensions
-}
+export const getExtensions = () => Extensions
 
 export const set = (newValue) => {
   const fun = 'set'

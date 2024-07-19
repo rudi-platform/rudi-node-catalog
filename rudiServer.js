@@ -9,7 +9,12 @@ import { API_VERSION } from './src/config/constApi.js'
 import { beautify, consoleErr, consoleLog, separateLogs } from './src/utils/jsUtils.js'
 
 // 2. Sys conf
-import { getAppName, getDbFullUri } from './src/config/confSystem.js'
+import {
+  getAppName,
+  getDbFullUri,
+  getServerAddress,
+  getServerPort,
+} from './src/config/confSystem.js'
 
 // 3. Log conf
 import './src/config/confLogs.js'
@@ -52,7 +57,6 @@ import { RudiError } from './src/utils/errors.js'
 // Prerequisites
 // -------------------------------------------------------------------------------------------------
 // Fixing Regexp display as a string
-// eslint-disable-next-line no-extend-native
 RegExp.prototype.toJSON = RegExp.prototype.toString
 
 // -------------------------------------------------------------------------------------------------
@@ -90,7 +94,7 @@ const mongoConnectWithRetry = async () => {
     logW(mod, fun, `Database connection failed, retrying... ${err}`)
     currentRetry++
     if (currentRetry <= MAX_DB_CONNECT_RETRIES) {
-      // Wait 5 seconds before retrying
+      // Wait 5 seconds before retryingut
       setTimeout(() => mongoConnectWithRetry(), 5000)
     } else {
       logE(mod, fun, `Failed to connect to database after ${MAX_DB_CONNECT_RETRIES}retries: ${err}`)
@@ -100,7 +104,7 @@ const mongoConnectWithRetry = async () => {
   }
 }
 
-const initilizeModelIndexes = async () => {
+const initializeModelIndexes = async () => {
   try {
     await Promise.all(
       [LogEntry, Contact, Organization, Media, Metadata].map(
@@ -120,7 +124,7 @@ const initilizeModelIndexes = async () => {
       )
     )
   } catch (err) {
-    logE(mod, 'initilizeModelIndexes', err)
+    logE(mod, 'initializeModelIndexes', err)
     throw new Error(`Model index initialization failed: ${err}`)
   }
 }
@@ -161,7 +165,7 @@ const start = async () => {
     await launchRouteListener()
 
     separateLogs('Indexing models', true) //////////////////////////////////////////////////////////
-    await initilizeModelIndexes()
+    await initializeModelIndexes()
 
     separateLogs('Thesauri init', true) ////////////////////////////////////////////////////////////
     await Keywords.initialize()
@@ -172,7 +176,7 @@ const start = async () => {
     const startMsg = `API v${API_VERSION} | App version: '${getAppHash()}' | '${getEnvironment()}' env`
     logI(mod, fun, startMsg)
     sysInfo(startMsg, '', '', ' ')
-    logI(mod, 'server', 'Ready')
+    logI(mod, 'server', `Ready, listening on ${getServerAddress()}:${getServerPort()}`)
 
     const logSeparatorEnd = separateLogs('Init OK', true) //////////////////////////////////////////
 

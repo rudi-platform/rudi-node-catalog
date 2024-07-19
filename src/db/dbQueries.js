@@ -45,6 +45,7 @@ import {
   QUERY_OFFSET,
   QUERY_SEARCH_TERMS,
   QUERY_SORT_BY,
+  QUERY_SORT_BY_CAML,
 } from '../config/constApi.js'
 import { JWT_EXP } from '../config/constJwt.js'
 // Fields from the JSON as defined in the API
@@ -189,7 +190,7 @@ export const getSearchableFields = (objectType) => {
 
     try {
       return ObjModel.getSearchableFields()
-    } catch (err) {
+    } catch {
       throw new NotImplementedError(`Object '${objectType}' is not searchable yet.`)
     }
   } catch (err) {
@@ -327,11 +328,13 @@ export const getObject = async (objectType, filter, shouldSkipPopulate) => {
     const ObjModel = getObjectModel(objectType)
 
     const populateOpts = shouldSkipPopulate ? [] : getPopulateOptions(objectType)
-    return isEmptyArray(populateOpts)
-      ? await ObjModel.findOne(filter)
-      : await ObjModel.findOne(filter).populate(populateOpts)
-  } catch (e) {
-    throw RudiError.treatError(mod, fun, e)
+    return await (
+      isEmptyArray(populateOpts)
+        ? ObjModel.findOne(filter)
+        : ObjModel.findOne(filter).populate(populateOpts)
+    ).exec()
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
@@ -339,7 +342,7 @@ export const getObject = async (objectType, filter, shouldSkipPopulate) => {
  * @param {String} objectType The RUDI object type
  * @param {String} dbId The MongoDB id of the object
  * @param {Boolean} shouldSkipPopulate True if the populating action should be skipped
- * @returns {Object} the RUDI object that is looked for
+ * @returns {Promise<Object>} the RUDI object that is looked for
  */
 export const getObjectWithDbId = (objectType, dbId, shouldSkipPopulate) =>
   getObject(objectType, { [DB_ID]: dbId }, shouldSkipPopulate).catch((err) => {
@@ -350,7 +353,7 @@ export const getObjectWithDbId = (objectType, dbId, shouldSkipPopulate) =>
  * @param {String} objectType The RUDI object type
  * @param {String} rudiId The RUDI id of the object (most likely a UUID v4)
  * @param {Boolean} shouldSkipPopulate True if the populating action should be skipped
- * @returns {Object} the RUDI object that is looked for
+ * @returns {Promise<Object>} the RUDI object that is looked for
  */
 export const getObjectWithRudiId = (objectType, rudiId, shouldSkipPopulate) => {
   const fun = `getObjectWithRudiId`
@@ -359,27 +362,14 @@ export const getObjectWithRudiId = (objectType, rudiId, shouldSkipPopulate) => {
   return getObject(objectType, { [getObjectIdField(objectType)]: rudiId }, shouldSkipPopulate)
 }
 
-export const getEnsuredObjectWithRudiId = async (objectType, rudiId) => {
-  const fun = `getEnsuredObjectWithRudiId`
-  // logT(mod, fun)
-  try {
-    if (!rudiId) throw new ParameterExpectedError(PARAM_ID, mod, fun)
-    const dbObject = await getObjectWithRudiId(objectType, rudiId)
-    if (!dbObject) throw new ObjectNotFoundError(objectType, rudiId)
-    return dbObject
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
-
-export const getObjectWithJson = async (objectType, rudiObject, shouldSkipPopulate) =>
+export const getObjectWithJson = (objectType, rudiObject, shouldSkipPopulate) =>
   getObjectWithRudiId(
     objectType,
     accessProperty(rudiObject, getObjectIdField(objectType)),
     shouldSkipPopulate
   )
 
-export const searchDbIdWithJson = async (objectType, rudiObject) =>
+export const searchDbIdWithJson = (objectType, rudiObject) =>
   getObjectModel(objectType).findOne(rudiObject).exec()
 
 export const getEnsuredObjectWithJson = async (objectType, rudiObject) => {
@@ -390,6 +380,18 @@ export const getEnsuredObjectWithJson = async (objectType, rudiObject) => {
     const rudiId = accessProperty(rudiObject, idField)
     const dbObject = await getObjectWithRudiId(objectType, rudiId)
     if (!dbObject) throw new ObjectNotFoundError(objectType, rudiId)
+    return dbObject
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+export const getEnsuredObjectWithRudiId = async (objectType, dbId) => {
+  const fun = `getEnsuredObjectWithRudiId`
+  // logT(mod, fun)
+  try {
+    const dbObject = await getObjectWithRudiId(objectType, dbId)
+    if (!dbObject) throw new ObjectNotFoundError(objectType, dbId)
     return dbObject
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -463,20 +465,20 @@ export const getNestedObject = async (objectType, nestedObjectProperty, filter, 
 export const getObjectPropertiesWithDbId = async (objectType, dbId, propertyList) => {
   const fun = `getObjectPropertiesWithDbId`
   // logT(mod, fun)
-  const ObjModel = getObjectModel(objectType)
-  const populateFields = getPopulateFields(objectType)
-  const fields = propertyList.join(' ')
-  const filter = { [DB_ID]: dbId }
+  try {
+    const ObjModel = getObjectModel(objectType)
+    const populateFields = getPopulateFields(objectType)
+    const fields = propertyList.join(' ')
+    const filter = { [DB_ID]: dbId }
 
-  return (
-    isEmptyArray(populateFields)
-      ? ObjModel.findOne(filter, fields)
-      : ObjModel.findOne(filter, fields).populate(populateFields)
-  )
-    .exec()
-    .catch((err) => {
-      throw RudiError.treatError(mod, fun, err)
-    })
+    return await (
+      isEmptyArray(populateFields)
+        ? ObjModel.findOne(filter, fields)
+        : ObjModel.findOne(filter, fields).populate(populateFields)
+    ).exec()
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
 }
 
 export const getObjectPropertiesWithRudiId = async (objectType, rudiId, propertyList) => {
@@ -548,17 +550,19 @@ export const getDbObjectList = async (objectType, options) => {
     //--- Parameters
     // Identify object type characteristics
     const ObjModel = getObjectModel(objectType)
+    logD(mod, fun, `options: ${beautify(options)}`)
 
     // Extract options
     const limit = getParamValue(options, QUERY_LIMIT, DEFAULT_QUERY_LIMIT, MAX_QUERY_LIMIT)
     const offset = getParamValue(options, QUERY_OFFSET, DEFAULT_QUERY_OFFSET)
     const filter = getParamValue(options, QUERY_FILTER)
     const fields = getParamValue(options, QUERY_FIELDS)
-    const sortByFields = getParamValue(options, QUERY_SORT_BY)
+    const sortByFields =
+      getParamValue(options, QUERY_SORT_BY) || getParamValue(options, QUERY_SORT_BY_CAML)
 
     const populateFields = getPopulateFields(objectType)
 
-    // logD(mod, fun, `options: ${beautify(options)}`)
+    logD(mod, fun, `options: ${beautify(options)}`)
 
     // logD(mod, fun, `filter: ${beautify(filter)}`)
 
@@ -567,7 +571,7 @@ export const getDbObjectList = async (objectType, options) => {
     if (sortByFields) {
       sortByFields.map((field) => {
         if (field[0] === '-') {
-          sortOptions[field.substring(1)] = -1
+          sortOptions[field.slice(1)] = -1
         } else {
           sortOptions[field] = 1
         }
@@ -575,11 +579,12 @@ export const getDbObjectList = async (objectType, options) => {
     }
     sortOptions[DB_ID] = 1 // Default sort to get consistent offset/limit results
 
-    // logD(mod, fun, `sortOptions: ${beautify(sortOptions)}`)
+    logD(mod, fun, `sortOptions: ${beautify(sortOptions)}`)
 
     //--- Find
+    const fieldsToKeep = fields ? fields.join(' ') : ``
+
     if (isEmptyArray(populateFields)) {
-      const fieldsToKeep = fields ? fields.join(' ') : ``
       return await ObjModel.find(filter, fieldsToKeep)
         .sort(sortOptions)
         .limit(limit)
@@ -587,7 +592,7 @@ export const getDbObjectList = async (objectType, options) => {
         .exec()
     } else {
       // Populate
-      const objectList = await ObjModel.find(filter)
+      const objectList = await ObjModel.find(filter, fieldsToKeep)
         .sort(sortOptions)
         .skip(offset)
         .limit(limit)
@@ -624,7 +629,8 @@ export const getDbObjectListAndCount = async (objectType, options) => {
     const offset = getParamValue(options, QUERY_OFFSET, DEFAULT_QUERY_OFFSET)
     const filter = getParamValue(options, QUERY_FILTER, {})
     const fieldsToKeep = getParamValue(options, QUERY_FIELDS)
-    const sortByFields = getParamValue(options, QUERY_SORT_BY)
+    const sortByFields =
+      getParamValue(options, QUERY_SORT_BY) || getParamValue(options, QUERY_SORT_BY_CAML)
 
     logD(mod, fun, `options: ${beautify(options)}`)
 
@@ -635,7 +641,7 @@ export const getDbObjectListAndCount = async (objectType, options) => {
     if (sortByFields) {
       sortByFields.map((field) => {
         if (field[0] === '-') {
-          sortOptions[field.substring(1)] = -1
+          sortOptions[field.slice(1)] = -1
         } else {
           sortOptions[field] = 1
         }
@@ -719,7 +725,7 @@ export const searchDbObjects = async (objectType, options) => {
 
     logD(mod, fun, `searching: ${searchTermsList}`)
 
-    const lang = options[QUERY_LANG]?.substring(0, 2) || 'fr'
+    const lang = options[QUERY_LANG]?.slice(0, 2) || 'fr'
     options[QUERY_FILTER].$text = {
       $search: searchTermsList.join(' '),
       $language: lang,
@@ -739,8 +745,8 @@ export const searchDbObjects = async (objectType, options) => {
         return await getDbObjectListAndCount(objectType, options)
       }
     } catch (err) {
-      // logV(mod, fun, beautify(err.message.substring(0, MDB_ERR_MSG_NO_INDEX.length)))
-      if (err.message?.substring(0, MDB_ERR_MSG_NO_INDEX.length) === MDB_ERR_MSG_NO_INDEX) {
+      // logV(mod, fun, beautify(err.message.slice(0, MDB_ERR_MSG_NO_INDEX.length)))
+      if (err.message?.slice(0, MDB_ERR_MSG_NO_INDEX.length) === MDB_ERR_MSG_NO_INDEX) {
         logV(mod, fun, `No search index: let's recreate them`)
         const ObjModel = getObjectModel(objectType)
         try {
@@ -762,7 +768,7 @@ export const searchDbObjects = async (objectType, options) => {
         logW(mod, fun, err)
         return { total: 0, items: [] }
       } else {
-        logW(mod, fun, `${err}`.substring(0, MDB_ERR_NO_INDEX.length))
+        logW(mod, fun, `${err}`.slice(0, MDB_ERR_NO_INDEX.length))
         throw err
       }
     }
@@ -809,7 +815,8 @@ export const groupDbObjectList = async (objectType, unionField, options) => {
     const groupOffset = getParamValue(options, QUERY_GROUP_OFFSET, DEFAULT_QUERY_OFFSET)
     const filter = getParamValue(options, QUERY_FILTER, {})
     const fieldsToKeep = getParamValue(options, QUERY_FIELDS)
-    const sortByFields = getParamValue(options, QUERY_SORT_BY)
+    const sortByFields =
+      getParamValue(options, QUERY_SORT_BY) || getParamValue(options, QUERY_SORT_BY_CAML)
 
     // Prepare sortBy options for MongoDB
     const groupList = 'list'
@@ -826,7 +833,7 @@ export const groupDbObjectList = async (objectType, unionField, options) => {
         const genericName = `${field}${i}`
         const genericField = `${groupList}.${genericName}`
         if (field[0] === '-') {
-          absoluteField = field.substring(1)
+          absoluteField = field.slice(1)
           sortOptions[genericField] = -1
         } else {
           absoluteField = field
@@ -1170,28 +1177,28 @@ function changeConditionsIntoRegex(conditions) {
 // ----------------------------------------
 // - Metadata
 // ----------------------------------------
-export const getMetadataWithJson = async (metadataJson) => {
+export const getMetadataWithJson = (metadataJson) => {
   // const fun = `getMetadataFromJson`
   // logT(mod, fun)
-  return await getObjectWithJson(OBJ_METADATA, metadataJson)
+  return getObjectWithJson(OBJ_METADATA, metadataJson)
 }
 
-export const getEnsuredMetadataWithJson = async (metadataJson) => {
+export const getEnsuredMetadataWithJson = (metadataJson) => {
   // const fun = `getEnsuredMetadataFromJson`
   // logT(mod, fun)
-  return await getEnsuredObjectWithJson(OBJ_METADATA, metadataJson)
+  return getEnsuredObjectWithJson(OBJ_METADATA, metadataJson)
 }
 
-export const getMetadataWithRudiId = async (rudiId) => {
+export const getMetadataWithRudiId = (rudiId) => {
   // const fun = `getMetadataWithRudiId`
   // logT(mod, fun)
-  return await getObjectWithRudiId(OBJ_METADATA, rudiId)
+  return getObjectWithRudiId(OBJ_METADATA, rudiId)
 }
 
-export const getEnsuredMetadataWithRudiId = async (rudiId) => {
+export const getEnsuredMetadataWithRudiId = (rudiId) => {
   // const fun = `getEnsuredMetadataWithRudiId`
   // logT(mod, fun)
-  return await getEnsuredObjectWithRudiId(OBJ_METADATA, rudiId)
+  return getEnsuredObjectWithRudiId(OBJ_METADATA, rudiId)
 }
 
 export const updateMetadata = async (jsonMetadata) => {
@@ -1235,29 +1242,29 @@ export const deleteMetadata = async (metadataRudiId) => {
 // ----------------------------------------
 // - Organization
 // ----------------------------------------
-export const getOrganizationWithJson = async (organizationJson) => {
+export const getOrganizationWithJson = (organizationJson) => {
   // const fun = `getOrganizationWithJson`
   // logT(mod, fun)
-  return await getObjectWithJson(OBJ_ORGANIZATIONS, organizationJson)
+  return getObjectWithJson(OBJ_ORGANIZATIONS, organizationJson)
 }
 
-export const getEnsuredOrganizationWithJson = async (organizationJson) => {
+export const getEnsuredOrganizationWithJson = (organizationJson) => {
   // const fun = `getEnsuredOrganizationWithJson`
   // logT(mod, fun)
   const rudiId = accessProperty(organizationJson, API_ORGANIZATION_ID)
-  return await getEnsuredOrganizationWithRudiId(rudiId)
+  return getEnsuredOrganizationWithRudiId(rudiId)
 }
 
-export const getOrganizationWithRudiId = async (rudiId) => {
+export const getOrganizationWithRudiId = (rudiId) => {
   // const fun = `getOrganizationWithRudiId`
   // logT(mod, fun)
-  return await getObjectWithRudiId(OBJ_ORGANIZATIONS, rudiId)
+  return getObjectWithRudiId(OBJ_ORGANIZATIONS, rudiId)
 }
 
-export const getEnsuredOrganizationWithRudiId = async (rudiId) => {
+export const getEnsuredOrganizationWithRudiId = (rudiId) => {
   // const fun = `getEnsuredOrganizationWithRudiId`
   // logT(mod, fun)
-  return await getEnsuredObjectWithRudiId(OBJ_ORGANIZATIONS, rudiId)
+  return getEnsuredObjectWithRudiId(OBJ_ORGANIZATIONS, rudiId)
 }
 
 export const getOrganizationWithDbId = async (id) => {
@@ -1450,7 +1457,7 @@ export const isReferencedInMetadata = async (objectType, rudiId) => {
     let dbId
     try {
       dbId = (await getObjectPropertiesWithRudiId(objectType, rudiId, [DB_ID]))[DB_ID]
-    } catch (err) {
+    } catch {
       logW(mod, fun, objectNotFound(objectType, rudiId))
       throw new ObjectNotFoundError(objectType, rudiId)
     }
@@ -1463,9 +1470,7 @@ export const isReferencedInMetadata = async (objectType, rudiId) => {
         metadataFilter = {
           $or: [
             { [API_DATA_PRODUCER_PROPERTY]: dbId },
-            {
-              [`${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`]: dbId,
-            },
+            { [`${API_METAINFO_PROPERTY}.${API_METAINFO_PROVIDER_PROPERTY}`]: dbId },
           ],
         }
         break
@@ -1473,16 +1478,12 @@ export const isReferencedInMetadata = async (objectType, rudiId) => {
         metadataFilter = {
           $or: [
             { [API_DATA_CONTACTS_PROPERTY]: dbId },
-            {
-              [`${API_METAINFO_PROPERTY}.${API_METAINFO_CONTACTS_PROPERTY}`]: dbId,
-            },
+            { [`${API_METAINFO_PROPERTY}.${API_METAINFO_CONTACTS_PROPERTY}`]: dbId },
           ],
         }
         break
       case OBJ_MEDIA:
-        metadataFilter = {
-          [`${API_MEDIA_PROPERTY}`]: dbId,
-        }
+        metadataFilter = { [`${API_MEDIA_PROPERTY}`]: dbId }
         break
       default:
         throw new NotFoundError(objectTypeNotFound(objectType))

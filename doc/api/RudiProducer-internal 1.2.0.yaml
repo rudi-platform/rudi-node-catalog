@@ -24,7 +24,7 @@ servers:
   # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/OlivierMartineau/RudiProducer-PrivateAPI/1.2.0
-  - url: https://data-rudi.aqmo.org
+  - url: https://data-rudi.org
 
 #•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
 # DEFINITIONS

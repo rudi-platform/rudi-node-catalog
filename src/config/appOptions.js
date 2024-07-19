@@ -19,6 +19,7 @@ export const OPT_APP_ENV = 'appEnv'
 export const OPT_USER_CONF = 'conf'
 export const OPT_PROFILES_CONF = 'profiles'
 export const OPT_PORTAL_CONF = 'portalConf'
+export const OPT_PORT = 'listeningPort'
 
 // -------------------------------------------------------------------------------------------------
 // Loading app options
@@ -28,6 +29,7 @@ export const OPTIONS = {
     text: 'DB connection URI (ex: mongodb://rudi-node.org/db_name)',
     cli: 'db_uri',
     env: 'RUDI_API_DB_URI',
+    alt: 'RUDI_CATALOG_DB_URI',
   },
   [OPT_NODE_ENV]: {
     text: `Node environment: 'production'|'development'`,
@@ -38,31 +40,43 @@ export const OPTIONS = {
     text: `Module environment type: 'production'|'release'|'shared'|'test'`,
     cli: 'app_env',
     env: 'RUDI_API_ENV',
+    alt: 'RUDI_CATALOG_ENV',
   },
   [OPT_GIT_HASH]: {
     text: 'Git hash',
     cli: 'hash',
     env: 'RUDI_API_GIT_REV',
+    alt: 'RUDI_CATALOG_GIT_REV',
+  },
+  [OPT_PORT]: {
+    text: 'RUDI Catalog server listening port',
+    cli: 'port',
+    env: 'RUDI_API_PORT',
+    alt: 'RUDI_CATALOG_PORT',
   },
   [OPT_PUBLIC_URL]: {
-    text: 'API server public URL',
+    text: 'RUDI Catalog server public URL',
     cli: 'api_url',
     env: 'RUDI_API_URL',
+    alt: 'RUDI_CATALOG_URL',
   },
   [OPT_USER_CONF]: {
     text: 'User conf file',
     cli: 'conf',
     env: 'RUDI_API_USER_CONF',
+    alt: 'RUDI_CATALOG_USER_CONF',
   },
   [OPT_PROFILES_CONF]: {
     text: 'Profiles conf file',
     cli: 'profiles',
     env: 'RUDI_API_PROFILES_CONF',
+    alt: 'RUDI_CATALOG_PROFILES_CONF',
   },
   [OPT_PORTAL_CONF]: {
     text: 'Portal conf file',
     cli: 'portal_conf',
     env: 'RUDI_API_PORTAL_CONF',
+    alt: 'RUDI_CATALOG_PORTAL_CONF',
   },
 }
 
@@ -133,14 +147,17 @@ export const getCliEnvOpt = (opt) => {
         if (envVal) {
           CLI_ENV_OPTIONS[opt] = envVal
           console.log('    (env) ' + opt.padEnd(longestOptName) + ' => ' + envVal)
+        } else {
+          const altEnvVar = OPTIONS[opt].alt
+          const altEnvVal = process.env[altEnvVar]
+          if (altEnvVal) {
+            CLI_ENV_OPTIONS[opt] = altEnvVal
+            console.log('    (env) ' + opt.padEnd(longestOptName) + ' => ' + altEnvVal)
+          }
         }
       }
     })
-    console.log(SEP_LINE + '\n') /////////////////////////////////////////////////////////////////////
-
-    // conf: CLI_OPTIONS.conf.cli || process.env[RUDI_API_USER_CONF],
-    // portal_conf: CLI_OPTIONS.portal_conf || process.env[RUDI_API_USER_CONF],
-    // }
+    console.log(SEP_LINE + '\n') ///////////////////////////////////////////////////////////////////
     wereAppOptsLoaded = true
   }
   return opt ? CLI_ENV_OPTIONS[opt] : CLI_ENV_OPTIONS

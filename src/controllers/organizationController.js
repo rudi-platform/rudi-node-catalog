@@ -7,8 +7,8 @@ const mod = 'orgCtrl'
 // -------------------------------------------------------------------------------------------------
 // External dependencies
 // -------------------------------------------------------------------------------------------------
-import { logT } from '../utils/logging.js'
 import { beautify } from '../utils/jsUtils.js'
+import { logT } from '../utils/logging.js'
 
 // -------------------------------------------------------------------------------------------------
 // Constants
@@ -17,9 +17,9 @@ import { beautify } from '../utils/jsUtils.js'
 // -------------------------------------------------------------------------------------------------
 // Data models
 // -------------------------------------------------------------------------------------------------
+import { getOrganizationWithJson } from '../db/dbQueries.js'
 import { Organization } from '../definitions/models/Organization.js'
 import { RudiError } from '../utils/errors.js'
-import { getOrganizationWithJson } from '../db/dbQueries.js'
 // import cache from '../db/dbCache'
 
 // -------------------------------------------------------------------------------------------------

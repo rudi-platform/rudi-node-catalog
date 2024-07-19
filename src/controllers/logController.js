@@ -12,12 +12,14 @@ import {
   ACT_SEARCH,
   OBJ_LOGS,
   QUERY_COUNT_BY,
+  QUERY_COUNT_BY_CAML,
   QUERY_FIELDS,
   QUERY_FILTER,
   QUERY_LIMIT,
   QUERY_OFFSET,
   QUERY_SEARCH_TERMS,
   QUERY_SORT_BY,
+  QUERY_SORT_BY_CAML,
   URL_PV_LOGS_ACCESS,
 } from '../config/constApi.js'
 
@@ -80,13 +82,15 @@ export const searchLogs = async (req, reply) => {
     }
 
     const options = pick(parsedParameters, [
+      QUERY_COUNT_BY_CAML,
+      QUERY_COUNT_BY,
+      QUERY_FIELDS,
+      QUERY_FILTER,
       QUERY_LIMIT,
       QUERY_OFFSET,
-      QUERY_SORT_BY,
-      QUERY_FILTER,
-      QUERY_FIELDS,
       QUERY_SEARCH_TERMS,
-      QUERY_COUNT_BY,
+      QUERY_SORT_BY_CAML,
+      QUERY_SORT_BY,
     ])
     const objectList = await searchDbObjects(objectType, options)
 

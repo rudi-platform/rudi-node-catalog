@@ -83,7 +83,13 @@ import {
 } from '../../db/dbFields.js'
 
 import { Latitude, Longitude } from '../schemas/GpsCoordinates.js'
-import { get as getFileTypes, MIME_YAML, MIME_YAML_ALT } from '../thesaurus/FileTypes.js'
+import {
+  ALT_MIME_MARKDOWN,
+  get as getFileTypes,
+  MIME_MARKDOWN,
+  MIME_YAML,
+  MIME_YAML_ALT,
+} from '../thesaurus/FileTypes.js'
 
 // -------------------------------------------------------------------------------------------------
 // Validators
@@ -173,16 +179,8 @@ export const isEveryMediaAvailable = (rudiMetadata) => {
   const fun = 'isEveryMediaAvailable'
   try {
     logT(mod, fun)
-
-    const metadataMediaList = rudiMetadata[API_MEDIA_PROPERTY]
-    let isOneMediaMissing = false
-    for (const media of metadataMediaList) {
-      if (isMediaMissing(media)) {
-        isOneMediaMissing = true
-        break
-      }
-    }
-    return !isOneMediaMissing
+    for (const media of rudiMetadata[API_MEDIA_PROPERTY]) if (isMediaMissing(media)) return false
+    return true
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -494,7 +492,7 @@ const MetadataSchema = new mongoose.Schema(
   {
     id: false,
     strict: true,
-    timestamps: true,
+    timestamps: true, // Adds mongoose fields 'updatedAt' and 'createdAt'
     optimisticConcurrency: true,
     useNestedStrict: true,
     toObject: {
@@ -770,6 +768,81 @@ const updateMetadataStatus = (metadata) => {
   metadata[API_STATUS_PROPERTY] = reckonMetadataStatus(metadata)
 }
 
+const PORTAL_MIMES = [
+  'application/geo+json',
+  'application/graphql',
+  'application/javascript',
+  'application/json',
+  'application/ld+json',
+  'application/msword',
+  'application/pdf',
+  'application/sql',
+  'application/vnd.api+json',
+  'application/vnd.ms-excel',
+  'application/vnd.ms-powerpoint',
+  'application/vnd.oasis.opendocument.text',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/x-executable',
+  'application/x-www-form-urlencoded',
+  'application/xml',
+  'application/zip',
+  'application/zstd',
+  'audio/mpeg',
+  'audio/ogg',
+  'image/apng',
+  'image/flif',
+  'image/gif',
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/x-mng',
+  'multipart/form-data',
+  'text/css',
+  'text/csv',
+  'text/html',
+  'text/php',
+  'text/plain',
+  'text/x-yaml',
+  'text/xml',
+  'application/graphql+crypt',
+  'application/javascript+crypt',
+  'application/json+crypt',
+  'application/ld+json+crypt',
+  'application/msword+crypt',
+  'application/pdf+crypt',
+  'application/sql+crypt',
+  'application/vnd.api+json+crypt',
+  'application/vnd.ms-excel+crypt',
+  'application/vnd.ms-powerpoint+crypt',
+  'application/vnd.oasis.opendocument.text+crypt',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation+crypt',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet+crypt',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document+crypt',
+  'application/x-executable+crypt',
+  'application/x-www-form-urlencoded+crypt',
+  'application/xml+crypt',
+  'application/zip+crypt',
+  'application/zstd+crypt',
+  'audio/mpeg+crypt',
+  'audio/ogg+crypt',
+  'image/apng+crypt',
+  'image/flif+crypt',
+  'image/gif+crypt',
+  'image/jpeg+crypt',
+  'image/png+crypt',
+  'image/webp+crypt',
+  'image/x-mng+crypt',
+  'multipart/form-data+crypt',
+  'text/css+crypt',
+  'text/csv+crypt',
+  'text/html+crypt',
+  'text/php+crypt',
+  'text/plain+crypt',
+  'text/x-yaml+crypt',
+  'text/xml+crypt',
+]
 export const toRudiPortalJSON = (metadata) => {
   const fun = 'toRudiPortalJSON'
   try {
@@ -782,7 +855,11 @@ export const toRudiPortalJSON = (metadata) => {
     portalReadyMetadata[API_MEDIA_PROPERTY].forEach((media) => {
       delete media[API_FILE_STORAGE_STATUS]
       delete media[API_FILE_STATUS_UPDATE]
-
+      if (media[API_FILE_MIME] == MIME_MARKDOWN || media[API_FILE_MIME] == ALT_MIME_MARKDOWN)
+        media[API_FILE_MIME] = 'text/plain'
+      else if (PORTAL_MIMES.indexOf(media[API_FILE_MIME]) == -1) {
+        media[API_FILE_MIME] = 'application/octet-stream'
+      }
       // delete media[API_MEDIA_THUMBNAIL]
       // delete media[API_MEDIA_SATELLITES]
     })

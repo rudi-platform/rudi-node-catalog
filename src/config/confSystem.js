@@ -12,6 +12,7 @@ import {
   OPT_DB_CONNECT_URI,
   OPT_GIT_HASH,
   OPT_NODE_ENV,
+  OPT_PORT,
   OPT_PROFILES_CONF,
   OPT_PUBLIC_URL,
   getCliEnvOpt,
@@ -22,7 +23,13 @@ import { TRACE, TRACE_ERR, TRACE_FUN, TRACE_MOD } from './constApi.js'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { consoleErr, consoleLog, pathJoin, separateLogs } from '../utils/jsUtils.js'
+import {
+  consoleErr,
+  consoleLog,
+  pathJoin,
+  removeTrailingSlash,
+  separateLogs,
+} from '../utils/jsUtils.js'
 
 import { readIniFile } from '../utils/fileActions.js'
 
@@ -72,17 +79,17 @@ const SERVER_SECTION = 'server'
 
 const APP_NAME = getConf(SERVER_SECTION, 'app_name')
 const LISTENING_ADDR = getConf(SERVER_SECTION, 'listening_address')
-const LISTENING_PORT = getConf(SERVER_SECTION, 'listening_port')
+const LISTENING_PORT = getCliEnvOpt(OPT_PORT) || getConf(SERVER_SECTION, 'listening_port')
 
 const publicUrl = getCliEnvOpt(OPT_PUBLIC_URL) || getConf(SERVER_SECTION, 'server_url')
-const PUBLIC_URL = publicUrl.endsWith('/') ? publicUrl.slice(0, -1) : publicUrl
+const PUBLIC_URL = removeTrailingSlash(publicUrl)
 
 export const getAppName = () => APP_NAME
 export const getServerAddress = () => LISTENING_ADDR
 export const getServerPort = () => LISTENING_PORT
-export const getHost = (suffix) => `http://${LISTENING_ADDR}:${LISTENING_PORT}/${suffix || ''}`
+export const getHost = (suffix) => pathJoin(`http://${LISTENING_ADDR}:${LISTENING_PORT}`, suffix)
 
-export const getPublicUrl = (suffix) => `${PUBLIC_URL}${suffix || ''}`
+export const getPublicUrl = (suffix) => pathJoin(PUBLIC_URL, suffix)
 
 // ----- App environment
 const NODE_ENV = getCliEnvOpt(OPT_NODE_ENV) || 'dev'
@@ -108,10 +115,13 @@ const DB_URI =
   getCliEnvOpt(OPT_DB_CONNECT_URI) ||
   pathJoin(
     getConf(DB_SECTION, 'db_url') || 'mongodb://127.0.0.1',
-    getConf(DB_SECTION, 'db_name') || 'rudi_api'
+    getConf(DB_SECTION, 'db_name') || 'rudi_catalog'
   )
 
 export const getDbFullUri = () => DB_URI
+
+// const DB_DUMP_DIR = getConf(DB_SECTION, 'db_dump_dir')
+// export const getDbDumpDir = () => DB_DUMP_DIR
 
 // ----- Security section
 const PROFILES = readIniFile(getCliEnvOpt(OPT_PROFILES_CONF) || getConf('security', 'profiles'))
@@ -135,6 +145,7 @@ export const getProfile = (subject) => {
 // const now = utils.nowLocaleFormatted()
 const appMsg = `App '${APP_NAME}' listening on: ${getHost()}`
 consoleLog(mod, 'init', appMsg)
+consoleLog(mod, 'init', `Public URL: ${getPublicUrl()}`)
 consoleLog(mod, 'init', `DB: ${DB_URI}`)
 
 // ----- SKOSMOS section

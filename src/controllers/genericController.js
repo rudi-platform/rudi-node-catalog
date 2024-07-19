@@ -40,7 +40,9 @@ import {
   QUERY_FILTER,
   QUERY_GROUP_BY,
   QUERY_GROUP_LIMIT,
+  QUERY_GROUP_LIMIT_CAML,
   QUERY_GROUP_OFFSET,
+  QUERY_GROUP_OFFSET_CAML,
   QUERY_LANG,
   QUERY_LIMIT,
   QUERY_OBJECT_FORMAT,
@@ -48,6 +50,7 @@ import {
   QUERY_OFFSET,
   QUERY_SEARCH_TERMS,
   QUERY_SORT_BY,
+  QUERY_SORT_BY_CAML,
   ROUTE_OPT,
   STATUS_CODE,
   URL_OBJECTS,
@@ -105,7 +108,7 @@ import {
 import { CallContext } from '../definitions/constructors/callContext.js'
 import { parseQueryParameters } from '../utils/parseRequest.js'
 
-import { isTranslatable } from '../translation/genericTranslationTools.js'
+import { getTranslator } from '../translation/genericTranslationTools.js'
 
 // -------------------------------------------------------------------------------------------------
 // Specific controllers
@@ -122,6 +125,7 @@ import {
   API_CONFIDENTIALITY,
   API_RESTRICTED_ACCESS,
 } from '../db/dbFields.js'
+import { Media } from '../definitions/models/Media.js'
 import { deletePortalMetadata } from './portalController.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -134,7 +138,7 @@ function getObjectParam(req) {
     const objectType = accessReqParam(req, PARAM_OBJECT)
     try {
       checkIsUrlObject(objectType)
-    } catch (err) {
+    } catch {
       const error = new NotFoundError(`Route '${req.method} ${req.url}' not found `)
       throw RudiError.treatError(mod, fun, error)
     }
@@ -164,6 +168,11 @@ async function newObject(objectType, objectData) {
         return await newOrganization(objectData)
       case OBJ_CONTACTS:
         return await newContact(objectData)
+      case OBJ_MEDIA: {
+        const dbMedia = new Media(objectData)
+        dbMedia.save()
+        return dbMedia
+      }
       case OBJ_SKOS_CONCEPTS:
       case OBJ_SKOS_CONCEPTS_CAML:
         return await newSkosConcept(objectData)
@@ -228,6 +237,7 @@ function overrideFilter(filterList, field, value) {
  */
 async function addSingleRudiObject(rudiObject, objectType, context) {
   const fun = 'addSingleRudiObject'
+  logT(mod, fun)
   try {
     // get the rudiId field for this object type
     const idField = getObjectIdField(objectType)
@@ -269,7 +279,7 @@ async function addSingleObject(inputObject, objectType, objectStandard, objectFo
     if (objectFormat === DEFAULT_OBJECT_FORMAT && objectStandard === DEFAULT_OBJECT_STANDARD) {
       rudiObject = inputObject
     } else {
-      const objectTranslator = isTranslatable(objectType, objectStandard, objectFormat)
+      const objectTranslator = getTranslator(objectType, objectStandard, objectFormat)
       if (!objectTranslator) {
         throw new NotImplementedError(
           `Object of type ${objectType}, at standard ${objectStandard} and format ${objectFormat} can not yet be uploaded.`
@@ -312,11 +322,12 @@ export const addObjects = async (req, reply) => {
     let createdObjects
     if (Array.isArray(inputObjects)) {
       createdObjects = []
-      for await (const inputObject of inputObjects) {
+      for (const inputObject of inputObjects) {
         createdObjects.push(
-          await addSingleObject(inputObject, objectType, objectStandard, objectFormat, context)
+          addSingleObject(inputObject, objectType, objectStandard, objectFormat, context)
         )
       }
+      await Promise.all(createdObjects)
     } else {
       createdObjects = await addSingleObject(
         inputObjects,
@@ -426,7 +437,7 @@ export const searchObjects = async (req, reply) => {
         )
         logD(mod, fun, `extendedSearchTerms: ${extendedSearchTerms}`)
         options[QUERY_SEARCH_TERMS].push(extendedSearchTerms)
-      } catch (e) {
+      } catch {
         // logE(mod, fun, `SKOSMOS down!: ERR ${e}`)
       }
     }
@@ -453,7 +464,7 @@ export const getSearchableProperties = (req, reply) => {
     Object.keys(rudiObjectList).forEach((objectType) => {
       try {
         getSearchableFields[objectType] = rudiObjectList[objectType].ObjModel.getSearchableFields()
-      } catch (err) {
+      } catch {
         logD(mod, fun, `${objectType}: not searchable`)
       }
     })
@@ -477,7 +488,7 @@ export const getManyObjects = async (objectType, req) => {
       logW(mod, fun, err)
       return []
     }
-    // logD(mod, fun, beautify(parsedParameters))
+    logD(mod, fun, beautify(parsedParameters))
 
     const countBy = parsedParameters[QUERY_COUNT_BY]
     const groupBy = parsedParameters[QUERY_GROUP_BY]
@@ -489,6 +500,7 @@ export const getManyObjects = async (objectType, req) => {
         QUERY_LIMIT,
         QUERY_OFFSET,
         QUERY_SORT_BY,
+        QUERY_SORT_BY_CAML,
         QUERY_FILTER,
         QUERY_FIELDS,
       ])
@@ -504,8 +516,11 @@ export const getManyObjects = async (objectType, req) => {
         QUERY_FILTER,
         QUERY_FIELDS,
         QUERY_SORT_BY,
+        QUERY_SORT_BY_CAML,
         QUERY_GROUP_LIMIT,
+        QUERY_GROUP_LIMIT_CAML,
         QUERY_GROUP_OFFSET,
+        QUERY_GROUP_OFFSET_CAML,
       ])
       objectList = await groupDbObjectList(objectType, groupBy, options)
     } else {
@@ -597,9 +612,9 @@ export const getManyPubKeys = async (req, reply) => {
  * => PUT /{object}
  */
 export const upsertSingleRudiObject = async (rudiObject, objectType, context) => {
-  const fun = 'upsertSingleObject'
+  const fun = 'upsertSingleRudiObject'
+  logT(mod, fun)
   try {
-    logT(mod, fun, `< PUT ${URL_PV_OBJECT_GENERIC}`)
     // retrieve url parameters: object type, object id
     const idField = getObjectIdField(objectType)
 
@@ -638,12 +653,24 @@ export const upsertSingleRudiObject = async (rudiObject, objectType, context) =>
  */
 async function upsertSingleObject(inputObject, objectType, objectStandard, objectFormat, context) {
   const fun = 'upsertSingleObject'
+  logT(mod, fun, `< PUT ${URL_PV_OBJECT_GENERIC}`)
+  logD(mod, fun, `objectType: ${objectType}`)
+  logD(mod, fun, `objectStandard: ${objectStandard}`)
+  logD(mod, fun, `objectFormat: ${objectFormat}`)
+  logD(mod, fun, `inputObject: ${beautify(inputObject)}`)
+
   let rudiObject
   try {
     if (objectFormat === DEFAULT_OBJECT_FORMAT && objectStandard === DEFAULT_OBJECT_STANDARD) {
       rudiObject = inputObject
+      logT(
+        mod,
+        fun,
+        `Standard ${objectFormat.toUpperCase()} ${objectStandard.toUpperCase()} object`
+      )
     } else {
-      const objectTranslator = isTranslatable(objectType, objectStandard, objectFormat)
+      logT(mod, fun, `Translation needed for ${objectFormat} ${objectStandard} object`)
+      const objectTranslator = getTranslator(objectType, objectStandard, objectFormat)
       if (!objectTranslator) {
         throw new NotImplementedError(
           `Object of type ${objectType}, at standard ${objectStandard} and format ${objectFormat} can not yet be uploaded.`
@@ -684,11 +711,12 @@ export const upsertObjects = async (req, reply) => {
     let createdObjects
     if (Array.isArray(inputObjects)) {
       createdObjects = []
-      for await (const inputObject of inputObjects) {
+      for (const inputObject of inputObjects) {
         createdObjects.push(
-          await upsertSingleObject(inputObject, objectType, objectStandard, objectFormat, context)
+          upsertSingleObject(inputObject, objectType, objectStandard, objectFormat, context)
         )
       }
+      await Promise.all(createdObjects)
     } else {
       createdObjects = await upsertSingleObject(
         inputObjects,

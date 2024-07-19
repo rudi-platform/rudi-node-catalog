@@ -207,7 +207,7 @@ export const CallContext = class CallContext {
     try {
       return (
         this.reqDetailsMsg +
-        ` <- ${this.clientApp}${this.reqUser}${
+        ` <- ${this.clientApp}${this.clientApp && this.reqUser ? ':' : ''}${this.reqUser}${
           this.clientApp || this.reqUser ? ' @ ' : ''
         }${this.ips.join(' <- ')}`
       )
@@ -378,6 +378,7 @@ export const CallContext = class CallContext {
       protectHeaderMethod(req)
       protectHeaderUrl(req)
       protectHeaderAuth(req)
+      // Limite la taille de tout ce qui est utilisé
     } catch (err) {
       throw RudiError.treatError(mod, fun, err)
     }

@@ -16,7 +16,6 @@ import {
   ACT_SEARCH,
   ACT_SEND,
   ACT_UUID_GEN,
-  HTTP_METHODS,
   OBJ_MEDIA,
   OBJ_METADATA,
   OBJ_PUB_KEYS,
@@ -103,7 +102,13 @@ import {
   getSingleReportForObject,
 } from '../controllers/reportController.js'
 
-import { dropCollection, dropDB, getCollections } from '../controllers/dbController.js'
+import {
+  dropCollection,
+  dropDB,
+  dumpDB,
+  getCollections,
+  restoreDB,
+} from '../controllers/dbController.js'
 import { getLogs, searchLogs } from '../controllers/logController.js'
 import {
   getApiVersion,
@@ -142,82 +147,6 @@ import {
 import { test } from '../controllers/testController.js'
 
 // -------------------------------------------------------------------------------------------------
-// Route names
-// -------------------------------------------------------------------------------------------------
-
-const REDIRECT_GET_DATA = 'redir_pub_metadata'
-const REDIRECT_GET_PLUS = 'redir_pub_metadata'
-const REDIRECT_PUT_PLUS = 'redir_pub_metadata'
-
-const PUB_GET_FAVICON = 'pub_get_favicon'
-const PUB_GET_API_VERSION = 'pub_get_api_version'
-const PUB_GET_ALL_METADATA = 'pub_get_all_metadata'
-const PUB_GET_ONE_METADATA = 'pub_get_one_metadata'
-const PUB_RCH_OBJ = 'pub_rch_obj'
-
-const PUB_GET_ALL_PUB_KEYS = 'pub_get_all_pub_keys'
-const PUB_GET_ONE_PUB_KEY = 'pub_get_one_pub_key'
-const PUB_GET_ONE_PUB_KEY_PROP = 'pub_get_one_pub_key_prop'
-
-const PORTAL_UPSERT_ONE_REPORT = 'portal_upsert_one_report'
-const PORTAL_GET_ALL_OBJ_REPORT = 'portal_get_all_obj_report'
-const PORTAL_GET_ONE_OBJ_REPORT = 'portal_get_one_obj_report'
-
-const PRV_ADD_ONE = 'prv_add_one'
-const PRV_UPSERT_ONE = 'prv_upsert_one'
-const PRV_SAVE_ALL = 'prv_save_all'
-const PRV_GET_ALL = 'prv_get_all'
-const PRV_GET_ONE = 'prv_get_one'
-const PRV_DEL_ONE = 'prv_del_one'
-const PRV_DEL_MANY = 'prv_del_many'
-const PRV_DEL_LIST = 'prv_del_list'
-const PRV_MEDIA_COMMIT = 'prv_media_commit'
-const PRV_POST_METADATA = 'prv_metadata_post'
-
-const PRV_OBJ_SEARCH = 'prv_obj_search'
-const PRV_OBJ_COUNT = 'prv_obj_count'
-
-const PRV_ADD_OBJ_REPORT = 'prv_add_obj_report'
-const PRV_UPSERT_OBJ_REPORT = 'prv_upsert_obj_report'
-const PRV_GET_OBJ_REPORT_LIST = 'prv_get_obj_report_list'
-const PRV_GET_ONE_OBJ_REPORT = 'prv_get_one_obj_report'
-const PRV_GET_ALL_OBJ_REPORT = 'prv_get_all_obj_report'
-const PRV_DEL_OBJ_REPORT = 'prv_del_obj_report'
-const PRV_DEL_ALL_OBJ_REPORT = 'prv_del_all_obj_report'
-const PRV_DEL_LIST_OBJ_REPORT = 'prv_del_list_obj_report'
-const PRV_DEL_OLD_REPORTS = 'prv_del_old_reports'
-
-const PRV_CHECK_PORTAL_METADATA = 'prv_check_portal_metadata'
-const PRV_CHECK_PORTAL_METADATA_IDS = 'prv_check_portal_metadata_ids'
-
-const DEV_GET_EVERY_THESAURUS = 'dev_get_every_thesaurus'
-const DEV_GET_SINGLE_THESAURUS = 'dev_get_single_thesaurus'
-const DEV_GET_ALL_LICENCES = 'dev_get_all_licences'
-const DEV_GET_ALL_LICENCE_CODES = 'dev_get_all_licence_codes'
-const DEV_INIT_LICENCES = 'dev_init_licences'
-const DEV_INIT_WITH_ODR = 'dev_init_with_odr'
-const DEV_GENERATE_UUID = 'dev_generate_uuid'
-const DEV_GET_PORTAL_TOKEN = 'dev_get_portal_token'
-const DEV_CHECK_STORED_TOKEN = 'dev_check_stored_token'
-const DEV_GET_PORTAL_METADATA = 'dev_get_portal_metadata'
-const DEV_SEND_METADATA_TO_PORTAL = 'dev_send_metadata_to_portal'
-const DEV_SEND_MANY_METADATA_TO_PORTAL = 'dev_send_many_metadata_to_portal'
-const DEV_DEL_PORTAL_METADATA = 'dev_del_portal_metadata'
-const DEV_GET_GIT_HASH = 'dev_get_git_hash'
-const DEV_GET_APP_HASH = 'dev_get_app_hash'
-const DEV_GET_NODE_VERSION = 'dev_get_node_version'
-const DEV_GET_APP_ENV = 'dev_get_app_env'
-const DEV_GET_LOGS = 'dev_get_logs'
-const DEV_SEARCH_LOGS = 'dev_search_logs'
-const DEV_GET_COLLECTIONS = 'dev_get_collections'
-const DEV_DROP_COLLECTION = 'dev_drop_collection'
-const DEV_DROP_DB = 'dev_drop_db'
-const DEV_INIT_THEMES = 'dev_init_themes'
-
-const DEV_CHECK_NODE_URL = 'dev_check_node_url'
-const DEV_CHECK_PORTAL_URL = 'dev_check_portal_url'
-
-// -------------------------------------------------------------------------------------------------
 // Free routes (no authentification required)
 // -------------------------------------------------------------------------------------------------
 export const publicRoutes = [
@@ -225,10 +154,10 @@ export const publicRoutes = [
   // Accessing app info
   // -------------------------------------------------------------------------------------------------
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `/favicon.png`,
     handler: serveFavicon,
-    config: { [ROUTE_NAME]: PUB_GET_FAVICON },
+    config: { [ROUTE_NAME]: 'pub_get_favicon' },
   },
 
   // -------------------------------------------------------------------------------------------------
@@ -241,10 +170,10 @@ export const publicRoutes = [
    *   - (query) limit {Integer:int32} The number of resources to return
    */
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: URL_PUB_METADATA,
     handler: getMetadataListAndCount,
-    config: { [ROUTE_NAME]: PUB_GET_ALL_METADATA },
+    config: { [ROUTE_NAME]: 'pub_get_all_metadata' },
   },
   /*
    * @oas [get] /api/v1/resources/{metaId}
@@ -264,20 +193,20 @@ export const publicRoutes = [
    *   - (query) updated_before {String:date} The date before which the listed metadata were updated
    */
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PUB_METADATA}/:${PARAM_ID}`,
     handler: getSingleMetadata,
-    config: { [ROUTE_NAME]: PUB_GET_ONE_METADATA },
+    config: { [ROUTE_NAME]: 'pub_get_one_metadata' },
   },
 
   /**
    * Search objects
    */
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PUB_METADATA}/${ACT_SEARCH}`,
     handler: searchMetadata,
-    config: { [ROUTE_NAME]: PUB_RCH_OBJ },
+    config: { [ROUTE_NAME]: 'pub_rch_obj' },
   },
   /*
    * @oas [get] /api/version
@@ -298,17 +227,17 @@ export const publicRoutes = [
    *              value: '1.2.3'
    */
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: URL_PUB_API_VERSION,
     handler: getApiVersion,
-    config: { [ROUTE_NAME]: PUB_GET_API_VERSION },
+    config: { [ROUTE_NAME]: 'pub_get_api_version' },
   },
 
   // redirection: GET /api -> GET /api/v1/resources
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `/api`,
-    config: { [ROUTE_NAME]: REDIRECT_GET_DATA },
+    config: { [ROUTE_NAME]: 'redirect_get_data' },
     handler: function (req, reply) {
       logD(mod, `redirect`, `${req.method} ${URL_PUB_METADATA}`)
       reply.redirect(URL_PUB_METADATA)
@@ -316,9 +245,9 @@ export const publicRoutes = [
   },
   // redirection: GET /api/v1 -> GET /api/v1/resources
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: '/api/v1',
-    config: { [ROUTE_NAME]: REDIRECT_GET_DATA },
+    config: { [ROUTE_NAME]: 'redirect_get_data' },
     handler: function (req, reply) {
       logD(mod, `redirect`, `${req.method} ${URL_PUB_METADATA}`)
       reply.redirect(URL_PUB_METADATA)
@@ -326,9 +255,9 @@ export const publicRoutes = [
   },
   // redirection: GET /resources -> GET /api/v1/resources
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `/${OBJ_METADATA}`,
-    config: { [ROUTE_NAME]: REDIRECT_GET_DATA },
+    config: { [ROUTE_NAME]: 'redirect_get_data' },
     handler: function (req, reply) {
       const newRoute = `${URL_PREFIX_PUBLIC}${req.url}`
       logD(mod, `redirect`, `${req.method} ${newRoute}`)
@@ -337,9 +266,9 @@ export const publicRoutes = [
   },
   // redirection: GET /resources/:id -> GET /api/v1/resources/:id
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `/${OBJ_METADATA}/:${PARAM_ID}`,
-    config: { [ROUTE_NAME]: REDIRECT_GET_DATA },
+    config: { [ROUTE_NAME]: 'redirect_get_data' },
     handler: function (req, reply) {
       const newRoute = `${URL_PREFIX_PUBLIC}${req.url}`
       logD(mod, `redirect`, `${req.method} ${newRoute}`)
@@ -348,22 +277,22 @@ export const publicRoutes = [
   },
 
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PREFIX_PUBLIC}/${OBJ_PUB_KEYS}`,
     handler: getManyPubKeys,
-    config: { [ROUTE_NAME]: PUB_GET_ALL_PUB_KEYS },
+    config: { [ROUTE_NAME]: 'pub_get_all_pub_keys' },
   },
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PREFIX_PUBLIC}/${OBJ_PUB_KEYS}/:${PARAM_ID}`,
     handler: getSinglePubKey,
-    config: { [ROUTE_NAME]: PUB_GET_ONE_PUB_KEY },
+    config: { [ROUTE_NAME]: 'pub_get_one_pub_key' },
   },
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PREFIX_PUBLIC}/${OBJ_PUB_KEYS}/:${PARAM_ID}/:${PARAM_PROP}`,
     handler: getSinglePubKey,
-    config: { [ROUTE_NAME]: PUB_GET_ONE_PUB_KEY_PROP },
+    config: { [ROUTE_NAME]: 'pub_get_one_pub_key_prop' },
   },
 ]
 // -------------------------------------------------------------------------------------------------
@@ -381,40 +310,40 @@ export const portalRoutes = [
 
   // Add/edit 1 report for one object integration
   {
-    method: HTTP_METHODS.PUT,
+    method: 'PUT',
     url: `/${OBJ_METADATA}/:${PARAM_ID}/${ACT_REPORT}`,
     handler: addOrEditSingleReportForMetadata,
-    config: { [ROUTE_NAME]: PORTAL_UPSERT_ONE_REPORT },
+    config: { [ROUTE_NAME]: 'portal_upsert_one_report' },
   },
 
   // Add/edit 1 report for one object integration
   {
-    method: HTTP_METHODS.PUT,
+    method: 'PUT',
     url: `${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}`,
     handler: addOrEditSingleReportForMetadata,
-    config: { [ROUTE_NAME]: PORTAL_UPSERT_ONE_REPORT },
+    config: { [ROUTE_NAME]: 'portal_upsert_one_report' },
   },
 
   // Get all reports for one object integration
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}`,
     handler: getReportListForMetadata,
-    config: { [ROUTE_NAME]: PORTAL_GET_ALL_OBJ_REPORT },
+    config: { [ROUTE_NAME]: 'portal_get_all_obj_report' },
   },
   // Get 1 report for one object integration
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}/:${PARAM_REPORT_ID}`,
     handler: getSingleReportForMetadata,
-    config: { [ROUTE_NAME]: PORTAL_GET_ONE_OBJ_REPORT },
+    config: { [ROUTE_NAME]: 'portal_get_one_obj_report' },
   },
 
   // Redirection for getting integration reports
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `/${OBJ_METADATA}/:${PARAM_ID}/*`,
-    config: { [ROUTE_NAME]: REDIRECT_GET_PLUS },
+    config: { [ROUTE_NAME]: 'redirect_get_plus' },
     handler: function (req, reply) {
       const newRoute = `${URL_PREFIX_PUBLIC}${req.url}`
       logD(mod, `redirect`, `${req.method} ${newRoute}`)
@@ -423,9 +352,9 @@ export const portalRoutes = [
   },
   // Redirection for adding an integration report
   {
-    method: HTTP_METHODS.PUT,
+    method: 'PUT',
     url: `/${OBJ_METADATA}/*`,
-    config: { [ROUTE_NAME]: REDIRECT_PUT_PLUS },
+    config: { [ROUTE_NAME]: 'redirect_put_plus' },
     handler: function (req, reply) {
       const newRoute = `${URL_PREFIX_PUBLIC}${req.url}`
       logD(mod, `redirect`, `${req.method} ${newRoute}`)
@@ -457,10 +386,10 @@ export const unrestrictedPrivateRoutes = [
    *              value: '0e636d4'
    */
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_GIT_HASH_ACCESS}`,
     handler: getGitHash,
-    config: { [ROUTE_NAME]: DEV_GET_GIT_HASH },
+    config: { [ROUTE_NAME]: 'dev_get_git_hash' },
   },
   /*
    * @oas [get] /api/admin/apphash
@@ -478,10 +407,10 @@ export const unrestrictedPrivateRoutes = [
    *              value: '0e636d4'
    */
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_APP_HASH_ACCESS}`,
     handler: getAppHash,
-    config: { [ROUTE_NAME]: DEV_GET_APP_HASH },
+    config: { [ROUTE_NAME]: 'dev_get_app_hash' },
   },
   /*
    * @oas [get] /api/admin/env
@@ -489,10 +418,10 @@ export const unrestrictedPrivateRoutes = [
    * description: 'Get environment version of the running application'
    */
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_APP_ENV_ACCESS}`,
     handler: getEnvironment,
-    config: { [ROUTE_NAME]: DEV_GET_APP_ENV },
+    config: { [ROUTE_NAME]: 'dev_get_app_env' },
   },
 ]
 export const backOfficeRoutes = [
@@ -503,118 +432,118 @@ export const backOfficeRoutes = [
 
   // Add one or many objects
   {
-    method: HTTP_METHODS.POST,
+    method: 'POST',
     url: URL_PV_OBJECT_GENERIC,
     handler: addObjects,
-    config: { [ROUTE_NAME]: PRV_ADD_ONE },
+    config: { [ROUTE_NAME]: 'prv_add_one' },
 
     // schema: documentation.addMetadataSchema
   },
   // Edit 1
   {
-    method: HTTP_METHODS.PUT,
+    method: 'PUT',
     url: URL_PV_OBJECT_GENERIC,
     handler: upsertObjects,
-    config: { [ROUTE_NAME]: PRV_UPSERT_ONE },
+    config: { [ROUTE_NAME]: 'prv_upsert_one' },
   },
   // Get all
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: URL_PV_OBJECT_GENERIC,
     handler: getObjectList,
-    config: { [ROUTE_NAME]: PRV_GET_ALL },
+    config: { [ROUTE_NAME]: 'prv_get_all' },
   },
   // Get 1
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`,
     handler: getSingleObject,
-    config: { [ROUTE_NAME]: PRV_GET_ONE },
+    config: { [ROUTE_NAME]: 'prv_get_one' },
   },
   // Get 1
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/:${PARAM_PROP}`,
     handler: getSingleObject,
-    config: { [ROUTE_NAME]: PRV_GET_ONE },
+    config: { [ROUTE_NAME]: 'prv_get_one' },
   },
 
   // Delete 1
   {
-    method: HTTP_METHODS.DELETE,
+    method: 'DELETE',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`,
     handler: deleteSingleObject,
-    config: { [ROUTE_NAME]: PRV_DEL_ONE },
+    config: { [ROUTE_NAME]: 'prv_del_one' },
   },
   // Delete all
   {
-    method: HTTP_METHODS.DELETE,
+    method: 'DELETE',
     url: URL_PV_OBJECT_GENERIC,
     handler: deleteManyObjects,
-    config: { [ROUTE_NAME]: PRV_DEL_MANY },
+    config: { [ROUTE_NAME]: 'prv_del_many' },
   },
   // Delete many
   {
-    method: HTTP_METHODS.POST,
+    method: 'POST',
     url: `${URL_PV_OBJECT_GENERIC}/${ACT_DELETION}`,
     handler: deleteObjectList,
-    config: { [ROUTE_NAME]: PRV_DEL_LIST },
+    config: { [ROUTE_NAME]: 'prv_del_list' },
   },
 
   // Access unlinked data
   // {
-  //   method: HTTP_METHODS.GET,
+  //   method: 'GET',
   //   url: `${URL_PV_OBJECT_GENERIC}/${ACT_UNLINKED}`,
   //   handler: getOrphans,
-  //   config: { [ROUTE_NAME]: PRV_GET_ORPHANS },
+  //   config: { [ROUTE_NAME]: 'prv_get_orphans' },
   // },
   // Search object
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/${ACT_SEARCH}`,
     handler: searchObjects,
-    config: { [ROUTE_NAME]: PRV_OBJ_SEARCH },
+    config: { [ROUTE_NAME]: 'prv_obj_search' },
   },
   // Extended search on object
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/${ACT_EXT_SEARCH}`,
     handler: searchObjects,
-    config: { [ROUTE_NAME]: PRV_OBJ_SEARCH, [ROUTE_OPT]: ACT_EXT_SEARCH },
+    config: { [ROUTE_NAME]: 'prv_obj_search', [ROUTE_OPT]: ACT_EXT_SEARCH },
   },
   // Get searchable fields for an object type
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PREFIX_PRIVATE}/${ACT_SEARCH}`,
     handler: getSearchableProperties,
-    config: { [ROUTE_NAME]: PRV_OBJ_SEARCH },
+    config: { [ROUTE_NAME]: 'prv_obj_search' },
   },
   // Count the number of objects
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/count`,
     handler: countObjects,
-    config: { [ROUTE_NAME]: PRV_OBJ_COUNT },
+    config: { [ROUTE_NAME]: 'prv_obj_count' },
   },
 
   // -------------------------------------------------------------------------------------------------
   // Metadata
   // -------------------------------------------------------------------------------------------------
   {
-    method: HTTP_METHODS.PUT,
+    method: 'PUT',
     url: `${URL_PREFIX_PRIVATE}/${OBJ_METADATA}/save`,
     handler: updateAllMetadataStatus,
-    config: { [ROUTE_NAME]: PRV_SAVE_ALL },
+    config: { [ROUTE_NAME]: 'prv_save_all' },
   },
   // -------------------------------------------------------------------------------------------------
   // Media
   // -------------------------------------------------------------------------------------------------
   // Commit a media
   {
-    method: HTTP_METHODS.POST,
+    method: 'POST',
     url: `${URL_PREFIX_PRIVATE}/${OBJ_MEDIA}/:${PARAM_ID}/${ACT_COMMIT}`,
     handler: commitMedia,
-    config: { [ROUTE_NAME]: PRV_MEDIA_COMMIT },
+    config: { [ROUTE_NAME]: 'prv_media_commit' },
   },
   // -------------------------------------------------------------------------------------------------
   // Integration reports
@@ -622,69 +551,69 @@ export const backOfficeRoutes = [
 
   // Add 1 integration report for an identified object
   {
-    method: HTTP_METHODS.POST,
+    method: 'POST',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}`,
     handler: addSingleReportForObject,
-    config: { [ROUTE_NAME]: PRV_ADD_OBJ_REPORT },
+    config: { [ROUTE_NAME]: 'prv_add_obj_report' },
   },
 
   // Add/edit 1 integration report for an identified object
   {
-    method: HTTP_METHODS.PUT,
+    method: 'PUT',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}`,
     handler: addOrEditSingleReportForObject,
-    config: { [ROUTE_NAME]: PRV_UPSERT_OBJ_REPORT },
+    config: { [ROUTE_NAME]: 'prv_upsert_obj_report' },
   },
 
   // Get all integration reports for an identified object
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}`,
     handler: getReportListForObject,
-    config: { [ROUTE_NAME]: PRV_GET_OBJ_REPORT_LIST },
+    config: { [ROUTE_NAME]: 'prv_get_obj_report_list' },
   },
   // Get 1 report for one object integration
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}/:${PARAM_REPORT_ID}`,
     handler: getSingleReportForObject,
-    config: { [ROUTE_NAME]: PRV_GET_ONE_OBJ_REPORT },
+    config: { [ROUTE_NAME]: 'prv_get_one_obj_report' },
   },
   // Get all integration reports for one object type
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/${OBJ_REPORTS}`,
     handler: getReportListForObjectType,
-    config: { [ROUTE_NAME]: PRV_GET_ALL_OBJ_REPORT },
+    config: { [ROUTE_NAME]: 'prv_get_all_obj_report' },
   },
 
   // Delete 1 identified integration report for one object
   {
-    method: HTTP_METHODS.DELETE,
+    method: 'DELETE',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}/:${PARAM_REPORT_ID}`,
     handler: deleteSingleReportForObject,
-    config: { [ROUTE_NAME]: PRV_DEL_OBJ_REPORT },
+    config: { [ROUTE_NAME]: 'prv_del_obj_report' },
   },
   // Delete all integration reports for one object
   {
-    method: HTTP_METHODS.DELETE,
+    method: 'DELETE',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}`,
     handler: deleteEveryReportForObject,
-    config: { [ROUTE_NAME]: PRV_DEL_ALL_OBJ_REPORT },
+    config: { [ROUTE_NAME]: 'prv_del_all_obj_report' },
   },
   // Delete many integration reports for an identified object
   {
-    method: HTTP_METHODS.POST,
+    method: 'POST',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}/${ACT_DELETION}`,
     handler: deleteManyReportForObject,
-    config: { [ROUTE_NAME]: PRV_DEL_LIST_OBJ_REPORT },
+    config: { [ROUTE_NAME]: 'prv_del_list_obj_report' },
   },
   // Purge old reports
   {
-    method: HTTP_METHODS.DELETE,
+    method: 'DELETE',
     url: `${URL_PREFIX_PRIVATE}/${OBJ_REPORTS}`,
     handler: deleteReportsBefore,
-    config: { [ROUTE_NAME]: PRV_DEL_OLD_REPORTS },
+    config: { [ROUTE_NAME]: 'prv_del_old_reports' },
   },
 ]
 
@@ -699,58 +628,58 @@ export const devRoutes = [
    * Get node and npm versions
    */
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_NODE_VERSION_ACCESS}`,
     handler: getNodeVersion,
-    config: { [ROUTE_NAME]: DEV_GET_NODE_VERSION },
+    config: { [ROUTE_NAME]: 'dev_get_node_version' },
   },
 
   // -------------------------------------------------------------------------------------------------
   // Accessing thesaurus
   // -------------------------------------------------------------------------------------------------
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_THESAURUS_ACCESS}`,
     handler: getEveryThesaurus,
-    config: { [ROUTE_NAME]: DEV_GET_EVERY_THESAURUS },
+    config: { [ROUTE_NAME]: 'dev_get_every_thesaurus' },
   },
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}`,
     handler: getSingleThesaurus,
-    config: { [ROUTE_NAME]: DEV_GET_SINGLE_THESAURUS },
+    config: { [ROUTE_NAME]: 'dev_get_single_thesaurus' },
   },
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}/:${PARAM_THESAURUS_LANG}`,
     handler: getSingleThesaurusLabels,
-    config: { [ROUTE_NAME]: DEV_GET_SINGLE_THESAURUS },
+    config: { [ROUTE_NAME]: 'dev_get_single_thesaurus' },
   },
   /** Init themes with values in stored data */
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}/${ACT_INIT}`,
     handler: initThemes,
-    config: { [ROUTE_NAME]: DEV_INIT_THEMES },
+    config: { [ROUTE_NAME]: 'dev_init_themes' },
   },
 
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_LICENCE_ACCESS}`,
     handler: getAllLicences,
-    config: { [ROUTE_NAME]: DEV_GET_ALL_LICENCES },
+    config: { [ROUTE_NAME]: 'dev_get_all_licences' },
   },
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_LICENCE_CODES_ACCESS}`,
     handler: getAllLicenceCodes,
-    config: { [ROUTE_NAME]: DEV_GET_ALL_LICENCE_CODES },
+    config: { [ROUTE_NAME]: 'dev_get_all_licence_codes' },
   },
   {
-    method: HTTP_METHODS.POST,
+    method: 'POST',
     url: `${URL_PV_LICENCE_ACCESS}/${ACT_INIT}`,
     handler: initLicences,
-    config: { [ROUTE_NAME]: DEV_INIT_LICENCES },
+    config: { [ROUTE_NAME]: 'dev_init_licences' },
   },
 
   // -------------------------------------------------------------------------------------------------
@@ -758,71 +687,71 @@ export const devRoutes = [
   // -------------------------------------------------------------------------------------------------
   // Mass init with ODS data
   {
-    method: HTTP_METHODS.POST,
+    method: 'POST',
     url: `${URL_PREFIX_PRIVATE}/${OBJ_METADATA}/${ACT_INIT}`,
     handler: initWithODR,
-    config: { [ROUTE_NAME]: DEV_INIT_WITH_ODR },
+    config: { [ROUTE_NAME]: 'dev_init_with_odr' },
   },
 
   // -------------------------------------------------------------------------------------------------
   // UUID v4 generation
   // -------------------------------------------------------------------------------------------------
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PREFIX_PRIVATE}/${ACT_UUID_GEN}`,
     handler: generateUUID,
-    config: { [ROUTE_NAME]: DEV_GENERATE_UUID },
+    config: { [ROUTE_NAME]: 'dev_generate_uuid' },
   },
   // -------------------------------------------------------------------------------------------------
   // Portal token
   // -------------------------------------------------------------------------------------------------
   // Get a new token from the Portal
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_PORTAL_PREFIX}/${URL_SUFFIX_TOKEN_GET}`,
     handler: exposedGetPortalToken,
-    config: { [ROUTE_NAME]: DEV_GET_PORTAL_TOKEN },
+    config: { [ROUTE_NAME]: 'dev_get_portal_token' },
   },
   // Get a token checked by the Portal
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_PORTAL_PREFIX}/${URL_SUFFIX_TOKEN_GET}/${URL_SUFFIX_TOKEN_CHECK}`,
     handler: checkStoredToken,
-    config: { [ROUTE_NAME]: DEV_CHECK_STORED_TOKEN },
+    config: { [ROUTE_NAME]: 'dev_check_stored_token' },
   },
 
   // -------------------------------------------------------------------------------------------------
   // Get/post resources from/to Portal
   // -------------------------------------------------------------------------------------------------
   {
-    method: HTTP_METHODS.POST,
+    method: 'POST',
     url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}/${ACT_SEND}`,
     handler: sendManyMetadataToPortal,
-    config: { [ROUTE_NAME]: DEV_SEND_MANY_METADATA_TO_PORTAL },
+    config: { [ROUTE_NAME]: 'dev_send_many_metadata_to_portal' },
   },
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}/:${PARAM_ID}`,
     handler: getMetadata,
-    config: { [ROUTE_NAME]: DEV_GET_PORTAL_METADATA },
+    config: { [ROUTE_NAME]: 'dev_get_portal_metadata' },
   },
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}`,
     handler: getMetadata,
-    config: { [ROUTE_NAME]: DEV_GET_PORTAL_METADATA },
+    config: { [ROUTE_NAME]: 'dev_get_portal_metadata' },
   },
   {
-    method: HTTP_METHODS.POST,
+    method: 'POST',
     url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}/:${PARAM_ID}`,
     handler: sendMetadata,
-    config: { [ROUTE_NAME]: DEV_SEND_METADATA_TO_PORTAL },
+    config: { [ROUTE_NAME]: 'dev_send_metadata_to_portal' },
   },
   {
-    method: HTTP_METHODS.DELETE,
+    method: 'DELETE',
     url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}/:${PARAM_ID}`,
     handler: deleteMetadata,
-    config: { [ROUTE_NAME]: DEV_DEL_PORTAL_METADATA },
+    config: { [ROUTE_NAME]: 'dev_del_portal_metadata' },
   },
 
   // -------------------------------------------------------------------------------------------------
@@ -830,81 +759,95 @@ export const devRoutes = [
   // -------------------------------------------------------------------------------------------------
   // Get the portal URL associated with this node
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PREFIX_CHECK}/${URL_SUFFIX_NODE}/url`,
     handler: () => getPublicUrl(),
-    config: { [ROUTE_NAME]: DEV_CHECK_NODE_URL },
+    config: { [ROUTE_NAME]: 'dev_check_node_url' },
   },
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PREFIX_CHECK}/${URL_SUFFIX_PORTAL}/url`,
     handler: getPortalBaseUrl,
-    config: { [ROUTE_NAME]: DEV_CHECK_PORTAL_URL },
+    config: { [ROUTE_NAME]: 'dev_check_portal_url' },
   },
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PREFIX_CHECK}/${URL_SUFFIX_PORTAL}/${OBJ_METADATA}`,
     handler: getPortalCachedMetadataList,
-    config: { [ROUTE_NAME]: PRV_CHECK_PORTAL_METADATA },
+    config: { [ROUTE_NAME]: 'prv_check_portal_metadata' },
   },
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PREFIX_CHECK}/${URL_SUFFIX_PORTAL}/ids`,
     handler: getPortalMetadataFields,
-    config: { [ROUTE_NAME]: PRV_CHECK_PORTAL_METADATA_IDS },
+    config: { [ROUTE_NAME]: 'prv_check_portal_metadata_ids' },
   },
   // -------------------------------------------------------------------------------------------------
   // Accessing logs
   // -------------------------------------------------------------------------------------------------
   // Get logs
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_LOGS_ACCESS}`,
     handler: getLogs,
-    config: { [ROUTE_NAME]: DEV_GET_LOGS },
+    config: { [ROUTE_NAME]: 'dev_get_logs' },
   },
   // {
-  //   method: HTTP_METHODS.GET,
+  //   method: 'GET',
   //   url: `${URL_PV_LOGS_ACCESS}/:${PARAM_LOGS_LINES}`,
   //   handler: getLastLogLines,
-  //   config: { [ROUTE_NAME]: DEV_GET_LAST_LOG_LINES },
+  //   config: { [ROUTE_NAME]: 'dev_get_last_log_lines' },
   // },
   // Search logs
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_LOGS_ACCESS}/${ACT_SEARCH}`,
     handler: searchLogs,
-    config: { [ROUTE_NAME]: DEV_SEARCH_LOGS },
+    config: { [ROUTE_NAME]: 'dev_search_logs' },
   },
   // -------------------------------------------------------------------------------------------------
   // Actions on DB
   // -------------------------------------------------------------------------------------------------
   /** Get all collections */
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PV_DB_ACCESS}`,
     handler: getCollections,
-    config: { [ROUTE_NAME]: DEV_GET_COLLECTIONS },
+    config: { [ROUTE_NAME]: 'dev_get_collections' },
   },
   /** Drop Collection */
   {
-    method: HTTP_METHODS.DELETE,
+    method: 'DELETE',
     url: `${URL_PV_DB_ACCESS}/:${PARAM_OBJECT}`,
     handler: dropCollection,
-    config: { [ROUTE_NAME]: DEV_DROP_COLLECTION },
+    config: { [ROUTE_NAME]: 'dev_drop_collection' },
   },
-  /** Drop DB */
+  /** Drop DB = delete all collections! */
   {
-    method: HTTP_METHODS.DELETE,
+    method: 'DELETE',
     url: `${URL_PV_DB_ACCESS}`,
     handler: dropDB,
-    config: { [ROUTE_NAME]: DEV_DROP_DB },
+    config: { [ROUTE_NAME]: 'dev_drop_db' },
+  },
+  /** Dump DB = save collections in a zip file */
+  {
+    method: 'POST',
+    url: `${URL_PV_DB_ACCESS}/dump`,
+    handler: dumpDB,
+    config: { [ROUTE_NAME]: 'dev_db_dump' },
+  },
+  /** Dump DB = restore collections from a local zip file */
+  {
+    method: 'POST',
+    url: `${URL_PV_DB_ACCESS}/restore`,
+    handler: restoreDB,
+    config: { [ROUTE_NAME]: 'dev_db_restore' },
   },
   // -------------------------------------------------------------------------------------------------
   // Tests entry
   // -------------------------------------------------------------------------------------------------
   {
-    method: HTTP_METHODS.GET,
+    method: 'GET',
     url: `${URL_PREFIX_PRIVATE}/test`,
     handler: test,
     config: { [ROUTE_NAME]: 'dev_test' },

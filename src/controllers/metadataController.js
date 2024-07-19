@@ -7,12 +7,8 @@ const mod = 'metaCtrl'
 // -------------------------------------------------------------------------------------------------
 // External dependencies
 // -------------------------------------------------------------------------------------------------
-import mongoose from 'mongoose'
-const { Types: MongooseTypes } = mongoose
-
 import _ from 'lodash'
 const { pick } = _
-// const { mergeWith } = _
 
 // -------------------------------------------------------------------------------------------------
 // Constants
@@ -40,6 +36,7 @@ import {
   API_LICENCE_CUSTOM_URI,
   API_LICENCE_TYPE,
   API_MEDIA_ID,
+  API_MEDIA_NAME,
   API_MEDIA_PROPERTY,
   API_MEDIA_TYPE,
   API_METADATA_ID,
@@ -56,6 +53,7 @@ import {
   DB_UPDATED_AT,
   DICT_LANG,
   LicenceTypes,
+  MetadataStatus,
 } from '../db/dbFields.js'
 
 import {
@@ -184,7 +182,7 @@ export const organizationRudiToDbFormat = async (rudiProducer, path, shouldCreat
       organizationDbId = newOrg[DB_ID]
     }
     // logD(mod, fun, `${beautify(rudiProducer)} -> ${organizationDbId} `)
-    return new MongooseTypes.ObjectId(organizationDbId)
+    return organizationDbId
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -224,7 +222,7 @@ export const contactListRudiToDbFormat = async (rudiContactList, path, shouldCre
 
           contactDbId = dbContact[DB_ID]
         }
-        contactDbIds.push(new MongooseTypes.ObjectId(contactDbId))
+        contactDbIds.push(contactDbId)
         // logD(mod, fun, `${beautify(rudiContact)} -> ${contactDbId}`)
       })
     )
@@ -302,7 +300,7 @@ export const mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFo
             throw new BadRequestError(e.message, mod, 'media.overwrite', [API_MEDIA_PROPERTY, i])
           }
         }
-        mediaDbIds.push(new MongooseTypes.ObjectId(mediaDbId))
+        mediaDbIds.push(mediaDbId)
         // logD(mod, fun, `${beautify(rudiMedia)} -> ${mediaDbId} `)
       })
     )
@@ -552,7 +550,7 @@ function toMDBLanguage(metadata, field) {
       return
     }
     prop.forEach((entry) => {
-      if (entry[DICT_LANG]) entry[DICT_LANG] = entry[DICT_LANG].substring(0, 2)
+      if (entry[DICT_LANG]) entry[DICT_LANG] = entry[DICT_LANG].slice(0, 2)
     })
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -719,6 +717,7 @@ const updateMetadataStorageState = async (dbMetadata, newState = StorageStatus.O
   try {
     logT(mod, fun)
     const metadata = await getMetadataWithJson(dbMetadata)
+    logT(mod, fun, `metadata: ${metadata[API_METADATA_ID]}`)
 
     const areAllMediaAvailable = isEveryMediaAvailable(metadata)
     if (areAllMediaAvailable) {
@@ -726,18 +725,67 @@ const updateMetadataStorageState = async (dbMetadata, newState = StorageStatus.O
     } else {
       metadata[API_STORAGE_STATUS] = StorageStatus.Pending
     }
+    logT(mod, fun, `areAllMediaAvailable: ${areAllMediaAvailable}`)
+
     if (dbMetadata[API_STORAGE_STATUS] !== metadata[API_STORAGE_STATUS]) {
       dbMetadata[API_STORAGE_STATUS] = metadata[API_STORAGE_STATUS]
       if (!dbMetadata[API_INTEGRATION_ERROR_ID]) await dbMetadata.save()
     }
+
     if (metadata[API_INTEGRATION_ERROR_ID]) {
       delete metadata[API_INTEGRATION_ERROR_ID]
       await dbMetadata.save()
       logD(mod, fun, 'Integration error flag removed')
     }
+    logT(mod, fun, `dbMetadata: ${dbMetadata}`)
+
     const msg = `Metadata is ${areAllMediaAvailable ? '' : 'not '}sendable: ${dbMetadata[API_METADATA_ID]}`
     logD(mod, fun, msg)
     return { metadata, areAllMediaAvailable } // OK to send
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+export const commitMedia = async (req, res) => {
+  const fun = 'commitMedia'
+  try {
+    logT(mod, fun)
+    const mediaId = accessReqParam(req, PARAM_ID)
+    const commitId = req.body?.commitId
+
+    const dbMedia = await getObjectWithRudiId(OBJ_MEDIA, mediaId)
+    if (!dbMedia) throw new NotFoundError(`Media not found for id '${mediaId}'`)
+
+    // Set media storage_status to 'available'
+    dbMedia[API_FILE_STORAGE_STATUS] = MediaStorageStatus.Available
+    // Set status_update date
+    dbMedia[API_FILE_STATUS_UPDATE] = nowISO()
+    const savedMedia = await dbMedia.save()
+
+    const filter = { [QUERY_FILTER]: { $and: [{ available_formats: { $in: [savedMedia._id] } }] } }
+    const dbMetadataList = await getDbObjectList(OBJ_METADATA, filter)
+
+    // Updating metadata global storage state
+    const metadataIdList = []
+    const promiseList = []
+    dbMetadataList.forEach((dbMetadata) => {
+      metadataIdList.push(dbMetadata[API_METADATA_ID])
+      promiseList.push(updateMetadataStorageState(dbMetadata))
+    })
+    await Promise.all(promiseList)
+
+    return {
+      status: 'OK',
+      media: pick(savedMedia, [
+        API_MEDIA_ID,
+        API_MEDIA_NAME,
+        API_FILE_STORAGE_STATUS,
+        API_FILE_STATUS_UPDATE,
+      ]),
+      metadata_list: metadataIdList,
+      commit_id: commitId,
+    }
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -749,8 +797,8 @@ const updateMetadataStorageState = async (dbMetadata, newState = StorageStatus.O
  * @param {*} res
  * @returns
  */
-export const commitMedia = async (req, res) => {
-  const fun = 'commitMedia'
+export const commitMediaForMetadata = async (req, res) => {
+  const fun = 'commitMediaForMetadata'
   try {
     logT(mod, fun)
     const mediaId = accessReqParam(req, PARAM_ID)
@@ -805,44 +853,56 @@ export const commitMedia = async (req, res) => {
 }
 
 export const sendManyMetadataToPortal = async (req) => {
-  const fun = 'sendAllMetadataToPortal'
+  const fun = 'sendManyMetadataToPortal'
   try {
     logT(mod, fun)
+
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     const listIds = req.body
-
-    if (!!listIds && !Array.isArray(listIds)) {
-      throw new BadRequestError(
-        'The body of the request should be empty (to send every metadata) or a list of ids',
-        mod,
-        fun
+    const FORCE_ALL = 'force=all'
+    if (Array.isArray(listIds)) {
+      logD(mod, fun, 'Sending a list of metadata')
+      listIds.forEach((metaId) =>
+        sendMetadataToPortal(metaId)
+          .then((res) => {
+            if (res)
+              logI(mod, fun, `Update request received by the portal for metadata '${metaId}'`)
+          })
+          .catch((err) =>
+            logE(mod, fun, `Sending to portal failed for metadata '${metaId}': ${err}`)
+          )
       )
-    }
-
-    if (!listIds || isEmptyArray(listIds)) {
-      logD(mod, fun, 'Getting the list of metadata ids')
-      let metadataListAndCount = await getDbObjectListAndCount(OBJ_METADATA, {
-        [QUERY_FIELDS]: [API_METADATA_ID],
-      })
+    } else {
+      let metadataListAndCount
+      let filter
+      if (req.url.endsWith(FORCE_ALL)) {
+        logD(mod, fun, 'Forcing the sending of every metadata')
+        filter = { [QUERY_FIELDS]: [API_METADATA_ID] }
+      } else if (!listIds) {
+        logD(mod, fun, 'Sending the refused metadata')
+        filter = {
+          [QUERY_FIELDS]: [API_METADATA_ID],
+          [QUERY_FILTER]: { [API_STATUS_PROPERTY]: MetadataStatus.Refused },
+        }
+      } else {
+        throw new BadRequestError(
+          'The body of the request should be empty (to send every refused metadata), ' +
+            'or a list of ids to be sent, ' +
+            `or the query should be "${FORCE_ALL}" to force the sending of every metadata`
+        )
+      }
+      metadataListAndCount = await getDbObjectListAndCount(OBJ_METADATA, filter)
       const metadataCount = metadataListAndCount[COUNT_LABEL]
       let metadataList = metadataListAndCount[LIST_LABEL]
       const currentCount = metadataList ? metadataList.length : 0
 
       if (currentCount < metadataCount) {
         logD(mod, fun, 'Getting the whole list of metadata ids')
-        metadataListAndCount = await getDbObjectListAndCount(OBJ_METADATA, {
-          [QUERY_FIELDS]: [API_METADATA_ID],
-          [QUERY_LIMIT]: metadataCount,
-        })
+        filter = { ...filter, [QUERY_LIMIT]: metadataCount }
+        metadataListAndCount = await getDbObjectListAndCount(OBJ_METADATA, { filter })
         metadataList = metadataListAndCount[LIST_LABEL]
       }
       metadataList.map((meta) => sendToPortal(meta))
-    } else {
-      listIds.map((id) =>
-        sendMetadataToPortal(id).then((res) => {
-          if (res) logI(mod, fun, `Update request received by the portal for metadata '${id}'`)
-        })
-      )
     }
     return 'Sending metadata to portal'
   } catch (err) {

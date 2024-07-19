@@ -25,9 +25,8 @@ import { logI } from '../../utils/logging.js'
  * @param {Array} args other arguments
  * @returns  the element located at path in the inputObject
  */
-export const translateStraightFromPath = async (inputObject, path, args) => {
-  return getFirstElementWithPath(inputObject, path)
-}
+export const translateStraightFromPath = async (inputObject, path) =>
+  getFirstElementWithPath(inputObject, path)
 
 /**
  * Gives the parameter in the XML's tag located at path.
@@ -53,15 +52,11 @@ export const translateStraightFromXmlParam = async (inputObject, path, args) => 
 // Specific functions to help translation from XML format, parsed with xml2js parser.
 // -------------------------------------------------------------------------------------------------
 
-export const createCustomLicence = (label) => {
-  // const fun = 'createCustomLicence'
-  let result = {
-    [API_LICENCE_TYPE]: LicenceTypes.Custom,
-    [API_LICENCE_CUSTOM_LABEL]: label,
-    [API_LICENCE_CUSTOM_URI]: label, // !! no available custom URI ?
-  }
-  return result
-}
+export const createCustomLicence = (label) => ({
+  [API_LICENCE_TYPE]: LicenceTypes.Custom,
+  [API_LICENCE_CUSTOM_LABEL]: label,
+  [API_LICENCE_CUSTOM_URI]: label, // !! no available custom URI ?
+})
 
 /**
  * Recursive function to get the element of object located at a path.
@@ -101,13 +96,10 @@ export const getElementWithPath = (object, path, depth = 0) => {
  */
 export const findElementWithPath = (object, path) => {
   const fun = 'findElementWithPath'
-  let result
   try {
-    result = getElementWithPath(object, path)
-    return result
+    return getElementWithPath(object, path)
   } catch (e) {
     logI(mod, fun, `The following error was intentionnaly skipped : ${e}.`)
-    return result
   }
 }
 
@@ -117,9 +109,8 @@ export const findElementWithPath = (object, path) => {
  * @param {Array[String]} path
  * @returns
  */
-export const findFirstElementWithPath = (object, path) => {
-  return arrayCheck(findElementWithPath(object, path))
-}
+export const findFirstElementWithPath = (object, path) =>
+  arrayCheck(findElementWithPath(object, path))
 
 /**
  * Returns the first element of x if it is an array, else x itself
@@ -147,10 +138,8 @@ export const arrayCheck = (x) => {
  * @param {Array[String]} path
  * @returns
  */
-export const getFirstElementWithPath = (object, path) => {
-  // const fun = 'getFirstElementWithPath'
-  return arrayCheck(getElementWithPath(object, path))
-}
+export const getFirstElementWithPath = (object, path) =>
+  arrayCheck(getElementWithPath(object, path))
 
 /**
  * Get an XML tag's parameter value (e.g. : tag <gmd:MD_Metadata xmlns="http://www.isotc211.org/2005/gmd"> has parameter xmlns with value "http://www.isotc211.org/2005/gmd")
@@ -205,9 +194,8 @@ export const findXmlParam = (inputObject, path, paramName) => {
  * @param {String} rudiField
  * @returns
  */
-export const getPath = (pathsDict, rudiField) => {
-  return accessProperty(accessProperty(pathsDict, rudiField), 'path')
-}
+export const getPath = (pathsDict, rudiField) =>
+  accessProperty(accessProperty(pathsDict, rudiField), 'path')
 
 /**
  * Shortcut of accessProperty for args.
@@ -215,6 +203,5 @@ export const getPath = (pathsDict, rudiField) => {
  * @param {String} rudiField
  * @returns
  */
-export const getArgs = (pathsDict, rudiField) => {
-  return accessProperty(accessProperty(pathsDict, rudiField), 'args')
-}
+export const getArgs = (pathsDict, rudiField) =>
+  accessProperty(accessProperty(pathsDict, rudiField), 'args')

@@ -11,7 +11,7 @@ import { RudiError } from '../utils/errors.js'
 export const test = async (req, res) => {
   const fun = 'test'
   try {
-    // const reqSearch = req.url.substring(req.url.indexOf('?'))
+    // const reqSearch = req.url.slice(req.url.indexOf('?'))
     // const searchParams = new URLSearchParams(reqSearch)
     // const rudiId = searchParams.get('id')
     // const objectType = searchParams.get('type')

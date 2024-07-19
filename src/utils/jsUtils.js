@@ -34,7 +34,7 @@ export const separateLogs = (insertStr, shouldDisplayDate) => {
   const inputStr = insertStr ? `[ ${insertStr} ]==` : ''
   const eatenCharacters = dateStr.length + inputStr.length
   // const line = inputStr.padStart(BASE_LINE.length - eatenCharacters, '=')
-  const line = BASE_LINE.substring(eatenCharacters)
+  const line = BASE_LINE.slice(eatenCharacters)
 
   const logSeparator = `${dateStr}${line}${inputStr}`
 
@@ -60,22 +60,34 @@ export const parseIntClean = (x) => {
 // -------------------------------------------------------------------------------------------------
 // String
 // -------------------------------------------------------------------------------------------------
-/* eslint no-extend-native: ["error", { "exceptions": ["String"] }] */
-String.prototype.merge = function (...args) {
-  const argNb = args.length
-  if (argNb == 0) return ''
-  let finalString = `${args[0]}`
-  for (let i = 1; i < argNb; i++) {
-    const str = `${args[i]}`
-    const mergableStr = str.startsWith(this) ? str : `${this}${str}`
-    finalString = !finalString.endsWith(this)
-      ? finalString + mergableStr
-      : finalString.substring(0, finalString.length - 1) + mergableStr
-  }
-  return finalString
-}
 
-export const pathJoin = (...args) => '/'.merge(...args)
+/**
+ * Joins several string chunks with the first argument the function is called with.
+ * This is basically the reverse of the String split function, with the difference that we make sure
+ * the merging character is not duplicated
+ * @param {string} sep separator we want to merge the string chunks with
+ * @param {...string} args string chunks to be joined
+ * @return {string}
+ */
+const mergeStrings = (sep, ...args) => {
+  const argNb = args.length
+  if (argNb == 0 || args[0] === undefined || args[0] === null) return ''
+  let accumulatedStr = `${args[0]}`
+  for (let i = 1; i < argNb; i++) {
+    if (args[i] === undefined || args[i] === null) break
+    const newChunk = `${args[i]}`
+    const cleanChunk = newChunk.startsWith(sep) ? newChunk.slice(1) : newChunk
+    accumulatedStr = accumulatedStr.endsWith(sep)
+      ? accumulatedStr + cleanChunk
+      : accumulatedStr + sep + cleanChunk
+  }
+  return accumulatedStr
+}
+export const pathJoin = (...args) => mergeStrings('/', ...args)
+
+export const removeTrailingChar = (str, char = '/') =>
+  str.endsWith(char) ? str.slice(0, str.length - char.length) : str
+export const removeTrailingSlash = (str) => removeTrailingChar(str, '/')
 
 export const isString = (str) => typeof str === 'string'
 
@@ -113,7 +125,7 @@ export const padEndModulo = (str, base, padSign) => {
   const fun = 'pad'
   // consoleLog(mod, fun, `base = ${base}, sign = '${padSign}'`)
   try {
-    padSign = padSign?.substring(0, 1)
+    padSign = padSign?.slice(0, 1)
     const modulo = str.length % base
     return modulo === 0 ? str : str.padEnd(str.length + base - modulo, padSign)
   } catch (err) {
@@ -125,7 +137,7 @@ export const padEndModulo = (str, base, padSign) => {
 export const shorten = (str, len) => {
   if (!str) return
   if (str.length < len) return str
-  return str.substring(0, len) + '[...]'
+  return str.slice(0, len) + '[...]'
 }
 
 export const padA1 = (num) => {
@@ -189,6 +201,11 @@ export const dateToIso = (date) => {
   }
 }
 export const nowISO = () => dateToIso()
+export const nowFileDate = () =>
+  new Date()
+    .toISOString()
+    .replace('T', '_')
+    .replace(/([:]|\..*)/g, '')
 
 export const dateEpochSToIso = (utcSeconds) => {
   const fun = 'dateEpochSToIso'
@@ -304,8 +321,7 @@ export const setSubProp = (obj, propArray, value) => objectPath.set(obj, propArr
  * @returns An object without the named property
  */
 export const omit = (obj, key) => {
-  // eslint-disable-next-line no-unused-vars, unused-imports/no-unused-vars
-  const { [key]: omitted, ...rest } = obj // NOSONAR
+  const { [key]: _, ...rest } = obj // NOSONAR
   return rest
 }
 const ARGV = omit(minimist(process.argv), '_')
@@ -337,7 +353,7 @@ export const beautify = (jsonObject, option) => {
     return isString(jsonObject)
       ? jsonObject
       : `${JSON.stringify(jsonObject, null, option).replace(/\\"/g, '"')}${option != null ? '\n' : ''}`
-  } catch (err) {
+  } catch {
     return `${jsonToString(jsonObject, false)}`
   }
 }

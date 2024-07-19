@@ -8,7 +8,7 @@ import { nanoid } from 'nanoid'
 // -------------------------------------------------------------------------------------------------
 // Constants
 // -------------------------------------------------------------------------------------------------
-const DEFAULT_MESSAGE = 'Rudi producer node - API Server Error'
+const DEFAULT_MESSAGE = 'Rudi producer node - RUDI Catalog server Error'
 const IS_RUDI_ERROR = 'is_rudi_error'
 const ERR_ID = 'errId'
 
@@ -208,7 +208,7 @@ export class RudiError extends Error {
   static treatCommunicationError(ctxMod, ctxFun, comError, errPrefix) {
     const fun = 'treatCommunicationError'
     try {
-      logT(mod, fun)
+      logT(mod, fun, `(issued at ${ctxMod}.${ctxFun})`)
 
       let error
       const errFlag = `${errPrefix ? errPrefix + ' ' : ''}`
@@ -268,7 +268,7 @@ export class RudiError extends Error {
       } else if (comError.message) {
         const errMsg = comError.message
         if (errMsg.startsWith('Request failed with status code ')) {
-          const errCode = `${errMsg}`.substring(32, 35)
+          const errCode = `${errMsg}`.slice(32, 35)
           logT(mod, fun, `${errFlag}error message ${errCode}: ${beautify(comError)}`)
           error = RudiError.createRudiHttpError(errCode, errMsg)
         } else {

@@ -66,6 +66,7 @@ import { logD, logT, logW } from './logging.js'
 import { BadRequestError, RudiError } from './errors.js'
 
 import { getModelPropertyNames, getNestedObject, getObjectModel } from '../db/dbQueries.js'
+import { Media, MediaFile, MediaService } from '../definitions/models/Media.js'
 
 // -------------------------------------------------------------------------------------------------
 // Local constants
@@ -111,6 +112,10 @@ export const parseQueryParameters = async (objectType, fullUrl) => {
     // identify object model
     const ObjModel = getObjectModel(objectType)
     const modelProperties = getModelPropertyNames(ObjModel)
+    if (ObjModel == Media) {
+      modelProperties.push(getModelPropertyNames(MediaFile))
+      modelProperties.push(getModelPropertyNames(MediaService))
+    }
     // logD(mod, fun, beautify(modelProperties))
     const returnedFilter = {
       [QUERY_LIMIT]: DEFAULT_QUERY_LIMIT,
@@ -130,7 +135,7 @@ export const parseQueryParameters = async (objectType, fullUrl) => {
       // logD(mod, fun, `No question mark in url: ${reqUrl}`)
       return returnedFilter
     }
-    // const reqArgs = reqUrl.substring(reqUrl.indexOf('?'))
+    // const reqArgs = reqUrl.slice(reqUrl.indexOf('?'))
     const splitUrl = fullUrl.split('?')
     const reqUrl = splitUrl[0]
     const reqArgs = splitUrl[1]
@@ -186,12 +191,13 @@ export const parseQueryParameters = async (objectType, fullUrl) => {
           case QUERY_SORT_BY:
           case QUERY_SORT_BY_CAML:
             returnedFilter[key] = value.split(',').map((field) => {
+              logD(mod, fun, `field=${field}`)
               let trimmedField = field.trim()
               let minus = ''
               let absoluteField = trimmedField
               if (trimmedField[0] === '-') {
                 minus = '-'
-                absoluteField = trimmedField.substring(1)
+                absoluteField = trimmedField.slice(1)
               }
               // Dealing with virtual fields
               switch (absoluteField) {
@@ -202,6 +208,7 @@ export const parseQueryParameters = async (objectType, fullUrl) => {
                 case `${META_DATES}${API_DATES_PUBLISHED}`:
                   return `${minus}${DB_PUBLISHED_AT}`
                 default:
+                  logD(mod, fun, `field=${trimmedField}`)
                   return trimmedField
               }
             })
@@ -245,7 +252,7 @@ export const parseQueryParameters = async (objectType, fullUrl) => {
               default:
                 filters.push({ [key]: obj })
             }
-          } catch (err) {
+          } catch {
             // logD(mod, fun, `Error while parsing: '${beautify(val)}': ${err}}`)
             switch (key) {
               case `${DB_CREATED_AT}`:
@@ -280,8 +287,8 @@ export const parseQueryParameters = async (objectType, fullUrl) => {
         }
       } else {
         const indexSeparator = key.indexOf('.')
-        const nestedField = key.substring(0, indexSeparator)
-        const nestedFieldProp = key.substring(indexSeparator + 1)
+        const nestedField = key.slice(0, indexSeparator)
+        const nestedFieldProp = key.slice(indexSeparator + 1)
 
         if (modelProperties.includes(nestedField)) {
           try {
@@ -294,7 +301,7 @@ export const parseQueryParameters = async (objectType, fullUrl) => {
               [EXT_OBJ_PROP]: nestedFieldProp,
               [EXT_OBJ_VAL]: obj,
             })
-          } catch (err) {
+          } catch {
             // const errMsg = `Couldn't parse: '${beautify(value)}': ${err}}`
             // logW(mod, fun, errMsg)
             if (!value) returnedFilter[QUERY_SEARCH_TERMS].push(nestedField)

@@ -18,7 +18,7 @@ import { FIELDS_TO_SKIP } from '../../db/dbFields.js'
 const PortalTokenSchema = new mongoose.Schema(
   {
     /** Base 64 encoded token information */
-    access_token: String,
+    access_token: { type: String, required: true, unique: true, index: true },
 
     token_type: String,
 

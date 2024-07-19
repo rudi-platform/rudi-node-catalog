@@ -134,7 +134,7 @@ export const makeSearchable = async (ObjModel) => {
       searchableFields = ObjModel.getSearchableFields()
       if (!searchableFields)
         throw Error(`Can't find any searchable field for Model '${collection.name}'`)
-    } catch (err) {
+    } catch {
       // => searchableFields is undefined or method ObjModel.getSearchableFields() doesn't exist
       logD(mod, fun, `No searchable fields for '${collection.name}'`)
       return
@@ -173,7 +173,7 @@ export const makeSearchable = async (ObjModel) => {
     try {
       try {
         await collection.createIndex(searchIndexes, indexOpts)
-      } catch (e) {
+      } catch {
         logT(mod, fun, `Need for droping ${collection.name} indexes`)
         await collection.dropIndex(SEARCH_INDEX)
         await collection.createIndex(searchIndexes, indexOpts)

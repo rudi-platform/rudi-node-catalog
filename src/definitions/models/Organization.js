@@ -65,17 +65,15 @@ const OrganizationSchema = new mongoose.Schema(
     [DB_PUBLISHED_AT]: Date,
   },
   {
-    // Adds mongoose fields 'updatedAt' and 'createdAt'
-    timestamps: true,
     id: false,
-
+    timestamps: true, // Adds mongoose fields 'updatedAt' and 'createdAt'
     // optimisticConcurrency: true,
-    // strict: true,
+    strict: true,
     // runSettersOnQuery: true,
     // toObject: {
     //   getters: true,
     //   setters: true,
-    //   virtuals: false
+    //   virtuals: false,
     // },
   }
 )

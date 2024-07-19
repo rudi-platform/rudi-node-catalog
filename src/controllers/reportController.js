@@ -461,8 +461,6 @@ export const getReportListForObjectType = async (req, reply) => {
 
 /**
  * Creates an internal report, e.g. for errors happening during a transmission to the portal
- * @param {MetadataSchema} metadata
- * @param {HTTP_METHODS} httpMethod
  */
 export const createErrorReport = async (err, details, shouldUpdateMetadataStatus) => {
   const fun = 'createErrorReport'
