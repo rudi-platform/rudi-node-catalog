@@ -208,8 +208,10 @@ MediaSchema.pre('save', function (next) {
       // Set status_update date
       this[API_FILE_STATUS_UPDATE] = this[API_FILE_STATUS_UPDATE] || nowISO()
       // Set connector interface_contract to 'dwnl'
-      // this[API_MEDIA_CONNECTOR][API_MEDIA_INTERFACE_CONTRACT] = InterfaceContract.Dwnld
     }
+    if (!this[API_MEDIA_CONNECTOR][API_MEDIA_INTERFACE_CONTRACT])
+      this[API_MEDIA_CONNECTOR][API_MEDIA_INTERFACE_CONTRACT] = InterfaceContract.Dwnld
+
     if (this[API_MEDIA_NAME]) {
       const nameBefore = this[API_MEDIA_NAME]
       const nameAfter = sanitize(this[API_MEDIA_NAME])
