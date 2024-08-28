@@ -109,12 +109,12 @@ const closeMongoConnection = async (signal) => {
   const fun = 'close'
   logI(mod, fun, `Received signal to shutdown: ${signal}`, false)
   return mongoose.connection
-    .close(signal == 'SIGKILL')
+    .close(signal == 'SIGKILL' || signal == 'SIGTERM')
     .then(
       () => logI(mod, fun, 'OK', false),
-      (err) => logW(mod, fun + '.ko', err, false)
+      (err) => logW(mod, `${fun}.${signal}.ko`, err, false)
     )
-    .catch((e) => logE(mod, fun + '.err', e, false))
+    .catch((e) => logE(mod, fun + `${fun}.${signal}.err`, e, false))
 }
 
 const initializeModelIndexes = async () => {
@@ -215,6 +215,8 @@ const start = async () => {
     // fastify.error(err)
     logE(mod, 'exitServer', err)
     sysAlert(`Server exited anormally: ${err}`, 'rudiServer.starting', {}, { error: err })
+    await closeMongoConnection('SIGKILL')
+    await shutDownListener('SIGKILL')
     process.exit(1)
   }
 }
