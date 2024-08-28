@@ -92,25 +92,32 @@ const Colors = {
 // -------------------------------------------------------------------------------------------------
 // Logging functions
 // -------------------------------------------------------------------------------------------------
-export const logLine = (logLevel, srcMod, srcFun, msg) => {
+export const logLine = (logLevel, srcMod, srcFun, msg, shouldAddLogEntry = true) => {
   try {
     if (SHOULD_LOG_CONSOLE)
       wLogger.log({ level: logLevel, message: displayStr(srcMod, srcFun, msg) })
     // console.log(displayStr(srcMod, srcFun, msg))
     if (`${msg}` === '[Object]: Object' || `${msg}` === '[object Object]') msg = JSON.stringify(msg)
-    addLogEntry(logLevel, srcMod, srcFun, msg)
+    if (shouldAddLogEntry) addLogEntry(logLevel, srcMod, srcFun, msg)
   } catch (e) {
     consoleErr(e)
   }
 }
-export const logE = (srcMod, srcFun, msg) => logLine('error', srcMod, srcFun, msg)
-export const logW = (srcMod, srcFun, msg) => logLine('warn', srcMod, srcFun, msg)
-export const logI = (srcMod, srcFun, msg) => logLine('info', srcMod, srcFun, msg)
-export const logV = (srcMod, srcFun, msg) => logLine('verbose', srcMod, srcFun, msg)
-export const logD = (srcMod, srcFun, msg) => logLine('debug', srcMod, srcFun, msg)
+export const logE = (srcMod, srcFun, msg, shouldAddLogEntry = true) =>
+  logLine('error', srcMod, srcFun, msg, shouldAddLogEntry)
+export const logW = (srcMod, srcFun, msg, shouldAddLogEntry = true) =>
+  logLine('warn', srcMod, srcFun, msg, shouldAddLogEntry)
+export const logI = (srcMod, srcFun, msg, shouldAddLogEntry = true) =>
+  logLine('info', srcMod, srcFun, msg, shouldAddLogEntry)
+export const logV = (srcMod, srcFun, msg, shouldAddLogEntry = true) =>
+  logLine('verbose', srcMod, srcFun, msg, shouldAddLogEntry)
+export const logD = (srcMod, srcFun, msg, shouldAddLogEntry = true) =>
+  logLine('debug', srcMod, srcFun, msg, shouldAddLogEntry)
 
-export const logT = (srcMod, srcFun, msg) =>
-  getLogLevel() === ERR_LEVEL_TRACE ? logLine('debug', srcMod, srcFun, msg) : () => null
+export const logT = (srcMod, srcFun, msg, shouldAddLogEntry = true) =>
+  getLogLevel() === ERR_LEVEL_TRACE
+    ? logLine('debug', srcMod, srcFun, msg, shouldAddLogEntry)
+    : () => null
 
 // -------------------------------------------------------------------------------------------------
 // Syslog functions

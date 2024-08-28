@@ -417,3 +417,15 @@ const declareRoutes = () => {
   declareRouteGroup(backOfficeRoutes, onPrivateRoute, 'Private', 'debug')
   declareRouteGroup(devRoutes, onPrivateRoute, 'Dev', 'verbose')
 }
+
+export const shutDownListener = async (signal) => {
+  const fun = 'close'
+  logI(mod, fun, `Received signal to shutdown: ${signal}`)
+  return routeListener
+    .close()
+    .then(
+      () => logI(mod, fun, 'OK', false),
+      (err) => logW(mod, fun + '.ko', err, false)
+    )
+    .catch((e) => logE(mod, fun + '.err', e, false))
+}

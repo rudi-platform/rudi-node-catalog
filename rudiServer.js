@@ -38,7 +38,7 @@ import { Metadata } from './src/definitions/models/Metadata.js'
 import { Organization } from './src/definitions/models/Organization.js'
 import Keywords from './src/definitions/thesaurus/Keywords.js'
 import Themes from './src/definitions/thesaurus/Themes.js'
-import { launchRouteListener } from './src/routes/fastify.js'
+import { launchRouteListener, shutDownListener } from './src/routes/fastify.js'
 import {
   addLogEntry,
   logE,
@@ -104,6 +104,19 @@ const mongoConnectWithRetry = async () => {
   }
 }
 
+const closeMongoConnection = async (signal) => {
+  const mod = 'mongoDB'
+  const fun = 'close'
+  logI(mod, fun, `Received signal to shutdown: ${signal}`, false)
+  return mongoose.connection
+    .close(signal == 'SIGKILL')
+    .then(
+      () => logI(mod, fun, 'OK', false),
+      (err) => logW(mod, fun + '.ko', err, false)
+    )
+    .catch((e) => logE(mod, fun + '.err', e, false))
+}
+
 const initializeModelIndexes = async () => {
   try {
     await Promise.all(
@@ -161,8 +174,23 @@ const start = async () => {
       )
       sysCrit(`Promise rejection error: ${beautify(err)}`, 'rudiServer.on', {}, { error: err })
     })
+
     separateLogs('Routes listener', true) //////////////////////////////////////////////////////////
     await launchRouteListener()
+
+    process.on('SIGINT', async () => {
+      const signal = 'SIGINT'
+      await closeMongoConnection(signal)
+      await shutDownListener(signal)
+      process.exit(0)
+    })
+
+    process.on('SIGQUIT', async () => {
+      const signal = 'SIGQUIT'
+      await closeMongoConnection(signal)
+      await shutDownListener(signal)
+      process.exit(0)
+    })
 
     separateLogs('Indexing models', true) //////////////////////////////////////////////////////////
     await initializeModelIndexes()
