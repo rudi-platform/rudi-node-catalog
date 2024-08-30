@@ -266,6 +266,7 @@ const FileSchema = new mongoose.Schema(
       },
       hash: {
         type: String,
+        default: 'toBe2186bb13eabf0bc49eaa22ee08d52166', // md5('NoHashFunctionAvailable')
         required: true,
       },
     },
