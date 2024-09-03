@@ -1,4 +1,4 @@
-const mod = 'main'
+const mod = 'catalog.app'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
@@ -108,13 +108,17 @@ const closeMongoConnection = async (signal) => {
   const mod = 'mongoDB'
   const fun = 'close'
   logI(mod, fun, `Received signal to shutdown: ${signal}`, false)
-  return mongoose.connection
-    .close(signal == 'SIGKILL' || signal == 'SIGTERM')
-    .then(
-      () => logI(mod, fun, 'OK', false),
-      (err) => logW(mod, `${fun}.${signal}.ko`, err, false)
-    )
-    .catch((e) => logE(mod, fun + `${fun}.${signal}.err`, e, false))
+  try {
+    await mongoose.connection.close(false)
+    logI(mod, `${fun}.${signal}`, 'OK', false)
+  } catch (e) {
+    logE(mod, `${fun}.${signal}.err`, e, false)
+  }
+
+  setTimeout(() => {
+    logE(mod, fun, 'Could not close connections in time, forcefully shutting down', false)
+    mongoose.connection.close(true)
+  }, 5000)
 }
 
 const initializeModelIndexes = async () => {
@@ -178,19 +182,9 @@ const start = async () => {
     separateLogs('Routes listener', true) //////////////////////////////////////////////////////////
     await launchRouteListener()
 
-    process.on('SIGINT', async () => {
-      const signal = 'SIGINT'
-      await closeMongoConnection(signal)
-      await shutDownListener(signal)
-      process.exit(0)
-    })
-
-    process.on('SIGQUIT', async () => {
-      const signal = 'SIGQUIT'
-      await closeMongoConnection(signal)
-      await shutDownListener(signal)
-      process.exit(0)
-    })
+    process.on('SIGINT', () => shutDown('SIGINT'))
+    process.on('SIGQUIT', () => shutDown('SIGQUIT'))
+    process.on('SIGTERM', () => shutDown('SIGTERM'))
 
     separateLogs('Indexing models', true) //////////////////////////////////////////////////////////
     await initializeModelIndexes()
@@ -215,12 +209,21 @@ const start = async () => {
     // fastify.error(err)
     logE(mod, 'exitServer', err)
     sysAlert(`Server exited anormally: ${err}`, 'rudiServer.starting', {}, { error: err })
-    await closeMongoConnection('SIGKILL')
-    await shutDownListener('SIGKILL')
-    process.exit(1)
+    shutDown('SIGKILL')
   }
 }
 
+async function shutDown(signal) {
+  const fun = 'shutDown'
+  try {
+    await closeMongoConnection(signal)
+    await shutDownListener(signal)
+    process.exit(0)
+  } catch (e) {
+    logE(mod, `${fun}.${signal}`, `An error occurred while shutting down: ${e}`, false)
+    process.exit(1)
+  }
+}
 // -------------------------------------------------------------------------------------------------
 // RUN SERVER
 // -------------------------------------------------------------------------------------------------

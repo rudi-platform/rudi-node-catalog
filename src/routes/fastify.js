@@ -59,7 +59,7 @@ import fastify from 'fastify'
 import { createIpsMsg } from '../utils/httpReq.js'
 
 // const fastifyLogger = new FFLogger('warn')
-const routeListener = fastify({
+const catalogApp = fastify({
   // logger: fastifyLogger,
   // logger: initFFLogger(),
   // logger: {
@@ -81,12 +81,11 @@ export const launchRouteListener = async () => {
   const fun = 'launchRouteListener'
   try {
     declareRoutes()
-    await routeListener.listen({
+    await catalogApp.listen({
       port: getServerPort(),
       host: getServerAddress(),
       listenTextResolver: (address) => logI(mod, fun, `App listening on ${address}`),
     })
-    // await routeListener.ready()
   } catch (err) {
     logE(mod, fun, `${err}`)
     sysCrit(`Fastify launch: ${err}`, 'rudiServer.routeListener', {}, { error: err })
@@ -97,7 +96,7 @@ export const launchRouteListener = async () => {
 // -------------------------------------------------------------------------------------------------
 // Fastify hooks: errors
 // -------------------------------------------------------------------------------------------------
-routeListener.addHook('onError', (request, reply, error, done) => {
+catalogApp.addHook('onError', (request, reply, error, done) => {
   const fun = 'onError'
   try {
     logV(mod, fun, ``)
@@ -123,7 +122,7 @@ routeListener.addHook('onError', (request, reply, error, done) => {
   done()
 })
 
-routeListener.setErrorHandler((error, request, reply) => {
+catalogApp.setErrorHandler((error, request, reply) => {
   const fun = 'finalErrorHandler'
   try {
     logT(mod, fun)
@@ -170,7 +169,7 @@ routeListener.setErrorHandler((error, request, reply) => {
   logT(mod, fun, 'done')
 })
 
-routeListener.decorate('notFound', (req, reply) => {
+catalogApp.decorate('notFound', (req, reply) => {
   const fun = 'route404'
   // const ip = req.ip
 
@@ -187,12 +186,12 @@ routeListener.decorate('notFound', (req, reply) => {
   reply.code(404).send(response)
 })
 
-routeListener.setNotFoundHandler(routeListener.notFound)
+catalogApp.setNotFoundHandler(catalogApp.notFound)
 
 // -------------------------------------------------------------------------------------------------
 // Fastify hooks: request receive / send
 // -------------------------------------------------------------------------------------------------
-routeListener.addHook('onRequest', (req, res, next) => {
+catalogApp.addHook('onRequest', (req, res, next) => {
   const fun = 'onRequest'
   try {
     const context = new CallContext()
@@ -223,7 +222,7 @@ routeListener.addHook('onRequest', (req, res, next) => {
   }
 })
 
-routeListener.addHook('onSend', (request, reply, payload, next) => {
+catalogApp.addHook('onSend', (request, reply, payload, next) => {
   const fun = 'onSend'
   try {
     // logT(mod, fun)
@@ -394,7 +393,7 @@ function declareRouteGroup(routeGroup, preHandler, routeGroupName, logLevel) {
     routeGroup.map((route, index) => {
       // logT(mod, 'declareRouteGroup', `${routeGroupName} ${index}`)
       route.preHandler = preHandler
-      routeListener.route(route)
+      catalogApp.route(route)
       if (shouldShowRoutes())
         logLine(logLevel, routeGroupName, 'routes', `${padA1(index)}: ${route.method} ${route.url}`)
       // logT(mod, fun, beautify(route))
@@ -419,13 +418,12 @@ const declareRoutes = () => {
 }
 
 export const shutDownListener = async (signal) => {
-  const fun = 'close'
+  const fun = 'shutDownListener'
   logI(mod, fun, `Received signal to shutdown: ${signal}`)
-  return routeListener
-    .close()
-    .then(
-      () => logI(mod, fun, 'OK', false),
-      (err) => logW(mod, fun + '.ko', err, false)
-    )
-    .catch((e) => logE(mod, fun + '.err', e, false))
+  try {
+    await catalogApp.close()
+    logI(mod, fun, 'OK', false)
+  } catch (e) {
+    logE(mod, fun + '.err', e, false)
+  }
 }
