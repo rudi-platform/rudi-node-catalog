@@ -104,63 +104,63 @@ export function optionsToString() {
   return optionStrParts.join('\n')
 }
 
-const _argv = getArgv()
-const CLI_OPTS = {}
-let wereAppOptsLoaded = false
-export const getCliOpt = (opt) => {
-  if (!wereAppOptsLoaded) {
-    Object.keys(_argv).forEach((cliOpt) => {
-      if (cliOpt == '_' || cliOpt == '') return
-      let found = false
+const USR_OPTIONS = {}
+function loadCliOpts() {
+  const _argv = getArgv()
+  Object.keys(_argv).forEach((cliOpt) => {
+    if (cliOpt == '_' || cliOpt == '') return
+    let found = false
 
-      for (const appOpt of Object.keys(OPTIONS)) {
-        if (OPTIONS[appOpt].cli == cliOpt) {
-          CLI_OPTS[cliOpt] = _argv[cliOpt]
-          found = true
-          // console.log('Command Line option recognized:', cliOption, '=', _argv[cliOption])
-          break
-        }
+    for (const appOpt of Object.keys(OPTIONS)) {
+      const opt = OPTIONS[appOpt]
+      if (opt.cli == cliOpt) {
+        USR_OPTIONS[appOpt] = _argv[cliOpt]
+        found = true
+        // console.log('Command Line option recognized:', cliOpt, '=', USR_OPTIONS[appOpt])
+        break
       }
-      if (!found) {
-        throw new Error(`!!! ERR Command Line option not recognized: --${cliOpt}=${_argv[cliOpt]}`)
-      }
-    })
-    wereAppOptsLoaded = true
-  }
-  return opt ? CLI_OPTS[opt] : CLI_OPTS
+    }
+    if (!found) {
+      throw new Error(`!!! ERR Command Line option not recognized: --${cliOpt}=${_argv[cliOpt]}`)
+    }
+  })
+  // console.log('CLI options:', USR_OPTIONS)
+  return USR_OPTIONS
 }
 
-const CLI_ENV_OPTIONS = {}
-export const getCliEnvOpt = (opt) => {
-  if (!wereAppOptsLoaded) {
-    console.log(optionsToString())
-
-    console.log(' Extracted conf values:')
-    Object.keys(OPTIONS).forEach((opt) => {
-      const cliOpt = getCliOpt(opt)
-      if (cliOpt) {
-        CLI_ENV_OPTIONS[opt] = cliOpt
-        console.log('    (cli) ' + opt.padEnd(longestOptName) + ' => ' + cliOpt)
+function loadEnvVars() {
+  console.log(' Extracted conf values:')
+  Object.keys(OPTIONS).forEach((opt) => {
+    // console.log(' opt:', opt)
+    const cliOpt = USR_OPTIONS[opt]
+    if (cliOpt) {
+      console.log('    (cli) ' + opt.padEnd(longestOptName) + ' => ' + cliOpt)
+    } else {
+      const envVar = OPTIONS[opt].env
+      const envVal = process.env[envVar]
+      if (envVal) {
+        USR_OPTIONS[opt] = envVal
+        console.log('    (env) ' + opt.padEnd(longestOptName) + ' => ' + envVal)
       } else {
-        const envVar = OPTIONS[opt].env
-        const envVal = process.env[envVar]
-        if (envVal) {
-          CLI_ENV_OPTIONS[opt] = envVal
-          console.log('    (env) ' + opt.padEnd(longestOptName) + ' => ' + envVal)
-        } else {
-          const altEnvVar = OPTIONS[opt].alt
-          const altEnvVal = process.env[altEnvVar]
-          if (altEnvVal) {
-            CLI_ENV_OPTIONS[opt] = altEnvVal
-            console.log('    (env) ' + opt.padEnd(longestOptName) + ' => ' + altEnvVal)
-          }
+        const altEnvVar = OPTIONS[opt].alt
+        const altEnvVal = process.env[altEnvVar]
+        if (altEnvVal) {
+          USR_OPTIONS[opt] = altEnvVal
+          console.log('    (env) ' + opt.padEnd(longestOptName) + ' => ' + altEnvVal)
         }
       }
-    })
+    }
+  })
+}
+
+export const getCliEnvOpt = (opt) => {
+  if (Object.keys(USR_OPTIONS).length == 0) {
+    console.log(optionsToString())
+    loadCliOpts()
+    loadEnvVars()
     console.log(SEP_LINE + '\n') ///////////////////////////////////////////////////////////////////
-    wereAppOptsLoaded = true
   }
-  return opt ? CLI_ENV_OPTIONS[opt] : CLI_ENV_OPTIONS
+  return opt ? USR_OPTIONS[opt] : USR_OPTIONS
 }
 
 // -------------------------------------------------------------------------------------------------
