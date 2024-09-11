@@ -143,11 +143,7 @@ const MediaSchema = new mongoose.Schema(
       // TODO: define this properly.
       // Most likely an enum defined in Rudi that can be handled in
       // a known manner
-      [API_MEDIA_INTERFACE_CONTRACT]: {
-        type: String,
-        required: true,
-        default: InterfaceContract.Dwnld,
-      },
+      [API_MEDIA_INTERFACE_CONTRACT]: String,
 
       // Optional connector parameters
       [API_MEDIA_CONNECTOR_PARAMS]: {
@@ -210,7 +206,8 @@ MediaSchema.pre('save', function (next) {
       // Set connector interface_contract to 'dwnl'
     }
     if (!this[API_MEDIA_CONNECTOR][API_MEDIA_INTERFACE_CONTRACT])
-      this[API_MEDIA_CONNECTOR][API_MEDIA_INTERFACE_CONTRACT] = InterfaceContract.Dwnld
+      this[API_MEDIA_CONNECTOR][API_MEDIA_INTERFACE_CONTRACT] =
+        this[API_MEDIA_TYPE] != MediaTypes.File ? InterfaceContract.Page : InterfaceContract.Dwnld
 
     if (this[API_MEDIA_NAME]) {
       const nameBefore = this[API_MEDIA_NAME]

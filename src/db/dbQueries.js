@@ -76,7 +76,13 @@ import {
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { beautify, deepClone, isEmptyArray, listPick } from '../utils/jsUtils.js'
+import {
+  beautify,
+  deepClone,
+  isEmptyArray,
+  listPick,
+  setNullForMissingLeaves,
+} from '../utils/jsUtils.js'
 import { logD, logE, logI, logMetadata, logT, logV, logW } from '../utils/logging.js'
 import {
   contactDeleted,
@@ -1029,6 +1035,8 @@ export const overwriteDbObject = async (objectType, updateData) => {
     if (existingObject) {
       // document exists in DB, we preserve the creation date
       updateData[DB_CREATED_AT] = existingObject[DB_CREATED_AT]
+
+      setNullForMissingLeaves(existingObject.toJSON(), updateData)
     }
     const updateOpts = {
       new: true, // returns the updated document

@@ -113,9 +113,7 @@ import { getTranslator } from '../translation/genericTranslationTools.js'
 // -------------------------------------------------------------------------------------------------
 // Specific controllers
 // -------------------------------------------------------------------------------------------------
-import { newContact } from './contactController.js'
 import { newMetadata, overwriteMetadata } from './metadataController.js'
-import { newOrganization } from './organizationController.js'
 import { newPublicKey, overwritePubKey } from './publicKeyController.js'
 import { newSkosConcept, newSkosScheme, widenSearch } from './skosController.js'
 
@@ -125,7 +123,9 @@ import {
   API_CONFIDENTIALITY,
   API_RESTRICTED_ACCESS,
 } from '../db/dbFields.js'
+import Contact from '../definitions/models/Contact.js'
 import { Media } from '../definitions/models/Media.js'
+import Organization from '../definitions/models/Organization.js'
 import { deletePortalMetadata } from './portalController.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -157,22 +157,18 @@ function checkIsUrlObject(objectType) {
 
 async function newObject(objectType, objectData) {
   const fun = 'newObject'
-
+  logT(mod, fun)
   try {
     // checkIsUrlObject(objectType)
-
     switch (objectType) {
+      case OBJ_ORGANIZATIONS:
+        return await newRudiObject(Organization, objectData)
+      case OBJ_CONTACTS:
+        return await newRudiObject(Contact, objectData)
+      case OBJ_MEDIA:
+        return await newRudiObject(Media, objectData)
       case OBJ_METADATA:
         return await newMetadata(objectData)
-      case OBJ_ORGANIZATIONS:
-        return await newOrganization(objectData)
-      case OBJ_CONTACTS:
-        return await newContact(objectData)
-      case OBJ_MEDIA: {
-        const dbMedia = new Media(objectData)
-        dbMedia.save()
-        return dbMedia
-      }
       case OBJ_SKOS_CONCEPTS:
       case OBJ_SKOS_CONCEPTS_CAML:
         return await newSkosConcept(objectData)
@@ -183,6 +179,7 @@ async function newObject(objectType, objectData) {
       case OBJ_PUB_KEYS:
       case OBJ_PUB_KEYS_CAML:
         return await newPublicKey(objectData)
+
       default:
         throw new NotFoundError(objectTypeNotFound(objectType))
     }
@@ -190,6 +187,16 @@ async function newObject(objectType, objectData) {
     if (err[STATUS_CODE] === 400) {
       throw new BadRequestError(err.message, mod, `${fun}.${objectType}`, err.path)
     }
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+async function newRudiObject(Model, objectData) {
+  const fun = 'newRudiObject'
+  try {
+    const dbObject = new Model(objectData)
+    await dbObject.save()
+    return dbObject
+  } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
 }

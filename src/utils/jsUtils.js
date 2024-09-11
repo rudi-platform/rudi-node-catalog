@@ -369,6 +369,39 @@ export const jsonToString = (jsonObject, shouldColorize = true) =>
  */
 export const deepClone = (jsonObject) => JSON.parse(JSON.stringify(jsonObject))
 
+// Helper function to recursively traverse and set null values in objB
+export const setNullForMissingLeaves = (source, destination) => {
+  const fun = 'setNullForMissingLeaves'
+  consoleLog(mod, fun)
+  // consoleLog(mod, fun + '.source', beautify(source))
+  // consoleLog(mod, fun + '.destination', beautify(destination))
+  if (isObject(source) && isObject(destination)) {
+    // consoleLog(mod, fun, 'isObject(source) && isObject(destination)')
+    for (const key of Object.keys(source)) {
+      // consoleLog(mod, fun, `key: ${key}, source.hasOwnProperty(key):${source.hasOwnProperty(key)}`)
+      if (!key.startsWith('$') && !key.startsWith('_')) {
+        // consoleLog(mod, 'setNullForMissingLeaves.source)', source[key])
+        // consoleLog(mod, 'setNullForMissingLeaves.dest)', destination[key])
+        if (destination[key] === undefined) {
+          destination[key] = null
+        } else if (isObject(source[key]) && isObject(destination[key]))
+          setNullForMissingLeaves(source[key], destination[key])
+      }
+    }
+  }
+  return destination
+}
+export const deepCompareAndSetNull = (source, destination) => {
+  // Create a deep copy of objB to avoid mutating the original object
+  const updatedDestination = JSON.parse(JSON.stringify(destination))
+  // Start the comparison and update
+  setNullForMissingLeaves(source, updatedDestination)
+  return updatedDestination
+}
+
+// -------------------------------------------------------------------------------------------------
+//  Logging
+// -------------------------------------------------------------------------------------------------
 export const logWhere = (srcMod, srcFun) =>
   srcMod && srcFun ? `${srcMod} . ${srcFun}` : srcMod || srcFun
 
