@@ -120,7 +120,7 @@ import Keywords from '../thesaurus/Keywords.js'
 import Themes from '../thesaurus/Themes.js'
 
 import { isValid as isLanguageValid } from '../thesaurus/Languages.js'
-import { get as getLicenceCodes } from '../thesaurus/LicenceCodes.js'
+// import { get as getLicenceCodes } from '../thesaurus/LicenceCodes.js'
 import { isValid as isProjectionValid } from '../thesaurus/Projections.js'
 import { isValid as isStorageStatusValid, StorageStatus } from '../thesaurus/StorageStatus.js'
 
@@ -138,6 +138,7 @@ import { checkDates, ReferenceDatesSchema } from '../schemas/ReferenceDates.js'
 // -------------------------------------------------------------------------------------------------
 import { isPortalConnectionDisabled } from '../../config/confPortal.js'
 import { getPublicUrl } from '../../config/confSystem.js'
+import { getLicenceCodes } from '../../controllers/licenceController.js'
 import { VALID_API_VERSION, VALID_URI } from '../schemaValidators.js'
 import { isMediaMissing, MediaTypes } from './Media.js'
 
@@ -269,9 +270,7 @@ const MetadataSchema = new mongoose.Schema(
     },
 
     /** 'collection_tag': Tag for identifying a collection of resources */
-    [API_COLLECTION_TAG]: {
-      type: String,
-    },
+    [API_COLLECTION_TAG]: String,
 
     /** 'integration_error_id': id of the last integration error report from the portal */
     [API_INTEGRATION_ERROR_ID]: UuidSchema,
@@ -338,9 +337,7 @@ const MetadataSchema = new mongoose.Schema(
         // Custom validation in pre-save hook: required if 'temporal_spread' is defined !
       },
       // 'end_date'
-      [API_END_DATE_PROPERTY]: {
-        type: Date,
-      },
+      [API_END_DATE_PROPERTY]: Date,
     },
 
     /**
@@ -410,7 +407,6 @@ const MetadataSchema = new mongoose.Schema(
         min: 0,
       },
     },
-
     /**
      * 'dataset_dates': Dates of the actions performed on the data (creation, publishing, update, deletion...)
      */
@@ -432,7 +428,7 @@ const MetadataSchema = new mongoose.Schema(
      * licence, confidentiality, terms of service, habilitation or required rights,
      * economical model. Default is open licence.
      */
-    [API_ACCESS_CONDITION]: AccessConditionSchema,
+    [API_ACCESS_CONDITION]: { type: AccessConditionSchema, required: true, _id: false },
 
     /** 'metadata_info': Metadata on the metadata */
     [API_METAINFO_PROPERTY]: {
@@ -535,6 +531,7 @@ async function checkLicence(metadata) {
     const accessCondition = accessProperty(metadata, API_ACCESS_CONDITION)
     const licence = requireSubProperty(metadata, API_ACCESS_CONDITION, API_LICENCE)
     const licenceType = requireSubProperty(accessCondition, API_LICENCE, API_LICENCE_TYPE)
+    logT(mod, fun, `licenceType: ${licenceType}`)
 
     switch (licenceType) {
       case LicenceTypes.Standard: {
@@ -546,8 +543,8 @@ async function checkLicence(metadata) {
           API_LICENCE_TYPE,
           LicenceTypes.Standard
         )
-        const listLicenceCode = getLicenceCodes()
-        // logD(mod, fun, ` [T] licence list: ${beautify(listLicenceCode)}`)
+        const listLicenceCode = await getLicenceCodes()
+        logD(mod, fun, ` [T] licence list: ${beautify(listLicenceCode)}`)
         if (listLicenceCode.indexOf(licenceLabel) === -1) {
           throw new NotFoundError(
             `Licence label '${licenceLabel}' was not found in licence list '${listLicenceCode}'`
@@ -942,13 +939,13 @@ MetadataSchema.virtual(API_RESTRICTED_ACCESS).set(function (isRestricted) {
 // -------------------------------------------------------------------------------------------------
 // Hooks
 // -------------------------------------------------------------------------------------------------
-MetadataSchema.pre('save', async function (next) {
+MetadataSchema.pre('save', async function () {
   const fun = 'pre save hook'
 
   try {
     logT(mod, fun)
     const metadata = this
-    // logD(mod, fun, metadata[API_GEOGRAPHY])
+    logT(mod, fun, `checking ${API_GEOGRAPHY}`)
     // If 'geography' field is defined, the field 'geography.bbox' is required
     if (requireSubProperty(metadata, API_GEOGRAPHY, API_GEO_BBOX_PROPERTY)) {
       if (isNothing(metadata[API_GEOGRAPHY][API_GEO_PROJECTION_PROPERTY])) {
@@ -957,6 +954,7 @@ MetadataSchema.pre('save', async function (next) {
       }
     }
 
+    logT(mod, fun, `checking ${API_PERIOD_PROPERTY}`)
     // If 'temporal_spread' is defined, the field 'start_date' should be defined
     requireSubProperty(metadata, API_PERIOD_PROPERTY, API_START_DATE_PROPERTY)
 
@@ -965,6 +963,8 @@ MetadataSchema.pre('save', async function (next) {
     } catch (e) {
       throw new BadRequestError(e.message, mod, fun, [API_PERIOD_PROPERTY, API_END_DATE_PROPERTY])
     }
+
+    logT(mod, fun, `checking ${API_DATA_DATES_PROPERTY}`)
     checkDates(
       metadata[API_DATA_DATES_PROPERTY],
       API_DATES_CREATED,

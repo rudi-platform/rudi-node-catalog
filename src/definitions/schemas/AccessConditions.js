@@ -14,7 +14,7 @@ import { LicenceSchema } from './Licence.js'
 // -------------------------------------------------------------------------------------------------
 export const AccessConditionSchema = {
   /** 'licence': Standard licence (recognized by RUDI system) */
-  [API_LICENCE]: LicenceSchema,
+  [API_LICENCE]: { type: LicenceSchema, required: true, _id: false },
 
   /** 'confidentiality': Restriction level for the resource */
   [API_CONFIDENTIALITY]: {

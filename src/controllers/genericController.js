@@ -630,7 +630,6 @@ export const upsertSingleRudiObject = async (rudiObject, objectType, context) =>
     switch (objectType) {
       case OBJ_METADATA:
         return await overwriteMetadata(rudiObject)
-
       case OBJ_PUB_KEYS:
         return await overwritePubKey(rudiObject)
       default:

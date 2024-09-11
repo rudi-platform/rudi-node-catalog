@@ -24,6 +24,7 @@ export const LicenceSchema = {
     type: String,
     enum: Object.values(LicenceTypes),
     required: true,
+    _id: false,
   },
 
   /** Standard licence (recognized by RUDI system): label of the licence = concept code */

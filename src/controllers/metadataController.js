@@ -46,6 +46,7 @@ import {
   API_METAINFO_VERSION_PROPERTY,
   API_ORGANIZATION_ID,
   API_PURPOSE,
+  API_RESTRICTED_ACCESS,
   API_STATUS_PROPERTY,
   API_STORAGE_STATUS,
   DB_CREATED_AT,
@@ -664,8 +665,8 @@ export const newMetadata = async (rudiMetadata) => {
     if (!rudiMetadata) throw new ParameterExpectedError('rudiMetadata', mod, fun)
 
     // Special treatment!
+    delete rudiMetadata[API_RESTRICTED_ACCESS] // Virtual setter, see 'src/definitions/models/Metadata.js'
     const dbReadyObject = await rudiToDbFormat(rudiMetadata, true)
-    logI(mod, fun, `dbReadyObject: ${beautify(dbReadyObject)}`)
     const dbMetadata = new Metadata(dbReadyObject)
     await dbMetadata.save()
 
@@ -677,6 +678,7 @@ export const newMetadata = async (rudiMetadata) => {
 
     return finalMetadata
   } catch (err) {
+    logE(mod, fun, `*** ERR: ${beautify(err)}`)
     throw RudiError.treatError(mod, fun, err)
   }
 }
