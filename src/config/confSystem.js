@@ -103,7 +103,8 @@ try {
   GIT_HASH = getCliEnvOpt(OPT_GIT_HASH) || `${execSync('git rev-parse --short HEAD')}`.trim()
 } catch (err) {
   consoleErr(mod, 'getGitHash', err)
-  throw err
+  GIT_HASH = `n/a`
+  // throw err
 }
 
 export const getGitHash = () => GIT_HASH
