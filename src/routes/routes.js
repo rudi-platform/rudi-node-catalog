@@ -170,6 +170,7 @@ export const publicRoutes = [
    *   - (query) limit {Integer:int32} The number of resources to return
    */
   {
+    description: 'Access all metadata on the RUDI producer node',
     method: 'GET',
     url: URL_PUB_METADATA,
     handler: getMetadataListAndCount,
@@ -193,6 +194,7 @@ export const publicRoutes = [
    *   - (query) updated_before {String:date} The date before which the listed metadata were updated
    */
   {
+    description: 'Access one identified metadata',
     method: 'GET',
     url: `${URL_PUB_METADATA}/:${PARAM_ID}`,
     handler: getSingleMetadata,
@@ -203,6 +205,7 @@ export const publicRoutes = [
    * Search objects
    */
   {
+    description: 'Search metadata',
     method: 'GET',
     url: `${URL_PUB_METADATA}/${ACT_SEARCH}`,
     handler: searchMetadata,
@@ -227,6 +230,7 @@ export const publicRoutes = [
    *              value: '1.2.3'
    */
   {
+    description: 'Get current API version',
     method: 'GET',
     url: URL_PUB_API_VERSION,
     handler: getApiVersion,
@@ -235,6 +239,7 @@ export const publicRoutes = [
 
   // redirection: GET /api -> GET /api/v1/resources
   {
+    description: 'Redirection: GET /api -> GET /api/v1/resources',
     method: 'GET',
     url: `/api`,
     config: { [ROUTE_NAME]: 'redirect_get_data' },
@@ -245,6 +250,7 @@ export const publicRoutes = [
   },
   // redirection: GET /api/v1 -> GET /api/v1/resources
   {
+    description: 'Redirection: GET /api/v1 -> GET /api/v1/resources',
     method: 'GET',
     url: '/api/v1',
     config: { [ROUTE_NAME]: 'redirect_get_data' },
@@ -255,6 +261,7 @@ export const publicRoutes = [
   },
   // redirection: GET /resources -> GET /api/v1/resources
   {
+    description: 'Redirection: GET /resources -> GET /api/v1/resources',
     method: 'GET',
     url: `/${OBJ_METADATA}`,
     config: { [ROUTE_NAME]: 'redirect_get_data' },
@@ -266,6 +273,7 @@ export const publicRoutes = [
   },
   // redirection: GET /resources/:id -> GET /api/v1/resources/:id
   {
+    description: 'Redirection: GET /resources/:id -> GET /api/v1/resources/:id',
     method: 'GET',
     url: `/${OBJ_METADATA}/:${PARAM_ID}`,
     config: { [ROUTE_NAME]: 'redirect_get_data' },
@@ -277,18 +285,21 @@ export const publicRoutes = [
   },
 
   {
+    description: 'Get every public key',
     method: 'GET',
     url: `${URL_PREFIX_PUBLIC}/${OBJ_PUB_KEYS}`,
     handler: getManyPubKeys,
     config: { [ROUTE_NAME]: 'pub_get_all_pub_keys' },
   },
   {
+    description: 'Get a public key with its name',
     method: 'GET',
     url: `${URL_PREFIX_PUBLIC}/${OBJ_PUB_KEYS}/:${PARAM_ID}`,
     handler: getSinglePubKey,
     config: { [ROUTE_NAME]: 'pub_get_one_pub_key' },
   },
   {
+    description: 'Get a public key property value given its name',
     method: 'GET',
     url: `${URL_PREFIX_PUBLIC}/${OBJ_PUB_KEYS}/:${PARAM_ID}/:${PARAM_PROP}`,
     handler: getSinglePubKey,
@@ -310,6 +321,7 @@ export const portalRoutes = [
 
   // Add/edit 1 report for one object integration
   {
+    description: 'Add/edit 1 report for one object integration',
     method: 'PUT',
     url: `/${OBJ_METADATA}/:${PARAM_ID}/${ACT_REPORT}`,
     handler: addOrEditSingleReportForMetadata,
@@ -318,6 +330,7 @@ export const portalRoutes = [
 
   // Add/edit 1 report for one object integration
   {
+    description: 'Add/edit 1 report for one object integration',
     method: 'PUT',
     url: `${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}`,
     handler: addOrEditSingleReportForMetadata,
@@ -326,6 +339,7 @@ export const portalRoutes = [
 
   // Get all reports for one object integration
   {
+    description: 'Get all reports for one object integration',
     method: 'GET',
     url: `${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}`,
     handler: getReportListForMetadata,
@@ -333,6 +347,7 @@ export const portalRoutes = [
   },
   // Get 1 report for one object integration
   {
+    description: 'Get 1 report for one object integration',
     method: 'GET',
     url: `${URL_PUB_METADATA}/:${PARAM_ID}/${ACT_REPORT}/:${PARAM_REPORT_ID}`,
     handler: getSingleReportForMetadata,
@@ -341,6 +356,7 @@ export const portalRoutes = [
 
   // Redirection for getting integration reports
   {
+    description: 'Redirection for getting integration reports',
     method: 'GET',
     url: `/${OBJ_METADATA}/:${PARAM_ID}/*`,
     config: { [ROUTE_NAME]: 'redirect_get_plus' },
@@ -352,6 +368,7 @@ export const portalRoutes = [
   },
   // Redirection for adding an integration report
   {
+    description: 'Redirection for adding an integration report',
     method: 'PUT',
     url: `/${OBJ_METADATA}/*`,
     config: { [ROUTE_NAME]: 'redirect_put_plus' },
@@ -386,6 +403,7 @@ export const unrestrictedPrivateRoutes = [
    *              value: '0e636d4'
    */
   {
+    description: 'Get current git hash',
     method: 'GET',
     url: `${URL_PV_GIT_HASH_ACCESS}`,
     handler: getGitHash,
@@ -407,6 +425,7 @@ export const unrestrictedPrivateRoutes = [
    *              value: '0e636d4'
    */
   {
+    description: 'Get current git hash from the running application',
     method: 'GET',
     url: `${URL_PV_APP_HASH_ACCESS}`,
     handler: getAppHash,
@@ -418,6 +437,7 @@ export const unrestrictedPrivateRoutes = [
    * description: 'Get environment version of the running application'
    */
   {
+    description: 'Get environment version of the running application',
     method: 'GET',
     url: `${URL_PV_APP_ENV_ACCESS}`,
     handler: getEnvironment,
@@ -432,6 +452,7 @@ export const backOfficeRoutes = [
 
   // Add one or many objects
   {
+    description: 'Add one or many objects',
     method: 'POST',
     url: URL_PV_OBJECT_GENERIC,
     handler: addObjects,
@@ -441,6 +462,7 @@ export const backOfficeRoutes = [
   },
   // Edit 1
   {
+    description: 'Edit one object',
     method: 'PUT',
     url: URL_PV_OBJECT_GENERIC,
     handler: upsertObjects,
@@ -448,6 +470,7 @@ export const backOfficeRoutes = [
   },
   // Get all
   {
+    description: 'Get all objects',
     method: 'GET',
     url: URL_PV_OBJECT_GENERIC,
     handler: getObjectList,
@@ -455,6 +478,7 @@ export const backOfficeRoutes = [
   },
   // Get 1
   {
+    description: 'Get one object',
     method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`,
     handler: getSingleObject,
@@ -462,6 +486,7 @@ export const backOfficeRoutes = [
   },
   // Get 1
   {
+    description: 'Get one object property value',
     method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/:${PARAM_PROP}`,
     handler: getSingleObject,
@@ -470,6 +495,7 @@ export const backOfficeRoutes = [
 
   // Delete 1
   {
+    description: 'Delete one object',
     method: 'DELETE',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}`,
     handler: deleteSingleObject,
@@ -477,6 +503,7 @@ export const backOfficeRoutes = [
   },
   // Delete all
   {
+    description: 'Get every object of a type',
     method: 'DELETE',
     url: URL_PV_OBJECT_GENERIC,
     handler: deleteManyObjects,
@@ -484,6 +511,7 @@ export const backOfficeRoutes = [
   },
   // Delete many
   {
+    description: 'Get a list of objects of a type',
     method: 'POST',
     url: `${URL_PV_OBJECT_GENERIC}/${ACT_DELETION}`,
     handler: deleteObjectList,
@@ -499,6 +527,7 @@ export const backOfficeRoutes = [
   // },
   // Search object
   {
+    description: 'Search object',
     method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/${ACT_SEARCH}`,
     handler: searchObjects,
@@ -506,6 +535,7 @@ export const backOfficeRoutes = [
   },
   // Extended search on object
   {
+    description: 'Search object (SKOS-powered)',
     method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/${ACT_EXT_SEARCH}`,
     handler: searchObjects,
@@ -513,6 +543,7 @@ export const backOfficeRoutes = [
   },
   // Get searchable fields for an object type
   {
+    description: 'Get searchable fields for an object type',
     method: 'GET',
     url: `${URL_PREFIX_PRIVATE}/${ACT_SEARCH}`,
     handler: getSearchableProperties,
@@ -520,6 +551,7 @@ export const backOfficeRoutes = [
   },
   // Count the number of objects
   {
+    description: 'Count the number of objects of a type',
     method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/count`,
     handler: countObjects,
@@ -530,6 +562,7 @@ export const backOfficeRoutes = [
   // Metadata
   // -------------------------------------------------------------------------------------------------
   {
+    description: 'Update every metadata status',
     method: 'PUT',
     url: `${URL_PREFIX_PRIVATE}/${OBJ_METADATA}/save`,
     handler: updateAllMetadataStatus,
@@ -540,6 +573,7 @@ export const backOfficeRoutes = [
   // -------------------------------------------------------------------------------------------------
   // Commit a media
   {
+    description: 'Commit a media for a given metadata',
     method: 'POST',
     url: `${URL_PREFIX_PRIVATE}/${OBJ_MEDIA}/:${PARAM_ID}/${ACT_COMMIT}`,
     handler: commitMedia,
@@ -551,6 +585,7 @@ export const backOfficeRoutes = [
 
   // Add 1 integration report for an identified object
   {
+    description: 'Add an integration report for an identified object',
     method: 'POST',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}`,
     handler: addSingleReportForObject,
@@ -559,6 +594,7 @@ export const backOfficeRoutes = [
 
   // Add/edit 1 integration report for an identified object
   {
+    description: 'Add/edit an integration report for an identified object',
     method: 'PUT',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}`,
     handler: addOrEditSingleReportForObject,
@@ -567,6 +603,7 @@ export const backOfficeRoutes = [
 
   // Get all integration reports for an identified object
   {
+    description: 'Get all integration reports for an identified object',
     method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}`,
     handler: getReportListForObject,
@@ -574,6 +611,7 @@ export const backOfficeRoutes = [
   },
   // Get 1 report for one object integration
   {
+    description: 'Get an identified report for an identified object integration',
     method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}/:${PARAM_REPORT_ID}`,
     handler: getSingleReportForObject,
@@ -581,6 +619,7 @@ export const backOfficeRoutes = [
   },
   // Get all integration reports for one object type
   {
+    description: 'Get all integration reports for one object type',
     method: 'GET',
     url: `${URL_PV_OBJECT_GENERIC}/${OBJ_REPORTS}`,
     handler: getReportListForObjectType,
@@ -589,6 +628,7 @@ export const backOfficeRoutes = [
 
   // Delete 1 identified integration report for one object
   {
+    description: 'Delete an identified integration report for an identified object',
     method: 'DELETE',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}/:${PARAM_REPORT_ID}`,
     handler: deleteSingleReportForObject,
@@ -596,6 +636,7 @@ export const backOfficeRoutes = [
   },
   // Delete all integration reports for one object
   {
+    description: 'Delete every integration report for an identified object',
     method: 'DELETE',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}`,
     handler: deleteEveryReportForObject,
@@ -603,6 +644,7 @@ export const backOfficeRoutes = [
   },
   // Delete many integration reports for an identified object
   {
+    description: 'Delete a list of integration reports for an identified object',
     method: 'POST',
     url: `${URL_PV_OBJECT_GENERIC}/:${PARAM_ID}/${OBJ_REPORTS}/${ACT_DELETION}`,
     handler: deleteManyReportForObject,
@@ -610,6 +652,7 @@ export const backOfficeRoutes = [
   },
   // Purge old reports
   {
+    description: 'Purge old reports',
     method: 'DELETE',
     url: `${URL_PREFIX_PRIVATE}/${OBJ_REPORTS}`,
     handler: deleteReportsBefore,
@@ -628,28 +671,32 @@ export const devRoutes = [
    * Get node and npm versions
    */
   {
+    description: 'Get node, npm, mongoose and mongodb versions',
     method: 'GET',
     url: `${URL_PV_NODE_VERSION_ACCESS}`,
     handler: getNodeVersion,
-    config: { [ROUTE_NAME]: 'dev_get_node_version' },
+    config: { [ROUTE_NAME]: 'd†ev_get_node_version' },
   },
 
   // -------------------------------------------------------------------------------------------------
   // Accessing thesaurus
   // -------------------------------------------------------------------------------------------------
   {
+    description: 'Get every thesaurus',
     method: 'GET',
     url: `${URL_PV_THESAURUS_ACCESS}`,
     handler: getEveryThesaurus,
     config: { [ROUTE_NAME]: 'dev_get_every_thesaurus' },
   },
   {
+    description: 'Get a thesaurus from its name/code',
     method: 'GET',
     url: `${URL_PV_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}`,
     handler: getSingleThesaurus,
     config: { [ROUTE_NAME]: 'dev_get_single_thesaurus' },
   },
   {
+    description: 'Get a thesaurus from its name in a given language',
     method: 'GET',
     url: `${URL_PV_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}/:${PARAM_THESAURUS_LANG}`,
     handler: getSingleThesaurusLabels,
@@ -657,6 +704,7 @@ export const devRoutes = [
   },
   /** Init themes with values in stored data */
   {
+    description: 'Init themes with values in stored data',
     method: 'GET',
     url: `${URL_PV_THESAURUS_ACCESS}/:${PARAM_THESAURUS_CODE}/${ACT_INIT}`,
     handler: initThemes,
@@ -664,18 +712,21 @@ export const devRoutes = [
   },
 
   {
+    description: 'Get every licence',
     method: 'GET',
     url: `${URL_PV_LICENCE_ACCESS}`,
     handler: getAllLicences,
     config: { [ROUTE_NAME]: 'dev_get_all_licences' },
   },
   {
+    description: 'Get every licence code',
     method: 'GET',
     url: `${URL_PV_LICENCE_CODES_ACCESS}`,
     handler: getAllLicenceCodes,
     config: { [ROUTE_NAME]: 'dev_get_all_licence_codes' },
   },
   {
+    description: 'Init licences',
     method: 'POST',
     url: `${URL_PV_LICENCE_ACCESS}/${ACT_INIT}`,
     handler: initLicences,
@@ -687,6 +738,7 @@ export const devRoutes = [
   // -------------------------------------------------------------------------------------------------
   // Mass init with ODS data
   {
+    description: 'Populate the DB with old ODS data',
     method: 'POST',
     url: `${URL_PREFIX_PRIVATE}/${OBJ_METADATA}/${ACT_INIT}`,
     handler: initWithODR,
@@ -697,6 +749,7 @@ export const devRoutes = [
   // UUID v4 generation
   // -------------------------------------------------------------------------------------------------
   {
+    description: 'Generate a UUID v4',
     method: 'GET',
     url: `${URL_PREFIX_PRIVATE}/${ACT_UUID_GEN}`,
     handler: generateUUID,
@@ -707,6 +760,7 @@ export const devRoutes = [
   // -------------------------------------------------------------------------------------------------
   // Get a new token from the Portal
   {
+    description: 'Get a new token from the Portal',
     method: 'GET',
     url: `${URL_PV_PORTAL_PREFIX}/${URL_SUFFIX_TOKEN_GET}`,
     handler: exposedGetPortalToken,
@@ -714,6 +768,7 @@ export const devRoutes = [
   },
   // Get a token checked by the Portal
   {
+    description: 'Get a token checked by the Portal',
     method: 'GET',
     url: `${URL_PV_PORTAL_PREFIX}/${URL_SUFFIX_TOKEN_GET}/${URL_SUFFIX_TOKEN_CHECK}`,
     handler: checkStoredToken,
@@ -724,69 +779,79 @@ export const devRoutes = [
   // Get/post resources from/to Portal
   // -------------------------------------------------------------------------------------------------
   {
+    description: 'Send a list of metadata to the Portal',
     method: 'POST',
     url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}/${ACT_SEND}`,
     handler: sendManyMetadataToPortal,
     config: { [ROUTE_NAME]: 'dev_send_many_metadata_to_portal' },
   },
   {
+    description: 'Get a metadata from the Portal',
     method: 'GET',
     url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}/:${PARAM_ID}`,
     handler: getMetadata,
     config: { [ROUTE_NAME]: 'dev_get_portal_metadata' },
   },
   {
+    description: 'Get every metadata from the Portal (paged)',
     method: 'GET',
     url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}`,
     handler: getMetadata,
     config: { [ROUTE_NAME]: 'dev_get_portal_metadata' },
   },
   {
+    description: 'Send a metadata to the Portal',
     method: 'POST',
     url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}/:${PARAM_ID}`,
     handler: sendMetadata,
     config: { [ROUTE_NAME]: 'dev_send_metadata_to_portal' },
   },
   {
+    description: 'Ask for metadata deletion to the Portal',
     method: 'DELETE',
     url: `${URL_PV_PORTAL_PREFIX}/${OBJ_METADATA}/:${PARAM_ID}`,
     handler: deleteMetadata,
     config: { [ROUTE_NAME]: 'dev_del_portal_metadata' },
   },
-
-  // -------------------------------------------------------------------------------------------------
-  //  Monitoring/control checks on metadata/data
-  // -------------------------------------------------------------------------------------------------
-  // Get the portal URL associated with this node
   {
-    method: 'GET',
-    url: `${URL_PREFIX_CHECK}/${URL_SUFFIX_NODE}/url`,
-    handler: () => getPublicUrl(),
-    config: { [ROUTE_NAME]: 'dev_check_node_url' },
-  },
-  {
-    method: 'GET',
-    url: `${URL_PREFIX_CHECK}/${URL_SUFFIX_PORTAL}/url`,
-    handler: getPortalBaseUrl,
-    config: { [ROUTE_NAME]: 'dev_check_portal_url' },
-  },
-  {
+    description: 'Get the whole list of metadata stored on the Portal',
     method: 'GET',
     url: `${URL_PREFIX_CHECK}/${URL_SUFFIX_PORTAL}/${OBJ_METADATA}`,
     handler: getPortalCachedMetadataList,
     config: { [ROUTE_NAME]: 'prv_check_portal_metadata' },
   },
   {
+    description: 'Get the whole list of metadata IDs stored on the Portal',
     method: 'GET',
     url: `${URL_PREFIX_CHECK}/${URL_SUFFIX_PORTAL}/ids`,
     handler: getPortalMetadataFields,
     config: { [ROUTE_NAME]: 'prv_check_portal_metadata_ids' },
   },
   // -------------------------------------------------------------------------------------------------
+  //  Monitoring/control checks on metadata/data
+  // -------------------------------------------------------------------------------------------------
+  // Get the portal URL associated with this node
+  {
+    description: 'Get the public URL of this node',
+    method: 'GET',
+    url: `${URL_PREFIX_CHECK}/${URL_SUFFIX_NODE}/url`,
+    handler: () => getPublicUrl(),
+    config: { [ROUTE_NAME]: 'dev_check_node_url' },
+  },
+  {
+    description: 'Get the URL of the portal associated with this node',
+    method: 'GET',
+    url: `${URL_PREFIX_CHECK}/${URL_SUFFIX_PORTAL}/url`,
+    handler: getPortalBaseUrl,
+    config: { [ROUTE_NAME]: 'dev_check_portal_url' },
+  },
+
+  // -------------------------------------------------------------------------------------------------
   // Accessing logs
   // -------------------------------------------------------------------------------------------------
   // Get logs
   {
+    description: 'Get logs',
     method: 'GET',
     url: `${URL_PV_LOGS_ACCESS}`,
     handler: getLogs,
@@ -800,6 +865,7 @@ export const devRoutes = [
   // },
   // Search logs
   {
+    description: 'Search logs',
     method: 'GET',
     url: `${URL_PV_LOGS_ACCESS}/${ACT_SEARCH}`,
     handler: searchLogs,
@@ -810,6 +876,7 @@ export const devRoutes = [
   // -------------------------------------------------------------------------------------------------
   /** Get all collections */
   {
+    description: 'Get every collection name',
     method: 'GET',
     url: `${URL_PV_DB_ACCESS}`,
     handler: getCollections,
@@ -817,6 +884,7 @@ export const devRoutes = [
   },
   /** Drop Collection */
   {
+    description: 'Drop a collection',
     method: 'DELETE',
     url: `${URL_PV_DB_ACCESS}/:${PARAM_OBJECT}`,
     handler: dropCollection,
@@ -824,6 +892,7 @@ export const devRoutes = [
   },
   /** Drop DB = delete all collections! */
   {
+    description: 'Drop every collection',
     method: 'DELETE',
     url: `${URL_PV_DB_ACCESS}`,
     handler: dropDB,
@@ -831,6 +900,7 @@ export const devRoutes = [
   },
   /** Dump DB = save collections in a zip file */
   {
+    description: 'Save the mongo DB collections in a zip file',
     method: 'POST',
     url: `${URL_PV_DB_ACCESS}/dump`,
     handler: dumpDB,
@@ -838,6 +908,7 @@ export const devRoutes = [
   },
   /** Dump DB = restore collections from a local zip file */
   {
+    description: 'Restore the mongo DB collections from a local zip file',
     method: 'POST',
     url: `${URL_PV_DB_ACCESS}/restore`,
     handler: restoreDB,
@@ -847,6 +918,7 @@ export const devRoutes = [
   // Tests entry
   // -------------------------------------------------------------------------------------------------
   {
+    description: 'Test the availability of the microservice',
     method: 'GET',
     url: `${URL_PREFIX_PRIVATE}/test`,
     handler: test,

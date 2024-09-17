@@ -3,7 +3,7 @@ const mod = 'fastify'
 // -------------------------------------------------------------------------------------------------
 // Constants
 // -------------------------------------------------------------------------------------------------
-import { ROUTE_NAME, STATUS_CODE } from '../config/constApi.js'
+import { ROUTE_NAME, STATUS_CODE, URL_PREFIX_PRIVATE } from '../config/constApi.js'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
@@ -56,6 +56,7 @@ import { getUrlMaxLength } from '../utils/protection.js'
 // -------------------------------------------------------------------------------------------------
 // Require the fastify framework and instantiate it
 import fastify from 'fastify'
+import { markdownTable } from 'markdown-table'
 import { createIpsMsg } from '../utils/httpReq.js'
 
 // const fastifyLogger = new FFLogger('warn')
@@ -414,7 +415,48 @@ const declareRoutes = () => {
   declareRouteGroup(portalRoutes, onPortalRoute, 'Portal', 'verbose')
   declareRouteGroup(unrestrictedPrivateRoutes, onUnrestrictedPrivateRoute, 'Unrestricted', 'info')
   declareRouteGroup(backOfficeRoutes, onPrivateRoute, 'Private', 'debug')
-  declareRouteGroup(devRoutes, onPrivateRoute, 'Dev', 'verbose')
+  declareRouteGroup(devRoutes, onPrivateRoute, 'RudiNode', 'verbose')
+  declareRouteGroup(
+    [
+      {
+        description: 'Generate the documentation for the REST API of this microservice',
+        method: 'GET',
+        url: `${URL_PREFIX_PRIVATE}/routes`,
+        handler: generateRestApiMarkdown,
+        config: { [ROUTE_NAME]: 'dev_api' },
+      },
+    ],
+    onPrivateRoute,
+    'API',
+    'info'
+  )
+}
+
+const ROUTES = {
+  public: publicRoutes,
+  portal: portalRoutes,
+  unrestricted: unrestrictedPrivateRoutes,
+  backend: [...backOfficeRoutes, ...devRoutes],
+}
+
+export const generateRestApiMarkdown = () => {
+  const markdownLines = [['Group', 'Method', 'URL', 'Description']]
+
+  Object.keys(ROUTES).forEach((routeGroup) => {
+    ROUTES[routeGroup].forEach((route) => {
+      const { method, url } = route
+      const description = route.description || 'No description provided'
+      markdownLines.push([routeGroup, method, url, description])
+    })
+    markdownLines.push([' ', ' ', ' ', ' '])
+  })
+  markdownLines.push([
+    'doc',
+    'GET',
+    `${URL_PREFIX_PRIVATE}/routes`,
+    'Generate the documentation for the REST API of this microservice',
+  ])
+  return markdownTable(markdownLines)
 }
 
 export const shutDownListener = async (signal) => {
