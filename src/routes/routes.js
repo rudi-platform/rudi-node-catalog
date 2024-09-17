@@ -154,6 +154,7 @@ export const publicRoutes = [
   // Accessing app info
   // -------------------------------------------------------------------------------------------------
   {
+    description: 'Favicon',
     method: 'GET',
     url: `/favicon.png`,
     handler: serveFavicon,

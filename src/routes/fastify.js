@@ -422,7 +422,7 @@ const declareRoutes = () => {
         description: 'Generate the documentation for the REST API of this microservice',
         method: 'GET',
         url: `${URL_PREFIX_PRIVATE}/routes`,
-        handler: generateRestApiMarkdown,
+        handler: getRestApi,
         config: { [ROUTE_NAME]: 'dev_api' },
       },
     ],
@@ -438,25 +438,54 @@ const ROUTES = {
   unrestricted: unrestrictedPrivateRoutes,
   backend: [...backOfficeRoutes, ...devRoutes],
 }
+export const getRestApi = (req) => {
+  if (!req?.query?.format || req.query.format == 'md') return generateRestApiMarkdown()
+  if (req.query.format == 'list' || req.query.format == 'array') {
+    const routeList = []
+    Object.keys(ROUTES).forEach((group) => {
+      ROUTES[group].forEach((route) => {
+        const { method, url } = route
+        const description = route.description || 'No description provided'
+        routeList.push([group, method, url, description])
+      })
+    })
+    return routeList
+  }
+
+  if (req.query.format == 'group') {
+    const routeList = {}
+    Object.keys(ROUTES).forEach((group) => {
+      routeList[group] = []
+
+      ROUTES[group].forEach((route) => {
+        const { method, url } = route
+        const description = route.description || 'No description provided'
+        routeList[group].push({ method, url, description })
+      })
+    })
+    return routeList
+  }
+  return generateRestApiMarkdown()
+}
 
 export const generateRestApiMarkdown = () => {
-  const markdownLines = [['Group', 'Method', 'URL', 'Description']]
+  const markdownRoutes = [['Group', 'Method', 'URL', 'Description']]
 
   Object.keys(ROUTES).forEach((routeGroup) => {
     ROUTES[routeGroup].forEach((route) => {
       const { method, url } = route
       const description = route.description || 'No description provided'
-      markdownLines.push([routeGroup, method, url, description])
+      markdownRoutes.push([routeGroup, method, url, description])
     })
-    markdownLines.push([' ', ' ', ' ', ' '])
+    markdownRoutes.push([' ', ' ', ' ', ' '])
   })
-  markdownLines.push([
+  markdownRoutes.push([
     'doc',
     'GET',
     `${URL_PREFIX_PRIVATE}/routes`,
     'Generate the documentation for the REST API of this microservice',
   ])
-  return markdownTable(markdownLines)
+  return markdownTable(markdownRoutes)
 }
 
 export const shutDownListener = async (signal) => {
