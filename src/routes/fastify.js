@@ -433,10 +433,8 @@ const declareRoutes = () => {
 }
 
 const ROUTES = {
-  public: publicRoutes,
-  portal: portalRoutes,
-  unrestricted: unrestrictedPrivateRoutes,
-  backend: [...backOfficeRoutes, ...devRoutes],
+  public: [...publicRoutes, ...unrestrictedPrivateRoutes],
+  jwt: [...portalRoutes, ...backOfficeRoutes, ...devRoutes],
 }
 export const getRestApi = (req) => {
   if (!req?.query?.format || req.query.format == 'md') return generateRestApiMarkdown()
@@ -469,7 +467,7 @@ export const getRestApi = (req) => {
 }
 
 export const generateRestApiMarkdown = () => {
-  const markdownRoutes = [['Group', 'Method', 'URL', 'Description']]
+  const markdownRoutes = [['Auth', 'Method', 'URL', 'Description']]
 
   Object.keys(ROUTES).forEach((routeGroup) => {
     ROUTES[routeGroup].forEach((route) => {
@@ -480,7 +478,7 @@ export const generateRestApiMarkdown = () => {
     markdownRoutes.push([' ', ' ', ' ', ' '])
   })
   markdownRoutes.push([
-    'doc',
+    'jwt',
     'GET',
     `${URL_PREFIX_PRIVATE}/routes`,
     'Generate the documentation for the REST API of this microservice',

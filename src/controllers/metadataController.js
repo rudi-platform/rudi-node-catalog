@@ -978,9 +978,9 @@ export const initWithODR = async (req, reply) => {
 
     // await dropDB()
 
-    const initProd = readJsonFile('./data/datarennes_prod.json')
-    const initCont = readJsonFile(`./data/datarennes_cont.json`)
-    const initData = readJsonFile(`./data/datarennes_meta.json`)
+    const initProd = readJsonFile('./tests/data/datarennes_prod.json')
+    const initCont = readJsonFile(`./tests/data/datarennes_cont.json`)
+    const initData = readJsonFile(`./tests/data/datarennes_meta.json`)
 
     await initializeLicences()
     // Themes.init('reset')
