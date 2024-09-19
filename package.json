@@ -37,7 +37,7 @@
     "@aqmo.org/rudi_logger": "^1.1.6",
     "axios": "^1.7.7",
     "date-and-time": "^3.5.0",
-    "fastify": "^4.28.1",
+    "fastify": "^5.0.0",
     "ini": "^5.0.0",
     "lodash": "^4.17.21",
     "markdown-table": "^3.0.3",
