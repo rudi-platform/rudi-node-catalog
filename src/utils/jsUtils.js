@@ -105,6 +105,12 @@ export const convertEncoding = (data, fromEncoding, toEncoding) =>
 export const joinBuffers = (buffers, delimiter = ':') =>
   buffers.reduce((prev, b) => Buffer.concat([prev, Buffer.from(delimiter, 'utf-8'), b]))
 
+export const capitalizeFirstLetter = (str = '') => str.charAt(0).toUpperCase() + str.slice(1)
+
+export const capitalize = (str = '') => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+
+export const strToList = (str = '') => str.split(',').map((item) => item.trim())
+
 export const createBasicAuth = (usr, pwd, usrEncoding = 'utf-8', pwdEncoding = 'base64') =>
   padWithEqualSignBase4(
     Buffer.concat([
@@ -372,7 +378,7 @@ export const deepClone = (jsonObject) => JSON.parse(JSON.stringify(jsonObject))
 // Helper function to recursively traverse and set null values in objB
 export const setNullForMissingLeaves = (source, destination) => {
   const fun = 'setNullForMissingLeaves'
-  consoleLog(mod, fun)
+  // consoleLog(mod, fun)
   // consoleLog(mod, fun + '.source', beautify(source))
   // consoleLog(mod, fun + '.destination', beautify(destination))
   if (isObject(source) && isObject(destination)) {

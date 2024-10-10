@@ -731,7 +731,11 @@ const updateMetadataStorageState = async (dbMetadata, newState = StorageStatus.O
 
     if (dbMetadata[API_STORAGE_STATUS] !== metadata[API_STORAGE_STATUS]) {
       dbMetadata[API_STORAGE_STATUS] = metadata[API_STORAGE_STATUS]
-      if (!dbMetadata[API_INTEGRATION_ERROR_ID]) await dbMetadata.save()
+      try {
+        if (!dbMetadata[API_INTEGRATION_ERROR_ID]) await dbMetadata.save()
+      } catch (err) {
+        logE(mod, fun + `.${dbMetadata[API_METADATA_ID]}`, err)
+      }
     }
 
     if (metadata[API_INTEGRATION_ERROR_ID]) {

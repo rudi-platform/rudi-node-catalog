@@ -17,7 +17,6 @@ import { BadRequestError, RudiError } from '../../utils/errors.js'
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { nowISO } from '../../utils/jsUtils.js'
-import { logD } from '../../utils/logging.js'
 
 // -------------------------------------------------------------------------------------------------
 // Custom schema definition
@@ -65,13 +64,13 @@ export function checkDates(datesObj, firstDateProp, secondDateProp, shouldInitia
     const date1 = toEpoch(datesObj[firstDateProp])
     const date2 = toEpoch(datesObj[secondDateProp])
 
-    logD(
-      mod,
-      fun,
-      `${firstDateProp}: ${toISOString(date1)} ${
-        date1 <= date2 ? '<=' : '>'
-      } ${secondDateProp}: ${toISOString(date2)}`
-    )
+    // logD(
+    //   mod,
+    //   fun,
+    //   `${firstDateProp}: ${toISOString(date1)} ${
+    //     date1 <= date2 ? '<=' : '>'
+    //   } ${secondDateProp}: ${toISOString(date2)}`
+    // )
     if (date1 <= date2) return true
 
     throw new BadRequestError(

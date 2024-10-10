@@ -19,11 +19,14 @@ export const DictionaryEntrySchema = {
       default: Languages.fr,
       enum: Object.values(Languages),
       required: true,
+      _id: false,
     },
+
     [DICT_TEXT]: {
       type: String, // Only one entry per language!
       required: true,
+      _id: false,
     },
+    _id: false,
   },
-  _id: false,
 }

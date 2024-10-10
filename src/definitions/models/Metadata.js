@@ -892,7 +892,7 @@ export const setMetadataStatusToSent = (metadata) => {
  * @returns the metadata information as a JSON object
  */
 MetadataSchema.methods.toJSON = function () {
-  logT(mod, 'MetadataSchema.toJSON')
+  // logT(mod, 'MetadataSchema.toJSON')
   return omit(this.toObject(), FIELDS_TO_SKIP)
 }
 
@@ -1006,6 +1006,7 @@ MetadataSchema.pre('save', async function () {
     // await checkMedia(metadata)
 
     updateMetadataStatus(metadata)
+    delete metadata[API_RESTRICTED_ACCESS] // Virtual setter, see 'src/definitions/models/Metadata.js'
 
     logT(mod, fun, `pre save checks OK`)
   } catch (err) {
@@ -1015,6 +1016,17 @@ MetadataSchema.pre('save', async function () {
     throw RudiError.treatError(mod, fun, err)
   }
   // next()
+})
+
+MetadataSchema.pre('insertMany', async function (next, docs) {
+  const fun = 'pre-insertMany hook'
+  try {
+    docs.map(async function (doc) {
+      delete doc[API_RESTRICTED_ACCESS]
+    })
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
 })
 
 // MetadataSchema.post('save', async function (metadata, next) {

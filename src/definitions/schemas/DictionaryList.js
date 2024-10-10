@@ -18,9 +18,12 @@ export const DictionaryListSchema = {
     default: Languages.fr,
     enum: Object.values(Languages),
     required: true,
+    _id: false,
   },
   [DICT_TEXT]: {
-    type: [String], // THE difference with DictionaryEntry: we can have several labels per langauge here !
+    type: [String], // THE difference with DictionaryEntry: we can have several labels per language here !
     required: true,
+    _id: false,
   },
+  _id: false,
 }

@@ -69,6 +69,7 @@ const SkosSchemeSchema = new mongoose.Schema(
       type: [DictionaryEntrySchema],
       required: true,
       validate: validArrayNotNull,
+      _id: false,
     },
 
     /** Web page that document the SKOS concept scheme */

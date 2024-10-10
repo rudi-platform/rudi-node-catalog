@@ -107,7 +107,10 @@ import {
   dropDB,
   dumpDB,
   getCollections,
+  getDbData,
   restoreDB,
+  restoreDbData,
+  updateDbData,
 } from '../controllers/dbController.js'
 import { getLogs, searchLogs } from '../controllers/logController.js'
 import {
@@ -914,6 +917,27 @@ export const devRoutes = [
     url: `${URL_PV_DB_ACCESS}/restore`,
     handler: restoreDB,
     config: { [ROUTE_NAME]: 'dev_db_restore' },
+  },
+  {
+    description: 'Get all the RUDI metadata',
+    method: 'GET',
+    url: `${URL_PV_DB_ACCESS}/data`,
+    handler: getDbData,
+    config: { [ROUTE_NAME]: 'dev_get_db_data' },
+  },
+  {
+    description: 'Restore all the RUDI metadata',
+    method: 'POST',
+    url: `${URL_PV_DB_ACCESS}/data`,
+    handler: restoreDbData,
+    config: { [ROUTE_NAME]: 'dev_post_db_data' },
+  },
+  {
+    description: 'Update all the RUDI metadata',
+    method: 'PUT',
+    url: `${URL_PV_DB_ACCESS}/data`,
+    handler: updateDbData,
+    config: { [ROUTE_NAME]: 'dev_put_db_data' },
   },
   // -------------------------------------------------------------------------------------------------
   // Tests entry

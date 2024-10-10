@@ -395,6 +395,20 @@ export class NotAcceptableError extends RudiError {
   }
 }
 
+export class UnsupportedMediaType extends RudiError {
+  constructor(errMessage, ctxMod, ctxFun) {
+    super(
+      errMessage,
+      415,
+      'Unsupported Media Type',
+      'Headers sent in the request are not compatible with the service',
+      undefined,
+      ctxMod,
+      ctxFun
+    )
+  }
+}
+
 export class InternalServerError extends RudiError {
   constructor(errMessage, ctxMod, ctxFun) {
     super(

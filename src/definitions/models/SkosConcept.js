@@ -96,14 +96,12 @@ const SkosConceptSchema = new mongoose.Schema(
     /**
      * List of alternative labels (in each language)
      */
-    alt_labels: {
-      type: [DictionaryListSchema],
-    },
+    alt_labels: [{ type: DictionaryListSchema, _id: false }],
 
     /**
      * List of alternative orthographs (in each language)
      */
-    hidden_labels: [DictionaryListSchema],
+    hidden_labels: [{ type: DictionaryListSchema, _id: false }],
 
     // ---------------------------
     // Classification

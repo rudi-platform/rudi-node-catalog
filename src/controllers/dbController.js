@@ -23,7 +23,16 @@ import { daDropCollection, daDropDB, daGetCollections } from '../db/dbActions.js
 
 import { execSync } from 'child_process'
 import mongoose from 'mongoose'
-import { nowFileDate, pathJoin } from '../utils/jsUtils.js'
+import { gzipSync } from 'zlib'
+import {
+  dbGetData,
+  dbGetEveryData,
+  dbGetRudiData,
+  dbPostData,
+  dbPutData,
+  isCatalogType,
+} from '../db/dbQueries.js'
+import { beautify, capitalize, isObject, nowFileDate, pathJoin } from '../utils/jsUtils.js'
 import { accessReqParam } from '../utils/jsonAccess.js'
 import { logT } from '../utils/logging.js'
 
@@ -69,6 +78,73 @@ export const dropDB = async (req, reply) => {
     const error = err.name === MONGO_ERROR ? new BadRequestError(err) : new NotFoundError(err)
     throw RudiError.treatError(mod, fun, error)
   }
+}
+
+export const getDbData = async (req, reply) => {
+  const fun = 'getDbData'
+  try {
+    const type = req.query?.type
+    const logs = req.query?.logs
+    logT(mod, fun, `type=${type}, logs=${logs}`)
+    let getData
+    if (!type) {
+      getData = dbGetRudiData
+    } else if (type == 'all') getData = dbGetEveryData
+    else {
+      const typeList = type.split(',').map((t) => {
+        if (!isCatalogType(t))
+          throw new BadRequestError(`Wrong input query: '${t}' is not a RUDI node Catalog object`)
+        return t.trim()
+      })
+      getData = () => dbGetData(typeList)
+    }
+    const catalogData = await getData(logs)
+    const catalogStr = JSON.stringify(catalogData, (key, value) =>
+      typeof value === 'string' ? value.replace(/"([^"]+)"/g, '“$1”') : value
+    )
+    reply.header('Content-Encoding', 'gzip')
+    reply.header('Content-Type', 'application/json')
+    reply.header('Content-Disposition', `attachment; filename="RudiCatalog${capitalize(type)}.gz"`)
+    return gzipSync(catalogStr)
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+export const restoreDbData = async (req, reply) => {
+  const fun = 'restoreDbData'
+  try {
+    const data = req.body
+    if (!isObject(data)) throw new BadRequestError('Input data should be a JSON')
+    for (const key of Object.keys(data)) {
+      if (!isCatalogType(key))
+        throw new BadRequestError(`Wrong input data: key '${key}' is not a Catalog object`)
+    }
+    return await dbPostData(data)
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+export const updateDbData = async (req, reply) => {
+  const fun = 'updateDbData'
+  logT(mod, fun)
+  const data = req.body
+  // if (data.mimetype !== 'application/gzip') {
+  //   return reply.code(415).send(new Error('Unsupported file type'))
+  // }
+
+  // const unzipped = unzipSync(data)
+  // const data = req.body
+  if (!isObject(data)) throw new BadRequestError('Input data should be a JSON')
+  for (const key of Object.keys(data)) {
+    if (!isCatalogType(key))
+      throw new BadRequestError(`Wrong input data: key '${key}' is not a Catalog object`)
+    logT(mod, fun, 'Found data for type: ' + key)
+  }
+  logT(mod, fun, 'Incoming data for types: ' + beautify(Object.keys(data)))
+
+  return await dbPutData(data)
 }
 
 export const dumpDB = async (req, reply) => {

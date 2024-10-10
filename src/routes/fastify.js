@@ -55,6 +55,8 @@ import { getUrlMaxLength } from '../utils/protection.js'
 // External dependencies
 // -------------------------------------------------------------------------------------------------
 // Require the fastify framework and instantiate it
+// import fastifyMultipart from '@fastify/multipart'
+import fastifyCompress from '@fastify/compress'
 import fastify from 'fastify'
 import { markdownTable } from 'markdown-table'
 import { createIpsMsg } from '../utils/httpReq.js'
@@ -81,6 +83,9 @@ const catalogApp = fastify({
 export const launchRouteListener = async () => {
   const fun = 'launchRouteListener'
   try {
+    await catalogApp.register(fastifyCompress, { global: true }, { threshold: 1024 })
+    // await catalogApp.register(fastifyMultipart)
+
     declareRoutes()
     await catalogApp.listen({
       port: getServerPort(),

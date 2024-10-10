@@ -28,17 +28,10 @@ export const LicenceSchema = {
   },
 
   /** Standard licence (recognized by RUDI system): label of the licence = concept code */
-  [API_LICENCE_LABEL]: {
-    type: String,
-    default: undefined,
-  },
+  [API_LICENCE_LABEL]: { type: String, default: undefined },
 
   /** Custom licence: Title of the custom licence */
-  [API_LICENCE_CUSTOM_LABEL]: {
-    type: [DictionaryEntrySchema],
-    default: undefined,
-    _id: false,
-  },
+  [API_LICENCE_CUSTOM_LABEL]: { type: [DictionaryEntrySchema], default: undefined, _id: false },
 
   /** Custom licence: Informative URL towards the custom licence */
   [API_LICENCE_CUSTOM_URI]: {
