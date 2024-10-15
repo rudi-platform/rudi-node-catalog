@@ -779,8 +779,16 @@ export const commitMedia = async (req, res) => {
       metadataIdList.push(dbMetadata[API_METADATA_ID])
       promiseList.push(updateMetadataStorageState(dbMetadata))
     })
-    await Promise.all(promiseList)
-
+    const metadataList = await Promise.all(promiseList)
+    metadataList.forEach((metadataInfo) => {
+      const { metadata, areAllMediaAvailable } = metadataInfo
+      logD(
+        mod,
+        fun,
+        `Metadata '${metadata[API_METADATA_ID]}' areAllMediaAvailable=${areAllMediaAvailable}`
+      )
+      if (areAllMediaAvailable) sendToPortal(metadata)
+    })
     return {
       status: 'OK',
       media: pick(savedMedia, [

@@ -552,7 +552,7 @@ export const getDbObjectList = async (objectType, options) => {
     //--- Parameters
     // Identify object type characteristics
     const ObjModel = getObjectModel(objectType)
-    logD(mod, fun, `options: ${beautify(options)}`)
+    // logD(mod, fun, `options: ${beautify(options)}`)
 
     // Extract options
     const limit = getParamValue(options, QUERY_LIMIT, DEFAULT_QUERY_LIMIT, MAX_QUERY_LIMIT)
@@ -564,7 +564,7 @@ export const getDbObjectList = async (objectType, options) => {
 
     const populateFields = getPopulateFields(objectType)
 
-    logD(mod, fun, `options: ${beautify(options)}`)
+    // logD(mod, fun, `options: ${beautify(options)}`)
 
     // logD(mod, fun, `filter: ${beautify(filter)}`)
 
@@ -581,7 +581,7 @@ export const getDbObjectList = async (objectType, options) => {
     }
     sortOptions[DB_ID] = 1 // Default sort to get consistent offset/limit results
 
-    logD(mod, fun, `sortOptions: ${beautify(sortOptions)}`)
+    // logD(mod, fun, `sortOptions: ${beautify(sortOptions)}`)
 
     //--- Find
     const fieldsToKeep = fields ? fields.join(' ') : ``
