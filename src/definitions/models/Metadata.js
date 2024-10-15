@@ -40,6 +40,7 @@ import {
   API_FILE_MIME,
   API_FILE_STATUS_UPDATE,
   API_FILE_STORAGE_STATUS,
+  API_GDPR_SENSITIVE,
   API_GEO_BBOX_EAST,
   API_GEO_BBOX_NORTH,
   API_GEO_BBOX_PROPERTY,
@@ -867,6 +868,13 @@ export const toRudiPortalJSON = (metadata) => {
     delete portalReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_SOURCE_PROPERTY]
     delete portalReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES][API_DATES_PUBLISHED]
 
+    if (portalReadyMetadata?.[API_ACCESS_CONDITION]?.[API_CONFIDENTIALITY]) {
+      if (
+        portalReadyMetadata[API_ACCESS_CONDITION][API_CONFIDENTIALITY][API_GDPR_SENSITIVE] == null
+      ) {
+        portalReadyMetadata[API_ACCESS_CONDITION][API_CONFIDENTIALITY][API_GDPR_SENSITIVE] = false
+      }
+    }
     return portalReadyMetadata
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
