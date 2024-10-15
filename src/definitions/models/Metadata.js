@@ -865,6 +865,7 @@ export const toRudiPortalJSON = (metadata) => {
     delete portalReadyMetadata[API_INTEGRATION_ERROR_ID]
     delete portalReadyMetadata[API_STATUS_PROPERTY]
     delete portalReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_SOURCE_PROPERTY]
+    delete portalReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES][API_DATES_PUBLISHED]
 
     return portalReadyMetadata
   } catch (err) {

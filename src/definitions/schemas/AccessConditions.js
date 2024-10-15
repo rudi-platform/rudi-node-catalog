@@ -1,7 +1,12 @@
 // -------------------------------------------------------------------------------------------------
 // Constants
 // -------------------------------------------------------------------------------------------------
-import { API_CONFIDENTIALITY, API_LICENCE, API_RESTRICTED_ACCESS } from '../../db/dbFields.js'
+import {
+  API_CONFIDENTIALITY,
+  API_GDPR_SENSITIVE,
+  API_LICENCE,
+  API_RESTRICTED_ACCESS,
+} from '../../db/dbFields.js'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
@@ -24,7 +29,7 @@ export const AccessConditionSchema = {
     [API_RESTRICTED_ACCESS]: { type: Boolean, default: false },
 
     /** True if the dataset embeds personal data */
-    gdpr_sensitive: { type: Boolean, default: false },
+    [API_GDPR_SENSITIVE]: { type: Boolean, default: false },
   },
 
   /** Describes how constrained is the use of the resource */
