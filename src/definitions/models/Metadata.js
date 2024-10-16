@@ -867,6 +867,8 @@ export const toRudiPortalJSON = (metadata) => {
         else if (PORTAL_MIMES.indexOf(media[API_FILE_MIME]) == -1) {
           media[API_FILE_MIME] = 'application/octet-stream'
         }
+      } else {
+        if (media[API_FILE_MIME]) delete media[API_FILE_MIME]
       }
       // delete media[API_MEDIA_THUMBNAIL]
       // delete media[API_MEDIA_SATELLITES]
