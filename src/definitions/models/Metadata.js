@@ -861,10 +861,12 @@ export const toRudiPortalJSON = (metadata) => {
     portalReadyMetadata[API_MEDIA_PROPERTY].forEach((media) => {
       delete media[API_FILE_STORAGE_STATUS]
       delete media[API_FILE_STATUS_UPDATE]
-      if (media[API_FILE_MIME] == MIME_MARKDOWN || media[API_FILE_MIME] == ALT_MIME_MARKDOWN)
-        media[API_FILE_MIME] = 'text/plain'
-      else if (PORTAL_MIMES.indexOf(media[API_FILE_MIME]) == -1) {
-        media[API_FILE_MIME] = 'application/octet-stream'
+      if (media[API_MEDIA_TYPE] == MediaTypes.File) {
+        if (media[API_FILE_MIME] == MIME_MARKDOWN || media[API_FILE_MIME] == ALT_MIME_MARKDOWN)
+          media[API_FILE_MIME] = 'text/plain'
+        else if (PORTAL_MIMES.indexOf(media[API_FILE_MIME]) == -1) {
+          media[API_FILE_MIME] = 'application/octet-stream'
+        }
       }
       // delete media[API_MEDIA_THUMBNAIL]
       // delete media[API_MEDIA_SATELLITES]
