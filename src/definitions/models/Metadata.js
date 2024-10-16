@@ -891,8 +891,12 @@ export const toRudiPortalJSON = (metadata) => {
 export const setMetadataStatusToSent = (metadata) => {
   const fun = 'setMetadataStatusToSent'
   try {
-    delete metadata[DB_PUBLISHED_AT] // `delete mongooseDocument.field` doesn't work!!!!
+    metadata[DB_PUBLISHED_AT] = undefined // `delete mongooseDocument.field` doesn't work!!!!
+    delete metadata[DB_PUBLISHED_AT]
+
+    metadata[API_INTEGRATION_ERROR_ID] = undefined
     delete metadata[API_INTEGRATION_ERROR_ID]
+
     metadata[API_STATUS_PROPERTY] = MetadataStatus.Sent
     return MetadataStatus.Sent
   } catch (err) {
