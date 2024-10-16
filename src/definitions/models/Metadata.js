@@ -600,6 +600,13 @@ async function checkLicence(metadata) {
     throw RudiError.treatError(mod, fun, err)
   }
 }
+async function checkGDPR(metadata) {
+  if (metadata?.[API_ACCESS_CONDITION]?.[API_CONFIDENTIALITY]) {
+    if (metadata[API_ACCESS_CONDITION][API_CONFIDENTIALITY][API_GDPR_SENSITIVE] == null) {
+      metadata[API_ACCESS_CONDITION][API_CONFIDENTIALITY][API_GDPR_SENSITIVE] = false
+    }
+  }
+}
 async function checkFileTypes(metadata) {
   const fun = 'checkFileTypes'
   try {
@@ -1011,6 +1018,7 @@ MetadataSchema.pre('save', async function () {
     await checkThesaurus(metadata)
     await checkFileTypes(metadata)
 
+    await checkGDPR(metadata)
     // await checkMetadataSource(metadata)
     // await checkMedia(metadata)
 
