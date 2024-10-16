@@ -604,6 +604,7 @@ async function checkGDPR(metadata) {
   if (metadata?.[API_ACCESS_CONDITION]?.[API_CONFIDENTIALITY]) {
     if (metadata[API_ACCESS_CONDITION][API_CONFIDENTIALITY][API_GDPR_SENSITIVE] == null) {
       metadata[API_ACCESS_CONDITION][API_CONFIDENTIALITY][API_GDPR_SENSITIVE] = false
+      delete metadata[API_ACCESS_CONDITION][API_CONFIDENTIALITY][API_GDPR_SENSITIVE]
     }
   }
 }
@@ -874,12 +875,13 @@ export const toRudiPortalJSON = (metadata) => {
     delete portalReadyMetadata[API_STATUS_PROPERTY]
     delete portalReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_SOURCE_PROPERTY]
     delete portalReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES][API_DATES_PUBLISHED]
+    delete portalReadyMetadata[API_RESTRICTED_ACCESS]
 
     if (portalReadyMetadata?.[API_ACCESS_CONDITION]?.[API_CONFIDENTIALITY]) {
       if (
         portalReadyMetadata[API_ACCESS_CONDITION][API_CONFIDENTIALITY][API_GDPR_SENSITIVE] == null
       ) {
-        portalReadyMetadata[API_ACCESS_CONDITION][API_CONFIDENTIALITY][API_GDPR_SENSITIVE] = false
+        delete portalReadyMetadata[API_ACCESS_CONDITION][API_CONFIDENTIALITY][API_GDPR_SENSITIVE]
       }
     }
     return portalReadyMetadata
