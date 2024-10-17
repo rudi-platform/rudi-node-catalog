@@ -59,7 +59,7 @@ export const getLogs = async (req, reply) => {
 }
 
 export const searchLogs = async (req, reply) => {
-  const fun = 'searchObjects'
+  const fun = 'searchLogs'
   logT(mod, fun, `< GET ${URL_PV_LOGS_ACCESS}/${ACT_SEARCH}`)
   try {
     // retrieve url parameters: object type, object id

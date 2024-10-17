@@ -674,7 +674,8 @@ export const newMetadata = async (rudiMetadata) => {
       await updateMetadataStorageState(dbMetadata)
 
     logI(mod, fun, `finalMetadata: ${beautify(finalMetadata)}`)
-    if (areAllMediaAvailable) sendToPortal(finalMetadata)
+
+    if (areAllMediaAvailable && !isPortalConnectionDisabled()) sendToPortal(finalMetadata)
 
     return finalMetadata
   } catch (err) {
@@ -697,7 +698,7 @@ export const overwriteMetadata = async (incomingRudiMetadata) => {
 
     const { metadata: finalMetadata, areAllMediaAvailable } =
       await updateMetadataStorageState(dbMetadata)
-    if (areAllMediaAvailable) sendToPortal(finalMetadata)
+    if (areAllMediaAvailable && !isPortalConnectionDisabled()) sendToPortal(finalMetadata)
 
     return finalMetadata
   } catch (err) {
@@ -787,7 +788,7 @@ export const commitMedia = async (req, res) => {
         fun,
         `Metadata '${metadata[API_METADATA_ID]}' areAllMediaAvailable=${areAllMediaAvailable}`
       )
-      if (areAllMediaAvailable) sendToPortal(metadata)
+      if (areAllMediaAvailable && !isPortalConnectionDisabled()) sendToPortal(metadata)
     })
     return {
       status: 'OK',
@@ -859,7 +860,7 @@ export const commitMediaForMetadata = async (req, res) => {
     result.metadata = pick(dbMetadata, [API_METADATA_ID, API_STORAGE_STATUS])
     logD(mod, fun, `Media commit success : ${beautify(result)}`)
 
-    sendToPortal(finalMetadata)
+    if (!isPortalConnectionDisabled()) sendToPortal(finalMetadata)
     return res.code(200).send(result)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -927,6 +928,8 @@ export const sendManyMetadataToPortal = async (req) => {
 export const sendToPortal = (metadata) => {
   const fun = 'sendToPortal'
   try {
+    if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
+
     const metaId = metadata[API_METADATA_ID]
     logT(mod, fun, `${metaId}`)
     return sendMetadataToPortal(metaId)

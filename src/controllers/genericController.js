@@ -404,10 +404,10 @@ export const searchObjects = async (req, reply) => {
     logT(mod, fun, `< GET ${URL_PV_OBJECT_GENERIC}/${ACT_SEARCH}`)
     // retrieve url parameters: object type, object id
     const objectType = getObjectParam(req)
-    logV(mod, fun, req.routeOptions?.config)
-    logV(mod, fun, req.routeOptions.schema)
+    logV(mod, fun + '.config', beautify(req.routeOptions?.config))
+    logV(mod, fun + '.schema', req.routeOptions.schema)
     const opt = req.routeOptions?.config ? req.routeOptions?.config[ROUTE_OPT] : undefined
-    logD(mod, fun, `opt: ${beautify(opt)}`)
+    logD(mod, fun + '.opt', opt)
 
     let parsedParameters
     try {

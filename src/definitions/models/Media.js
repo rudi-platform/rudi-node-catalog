@@ -52,6 +52,7 @@ import { missingField } from '../../utils/msg.js'
 import { VALID_URI } from '../schemaValidators.js'
 import { UuidV4Schema } from '../schemas/Identifiers.js'
 
+import { isPortalMime } from '../../config/confPortal.js'
 import { get as getEncodings } from '../thesaurus/Encodings.js'
 import { getFileTypesWithCrypt } from '../thesaurus/FileTypes.js'
 import { get as getHashAlgorithms } from '../thesaurus/HashAlgorithms.js'
@@ -106,6 +107,10 @@ export const isMediaMissing = (rudiMedia) => {
     mediaStatus === MediaStorageStatus.Removed
   )
 }
+
+export const isMimeTypePortalCompatible = (media) =>
+  media[API_MEDIA_TYPE] !== MediaTypes.File || isPortalMime(media[API_FILE_MIME])
+
 // -------------------------------------------------------------------------------------------------
 // Media schema definition
 // -------------------------------------------------------------------------------------------------

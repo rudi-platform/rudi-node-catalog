@@ -551,6 +551,9 @@ export const sendMetadataToPortal = async (metadataId) => {
     // Checking if the metadata is ok to be sent
     // If so, a portal ready metadata JSON is retrieved
     const sendableData = await isMetadataSendableToPortal(metadataId)
+
+    // TODO: if media is not portal compatible => error
+
     if (!sendableData) return
     const { portalReadyMetadata, waitIndex } = sendableData
 

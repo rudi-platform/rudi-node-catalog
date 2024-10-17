@@ -1041,7 +1041,7 @@ export const overwriteDbObject = async (objectType, updateData) => {
     return dbObject
   } catch (err) {
     let idKey
-    Object.keys(updateData).map((key) => {
+    Object.keys(updateData).forEach((key) => {
       if (key.endsWith('_id')) idKey = key
     })
     logE(mod, fun, `Error for ${objectType} ${updateData[idKey]}`)
