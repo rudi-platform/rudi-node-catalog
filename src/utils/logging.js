@@ -94,13 +94,16 @@ const Colors = {
 // -------------------------------------------------------------------------------------------------
 export const logLine = (logLevel, srcMod, srcFun, msg, shouldAddLogEntry = true) => {
   try {
+    if (`${msg}` === '[Object]: Object' || `${msg}` === '[object Object]') msg = JSON.stringify(msg)
     if (SHOULD_LOG_CONSOLE)
       wLogger.log({ level: logLevel, message: displayStr(srcMod, srcFun, msg) })
     // console.log(displayStr(srcMod, srcFun, msg))
-    if (`${msg}` === '[Object]: Object' || `${msg}` === '[object Object]') msg = JSON.stringify(msg)
     if (shouldAddLogEntry) addLogEntry(logLevel, srcMod, srcFun, msg)
+    if (SHOULD_SYSLOG && msg) {
+      sysLog(logLevel, msg, logWhere(srcMod, srcFun))
+    }
   } catch (e) {
-    consoleErr(e)
+    consoleErr(`logLevel=${logLevel}`, e)
   }
 }
 export const logE = (srcMod, srcFun, msg, shouldAddLogEntry = true) =>
@@ -122,20 +125,21 @@ export const logT = (srcMod, srcFun, msg, shouldAddLogEntry = true) =>
 // -------------------------------------------------------------------------------------------------
 // Syslog functions
 // -------------------------------------------------------------------------------------------------
-export const displaySyslog = (srcMod, srcFun, msg) => {
-  return `[ ${logWhere(srcMod, srcFun)} ] ${msg !== '' ? msg : '<-'}`
-}
+export const displaySyslog = (srcMod, srcFun, msg) =>
+  `[ ${logWhere(srcMod, srcFun)} ] ${msg !== '' ? msg : '<-'}`
 
 // -------------------------------------------------------------------------------------------------
 // Syslog functions: system level
 // -------------------------------------------------------------------------------------------------
-function sysLog(level, msg, location, context, cid, info) {
+const sysLog = (level, msg, location, context, cid, info) => {
   try {
-    if (SHOULD_SYSLOG)
+    if (SHOULD_SYSLOG) {
+      if (level == ERR_LEVEL_TRACE) level = 'debug'
+      if (level == 'verbose') level = 'info'
       sysLogger[level](msg, location, context, cid || context?.id, info || context?.detailsStr)
-    else () => null
+    } else return () => null
   } catch (err) {
-    logE(mod, 'sysLog', err)
+    consoleErr(mod, 'sysLog', err)
   }
 }
 // System-related "panic" conditions
