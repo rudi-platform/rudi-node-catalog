@@ -145,7 +145,7 @@ export const makeSearchable = async (ObjModel) => {
     // Dropping current text indexes if they exist
     try {
       const indexes = await collection.getIndexes()
-      if (indexes[SEARCH_INDEX]) {
+      if (indexes?.[SEARCH_INDEX]) {
         // const val = indexes[SEARCH_INDEX]
         logD(mod, fun, `Search indexes already exist: ${collection.name}`)
         // logT(mod, fun, `Dropping search indexes for '${collection.name}'`)
@@ -173,7 +173,8 @@ export const makeSearchable = async (ObjModel) => {
     try {
       try {
         await collection.createIndex(searchIndexes, indexOpts)
-      } catch {
+      } catch (e) {
+        logW(mod, fun, e)
         logT(mod, fun, `Need for droping ${collection.name} indexes`)
         await collection.dropIndex(SEARCH_INDEX)
         await collection.createIndex(searchIndexes, indexOpts)

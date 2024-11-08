@@ -744,7 +744,7 @@ const updateMetadataStorageState = async (dbMetadata, newState = StorageStatus.O
       await dbMetadata.save()
       logD(mod, fun, 'Integration error flag removed')
     }
-    logT(mod, fun, `dbMetadata: ${dbMetadata}`)
+    // logT(mod, fun, `dbMetadata: ${dbMetadata}`)
 
     const msg = `Metadata is ${areAllMediaAvailable ? '' : 'not '}sendable: ${dbMetadata[API_METADATA_ID]}`
     logD(mod, fun, msg)

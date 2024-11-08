@@ -136,7 +136,8 @@ export const updateDbData = async (req, reply) => {
 
   // const unzipped = unzipSync(data)
   // const data = req.body
-  if (!isObject(data)) throw new BadRequestError('Input data should be a JSON')
+  if (!isObject(data) && !Array.isArray(data))
+    throw new BadRequestError('Input data should be a JSON')
   for (const key of Object.keys(data)) {
     if (!isCatalogType(key))
       throw new BadRequestError(`Wrong input data: key '${key}' is not a Catalog object`)

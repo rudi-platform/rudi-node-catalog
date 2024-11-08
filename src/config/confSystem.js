@@ -114,6 +114,7 @@ const DB_SECTION = 'database'
 
 const DB_URI =
   getCliEnvOpt(OPT_DB_CONNECT_URI) ||
+  getConf(DB_SECTION, 'db_connection_uri') ||
   pathJoin(
     getConf(DB_SECTION, 'db_url') || 'mongodb://127.0.0.1',
     getConf(DB_SECTION, 'db_name') || 'rudi_catalog'

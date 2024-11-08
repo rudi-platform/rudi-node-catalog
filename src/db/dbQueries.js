@@ -1010,6 +1010,38 @@ export const updateDbObject = async (objectType, updateData) => {
   // logD(mod, fun, `updatedObject: ${beautify(updatedObject)}`)
 }
 
+// export const restoreDbList = async (objectType, updateData) => {
+//   const fun = `restoreDbList`
+//   try {
+//     logT(mod, fun)
+//     assertIsString(fun, objectType)
+//     const { ObjModel, idField } = getObjectAccesses(objectType)
+//     const promises = []
+//     for (const obj of updateData) {
+//       const rudiId = accessProperty(obj, idField)
+//       const filter = { [idField]: rudiId }
+//       const updateOpts = {
+//         new: true, // returns the updated document
+//         // overwrite: true,
+//         upsert: true, // creates the document if it wasn't found
+//       }
+//       if (objectType == OBJ_METADATA) {
+//         promises.push(newMetadata(obj))
+//       } else promises.push(ObjModel.findOneAndUpdate(filter, obj, updateOpts))
+//     }
+//     await Promise.all(promises)
+//   } catch (err) {
+//     let idKey
+//     Object.keys(updateData).forEach((key) => {
+//       if (key.endsWith('_id')) idKey = key
+//     })
+//     logE(mod, fun, `Error for ${objectType} ${updateData[idKey]}`)
+//     // logE(mod, fun, `Error for media_type=${updateData.media_type}`)
+//     const path = Object.keys(err.errors || err.error)[0]?.split('.')
+//     throw RudiError.treatError(mod, fun, err, path)
+//   }
+// }
+
 export const overwriteDbObject = async (objectType, updateData) => {
   const fun = `overwriteDbObject`
   // logT(mod, fun)

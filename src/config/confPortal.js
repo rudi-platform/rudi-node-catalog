@@ -74,7 +74,7 @@ export const getPortalConf = (opt) => {
 // Extracting and exporting sys configuration
 // -------------------------------------------------------------------------------------------------
 const API_PORTAL_URL = getPortalUserConf('portal_url')
-export const isPortalConnectionDisabled = () => !API_PORTAL_URL
+export const isPortalConnectionDisabled = () => !API_PORTAL_URL?.startsWith('http')
 
 // ----- Auth
 const AUTH_URL = getPortalUserConf('auth_url') || API_PORTAL_URL
