@@ -36,7 +36,7 @@ separateLogs('Loading log conf', true) /////////////////////////////////////////
 // -------------------------------------------------------------------------------------------------
 // Reading conf file
 // -------------------------------------------------------------------------------------------------
-const APP_NAME = getAppName()
+const APP_NAME = getConf(LOG_SECTION, 'app_name', getAppName())
 
 // ----- Flags section
 const FLAGS_SECTION = 'flags'
@@ -308,7 +308,7 @@ function getRudiLoggerOptions() {
 }
 
 export const sysLogger = new rudiLogger.RudiLogger(
-  getAppName(),
+  getConf(SYSLOG_SECTION, 'app_name', APP_NAME),
   getGitHash(),
   getRudiLoggerOptions()
 )
