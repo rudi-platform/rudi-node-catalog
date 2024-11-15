@@ -931,7 +931,7 @@ export const countDbObjectList = async (objectType, unionField, options) => {
   const fun = `countDbObjectList`
 
   try {
-    logT(mod, fun, `unionField: ${unionField}, options: ${beautify(options)}`)
+    // logT(mod, fun, `unionField: ${unionField}, options: ${beautify(options)}`)
     //--- Parameters
     // Identify object type characteristics
     const ObjModel = getObjectModel(objectType)
