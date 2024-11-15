@@ -36,7 +36,6 @@ separateLogs('Loading log conf', true) /////////////////////////////////////////
 // -------------------------------------------------------------------------------------------------
 // Reading conf file
 // -------------------------------------------------------------------------------------------------
-const APP_NAME = getConf(LOG_SECTION, 'app_name', getAppName())
 
 // ----- Flags section
 const FLAGS_SECTION = 'flags'
@@ -66,6 +65,8 @@ checkOption('Should log routes', SHOULD_SHOW_ROUTES)
 // ----- Logs section
 const LOG_SECTION = 'logging'
 
+const LOG_APP_NAME = getConf(LOG_SECTION, 'app_name', getAppName())
+
 const LOG_LVL = getConf(LOG_SECTION, 'log_level', 'debug')
 consoleLog(mod, fun, `Log level set to '${LOG_LVL.toUpperCase()}'`)
 
@@ -77,6 +78,8 @@ export const getLogLevel = () => LOG_LVL
 
 // ----- Syslog
 const SYSLOG_SECTION = 'syslog'
+
+const SYSLOG_APP_NAME = getConf(SYSLOG_SECTION, 'app_name', LOG_APP_NAME)
 
 const SYSLOG_LVL = getConf(SYSLOG_SECTION, 'log_level', 'info')
 // const SYSLOG_NODE_NAME = getConf(SYSLOG_SECTION, 'syslog_node_name')
@@ -205,10 +208,10 @@ if (SHOULD_FILELOG) {
     new winston.transports.DailyRotateFile({
       name: 'datedLogs',
       dirname: LOG_DIR,
-      filename: `${APP_NAME}-%DATE%`,
+      filename: `${LOG_APP_NAME}-%DATE%`,
       datePattern: 'YYYY-MM-DD-HH',
       createSymlink: true,
-      symlinkName: `${APP_NAME}-current.log`,
+      symlinkName: `${LOG_APP_NAME}-current.log`,
       maxSize: '75m',
       maxFiles: '7d',
       extension: '.log',
@@ -308,7 +311,7 @@ function getRudiLoggerOptions() {
 }
 
 export const sysLogger = new rudiLogger.RudiLogger(
-  getConf(SYSLOG_SECTION, 'app_name', APP_NAME),
+  SYSLOG_APP_NAME,
   getGitHash(),
   getRudiLoggerOptions()
 )
