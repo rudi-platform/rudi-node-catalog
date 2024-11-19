@@ -33,7 +33,7 @@
   "homepage": "https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER",
   "license": "EUPL-1.2",
   "dependencies": {
-    "@aqmo.org/jwt-lib": "^1.1.12",
+    "@aqmo.org/jwt-lib": "^1.1.13",
     "@aqmo.org/rudi_logger": "^1.1.6",
     "@fastify/compress": "^8.0.1",
     "@fastify/multipart": "^9.0.1",
@@ -44,7 +44,7 @@
     "lodash": "^4.17.21",
     "markdown-table": "^3.0.4",
     "minimist": "^1.2.8",
-    "mongoose": "^8.8.1",
+    "mongoose": "^8.8.2",
     "mongoose-geojson-schema": "^2.2.5",
     "mongoose-int32": "^0.6.0",
     "nanoid": "^5.0.8",
