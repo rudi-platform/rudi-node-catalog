@@ -7,7 +7,7 @@ const mod = 'sysCtrl'
 // -------------------------------------------------------------------------------------------------
 // External dependencies
 // -------------------------------------------------------------------------------------------------
-import { execSync } from 'child_process'
+import { exec } from 'child_process'
 import { readFileSync } from 'fs'
 
 import mongoose from 'mongoose'
@@ -66,42 +66,27 @@ export const getEnvironment = () => {
   }
 }
 
+const NA = 'n/a'
+const execCmd = async (cmd) =>
+  new Promise((resolve) =>
+    exec(cmd, { encoding: 'utf-8' }, (error, stdout) => resolve(stdout ? `${stdout}`.trim() : NA))
+  )
+
 let nVersions = {}
 /** Returns the node and npm versions */
 export const getNodeVersion = async () => {
-  const fun = 'getNodeVersion'
-  // logD(mod, fun, ` GET ${URL_PV_NODE_VERSION_ACCESS}`)
-  let nodeVersion = 'n/a'
-  let npmVersion = 'n/a'
-  let mongooseVersion = 'n/a'
-  let mongoDbVersion = 'n/a'
-  try {
-    nodeVersion = execSync('node -v')
-  } catch (err) {
-    logW(mod, fun, `Command 'node -v failed: ${err}`)
-  }
-  try {
-    npmVersion = execSync('npm -v')
-  } catch (err) {
-    logW(mod, fun, `Command 'npm -v failed: ${err}`)
-  }
-  try {
-    mongooseVersion = execSync('npm view mongoose version')
-  } catch (err) {
-    setTimeout(() => logW(mod, fun, `Command 'npm view mongoose version' failed: ${err}`), 3000)
-  }
-
-  try {
-    mongoDbVersion = await getMongoDbVersion()
-  } catch (err) {
-    logW(mod, fun, `Couldn't get MongoDB version: ${err}`)
-  }
+  const versions = await Promise.all([
+    execCmd('node -v'),
+    execCmd('npm -v'),
+    execCmd('npm view mongoose version'),
+    getMongoDbVersion(),
+  ])
 
   nVersions = {
-    node: `${nodeVersion}`.trim(),
-    npm: `${npmVersion}`.trim(),
-    mongoose: `${mongooseVersion}`.trim(),
-    mongodb: `${mongoDbVersion}`.trim(),
+    node: versions[0],
+    npm: versions[1],
+    mongoose: versions[2],
+    mongodb: versions[3],
   }
   return nVersions
 }
@@ -111,10 +96,10 @@ async function getMongoDbVersion() {
   try {
     const admin = new mongoose.mongo.Admin(mongoose.connection.db)
     let mongoInfo = await admin.buildInfo()
-    // logD(mod, fun, `Mongo : ${mongoInfo.version}`)
     return mongoInfo.version
   } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
+    logW(mod, fun, `Couldn't get MongoDB version: ${err}`)
+    return NA
   }
 }
 

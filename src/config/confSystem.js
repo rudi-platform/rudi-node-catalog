@@ -98,12 +98,13 @@ export const getNodeEnv = () => NODE_ENV
 const APP_ENV = getCliEnvOpt(OPT_APP_ENV)
 export const getAppEnv = () => APP_ENV
 
-let GIT_HASH
+let GIT_HASH = `n/a`
 try {
-  GIT_HASH = getCliEnvOpt(OPT_GIT_HASH) || `${execSync('git rev-parse --short HEAD')}`.trim()
+  GIT_HASH =
+    getCliEnvOpt(OPT_GIT_HASH) ||
+    `${execSync('git rev-parse --short HEAD', { encoding: 'utf-8' })}`.trim()
 } catch (err) {
   consoleErr(mod, 'getGitHash', err)
-  GIT_HASH = `n/a`
   // throw err
 }
 
