@@ -57,7 +57,7 @@ export const OPTIONS = {
   [OPT_PUBLIC_URL]: {
     text: 'RUDI Catalog server public URL',
     cli: 'url',
-    env: 'RUDI_API_URL',
+    env: 'CATALOG_PUBLIC_URL',
     alt: 'RUDI_CATALOG_URL',
   },
   [OPT_USER_CONF]: {
