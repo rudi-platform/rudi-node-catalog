@@ -85,8 +85,8 @@ export const MAX_QUERY_LIMIT = 500
 // -------------------------------------------------------------------------------------------------
 // REQ URL
 // -------------------------------------------------------------------------------------------------
-export const URL_PREFIX_PUBLIC = '/api/v1'
-export const URL_PREFIX_PRIVATE = '/api/admin'
+export const URL_PREFIX_PUBLIC = '/v1'
+export const URL_PREFIX_PRIVATE = '/admin'
 
 // This generic URL will be used to factorize the treatments on resources, organizations, contacts, etc.
 export const URL_PUB_METADATA = `${URL_PREFIX_PUBLIC}/${OBJ_METADATA}`
@@ -155,10 +155,7 @@ export const URL_PV_TOKEN_ACCESS = `${URL_PV_PORTAL_PREFIX}/${URL_SUFFIX_TOKEN_G
 export const URL_PV_TOKEN_CHECK_ACCESS = `${URL_PV_TOKEN_ACCESS}/${URL_SUFFIX_TOKEN_CHECK}`
 
 export const URL_PV_LOGS_ACCESS = `${URL_PREFIX_PRIVATE}/${OBJ_LOGS}`
-export const URL_PV_GIT_HASH_ACCESS = `${URL_PREFIX_PRIVATE}/${URL_SUFFIX_GIT_HASH}`
-export const URL_PV_APP_HASH_ACCESS = `${URL_PREFIX_PRIVATE}/${URL_SUFFIX_APP_HASH}`
-export const URL_PUB_API_VERSION = '/api/version'
-export const URL_PV_APP_ENV_ACCESS = `${URL_PREFIX_PRIVATE}/${URL_SUFFIX_APP_ENV}`
+export const URL_PUB_API_VERSION = '/version'
 export const URL_PV_NODE_VERSION_ACCESS = `${URL_PREFIX_PRIVATE}/${URL_SUFFIX_NODE_VERSION}`
 
 export const URL_PV_DB_ACCESS = `${URL_PREFIX_PRIVATE}/${URL_SUFFIX_DB}`

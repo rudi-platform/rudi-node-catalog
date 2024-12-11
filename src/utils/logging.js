@@ -134,8 +134,8 @@ export const displaySyslog = (srcMod, srcFun, msg) =>
 const sysLog = (level, msg, location, context, cid, info) => {
   try {
     if (SHOULD_SYSLOG) {
-      if (level == ERR_LEVEL_TRACE) level = 'debug'
       if (level == 'verbose') level = 'info'
+      if (level == ERR_LEVEL_TRACE || !level) level = 'debug'
       sysLogger[level](msg, location, context, cid || context?.id, info || context?.detailsStr)
     } else return () => null
   } catch (err) {

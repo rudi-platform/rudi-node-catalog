@@ -18,7 +18,7 @@ export const test = async (req, res) => {
     // logD(mod, fun, rudiId)
 
     // return await isReferencedInMetadata(objectType, rudiId)
-    res.code(200).send({ oh: 'ok' })
+    res.code(200).send({ test: 'ok' })
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }

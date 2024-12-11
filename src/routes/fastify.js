@@ -11,13 +11,15 @@ import { ROUTE_NAME, STATUS_CODE, URL_PREFIX_PRIVATE } from '../config/constApi.
 import { beautify, padA1, timeEpochMs } from '../utils/jsUtils.js'
 
 import {
+  getCatalog,
+  getPrivatePath,
   getServerAddress,
   getServerPort,
   shouldControlPrivateRequests,
   shouldControlPublicRequests,
 } from '../config/confSystem.js'
 
-import { shouldShowErrorPile, shouldShowRoutes } from '../config/confLogs.js'
+import { SHOULD_SYSLOG, shouldShowErrorPile, shouldShowRoutes } from '../config/confLogs.js'
 
 import { JWT_USER, isPortalConnectionDisabled } from '../config/confPortal.js'
 
@@ -87,10 +89,10 @@ export const launchRouteListener = async () => {
     // await catalogApp.register(fastifyMultipart)
 
     declareRoutes()
-    await catalogApp.listen({
+    catalogApp.listen({
       port: getServerPort(),
       host: getServerAddress(),
-      listenTextResolver: (address) => logI(mod, fun, `App listening on ${address}`),
+      listenTextResolver: (address) => logI(mod, fun, `App listening on ${address}${getCatalog()}`),
     })
   } catch (err) {
     logE(mod, fun, `${err}`)
@@ -391,7 +393,8 @@ async function onUnrestrictedPrivateRoute(req, reply) {
 // -------------------------------------------------------------------------------------------------
 // ROUTES
 // -------------------------------------------------------------------------------------------------
-function declareRouteGroup(routeGroup, preHandler, routeGroupName, logLevel) {
+let toggle = true
+function declareRouteGroup(routeGroupName, routeGroup, preHandler) {
   const fun = 'declareRouteGroup'
   // logT(mod, 'declareRouteGroup', routeGroupName)
 
@@ -400,10 +403,19 @@ function declareRouteGroup(routeGroup, preHandler, routeGroupName, logLevel) {
       // logT(mod, 'declareRouteGroup', `${routeGroupName} ${index}`)
       route.preHandler = preHandler
       catalogApp.route(route)
+      const displayRoute = `${padA1(index)}: ${route.method} ${route.url}`
       if (shouldShowRoutes())
-        logLine(logLevel, routeGroupName, 'routes', `${padA1(index)}: ${route.method} ${route.url}`)
-      // logT(mod, fun, beautify(route))
+        if (SHOULD_SYSLOG)
+          logLine(toggle ? 'info' : 'debug', routeGroupName, 'routes', displayRoute)
+        else
+          logLine(
+            toggle ? 'info' : 'debug',
+            routeGroupName,
+            'routes',
+            `${routeGroupName}: ${displayRoute}`
+          )
     })
+    toggle = !toggle
   } catch (err) {
     logE(mod, fun, err)
     RudiError.treatError(mod, 'declareRouteGroup', err)
@@ -416,24 +428,23 @@ function declareRouteGroup(routeGroup, preHandler, routeGroupName, logLevel) {
 const declareRoutes = () => {
   // logT(mod, 'declareRoutes')
   // declareRouteGroup(redirectRoutes, onPortalRoute, 'Redirect', 'd')
-  declareRouteGroup(publicRoutes, onPublicRoute, 'Public', 'info')
-  declareRouteGroup(portalRoutes, onPortalRoute, 'Portal', 'verbose')
-  declareRouteGroup(unrestrictedPrivateRoutes, onUnrestrictedPrivateRoute, 'Unrestricted', 'info')
-  declareRouteGroup(backOfficeRoutes, onPrivateRoute, 'Private', 'debug')
-  declareRouteGroup(devRoutes, onPrivateRoute, 'RudiNode', 'verbose')
+  declareRouteGroup('Public', publicRoutes, onPublicRoute)
+  declareRouteGroup('Portal', portalRoutes, onPortalRoute)
+  declareRouteGroup('Unrestricted', unrestrictedPrivateRoutes, onUnrestrictedPrivateRoute)
+  declareRouteGroup('Private', backOfficeRoutes, onPrivateRoute)
+  declareRouteGroup('RudiNode', devRoutes, onPrivateRoute)
   declareRouteGroup(
+    'API',
     [
       {
         description: 'Generate the documentation for the REST API of this microservice',
         method: 'GET',
-        url: `${URL_PREFIX_PRIVATE}/routes`,
+        url: getPrivatePath('routes'),
         handler: getRestApi,
         config: { [ROUTE_NAME]: 'dev_api' },
       },
     ],
-    onPrivateRoute,
-    'API',
-    'info'
+    onPrivateRoute
   )
 }
 

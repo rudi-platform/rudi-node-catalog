@@ -75,11 +75,9 @@ import { createErrorReport } from './reportController.js'
 // -------------------------------------------------------------------------------------------------
 // Portal auth header
 // -------------------------------------------------------------------------------------------------
-const portalHttpsAgent = new https.Agent({
-  rejectUnauthorized: false,
-})
+const portalHttpsAgent = new https.Agent({ rejectUnauthorized: false })
 
-export const getPortalAuthHeaderBearer = async () => {
+export const getPortalAuthHeaderBearer = async (httpsAgent) => {
   const fun = 'getPortalAuthHeaderBearer'
   try {
     logT(mod, fun)
@@ -88,6 +86,7 @@ export const getPortalAuthHeaderBearer = async () => {
         'User-Agent': USER_AGENT,
         Authorization: `Bearer ${await getPortalToken()}`,
       },
+      httpsAgent,
     }
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -282,13 +281,10 @@ export const getPortalEncryptPubKey = async () => {
   logT(mod, fun)
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
-    const portalCryptPubData = await axios.get(getPortalCryptPubUrl(), {
-      headers: {
-        'User-Agent': USER_AGENT,
-        Authorization: `Bearer ${await getPortalToken()}`,
-      },
-      httpsAgent: portalHttpsAgent,
-    })
+    const portalCryptPubData = await axios.get(
+      getPortalCryptPubUrl(),
+      getPortalAuthHeaderBearer(portalHttpsAgent)
+    )
     const portalEncryptPubKey = portalCryptPubData?.data
     return portalEncryptPubKey
   } catch (err) {

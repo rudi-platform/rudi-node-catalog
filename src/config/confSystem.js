@@ -78,16 +78,23 @@ export const shouldControlPublicRequests = () => SHOULD_CONTROL_PUBLIC_REQUESTS
 const SERVER_SECTION = 'server'
 
 const APP_NAME = getConf(SERVER_SECTION, 'app_name')
-const LISTENING_ADDR = getConf(SERVER_SECTION, 'listening_address')
+const LISTENING_ADDR = removeTrailingSlash(getConf(SERVER_SECTION, 'listening_address'))
 const LISTENING_PORT = getCliEnvOpt(OPT_PORT) || getConf(SERVER_SECTION, 'listening_port')
+const CATALOG_PREFIX = removeTrailingSlash(getConf(SERVER_SECTION, 'server_prefix') || 'api')
 
-const publicUrl = getCliEnvOpt(OPT_PUBLIC_URL) || getConf(SERVER_SECTION, 'server_url')
+export const getCatalog = (...url) => pathJoin('', CATALOG_PREFIX, ...url)
+export const getPrivatePath = (...url) => getCatalog('admin', ...url)
+export const getPublicPath = (...url) => getCatalog('v1', ...url)
+
+let publicUrl = getCliEnvOpt(OPT_PUBLIC_URL) || getConf(SERVER_SECTION, 'server_url')
+if (!publicUrl.endsWith(CATALOG_PREFIX)) publicUrl = pathJoin(publicUrl, CATALOG_PREFIX)
 const PUBLIC_URL = removeTrailingSlash(publicUrl)
 
 export const getAppName = () => APP_NAME
 export const getServerAddress = () => LISTENING_ADDR
 export const getServerPort = () => LISTENING_PORT
-export const getHost = (suffix) => pathJoin(`http://${LISTENING_ADDR}:${LISTENING_PORT}`, suffix)
+export const getHost = (suffix) =>
+  pathJoin(`http://${LISTENING_ADDR}:${LISTENING_PORT}`, CATALOG_PREFIX, suffix)
 
 export const getPublicUrl = (suffix) => pathJoin(PUBLIC_URL, suffix)
 
