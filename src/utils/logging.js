@@ -136,7 +136,10 @@ const sysLog = (level, msg, location, context, cid, info) => {
     if (SHOULD_SYSLOG) {
       if (level == 'verbose') level = 'info'
       if (level == ERR_LEVEL_TRACE || !level) level = 'debug'
-      sysLogger[level](msg, location, context, cid || context?.id, info || context?.detailsStr)
+      let msg_str = `${msg}`
+      if (msg_str === '[Object]: Object' || msg_str === '[object Object]')
+        msg_str = JSON.stringify(msg)
+      sysLogger[level](msg_str, location, context, cid || context?.id, info || context?.detailsStr)
     } else return () => null
   } catch (err) {
     consoleErr(mod, 'sysLog', err)
