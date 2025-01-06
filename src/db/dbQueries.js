@@ -1526,7 +1526,7 @@ export const isReferencedInMetadata = async (objectType, rudiId) => {
     }
     const res = await Metadata.findOne(metadataFilter, API_METADATA_ID)
     logD(mod, fun, `res: ${logMetadata(res)}`)
-    return !!res
+    return res
     // res = await Metadata.find(metadataFilter, API_METADATA_ID)
     // return !!isEmptyArray(res)
   } catch (err) {

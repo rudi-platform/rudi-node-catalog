@@ -121,6 +121,7 @@ import {
   API_ACCESS_CONDITION,
   API_COLLECTION_TAG,
   API_CONFIDENTIALITY,
+  API_METADATA_ID,
   API_RESTRICTED_ACCESS,
 } from '../db/dbFields.js'
 import Contact from '../definitions/models/Contact.js'
@@ -753,8 +754,11 @@ export const deleteSingleObject = async (req, reply) => {
     // ensure the object exists
     const rudiObj = await getEnsuredObjectWithRudiId(objectType, rudiId)
 
-    if (await isObjectReferenced(objectType, rudiId))
-      throw new ForbiddenError(objectNotDeletedBecauseUsed(objectType, rudiId))
+    const metaReferencingObject = await isObjectReferenced(objectType, rudiId)
+    if (metaReferencingObject)
+      throw new ForbiddenError(
+        objectNotDeletedBecauseUsed(objectType, metaReferencingObject[API_METADATA_ID])
+      )
 
     // TODO: if SkosScheme: delete all SkosConcepts that reference it
     // TODO: if SkosConcept: update all other SkosConcepts that reference it (parents/children/siblings/relatives)
