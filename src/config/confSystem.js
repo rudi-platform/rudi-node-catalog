@@ -109,7 +109,7 @@ let GIT_HASH = `n/a`
 try {
   GIT_HASH =
     getCliEnvOpt(OPT_GIT_HASH) ||
-    `${execSync('git rev-parse --short HEAD', { encoding: 'utf-8' })}`.trim()
+    `${execSync('git rev-parse --short HEAD', { encoding: 'utf-8' })}`.trim().slice(0, 7)
 } catch (err) {
   consoleErr(mod, 'getGitHash', err)
   // throw err
