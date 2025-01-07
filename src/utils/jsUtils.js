@@ -409,7 +409,7 @@ export const deepCompareAndSetNull = (source, destination) => {
 //  Logging
 // -------------------------------------------------------------------------------------------------
 export const logWhere = (srcMod, srcFun) =>
-  srcMod && srcFun ? `${srcMod} . ${srcFun}` : srcMod || srcFun
+  srcMod && srcFun ? `${srcMod}/${srcFun}` : srcMod || srcFun
 
 export const displayStr = (srcMod, srcFun, msg = '<-') => `[ ${logWhere(srcMod, srcFun)} ] ${msg}`
 
