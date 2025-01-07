@@ -100,7 +100,8 @@ export const logLine = (logLevel, srcMod, srcFun, msg, shouldAddLogEntry = true)
     // console.log(displayStr(srcMod, srcFun, msg))
     if (shouldAddLogEntry) addLogEntry(logLevel, srcMod, srcFun, msg)
     if (SHOULD_SYSLOG && msg) {
-      sysLog(logLevel, `[${logWhere(srcMod, srcFun)}] ${msg}`, logWhere(srcMod, srcFun))
+      if (`${srcMod}${srcFun}` === '') sysLog(logLevel, msg, logWhere(srcMod, srcFun))
+      else sysLog(logLevel, `[${logWhere(srcMod, srcFun)}] ${msg}`, logWhere(srcMod, srcFun))
     }
   } catch (e) {
     consoleErr(`logLevel=${logLevel}`, e)

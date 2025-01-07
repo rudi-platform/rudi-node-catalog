@@ -203,7 +203,7 @@ catalogApp.addHook('onRequest', (req, res, next) => {
   const fun = 'onRequest'
   try {
     const context = new CallContext()
-    logV(mod, fun, `----- Rcv req #${context.id} from ${createIpsMsg(req)} -----vvv---`)
+    logV('', '', `----- Rcv req #${context.id} from ${createIpsMsg(req)} -----vvv---`)
     // logV(mod, fun, req.url)
     const now = timeEpochMs()
     context.setIpsFromRequest(req)
@@ -240,7 +240,7 @@ catalogApp.addHook('onSend', (request, reply, payload, next) => {
       context.duration = now - context.timestamp
       context.statusCode = reply.statusCode
       if (!reply.isError) context.logInfo(mod, fun, 'API reply')
-      logV(mod, fun, `----- Send reply #${context.id} (${context.duration} ms) -----^^^--`)
+      logV('', '', `----- Send reply #${context.id} (${context.duration} ms) -----^^^--`)
     }
     next()
   } catch (err) {

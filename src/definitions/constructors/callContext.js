@@ -95,7 +95,7 @@ export const CallContext = class CallContext {
       const msg = `${authDetails ? beautify(authDetails) : ''}, ${
         opDetails ? beautify(opDetails) : ''
       }, ${rawDetails ? beautify(rawDetails) : ''}`
-      if (ACTIVATE_LOG) logT(mod, fun, msg)
+      // if (ACTIVATE_LOG) logT(mod, fun, msg)
 
       this[AUTH] = !authDetails ? {} : authDetails
       this[OP] = !opDetails ? {} : opDetails
