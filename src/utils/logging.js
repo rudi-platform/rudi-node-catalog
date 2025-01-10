@@ -201,32 +201,18 @@ export class FFLogger {
     this.level = level
   }
 
-  fatal(msg) {
-    return sysAlert(stringifyMsg(msg))
-  }
-  error(msg) {
-    return sysError(stringifyMsg(msg))
-  }
-  warn(msg) {
-    return sysWarn(stringifyMsg(msg))
-  }
-  info(msg) {
-    return sysInfo(stringifyMsg(msg))
-  }
-  debug(msg) {
-    return sysDebug(stringifyMsg(msg))
-  }
-  trace(msg) {
-    return sysTrace(
+  fatal = (msg) => sysAlert(stringifyMsg(msg))
+  error = (msg) => sysError(stringifyMsg(msg))
+  warn = (msg) => sysWarn(stringifyMsg(msg))
+  info = (msg) => sysInfo(stringifyMsg(msg))
+  debug = (msg) => sysDebug(stringifyMsg(msg))
+  trace = (msg) =>
+    sysTrace(
       typeof msg == 'string' ? msg : msg?.err ? `ERR ${msg.err.code} ${msg.err.message}` : `${msg}`
     )
-  }
-  log(msg) {
-    return sysLog(this.level, stringifyMsg(msg))
-  }
-  child() {
-    return new FFLogger()
-  }
+  log = (msg) => sysLog(this.level, stringifyMsg(msg))
+
+  child = () => new FFLogger()
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -277,9 +263,8 @@ export const logHttpAnswer = (loggedMod, loggedFun, httpAnswer) => {
 // -------------------------------------------------------------------------------------------------
 // Metadata
 // -------------------------------------------------------------------------------------------------
-export const logMetadata = (metadata) => {
-  return `${beautify(pick(metadata, [API_METADATA_ID, API_DATA_NAME_PROPERTY]))}`
-}
+export const logMetadata = (metadata) =>
+  `${beautify(pick(metadata, [API_METADATA_ID, API_DATA_NAME_PROPERTY]))}`
 
 // -------------------------------------------------------------------------------------------------
 // DB
@@ -300,7 +285,7 @@ export const addLogEntry = async (logLvl, loc_module, loc_function, msg) => {
     consoleErr(
       loc_module,
       `${loc_function} > ${fun}`,
-      `${logLvl} logging failed! msg: ${msg}, err: ${err}`
+      `${logLvl} log in db failed! msg: ${msg}, err: ${err}`
     )
     // throw err
   }
