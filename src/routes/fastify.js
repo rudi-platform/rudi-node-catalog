@@ -338,7 +338,7 @@ async function onPortalRoute(req, reply) {
 async function onPrivateRoute(req, reply) {
   const fun = 'onPrivateRoute'
   try {
-    logT(mod, fun, `${req.method} ${req.url} `)
+    // logT(mod, fun, `${req.method} ${req.url} `)
     if (!shouldControlPrivateRequests()) {
       logW(
         mod,
