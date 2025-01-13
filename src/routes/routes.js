@@ -363,6 +363,13 @@ export const portalRoutes = [
  * Routes that don't need a JWT check (to be accessed by internal programs)
  */
 export const unrestrictedPrivateRoutes = [
+  {
+    description: 'Get current API version',
+    method: 'GET',
+    url: getPrivatePath('version'),
+    handler: getApiVersion,
+    config: { [ROUTE_NAME]: 'prv_get_api_version' },
+  },
   /*
    * @oas [get] /api/admin/hash
    * scope: public
