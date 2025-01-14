@@ -368,7 +368,7 @@ export const unrestrictedPrivateRoutes = [
     method: 'GET',
     url: getPrivatePath('version'),
     handler: getApiVersion,
-    config: { [ROUTE_NAME]: 'prv_get_api_version' },
+    config: { [ROUTE_NAME]: 'dev_get_api_version' },
   },
   /*
    * @oas [get] /api/admin/hash
