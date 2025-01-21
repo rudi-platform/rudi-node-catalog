@@ -40,7 +40,7 @@ export const protectHeaderAuth = (req) => {
   const fun = 'protectHeaderAuth'
   try {
     if (ACTIVATE_LOG) logT(mod, fun)
-    const auth = req?.headers?.Authorization || req?.headers?.authorization
+    const auth = req?.headers?.Authorization ?? req?.headers?.authorization
     if (!auth) return
     if (auth.length > REQ_AUTH_MAX_LENGTH)
       throw new BadRequestError(

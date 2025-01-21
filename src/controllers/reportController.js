@@ -296,8 +296,8 @@ export const getReportList = async (objectType, req, reply) => {
     const urlObjectId = accessReqParam(req, PARAM_ID)
 
     // retrieve query parameters: 'limit' and 'offset'
-    const limit = parseInt(req.query[QUERY_LIMIT]) || DEFAULT_QUERY_LIMIT
-    const offset = parseInt(req.query[QUERY_OFFSET]) || 0
+    const limit = parseInt(req.query[QUERY_LIMIT]) ?? DEFAULT_QUERY_LIMIT
+    const offset = parseInt(req.query[QUERY_OFFSET]) ?? 0
 
     // ensure object exists
     const existsObject = await doesObjectExistWithRudiId(objectType, urlObjectId)
@@ -395,7 +395,7 @@ export const deleteReportsBefore = async (req, reply) => {
     const filters = []
     for (const metadataDateProp in dateFilters) {
       const dateQueryFilters = dateFilters[metadataDateProp]
-      const dateRaw = queryParams[dateQueryFilters[0]] || queryParams[dateQueryFilters[1]]
+      const dateRaw = queryParams[dateQueryFilters[0]] ?? queryParams[dateQueryFilters[1]]
       if (dateRaw) {
         const dateClean = cleanDate(dateRaw)
         logT(mod, fun, dateRaw)

@@ -36,7 +36,7 @@ export const NO_PORTAL_MSG = 'No portal connected'
 const INI_DIR = './0-ini'
 // - user conf path
 const portalConfUserFile = getCliEnvOpt(OPT_PORTAL_CONF)
-const PORTAL_CUSTOM_CONF_FILE = portalConfUserFile || `${INI_DIR}/portal_conf_custom.ini`
+const PORTAL_CUSTOM_CONF_FILE = portalConfUserFile ?? `${INI_DIR}/portal_conf_custom.ini`
 // - default conf path
 const PORTAL_DEFT_CONF_FILE = `${INI_DIR}/portal_conf_default.ini`
 
@@ -77,7 +77,7 @@ const API_PORTAL_URL = getPortalUserConf('portal_url')
 export const isPortalConnectionDisabled = () => !API_PORTAL_URL?.startsWith('http')
 
 // ----- Auth
-const AUTH_URL = getPortalUserConf('auth_url') || API_PORTAL_URL
+const AUTH_URL = getPortalUserConf('auth_url') ?? API_PORTAL_URL
 const AUTH_GET = getPortalConf('auth_get')
 const AUTH_CHK = getPortalConf('auth_chk')
 const JWT_PUB_KEY_URL = getPortalConf('auth_pub')
@@ -108,7 +108,7 @@ export const getCredentials = (headersOnly) =>
   headersOnly ? BAUTH_HEADERS_BASIC : [BAUTH_HEADERS_BASIC, PORTAL_TOKEN_REQ_BODY]
 
 // ----- API
-export const getPortalBaseUrl = () => API_PORTAL_URL || NO_PORTAL_MSG
+export const getPortalBaseUrl = () => API_PORTAL_URL ?? NO_PORTAL_MSG
 
 const API_GET_URL = getPortalConf('get_url')
 const API_SEND_URL = getPortalConf('put_url')

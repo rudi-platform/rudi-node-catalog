@@ -53,7 +53,7 @@ export const daDropDB = async (req, reply) => {
     // const dbActionResult = await connection.db.dropDatabase()
     // logD(mod, fun, 'DB dropped')
 
-    const logsCollection = LogEntry?.collection?.name || 'logentries'
+    const logsCollection = LogEntry?.collection?.name ?? 'logentries'
 
     const listCollections = await connection.db.listCollections().toArray()
     // logD(mod, fun, `listCollections: ${beautify(listCollections)}`)

@@ -722,7 +722,7 @@ export const searchDbObjects = async (objectType, options) => {
 
     logD(mod, fun, `searching: ${searchTermsList}`)
 
-    const lang = options[QUERY_LANG]?.slice(0, 2) || 'fr'
+    const lang = options[QUERY_LANG]?.slice(0, 2) ?? 'fr'
     options[QUERY_FILTER].$text = {
       $search: searchTermsList.join(' '),
       $language: lang,
@@ -1037,7 +1037,7 @@ export const updateDbObject = async (objectType, updateData) => {
 //     })
 //     logE(mod, fun, `Error for ${objectType} ${updateData[idKey]}`)
 //     // logE(mod, fun, `Error for media_type=${updateData.media_type}`)
-//     const path = Object.keys(err.errors || err.error)[0]?.split('.')
+//     const path = Object.keys(err.errors ?? err.error)[0]?.split('.')
 //     throw RudiError.treatError(mod, fun, err, path)
 //   }
 // }
@@ -1078,7 +1078,7 @@ export const overwriteDbObject = async (objectType, updateData) => {
     })
     logE(mod, fun, `Error for ${objectType} ${updateData[idKey]}`)
     // logE(mod, fun, `Error for media_type=${updateData.media_type}`)
-    const path = Object.keys(err.errors || err.error)[0]?.split('.')
+    const path = Object.keys(err.errors ?? err.error)[0]?.split('.')
     throw RudiError.treatError(mod, fun, err, path)
   }
 }
@@ -1634,9 +1634,9 @@ export const getLogEntries = async (options) => {
   try {
     // logD(mod, fun, `options: ${beautify(options)}`)
     // Extract options
-    const limit = options[QUERY_LIMIT] || DEFAULT_QUERY_LIMIT
-    const offset = options[QUERY_OFFSET] || DEFAULT_QUERY_OFFSET
-    const filter = options[QUERY_FILTER] || {}
+    const limit = options[QUERY_LIMIT] ?? DEFAULT_QUERY_LIMIT
+    const offset = options[QUERY_OFFSET] ?? DEFAULT_QUERY_OFFSET
+    const filter = options[QUERY_FILTER] ?? {}
 
     const aggregateOptions = [
       { $match: filter },
@@ -1667,7 +1667,7 @@ export const isCatalogType = (type, strict) =>
 export const dbGetData = async (rudiObjTypeList, shouldGetLogs) => {
   const fun = 'dbGetData'
   try {
-    const catalogTypes = rudiObjTypeList || RUDI_TYPES
+    const catalogTypes = rudiObjTypeList ?? RUDI_TYPES
     if (shouldGetLogs) catalogTypes.push(OBJ_LOGS)
 
     const catalogData = {}

@@ -59,7 +59,7 @@ export const getEnvironment = () => {
   const fun = 'getEnvironment'
   try {
     logT(mod, fun, getAppEnv())
-    const env = getAppEnv() || NOT_FOUND
+    const env = getAppEnv() ?? NOT_FOUND
     return env
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)

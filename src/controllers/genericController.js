@@ -315,10 +315,10 @@ export const addObjects = async (req, reply) => {
     logT(mod, fun, `< POST ${URL_PV_OBJECT_GENERIC}`)
 
     // get the objectStandard query param, default=rudi
-    const objectStandard = req.query?.[QUERY_OBJECT_STANDARD] || DEFAULT_OBJECT_STANDARD
+    const objectStandard = req.query?.[QUERY_OBJECT_STANDARD] ?? DEFAULT_OBJECT_STANDARD
 
     // get the objectFormat query param, default=json
-    const objectFormat = req.query?.[QUERY_OBJECT_FORMAT] || DEFAULT_OBJECT_FORMAT
+    const objectFormat = req.query?.[QUERY_OBJECT_FORMAT] ?? DEFAULT_OBJECT_FORMAT
 
     const objectType = getObjectParam(req)
 
@@ -703,10 +703,10 @@ export const upsertObjects = async (req, reply) => {
     logT(mod, fun, `< PUT ${URL_PV_OBJECT_GENERIC}`)
 
     // get the objectStandard query param, default=rudi
-    const objectStandard = req.query?.[QUERY_OBJECT_STANDARD] || DEFAULT_OBJECT_STANDARD
+    const objectStandard = req.query?.[QUERY_OBJECT_STANDARD] ?? DEFAULT_OBJECT_STANDARD
 
     // get the objectFormat query param, default=json
-    const objectFormat = req.query?.[QUERY_OBJECT_FORMAT] || DEFAULT_OBJECT_FORMAT
+    const objectFormat = req.query?.[QUERY_OBJECT_FORMAT] ?? DEFAULT_OBJECT_FORMAT
 
     const objectType = getObjectParam(req)
 
@@ -826,10 +826,9 @@ export const deleteManyObjects = async (req, reply) => {
     logD(mod, fun, `parsedParameters: ${beautify(parsedParameters)}`)
     const filter = parsedParameters[QUERY_FILTER]
     // const fields = parsedParameters[QUERY_FIELDS]
-    const confirmation = parsedParameters[QUERY_CONFIRM] || false
 
     if (isEmptyObject(filter)) {
-      if (confirmation) return await deleteAllDbObjectsWithType(objectType)
+      if (parsedParameters[QUERY_CONFIRM]) return await deleteAllDbObjectsWithType(objectType)
       else {
         const msg = `Use confirm=true as a parameter to confirm the deletion of all ${objectType}`
         logW(mod, fun, msg)

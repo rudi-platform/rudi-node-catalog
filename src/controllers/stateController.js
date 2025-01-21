@@ -62,7 +62,7 @@ export const getPortalCachedMetadataList = async (maxCacheTimeS = DEFAULT_CACHE_
 
     // 2. Retrieve the number of metadata on the portal
     const portalCheck = await getPortalMetadataListWithToken(token, 'limit=1')
-    const portalMetadataNb = portalCheck.total || 0
+    const portalMetadataNb = portalCheck.total ?? 0
 
     // 3. Retrieve all the metadata on the portal
     const optsArray = []
@@ -120,7 +120,7 @@ export const getPortalMetadataFields = async (req, reply, fields = DEFAULT_FIELD
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     const options = await parseQueryParameters(OBJ_METADATA, req.url)
     logD(mod, fun, `options: ${beautify(options)}`)
-    const fieldFilter = options[QUERY_FIELDS] || fields
+    const fieldFilter = options[QUERY_FIELDS] ?? fields
     if (fieldFilter.indexOf(API_METADATA_ID) === -1) fieldFilter.unshift(API_METADATA_ID)
     const nodeMetadata = (await getPortalCachedMetadataList())[LIST_LABEL]
     return nodeMetadata.map((metadata) => pick(metadata, fieldFilter))

@@ -44,11 +44,11 @@ export class RudiError extends Error {
     // else logT(mod, fun)
     super(message || DEFAULT_MESSAGE)
     this[IS_RUDI_ERROR] = true
-    this[STATUS_CODE] = code || 500
-    this.name = name || 'Internal Server Error'
-    this.error = description || 'An unexpected error occurred'
+    this[STATUS_CODE] = code ?? 500
+    this.name = name ?? 'Internal Server Error'
+    this.error = description ?? 'An unexpected error occurred'
     this.type = this.constructor.name
-    this[TRACE] = errTrace || []
+    this[TRACE] = errTrace ?? []
     // logD(mod, 'ici', beautify(this[TRACE]) + beautify(message))
     this.setId()
     this[TRACE_MOD] = ctxMod
@@ -261,7 +261,7 @@ export class RudiError extends Error {
           error = new UnauthorizedError('Credentials are incorrect')
         } else {
           logT(mod, fun, `${errFlag}error data: ${beautify(comError)}`)
-          const errMsg = (errData.path ? `Path '${errData.path} ` : '') + (errData.error || errData)
+          const errMsg = (errData.path ? `Path '${errData.path} ` : '') + (errData.error ?? errData)
           logT(mod, fun, `${errFlag}error msg: ${errMsg}`)
           error = RudiError.createRudiHttpError(errCode ? errCode : 500, errMsg)
         }

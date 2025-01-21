@@ -225,7 +225,7 @@ export const sysOnError = (statusCode, errMsg, context, details) => {
     logT(mod, fun)
     logE(mod, fun, errMsg) //`Error ${err.statusCode} (${err.name}): ${err.message}`)
     const errCode = parseInt(statusCode)
-    let sysLogErr = isNaN(errCode) || errCode >= 500 ? sysCrit : sysError
+    let sysLogErr = (isNaN(errCode) ?? errCode >= 500) ? sysCrit : sysError
     sysLogErr(errMsg, '', context, details)
     //   `Error ${err.statusCode} (${err.name}): ${err.message}`,
     //   '',

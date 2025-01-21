@@ -205,9 +205,9 @@ MediaSchema.pre('save', function (next) {
         throw new BadRequestError(missingField(API_FILE_CHECKSUM), mod, fun, [API_FILE_CHECKSUM])
     } else {
       // Set media storage_status to 'available'
-      this[API_FILE_STORAGE_STATUS] = this[API_FILE_STORAGE_STATUS] || MediaStorageStatus.Available
+      this[API_FILE_STORAGE_STATUS] = this[API_FILE_STORAGE_STATUS] ?? MediaStorageStatus.Available
       // Set status_update date
-      this[API_FILE_STATUS_UPDATE] = this[API_FILE_STATUS_UPDATE] || nowISO()
+      this[API_FILE_STATUS_UPDATE] = this[API_FILE_STATUS_UPDATE] ?? nowISO()
       // Set connector interface_contract to 'dwnl'
     }
     if (!this[API_MEDIA_CONNECTOR][API_MEDIA_INTERFACE_CONTRACT])

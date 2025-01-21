@@ -172,7 +172,7 @@ export const getCliEnvOpt = (opt) => {
 const INI_DIR = './0-ini'
 // - user conf path
 const userConfPath = getCliEnvOpt(OPT_USER_CONF)
-const USER_CONF_FILE = userConfPath || `${INI_DIR}/conf_custom.ini`
+const USER_CONF_FILE = userConfPath ?? `${INI_DIR}/conf_custom.ini`
 // - default conf path
 const DEFAULT_CONF_FILE = `${INI_DIR}/conf_default.ini`
 

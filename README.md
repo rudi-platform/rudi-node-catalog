@@ -17,14 +17,6 @@ The API module provides :
 
 ---
 
-## Current deployment
-
-- **release**: production-like environment used to ensure the compatibility with Rennes Métropole's RUDI Portal. This version is the one to be deployed in production.
-- **shared**: development environment used to ensure the compatibility with the other modules of the RUDI Producer node
-- **test**: environment used to test that the current code can be executed on a distant node
-
----
-
 ## Public API
 
 _See https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/ for further information_

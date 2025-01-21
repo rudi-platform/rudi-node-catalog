@@ -141,7 +141,7 @@ export const parseQueryParameters = async (objectType, fullUrl) => {
     const reqArgs = splitUrl[1]
     const urlSegments = reqUrl.split('/')
     const lastSegment = urlSegments[urlSegments.length - 1]
-    const searching = lastSegment === ACT_SEARCH || lastSegment === ACT_EXT_SEARCH
+    const searching = lastSegment === ACT_SEARCH ?? lastSegment === ACT_EXT_SEARCH
     const urlParams = new URLSearchParams(reqArgs)
 
     // Check if parameters were actually found by URLSearchParams

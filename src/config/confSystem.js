@@ -79,14 +79,14 @@ const SERVER_SECTION = 'server'
 
 const APP_NAME = getConf(SERVER_SECTION, 'app_name')
 const LISTENING_ADDR = removeTrailingSlash(getConf(SERVER_SECTION, 'listening_address'))
-const LISTENING_PORT = getCliEnvOpt(OPT_PORT) || getConf(SERVER_SECTION, 'listening_port')
-const CATALOG_PREFIX = removeTrailingSlash(getConf(SERVER_SECTION, 'server_prefix') || 'api')
+const LISTENING_PORT = getCliEnvOpt(OPT_PORT) ?? getConf(SERVER_SECTION, 'listening_port')
+const CATALOG_PREFIX = removeTrailingSlash(getConf(SERVER_SECTION, 'server_prefix') ?? 'api')
 
 export const getCatalog = (...url) => pathJoin('', CATALOG_PREFIX, ...url)
 export const getPrivatePath = (...url) => getCatalog('admin', ...url)
 export const getPublicPath = (...url) => getCatalog('v1', ...url)
 
-let publicUrl = getCliEnvOpt(OPT_PUBLIC_URL) || getConf(SERVER_SECTION, 'server_url')
+let publicUrl = getCliEnvOpt(OPT_PUBLIC_URL) ?? getConf(SERVER_SECTION, 'server_url')
 if (!publicUrl.endsWith(CATALOG_PREFIX)) publicUrl = pathJoin(publicUrl, CATALOG_PREFIX)
 const PUBLIC_URL = removeTrailingSlash(publicUrl)
 
@@ -99,7 +99,7 @@ export const getHost = (suffix) =>
 export const getPublicUrl = (suffix) => pathJoin(PUBLIC_URL, suffix)
 
 // ----- App environment
-const NODE_ENV = getCliEnvOpt(OPT_NODE_ENV) || 'dev'
+const NODE_ENV = getCliEnvOpt(OPT_NODE_ENV) ?? 'dev'
 export const getNodeEnv = () => NODE_ENV
 
 const APP_ENV = getCliEnvOpt(OPT_APP_ENV)
@@ -121,11 +121,11 @@ export const getGitHash = () => GIT_HASH
 const DB_SECTION = 'database'
 
 const DB_URI =
-  getCliEnvOpt(OPT_DB_CONNECT_URI) ||
-  getConf(DB_SECTION, 'db_connection_uri') ||
+  getCliEnvOpt(OPT_DB_CONNECT_URI) ??
+  getConf(DB_SECTION, 'db_connection_uri') ??
   pathJoin(
-    getConf(DB_SECTION, 'db_url') || 'mongodb://127.0.0.1',
-    getConf(DB_SECTION, 'db_name') || 'rudi_catalog'
+    getConf(DB_SECTION, 'db_url') ?? 'mongodb://127.0.0.1',
+    getConf(DB_SECTION, 'db_name') ?? 'rudi_catalog'
   )
 
 export const getDbFullUri = () => DB_URI
@@ -134,7 +134,7 @@ export const getDbFullUri = () => DB_URI
 // export const getDbDumpDir = () => DB_DUMP_DIR
 
 // ----- Security section
-const PROFILES = readIniFile(getCliEnvOpt(OPT_PROFILES_CONF) || getConf('security', 'profiles'))
+const PROFILES = readIniFile(getCliEnvOpt(OPT_PROFILES_CONF) ?? getConf('security', 'profiles'))
 
 export const getProfile = (subject) => {
   if (!subject)

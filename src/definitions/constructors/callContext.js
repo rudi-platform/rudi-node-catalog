@@ -289,7 +289,7 @@ export const CallContext = class CallContext {
       if (!this.getError()) this.addError(ctxMod, ctxFun, err)
       const rudiErr = this.getError()
       logV(mod, fun, 'rudiErr: ' + beautify(rudiErr))
-      const primeError = rudiErr.primeError || rudiErr
+      const primeError = rudiErr.primeError ?? rudiErr
 
       const errMsg = `Error ${rudiErr.statusCode} (${rudiErr.name}): ${rudiErr.message}`
       const errDetails =

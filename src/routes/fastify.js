@@ -281,8 +281,8 @@ async function onPublicRoute(req, reply) {
         const portalJwt = await checkPortalTokenInHeader(req, true)
         const jwtPayload = portalJwt[1]
         // logD(mod, fun, `Payload: ${beautify(jwtPayload)}`)
-        context.clientApp = jwtPayload[JWT_SUB] || 'RUDI Portal'
-        context.reqUser = jwtPayload[JWT_USER] || jwtPayload[JWT_CLIENT]
+        context.clientApp = jwtPayload[JWT_SUB] ?? 'RUDI Portal'
+        context.reqUser = jwtPayload[JWT_USER] ?? jwtPayload[JWT_CLIENT]
       } catch {
         try {
           const { subject, clientId } = await checkRudiProdPermission(req, true)
@@ -318,8 +318,8 @@ async function onPortalRoute(req, reply) {
     // logD(mod, fun, `Payload: ${beautify(jwtPayload)}`)
 
     const context = CallContext.getCallContextFromReq(req)
-    context.clientApp = jwtPayload[JWT_SUB] || 'RUDI Portal'
-    context.reqUser = jwtPayload[JWT_USER] || jwtPayload[JWT_CLIENT]
+    context.clientApp = jwtPayload[JWT_SUB] ?? 'RUDI Portal'
+    context.reqUser = jwtPayload[JWT_USER] ?? jwtPayload[JWT_CLIENT]
 
     context.logInfo('route', fun, 'API call')
     return true
@@ -459,7 +459,7 @@ export const getRestApi = (req) => {
     Object.keys(ROUTES).forEach((group) => {
       ROUTES[group].forEach((route) => {
         const { method, url } = route
-        const description = route.description || 'No description provided'
+        const description = route.description ?? 'No description provided'
         routeList.push([group, method, url, description])
       })
     })
@@ -473,7 +473,7 @@ export const getRestApi = (req) => {
 
       ROUTES[group].forEach((route) => {
         const { method, url } = route
-        const description = route.description || 'No description provided'
+        const description = route.description ?? 'No description provided'
         routeList[group].push({ method, url, description })
       })
     })
@@ -488,7 +488,7 @@ export const generateRestApiMarkdown = () => {
   Object.keys(ROUTES).forEach((routeGroup) => {
     ROUTES[routeGroup].forEach((route) => {
       const { method, url } = route
-      const description = route.description || 'No description provided'
+      const description = route.description ?? 'No description provided'
       markdownRoutes.push([routeGroup, method, url, description])
     })
     markdownRoutes.push([' ', ' ', ' ', ' '])

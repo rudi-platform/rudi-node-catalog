@@ -38,7 +38,7 @@ export const getUrlParameters = (reqUrl) => {
   try {
     logT(mod, fun)
     const splitUrl = reqUrl.split('?')
-    if ((splitUrl.length = 1 || !splitUrl[1])) return // No parameters found
+    if ((splitUrl.length = 1 ?? !splitUrl[1])) return // No parameters found
     if (splitUrl.length > 2)
       throw new BadRequestError('Wrong URL, quote character used several times')
 
@@ -203,7 +203,7 @@ export const directPut = async (destUrl, dataToSend, reqOpts) => {
 
 export const extractIpRedirections = (req) => {
   const headers = req.headers
-  const redirections = headers['x-forwarded-for'] || headers['X-Forwarded-For']
+  const redirections = headers['x-forwarded-for'] ?? headers['X-Forwarded-For']
   if (!redirections) return
   if (Array.isArray(redirections)) return redirections
   if (typeof redirections === 'string') return redirections.split(',')

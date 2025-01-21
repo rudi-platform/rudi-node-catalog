@@ -146,7 +146,7 @@ export class Thesaurus {
       Object.keys(this.#currentValues)
         .sort()
         .forEach((key) => {
-          langLabels[key] = this.#currentValues[key][lang] || key
+          langLabels[key] = this.#currentValues[key][lang] ?? key
         })
       return langLabels
     } catch (err) {

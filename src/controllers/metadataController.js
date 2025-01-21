@@ -274,7 +274,7 @@ export const mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFo
           // Set media storage_status to 'available'
           rudiMedia[API_FILE_STORAGE_STATUS] = MediaStorageStatus.Available
           // Set status_update date
-          rudiMedia[API_FILE_STATUS_UPDATE] = rudiMedia[API_FILE_STATUS_UPDATE] || nowISO()
+          rudiMedia[API_FILE_STATUS_UPDATE] = rudiMedia[API_FILE_STATUS_UPDATE] ?? nowISO()
         }
 
         if (!mediaDbId) {
