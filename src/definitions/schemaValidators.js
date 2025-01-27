@@ -11,9 +11,8 @@
 // -------------------------------------------------------------------------------------------------
 // Generic functions
 // -------------------------------------------------------------------------------------------------
-export const validateSchema = (schemaStr, regExPattern) => {
-  return !!schemaStr.match(new RegExp(regExPattern))
-}
+export const validateSchema = (schemaStr, regExPattern) =>
+  !!schemaStr.match(new RegExp(regExPattern))
 
 // -------------------------------------------------------------------------------------------------
 // Word

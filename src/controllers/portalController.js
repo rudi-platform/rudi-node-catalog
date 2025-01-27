@@ -305,12 +305,11 @@ export const getNewTokenFromPortal = async () => {
     // logD(mod, fun, `pwdb64: ${pwdb64}`)
     // logD(mod, fun, `pwd: ${pwd}`)
     // const body = {
-    //   grant_type: 'password',
-    //   scope: 'read',
+    //   grant_type: 'client_credentials',
     //   username: usr,
     //   password: pwd,
     // }
-    // const body = `grant_type=password&scope=read&username=${usr}&password=${pwd}`
+    // const body = `grant_type=client_credentials&username=${usr}&password=${pwd}`
     let answer
     try {
       answer = await directPost(portalAuthUrl, portalRequestBody, basicAuthHeaders)

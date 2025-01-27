@@ -99,7 +99,7 @@ const BAUTH_HEADERS_BASIC = {
   headers: { 'User-Agent': USER_AGENT, Authorization: `Basic ${BAUTH}` },
 }
 const PORTAL_TOKEN_REQ_BODY =
-  `grant_type=password&scope=read&username=${encodeURIComponent(uname)}&` +
+  `grant_type=client_credentials&username=${encodeURIComponent(uname)}&` +
   `password=${encodeURIComponent(isPwdB64 ? decodeBase64url(passw) : passw)}`
 
 // consoleLog(mod, 'readPortalConf',`READ_PASSW: ${READ_PASSW}` )
