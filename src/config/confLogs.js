@@ -302,7 +302,7 @@ function getRudiLoggerOptions() {
     log_server: { path, port, facility, transport },
     log_local: {
       directory: resolve(SYSLOG_DIR),
-      prefix: 'rudiProdApi',
+      prefix: 'rudiCatalog',
       console: !!SHOULD_SYSLOG_IN_CONSOLE,
       consoleData: !!SHOULD_SYSLOG_IN_CONSOLE,
       level: SYSLOG_LVL,

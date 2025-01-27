@@ -3,7 +3,12 @@ const mod = 'portalCtrl'
 // -------------------------------------------------------------------------------------------------
 // External dependencies
 // -------------------------------------------------------------------------------------------------
-import { extractJwt, readPublicKeyPem, verifyToken } from '@aqmo.org/jwt-lib'
+import {
+  extractJwt,
+  readPublicKeyPem,
+  tokenStringToJwtObject,
+  verifyToken,
+} from '@aqmo.org/jwt-lib'
 import axios from 'axios'
 import https from 'node:https'
 
@@ -37,16 +42,17 @@ import { logD, logE, logT, logV, logW } from '../utils/logging.js'
 
 import {
   FIELD_TOKEN,
+  getPortalAuthCredentials,
+  getPortalAuthHeaders,
+  getPortalMetaUrl,
+  getUrlPortalAuthCheck,
+  getUrlPortalAuthGet,
+  getUrlPortalAuthPub,
+  getUrlPortalEncryptPub,
+  isPortalConnectionDisabled,
   JWT_USER,
   NO_PORTAL_MSG,
   PARAM_TOKEN,
-  getAuthUrl,
-  getCheckAuthUrl,
-  getCredentials,
-  getPortalCryptPubUrl,
-  getPortalJwtPubKeyUrl,
-  getPortalMetaUrl,
-  isPortalConnectionDisabled,
   postPortalMetaUrl,
 } from '../config/confPortal.js'
 import { directPost, httpDelete, httpGet, httpPost, httpPut } from '../utils/httpReq.js'
@@ -130,9 +136,9 @@ export const checkPortalTokenInHeader = async (req, isCheckOptional) => {
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     const token = extractJwt(req)
-    const jwtInfo = await verifyPortalToken(token)
-    return jwtInfo
-    // return await getTokenCheckedByPortal(token)
+    return await getTokenCheckedByPortal(token)
+    // const jwtInfo = await verifyPortalToken(token)
+    // return jwtInfo
   } catch (err) {
     if (isCheckOptional) throw err
     const error = new UnauthorizedError(err)
@@ -162,10 +168,10 @@ export const getPortalToken = async () => {
 
     token = accessProperty(rmToken, FIELD_TOKEN)
     // logD(mod, fun, `token: ${ beautify(token)}`)
-    await verifyPortalToken(token)
+    await getTokenCheckedByPortal(token)
+    // await verifyPortalToken(token)
     logD(mod, fun, 'Stored token seems OK')
 
-    // await getTokenCheckedByPortal(token)
     return token
     // logD(mod, fun, 'Stored token was validated by the Portal')
   } catch (err) {
@@ -262,10 +268,10 @@ export const getPortalJwtPubKey = async () => {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     if (CACHED_PORTAL_PUB) return CACHED_PORTAL_PUB
 
-    const publicKeyUrl = getPortalJwtPubKeyUrl()
+    const publicKeyUrl = getUrlPortalAuthPub()
     // logD(mod, fun, 'publicKeyUrl: ' + publicKeyUrl)
 
-    const publicKeyObj = await axios.get(publicKeyUrl, getCredentials(1))
+    const publicKeyObj = await axios.get(publicKeyUrl, getPortalAuthHeaders())
     // logD(mod, fun, 'publicKeyObj: ' + beautify(publicKeyObj))
     const cachedPortalJwtPubKeyPem = publicKeyObj?.data?.value
     // logD(mod, fun, `portalJwtPubKey: ${cachedPortalJwtPubKey}`)
@@ -282,7 +288,7 @@ export const getPortalEncryptPubKey = async () => {
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     const portalCryptPubData = await axios.get(
-      getPortalCryptPubUrl(),
+      getUrlPortalEncryptPub(),
       getPortalAuthHeaderBearer(portalHttpsAgent)
     )
     const portalEncryptPubKey = portalCryptPubData?.data
@@ -299,8 +305,8 @@ export const getNewTokenFromPortal = async () => {
   logT(mod, fun)
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
-    const [basicAuthHeaders, portalRequestBody] = getCredentials()
-    const portalAuthUrl = getAuthUrl()
+    const [basicAuthHeaders, portalRequestBody] = getPortalAuthCredentials()
+    const portalAuthUrl = getUrlPortalAuthGet()
     // LM -- the password is now provided in base64
     // logD(mod, fun, `pwdb64: ${pwdb64}`)
     // logD(mod, fun, `pwd: ${pwd}`)
@@ -313,7 +319,10 @@ export const getNewTokenFromPortal = async () => {
     let answer
     try {
       answer = await directPost(portalAuthUrl, portalRequestBody, basicAuthHeaders)
+      // logT(mod, fun, 'OK portal answered')
     } catch (err) {
+      logE(mod, fun, `ERR GET portal JWT: ${beautify(err)}`)
+
       await createErrorReport(err, {
         step: 'posting the node credentials to Portal',
         description: 'An error occurred while getting a new token from the Portal',
@@ -327,28 +336,43 @@ export const getNewTokenFromPortal = async () => {
       }
     }
     // logD(mod, fun, `answer.status: ${answer.status}`)
+    // logD(mod, fun, `answer.data: ${beautify(answer.data)}`)
 
     if (answer?.status === 200) {
       // logD(mod, fun, `config: ${ beautify(answer.config)}`)
       // logD(mod, fun, `data: ${ beautify(answer.data)}`)
       const portalToken = answer.data
 
-      const jwToken = portalToken[FIELD_TOKEN]
+      const jwToken = portalToken?.[FIELD_TOKEN]
       if (typeof portalToken !== 'object' || !portalToken[FIELD_TOKEN])
         throw new NotAcceptableError(`The portal delivered an incorrect reply: ${portalToken}`)
 
+      // logT(mod, fun, 'OK we got a new token')
       // logD(mod, fun, `portalToken: ${ beautify(portalToken)}`)
-
-      const jwtBody = (await verifyPortalToken(jwToken))[1]
-      portalToken[JWT_EXP] = jwtBody[JWT_EXP]
-      logD(mod, fun, `We got a new token, that expires on ${dateEpochSToIso(jwtBody[JWT_EXP])}`)
-      await getTokenCheckedByPortal(portalToken[FIELD_TOKEN])
+      // let jwtBody
+      // try {
+      //   jwtBody = (await verifyPortalToken(jwToken))[1]
+      // } catch (err) {
+      //   logE(mod, fun, `ERR while verifying portal JWT: ${beautify(err)}`)
+      //   throw new ForbiddenError('Could not verify portal JWT', mod, fun)
+      // }
+      // portalToken[JWT_EXP] = jwtBody[JWT_EXP]
+      portalToken[JWT_EXP] = tokenStringToJwtObject(jwToken)?.payload[JWT_EXP]
+      logD(mod, fun, `We got a new token, that expires on ${dateEpochSToIso(portalToken[JWT_EXP])}`)
+      try {
+        await getTokenCheckedByPortal(portalToken[FIELD_TOKEN])
+        // logT(mod, fun, 'OK portal checked the token')
+      } catch (err) {
+        logE(mod, fun, `ERR while checking portal JWT: ${beautify(err)}`)
+        throw ForbiddenError('Could not get the JWT checked by the portal', mod, fun)
+      }
       await storePortalToken(portalToken)
+      // logT(mod, fun, 'OK token stored')
 
       return portalToken
     } else {
       const errMsg = `${beautify(answer)}`
-      // logW(mod, fun, errMsg)
+      logW(mod, fun, errMsg)
       throw RudiError.createRudiHttpError(answer.status, errMsg, mod, fun)
     }
   } catch (err) {
@@ -363,26 +387,28 @@ export const getNewTokenFromPortal = async () => {
   }
 }
 
-export const getTokenCheckedByPortal = async (token) => {
+export const getTokenCheckedByPortal = async (jwt) => {
   const fun = 'getTokenCheckedByPortal'
   logT(mod, fun)
   if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
-  if (!token) throw new BadRequestError('No token to check!', mod, fun)
+  if (!jwt) throw new BadRequestError('No token to check!', mod, fun)
   let portalResponse
   try {
-    portalResponse = await directPost(getCheckAuthUrl(), `${PARAM_TOKEN}=${token}`, {
+    portalResponse = await directPost(getUrlPortalAuthCheck(), `token=${jwt}`, {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     })
   } catch (err) {
+    logE(mod, fun, `ERR GET Portal Jwt checked: ${beautify(err)}`)
+
     await createErrorReport(err, {
       step: 'submitting the token to Portal checks',
       description: 'An error occurred while having the token checked by the Portal',
       method: 'POST',
-      url: getCheckAuthUrl(),
+      url: getUrlPortalAuthCheck(),
     })
     throw RudiError.treatError(mod, fun, err)
   }
-  if (portalResponse?.status === 200) {
+  if (portalResponse?.status === 200 && portalResponse?.data?.active) {
     logV(mod, fun, `RUDI Portal validated the token`)
     return portalResponse.data
   } else throw new ForbiddenError(`Portal invalidated the token: ${portalResponse.data}`, mod, fun)

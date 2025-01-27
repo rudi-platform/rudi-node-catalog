@@ -50,7 +50,7 @@ import {
 } from './routes.js'
 
 import { checkPortalTokenInHeader } from '../controllers/portalController.js'
-import { checkRudiProdPermission } from '../controllers/tokenController.js'
+import { checkRequesterPermission } from '../controllers/tokenController.js'
 import { getUrlMaxLength } from '../utils/protection.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -268,7 +268,7 @@ async function onPublicRoute(req, reply) {
 
     if (isPortalConnectionDisabled()) {
       try {
-        const { subject, clientId } = await checkRudiProdPermission(req, true)
+        const { subject, clientId } = await checkRequesterPermission(req, true)
         context.clientApp = subject
         context.reqUser = clientId
       } catch {
@@ -285,7 +285,7 @@ async function onPublicRoute(req, reply) {
         context.reqUser = jwtPayload[JWT_USER] ?? jwtPayload[JWT_CLIENT]
       } catch {
         try {
-          const { subject, clientId } = await checkRudiProdPermission(req, true)
+          const { subject, clientId } = await checkRequesterPermission(req, true)
           context.clientApp = subject
           context.reqUser = clientId
         } catch {
@@ -348,7 +348,7 @@ async function onPrivateRoute(req, reply) {
       return true
     }
 
-    const { subject, clientId } = await checkRudiProdPermission(req, false)
+    const { subject, clientId } = await checkRequesterPermission(req, false)
 
     const context = CallContext.getCallContextFromReq(req)
     context.clientApp = subject
@@ -376,7 +376,7 @@ async function onUnrestrictedPrivateRoute(req, reply) {
     const context = CallContext.getCallContextFromReq(req)
 
     try {
-      const { subject, clientId } = await checkRudiProdPermission(req, true)
+      const { subject, clientId } = await checkRequesterPermission(req, true)
       context.clientApp = subject
       context.reqUser = clientId
     } catch {

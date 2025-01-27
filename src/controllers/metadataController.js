@@ -182,7 +182,6 @@ export const organizationRudiToDbFormat = async (rudiProducer, path, shouldCreat
 
       organizationDbId = newOrg[DB_ID]
     }
-    // logD(mod, fun, `${beautify(rudiProducer)} -> ${organizationDbId} `)
     return organizationDbId
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)

@@ -78,15 +78,17 @@ export const isPortalConnectionDisabled = () => !API_PORTAL_URL?.startsWith('htt
 
 // ----- Auth
 const AUTH_URL = getPortalUserConf('auth_url') ?? API_PORTAL_URL
-const AUTH_GET = getPortalConf('auth_get')
-const AUTH_CHK = getPortalConf('auth_chk')
-const JWT_PUB_KEY_URL = getPortalConf('auth_pub')
-const CRYPT_PUB_KEY_URL = getPortalConf('encrypt_pub')
+const getAuthUrl = (...url) => pathJoin(AUTH_URL, ...url)
 
-export const getAuthUrl = () => pathJoin(AUTH_URL, AUTH_GET)
-export const getCheckAuthUrl = () => pathJoin(AUTH_URL, AUTH_CHK)
-export const getPortalJwtPubKeyUrl = () => pathJoin(AUTH_URL, JWT_PUB_KEY_URL)
-export const getPortalCryptPubUrl = () => pathJoin(AUTH_URL, CRYPT_PUB_KEY_URL)
+const AUTH_GET = getAuthUrl(getPortalConf('auth_get'))
+const AUTH_CHK = getAuthUrl(getPortalConf('auth_chk'))
+const JWT_PUB_KEY_URL = getAuthUrl(getPortalConf('auth_pub'))
+const CRYPT_PUB_KEY_URL = getAuthUrl(getPortalConf('encrypt_pub'))
+
+export const getUrlPortalAuthGet = () => AUTH_GET
+export const getUrlPortalAuthCheck = () => AUTH_CHK
+export const getUrlPortalAuthPub = () => JWT_PUB_KEY_URL
+export const getUrlPortalEncryptPub = () => CRYPT_PUB_KEY_URL
 
 // ----- Creds
 const uname = getPortalUserConf('login')
@@ -95,17 +97,19 @@ const isPwdB64 = getPortalUserConf('is_pwd_b64')
 const pwdEncoding = isPwdB64 ? 'base64' : 'utf-8'
 
 const BAUTH = createBasicAuth(uname, passw, 'utf-8', pwdEncoding)
-const BAUTH_HEADERS_BASIC = {
-  headers: { 'User-Agent': USER_AGENT, Authorization: `Basic ${BAUTH}` },
-}
+export const getPortalAuthHeaders = (additionalHeaders) => ({
+  headers: { 'User-Agent': USER_AGENT, Authorization: `Basic ${BAUTH}`, ...additionalHeaders },
+})
 const PORTAL_TOKEN_REQ_BODY =
   `grant_type=client_credentials&username=${encodeURIComponent(uname)}&` +
   `password=${encodeURIComponent(isPwdB64 ? decodeBase64url(passw) : passw)}`
 
 // consoleLog(mod, 'readPortalConf',`READ_PASSW: ${READ_PASSW}` )
 
-export const getCredentials = (headersOnly) =>
-  headersOnly ? BAUTH_HEADERS_BASIC : [BAUTH_HEADERS_BASIC, PORTAL_TOKEN_REQ_BODY]
+export const getPortalAuthCredentials = () => [
+  getPortalAuthHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' }),
+  PORTAL_TOKEN_REQ_BODY,
+]
 
 // ----- API
 export const getPortalBaseUrl = () => API_PORTAL_URL ?? NO_PORTAL_MSG

@@ -99,8 +99,8 @@ export const getHashAlgo = (algo) => {
   }
 }
 
-export const checkRudiProdPermission = async (req, isCheckOptional) => {
-  const fun = 'checkRudiProdPermission'
+export const checkRequesterPermission = async (req, isCheckOptional) => {
+  const fun = 'checkRequesterPermission'
   logT(mod, fun)
   try {
     let token
@@ -116,7 +116,7 @@ export const checkRudiProdPermission = async (req, isCheckOptional) => {
       throw RudiError.treatError(mod, fun, error)
     }
     // logD(mod, fun, `token: ${token}`)
-    const { subject, clientId } = await verifyRudiProdToken(token, req.method, req.url)
+    const { subject, clientId } = await verifyRudiCatalogToken(token, req.method, req.url)
     // logD(mod, fun, `subject: ${subject}, clientId: ${clientId}`)
 
     // Check the ACL (= does the subject have permission to enter this route?)
@@ -161,8 +161,8 @@ const getPubKey = (subject) => {
   }
 }
 
-export const verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
-  const fun = 'verifyRudiProdToken'
+export const verifyRudiCatalogToken = async (token, reqMethod, reqUrl) => {
+  const fun = 'verifyRudiCatalogToken'
   try {
     // Retrieve the public key
     const { payload } = tokenStringToJwtObject(token)
@@ -178,7 +178,7 @@ export const verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
       logE(mod, fun, token)
       throw new ForbiddenError(beautify(e.message || e))
     }
-    logT(mod, fun, 'Token is OK')
+    logT(mod, fun, 'Token in request headers is OK')
     // Check the current route
     const jwtMtd = accessProperty(payload, REQ_MTD)
     if (jwtMtd !== reqMethod && jwtMtd !== REQ_ROUTE_ALL)
@@ -202,8 +202,8 @@ export const verifyRudiProdToken = async (token, reqMethod, reqUrl) => {
   }
 }
 
-export const isRudiProducerToken = (token) => {
-  const fun = 'isRudiProducerToken'
+export const isRudiCatalogToken = (token) => {
+  const fun = 'isRudiCatalogToken'
   try {
     const jwtPayloadBase64url = token.split('.')[1]
     const jwtPayload = JSON.parse(decodeBase64url(jwtPayloadBase64url))
