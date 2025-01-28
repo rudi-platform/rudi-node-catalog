@@ -24,6 +24,7 @@ import { SHOULD_SYSLOG, shouldShowErrorPile, shouldShowRoutes } from '../config/
 import { JWT_USER, isPortalConnectionDisabled } from '../config/confPortal.js'
 
 import {
+  logD,
   logE,
   logI,
   logLine,
@@ -280,7 +281,7 @@ async function onPublicRoute(req, reply) {
         // Checking the token, if it exists, to retrieve the user info
         const portalJwt = await checkPortalTokenInHeader(req, true)
         const jwtPayload = portalJwt[1]
-        // logD(mod, fun, `Payload: ${beautify(jwtPayload)}`)
+        logD(mod, fun, `Payload: ${beautify(jwtPayload)}`)
         context.clientApp = jwtPayload[JWT_SUB] ?? 'RUDI Portal'
         context.reqUser = jwtPayload[JWT_USER] ?? jwtPayload[JWT_CLIENT]
       } catch {
@@ -315,7 +316,7 @@ async function onPortalRoute(req, reply) {
     // If incoming request has no token, raise an error
     const portalJwt = await checkPortalTokenInHeader(req, false)
     const jwtPayload = portalJwt[1]
-    // logD(mod, fun, `Payload: ${beautify(jwtPayload)}`)
+    logD(mod, fun, `Payload: ${beautify(jwtPayload)}`)
 
     const context = CallContext.getCallContextFromReq(req)
     context.clientApp = jwtPayload[JWT_SUB] ?? 'RUDI Portal'

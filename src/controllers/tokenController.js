@@ -17,7 +17,7 @@ import {
 import { beautify, decodeBase64url, removeTrailingChar } from '../utils/jsUtils.js'
 import { accessProperty } from '../utils/jsonAccess.js'
 
-import { logE, logT, logW } from '../utils/logging.js'
+import { logD, logE, logT, logW } from '../utils/logging.js'
 
 import { getProfile } from '../config/confSystem.js'
 import { ForbiddenError, RudiError, UnauthorizedError } from '../utils/errors.js'
@@ -166,7 +166,7 @@ export const verifyRudiCatalogToken = async (token, reqMethod, reqUrl) => {
   try {
     // Retrieve the public key
     const { payload } = tokenStringToJwtObject(token)
-    // logD(mod, fun, beautify(payload))
+    logD(mod, fun, beautify(payload))
 
     const subject = accessProperty(payload, JWT_SUB)
     const pubKey = getPubKey(subject)
