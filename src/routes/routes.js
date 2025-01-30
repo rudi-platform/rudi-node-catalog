@@ -17,9 +17,11 @@ import {
   ACT_SEARCH,
   ACT_SEND,
   ACT_UUID_GEN,
+  OBJ_CONTACTS,
   OBJ_LOGS,
   OBJ_MEDIA,
   OBJ_METADATA,
+  OBJ_ORGANIZATIONS,
   OBJ_PUB_KEYS,
   OBJ_REPORTS,
   PARAM_ID,
@@ -141,6 +143,7 @@ import {
   getPortalMetadataFields,
 } from '../controllers/stateController.js'
 import { test } from '../controllers/testController.js'
+import { getAllContacts, getAllOrganizations } from '../db/dbQueries.js'
 
 // -------------------------------------------------------------------------------------------------
 // Free routes (no authentification required)
@@ -225,6 +228,20 @@ export const publicRoutes = [
     method: 'GET',
     url: getPublicPath(OBJ_METADATA),
     handler: getMetadataListAndCount,
+    config: { [ROUTE_NAME]: 'pub_get_all_metadata' },
+  },
+  {
+    description: 'Access all organizations created on the RUDI producer node',
+    method: 'GET',
+    url: getPublicPath(OBJ_ORGANIZATIONS),
+    handler: getAllOrganizations,
+    config: { [ROUTE_NAME]: 'pub_get_all_metadata' },
+  },
+  {
+    description: 'Access all contacts created on the RUDI producer node',
+    method: 'GET',
+    url: getPublicPath(OBJ_CONTACTS),
+    handler: getAllContacts,
     config: { [ROUTE_NAME]: 'pub_get_all_metadata' },
   },
   /*

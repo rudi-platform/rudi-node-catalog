@@ -90,6 +90,8 @@ export const URL_PREFIX_PRIVATE = '/admin'
 
 // This generic URL will be used to factorize the treatments on resources, organizations, contacts, etc.
 export const URL_PUB_METADATA = `${URL_PREFIX_PUBLIC}/${OBJ_METADATA}`
+export const URL_PUB_ORGA = `${URL_PREFIX_PUBLIC}/${OBJ_ORGANIZATIONS}`
+export const URL_PUB_CONTACT = `${URL_PREFIX_PUBLIC}/${OBJ_CONTACTS}`
 
 export const ACT_UUID_GEN = 'id_generation'
 export const ACT_INIT = 'init'
