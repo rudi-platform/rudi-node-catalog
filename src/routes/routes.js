@@ -182,7 +182,7 @@ export const publicRoutes = [
     },
   },
   {
-    description: `Redirection: GET /api/v1 -> GET ${getPublicPath(OBJ_METADATA)}`,
+    description: `Redirection: GET ${getPublicPath()} -> GET ${getPublicPath(OBJ_METADATA)}`,
     method: 'GET',
     url: getPublicPath(),
     config: { [ROUTE_NAME]: 'redirect_get_data' },
@@ -192,7 +192,7 @@ export const publicRoutes = [
     },
   },
   {
-    description: `Redirection: GET /resources/* -> GET ${getPublicPath(OBJ_METADATA)}/*`,
+    description: `Redirection: GET /${OBJ_METADATA}/* -> GET ${getPublicPath(OBJ_METADATA)}/*`,
     method: 'GET',
     url: `/${OBJ_METADATA}/*`,
     config: { [ROUTE_NAME]: 'redirect_get_data' },
@@ -307,7 +307,7 @@ if (getCatalog() !== '/api') {
   // Deal with the legacy
   for (const method of ['DELETE', 'POST', 'PUT', 'GET'])
     publicRoutes.unshift({
-      description: `Redirection: ${method} /api -> GET ${getPublicPath()}`,
+      description: `Redirection: ${method} /api -> ${method} ${getCatalog()}`,
       method,
       url: '/api/*',
       config: { [ROUTE_NAME]: `redirect_${method.toLowerCase()}_data` },

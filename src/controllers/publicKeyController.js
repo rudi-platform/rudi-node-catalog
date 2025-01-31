@@ -136,9 +136,8 @@ const normalizeKeyData = async (pubKeyJson) => {
           `Couldn't reach the public key URL: ${pubKeyJson[API_PUB_URL]}: ${err.message}`
         )
       }
-      // logI(mod, fun, `response: ${beautify(response)}`)
 
-      const keyPem = pubKeyJson[API_PUB_PROP] ? response[pubKeyJson[API_PUB_PROP]] : response
+      const keyPem = response?.[pubKeyJson?.[API_PUB_PROP]] ?? response
       const key = checkKeyPem(keyPem)
 
       if (!pubKeyJson[API_PUB_PEM]) pubKeyJson[API_PUB_PEM] = keyPem

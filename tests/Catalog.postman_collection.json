@@ -1,15 +1,74 @@
 {
 	"info": {
-		"_postman_id": "c959120a-7096-4d6f-8053-ae999befc999",
+		"_postman_id": "aec3de11-cc9e-4c67-b9c3-5cdbc2811e5f",
 		"name": "01. Catalog",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "13557783",
-		"_collection_link": "https://rudirisa.postman.co/workspace/ce1a24e7-e510-4854-8451-d9ba84797044/collection/13557783-c959120a-7096-4d6f-8053-ae999befc999?action=share&source=collection_link&creator=13557783"
+		"_collection_link": "https://rudirisa.postman.co/workspace/ce1a24e7-e510-4854-8451-d9ba84797044/collection/13557783-aec3de11-cc9e-4c67-b9c3-5cdbc2811e5f?action=share&source=collection_link&creator=13557783"
 	},
 	"item": [
 		{
 			"name": "00. Tokens",
 			"item": [
+				{
+					"name": "Forge JWT & wipe cache",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"mem.wipeCollectionVars(pm.collectionVariables,[],1)",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Token loaded\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res =  pm.response.text()",
+									"    pm.expect(secu.isTokenValid(res)).to.be.true",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"followAuthorizationHeader": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"sub\": \"{{jwtAuthDelegate}}\",\n    \"client_id\": \"{{jwtAuthUser}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{jwtAuthUrl}}/forge",
+							"host": [
+								"{{jwtAuthUrl}}"
+							],
+							"path": [
+								"forge"
+							]
+						}
+					},
+					"response": []
+				},
 				{
 					"name": "Check JWT",
 					"event": [
@@ -29,8 +88,15 @@
 								"exec": [
 									"pm.test(\"Token loaded\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const res =  pm.response.json()",
+									"    const res = pm.response.json()",
 									"    pm.expect(res?.message).to.eq('JWT is valid')",
+									"    const jwtName = pm.variables.get('catalogJwtName')",
+									"    const jwt = pm.variables.get(jwtName)",
+									"    pm.expect(secu.isTokenValid(jwt)).to.be.true",
+									"    const b64Payload = jwt.split('.')[1]",
+									"    const payload = JSON.parse(codec.fromBase64Url(b64Payload))",
+									"    log.d(JSON.stringify(payload))",
+									"    pm.expect(payload.sub == pm.variables.get('jwtAuthDelegate')).to.be.true",
 									"});"
 								],
 								"type": "text/javascript",
@@ -65,7 +131,7 @@
 								"exec": [
 									"pm.test(\"Testing portal connection\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    if(pm.response.text() === pm.globals.get('noPortalMsg')) return true",
+									"    if(pm.response.text() === pm.variables.get('noPortalMsg')) return true",
 									"    const token = pm.response.json().access_token",
 									"    pm.expect(!!match.jwt(token)).to.be.true       ",
 									"    pm.collectionVariables.set(pm.variables.get('portalJwtName'),token)",
@@ -80,12 +146,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/{{catalogPrefix}}/admin/portal/token",
+							"raw": "{{catalogUrl}}/admin/portal/token",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"{{catalogPrefix}}",
 								"admin",
 								"portal",
 								"token"
@@ -116,12 +181,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/{{catalogPrefix}}/admin/logs?limit=300",
+							"raw": "{{catalogUrl}}/admin/logs?limit=300",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"{{catalogPrefix}}",
 								"admin",
 								"logs"
 							],
@@ -150,7 +214,7 @@
 									"pm.test(`Env: ${pm.variables.get('env')}`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const env = pm.variables.get('env')",
-									"    const responseStr = codec.streamToString(pm.response)",
+									"    const responseStr = pm.response.text()",
 									"    pm.expect(responseStr).to.eq(env)",
 									"});"
 								],
@@ -166,12 +230,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/{{catalogPrefix}}/admin/env",
+							"raw": "{{catalogUrl}}/admin/env",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"{{catalogPrefix}}",
 								"admin",
 								"env"
 							]
@@ -188,7 +251,7 @@
 								"exec": [
 									"pm.test(\"Git hash : 7 alphanumerical characters\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseStr = codec.streamToString(pm.response)",
+									"    const responseStr = pm.response.text()",
 									"    pm.expect(!!match.gitHash(responseStr)).to.be.true",
 									"    pm.collectionVariables.set('gitHash', responseStr)",
 									"});"
@@ -202,12 +265,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/{{catalogPrefix}}/admin/hash",
+							"raw": "{{catalogUrl}}/admin/hash",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"{{catalogPrefix}}",
 								"admin",
 								"hash"
 							]
@@ -224,8 +286,8 @@
 								"exec": [
 									"pm.test(\"Current app hash = git hash\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const gitHash = pm.collectionVariables.get('gitHash');",
-									"    const responseStr = codec.streamToString(pm.response)",
+									"    const gitHash = pm.variables.get('gitHash');",
+									"    const responseStr = pm.response.text()",
 									"    pm.expect(!!match.gitHash(responseStr)).to.be.true",
 									"    pm.expect(responseStr).to.eq(gitHash)",
 									"});",
@@ -243,12 +305,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/{{catalogPrefix}}/admin/apphash",
+							"raw": "{{catalogUrl}}/admin/apphash",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"{{catalogPrefix}}",
 								"admin",
 								"apphash"
 							]
@@ -265,7 +326,7 @@
 								"exec": [
 									"pm.test(\"API version\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const apiVersion = codec.streamToString(pm.response)",
+									"    const apiVersion = pm.response.text()",
 									"    pm.expect(!!match.version(apiVersion)).to.be.true",
 									"    pm.collectionVariables.set('apiVersion', apiVersion)",
 									"});"
@@ -282,12 +343,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/{{catalogPrefix}}/version",
+							"raw": "{{catalogUrl}}/version",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"{{catalogPrefix}}",
 								"version"
 							]
 						}
@@ -324,12 +384,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/{{catalogPrefix}}/admin/nv",
+							"raw": "{{catalogUrl}}/admin/nv",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"{{catalogPrefix}}",
 								"admin",
 								"nv"
 							]
@@ -346,7 +405,7 @@
 								"exec": [
 									"pm.test(\"Get new UUID\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseStr = codec.streamToString(pm.response)",
+									"    const responseStr = pm.response.text()",
 									"    pm.expect(!!match.uuid(responseStr)).to.be.true",
 									"});"
 								],
@@ -358,12 +417,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/id_generation",
+							"raw": "{{catalogUrl}}/admin/id_generation",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"id_generation"
 							]
@@ -380,7 +438,7 @@
 								"exec": [
 									"pm.test(\"Database accessible\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const res = codec.streamToString(pm.response)",
+									"    const res = pm.response.text()",
 									"    pm.expect(res.startsWith('| Auth')).to.be.true",
 									"});"
 								],
@@ -393,12 +451,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/routes",
+							"raw": "{{catalogUrl}}/admin/routes",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"routes"
 							]
@@ -429,12 +486,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/routes?format=list",
+							"raw": "{{catalogUrl}}/admin/routes?format=list",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"routes"
 							],
@@ -471,12 +527,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/routes?format=group",
+							"raw": "{{catalogUrl}}/admin/routes?format=group",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"routes"
 							],
@@ -512,12 +567,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/db",
+							"raw": "{{catalogUrl}}/admin/db",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"db"
 							]
@@ -549,12 +603,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/db/data",
+							"raw": "{{catalogUrl}}/admin/db/data",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"db",
 								"data"
@@ -587,12 +640,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/db/data?type=all",
+							"raw": "{{catalogUrl}}/admin/db/data?type=all",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"db",
 								"data"
@@ -632,12 +684,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/db/data?type=organizations,contacts",
+							"raw": "{{catalogUrl}}/admin/db/data?type=organizations,contacts",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"db",
 								"data"
@@ -675,12 +726,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/db/data?type=logs",
+							"raw": "{{catalogUrl}}/admin/db/data?type=logs",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"db",
 								"data"
@@ -718,12 +768,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/db/data?type=all&logs=true",
+							"raw": "{{catalogUrl}}/admin/db/data?type=all&logs=true",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"db",
 								"data"
@@ -774,12 +823,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/test",
+							"raw": "{{catalogUrl}}/admin/test",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"test"
 							]
@@ -799,7 +847,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const stamp = pm.collectionVariables.get('stamp')",
+									"const stamp = pm.variables.get('stamp')",
 									"pm.test(`Delete metadata with '${stamp}' stamp`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"});"
@@ -821,12 +869,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources?collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/resources?collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							],
@@ -847,7 +894,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const stamp = pm.collectionVariables.get('stamp')",
+									"const stamp = pm.variables.get('stamp')",
 									"pm.test(`Delete contacts with '${stamp}' stamp`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"});"
@@ -869,12 +916,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/contacts?collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/contacts?collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"contacts"
 							],
@@ -895,7 +941,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const stamp = pm.collectionVariables.get('stamp')",
+									"const stamp = pm.variables.get('stamp')",
 									"pm.test(`Delete orgs with '${stamp}' stamp`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"});"
@@ -917,12 +963,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/organizations?collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/organizations?collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"organizations"
 							],
@@ -943,7 +988,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const stamp = pm.collectionVariables.get('stamp')",
+									"const stamp = pm.variables.get('stamp')",
 									"pm.test(`Delete media with '${stamp}' stamp`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"});"
@@ -965,12 +1010,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/media?collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/media?collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"media"
 							],
@@ -991,7 +1035,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const stamp = pm.collectionVariables.get('stamp')",
+									"const stamp = pm.variables.get('stamp')",
 									"pm.test(`Delete reports with '${stamp}' stamp`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"});"
@@ -1013,12 +1057,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/reports?collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/reports?collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"reports"
 							],
@@ -1039,7 +1082,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const stamp = pm.collectionVariables.get('stamp')",
+									"const stamp = pm.variables.get('stamp')",
 									"pm.test(`Delete public keys with '${stamp}' stamp`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"});"
@@ -1062,12 +1105,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/pub_keys?collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/pub_keys?collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"pub_keys"
 							],
@@ -1120,12 +1162,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/licences/",
+							"raw": "{{catalogUrl}}/admin/licences/",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"licences",
 								""
@@ -1168,12 +1209,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/licence_codes",
+							"raw": "{{catalogUrl}}/admin/licence_codes",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"licence_codes"
 							]
@@ -1209,12 +1249,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/enum",
+							"raw": "{{catalogUrl}}/admin/enum",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"enum"
 							]
@@ -1249,12 +1288,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/enum?lang=fr",
+							"raw": "{{catalogUrl}}/admin/enum?lang=fr",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"enum"
 							],
@@ -1290,12 +1328,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/enum/Languages",
+							"raw": "{{catalogUrl}}/admin/enum/Languages",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"enum",
 								"Languages"
@@ -1326,12 +1363,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/enum/Keywords",
+							"raw": "{{catalogUrl}}/admin/enum/Keywords",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"enum",
 								"Keywords"
@@ -1362,12 +1398,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/enum/Themes",
+							"raw": "{{catalogUrl}}/admin/enum/Themes",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"enum",
 								"Themes"
@@ -1398,12 +1433,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/enum/Themes",
+							"raw": "{{catalogUrl}}/admin/enum/Themes",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"enum",
 								"Themes"
@@ -1436,12 +1470,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/enum/Themes/fr",
+							"raw": "{{catalogUrl}}/admin/enum/Themes/fr",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"enum",
 								"Themes",
@@ -1475,12 +1508,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/enum/Themes/en",
+							"raw": "{{catalogUrl}}/admin/enum/Themes/en",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"enum",
 								"Themes",
@@ -1511,12 +1543,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/search",
+							"raw": "{{catalogUrl}}/admin/search",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"search"
 							]
@@ -1575,12 +1606,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/organizations",
+							"raw": "{{catalogUrl}}/admin/organizations",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"organizations"
 							]
@@ -1611,12 +1641,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/organizations/{{softOrg1Id}}",
+							"raw": "{{catalogUrl}}/admin/organizations/{{softOrg1Id}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"organizations",
 								"{{softOrg1Id}}"
@@ -1648,7 +1677,7 @@
 								"exec": [
 									"pm.collectionVariables.set('softOrg2Id', rand.get('{{$randomUUID}}'))",
 									"let newCompanyName = rand.get('{{$randomCompanyName}}')",
-									"let previousCompanyName = pm.collectionVariables.get('softOrg1Name')",
+									"let previousCompanyName = pm.variables.get('softOrg1Name')",
 									"while (newCompanyName == previousCompanyName) {",
 									"    newCompanyName = rand.get('{{$randomCompanyName}}')",
 									"}",
@@ -1674,12 +1703,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/organizations",
+							"raw": "{{catalogUrl}}/admin/organizations",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"organizations"
 							]
@@ -1734,12 +1762,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/organizations",
+							"raw": "{{catalogUrl}}/admin/organizations",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"organizations"
 							]
@@ -1770,12 +1797,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/organizations/{{softOrg2Id}}",
+							"raw": "{{catalogUrl}}/admin/organizations/{{softOrg2Id}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"organizations",
 								"{{softOrg2Id}}"
@@ -1814,12 +1840,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/organizations?collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/organizations?collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"organizations"
 							],
@@ -1865,12 +1890,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/v1/organizations",
+							"raw": "{{catalogUrl}}/v1/organizations",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"v1",
 								"organizations"
 							]
@@ -1907,12 +1931,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/organizations/search?{{softOrg1Id}}&collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/organizations/search?{{softOrg1Id}}&collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"organizations",
 								"search"
@@ -1981,12 +2004,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/contacts",
+							"raw": "{{catalogUrl}}/admin/contacts",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"contacts"
 							]
@@ -2039,12 +2061,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/contacts",
+							"raw": "{{catalogUrl}}/admin/contacts",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"contacts"
 							]
@@ -2097,12 +2118,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/contacts",
+							"raw": "{{catalogUrl}}/admin/contacts",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"contacts"
 							]
@@ -2121,8 +2141,8 @@
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    //console.log(responseJson);",
-									"    const contactName = pm.collectionVariables.get('softContact3Name')",
-									"    const contactMail = pm.collectionVariables.get('softContact3Email')",
+									"    const contactName = pm.variables.get('softContact3Name')",
+									"    const contactMail = pm.variables.get('softContact3Email')",
 									"  ",
 									"    pm.expect(responseJson.contact_name).to.eq(contactName);",
 									"    pm.expect(responseJson.email).to.eq(contactMail);",
@@ -2159,12 +2179,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/contacts",
+							"raw": "{{catalogUrl}}/admin/contacts",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"contacts"
 							]
@@ -2194,12 +2213,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/contacts/{{softContact1Id}}",
+							"raw": "{{catalogUrl}}/admin/contacts/{{softContact1Id}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"contacts",
 								"{{softContact1Id}}"
@@ -2240,12 +2258,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/contacts",
+							"raw": "{{catalogUrl}}/admin/contacts",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"contacts"
 							]
@@ -2287,12 +2304,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/v1/contacts",
+							"raw": "{{catalogUrl}}/v1/contacts",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"v1",
 								"contacts"
 							]
@@ -2330,12 +2346,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/contacts/search?{{softContact2Name}}&collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/contacts/search?{{softContact2Name}}&collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"contacts",
 								"search"
@@ -2378,7 +2393,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"const media1 = pm.collectionVariables.get('media1')",
+									"const media1 = pm.variables.get('media1')",
 									"console.log('media1:', media1)",
 									"const media2 = { ...media1, media_id: rand.uuid(), collection_tag: pm.variables.get('stamp') }",
 									"console.log(media2)",
@@ -2403,12 +2418,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/media",
+							"raw": "{{catalogUrl}}/admin/media",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"media"
 							]
@@ -2435,7 +2449,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"const media1 = pm.collectionVariables.get('media1')",
+									"const media1 = pm.variables.get('media1')",
 									"console.log('media1:', media1)",
 									"const media2 = { ...media1, media_id: rand.uuid(), collection_tag: pm.variables.get('stamp') }",
 									"console.log(media2)",
@@ -2460,12 +2474,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/media",
+							"raw": "{{catalogUrl}}/admin/media",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"media"
 							]
@@ -2483,7 +2496,7 @@
 									"pm.test(\"List of existing media\", () => {",
 									"    const mediaList = pm.response.json()",
 									"    pm.expect(Array.isArray(mediaList))",
-									"    pm.collectionVariables.set('media1', mediaList[0])",
+									"    pm.collectionVariables.set('media1', JSON.stringify(mediaList[0]))",
 									"    pm.collectionVariables.set('media1Id', mediaList[0]['media_id'])",
 									"})"
 								],
@@ -2506,12 +2519,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/media",
+							"raw": "{{catalogUrl}}/admin/media",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"media"
 							]
@@ -2559,12 +2571,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/media/{{media1Id}}/commit",
+							"raw": "{{catalogUrl}}/admin/media/{{media1Id}}/commit",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"media",
 								"{{media1Id}}",
@@ -2594,7 +2605,7 @@
 									"pm.collectionVariables.set('softMeta1Id', rand.uuid())",
 									"pm.collectionVariables.set('softMedia1Id', rand.uuid())",
 									"",
-									"log.d('Ids', 'softMedia1Id', mem.get('softMedia1Id'))",
+									"log.d('Ids', 'softMedia1Id', pm.variables.get('softMedia1Id'))",
 									"",
 									"//————— Thesauri",
 									"log.d('Thesaurus: themes')",
@@ -2610,23 +2621,23 @@
 									"//————— Producer",
 									"log.d('Producer')",
 									"const orgs = [",
-									"    mem.get('softOrg1Id'),",
-									"    mem.get('softOrg2Id')]",
+									"    pm.variables.get('softOrg1Id'),",
+									"    pm.variables.get('softOrg2Id')]",
 									"const randomOrgId = rand.pickInList(orgs)",
 									"",
 									"pm.collectionVariables.set('randomOrgId', randomOrgId);",
-									"console.log(`randomOrgId: ${mem.get('randomOrgId')}`)",
-									"console.log(`mem.randomOrgId: ${mem.get('randomOrgId')}`)",
-									"console.log(`collectionVariables.randomOrgId: ${pm.collectionVariables.get('randomOrgId')}`)",
+									"console.log(`randomOrgId: ${pm.variables.get('randomOrgId')}`)",
+									"console.log(`mem.randomOrgId: ${pm.variables.get('randomOrgId')}`)",
+									"console.log(`collectionVariables.randomOrgId: ${pm.variables.get('randomOrgId')}`)",
 									"console.log(`variables.randomOrgId: ${pm.variables.get('randomOrgId')}`)",
 									"console.log(`globals.randomOrgId: ${pm.globals.get('randomOrgId')}`)",
 									"",
 									"//————— Contact 1",
 									"log.d('Contact 1')",
 									"const contacts = [",
-									"    mem.get('softContact1Id'),",
-									"    mem.get('softContact2Id'),",
-									"    mem.get('softContact3Id')];",
+									"    pm.variables.get('softContact1Id'),",
+									"    pm.variables.get('softContact2Id'),",
+									"    pm.variables.get('softContact3Id')];",
 									"//console.log(`contacts: ${contacts}`)",
 									"",
 									"",
@@ -2652,7 +2663,7 @@
 									"pm.collectionVariables.set('randomSummary',",
 									"    `${rand.get('{{$randomPhrase}}')} ${rand.get('{{$randomPhrase}}')} ${rand.get('{{$randomLoremParagraph}}')}`)",
 									"",
-									"// log.d('Description', 'randomSummary', mem.get('randomSummary'))"
+									"// log.d('Description', 'randomSummary', pm.variables.get('randomSummary'))"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -2695,12 +2706,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources",
+							"raw": "{{catalogUrl}}/admin/resources",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							]
@@ -2752,12 +2762,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources",
+							"raw": "{{catalogUrl}}/admin/resources",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							]
@@ -2808,12 +2817,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources",
+							"raw": "{{catalogUrl}}/admin/resources",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							]
@@ -2865,12 +2873,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources",
+							"raw": "{{catalogUrl}}/admin/resources",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							]
@@ -2923,12 +2930,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources",
+							"raw": "{{catalogUrl}}/admin/resources",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							]
@@ -2982,12 +2988,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources",
+							"raw": "{{catalogUrl}}/admin/resources",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							]
@@ -3041,12 +3046,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources",
+							"raw": "{{catalogUrl}}/admin/resources",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							]
@@ -3100,12 +3104,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources",
+							"raw": "{{catalogUrl}}/admin/resources",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							]
@@ -3159,12 +3162,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources",
+							"raw": "{{catalogUrl}}/admin/resources",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							]
@@ -3218,12 +3220,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources",
+							"raw": "{{catalogUrl}}/admin/resources",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							]
@@ -3277,12 +3278,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources",
+							"raw": "{{catalogUrl}}/admin/resources",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							]
@@ -3313,12 +3313,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/enum/Themes/init",
+							"raw": "{{catalogUrl}}/admin/enum/Themes/init",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"enum",
 								"Themes",
@@ -3360,12 +3359,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/v1/resources?limit=50&sort_by=-createdAt&fields=resource_title,global_id,createdAt,collection_tag&collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/v1/resources?limit=50&sort_by=-createdAt&fields=resource_title,global_id,createdAt,collection_tag&collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"v1",
 								"resources"
 							],
@@ -3414,12 +3412,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/v1/resources?sort_by=-createdAt&collection_tag={{stamp}}&fields=global_id,producer",
+							"raw": "{{catalogUrl}}/v1/resources?sort_by=-createdAt&collection_tag={{stamp}}&fields=global_id,producer",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"v1",
 								"resources"
 							],
@@ -3475,12 +3472,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/v1/resources/?sort_by=-createdAt&collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/v1/resources/?sort_by=-createdAt&collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"v1",
 								"resources",
 								""
@@ -3520,12 +3516,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources/search?\"local 33\"&collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/resources/search?\"local 33\"&collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources",
 								"search"
@@ -3565,12 +3560,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/v1/resources/search?\"local 33\"&collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/v1/resources/search?\"local 33\"&collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"v1",
 								"resources",
 								"search"
@@ -3638,12 +3632,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources",
+							"raw": "{{catalogUrl}}/admin/resources",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							],
@@ -3688,12 +3681,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources?limit=10&keywords=plu&perlin=2346&resource_languages=fr&collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/resources?limit=10&keywords=plu&perlin=2346&resource_languages=fr&collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							],
@@ -3732,7 +3724,7 @@
 								"exec": [
 									"pm.test(\"Count metadata\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const result = parseInt(codec.streamToString(pm.response))",
+									"    const result = parseInt(pm.response.text())",
 									"    pm.expect(result).to.gte(2);",
 									"});"
 								],
@@ -3744,12 +3736,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources/count",
+							"raw": "{{catalogUrl}}/admin/resources/count",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources",
 								"count"
@@ -3780,12 +3771,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources?count_by=metadata_status",
+							"raw": "{{catalogUrl}}/admin/resources?count_by=metadata_status",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							],
@@ -3821,12 +3811,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources?count_by=keywords",
+							"raw": "{{catalogUrl}}/admin/resources?count_by=keywords",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							],
@@ -3862,12 +3851,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources?count_by=producer&collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/resources?count_by=producer&collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							],
@@ -3907,12 +3895,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources?count_by=theme",
+							"raw": "{{catalogUrl}}/admin/resources?count_by=theme",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							],
@@ -3947,12 +3934,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources?count_by=metadata_info.api_version",
+							"raw": "{{catalogUrl}}/admin/resources?count_by=metadata_info.api_version",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							],
@@ -3987,12 +3973,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources?group_by=metadata_info.api_version&limit=3",
+							"raw": "{{catalogUrl}}/admin/resources?group_by=metadata_info.api_version&limit=3",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							],
@@ -4029,12 +4014,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources?count_by=metadata_info.metadata_provider",
+							"raw": "{{catalogUrl}}/admin/resources?count_by=metadata_info.metadata_provider",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							],
@@ -4067,12 +4051,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources?count_by=metadata_info.metadata_contacts",
+							"raw": "{{catalogUrl}}/admin/resources?count_by=metadata_info.metadata_contacts",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							],
@@ -4097,7 +4080,7 @@
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json()",
 									"",
-									"    const orgId = pm.collectionVariables.get('softOrg1Id')",
+									"    const orgId = pm.variables.get('softOrg1Id')",
 									"    // console.log(`orgId: ${orgId}`)",
 									"    responseJson.map((res) => {",
 									"        // console.log(`res.producer.organization_id: ${res.producer.organization_id}`)",
@@ -4116,12 +4099,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources?count_by=producer&collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/resources?count_by=producer&collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							],
@@ -4150,7 +4132,7 @@
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const res = pm.response.json()",
 									"",
-									"    const orgId = pm.collectionVariables.get('softOrg1Id')",
+									"    const orgId = pm.variables.get('softOrg1Id')",
 									"    // console.log(`orgId: ${orgId}`)",
 									"    pm.expect(res.items?.[0].producer?.organization_id == orgId).to.be.true",
 									"    pm.collectionVariables.set('countWithOrg1pub', res.total)",
@@ -4165,12 +4147,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/v1/resources?count_by=producer&collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/v1/resources?count_by=producer&collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"v1",
 								"resources"
 							],
@@ -4198,7 +4179,7 @@
 									"pm.test(\"Filter by producer\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    ",
-									"    const countWithOrg1 = pm.collectionVariables.get('countWithOrg1pub')",
+									"    const countWithOrg1 = pm.variables.get('countWithOrg1pub')",
 									"",
 									"    const publicMetadataList = pm.response.json();",
 									"    pm.expect(publicMetadataList.total).to.eq(countWithOrg1);",
@@ -4224,12 +4205,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/v1/resources?producer.organization_id=\"{{softOrg1Id}}\"&fields=global_id,resource_title,collection_tag,producer&collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/v1/resources?producer.organization_id=\"{{softOrg1Id}}\"&fields=global_id,resource_title,collection_tag,producer&collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"v1",
 								"resources"
 							],
@@ -4263,8 +4243,8 @@
 									"",
 									"    const responseJson = pm.response.json()",
 									"",
-									"    const orgId = pm.collectionVariables.get('softOrg1Id')",
-									"    const countWithOrg1 = pm.collectionVariables.get('countWithOrg1')",
+									"    const orgId = pm.variables.get('softOrg1Id')",
+									"    const countWithOrg1 = pm.variables.get('countWithOrg1')",
 									"    // console.log(`orgId: ${orgId}`)",
 									"",
 									"    let tested = false",
@@ -4289,12 +4269,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources?group_by=producer&collection_tag={{stamp}}&limit=3&group_limit=4&fields=global_id",
+							"raw": "{{catalogUrl}}/admin/resources?group_by=producer&collection_tag={{stamp}}&limit=3&group_limit=4&fields=global_id",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							],
@@ -4366,12 +4345,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/v1/resources/{{softMeta1Id}}",
+							"raw": "{{catalogUrl}}/v1/resources/{{softMeta1Id}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"v1",
 								"resources",
 								"{{softMeta1Id}}"
@@ -4413,12 +4391,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/v1/resources/test",
+							"raw": "{{catalogUrl}}/v1/resources/test",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"v1",
 								"resources",
 								"test"
@@ -4457,12 +4434,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources/{{softMeta2Id}}",
+							"raw": "{{catalogUrl}}/admin/resources/{{softMeta2Id}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources",
 								"{{softMeta2Id}}"
@@ -4517,12 +4493,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources",
+							"raw": "{{catalogUrl}}/admin/resources",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							]
@@ -4539,8 +4514,8 @@
 								"exec": [
 									"pm.test(\"Send metadata list to portal\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const res = codec.streamToString(pm.response)",
-									"    pm.expect(res == \"Sending metadata to portal\" || res == pm.collectionVariables.get('noPortalMsg')).to.be.true",
+									"    const res = pm.response.text()",
+									"    pm.expect(res == \"Sending metadata to portal\" || res == pm.variables.get('noPortalMsg')).to.be.true",
 									"});"
 								],
 								"type": "text/javascript"
@@ -4560,12 +4535,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/portal/resources/send",
+							"raw": "{{catalogUrl}}/admin/portal/resources/send",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"portal",
 								"resources",
@@ -4584,8 +4558,8 @@
 								"exec": [
 									"pm.test(\"Send all metadata to portal\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const res = codec.streamToString(pm.response)",
-									"    pm.expect(res == \"Sending metadata to portal\" || res == pm.collectionVariables.get('noPortalMsg')).to.be.true",
+									"    const res = pm.response.text()",
+									"    pm.expect(res == \"Sending metadata to portal\" || res == pm.variables.get('noPortalMsg')).to.be.true",
 									"});"
 								],
 								"type": "text/javascript"
@@ -4605,12 +4579,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/portal/resources/send",
+							"raw": "{{catalogUrl}}/admin/portal/resources/send",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"portal",
 								"resources",
@@ -4650,12 +4623,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources/save?status=empty",
+							"raw": "{{catalogUrl}}/admin/resources/save?status=empty",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources",
 								"save"
@@ -4703,8 +4675,8 @@
 									"        throw err",
 									"    }",
 									"    const responseJson = pm.response.json();",
-									"    const orgId = pm.collectionVariables.get('softOrgGmdXml1Id');",
-									"    const orgName = pm.collectionVariables.get('softOrgGmdXml1Name')",
+									"    const orgId = pm.variables.get('softOrgGmdXml1Id');",
+									"    const orgName = pm.variables.get('softOrgGmdXml1Name')",
 									"    pm.expect(responseJson.organization_id).to.eq(orgId);",
 									"    pm.expect(responseJson.organization_address).to.eq(\"Ancienne adresse, RENNES CEDEX, 35031, France\");",
 									"    pm.expect(responseJson.organization_name).to.eq(orgName)",
@@ -4736,12 +4708,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/organizations/?objectStandard=gmd&format=xml",
+							"raw": "{{catalogUrl}}/admin/organizations/?objectStandard=gmd&format=xml",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"organizations",
 								""
@@ -4785,8 +4756,8 @@
 									"        throw err",
 									"    }",
 									"    const responseJson = pm.response.json();",
-									"    const orgId = pm.collectionVariables.get('softOrgGmdXml1Id');",
-									"    const orgName = pm.collectionVariables.get('softOrgGmdXml1NewName');",
+									"    const orgId = pm.variables.get('softOrgGmdXml1Id');",
+									"    const orgName = pm.variables.get('softOrgGmdXml1NewName');",
 									"    pm.expect(responseJson.organization_id).to.eq(orgId);",
 									"    pm.expect(responseJson.organization_name).to.eq(orgName);",
 									"    pm.expect(responseJson.organization_address).to.eq(\"Nouvelle adresse, RENNES CEDEX, 35031, France\");",
@@ -4818,12 +4789,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/organizations/?objectStandard=gmd&format=xml",
+							"raw": "{{catalogUrl}}/admin/organizations/?objectStandard=gmd&format=xml",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"organizations",
 								""
@@ -4869,7 +4839,7 @@
 									"        throw err",
 									"    }",
 									"    const responseJson = pm.response.json();",
-									"    const orgName = pm.collectionVariables.get('softOrgGmdXml2Name')",
+									"    const orgName = pm.variables.get('softOrgGmdXml2Name')",
 									"    pm.expect(responseJson.organization_name).to.eq(orgName)",
 									"    pm.collectionVariables.set('softOrgGmdXml2Id', responseJson.organization_id)",
 									"});"
@@ -4900,12 +4870,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/organizations/?objectStandard=gmd&format=xml",
+							"raw": "{{catalogUrl}}/admin/organizations/?objectStandard=gmd&format=xml",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"organizations",
 								""
@@ -4954,10 +4923,10 @@
 									"        throw err",
 									"    }",
 									"    const responseJson = pm.response.json();",
-									"    const contactId = pm.collectionVariables.get('softContactGmdXml1Id');",
-									"    const contactName = pm.collectionVariables.get('softContactGmdXml1Name');",
-									"    const contactEmail = pm.collectionVariables.get('softContactGmdXml1Email');",
-									"    const orgName = pm.collectionVariables.get('softOrgGmdXml1NewName')",
+									"    const contactId = pm.variables.get('softContactGmdXml1Id');",
+									"    const contactName = pm.variables.get('softContactGmdXml1Name');",
+									"    const contactEmail = pm.variables.get('softContactGmdXml1Email');",
+									"    const orgName = pm.variables.get('softOrgGmdXml1NewName')",
 									"    pm.expect(responseJson.contact_id).to.eq(contactId);",
 									"    pm.expect(responseJson.email).to.eq(contactEmail);",
 									"    pm.expect(responseJson.contact_name).to.eq(contactName);",
@@ -4989,12 +4958,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/contacts/?objectStandard=gmd&format=xml",
+							"raw": "{{catalogUrl}}/admin/contacts/?objectStandard=gmd&format=xml",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"contacts",
 								""
@@ -5040,9 +5008,9 @@
 									"        throw err",
 									"    }",
 									"    const responseJson = pm.response.json();",
-									"    const contactId = pm.collectionVariables.get('softContactGmdXml1Id');",
-									"    const contactName = pm.collectionVariables.get('softContactGmdXml1NewName');",
-									"    const contactEmail = pm.collectionVariables.get('softContactGmdXml1NewEmail');",
+									"    const contactId = pm.variables.get('softContactGmdXml1Id');",
+									"    const contactName = pm.variables.get('softContactGmdXml1NewName');",
+									"    const contactEmail = pm.variables.get('softContactGmdXml1NewEmail');",
 									"    pm.expect(responseJson.contact_id).to.eq(contactId);",
 									"    pm.expect(responseJson.contact_name).to.eq(contactName);",
 									"    pm.expect(responseJson.email).to.eq(contactEmail);",
@@ -5074,12 +5042,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/contacts/?objectStandard=gmd&format=xml",
+							"raw": "{{catalogUrl}}/admin/contacts/?objectStandard=gmd&format=xml",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"contacts",
 								""
@@ -5128,14 +5095,14 @@
 									"        throw err",
 									"    }",
 									"    const responseJson = pm.response.json();",
-									"    const metaId = pm.collectionVariables.get('softMetaGmdXml1LocalId');",
-									"    const orgId = pm.collectionVariables.get('softOrgGmdXml1Id');",
+									"    const metaId = pm.variables.get('softMetaGmdXml1LocalId');",
+									"    const orgId = pm.variables.get('softOrgGmdXml1Id');",
 									"    pm.expect(responseJson.local_id).to.eq(metaId);",
 									"    pm.expect(responseJson.producer.organization_id).to.eq(orgId);",
 									"    pm.collectionVariables.set('softMetaGmdXml1Id', responseJson.global_id);",
-									"    const media1Id = pm.collectionVariables.get('softMediaGmdXml1Id');",
-									"    const media2Id = pm.collectionVariables.get('softMediaGmdXml2Id');",
-									"    const media3Id = pm.collectionVariables.get('softMediaGmdXml3Id');",
+									"    const media1Id = pm.variables.get('softMediaGmdXml1Id');",
+									"    const media2Id = pm.variables.get('softMediaGmdXml2Id');",
+									"    const media3Id = pm.variables.get('softMediaGmdXml3Id');",
 									"",
 									"    const addedMediaIDs = [media1Id, media2Id, media3Id];",
 									"    const mediaList = responseJson.available_formats;",
@@ -5172,12 +5139,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources/?objectStandard=gmd&format=xml",
+							"raw": "{{catalogUrl}}/admin/resources/?objectStandard=gmd&format=xml",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources",
 								""
@@ -5244,12 +5210,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources/?objectStandard=gmd&format=xml",
+							"raw": "{{catalogUrl}}/admin/resources/?objectStandard=gmd&format=xml",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources",
 								""
@@ -5316,12 +5281,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources/?objectStandard=gmd&format=xml",
+							"raw": "{{catalogUrl}}/admin/resources/?objectStandard=gmd&format=xml",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources",
 								""
@@ -5363,8 +5327,7 @@
 									"    const responseJson = pm.response.json();",
 									"    ////console.log(responseJson.message);",
 									"    const msg = \"Problem in translation of object 'resources'. Problem in translation of field 'contacts'. No valid contact was found. Reminder : a valid contact in xml-gmd must have 'codeListValue' set to 'pointOfContact'\"",
-									"    pm.expect(responseJson.message.substring(0, msg.length)).to.eql(msg);",
-									"    pm.collectionVariables.set('softMetaGmdXml4Id', responseJson.global_id)",
+									"    pm.expect(responseJson.message).to.eql(msg);",
 									"});"
 								],
 								"type": "text/javascript",
@@ -5390,12 +5353,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources/?objectStandard=gmd&format=xml",
+							"raw": "{{catalogUrl}}/admin/resources/?objectStandard=gmd&format=xml",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources",
 								""
@@ -5447,12 +5409,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources/deletion",
+							"raw": "{{catalogUrl}}/admin/resources/deletion",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources",
 								"deletion"
@@ -5494,12 +5455,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/media/deletion",
+							"raw": "{{catalogUrl}}/admin/media/deletion",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"media",
 								"deletion"
@@ -5541,12 +5501,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/organizations/deletion",
+							"raw": "{{catalogUrl}}/admin/organizations/deletion",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"organizations",
 								"deletion"
@@ -5588,12 +5547,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/contacts/deletion",
+							"raw": "{{catalogUrl}}/admin/contacts/deletion",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"contacts",
 								"deletion"
@@ -5607,6 +5565,43 @@
 		{
 			"name": "08. Add/edit/get reports",
 			"item": [
+				{
+					"name": "Check portal connection",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Testing portal connection\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    if(pm.response.text() === pm.globals.get('noPortalMsg')) return true",
+									"    const token = pm.response.json().access_token",
+									"    pm.expect(!!match.jwt(token)).to.be.true       ",
+									"    pm.collectionVariables.set(pm.variables.get('portalJwtName'),token)",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{catalogUrl}}/admin/portal/token",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"portal",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
 				{
 					"name": "[PUB] Add report 1 (meta 1)",
 					"event": [
@@ -5625,7 +5620,8 @@
 									"    pm.expect(responseJson.integration_status).to.eq(\"KO\");",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						},
 						{
@@ -5636,7 +5632,8 @@
 									"pm.collectionVariables.set('dateReport', time.now());",
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -5663,9 +5660,9 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/resources/{{softMeta1Id}}/report",
+							"raw": "{{catalogServer}}/resources/{{softMeta1Id}}/report",
 							"host": [
-								"{{catalogUrl}}"
+								"{{catalogServer}}"
 							],
 							"path": [
 								"resources",
@@ -5694,7 +5691,8 @@
 									"    pm.expect(responseJson.integration_status).to.eq(\"OK\");",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						},
 						{
@@ -5705,7 +5703,8 @@
 									"pm.collectionVariables.set('dateReport', time.now());",
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -5732,9 +5731,9 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/resources/{{softMeta1Id}}/report",
+							"raw": "{{catalogServer}}/resources/{{softMeta1Id}}/report",
 							"host": [
-								"{{catalogUrl}}"
+								"{{catalogServer}}"
 							],
 							"path": [
 								"resources",
@@ -5764,7 +5763,8 @@
 									"    pm.expect(responseJson.report_treatment_error.error_type).to.eq(\"Object not found\");",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						},
 						{
@@ -5776,7 +5776,8 @@
 									"pm.collectionVariables.set('dateReport', time.now());",
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -5803,9 +5804,9 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/resources/{{unkownMetaId}}/report",
+							"raw": "{{catalogServer}}/resources/{{unkownMetaId}}/report",
 							"host": [
-								"{{catalogUrl}}"
+								"{{catalogServer}}"
 							],
 							"path": [
 								"resources",
@@ -5859,12 +5860,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/v1/resources/{{softMeta1Id}}/report",
+							"raw": "{{catalogUrl}}/v1/resources/{{softMeta1Id}}/report",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"v1",
 								"resources",
 								"{{softMeta1Id}}",
@@ -5885,8 +5885,8 @@
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    // console.log(responseJson);",
-									"    const metaId = pm.collectionVariables.get('softMeta1Id');",
-									"    const reportId = pm.collectionVariables.get('softReport2Id');",
+									"    const metaId = pm.variables.get('softMeta1Id');",
+									"    const reportId = pm.variables.get('softReport2Id');",
 									"    const apiVersion = pm.variables.get('apiVersion');",
 									"    pm.expect(responseJson.report_id).to.eq(reportId);",
 									"    pm.expect(responseJson.resource_id).to.eq(metaId);",
@@ -5894,7 +5894,8 @@
 									"    pm.expect(responseJson.version).to.eq(apiVersion);",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -5911,12 +5912,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources/{{softMeta1Id}}/reports",
+							"raw": "{{catalogUrl}}/admin/resources/{{softMeta1Id}}/reports",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources",
 								"{{softMeta1Id}}",
@@ -5976,12 +5976,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/v1/resources/{{softMeta1Id}}/report/{{softReport2Id}}",
+							"raw": "{{catalogUrl}}/v1/resources/{{softMeta1Id}}/report/{{softReport2Id}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"v1",
 								"resources",
 								"{{softMeta1Id}}",
@@ -6020,12 +6019,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/reports/{{softReport2Id}}",
+							"raw": "{{catalogUrl}}/admin/reports/{{softReport2Id}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"reports",
 								"{{softReport2Id}}"
@@ -6067,12 +6065,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/reports?collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/reports?collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"reports"
 							],
@@ -6119,12 +6116,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/reports?sort_by=-updatedAt",
+							"raw": "{{catalogUrl}}/admin/reports?sort_by=-updatedAt",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"reports"
 							],
@@ -6162,12 +6158,11 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/organizations/{{softOrg1Id}}",
+							"raw": "{{catalogUrl}}/admin/organizations/{{softOrg1Id}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"organizations",
 								"{{softOrg1Id}}"
@@ -6195,12 +6190,11 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/contacts/{{softContact1Id}}",
+							"raw": "{{catalogUrl}}/admin/contacts/{{softContact1Id}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"contacts",
 								"{{softContact1Id}}"
@@ -6241,12 +6235,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/reports/deletion",
+							"raw": "{{catalogUrl}}/admin/reports/deletion",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"reports",
 								"deletion"
@@ -6287,12 +6280,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources/deletion",
+							"raw": "{{catalogUrl}}/admin/resources/deletion",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources",
 								"deletion"
@@ -6308,7 +6300,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const stamp = pm.collectionVariables.get('stamp')",
+									"const stamp = pm.variables.get('stamp')",
 									"pm.test(`No metadata left with '${stamp}' stamp'`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const publicMetadataList = pm.response.json();",
@@ -6333,12 +6325,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/v1/resources?collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/v1/resources?collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"v1",
 								"resources"
 							],
@@ -6363,7 +6354,7 @@
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    // console.log(responseJson);",
-									"    const metaId = pm.collectionVariables.get('softMeta1Id');",
+									"    const metaId = pm.variables.get('softMeta1Id');",
 									"    pm.expect(responseJson.global_id).to.eq(metaId);",
 									"});"
 								],
@@ -6393,12 +6384,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources",
+							"raw": "{{catalogUrl}}/admin/resources",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							]
@@ -6428,12 +6418,11 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources/{{softMeta1Id}}",
+							"raw": "{{catalogUrl}}/admin/resources/{{softMeta1Id}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources",
 								"{{softMeta1Id}}"
@@ -6474,12 +6463,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/media/deletion",
+							"raw": "{{catalogUrl}}/admin/media/deletion",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"media",
 								"deletion"
@@ -6520,12 +6508,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/organizations/deletion",
+							"raw": "{{catalogUrl}}/admin/organizations/deletion",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"organizations",
 								"deletion"
@@ -6566,12 +6553,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/contacts/deletion",
+							"raw": "{{catalogUrl}}/admin/contacts/deletion",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"contacts",
 								"deletion"
@@ -6587,7 +6573,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const stamp = pm.collectionVariables.get('stamp')",
+									"const stamp = pm.variables.get('stamp')",
 									"pm.test(`No metadata left with '${stamp}' stamp'`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const metadataList = pm.response.json();",
@@ -6602,12 +6588,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources?count_by=collection_tag&collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/resources?count_by=collection_tag&collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							],
@@ -6636,7 +6621,7 @@
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    // console.log(responseJson);",
-									"    const metaId = pm.collectionVariables.get('softMeta1Id');",
+									"    const metaId = pm.variables.get('softMeta1Id');",
 									"    pm.expect(responseJson.global_id).to.eq(metaId);",
 									"});"
 								],
@@ -6666,12 +6651,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources",
+							"raw": "{{catalogUrl}}/admin/resources",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							]
@@ -6686,7 +6670,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const stamp = pm.collectionVariables.get('stamp')",
+									"const stamp = pm.variables.get('stamp')",
 									"pm.test(`Meta 1 added with '${stamp}' stamp'`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const metadataList = pm.response.json();",
@@ -6701,12 +6685,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources?collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/resources?collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							],
@@ -6727,7 +6710,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const stamp = pm.collectionVariables.get('stamp')",
+									"const stamp = pm.variables.get('stamp')",
 									"pm.test(`Delete metadata with '${stamp}' stamp`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
@@ -6753,12 +6736,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources?collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/resources?collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							],
@@ -6779,7 +6761,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const stamp = pm.collectionVariables.get('stamp')",
+									"const stamp = pm.variables.get('stamp')",
 									"pm.test(`Delete orgs with '${stamp}' stamp`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
@@ -6805,12 +6787,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/organizations?collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/organizations?collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"organizations"
 							],
@@ -6831,7 +6812,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const stamp = pm.collectionVariables.get('stamp')",
+									"const stamp = pm.variables.get('stamp')",
 									"pm.test(`Delete contacts with '${stamp}' stamp`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
@@ -6857,12 +6838,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/contacts?collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/contacts?collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"contacts"
 							],
@@ -6883,7 +6863,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const stamp = pm.collectionVariables.get('stamp')",
+									"const stamp = pm.variables.get('stamp')",
 									"pm.test(`Delete media with '${stamp}' stamp`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
@@ -6910,12 +6890,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/media?collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/media?collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"media"
 							],
@@ -6936,7 +6915,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const stamp = pm.collectionVariables.get('stamp')",
+									"const stamp = pm.variables.get('stamp')",
 									"pm.test(`Delete reports with '${stamp}' stamp`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
@@ -6962,12 +6941,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/reports?collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/reports?collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"reports"
 							],
@@ -6988,7 +6966,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const stamp = pm.collectionVariables.get('stamp')",
+									"const stamp = pm.variables.get('stamp')",
 									"pm.test(`No metadata left with '${stamp}' stamp'`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const metadataList = pm.response.json();",
@@ -7003,12 +6981,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/resources?collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/resources?collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"resources"
 							],
@@ -7029,7 +7006,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const stamp = pm.collectionVariables.get('stamp')",
+									"const stamp = pm.variables.get('stamp')",
 									"pm.test(`No contact left with '${stamp}' stamp'`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const metadataList = pm.response.json();",
@@ -7044,12 +7021,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/contacts?collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/contacts?collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"contacts"
 							],
@@ -7070,7 +7046,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const stamp = pm.collectionVariables.get('stamp')",
+									"const stamp = pm.variables.get('stamp')",
 									"pm.test(`No organization left with '${stamp}' stamp'`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const metadataList = pm.response.json();",
@@ -7085,12 +7061,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/organizations?collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/organizations?collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"organizations"
 							],
@@ -7111,7 +7086,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const stamp = pm.collectionVariables.get('stamp')",
+									"const stamp = pm.variables.get('stamp')",
 									"pm.test(`No report left with '${stamp}' stamp'`, () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const metadataList = pm.response.json();",
@@ -7126,12 +7101,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/reports?collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/reports?collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"reports"
 							],
@@ -7182,12 +7156,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/pubKeys?collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/pubKeys?collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"pubKeys"
 							],
@@ -7215,7 +7188,7 @@
 									"    pm.expect(pubKey.url).to.be.not.null",
 									"    pm.expect(pubKey.pem).to.be.not.null",
 									"    pm.expect(pubKey.type).to.be.not.null",
-									"    pm.expect(pubKey.collection_tag).to.eql(pm.collectionVariables.get('stamp'))",
+									"    pm.expect(pubKey.collection_tag).to.eql(pm.variables.get('stamp'))",
 									"});",
 									""
 								],
@@ -7246,12 +7219,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/pub_keys",
+							"raw": "{{catalogUrl}}/admin/pub_keys",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"pub_keys"
 							]
@@ -7273,7 +7245,7 @@
 									"    pm.expect(pubKey.url).to.be.not.null",
 									"    pm.expect(pubKey.pem).to.be.not.null",
 									"    pm.expect(pubKey.type).to.be.not.null",
-									"    pm.expect(pubKey.collection_tag).to.eql(pm.collectionVariables.get('stamp'))",
+									"    pm.expect(pubKey.collection_tag).to.eql(pm.variables.get('stamp'))",
 									"});",
 									""
 								],
@@ -7303,12 +7275,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/pub_keys",
+							"raw": "{{catalogUrl}}/admin/pub_keys",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"pub_keys"
 							]
@@ -7330,7 +7301,7 @@
 									"    pm.expect(pubKey.url).to.be.not.null",
 									"    pm.expect(pubKey.pem).to.be.not.null",
 									"    pm.expect(pubKey.type).to.be.not.null",
-									"    pm.expect(pubKey.collection_tag).to.eql(pm.collectionVariables.get('stamp'))",
+									"    pm.expect(pubKey.collection_tag).to.eql(pm.variables.get('stamp'))",
 									"});",
 									""
 								],
@@ -7361,12 +7332,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/pub_keys",
+							"raw": "{{catalogUrl}}/admin/pub_keys",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"pub_keys"
 							]
@@ -7412,12 +7382,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/pub_keys",
+							"raw": "{{catalogUrl}}/admin/pub_keys",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"pub_keys"
 							]
@@ -7446,12 +7415,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/pub_keys?collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/pub_keys?collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"pub_keys"
 							],
@@ -7491,12 +7459,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/pubKeys/{{pubKeyName}}",
+							"raw": "{{catalogUrl}}/admin/pubKeys/{{pubKeyName}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"pubKeys",
 								"{{pubKeyName}}"
@@ -7535,12 +7502,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/v1/pub_keys/{{pubKeyName}}",
+							"raw": "{{catalogUrl}}/v1/pub_keys/{{pubKeyName}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"v1",
 								"pub_keys",
 								"{{pubKeyName}}"
@@ -7569,12 +7535,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/pub_keys?collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/pub_keys?collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"pub_keys"
 							],
@@ -7610,12 +7575,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/pub_keys/{{pubKeyName}}/pem",
+							"raw": "{{catalogUrl}}/admin/pub_keys/{{pubKeyName}}/pem",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"pub_keys",
 								"{{pubKeyName}}",
@@ -7647,12 +7611,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/v1/pub_keys/{{pubKeyName}}/pem",
+							"raw": "{{catalogUrl}}/v1/pub_keys/{{pubKeyName}}/pem",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"v1",
 								"pub_keys",
 								"{{pubKeyName}}",
@@ -7676,7 +7639,7 @@
 									"    pm.expect(pubKey.url).to.be.not.null",
 									"    pm.expect(pubKey.pem).to.be.not.null",
 									"    pm.expect(pubKey.type).to.be.not.null",
-									"    pm.expect(pubKey.collection_tag).to.eql(pm.collectionVariables.get('stamp'))",
+									"    pm.expect(pubKey.collection_tag).to.eql(pm.variables.get('stamp'))",
 									"});",
 									""
 								],
@@ -7697,12 +7660,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/pub_keys/{{pubKeyName}}",
+							"raw": "{{catalogUrl}}/admin/pub_keys/{{pubKeyName}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"pub_keys",
 								"{{pubKeyName}}"
@@ -7743,12 +7705,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/pubKeys?collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/pubKeys?collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"pubKeys"
 							],
@@ -7795,7 +7756,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"{{pubKeyName}}\",\n    \"url\": \"{{catalogUrl}}/{{catalogPrefix}}/v1/pub_keys/{{pubKeyName}}xx\",\n    \"pem\": \"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBQ/tgB/vCQxkgSlzztRAmE4dNsOo1HzLXcqTOtDIhi rudi_prod_manager\"\n}",
+							"raw": "{\n    \"name\": \"{{pubKeyName}}\",\n    \"url\": \"{{catalogUrl}}/v1/pub_keys/{{pubKeyName}}xx\",\n    \"pem\": \"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBQ/tgB/vCQxkgSlzztRAmE4dNsOo1HzLXcqTOtDIhi rudi_prod_manager\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -7803,12 +7764,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/pub_keys",
+							"raw": "{{catalogUrl}}/admin/pub_keys",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"pub_keys"
 							]
@@ -7854,12 +7814,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/pub_keys",
+							"raw": "{{catalogUrl}}/admin/pub_keys",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"pub_keys"
 							]
@@ -7907,12 +7866,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/pub_keys",
+							"raw": "{{catalogUrl}}/admin/pub_keys",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"pub_keys"
 							]
@@ -7943,7 +7901,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"url\": \"{{catalogUrl}}/{{catalogPrefix}}/admin/pub_keys/52d8ae34-5b34-482f-9a80-645d63f3ba0b\"\n}",
+							"raw": "{\n    \"url\": \"{{catalogUrl}}/admin/pub_keys/52d8ae34-5b34-482f-9a80-645d63f3ba0b\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -7951,12 +7909,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/pub_keys",
+							"raw": "{{catalogUrl}}/admin/pub_keys",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"pub_keys"
 							]
@@ -7978,11 +7935,13 @@
 									"    pm.expect(pubKey.url).to.be.not.null",
 									"    pm.expect(pubKey.pem).to.be.not.null",
 									"    pm.expect(pubKey.type).to.be.not.null",
-									"    pm.expect(pubKey.collection_tag).to.eql(pm.collectionVariables.get('stamp'))",
+									"    pm.expect(pubKey.collection_tag).to.eql(pm.variables.get('stamp'))",
+									"    pm.collectionVariables.set('pubKeyUrl',pubKey.url)",
 									"});",
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						},
 						{
@@ -7992,7 +7951,8 @@
 									"pm.collectionVariables.set('pubKeyName',rand.randomize('pubKeyName'))",
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -8009,12 +7969,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/pub_keys",
+							"raw": "{{catalogUrl}}/admin/pub_keys",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"pub_keys"
 							]
@@ -8046,12 +8005,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/{{catalogPrefix}}/admin/portal/token",
+							"raw": "{{catalogUrl}}/admin/portal/token",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"{{catalogPrefix}}",
 								"admin",
 								"portal",
 								"token"
@@ -8074,11 +8032,12 @@
 									"    pm.expect(pubKey.url).to.be.not.null",
 									"    pm.expect(pubKey.pem).to.be.not.null",
 									"    pm.expect(pubKey.type).to.be.not.null",
-									"    pm.expect(pubKey.collection_tag).to.eql(pm.collectionVariables.get('stamp'))",
+									"    pm.expect(pubKey.collection_tag).to.eql(pm.variables.get('stamp'))",
 									"});",
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -8087,7 +8046,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"portalxx-{{stamp}}\",\n    \"url\": \"{{portalBaseUrl}}/oauth/token_key\",\n    \"prop\": \"value\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"raw": "{\n    \"name\": \"portalxx-{{stamp}}\",\n    \"url\": \"https://gist.githubusercontent.com/OlivierMartineau/a5320c749ce1fac68bec068a6b3d6767/raw/f28f205393a935bff1dd9a90da4c6fb0960d5f5a/gistfile1.txt\",\n    \"prop\": \"value\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -8095,12 +8054,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/pub_keys",
+							"raw": "{{catalogUrl}}/admin/pub_keys",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"pub_keys"
 							]
@@ -8122,7 +8080,7 @@
 									"    pm.expect(pubKey.url).to.be.not.null",
 									"    pm.expect(pubKey.pem).to.be.not.null",
 									"    pm.expect(pubKey.type).to.be.not.null",
-									"    pm.expect(pubKey.collection_tag).to.eql(pm.collectionVariables.get('stamp'))",
+									"    pm.expect(pubKey.collection_tag).to.eql(pm.variables.get('stamp'))",
 									"});",
 									""
 								],
@@ -8143,12 +8101,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/pub_keys",
+							"raw": "{{catalogUrl}}/admin/pub_keys",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"pub_keys"
 							]
@@ -8164,14 +8121,14 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Creating the Portal key\", () => {",
-									"    if (pm.collectionVariables.get('skipPortalConnection')) return true",
+									"    if (pm.variables.get('skipPortalConnection')) return true",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const pubKey = pm.response.json()",
-									"    pm.expect(pubKey.name).to.be.eq('portal-' + pm.collectionVariables.get('stamp'))",
+									"    pm.expect(pubKey.name).to.be.eq('portal-' + pm.variables.get('stamp'))",
 									"    pm.expect(pubKey.url).to.be.not.null",
 									"    pm.expect(pubKey.pem).to.be.not.null",
 									"    pm.expect(pubKey.type).to.be.not.null",
-									"    pm.expect(pubKey.collection_tag).to.eql(pm.collectionVariables.get('stamp'))",
+									"    pm.expect(pubKey.collection_tag).to.eql(pm.variables.get('stamp'))",
 									"});",
 									""
 								],
@@ -8201,12 +8158,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/pub_keys",
+							"raw": "{{catalogUrl}}/admin/pub_keys",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"pub_keys"
 							]
@@ -8222,7 +8178,7 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Getting a public key property\", () => {",
-									"    if (pm.collectionVariables.get('skipPortalConnection')) return true",
+									"    if (pm.variables.get('skipPortalConnection')) return true",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const pem = pm.response.stream.toString('utf8');",
 									"    pm.expect(pem).to.be.not.null",
@@ -8240,12 +8196,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/v1/pub_keys/portal-{{stamp}}",
+							"raw": "{{catalogUrl}}/v1/pub_keys/portal-{{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"v1",
 								"pub_keys",
 								"portal-{{stamp}}"
@@ -8286,12 +8241,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/pubKeys?collection_tag={{stamp}}",
+							"raw": "{{catalogUrl}}/admin/pubKeys?collection_tag={{stamp}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"pubKeys"
 							],
@@ -8314,8 +8268,8 @@
 								"exec": [
 									"pm.test(\"Get portal URL\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const portalUrl = codec.streamToString(pm.response)",
-									"    pm.expect(portalUrl == 'https://rudi.bzh' || portalUrl == 'https://rudi-qualif.open-groupe.com' || portalUrl == pm.collectionVariables.get('noPortalMsg')).to.be.true",
+									"    const portalUrl = pm.response.text()",
+									"    pm.expect(portalUrl == 'https://rudi.bzh' || portalUrl == 'https://rudi-qualif.open-groupe.com' || portalUrl == pm.variables.get('noPortalMsg')).to.be.true",
 									"    pm.collectionVariables.set('portalUrl', portalUrl)",
 									"});",
 									""
@@ -8328,12 +8282,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/check/portal/url",
+							"raw": "{{catalogUrl}}/admin/check/portal/url",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"check",
 								"portal",
@@ -8351,10 +8304,10 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Creating the Portal key\", () => {",
-									"    if (pm.collectionVariables.get('skipPortalConnection')) return true",
+									"    if (pm.variables.get('skipPortalConnection')) return true",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const pubKey = pm.response.json()",
-									"    pm.expect(pubKey.name).to.be.eq(pm.collectionVariables.get('portalKeyName'))",
+									"    pm.expect(pubKey.name).to.be.eq(pm.variables.get('portalKeyName'))",
 									"    pm.expect(pubKey.url).to.be.not.null",
 									"    pm.expect(pubKey.pem).to.be.not.null",
 									"    pm.expect(pubKey.type).to.be.not.null",
@@ -8368,7 +8321,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"const portalUrl = pm.collectionVariables.get('portalUrl')",
+									"const portalUrl = pm.variables.get('portalUrl')",
 									"if (portalUrl === 'https://rudi.bzh')",
 									"    pm.collectionVariables.set('portalKeyName', 'portail-rudi')",
 									"else",
@@ -8391,12 +8344,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/pub_keys",
+							"raw": "{{catalogUrl}}/admin/pub_keys",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"pub_keys"
 							]
@@ -8412,7 +8364,7 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Portal key added\", () => {",
-									"    if (pm.collectionVariables.get('skipPortalConnection')) return true",
+									"    if (pm.variables.get('skipPortalConnection')) return true",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const pem = pm.response.stream.toString('utf8');",
 									"    pm.expect(pem).to.be.not.null",
@@ -8430,12 +8382,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/v1/pub_keys/{{portalKeyName}}/key",
+							"raw": "{{catalogUrl}}/v1/pub_keys/{{portalKeyName}}/key",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"v1",
 								"pub_keys",
 								"{{portalKeyName}}",
@@ -8459,7 +8410,7 @@
 								"exec": [
 									"pm.test(\"Check portal URL\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const res = codec.streamToString(pm.response)",
+									"    const res = pm.response.text()",
 									"    pm.expect(res.startsWith('http')).to.be.true",
 									"});",
 									""
@@ -8472,12 +8423,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/check/node/url",
+							"raw": "{{catalogUrl}}/admin/check/node/url",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"check",
 								"node",
@@ -8496,7 +8446,7 @@
 								"exec": [
 									"pm.test(\"Check portal URL\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const res = codec.streamToString(pm.response)",
+									"    const res = pm.response.text()",
 									"    pm.expect(res.startsWith('http') || res === 'No portal connected').to.be.true",
 									"});",
 									""
@@ -8509,12 +8459,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/check/portal/url",
+							"raw": "{{catalogUrl}}/admin/check/portal/url",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"check",
 								"portal",
@@ -8533,7 +8482,7 @@
 								"exec": [
 									"pm.test(\"Check portal resources\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    if (pm.collectionVariables.get('skipPortalConnection')) return true",
+									"    if (pm.variables.get('skipPortalConnection')) return true",
 									"    const res = pm.response.json()",
 									"    pm.expect(res.time).to.be.gt(0)",
 									"    pm.expect(res.total).to.be.gt(0)",
@@ -8549,12 +8498,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/check/portal/resources",
+							"raw": "{{catalogUrl}}/admin/check/portal/resources",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"check",
 								"portal",
@@ -8573,7 +8521,7 @@
 								"exec": [
 									"pm.test(\"Check portal resources ids\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    if (pm.collectionVariables.get('skipPortalConnection')) return true",
+									"    if (pm.variables.get('skipPortalConnection')) return true",
 									"    const res = pm.response.json()",
 									"    pm.expect(res[0].global_id).to.be.not.undefined",
 									"});",
@@ -8587,12 +8535,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/check/portal/ids",
+							"raw": "{{catalogUrl}}/admin/check/portal/ids",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"check",
 								"portal",
@@ -8619,9 +8566,14 @@
 									"    const response = pm.response.json()",
 									"    //const pm.response.header",
 									"    pm.expect(response.length).to.eq(20)",
-									"});"
+									"    mem.wipeCache([], 1)",
+									"});",
+									"",
+									"mem.wipeCollectionVars(pm.collectionVariables,[],1)",
+									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -8629,12 +8581,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/api/admin/logs?limit=20&sort_by=-updatedAt&updatedAfter={{dateUpdate}}",
+							"raw": "{{catalogUrl}}/admin/logs?limit=20&sort_by=-updatedAt&updatedAfter={{dateUpdate}}",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"logs"
 							],
@@ -8681,34 +8632,11 @@
 					"// --------------------------------------------------------------------------------------------------------------",
 					"",
 					"log = {",
-					"    lvl: 3,",
+					"    lvl: 1,",
 					"    e: (here, ...args) => log.lvl >= 1 && console.error(`E [${here}] ERROR:`, ...args),",
 					"    d: (here, ...args) => log.lvl >= 2 && console.log(`D [${here}]`, ...args),",
 					"    t: (here, msg = '<', ...args) => log.lvl >= 3 && console.log(`T [${here}]`, msg, ...args),",
 					"}",
-					"",
-					"log.t('Postan variables access functions')",
-					"mem = {",
-					"    get: (name) => {",
-					"        const val = pm.variables.get(name) ?? pm.collectionVariables.get(name) ?? pm.environment.get(name) ?? pm.globals.get(name)",
-					"        log.d('mem.get', name, val)",
-					"        return val",
-					"    },",
-					"    set: (name, val) => pm.collectionVariables.set(name, val),",
-					"",
-					"    initStoredVar: (name, defaultVal) => {",
-					"        const here = 'initStoredVar'",
-					"        if (!pm.collectionVariables.get(name)) {",
-					"            log.t(here, `No value stored for ${name}`)",
-					"            const val = mem.get(name) ?? defaultVal",
-					"            pm.collectionVariables.set(name, val)",
-					"            return val",
-					"        }",
-					"        return pm.collectionVariables.get(name)",
-					"    },",
-					"}",
-					"",
-					"const TOKEN_DURATION_S = 4147200",
 					"",
 					"log.t('Time-related functions')",
 					"time = {",
@@ -8720,6 +8648,75 @@
 					"        log.t('wait', `Waiting ${delayMs / 1000}s...`)",
 					"        setTimeout(doSomething ? doSomething : () => { log.t('wait', `Waited ${delayMs / 1000}s`) }, delayMs)",
 					"    },",
+					"}",
+					"",
+					"log.t('Function to manipulate strings')",
+					"const mergeStrings = (sep, ...args) => {",
+					"    const here = 'mergeStrings'",
+					"    log.t(here)",
+					"    const argNb = args.length",
+					"    if (argNb == 0 || args[0] === undefined || args[0] === null) return ''",
+					"    let accumulatedStr = `${args[0]}`",
+					"    for (let i = 1; i < argNb; i++) {",
+					"        if (args[i] === undefined || args[i] === null) break",
+					"        const newChunk = `${args[i]}`",
+					"        const cleanChunk = newChunk.startsWith(sep) ? newChunk.slice(1) : newChunk",
+					"        accumulatedStr = accumulatedStr.endsWith(sep)",
+					"            ? accumulatedStr + cleanChunk",
+					"            : accumulatedStr + sep + cleanChunk",
+					"    }",
+					"    return accumulatedStr",
+					"}",
+					"const pathJoin = (...args) => mergeStrings('/', ...args)",
+					"",
+					"log.t('Postman variables memory access functions')",
+					"mem = {",
+					"    get: (name) => {",
+					"        const val = pm.variables.get(name) ?? pm.collectionVariables.get(name) ?? pm.environment.get(name) ?? pm.globals.get(name)",
+					"        log.t('mem.get', name, val)",
+					"        return val",
+					"    },",
+					"",
+					"    set: (name, val) => pm.collectionVariables.set(name, val),",
+					"",
+					"    initStoredVar: (name, defaultVal) => {",
+					"        const here = 'initStoredVar'",
+					"        if (!mem.get(name)) {",
+					"            log.t(here, `No value stored for ${name}`)",
+					"            const val = mem.get(name) ?? defaultVal",
+					"            mem.set(name, val)",
+					"            return val",
+					"        }",
+					"        return mem.get(name)",
+					"    },",
+					"",
+					"    wipeCollectionVars: (collectionVariables = pm.collectionVariables, keepVals, force = false) => {",
+					"        // 'Function to wipe the cached values from previous tests'",
+					"        const here = 'wipeCollectionVars'",
+					"        log.t(here)",
+					"        if (!force && collectionVariables.get('postmanEnv') == pm.environment.name) return",
+					"        const cache = {}",
+					"        if (keepVals === undefined) keepVals = [CATALOG_JWT_NAME, STORAGE_JWT_NAME, MANAGER_JWT_NAME, PORTAL_TOKEN_NAME]",
+					"        keepVals = ['stamp', ...keepVals]",
+					"        keepVals.map(key => {",
+					"            const val = collectionVariables.get(key) ?? pm.collectionVariables.get(key)",
+					"            if (val) {",
+					"                cache[key] = collectionVariables.get(key)",
+					"                log.t(here, `Memorizing the protected variable ${key}: ${cache[key]}`)",
+					"            }",
+					"        })",
+					"        collectionVariables.clear()",
+					"        log.t(here, 'collectionVariables wiped:', JSON.stringify(collectionVariables))",
+					"        log.t(here, 'collectionVariables:', JSON.stringify(collectionVariables.values))",
+					"",
+					"        for (const key in cache) {",
+					"            log.t(`Restoring the variable ${key}: ${cache[key]}`)",
+					"            collectionVariables.set(key, cache[key])",
+					"            pm.collectionVariables.set(key, cache[key])",
+					"        }",
+					"        collectionVariables.set('dateUpdate', time.now())",
+					"        collectionVariables.set('postmanEnv', pm.environment.name)",
+					"    }",
 					"}",
 					"",
 					"log.t('Function to homogenize old environment variables')",
@@ -8740,12 +8737,32 @@
 					"}",
 					"",
 					"log.t('Variable names homogenization')",
-					"changeVarName('apiUrl', 'catalogUrl')",
-					"changeVarName('pmBackUrl', 'managerUrl')",
-					"changeVarName('pmFrontUrl', 'managerFrontUrl')",
-					"changeVarName('mediaUrl', 'storageUrl')",
-					"changeVarName('pmAdminUsr', 'managerAdminUsr')",
-					"changeVarName('pmAdminPwd', 'managerAdminPwd')",
+					"function homogenizeVars() {",
+					"    changeVarName('apiUrl', 'catalogUrl')",
+					"    changeVarName('pmBackUrl', 'managerUrl')",
+					"    changeVarName('pmFrontUrl', 'managerFrontUrl')",
+					"    changeVarName('mediaUrl', 'storageUrl')",
+					"    changeVarName('pmAdminUsr', 'managerAdminUsr')",
+					"    changeVarName('pmAdminPwd', 'managerAdminPwd')",
+					"    if (!(pm.environment.get('storageUrl'))) {",
+					"        pm.environment.set('storageUrl', `${mem.get('managerUrl')}`.replace('/prodmanager', '/media'))",
+					"    }",
+					"    const catalogUrl = pm.environment.get('catalogUrl')",
+					"    if (!(catalogUrl.endsWith('api') || catalogUrl.endsWith('catalog'))) {",
+					"",
+					"        const catalogPrefix = mem.get('catalogPrefix') ?? 'api'",
+					"        pm.environment.set('catalogServer', catalogUrl)",
+					"        pm.environment.set('catalogUrl', pathJoin(catalogUrl, catalogPrefix))",
+					"        pm.environment.unset(catalogPrefix)",
+					"    } else {",
+					"        pm.environment.set('catalogServer', catalogUrl.replace(/\\/(api|catalog)/, ''))",
+					"    }",
+					"    pm.environment.set('homogenized', true)",
+					"}",
+					"if (!pm.environment.get('homogenized')) homogenizeVars()",
+					"",
+					"",
+					"const regexCheck = (regex, str) => str ? regex.exec(`${str}`) : regex",
 					"",
 					"log.t('Constants initialization')",
 					"const REGEX_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i",
@@ -8753,69 +8770,6 @@
 					"const REGEX_API_VERSION = /^[0-9]+\\.[0-9]+(\\.[0-9]+)?[a-z]*$/",
 					"const REGEX_URI = /^(https?|ftp):\\/\\/([\\w-]+(\\.[\\w-]+)+|(:[0-9]+)?)([\\w.,@?^=%&amp;:\\/~+#-]*[\\w@?^=%&amp;\\/~+#-])?$/",
 					"const REGEX_GIT_HASH_SHORT = /^[a-z0-9]{7}/",
-					"",
-					"const CATALOG_JWT_NAME = mem.initStoredVar('catalogJwtName', 'catalogJwt')",
-					"const STORAGE_JWT_NAME = mem.initStoredVar('storageJwtName', 'storageJwt')",
-					"const MANAGER_JWT_NAME = mem.initStoredVar('managerJwtName', 'managerJwt')",
-					"const MANAGER_COOKIE_NAME = mem.initStoredVar('managerCookieName', 'pmFrontToken')",
-					"const PORTAL_TOKEN_NAME = mem.initStoredVar('portalJwtName', 'portalJwt')",
-					"const POSTMAN_ENV = 'postmanEnv'",
-					"",
-					"if (!mem.get('portalUsr')) mem.set('skipPortalConnection', true)",
-					"",
-					"if (!(pm.environment.get('storageUrl'))) {",
-					"    const storageUrl = mem.get('managerUrl')",
-					"    pm.environment.set('storageUrl', `${storageUrl}`.replace('/prodmanager', '/media'))",
-					"}",
-					"",
-					"log.t('Function to wipe the cached values from previous tests')",
-					"const wipeCache = (force) => {",
-					"    const here = 'wipeCache'",
-					"    log.t(here)",
-					"    if (!force && mem.get(POSTMAN_ENV) == pm.environment.name) return",
-					"    log.t('Wiping the cache except:')",
-					"    const cacheKeys = [",
-					"        'stamp',",
-					"        mem.get(CATALOG_JWT_NAME),",
-					"        mem.get(STORAGE_JWT_NAME),",
-					"        mem.get(MANAGER_JWT_NAME),",
-					"        mem.get(MANAGER_COOKIE_NAME),",
-					"        mem.get(PORTAL_TOKEN_NAME),",
-					"    ]",
-					"",
-					"    const cache = {}",
-					"    cacheKeys.map(key => {",
-					"        cache[key] = mem.get(key)",
-					"        console.log(key + ':', cache[key])",
-					"    })",
-					"    pm.collectionVariables.clear()",
-					"    for (const key in cache) pm.collectionVariables.set(key, cache[key])",
-					"    pm.collectionVariables.set('dateUpdate', time.now())",
-					"    pm.collectionVariables.set(POSTMAN_ENV, pm.environment.name)",
-					"}",
-					"wipeCache()",
-					"",
-					"log.t('Function to wipe the cached values from previous tests')",
-					"",
-					"const mergeStrings = (sep, ...args) => {",
-					"    const here = 'mergeStrings'",
-					"    log.t(here)",
-					"    const argNb = args.length",
-					"    if (argNb == 0 || args[0] === undefined || args[0] === null) return ''",
-					"    let accumulatedStr = `${args[0]}`",
-					"    for (let i = 1; i < argNb; i++) {",
-					"        if (args[i] === undefined || args[i] === null) break",
-					"        const newChunk = `${args[i]}`",
-					"        const cleanChunk = newChunk.startsWith(sep) ? newChunk.slice(1) : newChunk",
-					"        accumulatedStr = accumulatedStr.endsWith(sep)",
-					"            ? accumulatedStr + cleanChunk",
-					"            : accumulatedStr + sep + cleanChunk",
-					"    }",
-					"    return accumulatedStr",
-					"}",
-					"const pathJoin = (...args) => mergeStrings('/', ...args)",
-					"",
-					"const regexCheck = (regex, str) => str ? regex.exec(`${str}`) : regex",
 					"",
 					"match = {",
 					"    uuid: (str) => regexCheck(REGEX_UUID, str),",
@@ -8851,6 +8805,7 @@
 					"    }",
 					"}",
 					"",
+					"log.t('Functions to initialiaze test variables')",
 					"rand = {",
 					"    get: (randName) => pm.collectionVariables.replaceIn(randName),",
 					"",
@@ -8882,6 +8837,7 @@
 					"    },",
 					"}",
 					"",
+					"log.t('Functions for connections')",
 					"co = {",
 					"    reqToStr: (req) => `${req.method} ${req.url}`,",
 					"    sendRequest: (req) => {",
@@ -8902,6 +8858,18 @@
 					"    },",
 					"}",
 					"",
+					"log.t('Constants initialization')",
+					"const TOKEN_DURATION_S = 4147200",
+					"const MANAGER_COOKIE_NAME = `pmFrontToken`",
+					"",
+					"const CATALOG_JWT_NAME = `catalogJwt-${pm.environment.name}`; mem.set('catalogJwtName', CATALOG_JWT_NAME)",
+					"const STORAGE_JWT_NAME = `storageJwt-${pm.environment.name}`; mem.set('storageJwtName', STORAGE_JWT_NAME)",
+					"const MANAGER_JWT_NAME = `managerJwt-${pm.environment.name}`; mem.set('managerJwtName', MANAGER_JWT_NAME)",
+					"const PORTAL_TOKEN_NAME = `portalJwt-${pm.environment.name}`; mem.set('portalJwtName', PORTAL_TOKEN_NAME)",
+					"",
+					"if (!pm.environment.get('portalUsr')) mem.set('skipPortalConnection', true)",
+					"",
+					"log.t('Functions for creating JWTs')",
 					"secu = {",
 					"    isTokenValid: (token) => {",
 					"        const here = 'isTokenValid'",
@@ -8966,7 +8934,7 @@
 					"        const here = 'getStorageJwt'",
 					"        log.t(here)",
 					"        const tokenName = mem.get(STORAGE_JWT_NAME)",
-					"        const token = mem.get(tokenName)",
+					"        const token = pm.vault.get(tokenName)",
 					"        if (secu.isTokenValid(token)) return token",
 					"",
 					"        jwtAuthUrl = pathJoin(mem.get('jwtAuthUrl'), 'forge')",
@@ -9042,12 +9010,15 @@
 					"    }",
 					"}",
 					"",
+					"",
+					"",
 					"// --------------------------------------------------------------------------------------------------------------",
 					"// Init function",
 					"// --------------------------------------------------------------------------------------------------------------",
 					"const init = async () => {",
 					"    await Promise.all([secu.getCatalogJwt()])",
 					"}",
+					"",
 					"",
 					"// --------------------------------------------------------------------------------------------------------------",
 					"// Launch",
@@ -9072,77 +9043,15 @@
 	"variable": [
 		{
 			"key": "stamp",
-			"value": "soft-checks"
+			"value": "catalog-tests",
+			"type": "string"
 		},
 		{
 			"key": "dateUpdate",
 			"value": ""
 		},
 		{
-			"key": "catalogJwt",
-			"value": ""
-		},
-		{
 			"key": "postmanEnv",
-			"value": ""
-		},
-		{
-			"value": ""
-		},
-		{
-			"key": "undefined",
-			"value": ""
-		},
-		{
-			"key": "eyJhbGciOiJFZERTQSJ9.eyJqdGkiOiJkZWExNDc2ZS0zZjdiLTQ2NjgtODhlMC0wYjhkYThlZGM0OTMiLCJpYXQiOjE3MzgyMjg0NjYsImV4cCI6MTc0MjM3NTY2Niwic3ViIjoicnVkaV9hcGlfcG0iLCJjbGllbnRfaWQiOiJvbSIsInJlcV9tdGQiOiJhbGwiLCJyZXFfdXJsIjoiYWxsIn0.JD-lq4ITQw1ffQk5jWJPknvVH4blpgQFeWGq0VrZyflTpmybYqs0WT4C7hfqoEp1RKFkv1OC2elDvQ8G23m8BQ",
-			"value": ""
-		},
-		{
-			"key": "catalogJwtName",
-			"value": ""
-		},
-		{
-			"key": "storageJwtName",
-			"value": ""
-		},
-		{
-			"key": "managerJwtName",
-			"value": ""
-		},
-		{
-			"key": "managerCookieName",
-			"value": ""
-		},
-		{
-			"key": "portalJwtName",
-			"value": ""
-		},
-		{
-			"key": "portalJwt",
-			"value": ""
-		},
-		{
-			"key": "softOrg1Id",
-			"value": ""
-		},
-		{
-			"key": "softOrg1Name",
-			"value": ""
-		},
-		{
-			"key": "softOrg1Address",
-			"value": ""
-		},
-		{
-			"key": "softContact1Id",
-			"value": ""
-		},
-		{
-			"key": "softContact1Name",
-			"value": ""
-		},
-		{
-			"key": "softContact1Email",
 			"value": ""
 		}
 	]
