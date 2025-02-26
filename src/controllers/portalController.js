@@ -60,7 +60,11 @@ import { directPost, httpDelete, httpGet, httpPost, httpPut } from '../utils/htt
 import { isUUID } from '../definitions/schemaValidators.js'
 import { StorageStatus } from '../definitions/thesaurus/StorageStatus.js'
 
-import { getObjectWithRudiId, storePortalToken } from '../db/dbQueries.js'
+import {
+  getLatestStoredPortalToken,
+  getObjectWithRudiId,
+  storePortalToken,
+} from '../db/dbQueries.js'
 
 import { isEveryMediaAvailable, setMetadataStatusToSent } from '../definitions/models/Metadata.js'
 import {
@@ -174,6 +178,23 @@ export const getPortalToken = async () => {
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
     //  new InternalServerError(`Failed to get a new token from the portal: ${err}`)
+  }
+}
+
+/**
+ * Ensure a token is valid
+ */
+export const checkStoredToken = async (req, reply) => {
+  const fun = 'checkStoredToken'
+  logT(mod, fun)
+  // logT(mod, fun, `< GET portal check token`)
+  try {
+    if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
+    const token = await getLatestStoredPortalToken()
+    if (!token) throw new NotFoundError('No Portal token is actually stored')
+    return await getTokenCheckedByPortal(token[FIELD_TOKEN])
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
   }
 }
 
