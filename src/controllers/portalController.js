@@ -150,7 +150,7 @@ export const getPortalJwtPubKey = async (kid) => {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     if (!_cachedPortalJwtPubs[kid]) {
       const publicKeyUrl = getUrlPortalAuthPub()
-      // logD(mod, fun, 'publicKeyUrl: ' + publicKeyUrl)
+      logD(mod, fun, 'publicKeyUrl: ' + publicKeyUrl)
 
       const portalPubKeysList = (await axios.get(publicKeyUrl, getPortalAuthHeaders()))?.data?.keys
       logV(mod, fun, `publicKeyObj: ${beautify(portalPubKeysList)}`)
