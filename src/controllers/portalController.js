@@ -549,6 +549,7 @@ export const sendMetadataToPortal = async (metadataId) => {
       logD(mod, fun, `Metadata is on the portal and same: not updating '${metadataId}'`)
     }
   } catch (err) {
+    logW(mod, fun, beautify(err))
     report.description = 'An error occurred while sending the metadata to the Portal'
     await createErrorReport(err, report, 'update metadata status')
     throw RudiError.treatError(mod, fun, err)

@@ -80,8 +80,10 @@ export const isPortalConnectionDisabled = () => !API_PORTAL_URL?.startsWith('htt
 const AUTH_URL = getPortalUserConf('auth_url') ?? API_PORTAL_URL
 const getAuthUrl = (...url) => pathJoin(AUTH_URL, ...url)
 
-const AUTH_GET = getAuthUrl(getPortalConf('auth_get'))
-const AUTH_CHK = getAuthUrl(getPortalConf('auth_chk'))
+// const AUTH_GET = getAuthUrl(getPortalConf('auth_get'))
+const AUTH_GET = getAuthUrl('oauth/token')
+// const AUTH_CHK = getAuthUrl(getPortalConf('auth_chk'))
+const AUTH_CHK = getAuthUrl('oauth/check_token')
 // const JWT_PUB_KEY_URL = getAuthUrl(getPortalConf('auth_pub'))
 const JWT_PUB_KEY_URL = getAuthUrl('oauth/jwks')
 const CRYPT_PUB_KEY_URL = getAuthUrl(getPortalConf('encrypt_pub'))
