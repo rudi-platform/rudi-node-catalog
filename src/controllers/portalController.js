@@ -153,7 +153,7 @@ export const getPortalJwtPubKey = async (kid) => {
       logD(mod, fun, 'publicKeyUrl: ' + publicKeyUrl)
 
       const portalPubKeysList = (await axios.get(publicKeyUrl, getPortalAuthHeaders()))?.data?.keys
-      logV(mod, fun, `publicKeyObj: ${beautify(portalPubKeysList)}`)
+      // logV(mod, fun, `publicKeyObj: ${beautify(portalPubKeysList)}`)
       const format = 'jwk'
       for (const key of portalPubKeysList) {
         const pubKey = createPublicKey({ key, format })
