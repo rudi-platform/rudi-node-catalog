@@ -197,7 +197,6 @@ let _cachedPortalToken
 const updateCachedPortalJwt = async () => {
   const fun = 'updateCachedPortalJwt'
   _cachedPortalToken = await getNewTokenFromPortal()
-  logV(mod, fun, `_cachedPortalToken=${beautify(_cachedPortalToken)}`)
   return _cachedPortalToken.jwt
 }
 const getCachedPortalJwt = () => _cachedPortalToken.jwt
@@ -324,9 +323,7 @@ export const getTokenCheckedByPortal = async (jwt) => {
 }
 
 /**
- * (obsolete Jan. 2025)
- * This does not work anymore and should not be used.
- * Portal's public key that made it possible to verify portal tokens is not accessible anymore.
+ * Verifies the JWT signature with the portal public key declared in the headers of the JWT
  * @param {*} jwt
  * @returns
  */
@@ -339,10 +336,19 @@ export const verifyPortalTokenSign = async (jwt) => {
     if (!jwt) throw new ForbiddenError('No token to verify!', mod, fun)
 
     const { header } = tokenStringToJwtObject(jwt)
-    const kid = header.kid
+    const kid = header?.kid
+    if (kid) logT(mod, fun, `JWT signed with key ID: ${kid}`)
+    else {
+      logW(mod, fun, `Cannot verify JWT sign! Unexpected portal JWT headers: ${beautify(header)}`)
+      return false
+    }
 
     const portalPubKey = await getPortalJwtPubKey(kid)
-    logV(mod, fun, `portalPubKey: ${beautify(portalPubKey)}`)
+    if (portalPubKey) logV(mod, fun, `portalPubKey: ${beautify(portalPubKey)}`)
+    else {
+      logW(mod, fun, `Cannot verify JWT sign! No portal JWT sign pub key found for ID ${kid}`)
+      return false
+    }
     const { payload } = verifyToken(portalPubKey, jwt)
 
     if (!payload[JWT_USER] && payload[REQ_MTD])
