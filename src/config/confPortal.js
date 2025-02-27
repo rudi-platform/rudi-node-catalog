@@ -82,7 +82,8 @@ const getAuthUrl = (...url) => pathJoin(AUTH_URL, ...url)
 
 const AUTH_GET = getAuthUrl(getPortalConf('auth_get'))
 const AUTH_CHK = getAuthUrl(getPortalConf('auth_chk'))
-const JWT_PUB_KEY_URL = getAuthUrl(getPortalConf('auth_pub'))
+// const JWT_PUB_KEY_URL = getAuthUrl(getPortalConf('auth_pub'))
+const JWT_PUB_KEY_URL = getAuthUrl('oauth/jwks')
 const CRYPT_PUB_KEY_URL = getAuthUrl(getPortalConf('encrypt_pub'))
 
 export const getUrlPortalAuthGet = () => AUTH_GET
