@@ -77,8 +77,7 @@ const API_PORTAL_URL = getPortalUserConf('portal_url')
 export const isPortalConnectionDisabled = () => !API_PORTAL_URL?.startsWith('http')
 
 // ----- Auth
-const AUTH_URL = getPortalUserConf('auth_url') ?? API_PORTAL_URL
-const getAuthUrl = (...url) => pathJoin(AUTH_URL, ...url)
+const getAuthUrl = (...url) => pathJoin(API_PORTAL_URL, ...url)
 
 const AUTH_GET = getAuthUrl(getPortalConf('oauth_get'))
 const AUTH_CHK = getAuthUrl(getPortalConf('oauth_chk'))
@@ -167,7 +166,6 @@ if (isPortalConnectionDisabled()) {
   logD(mod, '', NO_PORTAL_MSG)
 } else {
   logD(mod, '', `Portal - Data: '${API_PORTAL_URL}'`)
-  logD(mod, '', `Portal - Auth: '${AUTH_URL}'`)
 }
 
 // -------------------------------------------------------------------------------------------------
