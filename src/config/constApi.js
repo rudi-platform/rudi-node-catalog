@@ -167,8 +167,6 @@ export const URL_PV_THESAURUS_ACCESS = `${URL_PREFIX_PRIVATE}/${URL_SUFFIX_THESA
 export const URL_PV_LICENCE_ACCESS = `${URL_PREFIX_PRIVATE}/${URL_LICENCE_SUFFIX}`
 export const URL_PV_LICENCE_CODES_ACCESS = `${URL_PREFIX_PRIVATE}/${URL_SUFFIX_LICENCE_CODES}`
 
-export const URL_PREFIX_CHECK = `${URL_PREFIX_PRIVATE}/${ACT_CHECK}`
-
 // -------------------------------------------------------------------------------------------------
 // Syslog places
 // -------------------------------------------------------------------------------------------------

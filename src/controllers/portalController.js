@@ -3,12 +3,7 @@ const mod = 'portalCtrl'
 // -------------------------------------------------------------------------------------------------
 // External dependencies
 // -------------------------------------------------------------------------------------------------
-import {
-  extractJwt,
-  readPublicKeyPem,
-  tokenStringToJwtObject,
-  verifyToken,
-} from '@aqmo.org/jwt-lib'
+import { extractJwt, tokenStringToJwtObject, verifyToken } from '@aqmo.org/jwt-lib'
 import axios from 'axios'
 import https from 'node:https'
 
@@ -37,8 +32,7 @@ import {
 // -------------------------------------------------------------------------------------------------
 import { JWT_EXP, REQ_MTD } from '../config/constJwt.js'
 import { beautify, dateEpochSToIso, nowISO, timeEpochS } from '../utils/jsUtils.js'
-import { accessProperty, accessReqParam } from '../utils/jsonAccess.js'
-import { logD, logE, logT, logV, logW } from '../utils/logging.js'
+import { logD, logE, logI, logT, logV, logW } from '../utils/logging.js'
 
 import {
   FIELD_TOKEN,
@@ -52,7 +46,6 @@ import {
   isPortalConnectionDisabled,
   JWT_USER,
   NO_PORTAL_MSG,
-  PARAM_TOKEN,
   postPortalMetaUrl,
 } from '../config/confPortal.js'
 import { directPost, httpDelete, httpGet, httpPost, httpPut } from '../utils/httpReq.js'
@@ -60,12 +53,9 @@ import { directPost, httpDelete, httpGet, httpPost, httpPut } from '../utils/htt
 import { isUUID } from '../definitions/schemaValidators.js'
 import { StorageStatus } from '../definitions/thesaurus/StorageStatus.js'
 
-import {
-  getLatestStoredPortalToken,
-  getObjectWithRudiId,
-  storePortalToken,
-} from '../db/dbQueries.js'
+import { getObjectWithRudiId } from '../db/dbQueries.js'
 
+import { createPublicKey } from 'node:crypto'
 import { isEveryMediaAvailable, setMetadataStatusToSent } from '../definitions/models/Metadata.js'
 import {
   BadRequestError,
@@ -98,117 +88,8 @@ export const getPortalAuthHeaderBearer = async (httpsAgent) => {
 }
 
 // -------------------------------------------------------------------------------------------------
-// Token manager
-// -------------------------------------------------------------------------------------------------
-// import { RMTokenManager } from '../definitions/constructors/RMTokenManager'
-// const portalInfo = {
-//   host: API_GET_HOST,
-//   port: API_GET_PORT,
-//   path_request: API_GET_PATH,
-//   path_check: API_SEND_PATH,
-//   login: LOGIN,
-//   passw: PASSW,
-// }
-// const agent = `RUDI/${VERSION}`
-
-// const tokenManager = new RMTokenManager(portalInfo, agent)
-
-// -------------------------------------------------------------------------------------------------
-// REST access
-// -------------------------------------------------------------------------------------------------
-export const exposedGetPortalToken = async (req, reply) => {
-  const fun = 'exposedGetPortalToken'
-  logT(mod, fun, `< GET new portal token`)
-  try {
-    if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
-    // logD(mod, fun, getAuthUrl())
-    return await getNewTokenFromPortal()
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
-
-export const checkPortalTokenInHeader = async (req, isCheckOptional) => {
-  const fun = 'checkPortalTokenInHeader'
-  logT(mod, fun)
-  try {
-    if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
-    const token = extractJwt(req)
-    await getTokenCheckedByPortal(token)
-    return token
-    // const jwtInfo = await verifyPortalToken(token)
-    // return jwtInfo
-  } catch (err) {
-    if (isCheckOptional) throw err
-    const error = new UnauthorizedError(err)
-    throw RudiError.treatError(mod, fun, error)
-  }
-}
-
-// -------------------------------------------------------------------------------------------------
 // Controllers
 // -------------------------------------------------------------------------------------------------
-let _cachedPortalToken
-/**
- * Get a new token from the portal
- */
-export const getPortalToken = async () => {
-  const fun = 'getPortalToken'
-  logT(mod, fun)
-  try {
-    if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
-    if (!_cachedPortalToken || _cachedPortalToken.exp < timeEpochS()) {
-      logD(mod, fun, 'Need for a new portal token')
-      _cachedPortalToken = await getNewTokenFromPortal()
-    }
-
-    let token = accessProperty(_cachedPortalToken, FIELD_TOKEN)
-    // logD(mod, fun, `token: ${ beautify(token)}`)
-    const checkRes = await getTokenCheckedByPortal(token)
-    if (!checkRes?.active) {
-      logD(mod, fun, 'Renewing portal token')
-      _cachedPortalToken = await getNewTokenFromPortal()
-      token = accessProperty(_cachedPortalToken, FIELD_TOKEN)
-    }
-    // await verifyPortalToken(token)
-    else logD(mod, fun, 'Stored token seems OK')
-    _cachedPortalToken.exp = token.exp
-    return token
-    // logD(mod, fun, 'Stored token was validated by the Portal')
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-    //  new InternalServerError(`Failed to get a new token from the portal: ${err}`)
-  }
-}
-
-/**
- * Ensure a token is valid
- */
-export const checkStoredToken = async (req, reply) => {
-  const fun = 'checkStoredToken'
-  logT(mod, fun)
-  // logT(mod, fun, `< GET portal check token`)
-  try {
-    if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
-    const token = await getLatestStoredPortalToken()
-    if (!token) throw new NotFoundError('No Portal token is actually stored')
-    return await getTokenCheckedByPortal(token[FIELD_TOKEN])
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
-
-export const checkInputToken = async (req, reply) => {
-  const fun = 'checkInputToken'
-  logT(mod, fun)
-  try {
-    if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
-    const token = accessReqParam(req.params, PARAM_TOKEN)
-    return await getTokenCheckedByPortal(token[FIELD_TOKEN])
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
 
 export const getMetadata = async (req, reply) => {
   const fun = 'getMetadata'
@@ -261,23 +142,29 @@ export const deleteMetadata = async (req, reply) => {
 // Portal calls: GET public key
 // -------------------------------------------------------------------------------------------------
 // ----- GET Portal public key
-let CACHED_PORTAL_PUB
-export const getPortalJwtPubKey = async () => {
+const _cachedPortalJwtPubs = {}
+export const getPortalJwtPubKey = async (kid) => {
   const fun = 'getPortalJwtPubKey'
   logT(mod, fun)
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
-    if (CACHED_PORTAL_PUB) return CACHED_PORTAL_PUB
+    if (!_cachedPortalJwtPubs[kid]) {
+      const publicKeyUrl = getUrlPortalAuthPub()
+      // logD(mod, fun, 'publicKeyUrl: ' + publicKeyUrl)
 
-    const publicKeyUrl = getUrlPortalAuthPub()
-    // logD(mod, fun, 'publicKeyUrl: ' + publicKeyUrl)
-
-    const publicKeyObj = (await axios.get(publicKeyUrl, getPortalAuthHeaders()))?.data
-    // logD(mod, fun, 'publicKeyObj: ' + beautify(publicKeyObj))
-    const cachedPortalJwtPubKeyPem = publicKeyObj?.data?.value
-    // logD(mod, fun, `portalJwtPubKey: ${cachedPortalJwtPubKey}`)
-    CACHED_PORTAL_PUB = readPublicKeyPem(cachedPortalJwtPubKeyPem)
-    return CACHED_PORTAL_PUB
+      const portalPubKeysList = (await axios.get(publicKeyUrl, getPortalAuthHeaders()))?.data?.keys
+      logV(mod, fun, `publicKeyObj: ${beautify(portalPubKeysList)}`)
+      const format = 'jwk'
+      for (const key of portalPubKeysList) {
+        const pubKey = createPublicKey({ key, format })
+        // const keyPem = pubKey.export({ type: 'pkcs1', format: 'pem' })
+        // logV(mod, fun, `keyPem:\n ${beautify(keyPem)}`)
+        // logV(mod, fun, `readPublicKeyPem:\n ${beautify(readPublicKeyPem(keyPem))}`)
+        _cachedPortalJwtPubs[key.kid] = pubKey
+      }
+      logV(mod, fun, `_cachedPortalJwtPubs: ${beautify(_cachedPortalJwtPubs)}`)
+    }
+    return _cachedPortalJwtPubs[kid]
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -304,25 +191,55 @@ export const getPortalEncryptPubKey = async () => {
 // -------------------------------------------------------------------------------------------------
 // Portal calls: token
 // -------------------------------------------------------------------------------------------------
+
+let _cachedPortalToken
+
+const updateCachedPortalJwt = async () => {
+  const fun = 'updateCachedPortalJwt'
+  _cachedPortalToken = await getNewTokenFromPortal()
+  logV(mod, fun, `_cachedPortalToken=${beautify(_cachedPortalToken)}`)
+  return _cachedPortalToken.jwt
+}
+const getCachedPortalJwt = () => _cachedPortalToken.jwt
+const hasExpiredPortalJwt = () => !_cachedPortalToken?.jwt || _cachedPortalToken.exp < timeEpochS()
+
+/**
+ * Get a valid portal token
+ */
+export const getPortalToken = async () => {
+  const fun = 'getPortalToken'
+  logT(mod, fun)
+  try {
+    if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
+    if (hasExpiredPortalJwt()) {
+      logD(mod, fun, 'Need for a new portal token')
+      return updateCachedPortalJwt()
+    }
+    const portalJwt = getCachedPortalJwt()
+    logI(mod, fun, `cached portal JWT=${portalJwt}`)
+    const checkRes = await getTokenCheckedByPortal(portalJwt)
+    if (!checkRes?.active) return updateCachedPortalJwt()
+    else logD(mod, fun, 'Stored token seems OK')
+    return portalJwt
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+/**
+ * Renew portal token
+ */
 export const getNewTokenFromPortal = async () => {
   const fun = 'getNewTokenFromPortal'
   logT(mod, fun)
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
+
     const [basicAuthHeaders, portalRequestBody] = getPortalAuthCredentials()
     const portalAuthUrl = getUrlPortalAuthGet()
-    // LM -- the password is now provided in base64
-    // logD(mod, fun, `pwdb64: ${pwdb64}`)
-    // logD(mod, fun, `pwd: ${pwd}`)
-    // const body = {
-    //   grant_type: 'client_credentials',
-    //   username: usr,
-    //   password: pwd,
-    // }
-    // const body = `grant_type=client_credentials&username=${usr}&password=${pwd}`
-    let answer
+    let portalAnswer
     try {
-      answer = await directPost(portalAuthUrl, portalRequestBody, basicAuthHeaders)
+      portalAnswer = await directPost(portalAuthUrl, portalRequestBody, basicAuthHeaders)
       // logT(mod, fun, 'OK portal answered')
     } catch (err) {
       logE(mod, fun, `ERR GET portal JWT: ${beautify(err)}`)
@@ -339,45 +256,27 @@ export const getNewTokenFromPortal = async () => {
         throw RudiError.treatError(mod, fun, error)
       }
     }
-    // logD(mod, fun, `answer.status: ${answer.status}`)
-    // logD(mod, fun, `answer.data: ${beautify(answer.data)}`)
-
-    if (answer?.status === 200) {
-      // logD(mod, fun, `config: ${ beautify(answer.config)}`)
-      // logD(mod, fun, `data: ${ beautify(answer.data)}`)
-      const portalToken = answer.data
-
-      const jwToken = portalToken?.[FIELD_TOKEN]
-      if (typeof portalToken !== 'object' || !portalToken[FIELD_TOKEN])
+    if (portalAnswer?.status === 200) {
+      const portalToken = portalAnswer.data
+      const jwt = portalToken?.[FIELD_TOKEN]
+      if (!jwt)
         throw new NotAcceptableError(`The portal delivered an incorrect reply: ${portalToken}`)
 
-      // logT(mod, fun, 'OK we got a new token')
-      // logD(mod, fun, `portalToken: ${ beautify(portalToken)}`)
-      // let jwtBody
-      // try {
-      //   jwtBody = (await verifyPortalToken(jwToken))[1]
-      // } catch (err) {
-      //   logE(mod, fun, `ERR while verifying portal JWT: ${beautify(err)}`)
-      //   throw new ForbiddenError('Could not verify portal JWT', mod, fun)
-      // }
-      // portalToken[JWT_EXP] = jwtBody[JWT_EXP]
-      portalToken[JWT_EXP] = tokenStringToJwtObject(jwToken)?.payload[JWT_EXP]
-      logD(mod, fun, `We got a new token, that expires on ${dateEpochSToIso(portalToken[JWT_EXP])}`)
+      logT(mod, fun, 'OK we got a new token')
       try {
-        await getTokenCheckedByPortal(portalToken[FIELD_TOKEN])
-        // logT(mod, fun, 'OK portal checked the token')
+        await verifyPortalTokenSign(jwt)
       } catch (err) {
-        logE(mod, fun, `ERR while checking portal JWT: ${beautify(err)}`)
-        throw ForbiddenError('Could not get the JWT checked by the portal', mod, fun)
+        logE(mod, fun, `ERR while verifying portal JWT: ${beautify(err)}`)
+        throw new ForbiddenError('Could not verify portal JWT', mod, fun)
       }
-      await storePortalToken(portalToken)
-      // logT(mod, fun, 'OK token stored')
+      const exp = tokenStringToJwtObject(jwt)?.payload[JWT_EXP]
+      logD(mod, fun, `We got a new token, that expires on ${dateEpochSToIso(exp)}`)
 
-      return portalToken
+      return { jwt, exp }
     } else {
-      const errMsg = `${beautify(answer)}`
+      const errMsg = `${beautify(portalAnswer)}`
       logW(mod, fun, errMsg)
-      throw RudiError.createRudiHttpError(answer.status, errMsg, mod, fun)
+      throw RudiError.createRudiHttpError(portalAnswer.status, errMsg, mod, fun)
     }
   } catch (err) {
     if (RudiError.isRudiError(err)) {
@@ -413,7 +312,8 @@ export const getTokenCheckedByPortal = async (jwt) => {
     throw RudiError.treatError(mod, fun, err)
   }
   if (portalResponse?.status === 200 && portalResponse?.data?.active) {
-    logV(mod, fun, `RUDI Portal validated the token: ${beautify(portalResponse.data)}`)
+    logV(mod, fun, `RUDI Portal validated the token`)
+    // logV(mod, fun, `RUDI Portal validated the token: ${beautify(portalResponse.data)}`)
     return portalResponse.data
   } else
     throw new ForbiddenError(
@@ -427,19 +327,23 @@ export const getTokenCheckedByPortal = async (jwt) => {
  * (obsolete Jan. 2025)
  * This does not work anymore and should not be used.
  * Portal's public key that made it possible to verify portal tokens is not accessible anymore.
- * @param {*} accessToken
+ * @param {*} jwt
  * @returns
  */
-export const verifyPortalToken = async (accessToken) => {
-  const fun = 'verifyPortalToken'
+export const verifyPortalTokenSign = async (jwt) => {
+  const fun = 'verifyPortalTokenSign'
   logT(mod, fun)
 
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
-    if (!accessToken) throw new ForbiddenError('No token to verify!', mod, fun)
+    if (!jwt) throw new ForbiddenError('No token to verify!', mod, fun)
 
-    const portalPubKey = await getPortalJwtPubKey()
-    const { header, payload } = verifyToken(portalPubKey, accessToken)
+    const { header } = tokenStringToJwtObject(jwt)
+    const kid = header.kid
+
+    const portalPubKey = await getPortalJwtPubKey(kid)
+    logV(mod, fun, `portalPubKey: ${beautify(portalPubKey)}`)
+    const { payload } = verifyToken(portalPubKey, jwt)
 
     if (!payload[JWT_USER] && payload[REQ_MTD])
       throw new ForbiddenError(
@@ -686,5 +590,52 @@ export const deletePortalMetadata = async (metadataId) => {
   } catch (err) {
     const error = new Error(`Couldn't delete on Portal side: ${err}`)
     throw RudiError.treatError(mod, fun, error)
+  }
+}
+
+// -------------------------------------------------------------------------------------------------
+// REST access
+// -------------------------------------------------------------------------------------------------
+export const checkPortalTokenInHeader = async (req, isCheckOptional) => {
+  const fun = 'checkPortalTokenInHeader'
+  logT(mod, fun)
+  try {
+    if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
+    const token = extractJwt(req)
+    await verifyPortalTokenSign(token)
+    await getTokenCheckedByPortal(token)
+    return token
+    // return jwtInfo
+  } catch (err) {
+    if (isCheckOptional) throw err
+    const error = new UnauthorizedError(err)
+    throw RudiError.treatError(mod, fun, error)
+  }
+}
+
+export const exposedGetPortalToken = async (req, reply) => {
+  const fun = 'exposedGetPortalToken'
+  logT(mod, fun, `< GET new portal token`)
+  try {
+    if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
+    // logD(mod, fun, getAuthUrl())
+    const token = await getPortalToken()
+    return { access_token: token }
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+export const exposedCheckPortalToken = async (req, reply) => {
+  const fun = 'exposedCheckPortalToken'
+  logT(mod, fun, `< GET new portal token checked`)
+  try {
+    if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
+    // logD(mod, fun, getAuthUrl())
+    const token = await getPortalToken()
+    const { active, exp } = await getTokenCheckedByPortal(token)
+    return { active, exp }
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
   }
 }

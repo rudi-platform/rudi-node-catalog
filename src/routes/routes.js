@@ -43,7 +43,6 @@ import {
   URL_SUFFIX_NODE_VERSION,
   URL_SUFFIX_PORTAL,
   URL_SUFFIX_THESAURUS,
-  URL_SUFFIX_TOKEN_CHECK,
   URL_SUFFIX_TOKEN_GET,
 } from '../config/constApi.js'
 
@@ -133,8 +132,8 @@ import {
 import { getPortalBaseUrl } from '../config/confPortal.js'
 import { getCatalog, getPrivatePath, getPublicPath, getPublicUrl } from '../config/confSystem.js'
 import {
-  checkStoredToken,
   deleteMetadata,
+  exposedCheckPortalToken,
   exposedGetPortalToken,
   getMetadata,
   sendMetadata,
@@ -762,7 +761,6 @@ export const devRoutes = [
   // -----------------------------------------------------------------------------------------------
   // Portal token
   // -----------------------------------------------------------------------------------------------
-  // Get a new token from the Portal
   {
     description: 'Get a new token from the Portal',
     method: 'GET',
@@ -770,11 +768,11 @@ export const devRoutes = [
     handler: exposedGetPortalToken,
     config: { [ROUTE_NAME]: 'dev_get_portal_token' },
   },
-  // Get a token checked by the Portal
   {
+    description: 'Get a portal token checked',
     method: 'GET',
-    url: getPrivatePath(URL_SUFFIX_PORTAL, URL_SUFFIX_TOKEN_GET, URL_SUFFIX_TOKEN_CHECK),
-    handler: checkStoredToken,
+    url: getPrivatePath(URL_SUFFIX_PORTAL, URL_SUFFIX_TOKEN_GET, ACT_CHECK),
+    handler: exposedCheckPortalToken,
     config: { [ROUTE_NAME]: 'dev_check_portal_token' },
   },
 
