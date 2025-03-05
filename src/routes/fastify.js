@@ -3,7 +3,7 @@ const mod = 'fastify'
 // -------------------------------------------------------------------------------------------------
 // Constants
 // -------------------------------------------------------------------------------------------------
-import { ROUTE_NAME, STATUS_CODE, URL_PREFIX_PRIVATE } from '../config/constApi.js'
+import { ROUTE_NAME, STATUS_CODE } from '../config/constApi.js'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
@@ -15,16 +15,11 @@ import {
   getPrivatePath,
   getServerAddress,
   getServerPort,
-  shouldControlPrivateRequests,
-  shouldControlPublicRequests,
 } from '../config/confSystem.js'
 
 import { SHOULD_SYSLOG, shouldShowErrorPile, shouldShowRoutes } from '../config/confLogs.js'
 
-import { JWT_USER, isPortalConnectionDisabled } from '../config/confPortal.js'
-
 import {
-  logD,
   logE,
   logI,
   logLine,
@@ -35,8 +30,6 @@ import {
   sysNotice,
   sysOnError,
 } from '../utils/logging.js'
-
-import { JWT_CLIENT, JWT_SUB } from '../config/constJwt.js'
 
 import { RudiError } from '../utils/errors.js'
 
@@ -50,8 +43,6 @@ import {
   unrestrictedPrivateRoutes,
 } from './routes.js'
 
-import { checkPortalTokenInHeader } from '../controllers/portalController.js'
-import { checkRequesterPermission } from '../controllers/tokenController.js'
 import { getUrlMaxLength } from '../utils/protection.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -61,8 +52,8 @@ import { getUrlMaxLength } from '../utils/protection.js'
 // import fastifyMultipart from '@fastify/multipart'
 import fastifyCompress from '@fastify/compress'
 import fastify from 'fastify'
-import { markdownTable } from 'markdown-table'
 import { createIpsMsg } from '../utils/httpReq.js'
+import { getRestApi, onPrivateRoute } from './routes_secu.js'
 
 // const fastifyLogger = new FFLogger('warn')
 const catalogApp = fastify({
@@ -254,155 +245,17 @@ catalogApp.addHook('onSend', (request, reply, payload, next) => {
 // -------------------------------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------------------------------
-// Pre-handler functions
-// -------------------------------------------------------------------------------------------------
-/**
- * Pre-handler for requests that need no authentication ("free routes")
- * @param {object} req incoming request
- * @param {object} reply reply
- */
-async function onPublicRoute(req, reply) {
-  const fun = 'onPublicRoute'
-  try {
-    logT(mod, fun, `${req.method} ${req.url} `)
-    const context = CallContext.getCallContextFromReq(req)
-
-    if (isPortalConnectionDisabled()) {
-      try {
-        const { subject, clientId } = await checkRequesterPermission(req, true)
-        context.clientApp = subject
-        context.reqUser = clientId
-      } catch {
-        // It's OK to have no token
-        logT(mod, fun, `Token-less call to ${req.method} ${req.url} `)
-      }
-    } else {
-      try {
-        // Checking the token, if it exists, to retrieve the user info
-        const portalJwt = await checkPortalTokenInHeader(req, true)
-        const jwtPayload = portalJwt[1]
-        logD(mod, fun, `Payload: ${beautify(jwtPayload)}`)
-        context.clientApp = jwtPayload[JWT_SUB] ?? 'RUDI Portal'
-        context.reqUser = jwtPayload[JWT_USER] ?? jwtPayload[JWT_CLIENT]
-      } catch {
-        try {
-          const { subject, clientId } = await checkRequesterPermission(req, true)
-          context.clientApp = subject
-          context.reqUser = clientId
-        } catch {
-          // It's OK to have no token
-          logT(mod, fun, `Token-less call to ${req.method} ${req.url} `)
-        }
-      }
-      context.logInfo('route', fun, 'v1 API call')
-    }
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
-
-/**
- * Pre-handler for requests that need a "public" (aka portal) authentication
- * ("public routes")
- * @param {object} req incoming request
- * @param {object} reply reply
- */
-async function onPortalRoute(req, reply) {
-  const fun = 'onPortalRoute'
-  try {
-    logT(mod, fun, `${req.method} ${req.url} `)
-    if (!shouldControlPublicRequests()) return true
-
-    // If incoming request has no token, raise an error
-    const portalJwt = await checkPortalTokenInHeader(req, false)
-    const jwtPayload = portalJwt[1]
-    logD(mod, fun, `Payload: ${beautify(jwtPayload)}`)
-
-    const context = CallContext.getCallContextFromReq(req)
-    context.clientApp = jwtPayload[JWT_SUB] ?? 'RUDI Portal'
-    context.reqUser = jwtPayload[JWT_USER] ?? jwtPayload[JWT_CLIENT]
-
-    context.logInfo('route', fun, 'API call')
-    return true
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
-
-/**
- * Pre-handler for requests that need a "private" (aka rudi producer node)
- * authentication ("private/back-office routes")
- * These requests should normally bear a user identification
- * @param {object} req incoming request
- * @param {object} reply reply
- */
-async function onPrivateRoute(req, reply) {
-  const fun = 'onPrivateRoute'
-  try {
-    // logT(mod, fun, `${req.method} ${req.url} `)
-    if (!shouldControlPrivateRequests()) {
-      logW(
-        mod,
-        fun,
-        'Not checking incoming JWT, set "should_control_public_requests = true" to enforce checking'
-      )
-      return true
-    }
-
-    const { subject, clientId } = await checkRequesterPermission(req, false)
-
-    const context = CallContext.getCallContextFromReq(req)
-    context.clientApp = subject
-    context.reqUser = clientId
-
-    context.logInfo('route', fun, 'API call')
-    return
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
-
-/**
- * Pre-handler for private requests that don't need an
- * authentication ("unrestricted private routes")
- * These requests are normally not user driven actions, but sent by an app
- * such as the prodmanager
- * @param {object} req incoming request
- * @param {object} reply reply
- */
-async function onUnrestrictedPrivateRoute(req, reply) {
-  const fun = 'onUnrestrictedPrivateRoute'
-  try {
-    logT(mod, fun, `${req.method} ${req.url} `)
-    const context = CallContext.getCallContextFromReq(req)
-
-    try {
-      const { subject, clientId } = await checkRequesterPermission(req, true)
-      context.clientApp = subject
-      context.reqUser = clientId
-    } catch {
-      // It's OK to have no token
-      logT(mod, fun, `Token-less call to ${req.method} ${req.url} `)
-    } finally {
-      context.logInfo('route', fun, 'API call')
-    }
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
-}
-
-// -------------------------------------------------------------------------------------------------
 // ROUTES
 // -------------------------------------------------------------------------------------------------
 let toggle = true
-function declareRouteGroup(routeGroupName, routeGroup, preHandler) {
+function declareRouteGroup(routeGroupName, routeGroup) {
   const fun = 'declareRouteGroup'
   // logT(mod, 'declareRouteGroup', routeGroupName)
 
   try {
     routeGroup.map((route, index) => {
       // logT(mod, 'declareRouteGroup', `${routeGroupName} ${index}`)
-      route.preHandler = preHandler
+      if (!route.preHandler) route.preHandler = onPrivateRoute
       catalogApp.route(route)
       const displayRoute = `${padA1(index)}: ${route.method} ${route.url}`
       if (shouldShowRoutes())
@@ -429,80 +282,23 @@ function declareRouteGroup(routeGroupName, routeGroup, preHandler) {
 const declareRoutes = () => {
   // logT(mod, 'declareRoutes')
   // Beware of redirections: unrestricted first, then private/dev, then public!
-  declareRouteGroup('Unrestricted', unrestrictedPrivateRoutes, onUnrestrictedPrivateRoute)
-  declareRouteGroup('RudiNode', devRoutes, onPrivateRoute)
-  declareRouteGroup('Private', backOfficeRoutes, onPrivateRoute)
+  declareRouteGroup('Unrestricted', unrestrictedPrivateRoutes)
+  declareRouteGroup('RudiNode', devRoutes)
+  declareRouteGroup('Private', backOfficeRoutes)
 
-  declareRouteGroup('Portal', portalRoutes, onPortalRoute)
-  declareRouteGroup('Public', publicRoutes, onPublicRoute)
+  declareRouteGroup('Portal', portalRoutes)
+  declareRouteGroup('Public', publicRoutes)
 
-  declareRouteGroup(
-    'API',
-    [
-      {
-        description: 'Generate the documentation for the REST API of this microservice',
-        method: 'GET',
-        url: getPrivatePath('routes'),
-        handler: getRestApi,
-        config: { [ROUTE_NAME]: 'dev_api' },
-      },
-    ],
-    onPrivateRoute
-  )
-}
-
-const ROUTES = {
-  public: [...publicRoutes, ...unrestrictedPrivateRoutes],
-  jwt: [...portalRoutes, ...backOfficeRoutes, ...devRoutes],
-}
-export const getRestApi = (req) => {
-  if (!req?.query?.format || req.query.format == 'md') return generateRestApiMarkdown()
-  if (req.query.format == 'list' || req.query.format == 'array') {
-    const routeList = []
-    Object.keys(ROUTES).forEach((group) => {
-      ROUTES[group].forEach((route) => {
-        const { method, url } = route
-        const description = route.description ?? 'No description provided'
-        routeList.push([group, method, url, description])
-      })
-    })
-    return routeList
-  }
-
-  if (req.query.format == 'group') {
-    const routeList = {}
-    Object.keys(ROUTES).forEach((group) => {
-      routeList[group] = []
-
-      ROUTES[group].forEach((route) => {
-        const { method, url } = route
-        const description = route.description ?? 'No description provided'
-        routeList[group].push({ method, url, description })
-      })
-    })
-    return routeList
-  }
-  return generateRestApiMarkdown()
-}
-
-export const generateRestApiMarkdown = () => {
-  const markdownRoutes = [['Auth', 'Method', 'URL', 'Description']]
-
-  Object.keys(ROUTES).forEach((routeGroup) => {
-    ROUTES[routeGroup].forEach((route) => {
-      const { method, url } = route
-      const description = route.description ?? 'No description provided'
-      markdownRoutes.push([routeGroup, method, url, description])
-    })
-    markdownRoutes.push([' ', ' ', ' ', ' '])
-  })
-  markdownRoutes.push([
-    'jwt',
-    'GET',
-    `${URL_PREFIX_PRIVATE}/routes`,
-    'Generate the documentation for the REST API of this microservice',
+  declareRouteGroup('API', [
+    {
+      description: 'Generate the documentation for the REST API of this microservice',
+      method: 'GET',
+      url: getPrivatePath('routes'),
+      preHandler: onPrivateRoute,
+      handler: getRestApi,
+      config: { [ROUTE_NAME]: 'dev_api' },
+    },
   ])
-  return markdownTable(markdownRoutes)
 }
 
 export const shutDownListener = async (signal) => {

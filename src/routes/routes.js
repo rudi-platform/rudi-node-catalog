@@ -152,6 +152,12 @@ import {
 } from '../controllers/stateController.js'
 import { test } from '../controllers/testController.js'
 import { getAllContacts, getAllOrganizations } from '../db/dbQueries.js'
+import {
+  onPortalRoute,
+  onPrivateRoute,
+  onPublicRoute,
+  onUnrestrictedPrivateRoute,
+} from './routes_secu.js'
 
 // -------------------------------------------------------------------------------------------------
 // Free routes (no authentification required)
@@ -310,7 +316,11 @@ export const publicRoutes = [
   },
 ]
 
-if (getCatalog() !== '/api') {
+publicRoutes.forEach((route) => {
+  route.preHandler = onPublicRoute
+})
+
+if (getCatalog() !== getLegacyApiPath()) {
   // Deal with the legacy
   for (const method of ['DELETE', 'POST', 'PUT', 'GET'])
     publicRoutes.unshift({
@@ -378,6 +388,10 @@ export const portalRoutes = [
     },
   },
 ]
+
+portalRoutes.forEach((route) => {
+  route.preHandler = onPortalRoute
+})
 // -------------------------------------------------------------------------------------------------
 // Private routes
 // -------------------------------------------------------------------------------------------------
@@ -393,13 +407,7 @@ export const unrestrictedPrivateRoutes = [
     handler: getApiVersion,
     config: { [ROUTE_NAME]: 'dev_get_api_version' },
   },
-  {
-    description: 'Get current API version',
-    method: 'GET',
-    url: getLegacyPrivatePath('version'),
-    handler: getApiVersion,
-    config: { [ROUTE_NAME]: 'dev_get_api_version' },
-  },
+
   /*
    * @oas [get] /api/admin/hash
    * scope: public
@@ -422,13 +430,7 @@ export const unrestrictedPrivateRoutes = [
     handler: getGitHash,
     config: { [ROUTE_NAME]: 'dev_get_git_hash' },
   },
-  {
-    description: 'Get current git hash',
-    method: 'GET',
-    url: getLegacyPrivatePath(URL_SUFFIX_GIT_HASH),
-    handler: getGitHash,
-    config: { [ROUTE_NAME]: 'dev_get_git_hash' },
-  },
+
   /*
    * @oas [get] /api/admin/apphash
    * scope: public
@@ -451,13 +453,7 @@ export const unrestrictedPrivateRoutes = [
     handler: getAppHash,
     config: { [ROUTE_NAME]: 'dev_get_app_hash' },
   },
-  {
-    description: 'Get current git hash from the running application',
-    method: 'GET',
-    url: getLegacyPrivatePath(URL_SUFFIX_APP_HASH),
-    handler: getAppHash,
-    config: { [ROUTE_NAME]: 'dev_get_app_hash' },
-  },
+
   /*
    * @oas [get] /api/admin/env
    * scope: public
@@ -470,14 +466,44 @@ export const unrestrictedPrivateRoutes = [
     handler: getEnvironment,
     config: { [ROUTE_NAME]: 'dev_get_app_env' },
   },
-  {
-    description: 'Get environment version of the running application',
-    method: 'GET',
-    url: getLegacyPrivatePath(URL_SUFFIX_APP_ENV),
-    handler: getEnvironment,
-    config: { [ROUTE_NAME]: 'dev_get_app_env' },
-  },
 ]
+if (getCatalog() !== getLegacyApiPath()) {
+  for (const route of [
+    {
+      description: 'Get current API version',
+      method: 'GET',
+      url: getLegacyPrivatePath('version'),
+      handler: getApiVersion,
+      config: { [ROUTE_NAME]: 'dev_get_api_version' },
+    },
+    {
+      description: 'Get environment version of the running application',
+      method: 'GET',
+      url: getLegacyPrivatePath(URL_SUFFIX_APP_ENV),
+      handler: getEnvironment,
+      config: { [ROUTE_NAME]: 'dev_get_app_env' },
+    },
+    {
+      description: 'Get current git hash from the running application',
+      method: 'GET',
+      url: getLegacyPrivatePath(URL_SUFFIX_APP_HASH),
+      handler: getAppHash,
+      config: { [ROUTE_NAME]: 'dev_get_app_hash' },
+    },
+    {
+      description: 'Get current git hash',
+      method: 'GET',
+      url: getLegacyPrivatePath(URL_SUFFIX_GIT_HASH),
+      handler: getGitHash,
+      config: { [ROUTE_NAME]: 'dev_get_git_hash' },
+    },
+  ])
+    unrestrictedPrivateRoutes.push(route)
+}
+
+unrestrictedPrivateRoutes.forEach((route) => {
+  route.preHandler = onUnrestrictedPrivateRoute
+})
 
 export const backOfficeRoutes = [
   // -----------------------------------------------------------------------------------------------
@@ -694,6 +720,9 @@ export const backOfficeRoutes = [
     config: { [ROUTE_NAME]: 'prv_del_old_reports' },
   },
 ]
+backOfficeRoutes.forEach((route) => {
+  route.preHandler = onPrivateRoute
+})
 
 if (getCatalog() !== getLegacyApiPath()) {
   // Deal with the legacy
@@ -999,3 +1028,13 @@ export const devRoutes = [
     config: { [ROUTE_NAME]: 'dev_test' },
   },
 ]
+
+devRoutes.forEach((route) => {
+  route.preHandler = onPrivateRoute
+})
+
+const ROUTES = {
+  public: [...publicRoutes, ...unrestrictedPrivateRoutes],
+  jwt: [...portalRoutes, ...backOfficeRoutes, ...devRoutes],
+}
+export const getRoutes = (group) => (group ? ROUTES[group] : ROUTES)
