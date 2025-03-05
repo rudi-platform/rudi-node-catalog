@@ -428,12 +428,14 @@ function declareRouteGroup(routeGroupName, routeGroup, preHandler) {
  */
 const declareRoutes = () => {
   // logT(mod, 'declareRoutes')
-  // declareRouteGroup(redirectRoutes, onPortalRoute, 'Redirect', 'd')
-  declareRouteGroup('Public', publicRoutes, onPublicRoute)
-  declareRouteGroup('Portal', portalRoutes, onPortalRoute)
+  // Beware of redirections: unrestricted first, then private/dev, then public!
   declareRouteGroup('Unrestricted', unrestrictedPrivateRoutes, onUnrestrictedPrivateRoute)
-  declareRouteGroup('Private', backOfficeRoutes, onPrivateRoute)
   declareRouteGroup('RudiNode', devRoutes, onPrivateRoute)
+  declareRouteGroup('Private', backOfficeRoutes, onPrivateRoute)
+
+  declareRouteGroup('Portal', portalRoutes, onPortalRoute)
+  declareRouteGroup('Public', publicRoutes, onPublicRoute)
+
   declareRouteGroup(
     'API',
     [

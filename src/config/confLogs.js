@@ -6,7 +6,7 @@ const fun = 'init'
 // -------------------------------------------------------------------------------------------------
 import { existsSync, mkdirSync } from 'fs'
 
-import rudiLogger, { Facility, Transport } from '@aqmo.org/rudi_logger'
+import { Facility, RudiLogger, Transport } from '@aqmo.org/rudi_logger'
 import winston from 'winston'
 import 'winston-daily-rotate-file'
 
@@ -298,7 +298,7 @@ function getRudiLoggerOptions() {
     default:
       transport = Transport.Udp
   }
-  const rudiLoggerOpts = {
+  return {
     log_server: { path, port, facility, transport },
     log_local: {
       directory: resolve(SYSLOG_DIR),
@@ -308,11 +308,6 @@ function getRudiLoggerOptions() {
       level: SYSLOG_LVL,
     },
   }
-  return rudiLoggerOpts
 }
 
-export const sysLogger = new rudiLogger.RudiLogger(
-  SYSLOG_APP_NAME,
-  getGitHash(),
-  getRudiLoggerOptions()
-)
+export const sysLogger = new RudiLogger(SYSLOG_APP_NAME, getGitHash(), getRudiLoggerOptions())

@@ -130,7 +130,14 @@ import {
 } from '../controllers/skosController.js'
 
 import { getPortalBaseUrl } from '../config/confPortal.js'
-import { getCatalog, getPrivatePath, getPublicPath, getPublicUrl } from '../config/confSystem.js'
+import {
+  getCatalog,
+  getLegacyApiPath,
+  getLegacyPrivatePath,
+  getPrivatePath,
+  getPublicPath,
+  getPublicUrl,
+} from '../config/confSystem.js'
 import {
   deleteMetadata,
   exposedCheckPortalToken,
@@ -160,7 +167,6 @@ export const publicRoutes = [
     handler: serveFavicon,
     config: { [ROUTE_NAME]: 'pub_get_favicon' },
   },
-
   {
     description: 'Favicon',
     method: 'GET',
@@ -378,11 +384,19 @@ export const portalRoutes = [
 /**
  * Routes that don't need a JWT check (to be accessed by internal programs)
  */
+
 export const unrestrictedPrivateRoutes = [
   {
     description: 'Get current API version',
     method: 'GET',
     url: getPrivatePath('version'),
+    handler: getApiVersion,
+    config: { [ROUTE_NAME]: 'dev_get_api_version' },
+  },
+  {
+    description: 'Get current API version',
+    method: 'GET',
+    url: getLegacyPrivatePath('version'),
     handler: getApiVersion,
     config: { [ROUTE_NAME]: 'dev_get_api_version' },
   },
@@ -408,6 +422,13 @@ export const unrestrictedPrivateRoutes = [
     handler: getGitHash,
     config: { [ROUTE_NAME]: 'dev_get_git_hash' },
   },
+  {
+    description: 'Get current git hash',
+    method: 'GET',
+    url: getLegacyPrivatePath(URL_SUFFIX_GIT_HASH),
+    handler: getGitHash,
+    config: { [ROUTE_NAME]: 'dev_get_git_hash' },
+  },
   /*
    * @oas [get] /api/admin/apphash
    * scope: public
@@ -430,6 +451,13 @@ export const unrestrictedPrivateRoutes = [
     handler: getAppHash,
     config: { [ROUTE_NAME]: 'dev_get_app_hash' },
   },
+  {
+    description: 'Get current git hash from the running application',
+    method: 'GET',
+    url: getLegacyPrivatePath(URL_SUFFIX_APP_HASH),
+    handler: getAppHash,
+    config: { [ROUTE_NAME]: 'dev_get_app_hash' },
+  },
   /*
    * @oas [get] /api/admin/env
    * scope: public
@@ -442,7 +470,15 @@ export const unrestrictedPrivateRoutes = [
     handler: getEnvironment,
     config: { [ROUTE_NAME]: 'dev_get_app_env' },
   },
+  {
+    description: 'Get environment version of the running application',
+    method: 'GET',
+    url: getLegacyPrivatePath(URL_SUFFIX_APP_ENV),
+    handler: getEnvironment,
+    config: { [ROUTE_NAME]: 'dev_get_app_env' },
+  },
 ]
+
 export const backOfficeRoutes = [
   // -----------------------------------------------------------------------------------------------
   // Generic routes for accessing any object
@@ -658,6 +694,22 @@ export const backOfficeRoutes = [
     config: { [ROUTE_NAME]: 'prv_del_old_reports' },
   },
 ]
+
+if (getCatalog() !== getLegacyApiPath()) {
+  // Deal with the legacy
+  for (const method of ['DELETE', 'POST', 'PUT', 'GET'])
+    backOfficeRoutes.unshift({
+      description: `Redirection: ${method} /api -> ${method} ${getCatalog()}`,
+      method,
+      url: getLegacyPrivatePath('*'),
+      config: { [ROUTE_NAME]: `redirect_${method.toLowerCase()}_data` },
+      handler: function (req, reply) {
+        const newRoute = req.url.replace(getLegacyPrivatePath(), getPrivatePath())
+        logD(mod, `redirect`, `${req.method} ${req.url}`)
+        reply.code(308).redirect(newRoute)
+      },
+    })
+}
 
 // -------------------------------------------------------------------------------------------------
 // External application/module routes

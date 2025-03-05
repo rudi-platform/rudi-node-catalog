@@ -86,6 +86,11 @@ export const getCatalog = (...url) => pathJoin('', CATALOG_PREFIX, ...url)
 export const getPrivatePath = (...url) => getCatalog('admin', ...url)
 export const getPublicPath = (...url) => getCatalog('v1', ...url)
 
+export const LEGACY_PREFIX = CATALOG_PREFIX.replace('catalog', 'api')
+export const getLegacyApiPath = (...url) => pathJoin('', LEGACY_PREFIX, ...url)
+export const getLegacyPrivatePath = (...url) => getLegacyApiPath('admin', ...url)
+export const getLegacyPublicPath = (...url) => getLegacyApiPath('v1', ...url)
+
 let publicUrl = getCliEnvOpt(OPT_PUBLIC_URL) ?? getConf(SERVER_SECTION, 'server_url')
 if (!publicUrl.endsWith(CATALOG_PREFIX)) publicUrl = pathJoin(publicUrl, CATALOG_PREFIX)
 const PUBLIC_URL = removeTrailingSlash(publicUrl)

@@ -22,7 +22,6 @@ separateLogs('Portal conf', true) //////////////////////////////////////////////
 // -------------------------------------------------------------------------------------------------
 // Constants: Portal JWT properties
 // -------------------------------------------------------------------------------------------------
-export const PARAM_TOKEN = 'token'
 export const FIELD_TOKEN = 'access_token'
 export const JWT_USER = 'user_name'
 
