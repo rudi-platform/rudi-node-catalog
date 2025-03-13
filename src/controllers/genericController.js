@@ -224,7 +224,8 @@ function overrideFilter(filterList, field, value) {
   const fun = 'overrideFilter'
   const newFilter = { [field]: value }
 
-  if (!filterList || filterList[field]) return { $and: [newFilter] }
+  if (!filterList || Object.keys(filterList).length === 0 || filterList[field])
+    return { $and: [newFilter] }
   if (!filterList?.$and) {
     // Simple filter
     return { $and: [filterList, newFilter] }
@@ -588,7 +589,7 @@ export const getMetadataListAndCount = async (req, reply) => {
       QUERY_FILTER,
       QUERY_FIELDS,
     ])
-    logD(mod, fun, beautify(options[QUERY_FILTER]))
+    // logD(mod, fun, beautify(options[QUERY_FILTER]))
     options[QUERY_FILTER] = overrideFilter(
       options[QUERY_FILTER],
       `${API_ACCESS_CONDITION}.${API_CONFIDENTIALITY}.${API_RESTRICTED_ACCESS}`,

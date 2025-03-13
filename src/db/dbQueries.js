@@ -53,10 +53,14 @@ import {
   API_CONTACT_ID,
   API_DATA_CONTACTS_PROPERTY,
   API_DATA_PRODUCER_PROPERTY,
+  API_DATES_CREATED,
+  API_DATES_EDITED,
+  API_DATES_PUBLISHED,
   API_MEDIA_ID,
   API_MEDIA_PROPERTY,
   API_METADATA_ID,
   API_METAINFO_CONTACTS_PROPERTY,
+  API_METAINFO_DATES,
   API_METAINFO_PROPERTY,
   API_METAINFO_PROVIDER_PROPERTY,
   API_ORGANIZATION_ID,
@@ -69,6 +73,8 @@ import {
   API_THEME_PROPERTY,
   DB_CREATED_AT,
   DB_ID,
+  DB_PUBLISHED_AT,
+  DB_UPDATED_AT,
   FIELDS_TO_SKIP,
   LOG_ID,
 } from './dbFields.js'
@@ -652,6 +658,17 @@ export const getDbObjectListAndCount = async (objectType, options) => {
     let aggregateOptions = [
       { $match: filter },
       {
+        $addFields: {
+          [API_METAINFO_PROPERTY]: {
+            [API_METAINFO_DATES]: {
+              [API_DATES_CREATED]: `$${DB_CREATED_AT}`,
+              [API_DATES_EDITED]: `$${DB_UPDATED_AT}`,
+              [API_DATES_PUBLISHED]: `$${DB_PUBLISHED_AT}`,
+            },
+          },
+        },
+      },
+      {
         $facet: {
           [COUNT_LABEL]: [{ $group: { _id: null, count: { $sum: 1 } } }],
           [LIST_LABEL]: [{ $sort: sortOptions }, { $skip: offset }, { $limit: limit }],
@@ -667,18 +684,13 @@ export const getDbObjectListAndCount = async (objectType, options) => {
 
     // logD(mod, fun, `total: ${globalCount}`)
 
-    let populateOptions = getPopulateOptions(objectType)
-    const objListPopulated = await ObjModel.populate(objectList, populateOptions)
-
-    // logD(mod, fun, `objListPopulated: ${objListPopulated}`)
+    const objListPopulated = await ObjModel.populate(objectList, getPopulateOptions(objectType))
 
     // Reshaping: selecting fields
-    let finalObjList
-    if (!fieldsToKeep) {
-      finalObjList = objListPopulated.map((obj) => omit(obj, FIELDS_TO_SKIP))
-    } else {
-      finalObjList = objListPopulated.map((obj) => pick(obj, fieldsToKeep))
-    }
+    const finalObjList = !fieldsToKeep
+      ? objListPopulated.map((obj) => omit(obj, FIELDS_TO_SKIP))
+      : objListPopulated.map((obj) => pick(obj, fieldsToKeep))
+
     // logD(mod, fun, `finalObjList: ${finalObjList}`)
 
     const reshapedResult = {

@@ -316,10 +316,6 @@ export const publicRoutes = [
   },
 ]
 
-publicRoutes.forEach((route) => {
-  route.preHandler = onPublicRoute
-})
-
 if (getCatalog() !== getLegacyApiPath()) {
   // Deal with the legacy
   for (const method of ['DELETE', 'POST', 'PUT', 'GET'])
@@ -335,6 +331,10 @@ if (getCatalog() !== getLegacyApiPath()) {
       },
     })
 }
+
+publicRoutes.forEach((route) => {
+  route.preHandler = onPublicRoute
+})
 
 // -------------------------------------------------------------------------------------------------
 // 'Public' routes (Portal authentification required)
@@ -720,9 +720,6 @@ export const backOfficeRoutes = [
     config: { [ROUTE_NAME]: 'prv_del_old_reports' },
   },
 ]
-backOfficeRoutes.forEach((route) => {
-  route.preHandler = onPrivateRoute
-})
 
 if (getCatalog() !== getLegacyApiPath()) {
   // Deal with the legacy
@@ -739,6 +736,9 @@ if (getCatalog() !== getLegacyApiPath()) {
       },
     })
 }
+backOfficeRoutes.forEach((route) => {
+  route.preHandler = onPrivateRoute
+})
 
 // -------------------------------------------------------------------------------------------------
 // External application/module routes
