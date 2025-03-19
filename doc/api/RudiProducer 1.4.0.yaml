@@ -51,10 +51,9 @@
 #     metadata may not be available or relevant anymore
 #   - Added MediaTypes '+crypt' for encrypted files
 #   - Added a new MIME type 'text/x-yaml' for .yaml / .yml files
+#
 # [1.4.0]
-#   - Added 'ext_metadata' to be able to extend the current metadata with
-#     additional sub-parts, in particular 'ext_selfdata' to describe a
-#     dataset that contains personal (GDPR) information.
+#   - Added 'OrganizationIntegrationReport' and 'ResourceIntegrationReport'
 #
 #•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
 openapi: 3.0.0
@@ -72,7 +71,7 @@ info:
 
 #•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
 servers:
-  - url: https://data-rudi.org
+  - url: https://data-rudi.aqmo.org
 
 #•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
 # DEFINITIONS
@@ -252,7 +251,7 @@ paths:
                       $ref: '#/components/schemas/Metadata'
 
   #=============================================================================
-  # REPORT
+  # REPORT: RESOURCE
   #=============================================================================
   '/api/v1/resources/{id}/report':
     parameters:
@@ -275,7 +274,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/IntegrationReport'
+              $ref: '#/components/schemas/ResourceIntegrationReport'
       responses:
         '202':
           description: The report has been received.
@@ -296,7 +295,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/IntegrationReport'
+                  $ref: '#/components/schemas/ResourceIntegrationReport'
 
   #=============================================================================
   '/api/v1/resources/{id}/report/{irid}':
@@ -328,7 +327,84 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IntegrationReport'
+                $ref: '#/components/schemas/ResourceIntegrationReport'
+
+  #=============================================================================
+  # REPORT: ORGANIZATION
+  #=============================================================================
+  '/api/v1/organizations/{id}/report':
+    parameters:
+      - name: 'id'
+        description: Unique id of the organization
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    'put':
+      tags:
+        - Report
+      description: Create or update a Portal report for an organization integration operation
+        (create, update or delete)
+      operationId: updateOrganizationIntegrationReport
+      security:
+        - authRudi: [portal]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationIntegrationReport'
+      responses:
+        '202':
+          description: The report has been received.
+    'get':
+      tags:
+        - Report
+      description: List reports all the Portal integration reports for the identified organization
+      operationId: getIntegrationReportListForOrganization
+      security:
+        - authRudi: [portal]
+      responses:
+        '202':
+          description: List of the integration reports for the organization
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResourceIntegrationReport'
+
+  #=============================================================================
+  '/api/v1/organizations/{id}/report/{irid}':
+    parameters:
+      - name: 'id'
+        description: Unique id of the organization
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: 'irid'
+        description: Unique id of the report
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    'get':
+      tags:
+        - Report
+      description: Access one identified integration for the identified organization
+      operationId: getIntegrationReportForOrganization
+      security:
+        - authRudi: [portal]
+      responses:
+        '202':
+          description: Identified integration report for the organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationIntegrationReport'
 
 #•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
 components:
@@ -644,7 +720,6 @@ components:
               items:
                 $ref: '#/components/schemas/DictionaryEntry'
               example: [{ 'lang': 'fr', 'text': "Pas de restriction d'accès public" }]
-
         #—•—•—•—•—•—•—•—•—•—•—•—•—•
         # METADATA INFO
         #——————————————————————————
@@ -678,32 +753,6 @@ components:
               description: URI of the initial metadata
               type: string
               format: uri
-
-        #—•—•—•—•—•—•—•—•—•—•—•—•—•
-        # EXTENDED METADATA
-        #——————————————————————————
-        'ext_metadata':
-          description: Extension of the metadata
-          type: object
-          properties:
-            'ext_selfdata':
-              description: Extension to deal with the declaration of "self-data". The format of the JSON object that describes the self-data is refenced bellow as "1.0.0self" and is described in an external OpenAPI document.
-              type: object
-              properties:
-                'ext_selfdata_connector':
-                  # Connector towards an encrypted media that contains the metadata extension as a JSON object in "1.0.0self" format.
-                  # This is stored on the Producer Node but not sent to the Portal.
-                  # A version of metadata that has such a field is referenced as "1.4.0int".
-                  # All "1.4.0int" metadata are set as readonly on the Producer Node UX.
-                  $ref: '#/components/schemas/Connector'
-
-                'ext_selfdata_content':
-                  # JSON object of the metadata in "1.0.0self" format that describes the self-data
-                  # This is sent to the Portal but not stored in the Producer Node.
-                  # A version of metadata that has such a field is referenced as "1.4.0ext".
-                  type:
-                    object
-                    # $ref: <externally described "1.0.0self" format>
 
     #---------------------------------------------------------------------------
     'Organization': # Organization
@@ -823,17 +872,7 @@ components:
               description: Value of the field SkosConcept.concept_code
               type: string
               # format: skosConceptCode
-              # enum:
-              #   [
-              #     'apache-2.0',
-              #     'cc-by-nd-4.0',
-              #     'etalab-1.0',
-              #     'etalab-2.0',
-              #     'gpl-3.0',
-              #     'mit',
-              #     'odbl-1.0',
-              #     'public-domain-cc0',
-              #   ]
+
       #---------------------------------------------------------------------------
     'LicenceCustom':
       allOf:
@@ -1091,14 +1130,6 @@ components:
           type: string
           format: uuid
         #——————————————————————————
-        'resource_id':
-          type: string
-          format: uuid
-        #——————————————————————————
-        'resource_title':
-          type: string
-          description: Simple name of the resource
-        #——————————————————————————
         'submission_date':
           allOf:
             - $ref: '#/components/schemas/Date'
@@ -1140,7 +1171,40 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/IntegrationError'
-
+    #---------------------------------------------------------------------------
+    'ResourceIntegrationReport':
+      allOf:
+        - $ref: '#/components/schemas/IntegrationReport'
+        - description: Report for an organization integration or attachment
+          type: object
+          required:
+            - resource_id
+          properties:
+            #——————————————————————————
+            'resource_id':
+              type: string
+              format: uuid
+            #——————————————————————————
+            'resource_title':
+              type: string
+              description: Simple name of the resource
+    #---------------------------------------------------------------------------
+    'OrganizationIntegrationReport':
+      allOf:
+        - $ref: '#/components/schemas/IntegrationReport'
+        - description: Report for an organization integration or attachment
+          type: object
+          required:
+            - organization_id
+          properties:
+            #——————————————————————————
+            'organization_id':
+              type: string
+              format: uuid
+            #——————————————————————————
+            'organization_title':
+              type: string
+              description: Simple name of the organization
     #---------------------------------------------------------------------------
     'DOI':
       description: Digital object identifier (modern Crossref DOIs version)
@@ -1592,7 +1656,7 @@ components:
                 enum: ['The JSON is not valid.']
     #---------------------------------------------------------------------------
     'Error401Unauthorized':
-      description: The request requires a user authentication.
+      description: The request requires an user authentication.
       content:
         application/json:
           schema:
@@ -1603,7 +1667,7 @@ components:
                 enum: [401]
               'message':
                 type: string
-                enum: ['The request requires a user authentication.']
+                enum: ['The request requires an user authentication.']
     #---------------------------------------------------------------------------
     'Error403Forbidden':
       description: The access is not allowed.
