@@ -16,8 +16,8 @@ import { parameterExpected } from '../../utils/msg.js'
 
 export const MIME_YAML = 'text/x-yaml'
 export const MIME_YAML_ALT = 'application/x-yaml'
-export const MIME_MARKDOWN = 'text/x-markdown'
-export const ALT_MIME_MARKDOWN = 'text/markdown'
+export const MIME_MARKDOWN = 'text/markdown'
+export const ALT_MIME_MARKDOWN = 'text/x-markdown'
 
 export const FileTypes = [
   'application/epub+zip', // (.epub)
