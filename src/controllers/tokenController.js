@@ -9,6 +9,7 @@ import {
   tokenStringToJwtObject,
   verifyToken,
 } from '@aqmo.org/jwt-lib'
+import { readFileSync } from 'fs'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
@@ -176,8 +177,13 @@ export const verifyRudiCatalogToken = async (token, reqMethod, reqUrl) => {
     try {
       verifyToken(pubKey, token)
     } catch (e) {
-      logE(mod, fun, e)
-      logE(mod, fun, token)
+      logE(mod, fun, `error: ${e}`)
+      logD(mod, fun, `token: ${token}`)
+      logD(mod, fun, `subject: '${subject}'`)
+      const keyFile = getProfile(subject)[PUB_KEY]
+      const pubStr = readFileSync(keyFile)
+      logD(mod, fun, `key file: '${keyFile}'`)
+      logE(mod, fun, `content: '${pubStr}'`)
       throw new ForbiddenError(beautify(e.message || e))
     }
     logT(mod, fun, 'Token in request headers is OK')
