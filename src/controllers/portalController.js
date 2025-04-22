@@ -32,7 +32,7 @@ import {
 // -------------------------------------------------------------------------------------------------
 import { JWT_EXP, REQ_MTD } from '../config/constJwt.js'
 import { beautify, dateEpochSToIso, nowISO, timeEpochS } from '../utils/jsUtils.js'
-import { logD, logE, logI, logT, logV, logW } from '../utils/logging.js'
+import { logD, logE, logT, logV, logW } from '../utils/logging.js'
 
 import {
   FIELD_TOKEN,
@@ -215,7 +215,7 @@ export const getPortalToken = async () => {
       return updateCachedPortalJwt()
     }
     const portalJwt = getCachedPortalJwt()
-    logI(mod, fun, `cached portal JWT=${portalJwt}`)
+    // logI(mod, fun, `cached portal JWT=${portalJwt}`)
     const checkRes = await getTokenCheckedByPortal(portalJwt)
     if (!checkRes?.active) return updateCachedPortalJwt()
     else logD(mod, fun, 'Stored token seems OK')
