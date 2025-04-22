@@ -141,7 +141,6 @@ export const URL_SUFFIX_LICENCE_CODES = 'licence_codes'
 export const URL_SUFFIX_AUTH = 'auth'
 export const URL_SUFFIX_PUB_KEY = 'pub'
 export const URL_SUFFIX_TOKEN_GET = 'token'
-export const URL_SUFFIX_TOKEN_CHECK = 'check'
 export const URL_SUFFIX_GIT_HASH = 'hash'
 export const URL_SUFFIX_APP_HASH = 'apphash'
 export const URL_SUFFIX_APP_ENV = 'env'
@@ -154,7 +153,6 @@ export const PARAM_LOGS_LINES = 'lines'
 
 export const URL_PV_PORTAL_PREFIX = `${URL_PREFIX_PRIVATE}/${URL_SUFFIX_PORTAL}`
 export const URL_PV_TOKEN_ACCESS = `${URL_PV_PORTAL_PREFIX}/${URL_SUFFIX_TOKEN_GET}`
-export const URL_PV_TOKEN_CHECK_ACCESS = `${URL_PV_TOKEN_ACCESS}/${URL_SUFFIX_TOKEN_CHECK}`
 
 export const URL_PV_LOGS_ACCESS = `${URL_PREFIX_PRIVATE}/${OBJ_LOGS}`
 export const URL_PUB_API_VERSION = '/version'
