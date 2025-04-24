@@ -143,6 +143,7 @@ import {
   exposedCheckPortalToken,
   exposedGetPortalToken,
   getMetadata,
+  sendAllMetadataToPortal,
   sendMetadata,
 } from '../controllers/portalController.js'
 import { getSinglePubKey } from '../controllers/publicKeyController.js'
@@ -860,6 +861,13 @@ export const devRoutes = [
   // -----------------------------------------------------------------------------------------------
   // Get/post resources from/to Portal
   // -----------------------------------------------------------------------------------------------
+  {
+    description: 'Send all metadata to the Portal',
+    method: 'GET',
+    url: getPrivatePath(URL_SUFFIX_PORTAL, OBJ_METADATA, ACT_SEND),
+    handler: sendAllMetadataToPortal,
+    config: { [ROUTE_NAME]: 'dev_send_all_metadata_to_portal' },
+  },
   {
     description: 'Send a list of metadata to the Portal',
     method: 'POST',

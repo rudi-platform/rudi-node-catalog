@@ -197,6 +197,8 @@ export const toISOLocale = (date) => {
 export const timeEpochMs = (delayMs = 0) => new Date().getTime() + delayMs
 export const timeEpochS = (delayS = 0) => Math.floor(new Date().getTime() / 1000) + delayS
 
+export const sleepMs = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
 export const dateToIso = (date) => {
   const fun = 'dateToIso'
   try {

@@ -22,16 +22,18 @@ import {
   API_METAINFO_DATES,
   API_METAINFO_PROPERTY,
   API_REPORT_ID,
+  API_STATUS_PROPERTY,
   API_STORAGE_STATUS,
   DB_UPDATED_AT,
   getUpdatedDate,
+  MetadataStatus,
 } from '../db/dbFields.js'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { JWT_EXP, REQ_MTD } from '../config/constJwt.js'
-import { beautify, dateEpochSToIso, nowISO, timeEpochS } from '../utils/jsUtils.js'
+import { beautify, dateEpochSToIso, nowISO, sleepMs, timeEpochS } from '../utils/jsUtils.js'
 import { logD, logE, logI, logT, logV, logW } from '../utils/logging.js'
 
 import {
@@ -53,7 +55,7 @@ import { directPost, httpDelete, httpGet, httpPost, httpPut } from '../utils/htt
 import { isUUID } from '../definitions/schemaValidators.js'
 import { StorageStatus } from '../definitions/thesaurus/StorageStatus.js'
 
-import { getObjectWithRudiId } from '../db/dbQueries.js'
+import { getDbObjectList, getObjectWithRudiId } from '../db/dbQueries.js'
 
 import { createPublicKey } from 'node:crypto'
 import { isEveryMediaAvailable, setMetadataStatusToSent } from '../definitions/models/Metadata.js'
@@ -119,6 +121,38 @@ export const sendMetadata = async (req, reply) => {
       throw new BadRequestError('Parameter is not a valid UUID v4')
 
     return await sendMetadataToPortal(metadataId)
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+export const sendAllMetadataToPortal = async (req, reply) => {
+  const fun = 'sendAllMetadataToPortal'
+  logT(mod, fun)
+  try {
+    if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
+    const status = req.query?.metadata_status || MetadataStatus.Sent
+    const msg = `Sending all the metadata with status = ${status}`
+    logD(mod, fun, msg)
+    const metadataList = await getDbObjectList(OBJ_METADATA, { metadata_status: status })
+    const metaCount = metadataList.length
+    logD(mod, fun, `${metaCount} metadata impacted`)
+    await getPortalToken()
+    const bucketLen = 5
+    // const delay = 200
+    const bucketCount = Math.ceil(metaCount / bucketLen)
+
+    for (let n = 0; n < bucketCount; n++) {
+      for (let i = 0; i < bucketLen && bucketLen * n + i < metaCount; i++) {
+        const meta = metadataList[bucketLen * n + i]
+        logD(mod, fun, `meta: ${beautify(meta)}`)
+        sendMetadataToPortal(metadataList[bucketLen * n + i]?.[API_METADATA_ID])
+          .then((res) => logD(mod, fun, `OK: ${beautify(res)}`))
+          .catch((err) => logW(mod, fun, `ERR: ${beautify(err)}`))
+        sleepMs(50)
+      }
+    }
+    reply.send(msg)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -223,13 +257,14 @@ export const getPortalToken = async () => {
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     if (hasExpiredPortalJwt()) {
-      logD(mod, fun, 'Need for a new portal token')
-      return updateCachedPortalJwt()
+      if (!_cachedPortalToken?.jwt) logD(mod, fun, 'No portal JWT yet')
+      else logD(mod, fun, `Need for a new portal token: (exp = ${_cachedPortalToken?.exp})`)
+      return await updateCachedPortalJwt()
     }
     const portalJwt = getCachedPortalJwt()
     // logI(mod, fun, `cached portal JWT=${portalJwt}`)
     const checkRes = await getTokenCheckedByPortal(portalJwt)
-    if (!checkRes?.active) return updateCachedPortalJwt()
+    if (!checkRes?.active) return await updateCachedPortalJwt()
     else logD(mod, fun, 'Stored token seems OK')
     return portalJwt
   } catch (err) {
@@ -240,7 +275,7 @@ export const getPortalToken = async () => {
 /**
  * Renew portal token
  */
-export const getNewTokenFromPortal = async () => {
+const getNewTokenFromPortal = async () => {
   const fun = 'getNewTokenFromPortal'
   logT(mod, fun)
   try {
@@ -503,7 +538,7 @@ const isMetadataSendableToPortal = async (metadataId) => {
     //--- Updating the DB metadata status
     setMetadataStatusToSent(dbMetadata)
     await dbMetadata.save()
-    logV(mod, `${fun}.metadata_status saved`, dbMetadata.metadata_status)
+    logV(mod, `${fun}.metadata_status saved`, dbMetadata[API_STATUS_PROPERTY])
     portalReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES][API_DATES_PUBLISHED] = nowISO()
     return { portalReadyMetadata, waitIndex }
   } catch (err) {
