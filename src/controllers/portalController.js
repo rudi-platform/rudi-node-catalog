@@ -32,7 +32,7 @@ import {
 // -------------------------------------------------------------------------------------------------
 import { JWT_EXP, REQ_MTD } from '../config/constJwt.js'
 import { beautify, dateEpochSToIso, nowISO, timeEpochS } from '../utils/jsUtils.js'
-import { logD, logE, logT, logV, logW } from '../utils/logging.js'
+import { logD, logE, logI, logT, logV, logW } from '../utils/logging.js'
 
 import {
   FIELD_TOKEN,
@@ -149,22 +149,34 @@ export const getPortalJwtPubKey = async (kid) => {
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     if (!_cachedPortalJwtPubs[kid]) {
-      const publicKeyUrl = getUrlPortalAuthPub()
-      logD(mod, fun, 'publicKeyUrl: ' + publicKeyUrl)
-
-      const portalPubKeysList = (await axios.get(publicKeyUrl, getPortalAuthHeaders()))?.data?.keys
+      const portalPubKeysList = await getPortalPubKeys()
       // logV(mod, fun, `publicKeyObj: ${beautify(portalPubKeysList)}`)
       const format = 'jwk'
       for (const key of portalPubKeysList) {
+        // logD(mod, fun, `portal key: ${beautify(key)}`)
         const pubKey = createPublicKey({ key, format })
         // const keyPem = pubKey.export({ type: 'pkcs1', format: 'pem' })
         // logV(mod, fun, `keyPem:\n ${beautify(keyPem)}`)
         // logV(mod, fun, `readPublicKeyPem:\n ${beautify(readPublicKeyPem(keyPem))}`)
-        _cachedPortalJwtPubs[key.kid] = pubKey
+        _cachedPortalJwtPubs[key.kid] = { key, pubk: pubKey, date: nowISO() }
       }
-      logV(mod, fun, `_cachedPortalJwtPubs: ${beautify(_cachedPortalJwtPubs)}`)
+      // logV(mod, fun, `_cachedPortalJwtPubs: ${beautify(_cachedPortalJwtPubs)}`)
     }
-    return _cachedPortalJwtPubs[kid]
+    return _cachedPortalJwtPubs[kid]?.pubk
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+const getPortalPubKeys = async () => {
+  const fun = 'getPortalPubKeys'
+  logT(mod, fun)
+  try {
+    if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
+    const publicKeyUrl = getUrlPortalAuthPub()
+    logD(mod, fun, `publicKeyUrl: ${publicKeyUrl}`)
+    const portalPubKeysList = (await axios.get(publicKeyUrl, getPortalAuthHeaders()))?.data?.keys
+    return portalPubKeysList
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -330,23 +342,23 @@ export const getTokenCheckedByPortal = async (jwt) => {
 export const verifyPortalTokenSign = async (jwt) => {
   const fun = 'verifyPortalTokenSign'
   logT(mod, fun)
-
+  let keyId
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
     if (!jwt) throw new ForbiddenError('No token to verify!', mod, fun)
 
     const { header } = tokenStringToJwtObject(jwt)
-    const kid = header?.kid
-    if (kid) logT(mod, fun, `JWT signed with key ID: ${kid}`)
-    else {
+    keyId = header?.kid
+    if (!keyId) {
       logW(mod, fun, `Cannot verify JWT sign! Unexpected portal JWT headers: ${beautify(header)}`)
       return false
     }
+    logT(mod, fun, `JWT signed with key ID: ${keyId}`)
 
-    const portalPubKey = await getPortalJwtPubKey(kid)
+    const portalPubKey = await getPortalJwtPubKey(keyId)
     if (portalPubKey) logV(mod, fun, `portalPubKey: ${beautify(portalPubKey)}`)
     else {
-      logW(mod, fun, `Cannot verify JWT sign! No portal JWT sign pub key found for ID ${kid}`)
+      logW(mod, fun, `Cannot verify JWT sign! No portal JWT sign pub key found for ID ${keyId}`)
       return false
     }
     const { payload } = verifyToken(portalPubKey, jwt)
@@ -360,8 +372,21 @@ export const verifyPortalTokenSign = async (jwt) => {
 
     return [header, payload]
   } catch (err) {
-    // const errMsg = `Invalid token: ${err}`
-    // logV(mod, fun, errMsg)
+    const errMsg = `Invalid token: ${err}`
+    logV(mod, fun, errMsg)
+    const portalPubKeys = await getPortalPubKeys()
+    if (keyId) {
+      logI(mod, fun, `key ID: ${keyId}`)
+      const msg = `cached key: ${keyId ? beautify(_cachedPortalJwtPubs[keyId]?.key) : beautify(_cachedPortalJwtPubs)}`
+      logI(mod, fun, msg)
+      const cachedPub = _cachedPortalJwtPubs[keyId]?.key?.n
+      const portalPub = portalPubKeys.find((key) => key.kid == keyId)?.n
+      if (cachedPub != portalPub)
+        logW(mod, fun, `Portal pub \n'${portalPub}'\n ≠ Cached pub \n'${cachedPub}'`)
+    } else {
+      logD(mod, fun, `cached keys: ${beautify(_cachedPortalJwtPubs)}`)
+      logD(mod, fun, `portal keys: ${beautify(portalPubKeys)}`)
+    }
     throw RudiError.treatError(mod, fun, err)
   }
 }
