@@ -12,7 +12,7 @@ It also makes it possible to upload metadata from another module such as the Pro
 The API module provides :
 
 - A definition of the RUDI metadata that is compatible with the definition (https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER)
-- An external API for fetching open-data metadata (public and accessible without any authentification)
+- An external API for fetching open-data metadata (public and accessible without any authentication)
 - An internal API for creating, accessing, updating and deleting metadata (https://app.swaggerhub.com/apis/OlivierMartineau/RudiProducer-InternalAPI)
 
 ---
@@ -34,7 +34,7 @@ _See https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/ for further
 - `GET /resources` -> `GET /api/v1/resources`
 - `GET /resources/*` -> `GET /api/v1/resources/*`
 
-## No authentification required
+## No authentication required
 
 - `GET /api/version`
 - `GET /api/admin/hash`
@@ -43,7 +43,7 @@ _See https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/ for further
 - `GET /api/v1/resources`
 - `GET /api/v1/resources/:id`
 
-## Portal authentification required
+## Portal authentication required
 
 - `PUT /resources/*`-> `PUT /api/v1/resources/*`
 - `PUT /resources/:id/report`
@@ -51,7 +51,7 @@ _See https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/ for further
 - `GET /api/v1/resources/:id/report`
 - `GET /api/v1/resources/:id/report/:irid`
 
-## Rudi prod authentification required, action on objects
+## Rudi prod authentication required, action on objects
 
 - `POST /api/admin/:object`
 - `PUT /api/admin/:object`
@@ -72,7 +72,7 @@ _See https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER/ for further
 - `DELETE /api/admin/:object/:id/reports`
 - `POST /api/admin/:object/:id/reports/deletion`
 
-## Rudi prod authentification + app driven actions
+## Rudi prod authentication + app driven actions
 
 - `GET /api/admin/nv`
 - `GET /api/admin/enum`
@@ -203,3 +203,52 @@ In `tests/env-rudi-*.postman_environment.json` the value for the key `cryptoJwtU
 ## Installation
 
 The
+
+---
+
+## Getting started locally
+
+To get started locally with the catalog, follow these instructions. You'll need `node` and `npm` installed.
+
+### Create a MongoDB Database
+
+The rudi-node catalog interfaces with a MongoDB Database to store __metadatas__. To use the catalog locally - for dev per example; you need to install MongoDB.
+
+> https://www.mongodb.com/docs/manual/installation/
+
+Once MongoDB is installed and started, you'll need its url. It should looks like `mongodb://127.0.0.1:27017`- you can find it by running `mongosh` in a terminal.
+
+See next step to paste the url in config file.
+
+### Set up config files :
+
+Copy-paste, rename and modify if you wish the two following files :
+
+conf_default.ini > conf_custom.ini
+
+portal_conf_default.ini > portal_conf_custom.ini
+
+Copy paste the base url of your MongoDB database in the [`conf_custom.ini`](0-ini/conf_custom.ini) file (replace with your own):
+
+```ini
+[database]
+
+db_connection_uri: mongodb://127.0.0.1:27017
+```
+
+See [Configuration](#configuration) for more details.
+
+### Run the rudinode-catalog
+
+Now, everything should be set up; you can start the rudinode-catalog by running :
+
+```bash
+npm run start
+```
+
+The rudinode-catalog should now be locally accessible.
+
+Notice that for the next times, you only have to run this command to start it.
+
+> tip : execute `npm run` in bash to see all available shortcuts
+
