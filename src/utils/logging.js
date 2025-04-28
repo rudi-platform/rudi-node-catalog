@@ -15,7 +15,7 @@ import { API_DATA_NAME_PROPERTY, API_METADATA_ID } from '../db/dbFields.js'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { beautify, consoleErr, displayStr, logWhere, shorten } from './jsUtils.js'
+import { beautify, consoleErr, displayStr, getConsoleLogs, logWhere, shorten } from './jsUtils.js'
 
 import {
   SHOULD_LOG_CONSOLE,
@@ -132,8 +132,17 @@ export const displaySyslog = (srcMod, srcFun, msg) =>
 // -------------------------------------------------------------------------------------------------
 // Syslog functions: system level
 // -------------------------------------------------------------------------------------------------
+let initDump = true
+const dumpInitLogs = () => {
+  for (const logLine of getConsoleLogs()) sysDebug(logLine, 'init')
+}
+
 const sysLog = (level, msg, location, context, cid, info) => {
   try {
+    if (initDump) {
+      initDump = false
+      dumpInitLogs()
+    }
     if (SHOULD_SYSLOG) {
       if (level == 'verbose') level = 'info'
       if (level == ERR_LEVEL_TRACE || !level) level = 'debug'
@@ -146,6 +155,7 @@ const sysLog = (level, msg, location, context, cid, info) => {
     consoleErr(mod, 'sysLog', err)
   }
 }
+
 // System-related "panic" conditions
 export const sysEmerg = (msg, location, context, info, cid) =>
   sysLog('emergency', msg, location, context, cid, info)

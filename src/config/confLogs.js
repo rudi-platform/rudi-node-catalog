@@ -209,7 +209,7 @@ if (SHOULD_FILELOG) {
       name: 'datedLogs',
       dirname: LOG_DIR,
       filename: `${LOG_APP_NAME}-%DATE%`,
-      datePattern: 'YYYY-MM-DD-HH',
+      datePattern: 'YYYY-MM-DD_HH-mm-ss',
       createSymlink: true,
       symlinkName: `${LOG_APP_NAME}-current.log`,
       maxSize: '75m',

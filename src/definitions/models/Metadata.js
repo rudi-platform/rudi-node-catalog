@@ -545,7 +545,7 @@ async function checkLicence(metadata) {
           LicenceTypes.Standard
         )
         const listLicenceCode = await getLicenceCodes()
-        logD(mod, fun, ` [T] licence list: ${beautify(listLicenceCode)}`)
+        // logD(mod, fun, ` [T] licence list: ${beautify(listLicenceCode)}`)
         if (listLicenceCode.indexOf(licenceLabel) === -1) {
           throw new NotFoundError(
             `Licence label '${licenceLabel}' was not found in licence list '${listLicenceCode}'`
