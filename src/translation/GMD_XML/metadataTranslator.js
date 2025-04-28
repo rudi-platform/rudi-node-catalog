@@ -10,6 +10,7 @@ import { parseStringPromise as xml2jsonParser } from 'xml2js'
 // -------------------------------------------------------------------------------------------------
 import {
   API_ACCESS_CONDITION,
+  API_COLLECTION_TAG,
   API_DATA_CONTACTS_PROPERTY,
   API_DATA_DATES_PROPERTY,
   API_DATA_DESCRIPTION_PROPERTY,
@@ -74,6 +75,7 @@ import {
   getPath,
   getXmlParam,
   translateStraightFromPath,
+  translateStraightFromXmlParam,
 } from './genericTranslationFunctions.js'
 import { GmdXmlToRudiGeoTranslator } from './geographyTranslator.js'
 import { GmdXmlToRudiMediaTranslator, findMediaIdWithURL } from './mediaTranslator.js'
@@ -623,6 +625,13 @@ export const GmdXmlToRudiMetadataTranslator = new ObjectTranslator(
       true
     ),
     new FieldTranslator(API_STORAGE_STATUS, () => StorageStatus.Online, true),
+    new FieldTranslator(
+      API_COLLECTION_TAG,
+      translateStraightFromXmlParam,
+      false,
+      getPath(PATHS_GMD_TO_RUDI, API_COLLECTION_TAG),
+      getArgs(PATHS_GMD_TO_RUDI, API_COLLECTION_TAG)
+    ),
   ],
   xml2jsonParser
 )

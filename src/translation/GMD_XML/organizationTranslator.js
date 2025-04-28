@@ -13,6 +13,7 @@ import {
 } from '../../config/confTranslation/GMD_XML/confGMDXML.js'
 import { OBJ_ORGANIZATIONS } from '../../config/constApi.js'
 import {
+  API_COLLECTION_TAG,
   API_DATA_PRODUCER_PROPERTY,
   API_ORGANIZATION_ADDRESS,
   API_ORGANIZATION_ID,
@@ -28,6 +29,7 @@ import {
   getFirstElementWithPath,
   getPath,
   translateStraightFromPath,
+  translateStraightFromXmlParam,
 } from './genericTranslationFunctions.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -123,6 +125,13 @@ export const GmdXmlToRudiOrgaTranslator = new ObjectTranslator(
       false,
       getPath(argsOrgGmdXml, API_ORGANIZATION_ADDRESS),
       getArgs(argsOrgGmdXml, API_ORGANIZATION_ADDRESS)
+    ),
+    new FieldTranslator(
+      API_COLLECTION_TAG,
+      translateStraightFromXmlParam,
+      false,
+      getPath(argsOrgGmdXml, API_COLLECTION_TAG),
+      getArgs(argsOrgGmdXml, API_COLLECTION_TAG)
     ),
   ],
   xml2jsonParser

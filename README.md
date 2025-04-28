@@ -210,13 +210,15 @@ The
 
 To get started locally with the catalog, follow these instructions. You'll need `node` and `npm` installed.
 
-### Install necessary lib :
+### Create a MongoDB Database
 
-```bash
-npm install
-```
+The rudi-node catalog interfaces with a MongoDB Database to store __metadatas__. To use the catalog locally - for dev per example; you need to install MongoDB.
 
-> Note : `npm run prestart` is equivalent
+> https://www.mongodb.com/docs/manual/installation/
+
+Once MongoDB is installed and started, you'll need its url. It should looks like `mongodb://127.0.0.1:27017`- you can find it by running `mongosh` in a terminal.
+
+See next step to paste the url in config file.
 
 ### Set up config files :
 
@@ -226,24 +228,15 @@ conf_default.ini > conf_custom.ini
 
 portal_conf_default.ini > portal_conf_custom.ini
 
-See [Configuration](#configuration) for more details.
-
-
-### Create a MongoDB Database
-
-The rudi-node catalog interfaces with a MongoDB Database to store __metadatas__. To use the catalog locally - for dev per example; you need to install MongoDB.
-
-> https://www.mongodb.com/docs/manual/installation/
-
-Once MongoDB is installed and started, you'll need its url. It should looks like `mongodb://127.0.0.1:27017`- you can find it by running `mongosh` in a terminal.
-
-Copy paste this base url in the [`conf_custom.ini`](0-ini/conf_custom.ini) file :
+Copy paste the base url of your MongoDB database in the [`conf_custom.ini`](0-ini/conf_custom.ini) file (replace with your own):
 
 ```ini
 [database]
 
 db_connection_uri: mongodb://127.0.0.1:27017
 ```
+
+See [Configuration](#configuration) for more details.
 
 ### Run the rudinode-catalog
 

@@ -1,5 +1,6 @@
 import {
   API_ACCESS_CONDITION,
+  API_COLLECTION_TAG,
   API_CONTACT_ID,
   API_CONTACT_MAIL,
   API_CONTACT_NAME,
@@ -162,6 +163,12 @@ export const PATHS_GMD_TO_RUDI = {
           relativePathCharacter: ['gco:CharacterString'],
         },
       },
+      [API_COLLECTION_TAG]: {
+        path: ['gmd:CI_ResponsibleParty'],
+        args: {
+          paramName: 'collectionTag',
+        },
+      },
     },
   },
 
@@ -207,6 +214,12 @@ export const PATHS_GMD_TO_RUDI = {
           'gmd:code',
           'gco:CharacterString',
         ],
+      },
+      [API_COLLECTION_TAG]: {
+        path: ['gmd:CI_ResponsibleParty'],
+        args: {
+          paramName: 'collectionTag',
+        },
       },
     },
   },
@@ -385,5 +398,9 @@ export const PATHS_GMD_TO_RUDI = {
         ],
       },
     },
+  },
+  [API_COLLECTION_TAG]: {
+    path: ['gmd:MD_Metadata'],
+    args: { paramName: 'collectionTag' },
   },
 }

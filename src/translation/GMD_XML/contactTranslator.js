@@ -16,6 +16,7 @@ import {
 } from '../../config/confTranslation/GMD_XML/confGMDXML.js'
 import { OBJ_CONTACTS } from '../../config/constApi.js'
 import {
+  API_COLLECTION_TAG,
   API_CONTACT_ID,
   API_CONTACT_MAIL,
   API_CONTACT_NAME,
@@ -119,6 +120,13 @@ export const GmdXmlToRudiContactTranslator = new ObjectTranslator(
       translateStraightFromPath,
       true,
       getPath(argsContGmdXml, API_CONTACT_MAIL)
+    ),
+    new FieldTranslator(
+      API_COLLECTION_TAG,
+      translateStraightFromXmlParam,
+      false,
+      getPath(argsContGmdXml, API_COLLECTION_TAG),
+      getArgs(argsContGmdXml, API_COLLECTION_TAG)
     ),
   ],
   xml2jsonParser
