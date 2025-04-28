@@ -14,6 +14,7 @@ import {
 } from '../../config/confTranslation/GMD_XML/confGMDXML.js'
 import { OBJ_MEDIA } from '../../config/constApi.js'
 import {
+  API_COLLECTION_TAG,
   API_MEDIA_CAPTION,
   API_MEDIA_CONNECTOR,
   API_MEDIA_ID,
@@ -34,6 +35,7 @@ import {
   getArgs,
   getPath,
   translateStraightFromPath,
+  translateStraightFromXmlParam,
 } from './genericTranslationFunctions.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -176,6 +178,13 @@ export const GmdXmlToRudiMediaTranslator = new ObjectTranslator(
       true,
       pathConnectorGmdXml,
       argsConnnectorGmdXml
+    ),
+    new FieldTranslator(
+      API_COLLECTION_TAG,
+      translateStraightFromXmlParam,
+      false,
+      getPath(argsMediaGmdXml, API_COLLECTION_TAG),
+      getArgs(argsMediaGmdXml, API_COLLECTION_TAG)
     ),
   ]
 )

@@ -1,8 +1,8 @@
 {
 	"info": {
-		"_postman_id": "c2258aea-e65a-4bf0-b3c6-44d3d1610c8a",
+		"_postman_id": "c1ba81ce-1c1e-49ef-9ac8-3a93df3ad225",
 		"name": "01. Catalog",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
 		"_exporter_id": "33400273"
 	},
 	"item": [
@@ -56,15 +56,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{jwtAuthUrl}}/forge",
-							"host": [
-								"{{jwtAuthUrl}}"
-							],
-							"path": [
-								"forge"
-							]
-						}
+						"url": "{{jwtAuthUrl}}/forge"
 					},
 					"response": []
 				},
@@ -109,15 +101,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{jwtAuthUrl}}/check",
-							"host": [
-								"{{jwtAuthUrl}}"
-							],
-							"path": [
-								"check"
-							]
-						}
+						"url": "{{jwtAuthUrl}}/check"
 					},
 					"response": []
 				},
@@ -144,17 +128,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/portal/token",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"portal",
-								"token"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/portal/token"
 					},
 					"response": []
 				},
@@ -228,16 +202,7 @@
 						},
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/env",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"env"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/env"
 					},
 					"response": []
 				},
@@ -263,16 +228,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/hash",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"hash"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/hash"
 					},
 					"response": []
 				},
@@ -303,16 +259,7 @@
 						},
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/apphash",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"apphash"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/apphash"
 					},
 					"response": []
 				},
@@ -341,15 +288,7 @@
 						},
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/version",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"version"
-							]
-						}
+						"url": "{{catalogUrl}}/version"
 					},
 					"response": []
 				},
@@ -382,16 +321,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/nv",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"nv"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/nv"
 					},
 					"response": []
 				},
@@ -415,16 +345,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/id_generation",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"id_generation"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/id_generation"
 					},
 					"response": []
 				},
@@ -449,16 +370,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/routes",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"routes"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/routes"
 					},
 					"response": []
 				},
@@ -565,16 +477,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/db",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"db"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/db"
 					},
 					"response": []
 				},
@@ -601,17 +504,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/db/data",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"db",
-								"data"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/db/data"
 					},
 					"response": []
 				},
@@ -811,26 +704,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{{{catalogJwtName}}}}",
-									"type": "string"
-								}
-							]
+							"bearer": {
+								"token": "{{{{catalogJwtName}}}}"
+							}
 						},
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/test",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"test"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/test"
 					},
 					"response": []
 				}
@@ -1160,17 +1040,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/licences/",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"licences",
-								""
-							]
-						}
+						"url": "{{catalogUrl}}/admin/licences/"
 					},
 					"response": []
 				},
@@ -1207,16 +1077,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/licence_codes",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"licence_codes"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/licence_codes"
 					},
 					"response": []
 				},
@@ -1247,16 +1108,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/enum",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"enum"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/enum"
 					},
 					"response": []
 				},
@@ -1326,17 +1178,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/enum/Languages",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"enum",
-								"Languages"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/enum/Languages"
 					},
 					"response": []
 				},
@@ -1361,17 +1203,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/enum/Keywords",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"enum",
-								"Keywords"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/enum/Keywords"
 					},
 					"response": []
 				},
@@ -1396,17 +1228,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/enum/Themes",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"enum",
-								"Themes"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/enum/Themes"
 					},
 					"response": []
 				},
@@ -1431,17 +1253,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/enum/Themes",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"enum",
-								"Themes"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/enum/Themes"
 					},
 					"response": []
 				},
@@ -1468,18 +1280,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/enum/Themes/fr",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"enum",
-								"Themes",
-								"fr"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/enum/Themes/fr"
 					},
 					"response": []
 				},
@@ -1506,18 +1307,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/enum/Themes/en",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"enum",
-								"Themes",
-								"en"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/enum/Themes/en"
 					},
 					"response": []
 				},
@@ -1541,16 +1331,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/search",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"search"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/search"
 					},
 					"response": []
 				}
@@ -1604,16 +1385,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/organizations",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"organizations"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/organizations"
 					},
 					"response": []
 				},
@@ -1639,17 +1411,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/organizations/{{softOrg1Id}}",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"organizations",
-								"{{softOrg1Id}}"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/organizations/{{softOrg1Id}}"
 					},
 					"response": []
 				},
@@ -1701,16 +1463,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/organizations",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"organizations"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/organizations"
 					},
 					"response": []
 				},
@@ -1760,16 +1513,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/organizations",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"organizations"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/organizations"
 					},
 					"response": []
 				},
@@ -1795,17 +1539,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/organizations/{{softOrg2Id}}",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"organizations",
-								"{{softOrg2Id}}"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/organizations/{{softOrg2Id}}"
 					},
 					"response": []
 				},
@@ -1888,16 +1622,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/v1/organizations",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"v1",
-								"organizations"
-							]
-						}
+						"url": "{{catalogUrl}}/v1/organizations"
 					},
 					"response": []
 				},
@@ -2002,16 +1727,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/contacts",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"contacts"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/contacts"
 					},
 					"response": []
 				},
@@ -2059,16 +1775,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/contacts",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"contacts"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/contacts"
 					},
 					"response": []
 				},
@@ -2116,16 +1823,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/contacts",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"contacts"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/contacts"
 					},
 					"response": []
 				},
@@ -2177,16 +1875,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/contacts",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"contacts"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/contacts"
 					},
 					"response": []
 				},
@@ -2211,17 +1900,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/contacts/{{softContact1Id}}",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"contacts",
-								"{{softContact1Id}}"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/contacts/{{softContact1Id}}"
 					},
 					"response": []
 				},
@@ -2256,16 +1935,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/contacts",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"contacts"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/contacts"
 					},
 					"response": []
 				},
@@ -2302,16 +1972,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/v1/contacts",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"v1",
-								"contacts"
-							]
-						}
+						"url": "{{catalogUrl}}/v1/contacts"
 					},
 					"response": []
 				},
@@ -2416,16 +2077,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/media",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"media"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/media"
 					},
 					"response": []
 				},
@@ -2472,16 +2124,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/media",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"media"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/media"
 					},
 					"response": []
 				},
@@ -2517,16 +2160,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/media",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"media"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/media"
 					},
 					"response": []
 				},
@@ -2569,18 +2203,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/media/{{media1Id}}/commit",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"media",
-								"{{media1Id}}",
-								"commit"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/media/{{media1Id}}/commit"
 					},
 					"response": []
 				}
@@ -2704,16 +2327,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/resources",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"resources"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/resources"
 					},
 					"response": []
 				},
@@ -2760,16 +2374,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/resources",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"resources"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/resources"
 					},
 					"response": []
 				},
@@ -2815,16 +2420,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/resources",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"resources"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/resources"
 					},
 					"response": []
 				},
@@ -2871,16 +2467,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/resources",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"resources"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/resources"
 					},
 					"response": []
 				},
@@ -2928,16 +2515,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/resources",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"resources"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/resources"
 					},
 					"response": []
 				},
@@ -2986,16 +2564,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/resources",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"resources"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/resources"
 					},
 					"response": []
 				},
@@ -3044,16 +2613,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/resources",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"resources"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/resources"
 					},
 					"response": []
 				},
@@ -3102,16 +2662,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/resources",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"resources"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/resources"
 					},
 					"response": []
 				},
@@ -3160,16 +2711,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/resources",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"resources"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/resources"
 					},
 					"response": []
 				},
@@ -3218,16 +2760,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/resources",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"resources"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/resources"
 					},
 					"response": []
 				},
@@ -3276,16 +2809,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/resources",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"resources"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/resources"
 					},
 					"response": []
 				},
@@ -3311,18 +2835,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/enum/Themes/init",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"enum",
-								"Themes",
-								"init"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/enum/Themes/init"
 					},
 					"response": []
 				},
@@ -3347,13 +2860,9 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{{{portalJwtName}}}}",
-									"type": "string"
-								}
-							]
+							"bearer": {
+								"token": "{{{{portalJwtName}}}}"
+							}
 						},
 						"method": "GET",
 						"header": [],
@@ -3460,13 +2969,9 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{{{portalJwtName}}}}",
-									"type": "string"
-								}
-							]
+							"bearer": {
+								"token": "{{{{portalJwtName}}}}"
+							}
 						},
 						"method": "GET",
 						"header": [],
@@ -3734,17 +3239,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/resources/count",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"resources",
-								"count"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/resources/count"
 					},
 					"response": []
 				},
@@ -4193,13 +3688,9 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{{{portalJwtName}}}}",
-									"type": "string"
-								}
-							]
+							"bearer": {
+								"token": "{{{{portalJwtName}}}}"
+							}
 						},
 						"method": "GET",
 						"header": [],
@@ -4333,27 +3824,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{{{portalJwtName}}}}",
-									"type": "string"
-								}
-							]
+							"bearer": {
+								"token": "{{{{portalJwtName}}}}"
+							}
 						},
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/v1/resources/{{softMeta1Id}}",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"v1",
-								"resources",
-								"{{softMeta1Id}}"
-							]
-						}
+						"url": "{{catalogUrl}}/v1/resources/{{softMeta1Id}}"
 					},
 					"response": []
 				},
@@ -4379,27 +3856,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{{{portalJwtName}}}}",
-									"type": "string"
-								}
-							]
+							"bearer": {
+								"token": "{{{{portalJwtName}}}}"
+							}
 						},
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/v1/resources/test",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"v1",
-								"resources",
-								"test"
-							]
-						}
+						"url": "{{catalogUrl}}/v1/resources/test"
 					},
 					"response": []
 				},
@@ -4432,17 +3895,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/resources/{{softMeta2Id}}",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"resources",
-								"{{softMeta2Id}}"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/resources/{{softMeta2Id}}"
 					},
 					"response": []
 				},
@@ -4491,16 +3944,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/resources",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"resources"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/resources"
 					},
 					"response": []
 				},
@@ -4533,18 +3977,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/portal/resources/send",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"portal",
-								"resources",
-								"send"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/portal/resources/send"
 					},
 					"response": []
 				},
@@ -4577,18 +4010,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/portal/resources/send",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"portal",
-								"resources",
-								"send"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/portal/resources/send"
 					},
 					"response": []
 				},
@@ -4780,7 +4202,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "<gmd:CI_ResponsibleParty>\n    <gmd:identifier>\n        <gmd:MD_Identifier>\n            <gmd:code>\n                <gco:CharacterString>{{softOrgGmdXml1Id}}</gco:CharacterString>\n            </gmd:code>\n        </gmd:MD_Identifier>\n    </gmd:identifier>\n    <gmd:organisationName>\n        <gco:CharacterString>{{softOrgGmdXml1NewName}}</gco:CharacterString>\n    </gmd:organisationName>\n    <gmd:contactInfo>\n        <gmd:CI_Contact>\n            <gmd:phone>\n                <gmd:CI_Telephone>\n                    <gmd:voice>\n                        <gco:CharacterString>00 00 00 00 00</gco:CharacterString>\n                    </gmd:voice>\n                </gmd:CI_Telephone>\n            </gmd:phone>\n            <gmd:address>\n                <gmd:CI_Address>\n                    <gmd:deliveryPoint>\n                        <gco:CharacterString>Nouvelle adresse</gco:CharacterString>\n                    </gmd:deliveryPoint>\n                    <gmd:deliveryPoint>\n                        <gco:CharacterString>CS 23167</gco:CharacterString>\n                    </gmd:deliveryPoint>\n                    <gmd:city>\n                        <gco:CharacterString>RENNES CEDEX</gco:CharacterString>\n                    </gmd:city>\n                    <gmd:postalCode>\n                        <gco:CharacterString>35031</gco:CharacterString>\n                    </gmd:postalCode>\n                    <gmd:country>\n                        <gco:CharacterString>France</gco:CharacterString>\n                    </gmd:country>\n                    <gmd:electronicMailAddress>\n                        <gco:CharacterString>mail@mail.mail</gco:CharacterString>\n                    </gmd:electronicMailAddress>\n                    <gmd:electronicMailAddress>\n                        <gco:CharacterString>mail2@mail.mail</gco:CharacterString>\n                    </gmd:electronicMailAddress>\n                </gmd:CI_Address>\n            </gmd:address>\n            <gmd:onlineResource>\n                <gmd:CI_OnlineResource>\n                    <gmd:linkage>\n                        <gmd:URL>mail@mail.mail</gmd:URL>\n                    </gmd:linkage>\n                    <gmd:protocol>\n                        <gco:CharacterString>WWW:LINK-1.0-http--link</gco:CharacterString>\n                    </gmd:protocol>\n                </gmd:CI_OnlineResource>\n            </gmd:onlineResource>\n            <gmd:contactInstructions>\n                <gmx:FileName src=\"http://public.sig.rennesmetropole.fr/ressources/catalogue/apercus/republique_francaise.png\">Logo</gmx:FileName>\n            </gmd:contactInstructions>\n        </gmd:CI_Contact>\n    </gmd:contactInfo>\n    <gmd:role>\n        <gmd:CI_RoleCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode\" codeListValue=\"custodian\" />\n    </gmd:role>\n</gmd:CI_ResponsibleParty>",
+							"raw": "<gmd:CI_ResponsibleParty collectionTag=\"{{stamp}}\">\n    <gmd:identifier>\n        <gmd:MD_Identifier>\n            <gmd:code>\n                <gco:CharacterString>{{softOrgGmdXml1Id}}</gco:CharacterString>\n            </gmd:code>\n        </gmd:MD_Identifier>\n    </gmd:identifier>\n    <gmd:organisationName>\n        <gco:CharacterString>{{softOrgGmdXml1NewName}}</gco:CharacterString>\n    </gmd:organisationName>\n    <gmd:contactInfo>\n        <gmd:CI_Contact>\n            <gmd:phone>\n                <gmd:CI_Telephone>\n                    <gmd:voice>\n                        <gco:CharacterString>00 00 00 00 00</gco:CharacterString>\n                    </gmd:voice>\n                </gmd:CI_Telephone>\n            </gmd:phone>\n            <gmd:address>\n                <gmd:CI_Address>\n                    <gmd:deliveryPoint>\n                        <gco:CharacterString>Nouvelle adresse</gco:CharacterString>\n                    </gmd:deliveryPoint>\n                    <gmd:deliveryPoint>\n                        <gco:CharacterString>CS 23167</gco:CharacterString>\n                    </gmd:deliveryPoint>\n                    <gmd:city>\n                        <gco:CharacterString>RENNES CEDEX</gco:CharacterString>\n                    </gmd:city>\n                    <gmd:postalCode>\n                        <gco:CharacterString>35031</gco:CharacterString>\n                    </gmd:postalCode>\n                    <gmd:country>\n                        <gco:CharacterString>France</gco:CharacterString>\n                    </gmd:country>\n                    <gmd:electronicMailAddress>\n                        <gco:CharacterString>mail@mail.mail</gco:CharacterString>\n                    </gmd:electronicMailAddress>\n                    <gmd:electronicMailAddress>\n                        <gco:CharacterString>mail2@mail.mail</gco:CharacterString>\n                    </gmd:electronicMailAddress>\n                </gmd:CI_Address>\n            </gmd:address>\n            <gmd:onlineResource>\n                <gmd:CI_OnlineResource>\n                    <gmd:linkage>\n                        <gmd:URL>mail@mail.mail</gmd:URL>\n                    </gmd:linkage>\n                    <gmd:protocol>\n                        <gco:CharacterString>WWW:LINK-1.0-http--link</gco:CharacterString>\n                    </gmd:protocol>\n                </gmd:CI_OnlineResource>\n            </gmd:onlineResource>\n            <gmd:contactInstructions>\n                <gmx:FileName src=\"http://public.sig.rennesmetropole.fr/ressources/catalogue/apercus/republique_francaise.png\">Logo</gmx:FileName>\n            </gmd:contactInstructions>\n        </gmd:CI_Contact>\n    </gmd:contactInfo>\n    <gmd:role>\n        <gmd:CI_RoleCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode\" codeListValue=\"custodian\" />\n    </gmd:role>\n</gmd:CI_ResponsibleParty>",
 							"options": {
 								"raw": {
 									"language": "xml"
@@ -4861,7 +4283,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "<gmd:CI_ResponsibleParty>\n    <gmd:organisationName>\n        <gco:CharacterString>{{softOrgGmdXml2Name}}</gco:CharacterString>\n    </gmd:organisationName>\n    <gmd:contactInfo>\n        <gmd:CI_Contact>\n            <gmd:phone>\n                <gmd:CI_Telephone>\n                    <gmd:voice>\n                        <gco:CharacterString>00 00 00 00 00</gco:CharacterString>\n                    </gmd:voice>\n                </gmd:CI_Telephone>\n            </gmd:phone>\n            <gmd:address>\n                <gmd:CI_Address>\n                    <gmd:deliveryPoint>\n                        <gco:CharacterString>Ancienne adresse</gco:CharacterString>\n                    </gmd:deliveryPoint>\n                    <gmd:deliveryPoint>\n                        <gco:CharacterString>CS 23167</gco:CharacterString>\n                    </gmd:deliveryPoint>\n                    <gmd:city>\n                        <gco:CharacterString>RENNES CEDEX</gco:CharacterString>\n                    </gmd:city>\n                    <gmd:postalCode>\n                        <gco:CharacterString>35031</gco:CharacterString>\n                    </gmd:postalCode>\n                    <gmd:country>\n                        <gco:CharacterString>France</gco:CharacterString>\n                    </gmd:country>\n                    <gmd:electronicMailAddress>\n                        <gco:CharacterString>mail@mail.mail</gco:CharacterString>\n                    </gmd:electronicMailAddress>\n                    <gmd:electronicMailAddress>\n                        <gco:CharacterString>mail2@mail.mail</gco:CharacterString>\n                    </gmd:electronicMailAddress>\n                </gmd:CI_Address>\n            </gmd:address>\n            <gmd:onlineResource>\n                <gmd:CI_OnlineResource>\n                    <gmd:linkage>\n                        <gmd:URL>mail@mail.mail</gmd:URL>\n                    </gmd:linkage>\n                    <gmd:protocol>\n                        <gco:CharacterString>WWW:LINK-1.0-http--link</gco:CharacterString>\n                    </gmd:protocol>\n                </gmd:CI_OnlineResource>\n            </gmd:onlineResource>\n            <gmd:contactInstructions>\n                <gmx:FileName src=\"http://public.sig.rennesmetropole.fr/ressources/catalogue/apercus/republique_francaise.png\">Logo</gmx:FileName>\n            </gmd:contactInstructions>\n        </gmd:CI_Contact>\n    </gmd:contactInfo>\n    <gmd:role>\n        <gmd:CI_RoleCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode\" codeListValue=\"custodian\" />\n    </gmd:role>\n</gmd:CI_ResponsibleParty>",
+							"raw": "<gmd:CI_ResponsibleParty collectionTag=\"{{stamp}}\">\n    <gmd:organisationName>\n        <gco:CharacterString>{{softOrgGmdXml2Name}}</gco:CharacterString>\n    </gmd:organisationName>\n    <gmd:contactInfo>\n        <gmd:CI_Contact>\n            <gmd:phone>\n                <gmd:CI_Telephone>\n                    <gmd:voice>\n                        <gco:CharacterString>00 00 00 00 00</gco:CharacterString>\n                    </gmd:voice>\n                </gmd:CI_Telephone>\n            </gmd:phone>\n            <gmd:address>\n                <gmd:CI_Address>\n                    <gmd:deliveryPoint>\n                        <gco:CharacterString>Ancienne adresse</gco:CharacterString>\n                    </gmd:deliveryPoint>\n                    <gmd:deliveryPoint>\n                        <gco:CharacterString>CS 23167</gco:CharacterString>\n                    </gmd:deliveryPoint>\n                    <gmd:city>\n                        <gco:CharacterString>RENNES CEDEX</gco:CharacterString>\n                    </gmd:city>\n                    <gmd:postalCode>\n                        <gco:CharacterString>35031</gco:CharacterString>\n                    </gmd:postalCode>\n                    <gmd:country>\n                        <gco:CharacterString>France</gco:CharacterString>\n                    </gmd:country>\n                    <gmd:electronicMailAddress>\n                        <gco:CharacterString>mail@mail.mail</gco:CharacterString>\n                    </gmd:electronicMailAddress>\n                    <gmd:electronicMailAddress>\n                        <gco:CharacterString>mail2@mail.mail</gco:CharacterString>\n                    </gmd:electronicMailAddress>\n                </gmd:CI_Address>\n            </gmd:address>\n            <gmd:onlineResource>\n                <gmd:CI_OnlineResource>\n                    <gmd:linkage>\n                        <gmd:URL>mail@mail.mail</gmd:URL>\n                    </gmd:linkage>\n                    <gmd:protocol>\n                        <gco:CharacterString>WWW:LINK-1.0-http--link</gco:CharacterString>\n                    </gmd:protocol>\n                </gmd:CI_OnlineResource>\n            </gmd:onlineResource>\n            <gmd:contactInstructions>\n                <gmx:FileName src=\"http://public.sig.rennesmetropole.fr/ressources/catalogue/apercus/republique_francaise.png\">Logo</gmx:FileName>\n            </gmd:contactInstructions>\n        </gmd:CI_Contact>\n    </gmd:contactInfo>\n    <gmd:role>\n        <gmd:CI_RoleCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode\" codeListValue=\"custodian\" />\n    </gmd:role>\n</gmd:CI_ResponsibleParty>",
 							"options": {
 								"raw": {
 									"language": "xml"
@@ -5033,7 +4455,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "<gmd:CI_ResponsibleParty>\n    <gmd:identifier>\n        <gmd:MD_Identifier>\n            <gmd:code>\n                <gco:CharacterString>{{softContactGmdXml1Id}}</gco:CharacterString>\n            </gmd:code>\n        </gmd:MD_Identifier>\n    </gmd:identifier>\n    <gmd:individualName>\n        <gco:CharacterString>{{softContactGmdXml1NewName}}</gco:CharacterString>\n    </gmd:individualName>\n    <gmd:organisationName>\n        <gco:CharacterString>{{softOrgGmdXml1NewName}}</gco:CharacterString>\n    </gmd:organisationName>\n    <gmd:contactInfo>\n        <gmd:CI_Contact>\n            <gmd:phone>\n                <gmd:CI_Telephone>\n                    <gmd:voice>\n                        <gco:CharacterString>00 00 00 00 00</gco:CharacterString>\n                    </gmd:voice>\n                </gmd:CI_Telephone>\n            </gmd:phone>\n            <gmd:address>\n                <gmd:CI_Address>\n                    <gmd:electronicMailAddress>\n                        <gco:CharacterString>{{softContactGmdXml1NewEmail}}</gco:CharacterString>\n                    </gmd:electronicMailAddress>\n                </gmd:CI_Address>\n            </gmd:address>\n            <gmd:hoursOfService>\n                <gco:CharacterString>08h00 - 13h00 et 13h00 - 12h00</gco:CharacterString>\n            </gmd:hoursOfService>\n        </gmd:CI_Contact>\n    </gmd:contactInfo>\n    <gmd:role>\n        <gmd:CI_RoleCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode\" codeListValue=\"pointOfContact\" />\n    </gmd:role>\n</gmd:CI_ResponsibleParty>",
+							"raw": "<gmd:CI_ResponsibleParty collectionTag=\"{{stamp}}\">\n    <gmd:identifier>\n        <gmd:MD_Identifier>\n            <gmd:code>\n                <gco:CharacterString>{{softContactGmdXml1Id}}</gco:CharacterString>\n            </gmd:code>\n        </gmd:MD_Identifier>\n    </gmd:identifier>\n    <gmd:individualName>\n        <gco:CharacterString>{{softContactGmdXml1NewName}}</gco:CharacterString>\n    </gmd:individualName>\n    <gmd:organisationName>\n        <gco:CharacterString>{{softOrgGmdXml1NewName}}</gco:CharacterString>\n    </gmd:organisationName>\n    <gmd:contactInfo>\n        <gmd:CI_Contact>\n            <gmd:phone>\n                <gmd:CI_Telephone>\n                    <gmd:voice>\n                        <gco:CharacterString>00 00 00 00 00</gco:CharacterString>\n                    </gmd:voice>\n                </gmd:CI_Telephone>\n            </gmd:phone>\n            <gmd:address>\n                <gmd:CI_Address>\n                    <gmd:electronicMailAddress>\n                        <gco:CharacterString>{{softContactGmdXml1NewEmail}}</gco:CharacterString>\n                    </gmd:electronicMailAddress>\n                </gmd:CI_Address>\n            </gmd:address>\n            <gmd:hoursOfService>\n                <gco:CharacterString>08h00 - 13h00 et 13h00 - 12h00</gco:CharacterString>\n            </gmd:hoursOfService>\n        </gmd:CI_Contact>\n    </gmd:contactInfo>\n    <gmd:role>\n        <gmd:CI_RoleCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode\" codeListValue=\"pointOfContact\" />\n    </gmd:role>\n</gmd:CI_ResponsibleParty>",
 							"options": {
 								"raw": {
 									"language": "xml"
@@ -5130,7 +4552,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:gco=\"http://www.isotc211.org/2005/gco\" xmlns:srv=\"http://www.isotc211.org/2005/srv\" xmlns:gmx=\"http://www.isotc211.org/2005/gmx\" xmlns:gts=\"http://www.isotc211.org/2005/gts\" xmlns:gsr=\"http://www.isotc211.org/2005/gsr\" xmlns:gmi=\"http://www.isotc211.org/2005/gmi\" xmlns:gml=\"http://www.opengis.net/gml\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xsi:schemaLocation=\"http://www.isotc211.org/2005/gmd http://www.isotc211.org/2005/gmd/gmd.xsd http://www.isotc211.org/2005/gmx http://www.isotc211.org/2005/gmx/gmx.xsd http://www.isotc211.org/2005/srv http://schemas.opengis.net/iso/19139/20060504/srv/srv.xsd\" collectionTag=\"{{stamp}}\">\n    <gmd:fileIdentifier>\n        <gco:CharacterString>{{softMetaGmdXml1LocalId}}</gco:CharacterString>\n    </gmd:fileIdentifier>\n    <gmd:language xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gmd:LanguageCode codeList=\"http://www.loc.gov/standards/iso639-2/\" codeListValue=\"fre\" />\n    </gmd:language>\n    <gmd:characterSet xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gmd:MD_CharacterSetCode codeListValue=\"utf8\" codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CharacterSetCode\" />\n    </gmd:characterSet>\n    <gmd:parentIdentifier xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gco:CharacterString>unknown</gco:CharacterString>\n    </gmd:parentIdentifier>\n    <gmd:hierarchyLevel xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gmd:MD_ScopeCode codeListValue=\"dataset\" codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ScopeCode\" />\n    </gmd:hierarchyLevel>\n    <gmd:hierarchyLevelName xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gco:CharacterString>Série de données</gco:CharacterString>\n    </gmd:hierarchyLevelName>\n    <gmd:contact xmlns:gss=\"http://www.isotc211.org/2005/gss\" xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gmd:CI_ResponsibleParty>\n            <gmd:identifier>\n                <gmd:MD_Identifier>\n                    <gmd:code>\n                        <gco:CharacterString>{{softContactGmdXml1Id}}</gco:CharacterString>\n                    </gmd:code>\n                </gmd:MD_Identifier>\n            </gmd:identifier>\n            <gmd:individualName>\n                <gco:CharacterString>{{softContactGmdXml1NewName}}</gco:CharacterString>\n            </gmd:individualName>\n            <gmd:organisationName>\n                <gco:CharacterString>{{softOrgGmdXml1NewName}}</gco:CharacterString>\n            </gmd:organisationName>\n            <gmd:contactInfo>\n                <gmd:CI_Contact>\n                    <gmd:phone>\n                        <gmd:CI_Telephone>\n                            <gmd:voice>\n                                <gco:CharacterString>00 00 00 00 00</gco:CharacterString>\n                            </gmd:voice>\n                        </gmd:CI_Telephone>\n                    </gmd:phone>\n                    <gmd:address>\n                        <gmd:CI_Address>\n                            <gmd:electronicMailAddress>\n                                <gco:CharacterString>{{softContactGmdXml1NewEmail}}</gco:CharacterString>\n                            </gmd:electronicMailAddress>\n                        </gmd:CI_Address>\n                    </gmd:address>\n                    <gmd:hoursOfService>\n                        <gco:CharacterString>08h00 - 13h00 et 13h00 - 12h00</gco:CharacterString>\n                    </gmd:hoursOfService>\n                </gmd:CI_Contact>\n            </gmd:contactInfo>\n            <gmd:role>\n                <gmd:CI_RoleCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode\" codeListValue=\"pointOfContact\" />\n            </gmd:role>\n        </gmd:CI_ResponsibleParty>\n    </gmd:contact>\n    <gmd:dateStamp xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gco:DateTime>2023-10-20T06:15:07</gco:DateTime>\n    </gmd:dateStamp>\n    <gmd:metadataStandardName xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gco:CharacterString>ISO 19115:2003/19139</gco:CharacterString>\n    </gmd:metadataStandardName>\n    <gmd:metadataStandardVersion xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gco:CharacterString>1.0</gco:CharacterString>\n    </gmd:metadataStandardVersion>\n    <gmd:spatialRepresentationInfo xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\" />\n    <gmd:spatialRepresentationInfo xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gmd:MD_VectorSpatialRepresentation>\n            <gmd:topologyLevel>\n                <gmd:MD_TopologyLevelCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_TopologyLevelCode\" codeListValue=\"abstract\" />\n            </gmd:topologyLevel>\n            <gmd:geometricObjects>\n                <gmd:MD_GeometricObjects>\n                    <gmd:geometricObjectType>\n                        <gmd:MD_GeometricObjectTypeCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_GeometricObjectTypeCode\" codeListValue=\"surface\" />\n                    </gmd:geometricObjectType>\n                </gmd:MD_GeometricObjects>\n            </gmd:geometricObjects>\n        </gmd:MD_VectorSpatialRepresentation>\n    </gmd:spatialRepresentationInfo>\n    <gmd:referenceSystemInfo xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gmd:MD_ReferenceSystem>\n            <gmd:referenceSystemIdentifier>\n                <gmd:RS_Identifier>\n                    <gmd:code>\n                        <gco:CharacterString>RGF93 / CC48 (EPSG:3948)</gco:CharacterString>\n                    </gmd:code>\n                </gmd:RS_Identifier>\n            </gmd:referenceSystemIdentifier>\n        </gmd:MD_ReferenceSystem>\n    </gmd:referenceSystemInfo>\n    <gmd:identificationInfo xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gmd:MD_DataIdentification>\n            <gmd:citation>\n                <gmd:CI_Citation>\n                    <gmd:title>\n                        <gco:CharacterString>Classement sonore des infrastructures routières sur Rennes Métropole : secteurs affectés</gco:CharacterString>\n                    </gmd:title>\n                    <gmd:alternateTitle>\n                        <gco:CharacterString>risque_secu.ddtm_csv_secteurs_affectes</gco:CharacterString>\n                    </gmd:alternateTitle>\n                    <gmd:date>\n                        <gmd:CI_Date>\n                            <gmd:date>\n                                <gco:Date>2023-10-17</gco:Date>\n                            </gmd:date>\n                            <gmd:dateType>\n                                <gmd:CI_DateTypeCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode\" codeListValue=\"creation\" />\n                            </gmd:dateType>\n                        </gmd:CI_Date>\n                    </gmd:date>\n                    <gmd:date>\n                        <gmd:CI_Date>\n                            <gmd:date>\n                                <gco:Date>2023-10-17</gco:Date>\n                            </gmd:date>\n                            <gmd:dateType>\n                                <gmd:CI_DateTypeCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode\" codeListValue=\"revision\" />\n                            </gmd:dateType>\n                        </gmd:CI_Date>\n                    </gmd:date>\n                    <gmd:identifier>\n                        <gmd:MD_Identifier>\n                            <gmd:code>\n                                <gco:CharacterString>https://input_server_url/geonetwork/srv/fre/xml.metadata.get?uuid={{softMetaGmdXml1LocalId}}</gco:CharacterString>\n                            </gmd:code>\n                        </gmd:MD_Identifier>\n                    </gmd:identifier>\n                </gmd:CI_Citation>\n            </gmd:citation>\n            <gmd:abstract>\n                <gco:CharacterString>Résumé de la métadonnée.</gco:CharacterString>\n            </gmd:abstract>\n            <gmd:purpose>\n                <gco:CharacterString>Objectif</gco:CharacterString>\n            </gmd:purpose>\n            <gmd:status>\n                <gmd:MD_ProgressCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ProgressCode\" codeListValue=\"completed\" />\n            </gmd:status>\n            <gmd:pointOfContact>\n                <gmd:CI_ResponsibleParty>\n                    <gmd:identifier>\n                        <gmd:MD_Identifier>\n                            <gmd:code>\n                                <gco:CharacterString>{{softContactGmdXml1Id}}</gco:CharacterString>\n                            </gmd:code>\n                        </gmd:MD_Identifier>\n                    </gmd:identifier>\n                    <gmd:individualName>\n                        <gco:CharacterString>{{softContactGmdXml1NewName}}</gco:CharacterString>\n                    </gmd:individualName>\n                    <gmd:organisationName>\n                        <gco:CharacterString>{{softOrgGmdXml1NewName}}</gco:CharacterString>\n                    </gmd:organisationName>\n                    <gmd:contactInfo>\n                        <gmd:CI_Contact>\n                            <gmd:phone>\n                                <gmd:CI_Telephone>\n                                    <gmd:voice>\n                                        <gco:CharacterString>00 00 00 00 00</gco:CharacterString>\n                                    </gmd:voice>\n                                </gmd:CI_Telephone>\n                            </gmd:phone>\n                            <gmd:address>\n                                <gmd:CI_Address>\n                                    <gmd:electronicMailAddress>\n                                        <gco:CharacterString>{{softContactGmdXml1NewEmail}}</gco:CharacterString>\n                                    </gmd:electronicMailAddress>\n                                </gmd:CI_Address>\n                            </gmd:address>\n                            <gmd:hoursOfService>\n                                <gco:CharacterString>08h00 - 13h00 et 13h00 - 12h00</gco:CharacterString>\n                            </gmd:hoursOfService>\n                        </gmd:CI_Contact>\n                    </gmd:contactInfo>\n                    <gmd:role>\n                        <gmd:CI_RoleCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode\" codeListValue=\"pointOfContact\" />\n                    </gmd:role>\n                </gmd:CI_ResponsibleParty>\n            </gmd:pointOfContact>\n            <gmd:pointOfContact>\n                <gmd:CI_ResponsibleParty>\n                    <gmd:identifier>\n                        <gmd:MD_Identifier>\n                            <gmd:code>\n                                <gco:CharacterString>{{softOrgGmdXml1Id}}</gco:CharacterString>\n                            </gmd:code>\n                        </gmd:MD_Identifier>\n                    </gmd:identifier>\n                    <gmd:organisationName>\n                        <gco:CharacterString>{{softOrgGmdXml1NewName}}</gco:CharacterString>\n                    </gmd:organisationName>\n                    <gmd:contactInfo>\n                        <gmd:CI_Contact>\n                            <gmd:phone>\n                                <gmd:CI_Telephone>\n                                    <gmd:voice>\n                                        <gco:CharacterString>00 00 00 00 00</gco:CharacterString>\n                                    </gmd:voice>\n                                </gmd:CI_Telephone>\n                            </gmd:phone>\n                            <gmd:address>\n                                <gmd:CI_Address>\n                                    <gmd:deliveryPoint>\n                                        <gco:CharacterString>Nouvelle adresse</gco:CharacterString>\n                                    </gmd:deliveryPoint>\n                                    <gmd:deliveryPoint>\n                                        <gco:CharacterString>CS 23167</gco:CharacterString>\n                                    </gmd:deliveryPoint>\n                                    <gmd:city>\n                                        <gco:CharacterString>RENNES CEDEX</gco:CharacterString>\n                                    </gmd:city>\n                                    <gmd:postalCode>\n                                        <gco:CharacterString>35031</gco:CharacterString>\n                                    </gmd:postalCode>\n                                    <gmd:country>\n                                        <gco:CharacterString>France</gco:CharacterString>\n                                    </gmd:country>\n                                    <gmd:electronicMailAddress>\n                                        <gco:CharacterString>mail@mail.mail</gco:CharacterString>\n                                    </gmd:electronicMailAddress>\n                                    <gmd:electronicMailAddress>\n                                        <gco:CharacterString>mail2@mail.mail</gco:CharacterString>\n                                    </gmd:electronicMailAddress>\n                                </gmd:CI_Address>\n                            </gmd:address>\n                            <gmd:onlineResource>\n                                <gmd:CI_OnlineResource>\n                                    <gmd:linkage>\n                                        <gmd:URL>mail@mail.mail</gmd:URL>\n                                    </gmd:linkage>\n                                    <gmd:protocol>\n                                        <gco:CharacterString>WWW:LINK-1.0-http--link</gco:CharacterString>\n                                    </gmd:protocol>\n                                </gmd:CI_OnlineResource>\n                            </gmd:onlineResource>\n                            <gmd:contactInstructions>\n                                <gmx:FileName src=\"http://public.sig.rennesmetropole.fr/ressources/catalogue/apercus/republique_francaise.png\">Logo</gmx:FileName>\n                            </gmd:contactInstructions>\n                        </gmd:CI_Contact>\n                    </gmd:contactInfo>\n                    <gmd:role>\n                        <gmd:CI_RoleCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode\" codeListValue=\"custodian\" />\n                    </gmd:role>\n                </gmd:CI_ResponsibleParty>\n            </gmd:pointOfContact>\n            <gmd:resourceMaintenance>\n                <gmd:MD_MaintenanceInformation>\n                    <gmd:maintenanceAndUpdateFrequency>\n                        <gmd:MD_MaintenanceFrequencyCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_MaintenanceFrequencyCode\" codeListValue=\"notPlanned\" />\n                    </gmd:maintenanceAndUpdateFrequency>\n                </gmd:MD_MaintenanceInformation>\n            </gmd:resourceMaintenance>\n            <gmd:graphicOverview>\n                <gmd:MD_BrowseGraphic>\n                    <gmd:fileName>\n                        <gco:CharacterString>https://public.sig.rennesmetropole.fr/ressources/catalogue/apercus/sec_sanit_ddtm_csv.png</gco:CharacterString>\n                    </gmd:fileName>\n                </gmd:MD_BrowseGraphic>\n            </gmd:graphicOverview>\n            <gmd:descriptiveKeywords>\n                <gmd:MD_Keywords>\n                    <gmd:keyword>\n                        <gco:CharacterString>{{randomTheme}}</gco:CharacterString>\n                    </gmd:keyword>\n                    <gmd:type>\n                        <gmd:MD_KeywordTypeCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode\" codeListValue=\"theme\" />\n                    </gmd:type>\n                    <gmd:thesaurusName>\n                        <gmd:CI_Citation>\n                            <gmd:title>\n                                <gco:CharacterString>GEMET - INSPIRE themes, version 1.1</gco:CharacterString>\n                            </gmd:title>\n                            <gmd:date>\n                                <gmd:CI_Date>\n                                    <gmd:date>\n                                        <gco:Date>2008-06-01</gco:Date>\n                                    </gmd:date>\n                                    <gmd:dateType>\n                                        <gmd:CI_DateTypeCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode\" codeListValue=\"publication\" />\n                                    </gmd:dateType>\n                                </gmd:CI_Date>\n                            </gmd:date>\n                            <gmd:identifier>\n                                <gmd:MD_Identifier>\n                                    <gmd:code>\n                                        <gmx:Anchor xlink:href=\"http://geonetwork.mutu.local/geonetwork/srv/eng/thesaurus.download?ref=external.theme.inspire-theme\">geonetwork.thesaurus.external.theme.inspire-theme</gmx:Anchor>\n                                    </gmd:code>\n                                </gmd:MD_Identifier>\n                            </gmd:identifier>\n                        </gmd:CI_Citation>\n                    </gmd:thesaurusName>\n                </gmd:MD_Keywords>\n            </gmd:descriptiveKeywords>\n            <gmd:descriptiveKeywords>\n                <gmd:MD_Keywords>\n                    <gmd:keyword>\n                        <gco:CharacterString>bruit routier</gco:CharacterString>\n                    </gmd:keyword>\n                    <gmd:type>\n                        <gmd:MD_KeywordTypeCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode\" codeListValue=\"theme\" />\n                    </gmd:type>\n                    <gmd:thesaurusName>\n                        <gmd:CI_Citation>\n                            <gmd:title>\n                                <gco:CharacterString>GEMET</gco:CharacterString>\n                            </gmd:title>\n                            <gmd:date>\n                                <gmd:CI_Date>\n                                    <gmd:date>\n                                        <gco:Date>2018-10-26</gco:Date>\n                                    </gmd:date>\n                                    <gmd:dateType>\n                                        <gmd:CI_DateTypeCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode\" codeListValue=\"publication\" />\n                                    </gmd:dateType>\n                                </gmd:CI_Date>\n                            </gmd:date>\n                            <gmd:identifier>\n                                <gmd:MD_Identifier>\n                                    <gmd:code>\n                                        <gmx:Anchor xlink:href=\"https://public.sig.rennesmetropole.fr/geonetwork/srv/eng/thesaurus.download?ref=external.theme.gemet\">geonetwork.thesaurus.external.theme.gemet</gmx:Anchor>\n                                    </gmd:code>\n                                </gmd:MD_Identifier>\n                            </gmd:identifier>\n                        </gmd:CI_Citation>\n                    </gmd:thesaurusName>\n                </gmd:MD_Keywords>\n            </gmd:descriptiveKeywords>\n            <gmd:descriptiveKeywords>\n                <gmd:MD_Keywords>\n                    <gmd:keyword>\n                        <gco:CharacterString>risques et sécurité : risques sanitaires</gco:CharacterString>\n                    </gmd:keyword>\n                    <gmd:type>\n                        <gmd:MD_KeywordTypeCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode\" codeListValue=\"theme\" />\n                    </gmd:type>\n                    <gmd:thesaurusName>\n                        <gmd:CI_Citation>\n                            <gmd:title>\n                                <gco:CharacterString>GéoBretagne v 2.0</gco:CharacterString>\n                            </gmd:title>\n                            <gmd:date>\n                                <gmd:CI_Date>\n                                    <gmd:date>\n                                        <gco:Date>2014-01-13</gco:Date>\n                                    </gmd:date>\n                                    <gmd:dateType>\n                                        <gmd:CI_DateTypeCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode\" codeListValue=\"publication\" />\n                                    </gmd:dateType>\n                                </gmd:CI_Date>\n                            </gmd:date>\n                            <gmd:identifier>\n                                <gmd:MD_Identifier>\n                                    <gmd:code>\n                                        <gmx:Anchor xlink:href=\"http://geonetwork.mutu.local/geonetwork/srv/eng/thesaurus.download?ref=external.theme.geobretagne\">geonetwork.thesaurus.external.theme.geobretagne</gmx:Anchor>\n                                    </gmd:code>\n                                </gmd:MD_Identifier>\n                            </gmd:identifier>\n                        </gmd:CI_Citation>\n                    </gmd:thesaurusName>\n                </gmd:MD_Keywords>\n            </gmd:descriptiveKeywords>\n            <gmd:descriptiveKeywords>\n                <gmd:MD_Keywords>\n                    <gmd:keyword>\n                        <gco:CharacterString>données ouvertes</gco:CharacterString>\n                    </gmd:keyword>\n                    <gmd:type>\n                        <gmd:MD_KeywordTypeCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode\" codeListValue=\"theme\" />\n                    </gmd:type>\n                    <gmd:thesaurusName>\n                        <gmd:CI_Citation>\n                            <gmd:title>\n                                <gco:CharacterString>RM Diffusion v 1.2</gco:CharacterString>\n                            </gmd:title>\n                            <gmd:date>\n                                <gmd:CI_Date>\n                                    <gmd:date>\n                                        <gco:Date>2014-02-12</gco:Date>\n                                    </gmd:date>\n                                    <gmd:dateType>\n                                        <gmd:CI_DateTypeCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode\" codeListValue=\"publication\" />\n                                    </gmd:dateType>\n                                </gmd:CI_Date>\n                            </gmd:date>\n                            <gmd:identifier>\n                                <gmd:MD_Identifier>\n                                    <gmd:code>\n                                        <gmx:Anchor xlink:href=\"http://geonetwork.mutu.local/geonetwork/srv/eng/thesaurus.download?ref=external.theme.rm_diffusion\">geonetwork.thesaurus.external.theme.rm_diffusion</gmx:Anchor>\n                                    </gmd:code>\n                                </gmd:MD_Identifier>\n                            </gmd:identifier>\n                        </gmd:CI_Citation>\n                    </gmd:thesaurusName>\n                </gmd:MD_Keywords>\n            </gmd:descriptiveKeywords>\n            <gmd:resourceConstraints>\n                <gmd:MD_LegalConstraints>\n                    <gmd:useLimitation>\n                        <gco:CharacterString>Réutilisation libre sous réserve de la mention obligatoire suivante : \"source : DDTM 35\"</gco:CharacterString>\n                    </gmd:useLimitation>\n                    <gmd:useLimitation>\n                        <gco:CharacterString>Licence Ouverte Etalab v2.0</gco:CharacterString>\n                    </gmd:useLimitation>\n                    <gmd:accessConstraints>\n                        <gmd:MD_RestrictionCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode\" codeListValue=\"otherRestrictions\" />\n                    </gmd:accessConstraints>\n                    <gmd:useConstraints>\n                        <gmd:MD_RestrictionCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode\" codeListValue=\"license\" />\n                    </gmd:useConstraints>\n                    <gmd:otherConstraints>\n                        <gco:CharacterString>Pas de restriction d’accès public</gco:CharacterString>\n                    </gmd:otherConstraints>\n                </gmd:MD_LegalConstraints>\n            </gmd:resourceConstraints>\n            <gmd:spatialResolution>\n                <gmd:MD_Resolution>\n                    <gmd:distance>\n                        <gco:Distance uom=\"m\">10</gco:Distance>\n                    </gmd:distance>\n                </gmd:MD_Resolution>\n            </gmd:spatialResolution>\n            <gmd:language>\n                <gmd:LanguageCode codeList=\"http://www.loc.gov/standards/iso639-2/\" codeListValue=\"fre\" />\n            </gmd:language>\n            <gmd:characterSet>\n                <gmd:MD_CharacterSetCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CharacterSetCode\" codeListValue=\"utf8\" />\n            </gmd:characterSet>\n            <gmd:topicCategory>\n                <gmd:MD_TopicCategoryCode>health</gmd:MD_TopicCategoryCode>\n            </gmd:topicCategory>\n            <gmd:extent>\n                <gmd:EX_Extent>\n                    <gmd:geographicElement>\n                        <gmd:EX_GeographicBoundingBox>\n                            <gmd:westBoundLongitude>\n                                <gco:Decimal>-1.96327</gco:Decimal>\n                            </gmd:westBoundLongitude>\n                            <gmd:eastBoundLongitude>\n                                <gco:Decimal>-1.46558</gco:Decimal>\n                            </gmd:eastBoundLongitude>\n                            <gmd:southBoundLatitude>\n                                <gco:Decimal>47.93192</gco:Decimal>\n                            </gmd:southBoundLatitude>\n                            <gmd:northBoundLatitude>\n                                <gco:Decimal>48.30684</gco:Decimal>\n                            </gmd:northBoundLatitude>\n                        </gmd:EX_GeographicBoundingBox>\n                    </gmd:geographicElement>\n                </gmd:EX_Extent>\n            </gmd:extent>\n        </gmd:MD_DataIdentification>\n    </gmd:identificationInfo>\n    <gmd:distributionInfo xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gmd:MD_Distribution>\n            <gmd:distributionFormat>\n                <gmd:MD_Format>\n                    <gmd:name>\n                        <gco:CharacterString>GML</gco:CharacterString>\n                    </gmd:name>\n                    <gmd:version>\n                        <gco:CharacterString>3.2.1</gco:CharacterString>\n                    </gmd:version>\n                </gmd:MD_Format>\n            </gmd:distributionFormat>\n            <gmd:transferOptions>\n                <gmd:MD_DigitalTransferOptions>\n                    <gmd:onLine>\n                        <gmd:CI_OnlineResource>\n                            <gmd:identifier>\n                                <gmd:MD_Identifier>\n                                    <gmd:code>\n                                        <gco:CharacterString>{{softMediaGmdXml1Id}}</gco:CharacterString>\n                                    </gmd:code>\n                                </gmd:MD_Identifier>\n                            </gmd:identifier>\n                            <gmd:linkage>\n                                <gmd:URL>https://public.sig.rennesmetropole.fr/geoserver/ows?service=wms&amp;request=GetCapabilities</gmd:URL>\n                            </gmd:linkage>\n                            <gmd:protocol>\n                                <gco:CharacterString>OGC:WMS</gco:CharacterString>\n                            </gmd:protocol>\n                            <gmd:name>\n                                <gco:CharacterString>sec_sanit:ddtm_csv_secteurs_affectes</gco:CharacterString>\n                            </gmd:name>\n                            <gmd:description>\n                                <gco:CharacterString>Classement sonore des infrastructures routières sur Rennes Métropole : secteurs affectés</gco:CharacterString>\n                            </gmd:description>\n                        </gmd:CI_OnlineResource>\n                    </gmd:onLine>\n                    <gmd:onLine>\n                        <gmd:CI_OnlineResource>\n                            <gmd:linkage>\n                                <gmd:URL>https://public.sig.rennesmetropole.fr/geoserver/ows?service=wfs&amp;request=GetCapabilities</gmd:URL>\n                            </gmd:linkage>\n                            <gmd:protocol>\n                                <gco:CharacterString>OGC:WFS</gco:CharacterString>\n                            </gmd:protocol>\n                            <gmd:name>\n                                <gco:CharacterString>sec_sanit:ddtm_csv_secteurs_affectes</gco:CharacterString>\n                            </gmd:name>\n                            <gmd:description>\n                                <gco:CharacterString>Classement sonore des infrastructures routières sur Rennes Métropole : secteurs affectés</gco:CharacterString>\n                            </gmd:description>\n                        </gmd:CI_OnlineResource>\n                    </gmd:onLine>\n                </gmd:MD_DigitalTransferOptions>\n            </gmd:transferOptions>\n            <gmd:transferOptions>\n                <gmd:MD_DigitalTransferOptions>\n                    <gmd:onLine>\n                        <gmd:CI_OnlineResource>\n                            <gmd:identifier>\n                                <gmd:MD_Identifier>\n                                    <gmd:code>\n                                        <gco:CharacterString>{{softMediaGmdXml2Id}}</gco:CharacterString>\n                                    </gmd:code>\n                                </gmd:MD_Identifier>\n                            </gmd:identifier>\n                            <gmd:linkage>\n                                <gmd:URL>https://data.rennesmetropole.fr/explore/dataset/classement-sonore-voies-secteurs-affectes</gmd:URL>\n                            </gmd:linkage>\n                            <gmd:protocol>\n                                <gco:CharacterString>WWW:LINK-1.0-http--link</gco:CharacterString>\n                            </gmd:protocol>\n                            <gmd:description>\n                                <gco:CharacterString>Site open data de Rennes Métropole</gco:CharacterString>\n                            </gmd:description>\n                        </gmd:CI_OnlineResource>\n                    </gmd:onLine>\n                </gmd:MD_DigitalTransferOptions>\n            </gmd:transferOptions>\n            <gmd:transferOptions>\n                <gmd:MD_DigitalTransferOptions>\n                    <gmd:onLine>\n                        <gmd:CI_OnlineResource>\n                            <gmd:identifier>\n                                <gmd:MD_Identifier>\n                                    <gmd:code>\n                                        <gco:CharacterString>{{softMediaGmdXml3Id}}</gco:CharacterString>\n                                    </gmd:code>\n                                </gmd:MD_Identifier>\n                            </gmd:identifier>\n                            <gmd:linkage>\n                                <gmd:URL>https://public.sig.rennesmetropole.fr/geoserver/ows?service=wfs&amp;version=2.0.0&amp;request=getfeature&amp;typename=sec_sanit:ddtm_csv_secteurs_affectes&amp;srsname=EPSG:3948&amp;outputformat=GML3&amp;format_options=charset:utf-8</gmd:URL>\n                            </gmd:linkage>\n                            <gmd:protocol>\n                                <gco:CharacterString>OGC:GML</gco:CharacterString>\n                            </gmd:protocol>\n                            <gmd:description>\n                                <gco:CharacterString>Lien de téléchargement direct (GML3 EPSG:3948)</gco:CharacterString>\n                            </gmd:description>\n                        </gmd:CI_OnlineResource>\n                    </gmd:onLine>\n                </gmd:MD_DigitalTransferOptions>\n            </gmd:transferOptions>\n        </gmd:MD_Distribution>\n    </gmd:distributionInfo>\n    <gmd:dataQualityInfo xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gmd:DQ_DataQuality>\n            <gmd:scope>\n                <gmd:DQ_Scope>\n                    <gmd:level>\n                        <gmd:MD_ScopeCode codeListValue=\"dataset\" codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ScopeCode\" />\n                    </gmd:level>\n                </gmd:DQ_Scope>\n            </gmd:scope>\n            <gmd:report>\n                <gmd:DQ_DomainConsistency>\n                    <gmd:result>\n                        <gmd:DQ_ConformanceResult>\n                            <gmd:specification>\n                                <gmd:CI_Citation>\n                                    <gmd:title>\n                                        <gco:CharacterString>D2.8.III.5 INSPIRE Data Specification on Human Health and Safety – Technical Guidelines - v 3.0</gco:CharacterString>\n                                    </gmd:title>\n                                    <gmd:date>\n                                        <gmd:CI_Date>\n                                            <gmd:date>\n                                                <gco:Date>2013-12-10</gco:Date>\n                                            </gmd:date>\n                                            <gmd:dateType>\n                                                <gmd:CI_DateTypeCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode\" codeListValue=\"publication\" />\n                                            </gmd:dateType>\n                                        </gmd:CI_Date>\n                                    </gmd:date>\n                                </gmd:CI_Citation>\n                            </gmd:specification>\n                            <gmd:explanation>\n                                <gco:CharacterString>non testé</gco:CharacterString>\n                            </gmd:explanation>\n                            <gmd:pass>\n                                <gco:Boolean>false</gco:Boolean>\n                            </gmd:pass>\n                        </gmd:DQ_ConformanceResult>\n                    </gmd:result>\n                </gmd:DQ_DomainConsistency>\n            </gmd:report>\n            <gmd:lineage>\n                <gmd:LI_Lineage>\n                    <gmd:statement>\n                        <gco:CharacterString>Données fournies par la DDTM35. Pas de métadonnée.\nsecteurs affectéss probablement basés sur la BD Topo de l'IGN.</gco:CharacterString>\n                    </gmd:statement>\n                </gmd:LI_Lineage>\n            </gmd:lineage>\n        </gmd:DQ_DataQuality>\n    </gmd:dataQualityInfo>\n</gmd:MD_Metadata>",
+							"raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:gco=\"http://www.isotc211.org/2005/gco\" xmlns:srv=\"http://www.isotc211.org/2005/srv\" xmlns:gmx=\"http://www.isotc211.org/2005/gmx\" xmlns:gts=\"http://www.isotc211.org/2005/gts\" xmlns:gsr=\"http://www.isotc211.org/2005/gsr\" xmlns:gmi=\"http://www.isotc211.org/2005/gmi\" xmlns:gml=\"http://www.opengis.net/gml\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xsi:schemaLocation=\"http://www.isotc211.org/2005/gmd http://www.isotc211.org/2005/gmd/gmd.xsd http://www.isotc211.org/2005/gmx http://www.isotc211.org/2005/gmx/gmx.xsd http://www.isotc211.org/2005/srv http://schemas.opengis.net/iso/19139/20060504/srv/srv.xsd\" collectionTag=\"{{stamp}}\">\n    <gmd:fileIdentifier>\n        <gco:CharacterString>{{softMetaGmdXml1LocalId}}</gco:CharacterString>\n    </gmd:fileIdentifier>\n    <gmd:language xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gmd:LanguageCode codeList=\"http://www.loc.gov/standards/iso639-2/\" codeListValue=\"fre\" />\n    </gmd:language>\n    <gmd:characterSet xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gmd:MD_CharacterSetCode codeListValue=\"utf8\" codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CharacterSetCode\" />\n    </gmd:characterSet>\n    <gmd:parentIdentifier xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gco:CharacterString>unknown</gco:CharacterString>\n    </gmd:parentIdentifier>\n    <gmd:hierarchyLevel xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gmd:MD_ScopeCode codeListValue=\"dataset\" codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ScopeCode\" />\n    </gmd:hierarchyLevel>\n    <gmd:hierarchyLevelName xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gco:CharacterString>Série de données</gco:CharacterString>\n    </gmd:hierarchyLevelName>\n    <gmd:contact xmlns:gss=\"http://www.isotc211.org/2005/gss\" xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gmd:CI_ResponsibleParty>\n            <gmd:identifier>\n                <gmd:MD_Identifier>\n                    <gmd:code>\n                        <gco:CharacterString>{{softContactGmdXml1Id}}</gco:CharacterString>\n                    </gmd:code>\n                </gmd:MD_Identifier>\n            </gmd:identifier>\n            <gmd:individualName>\n                <gco:CharacterString>{{softContactGmdXml1NewName}}</gco:CharacterString>\n            </gmd:individualName>\n            <gmd:organisationName>\n                <gco:CharacterString>{{softOrgGmdXml1NewName}}</gco:CharacterString>\n            </gmd:organisationName>\n            <gmd:contactInfo>\n                <gmd:CI_Contact>\n                    <gmd:phone>\n                        <gmd:CI_Telephone>\n                            <gmd:voice>\n                                <gco:CharacterString>00 00 00 00 00</gco:CharacterString>\n                            </gmd:voice>\n                        </gmd:CI_Telephone>\n                    </gmd:phone>\n                    <gmd:address>\n                        <gmd:CI_Address>\n                            <gmd:electronicMailAddress>\n                                <gco:CharacterString>{{softContactGmdXml1NewEmail}}</gco:CharacterString>\n                            </gmd:electronicMailAddress>\n                        </gmd:CI_Address>\n                    </gmd:address>\n                    <gmd:hoursOfService>\n                        <gco:CharacterString>08h00 - 13h00 et 13h00 - 12h00</gco:CharacterString>\n                    </gmd:hoursOfService>\n                </gmd:CI_Contact>\n            </gmd:contactInfo>\n            <gmd:role>\n                <gmd:CI_RoleCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode\" codeListValue=\"pointOfContact\" />\n            </gmd:role>\n        </gmd:CI_ResponsibleParty>\n    </gmd:contact>\n    <gmd:dateStamp xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gco:DateTime>2023-10-20T06:15:07</gco:DateTime>\n    </gmd:dateStamp>\n    <gmd:metadataStandardName xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gco:CharacterString>ISO 19115:2003/19139</gco:CharacterString>\n    </gmd:metadataStandardName>\n    <gmd:metadataStandardVersion xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gco:CharacterString>1.0</gco:CharacterString>\n    </gmd:metadataStandardVersion>\n    <gmd:spatialRepresentationInfo xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\" />\n    <gmd:spatialRepresentationInfo xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gmd:MD_VectorSpatialRepresentation>\n            <gmd:topologyLevel>\n                <gmd:MD_TopologyLevelCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_TopologyLevelCode\" codeListValue=\"abstract\" />\n            </gmd:topologyLevel>\n            <gmd:geometricObjects>\n                <gmd:MD_GeometricObjects>\n                    <gmd:geometricObjectType>\n                        <gmd:MD_GeometricObjectTypeCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_GeometricObjectTypeCode\" codeListValue=\"surface\" />\n                    </gmd:geometricObjectType>\n                </gmd:MD_GeometricObjects>\n            </gmd:geometricObjects>\n        </gmd:MD_VectorSpatialRepresentation>\n    </gmd:spatialRepresentationInfo>\n    <gmd:referenceSystemInfo xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gmd:MD_ReferenceSystem>\n            <gmd:referenceSystemIdentifier>\n                <gmd:RS_Identifier>\n                    <gmd:code>\n                        <gco:CharacterString>RGF93 / CC48 (EPSG:3948)</gco:CharacterString>\n                    </gmd:code>\n                </gmd:RS_Identifier>\n            </gmd:referenceSystemIdentifier>\n        </gmd:MD_ReferenceSystem>\n    </gmd:referenceSystemInfo>\n    <gmd:identificationInfo xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gmd:MD_DataIdentification>\n            <gmd:citation>\n                <gmd:CI_Citation>\n                    <gmd:title>\n                        <gco:CharacterString>Classement sonore des infrastructures routières sur Rennes Métropole : secteurs affectés</gco:CharacterString>\n                    </gmd:title>\n                    <gmd:alternateTitle>\n                        <gco:CharacterString>risque_secu.ddtm_csv_secteurs_affectes</gco:CharacterString>\n                    </gmd:alternateTitle>\n                    <gmd:date>\n                        <gmd:CI_Date>\n                            <gmd:date>\n                                <gco:Date>2023-10-17</gco:Date>\n                            </gmd:date>\n                            <gmd:dateType>\n                                <gmd:CI_DateTypeCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode\" codeListValue=\"creation\" />\n                            </gmd:dateType>\n                        </gmd:CI_Date>\n                    </gmd:date>\n                    <gmd:date>\n                        <gmd:CI_Date>\n                            <gmd:date>\n                                <gco:Date>2023-10-17</gco:Date>\n                            </gmd:date>\n                            <gmd:dateType>\n                                <gmd:CI_DateTypeCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode\" codeListValue=\"revision\" />\n                            </gmd:dateType>\n                        </gmd:CI_Date>\n                    </gmd:date>\n                    <gmd:identifier>\n                        <gmd:MD_Identifier>\n                            <gmd:code>\n                                <gco:CharacterString>https://input_server_url/geonetwork/srv/fre/xml.metadata.get?uuid={{softMetaGmdXml1LocalId}}</gco:CharacterString>\n                            </gmd:code>\n                        </gmd:MD_Identifier>\n                    </gmd:identifier>\n                </gmd:CI_Citation>\n            </gmd:citation>\n            <gmd:abstract>\n                <gco:CharacterString>Résumé de la métadonnée.</gco:CharacterString>\n            </gmd:abstract>\n            <gmd:purpose>\n                <gco:CharacterString>Objectif</gco:CharacterString>\n            </gmd:purpose>\n            <gmd:status>\n                <gmd:MD_ProgressCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ProgressCode\" codeListValue=\"completed\" />\n            </gmd:status>\n            <gmd:pointOfContact>\n                <gmd:CI_ResponsibleParty>\n                    <gmd:identifier>\n                        <gmd:MD_Identifier>\n                            <gmd:code>\n                                <gco:CharacterString>{{softContactGmdXml1Id}}</gco:CharacterString>\n                            </gmd:code>\n                        </gmd:MD_Identifier>\n                    </gmd:identifier>\n                    <gmd:individualName>\n                        <gco:CharacterString>{{softContactGmdXml1NewName}}</gco:CharacterString>\n                    </gmd:individualName>\n                    <gmd:organisationName>\n                        <gco:CharacterString>{{softOrgGmdXml1NewName}}</gco:CharacterString>\n                    </gmd:organisationName>\n                    <gmd:contactInfo>\n                        <gmd:CI_Contact>\n                            <gmd:phone>\n                                <gmd:CI_Telephone>\n                                    <gmd:voice>\n                                        <gco:CharacterString>00 00 00 00 00</gco:CharacterString>\n                                    </gmd:voice>\n                                </gmd:CI_Telephone>\n                            </gmd:phone>\n                            <gmd:address>\n                                <gmd:CI_Address>\n                                    <gmd:electronicMailAddress>\n                                        <gco:CharacterString>{{softContactGmdXml1NewEmail}}</gco:CharacterString>\n                                    </gmd:electronicMailAddress>\n                                </gmd:CI_Address>\n                            </gmd:address>\n                            <gmd:hoursOfService>\n                                <gco:CharacterString>08h00 - 13h00 et 13h00 - 12h00</gco:CharacterString>\n                            </gmd:hoursOfService>\n                        </gmd:CI_Contact>\n                    </gmd:contactInfo>\n                    <gmd:role>\n                        <gmd:CI_RoleCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode\" codeListValue=\"pointOfContact\" />\n                    </gmd:role>\n                </gmd:CI_ResponsibleParty>\n            </gmd:pointOfContact>\n            <gmd:pointOfContact>\n                <gmd:CI_ResponsibleParty>\n                    <gmd:identifier>\n                        <gmd:MD_Identifier>\n                            <gmd:code>\n                                <gco:CharacterString>{{softOrgGmdXml1Id}}</gco:CharacterString>\n                            </gmd:code>\n                        </gmd:MD_Identifier>\n                    </gmd:identifier>\n                    <gmd:organisationName>\n                        <gco:CharacterString>{{softOrgGmdXml1NewName}}</gco:CharacterString>\n                    </gmd:organisationName>\n                    <gmd:contactInfo>\n                        <gmd:CI_Contact>\n                            <gmd:phone>\n                                <gmd:CI_Telephone>\n                                    <gmd:voice>\n                                        <gco:CharacterString>00 00 00 00 00</gco:CharacterString>\n                                    </gmd:voice>\n                                </gmd:CI_Telephone>\n                            </gmd:phone>\n                            <gmd:address>\n                                <gmd:CI_Address>\n                                    <gmd:deliveryPoint>\n                                        <gco:CharacterString>Nouvelle adresse</gco:CharacterString>\n                                    </gmd:deliveryPoint>\n                                    <gmd:deliveryPoint>\n                                        <gco:CharacterString>CS 23167</gco:CharacterString>\n                                    </gmd:deliveryPoint>\n                                    <gmd:city>\n                                        <gco:CharacterString>RENNES CEDEX</gco:CharacterString>\n                                    </gmd:city>\n                                    <gmd:postalCode>\n                                        <gco:CharacterString>35031</gco:CharacterString>\n                                    </gmd:postalCode>\n                                    <gmd:country>\n                                        <gco:CharacterString>France</gco:CharacterString>\n                                    </gmd:country>\n                                    <gmd:electronicMailAddress>\n                                        <gco:CharacterString>mail@mail.mail</gco:CharacterString>\n                                    </gmd:electronicMailAddress>\n                                    <gmd:electronicMailAddress>\n                                        <gco:CharacterString>mail2@mail.mail</gco:CharacterString>\n                                    </gmd:electronicMailAddress>\n                                </gmd:CI_Address>\n                            </gmd:address>\n                            <gmd:onlineResource>\n                                <gmd:CI_OnlineResource>\n                                    <gmd:linkage>\n                                        <gmd:URL>mail@mail.mail</gmd:URL>\n                                    </gmd:linkage>\n                                    <gmd:protocol>\n                                        <gco:CharacterString>WWW:LINK-1.0-http--link</gco:CharacterString>\n                                    </gmd:protocol>\n                                </gmd:CI_OnlineResource>\n                            </gmd:onlineResource>\n                            <gmd:contactInstructions>\n                                <gmx:FileName src=\"http://public.sig.rennesmetropole.fr/ressources/catalogue/apercus/republique_francaise.png\">Logo</gmx:FileName>\n                            </gmd:contactInstructions>\n                        </gmd:CI_Contact>\n                    </gmd:contactInfo>\n                    <gmd:role>\n                        <gmd:CI_RoleCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode\" codeListValue=\"custodian\" />\n                    </gmd:role>\n                </gmd:CI_ResponsibleParty>\n            </gmd:pointOfContact>\n            <gmd:resourceMaintenance>\n                <gmd:MD_MaintenanceInformation>\n                    <gmd:maintenanceAndUpdateFrequency>\n                        <gmd:MD_MaintenanceFrequencyCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_MaintenanceFrequencyCode\" codeListValue=\"notPlanned\" />\n                    </gmd:maintenanceAndUpdateFrequency>\n                </gmd:MD_MaintenanceInformation>\n            </gmd:resourceMaintenance>\n            <gmd:graphicOverview>\n                <gmd:MD_BrowseGraphic>\n                    <gmd:fileName>\n                        <gco:CharacterString>https://public.sig.rennesmetropole.fr/ressources/catalogue/apercus/sec_sanit_ddtm_csv.png</gco:CharacterString>\n                    </gmd:fileName>\n                </gmd:MD_BrowseGraphic>\n            </gmd:graphicOverview>\n            <gmd:descriptiveKeywords>\n                <gmd:MD_Keywords>\n                    <gmd:keyword>\n                        <gco:CharacterString>{{randomTheme}}</gco:CharacterString>\n                    </gmd:keyword>\n                    <gmd:type>\n                        <gmd:MD_KeywordTypeCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode\" codeListValue=\"theme\" />\n                    </gmd:type>\n                    <gmd:thesaurusName>\n                        <gmd:CI_Citation>\n                            <gmd:title>\n                                <gco:CharacterString>GEMET - INSPIRE themes, version 1.1</gco:CharacterString>\n                            </gmd:title>\n                            <gmd:date>\n                                <gmd:CI_Date>\n                                    <gmd:date>\n                                        <gco:Date>2008-06-01</gco:Date>\n                                    </gmd:date>\n                                    <gmd:dateType>\n                                        <gmd:CI_DateTypeCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode\" codeListValue=\"publication\" />\n                                    </gmd:dateType>\n                                </gmd:CI_Date>\n                            </gmd:date>\n                            <gmd:identifier>\n                                <gmd:MD_Identifier>\n                                    <gmd:code>\n                                        <gmx:Anchor xlink:href=\"http://geonetwork.mutu.local/geonetwork/srv/eng/thesaurus.download?ref=external.theme.inspire-theme\">geonetwork.thesaurus.external.theme.inspire-theme</gmx:Anchor>\n                                    </gmd:code>\n                                </gmd:MD_Identifier>\n                            </gmd:identifier>\n                        </gmd:CI_Citation>\n                    </gmd:thesaurusName>\n                </gmd:MD_Keywords>\n            </gmd:descriptiveKeywords>\n            <gmd:descriptiveKeywords>\n                <gmd:MD_Keywords>\n                    <gmd:keyword>\n                        <gco:CharacterString>bruit routier</gco:CharacterString>\n                    </gmd:keyword>\n                    <gmd:type>\n                        <gmd:MD_KeywordTypeCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode\" codeListValue=\"theme\" />\n                    </gmd:type>\n                    <gmd:thesaurusName>\n                        <gmd:CI_Citation>\n                            <gmd:title>\n                                <gco:CharacterString>GEMET</gco:CharacterString>\n                            </gmd:title>\n                            <gmd:date>\n                                <gmd:CI_Date>\n                                    <gmd:date>\n                                        <gco:Date>2018-10-26</gco:Date>\n                                    </gmd:date>\n                                    <gmd:dateType>\n                                        <gmd:CI_DateTypeCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode\" codeListValue=\"publication\" />\n                                    </gmd:dateType>\n                                </gmd:CI_Date>\n                            </gmd:date>\n                            <gmd:identifier>\n                                <gmd:MD_Identifier>\n                                    <gmd:code>\n                                        <gmx:Anchor xlink:href=\"https://public.sig.rennesmetropole.fr/geonetwork/srv/eng/thesaurus.download?ref=external.theme.gemet\">geonetwork.thesaurus.external.theme.gemet</gmx:Anchor>\n                                    </gmd:code>\n                                </gmd:MD_Identifier>\n                            </gmd:identifier>\n                        </gmd:CI_Citation>\n                    </gmd:thesaurusName>\n                </gmd:MD_Keywords>\n            </gmd:descriptiveKeywords>\n            <gmd:descriptiveKeywords>\n                <gmd:MD_Keywords>\n                    <gmd:keyword>\n                        <gco:CharacterString>risques et sécurité : risques sanitaires</gco:CharacterString>\n                    </gmd:keyword>\n                    <gmd:type>\n                        <gmd:MD_KeywordTypeCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode\" codeListValue=\"theme\" />\n                    </gmd:type>\n                    <gmd:thesaurusName>\n                        <gmd:CI_Citation>\n                            <gmd:title>\n                                <gco:CharacterString>GéoBretagne v 2.0</gco:CharacterString>\n                            </gmd:title>\n                            <gmd:date>\n                                <gmd:CI_Date>\n                                    <gmd:date>\n                                        <gco:Date>2014-01-13</gco:Date>\n                                    </gmd:date>\n                                    <gmd:dateType>\n                                        <gmd:CI_DateTypeCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode\" codeListValue=\"publication\" />\n                                    </gmd:dateType>\n                                </gmd:CI_Date>\n                            </gmd:date>\n                            <gmd:identifier>\n                                <gmd:MD_Identifier>\n                                    <gmd:code>\n                                        <gmx:Anchor xlink:href=\"http://geonetwork.mutu.local/geonetwork/srv/eng/thesaurus.download?ref=external.theme.geobretagne\">geonetwork.thesaurus.external.theme.geobretagne</gmx:Anchor>\n                                    </gmd:code>\n                                </gmd:MD_Identifier>\n                            </gmd:identifier>\n                        </gmd:CI_Citation>\n                    </gmd:thesaurusName>\n                </gmd:MD_Keywords>\n            </gmd:descriptiveKeywords>\n            <gmd:descriptiveKeywords>\n                <gmd:MD_Keywords>\n                    <gmd:keyword>\n                        <gco:CharacterString>données ouvertes</gco:CharacterString>\n                    </gmd:keyword>\n                    <gmd:type>\n                        <gmd:MD_KeywordTypeCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode\" codeListValue=\"theme\" />\n                    </gmd:type>\n                    <gmd:thesaurusName>\n                        <gmd:CI_Citation>\n                            <gmd:title>\n                                <gco:CharacterString>RM Diffusion v 1.2</gco:CharacterString>\n                            </gmd:title>\n                            <gmd:date>\n                                <gmd:CI_Date>\n                                    <gmd:date>\n                                        <gco:Date>2014-02-12</gco:Date>\n                                    </gmd:date>\n                                    <gmd:dateType>\n                                        <gmd:CI_DateTypeCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode\" codeListValue=\"publication\" />\n                                    </gmd:dateType>\n                                </gmd:CI_Date>\n                            </gmd:date>\n                            <gmd:identifier>\n                                <gmd:MD_Identifier>\n                                    <gmd:code>\n                                        <gmx:Anchor xlink:href=\"http://geonetwork.mutu.local/geonetwork/srv/eng/thesaurus.download?ref=external.theme.rm_diffusion\">geonetwork.thesaurus.external.theme.rm_diffusion</gmx:Anchor>\n                                    </gmd:code>\n                                </gmd:MD_Identifier>\n                            </gmd:identifier>\n                        </gmd:CI_Citation>\n                    </gmd:thesaurusName>\n                </gmd:MD_Keywords>\n            </gmd:descriptiveKeywords>\n            <gmd:resourceConstraints>\n                <gmd:MD_LegalConstraints>\n                    <gmd:useLimitation>\n                        <gco:CharacterString>Réutilisation libre sous réserve de la mention obligatoire suivante : \"source : DDTM 35\"</gco:CharacterString>\n                    </gmd:useLimitation>\n                    <gmd:useLimitation>\n                        <gco:CharacterString>Licence Ouverte Etalab v2.0</gco:CharacterString>\n                    </gmd:useLimitation>\n                    <gmd:accessConstraints>\n                        <gmd:MD_RestrictionCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode\" codeListValue=\"otherRestrictions\" />\n                    </gmd:accessConstraints>\n                    <gmd:useConstraints>\n                        <gmd:MD_RestrictionCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode\" codeListValue=\"license\" />\n                    </gmd:useConstraints>\n                    <gmd:otherConstraints>\n                        <gco:CharacterString>Pas de restriction d’accès public</gco:CharacterString>\n                    </gmd:otherConstraints>\n                </gmd:MD_LegalConstraints>\n            </gmd:resourceConstraints>\n            <gmd:spatialResolution>\n                <gmd:MD_Resolution>\n                    <gmd:distance>\n                        <gco:Distance uom=\"m\">10</gco:Distance>\n                    </gmd:distance>\n                </gmd:MD_Resolution>\n            </gmd:spatialResolution>\n            <gmd:language>\n                <gmd:LanguageCode codeList=\"http://www.loc.gov/standards/iso639-2/\" codeListValue=\"fre\" />\n            </gmd:language>\n            <gmd:characterSet>\n                <gmd:MD_CharacterSetCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CharacterSetCode\" codeListValue=\"utf8\" />\n            </gmd:characterSet>\n            <gmd:topicCategory>\n                <gmd:MD_TopicCategoryCode>health</gmd:MD_TopicCategoryCode>\n            </gmd:topicCategory>\n            <gmd:extent>\n                <gmd:EX_Extent>\n                    <gmd:geographicElement>\n                        <gmd:EX_GeographicBoundingBox>\n                            <gmd:westBoundLongitude>\n                                <gco:Decimal>-1.96327</gco:Decimal>\n                            </gmd:westBoundLongitude>\n                            <gmd:eastBoundLongitude>\n                                <gco:Decimal>-1.46558</gco:Decimal>\n                            </gmd:eastBoundLongitude>\n                            <gmd:southBoundLatitude>\n                                <gco:Decimal>47.93192</gco:Decimal>\n                            </gmd:southBoundLatitude>\n                            <gmd:northBoundLatitude>\n                                <gco:Decimal>48.30684</gco:Decimal>\n                            </gmd:northBoundLatitude>\n                        </gmd:EX_GeographicBoundingBox>\n                    </gmd:geographicElement>\n                </gmd:EX_Extent>\n            </gmd:extent>\n        </gmd:MD_DataIdentification>\n    </gmd:identificationInfo>\n    <gmd:distributionInfo xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gmd:MD_Distribution>\n            <gmd:distributionFormat>\n                <gmd:MD_Format>\n                    <gmd:name>\n                        <gco:CharacterString>GML</gco:CharacterString>\n                    </gmd:name>\n                    <gmd:version>\n                        <gco:CharacterString>3.2.1</gco:CharacterString>\n                    </gmd:version>\n                </gmd:MD_Format>\n            </gmd:distributionFormat>\n            <gmd:transferOptions>\n                <gmd:MD_DigitalTransferOptions>\n                    <gmd:onLine>\n                        <gmd:CI_OnlineResource collectionTag=\"{{stamp}}\">\n                            <gmd:identifier>\n                                <gmd:MD_Identifier>\n                                    <gmd:code>\n                                        <gco:CharacterString>{{softMediaGmdXml1Id}}</gco:CharacterString>\n                                    </gmd:code>\n                                </gmd:MD_Identifier>\n                            </gmd:identifier>\n                            <gmd:linkage>\n                                <gmd:URL>https://public.sig.rennesmetropole.fr/geoserver/ows?service=wms&amp;request=GetCapabilities</gmd:URL>\n                            </gmd:linkage>\n                            <gmd:protocol>\n                                <gco:CharacterString>OGC:WMS</gco:CharacterString>\n                            </gmd:protocol>\n                            <gmd:name>\n                                <gco:CharacterString>sec_sanit:ddtm_csv_secteurs_affectes</gco:CharacterString>\n                            </gmd:name>\n                            <gmd:description>\n                                <gco:CharacterString>Classement sonore des infrastructures routières sur Rennes Métropole : secteurs affectés</gco:CharacterString>\n                            </gmd:description>\n                        </gmd:CI_OnlineResource>\n                    </gmd:onLine>\n                    <gmd:onLine>\n                        <gmd:CI_OnlineResource collectionTag=\"{{stamp}}\">\n                            <gmd:linkage>\n                                <gmd:URL>https://public.sig.rennesmetropole.fr/geoserver/ows?service=wfs&amp;request=GetCapabilities</gmd:URL>\n                            </gmd:linkage>\n                            <gmd:protocol>\n                                <gco:CharacterString>OGC:WFS</gco:CharacterString>\n                            </gmd:protocol>\n                            <gmd:name>\n                                <gco:CharacterString>sec_sanit:ddtm_csv_secteurs_affectes</gco:CharacterString>\n                            </gmd:name>\n                            <gmd:description>\n                                <gco:CharacterString>Classement sonore des infrastructures routières sur Rennes Métropole : secteurs affectés</gco:CharacterString>\n                            </gmd:description>\n                        </gmd:CI_OnlineResource>\n                    </gmd:onLine>\n                </gmd:MD_DigitalTransferOptions>\n            </gmd:transferOptions>\n            <gmd:transferOptions>\n                <gmd:MD_DigitalTransferOptions>\n                    <gmd:onLine>\n                        <gmd:CI_OnlineResource collectionTag=\"{{stamp}}\">\n                            <gmd:identifier>\n                                <gmd:MD_Identifier>\n                                    <gmd:code>\n                                        <gco:CharacterString>{{softMediaGmdXml2Id}}</gco:CharacterString>\n                                    </gmd:code>\n                                </gmd:MD_Identifier>\n                            </gmd:identifier>\n                            <gmd:linkage>\n                                <gmd:URL>https://data.rennesmetropole.fr/explore/dataset/classement-sonore-voies-secteurs-affectes</gmd:URL>\n                            </gmd:linkage>\n                            <gmd:protocol>\n                                <gco:CharacterString>WWW:LINK-1.0-http--link</gco:CharacterString>\n                            </gmd:protocol>\n                            <gmd:description>\n                                <gco:CharacterString>Site open data de Rennes Métropole</gco:CharacterString>\n                            </gmd:description>\n                        </gmd:CI_OnlineResource>\n                    </gmd:onLine>\n                </gmd:MD_DigitalTransferOptions>\n            </gmd:transferOptions>\n            <gmd:transferOptions>\n                <gmd:MD_DigitalTransferOptions>\n                    <gmd:onLine>\n                        <gmd:CI_OnlineResource collectionTag=\"{{stamp}}\">\n                            <gmd:identifier>\n                                <gmd:MD_Identifier>\n                                    <gmd:code>\n                                        <gco:CharacterString>{{softMediaGmdXml3Id}}</gco:CharacterString>\n                                    </gmd:code>\n                                </gmd:MD_Identifier>\n                            </gmd:identifier>\n                            <gmd:linkage>\n                                <gmd:URL>https://public.sig.rennesmetropole.fr/geoserver/ows?service=wfs&amp;version=2.0.0&amp;request=getfeature&amp;typename=sec_sanit:ddtm_csv_secteurs_affectes&amp;srsname=EPSG:3948&amp;outputformat=GML3&amp;format_options=charset:utf-8</gmd:URL>\n                            </gmd:linkage>\n                            <gmd:protocol>\n                                <gco:CharacterString>OGC:GML</gco:CharacterString>\n                            </gmd:protocol>\n                            <gmd:description>\n                                <gco:CharacterString>Lien de téléchargement direct (GML3 EPSG:3948)</gco:CharacterString>\n                            </gmd:description>\n                        </gmd:CI_OnlineResource>\n                    </gmd:onLine>\n                </gmd:MD_DigitalTransferOptions>\n            </gmd:transferOptions>\n        </gmd:MD_Distribution>\n    </gmd:distributionInfo>\n    <gmd:dataQualityInfo xmlns:gfc=\"http://www.isotc211.org/2005/gfc\" xmlns:geonet=\"http://www.fao.org/geonetwork\">\n        <gmd:DQ_DataQuality>\n            <gmd:scope>\n                <gmd:DQ_Scope>\n                    <gmd:level>\n                        <gmd:MD_ScopeCode codeListValue=\"dataset\" codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ScopeCode\" />\n                    </gmd:level>\n                </gmd:DQ_Scope>\n            </gmd:scope>\n            <gmd:report>\n                <gmd:DQ_DomainConsistency>\n                    <gmd:result>\n                        <gmd:DQ_ConformanceResult>\n                            <gmd:specification>\n                                <gmd:CI_Citation>\n                                    <gmd:title>\n                                        <gco:CharacterString>D2.8.III.5 INSPIRE Data Specification on Human Health and Safety – Technical Guidelines - v 3.0</gco:CharacterString>\n                                    </gmd:title>\n                                    <gmd:date>\n                                        <gmd:CI_Date>\n                                            <gmd:date>\n                                                <gco:Date>2013-12-10</gco:Date>\n                                            </gmd:date>\n                                            <gmd:dateType>\n                                                <gmd:CI_DateTypeCode codeList=\"http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode\" codeListValue=\"publication\" />\n                                            </gmd:dateType>\n                                        </gmd:CI_Date>\n                                    </gmd:date>\n                                </gmd:CI_Citation>\n                            </gmd:specification>\n                            <gmd:explanation>\n                                <gco:CharacterString>non testé</gco:CharacterString>\n                            </gmd:explanation>\n                            <gmd:pass>\n                                <gco:Boolean>false</gco:Boolean>\n                            </gmd:pass>\n                        </gmd:DQ_ConformanceResult>\n                    </gmd:result>\n                </gmd:DQ_DomainConsistency>\n            </gmd:report>\n            <gmd:lineage>\n                <gmd:LI_Lineage>\n                    <gmd:statement>\n                        <gco:CharacterString>Données fournies par la DDTM35. Pas de métadonnée.\nsecteurs affectéss probablement basés sur la BD Topo de l'IGN.</gco:CharacterString>\n                    </gmd:statement>\n                </gmd:LI_Lineage>\n            </gmd:lineage>\n        </gmd:DQ_DataQuality>\n    </gmd:dataQualityInfo>\n</gmd:MD_Metadata>",
 							"options": {
 								"raw": {
 									"language": "xml"
@@ -5407,17 +4829,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/resources/deletion",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"resources",
-								"deletion"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/resources/deletion"
 					},
 					"response": []
 				},
@@ -5453,17 +4865,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/media/deletion",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"media",
-								"deletion"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/media/deletion"
 					},
 					"response": []
 				},
@@ -5499,17 +4901,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/organizations/deletion",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"organizations",
-								"deletion"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/organizations/deletion"
 					},
 					"response": []
 				},
@@ -5545,17 +4937,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/contacts/deletion",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"contacts",
-								"deletion"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/contacts/deletion"
 					},
 					"response": []
 				}
@@ -5587,17 +4969,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/portal/token",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"portal",
-								"token"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/portal/token"
 					},
 					"response": []
 				},
@@ -5639,13 +5011,9 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{{{portalJwtName}}}}",
-									"type": "string"
-								}
-							]
+							"bearer": {
+								"token": "{{{{portalJwtName}}}}"
+							}
 						},
 						"method": "PUT",
 						"header": [],
@@ -5658,17 +5026,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogServer}}/resources/{{softMeta1Id}}/report",
-							"host": [
-								"{{catalogServer}}"
-							],
-							"path": [
-								"resources",
-								"{{softMeta1Id}}",
-								"report"
-							]
-						}
+						"url": "{{catalogServer}}/resources/{{softMeta1Id}}/report"
 					},
 					"response": []
 				},
@@ -5710,13 +5068,9 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{{{portalJwtName}}}}",
-									"type": "string"
-								}
-							]
+							"bearer": {
+								"token": "{{{{portalJwtName}}}}"
+							}
 						},
 						"method": "PUT",
 						"header": [],
@@ -5729,17 +5083,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogServer}}/resources/{{softMeta1Id}}/report",
-							"host": [
-								"{{catalogServer}}"
-							],
-							"path": [
-								"resources",
-								"{{softMeta1Id}}",
-								"report"
-							]
-						}
+						"url": "{{catalogServer}}/resources/{{softMeta1Id}}/report"
 					},
 					"response": []
 				},
@@ -5783,13 +5127,9 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{{{portalJwtName}}}}",
-									"type": "string"
-								}
-							]
+							"bearer": {
+								"token": "{{{{portalJwtName}}}}"
+							}
 						},
 						"method": "PUT",
 						"header": [],
@@ -5802,17 +5142,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogServer}}/resources/{{unkownMetaId}}/report",
-							"host": [
-								"{{catalogServer}}"
-							],
-							"path": [
-								"resources",
-								"{{unkownMetaId}}",
-								"report"
-							]
-						}
+						"url": "{{catalogServer}}/resources/{{unkownMetaId}}/report"
 					},
 					"response": []
 				},
@@ -5839,13 +5169,9 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{{{portalJwtName}}}}",
-									"type": "string"
-								}
-							]
+							"bearer": {
+								"token": "{{{{portalJwtName}}}}"
+							}
 						},
 						"method": "GET",
 						"header": [],
@@ -5858,18 +5184,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/v1/resources/{{softMeta1Id}}/report",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"v1",
-								"resources",
-								"{{softMeta1Id}}",
-								"report"
-							]
-						}
+						"url": "{{catalogUrl}}/v1/resources/{{softMeta1Id}}/report"
 					},
 					"response": []
 				},
@@ -5910,18 +5225,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/resources/{{softMeta1Id}}/reports",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"resources",
-								"{{softMeta1Id}}",
-								"reports"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/resources/{{softMeta1Id}}/reports"
 					},
 					"response": []
 				},
@@ -5955,13 +5259,9 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{{{portalJwtName}}}}",
-									"type": "string"
-								}
-							]
+							"bearer": {
+								"token": "{{{{portalJwtName}}}}"
+							}
 						},
 						"method": "GET",
 						"header": [],
@@ -5974,19 +5274,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/v1/resources/{{softMeta1Id}}/report/{{softReport2Id}}",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"v1",
-								"resources",
-								"{{softMeta1Id}}",
-								"report",
-								"{{softReport2Id}}"
-							]
-						}
+						"url": "{{catalogUrl}}/v1/resources/{{softMeta1Id}}/report/{{softReport2Id}}"
 					},
 					"response": []
 				},
@@ -6017,17 +5305,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/reports/{{softReport2Id}}",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"reports",
-								"{{softReport2Id}}"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/reports/{{softReport2Id}}"
 					},
 					"response": []
 				},
@@ -6156,17 +5434,7 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/organizations/{{softOrg1Id}}",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"organizations",
-								"{{softOrg1Id}}"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/organizations/{{softOrg1Id}}"
 					},
 					"response": []
 				},
@@ -6188,17 +5456,7 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/contacts/{{softContact1Id}}",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"contacts",
-								"{{softContact1Id}}"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/contacts/{{softContact1Id}}"
 					},
 					"response": []
 				},
@@ -6233,17 +5491,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/reports/deletion",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"reports",
-								"deletion"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/reports/deletion"
 					},
 					"response": []
 				},
@@ -6278,17 +5526,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/resources/deletion",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"resources",
-								"deletion"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/resources/deletion"
 					},
 					"response": []
 				},
@@ -6313,13 +5551,9 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{{{portalJwtName}}}}",
-									"type": "string"
-								}
-							]
+							"bearer": {
+								"token": "{{{{portalJwtName}}}}"
+							}
 						},
 						"method": "GET",
 						"header": [],
@@ -6382,16 +5616,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/resources",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"resources"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/resources"
 					},
 					"response": []
 				},
@@ -6416,17 +5641,7 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/resources/{{softMeta1Id}}",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"resources",
-								"{{softMeta1Id}}"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/resources/{{softMeta1Id}}"
 					},
 					"response": []
 				},
@@ -6461,17 +5676,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/media/deletion",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"media",
-								"deletion"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/media/deletion"
 					},
 					"response": []
 				},
@@ -6506,17 +5711,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/organizations/deletion",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"organizations",
-								"deletion"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/organizations/deletion"
 					},
 					"response": []
 				},
@@ -6551,17 +5746,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/contacts/deletion",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"contacts",
-								"deletion"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/contacts/deletion"
 					},
 					"response": []
 				},
@@ -6649,16 +5834,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/resources",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"resources"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/resources"
 					},
 					"response": []
 				},
@@ -7217,16 +6393,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/pub_keys",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"pub_keys"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/pub_keys"
 					},
 					"response": []
 				},
@@ -7273,16 +6440,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/pub_keys",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"pub_keys"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/pub_keys"
 					},
 					"response": []
 				},
@@ -7330,16 +6488,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/pub_keys",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"pub_keys"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/pub_keys"
 					},
 					"response": []
 				},
@@ -7380,16 +6529,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/pub_keys",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"pub_keys"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/pub_keys"
 					},
 					"response": []
 				},
@@ -7457,17 +6597,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/pubKeys/{{pubKeyName}}",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"pubKeys",
-								"{{pubKeyName}}"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/pubKeys/{{pubKeyName}}"
 					},
 					"response": []
 				},
@@ -7500,17 +6630,7 @@
 						},
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/v1/pub_keys/{{pubKeyName}}",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"v1",
-								"pub_keys",
-								"{{pubKeyName}}"
-							]
-						}
+						"url": "{{catalogUrl}}/v1/pub_keys/{{pubKeyName}}"
 					},
 					"response": []
 				},
@@ -7573,18 +6693,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/pub_keys/{{pubKeyName}}/pem",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"pub_keys",
-								"{{pubKeyName}}",
-								"pem"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/pub_keys/{{pubKeyName}}/pem"
 					},
 					"response": []
 				},
@@ -7609,18 +6718,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/v1/pub_keys/{{pubKeyName}}/pem",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"v1",
-								"pub_keys",
-								"{{pubKeyName}}",
-								"pem"
-							]
-						}
+						"url": "{{catalogUrl}}/v1/pub_keys/{{pubKeyName}}/pem"
 					},
 					"response": []
 				},
@@ -7658,17 +6756,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/pub_keys/{{pubKeyName}}",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"pub_keys",
-								"{{pubKeyName}}"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/pub_keys/{{pubKeyName}}"
 					},
 					"response": []
 				},
@@ -7762,16 +6850,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/pub_keys",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"pub_keys"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/pub_keys"
 					},
 					"response": []
 				},
@@ -7812,16 +6891,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/pub_keys",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"pub_keys"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/pub_keys"
 					},
 					"response": []
 				},
@@ -7864,16 +6934,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/pub_keys",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"pub_keys"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/pub_keys"
 					},
 					"response": []
 				},
@@ -7907,16 +6968,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/pub_keys",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"pub_keys"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/pub_keys"
 					},
 					"response": []
 				},
@@ -7967,16 +7019,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/pub_keys",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"pub_keys"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/pub_keys"
 					},
 					"response": []
 				},
@@ -8003,17 +7046,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/portal/token",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"portal",
-								"token"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/portal/token"
 					},
 					"response": []
 				},
@@ -8052,16 +7085,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/pub_keys",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"pub_keys"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/pub_keys"
 					},
 					"response": []
 				},
@@ -8099,16 +7123,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/pub_keys",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"pub_keys"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/pub_keys"
 					},
 					"response": []
 				},
@@ -8156,16 +7171,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/pub_keys",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"pub_keys"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/pub_keys"
 					},
 					"response": []
 				},
@@ -8194,17 +7200,7 @@
 						},
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/v1/pub_keys/portal-{{stamp}}",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"v1",
-								"pub_keys",
-								"portal-{{stamp}}"
-							]
-						}
+						"url": "{{catalogUrl}}/v1/pub_keys/portal-{{stamp}}"
 					},
 					"response": []
 				},
@@ -8280,18 +7276,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/check/portal/url",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"check",
-								"portal",
-								"url"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/check/portal/url"
 					},
 					"response": []
 				},
@@ -8342,16 +7327,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/pub_keys",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"pub_keys"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/pub_keys"
 					},
 					"response": []
 				},
@@ -8380,18 +7356,7 @@
 						},
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/v1/pub_keys/{{portalKeyName}}/key",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"v1",
-								"pub_keys",
-								"{{portalKeyName}}",
-								"key"
-							]
-						}
+						"url": "{{catalogUrl}}/v1/pub_keys/{{portalKeyName}}/key"
 					},
 					"response": []
 				}
@@ -8421,18 +7386,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/check/node/url",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"check",
-								"node",
-								"url"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/check/node/url"
 					},
 					"response": []
 				},
@@ -8457,18 +7411,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/check/portal/url",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"check",
-								"portal",
-								"url"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/check/portal/url"
 					},
 					"response": []
 				},
@@ -8496,18 +7439,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/check/portal/resources",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"check",
-								"portal",
-								"resources"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/check/portal/resources"
 					},
 					"response": []
 				},
@@ -8533,18 +7465,7 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{catalogUrl}}/admin/check/portal/ids",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"check",
-								"portal",
-								"ids"
-							]
-						}
+						"url": "{{catalogUrl}}/admin/check/portal/ids"
 					},
 					"response": []
 				}
@@ -8611,13 +7532,9 @@
 	],
 	"auth": {
 		"type": "bearer",
-		"bearer": [
-			{
-				"key": "token",
-				"value": "{{{{catalogJwtName}}}}",
-				"type": "string"
-			}
-		]
+		"bearer": {
+			"token": "{{{{catalogJwtName}}}}"
+		}
 	},
 	"event": [
 		{

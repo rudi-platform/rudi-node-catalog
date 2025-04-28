@@ -279,6 +279,10 @@ export const PATHS_GMD_TO_RUDI = {
           },
         },
       },
+      [API_COLLECTION_TAG]: {
+        path: ['gmd:MD_DigitalTransferOptions', 'gmd:onLine', 'gmd:CI_OnlineResource'],
+        args: { paramName: 'collectionTag' },
+      },
       pathToSourceMetadata: [
         'gmd:MD_Metadata',
         'gmd:identificationInfo',
