@@ -284,18 +284,19 @@ const translateAvailableFormats = async (inputObject, path, args) => {
       )
     }
 
-    const mediaURLOldMetadata = getFirstElementWithPath(inputObject, args.pathToSourceMetadata)
-    const mediaId = await findMediaIdWithURL(mediaURLOldMetadata)
-    let customMediaService = {
-      [API_MEDIA_ID]: mediaId,
-      [API_MEDIA_TYPE]: MediaTypes.Service,
-      [API_MEDIA_NAME]: 'Link to source metadata',
-      [API_MEDIA_CAPTION]:
-        'Link to the metadata that was translated in RUDI format. Contains more informations.',
-      [API_MEDIA_CONNECTOR]: {
-        [API_PUB_URL]: mediaURLOldMetadata,
-      },
-    }
+    // Deprecated : used to keep track of source metadata, replace by metadata_source field.
+    // const mediaURLOldMetadata = getFirstElementWithPath(inputObject, args.pathToSourceMetadata)
+    // const mediaId = await findMediaIdWithURL(mediaURLOldMetadata)
+    // let customMediaService = {
+    //   [API_MEDIA_ID]: mediaId,
+    //   [API_MEDIA_TYPE]: MediaTypes.Service,
+    //   [API_MEDIA_NAME]: 'Link to source metadata',
+    //   [API_MEDIA_CAPTION]:
+    //     'Link to the metadata that was translated in RUDI format. Contains more informations.',
+    //   [API_MEDIA_CONNECTOR]: {
+    //     [API_PUB_URL]: mediaURLOldMetadata,
+    //   },
+    // }
 
     result.push(customMediaService)
     return result
