@@ -270,11 +270,7 @@ const translateAvailableFormats = async (inputObject, path, args) => {
     const mediaList = getElementWithPath(inputObject, path)
 
     await Promise.all(
-      mediaList.map((media) =>
-        translateOneMedia(media).then((value) => {
-          result.push(value)
-        })
-      )
+      mediaList.map((media) => translateOneMedia(media).then((value) => result.push(value)))
     )
     if (result.length === 0) {
       throw new BadRequestError(
@@ -286,15 +282,13 @@ const translateAvailableFormats = async (inputObject, path, args) => {
 
     const mediaURLOldMetadata = getFirstElementWithPath(inputObject, args.pathToSourceMetadata)
     const mediaId = await findMediaIdWithURL(mediaURLOldMetadata)
-    let customMediaService = {
+    const customMediaService = {
       [API_MEDIA_ID]: mediaId,
       [API_MEDIA_TYPE]: MediaTypes.Service,
       [API_MEDIA_NAME]: 'Link to source metadata',
       [API_MEDIA_CAPTION]:
         'Link to the metadata that was translated in RUDI format. Contains more informations.',
-      [API_MEDIA_CONNECTOR]: {
-        [API_PUB_URL]: mediaURLOldMetadata,
-      },
+      [API_MEDIA_CONNECTOR]: { [API_PUB_URL]: mediaURLOldMetadata },
     }
 
     result.push(customMediaService)
@@ -314,7 +308,7 @@ const translateAvailableFormats = async (inputObject, path, args) => {
 
 const translateDataDates = (inputObject, path, args) => {
   const fun = 'translateDataDates'
-  let result = {}
+  const result = {}
   try {
     const argsCreated = getArgs(args, API_DATES_CREATED)
     const argsEdited = getArgs(args, API_DATES_EDITED)
@@ -322,10 +316,10 @@ const translateDataDates = (inputObject, path, args) => {
     const pathEdited = getPath(args, API_DATES_EDITED)
     const datesList = getElementWithPath(inputObject, path)
     for (const date of datesList) {
-      let paramValueCreated = arrayCheck(
+      const paramValueCreated = arrayCheck(
         findXmlParam(date, argsCreated.relativePathCondition, argsCreated.paramCondition)
       )
-      let paramValueEdited = arrayCheck(
+      const paramValueEdited = arrayCheck(
         findXmlParam(date, argsEdited.relativePathCondition, argsEdited.paramCondition)
       )
 
