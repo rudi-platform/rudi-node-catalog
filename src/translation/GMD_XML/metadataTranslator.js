@@ -255,7 +255,7 @@ const translateContacts = async (inputObject, path, args) => {
  * @param {*} args
  * @returns
  */
-const translateAvailableFormats = async (inputObject, path, args) => {
+const translateAvailableFormats = async (inputObject, path) => {
   const fun = 'translateAvailableFormats'
 
   let result = []

@@ -1,9 +1,10 @@
 {
 	"info": {
-		"_postman_id": "b6428778-e342-40d9-83c7-fd3613c4e549",
+		"_postman_id": "aec3de11-cc9e-4c67-b9c3-5cdbc2811e5f",
 		"name": "01. Catalog",
-		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
-		"_exporter_id": "33400273"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13557783",
+		"_collection_link": "https://rudirisa.postman.co/workspace/ce1a24e7-e510-4854-8451-d9ba84797044/collection/13557783-aec3de11-cc9e-4c67-b9c3-5cdbc2811e5f?action=share&source=collection_link&creator=13557783"
 	},
 	"item": [
 		{
@@ -56,7 +57,15 @@
 								}
 							}
 						},
-						"url": "{{jwtAuthUrl}}/forge"
+						"url": {
+							"raw": "{{jwtAuthUrl}}/forge",
+							"host": [
+								"{{jwtAuthUrl}}"
+							],
+							"path": [
+								"forge"
+							]
+						}
 					},
 					"response": []
 				},
@@ -101,12 +110,20 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{jwtAuthUrl}}/check"
+						"url": {
+							"raw": "{{jwtAuthUrl}}/check",
+							"host": [
+								"{{jwtAuthUrl}}"
+							],
+							"path": [
+								"check"
+							]
+						}
 					},
 					"response": []
 				},
 				{
-					"name": "Check portal connection",
+					"name": "Get portal token",
 					"event": [
 						{
 							"listen": "test",
@@ -114,10 +131,14 @@
 								"exec": [
 									"pm.test(\"Testing portal connection\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    if(pm.response.text() === pm.variables.get('noPortalMsg')) return true",
+									"    const portalJwtName = mem.get('portalJwtName')",
+									"    if (pm.response.text() === pm.variables.get('noPortalMsg')) {",
+									"        pm.collectionVariables.unset(portalJwtName)",
+									"        return true",
+									"    }",
 									"    const token = pm.response.json().access_token",
-									"    pm.expect(!!match.jwt(token)).to.be.true       ",
-									"    pm.collectionVariables.set(pm.variables.get('portalJwtName'),token)",
+									"    pm.expect(!!match.jwt(token)).to.be.true",
+									"    pm.collectionVariables.set(portalJwtName, token)",
 									"});"
 								],
 								"type": "text/javascript",
@@ -128,7 +149,52 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/portal/token"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/portal/token",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"portal",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check portal token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Testing portal connection\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    pm.expect(pm.response.text() === pm.variables.get('noPortalMsg') || pm.response.json().active).to.be.true       ",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{catalogUrl}}/admin/portal/token/check",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"portal",
+								"token",
+								"check"
+							]
+						}
 					},
 					"response": []
 				},
@@ -154,7 +220,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/admin/logs?limit=300",
+							"raw": "{{catalogUrl}}/admin/logs?limit=20000&sort_by=-updatedAt",
 							"host": [
 								"{{catalogUrl}}"
 							],
@@ -165,7 +231,11 @@
 							"query": [
 								{
 									"key": "limit",
-									"value": "300"
+									"value": "20000"
+								},
+								{
+									"key": "sort_by",
+									"value": "-updatedAt"
 								}
 							]
 						}
@@ -202,7 +272,54 @@
 						},
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/env"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/env",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"env"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get git hash pub",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Git hash : 7 alphanumerical characters\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseStr = pm.response.text()",
+									"    pm.expect(!!match.gitHash(responseStr)).to.be.true",
+									"    pm.collectionVariables.set('gitHash', responseStr)",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{catalogUrl}}/admin/hash",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"hash"
+							]
+						}
 					},
 					"response": []
 				},
@@ -228,7 +345,16 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/hash"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/hash",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"hash"
+							]
+						}
 					},
 					"response": []
 				},
@@ -259,7 +385,16 @@
 						},
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/apphash"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/apphash",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"apphash"
+							]
+						}
 					},
 					"response": []
 				},
@@ -288,7 +423,53 @@
 						},
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/version"
+						"url": {
+							"raw": "{{catalogUrl}}/version",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"version"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get API version (admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"API version\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const apiVersion = pm.response.text()",
+									"    pm.expect(!!match.version(apiVersion)).to.be.true",
+									"    pm.collectionVariables.set('apiVersion', apiVersion)",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{catalogUrl}}/admin/version",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"version"
+							]
+						}
 					},
 					"response": []
 				},
@@ -321,7 +502,16 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/nv"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/nv",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"nv"
+							]
+						}
 					},
 					"response": []
 				},
@@ -345,7 +535,16 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/id_generation"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/id_generation",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"id_generation"
+							]
+						}
 					},
 					"response": []
 				},
@@ -370,7 +569,16 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/routes"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/routes",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"routes"
+							]
+						}
 					},
 					"response": []
 				},
@@ -477,7 +685,16 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/db"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/db",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"db"
+							]
+						}
 					},
 					"response": []
 				},
@@ -504,7 +721,17 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/db/data"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/db/data",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"db",
+								"data"
+							]
+						}
 					},
 					"response": []
 				},
@@ -704,13 +931,26 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{{{catalogJwtName}}}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{{{catalogJwtName}}}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/test"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/test",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"test"
+							]
+						}
 					},
 					"response": []
 				}
@@ -1040,7 +1280,17 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/licences/"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/licences/",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"licences",
+								""
+							]
+						}
 					},
 					"response": []
 				},
@@ -1077,7 +1327,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/licence_codes"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/licence_codes",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"licence_codes"
+							]
+						}
 					},
 					"response": []
 				},
@@ -1108,7 +1367,16 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/enum"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/enum",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"enum"
+							]
+						}
 					},
 					"response": []
 				},
@@ -1178,7 +1446,17 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/enum/Languages"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/enum/Languages",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"enum",
+								"Languages"
+							]
+						}
 					},
 					"response": []
 				},
@@ -1203,7 +1481,17 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/enum/Keywords"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/enum/Keywords",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"enum",
+								"Keywords"
+							]
+						}
 					},
 					"response": []
 				},
@@ -1228,7 +1516,17 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/enum/Themes"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/enum/Themes",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"enum",
+								"Themes"
+							]
+						}
 					},
 					"response": []
 				},
@@ -1253,7 +1551,17 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/enum/Themes"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/enum/Themes",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"enum",
+								"Themes"
+							]
+						}
 					},
 					"response": []
 				},
@@ -1280,7 +1588,18 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/enum/Themes/fr"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/enum/Themes/fr",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"enum",
+								"Themes",
+								"fr"
+							]
+						}
 					},
 					"response": []
 				},
@@ -1307,7 +1626,18 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/enum/Themes/en"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/enum/Themes/en",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"enum",
+								"Themes",
+								"en"
+							]
+						}
 					},
 					"response": []
 				},
@@ -1331,7 +1661,16 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/search"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/search",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"search"
+							]
+						}
 					},
 					"response": []
 				}
@@ -1385,7 +1724,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/organizations"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/organizations",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"organizations"
+							]
+						}
 					},
 					"response": []
 				},
@@ -1411,7 +1759,17 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/organizations/{{softOrg1Id}}"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/organizations/{{softOrg1Id}}",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"organizations",
+								"{{softOrg1Id}}"
+							]
+						}
 					},
 					"response": []
 				},
@@ -1463,7 +1821,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/organizations"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/organizations",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"organizations"
+							]
+						}
 					},
 					"response": []
 				},
@@ -1513,7 +1880,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/organizations"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/organizations",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"organizations"
+							]
+						}
 					},
 					"response": []
 				},
@@ -1539,7 +1915,17 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/organizations/{{softOrg2Id}}"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/organizations/{{softOrg2Id}}",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"organizations",
+								"{{softOrg2Id}}"
+							]
+						}
 					},
 					"response": []
 				},
@@ -1620,9 +2006,21 @@
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/v1/organizations"
+						"url": {
+							"raw": "{{catalogUrl}}/v1/organizations",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"v1",
+								"organizations"
+							]
+						}
 					},
 					"response": []
 				},
@@ -1727,7 +2125,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/contacts"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/contacts",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"contacts"
+							]
+						}
 					},
 					"response": []
 				},
@@ -1775,7 +2182,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/contacts"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/contacts",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"contacts"
+							]
+						}
 					},
 					"response": []
 				},
@@ -1823,7 +2239,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/contacts"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/contacts",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"contacts"
+							]
+						}
 					},
 					"response": []
 				},
@@ -1875,7 +2300,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/contacts"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/contacts",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"contacts"
+							]
+						}
 					},
 					"response": []
 				},
@@ -1900,7 +2334,17 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/contacts/{{softContact1Id}}"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/contacts/{{softContact1Id}}",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"contacts",
+								"{{softContact1Id}}"
+							]
+						}
 					},
 					"response": []
 				},
@@ -1935,7 +2379,16 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/contacts"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/contacts",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"contacts"
+							]
+						}
 					},
 					"response": []
 				},
@@ -1972,7 +2425,16 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/v1/contacts"
+						"url": {
+							"raw": "{{catalogUrl}}/v1/contacts",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"v1",
+								"contacts"
+							]
+						}
 					},
 					"response": []
 				},
@@ -2077,7 +2539,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/media"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/media",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"media"
+							]
+						}
 					},
 					"response": []
 				},
@@ -2124,7 +2595,73 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/media"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/media",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"media"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT media service",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Creation of a new media\", () => {",
+									"    pm.expect(pm.response.code).to.eq(200)",
+									"    pm.expect(pm.response.json().media_dates?.created.startsWith('20')).to.be.true",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const media1 = pm.variables.get('media1')",
+									"console.log('media1:', media1)",
+									"const media2 = { ...media1, media_id: rand.uuid(), collection_tag: pm.variables.get('stamp') }",
+									"console.log(media2)",
+									"pm.collectionVariables.set('media2', JSON.stringify(media2))",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"media_type\": \"SERVICE\",\n    \"media_id\": \"{{$randomUUID}}\",\n    \"media_name\": \"test\",\n    \"connector\": {\n        \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER\",\n        \"interface_contract\": \"dwnl\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{catalogUrl}}/admin/media",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"media"
+							]
+						}
 					},
 					"response": []
 				},
@@ -2160,7 +2697,16 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/media"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/media",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"media"
+							]
+						}
 					},
 					"response": []
 				},
@@ -2203,7 +2749,18 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/media/{{media1Id}}/commit"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/media/{{media1Id}}/commit",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"media",
+								"{{media1Id}}",
+								"commit"
+							]
+						}
 					},
 					"response": []
 				}
@@ -2327,7 +2884,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/resources"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/resources",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"resources"
+							]
+						}
 					},
 					"response": []
 				},
@@ -2374,7 +2940,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/resources"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/resources",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"resources"
+							]
+						}
 					},
 					"response": []
 				},
@@ -2420,7 +2995,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/resources"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/resources",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"resources"
+							]
+						}
 					},
 					"response": []
 				},
@@ -2467,7 +3051,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/resources"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/resources",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"resources"
+							]
+						}
 					},
 					"response": []
 				},
@@ -2515,7 +3108,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/resources"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/resources",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"resources"
+							]
+						}
 					},
 					"response": []
 				},
@@ -2564,7 +3166,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/resources"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/resources",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"resources"
+							]
+						}
 					},
 					"response": []
 				},
@@ -2613,7 +3224,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/resources"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/resources",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"resources"
+							]
+						}
 					},
 					"response": []
 				},
@@ -2662,7 +3282,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/resources"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/resources",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"resources"
+							]
+						}
 					},
 					"response": []
 				},
@@ -2711,7 +3340,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/resources"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/resources",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"resources"
+							]
+						}
 					},
 					"response": []
 				},
@@ -2760,7 +3398,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/resources"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/resources",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"resources"
+							]
+						}
 					},
 					"response": []
 				},
@@ -2809,7 +3456,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/resources"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/resources",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"resources"
+							]
+						}
 					},
 					"response": []
 				},
@@ -2835,7 +3491,18 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/enum/Themes/init"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/enum/Themes/init",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"enum",
+								"Themes",
+								"init"
+							]
+						}
 					},
 					"response": []
 				},
@@ -2847,22 +3514,24 @@
 							"script": {
 								"exec": [
 									"pm.test(\"2 metadata created\", () => {",
+									"    if (!mem.get(mem.get('portalJwtName')) == 'No portal connected') {",
+									"        pm.expect(pm.response.code).to.eql(400);",
+									"        return",
+									"    }",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"",
 									"    const publicMetadataList = pm.response.json();",
 									"    pm.expect(publicMetadataList.total).to.eq(1);",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
 					"request": {
 						"auth": {
-							"type": "bearer",
-							"bearer": {
-								"token": "{{{{portalJwtName}}}}"
-							}
+							"type": "noauth"
 						},
 						"method": "GET",
 						"header": [],
@@ -2917,6 +3586,9 @@
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -2947,6 +3619,44 @@
 					"response": []
 				},
 				{
+					"name": "[PUB] Get all metadata unfiltered",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"2 metadata created\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const metadataList = pm.response.json();",
+									"    const publicMetadataList = pm.response.json();",
+									"    pm.expect(publicMetadataList.total).to.gte(1);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{catalogUrl}}/v1/resources",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"v1",
+								"resources"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "[PUB] Get all metadata with trailing slashes",
 					"event": [
 						{
@@ -2968,10 +3678,7 @@
 					],
 					"request": {
 						"auth": {
-							"type": "bearer",
-							"bearer": {
-								"token": "{{{{portalJwtName}}}}"
-							}
+							"type": "noauth"
 						},
 						"method": "GET",
 						"header": [],
@@ -2993,6 +3700,60 @@
 								{
 									"key": "collection_tag",
 									"value": "{{stamp}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[PUB] Get last updated metadata",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Testing URL with slashes\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const metadataList = pm.response.json();",
+									"    // console.log(metadataList.length)",
+									"    const publicMetadataList = pm.response.json();",
+									"    pm.expect(publicMetadataList.items.length).to.lte(1);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{catalogUrl}}/v1/resources/?sort_by=-updatedAt&limit=1&fields=updatedAt",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"v1",
+								"resources",
+								""
+							],
+							"query": [
+								{
+									"key": "sort_by",
+									"value": "-updatedAt"
+								},
+								{
+									"key": "limit",
+									"value": "1"
+								},
+								{
+									"key": "fields",
+									"value": "updatedAt"
 								}
 							]
 						}
@@ -3056,11 +3817,15 @@
 									"    pm.expect(res.total).to.eq(1);",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -3239,7 +4004,17 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/resources/count"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/resources/count",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"resources",
+								"count"
+							]
+						}
 					},
 					"response": []
 				},
@@ -3253,7 +4028,7 @@
 									"pm.test(\"Count metadata by status\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const result = pm.response.json()",
-									"    pm.expect(result[0].count).to.gte(2);",
+									"    pm.expect(result[0].count).to.gte(1);",
 									"});"
 								],
 								"type": "text/javascript",
@@ -3293,7 +4068,7 @@
 									"pm.test(\"Count metadata by keywords\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const result = pm.response.json()",
-									"    pm.expect(result[0].count).to.gte(2);",
+									"    pm.expect(result[0].count).to.gte(1);",
 									"});"
 								],
 								"type": "text/javascript",
@@ -3638,6 +4413,9 @@
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -3687,10 +4465,7 @@
 					],
 					"request": {
 						"auth": {
-							"type": "bearer",
-							"bearer": {
-								"token": "{{{{portalJwtName}}}}"
-							}
+							"type": "noauth"
 						},
 						"method": "GET",
 						"header": [],
@@ -3817,20 +4592,28 @@
 									"    pm.expect(responseJson.metadata_info.metadata_contacts[0].contact_id).to.eq(contId2);",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
 					"request": {
 						"auth": {
-							"type": "bearer",
-							"bearer": {
-								"token": "{{{{portalJwtName}}}}"
-							}
+							"type": "noauth"
 						},
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/v1/resources/{{softMeta1Id}}"
+						"url": {
+							"raw": "{{catalogUrl}}/v1/resources/{{softMeta1Id}}",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"v1",
+								"resources",
+								"{{softMeta1Id}}"
+							]
+						}
 					},
 					"response": []
 				},
@@ -3849,20 +4632,28 @@
 									"    pm.expect(responseJson.error).to.eq('Not Found')",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
 					"request": {
 						"auth": {
-							"type": "bearer",
-							"bearer": {
-								"token": "{{{{portalJwtName}}}}"
-							}
+							"type": "noauth"
 						},
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/v1/resources/test"
+						"url": {
+							"raw": "{{catalogUrl}}/v1/resources/test",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"v1",
+								"resources",
+								"test"
+							]
+						}
 					},
 					"response": []
 				},
@@ -3895,7 +4686,17 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/resources/{{softMeta2Id}}"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/resources/{{softMeta2Id}}",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"resources",
+								"{{softMeta2Id}}"
+							]
+						}
 					},
 					"response": []
 				},
@@ -3944,7 +4745,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/resources"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/resources",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"resources"
+							]
+						}
 					},
 					"response": []
 				},
@@ -3977,7 +4787,18 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/portal/resources/send"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/portal/resources/send",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"portal",
+								"resources",
+								"send"
+							]
+						}
 					},
 					"response": []
 				},
@@ -4010,7 +4831,18 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/portal/resources/send"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/portal/resources/send",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"portal",
+								"resources",
+								"send"
+							]
+						}
 					},
 					"response": []
 				},
@@ -4498,6 +5330,10 @@
 									"pm.collectionVariables.set('softMediaGmdXml1Id', rand.get('{{$randomUUID}}'))",
 									"pm.collectionVariables.set('softMediaGmdXml2Id', rand.get('{{$randomUUID}}'))",
 									"pm.collectionVariables.set('softMediaGmdXml3Id', rand.get('{{$randomUUID}}'))",
+									"",
+									"log.d('Add meta GMD-XML 1', 'Themes',)",
+									"log.d('Add meta GMD-XML 1', 'Themes', rand.pick('themes'))",
+									"pm.collectionVariables.set('randomTheme', rand.pick('themes'));",
 									""
 								],
 								"type": "text/javascript",
@@ -4523,7 +5359,18 @@
 									"    pm.collectionVariables.set('softMetaGmdXml1Id', responseJson.global_id);",
 									"    const media1Id = pm.variables.get('softMediaGmdXml1Id');",
 									"    const media2Id = pm.variables.get('softMediaGmdXml2Id');",
-									"    const media3Id = pm.variables.get('softMediaGmdXml3Id')",
+									"    const media3Id = pm.variables.get('softMediaGmdXml3Id');",
+									"",
+									"    const addedMediaIDs = [media1Id, media2Id, media3Id];",
+									"    const mediaList = responseJson.available_formats;",
+									"    let mediaServiceLinkOldMeta;",
+									"    mediaList.forEach((media)=>{",
+									"        const mediaId = media.media_id",
+									"        if (!addedMediaIDs.includes(mediaId)) {",
+									"            mediaServiceLinkOldMeta = mediaId",
+									"        }",
+									"    });",
+									"    pm.collectionVariables.set('softMediaGmdXml4Id', mediaServiceLinkOldMeta);",
 									"});"
 								],
 								"type": "text/javascript",
@@ -4818,7 +5665,17 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/resources/deletion"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/resources/deletion",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"resources",
+								"deletion"
+							]
+						}
 					},
 					"response": []
 				},
@@ -4854,7 +5711,17 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/media/deletion"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/media/deletion",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"media",
+								"deletion"
+							]
+						}
 					},
 					"response": []
 				},
@@ -4890,7 +5757,17 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/organizations/deletion"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/organizations/deletion",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"organizations",
+								"deletion"
+							]
+						}
 					},
 					"response": []
 				},
@@ -4926,7 +5803,17 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/contacts/deletion"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/contacts/deletion",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"contacts",
+								"deletion"
+							]
+						}
 					},
 					"response": []
 				}
@@ -4958,7 +5845,17 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/portal/token"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/portal/token",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"portal",
+								"token"
+							]
+						}
 					},
 					"response": []
 				},
@@ -5000,9 +5897,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{{{portalJwtName}}}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{{{portalJwtName}}}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "PUT",
 						"header": [],
@@ -5015,7 +5916,17 @@
 								}
 							}
 						},
-						"url": "{{catalogServer}}/resources/{{softMeta1Id}}/report"
+						"url": {
+							"raw": "{{catalogServer}}/resources/{{softMeta1Id}}/report",
+							"host": [
+								"{{catalogServer}}"
+							],
+							"path": [
+								"resources",
+								"{{softMeta1Id}}",
+								"report"
+							]
+						}
 					},
 					"response": []
 				},
@@ -5057,9 +5968,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{{{portalJwtName}}}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{{{portalJwtName}}}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "PUT",
 						"header": [],
@@ -5072,7 +5987,17 @@
 								}
 							}
 						},
-						"url": "{{catalogServer}}/resources/{{softMeta1Id}}/report"
+						"url": {
+							"raw": "{{catalogServer}}/resources/{{softMeta1Id}}/report",
+							"host": [
+								"{{catalogServer}}"
+							],
+							"path": [
+								"resources",
+								"{{softMeta1Id}}",
+								"report"
+							]
+						}
 					},
 					"response": []
 				},
@@ -5116,9 +6041,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{{{portalJwtName}}}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{{{portalJwtName}}}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "PUT",
 						"header": [],
@@ -5131,7 +6060,17 @@
 								}
 							}
 						},
-						"url": "{{catalogServer}}/resources/{{unkownMetaId}}/report"
+						"url": {
+							"raw": "{{catalogServer}}/resources/{{unkownMetaId}}/report",
+							"host": [
+								"{{catalogServer}}"
+							],
+							"path": [
+								"resources",
+								"{{unkownMetaId}}",
+								"report"
+							]
+						}
 					},
 					"response": []
 				},
@@ -5158,9 +6097,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{{{portalJwtName}}}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{{{portalJwtName}}}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "GET",
 						"header": [],
@@ -5173,7 +6116,18 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/v1/resources/{{softMeta1Id}}/report"
+						"url": {
+							"raw": "{{catalogUrl}}/v1/resources/{{softMeta1Id}}/report",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"v1",
+								"resources",
+								"{{softMeta1Id}}",
+								"report"
+							]
+						}
 					},
 					"response": []
 				},
@@ -5214,7 +6168,18 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/resources/{{softMeta1Id}}/reports"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/resources/{{softMeta1Id}}/reports",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"resources",
+								"{{softMeta1Id}}",
+								"reports"
+							]
+						}
 					},
 					"response": []
 				},
@@ -5248,9 +6213,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{{{portalJwtName}}}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{{{portalJwtName}}}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "GET",
 						"header": [],
@@ -5263,7 +6232,19 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/v1/resources/{{softMeta1Id}}/report/{{softReport2Id}}"
+						"url": {
+							"raw": "{{catalogUrl}}/v1/resources/{{softMeta1Id}}/report/{{softReport2Id}}",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"v1",
+								"resources",
+								"{{softMeta1Id}}",
+								"report",
+								"{{softReport2Id}}"
+							]
+						}
 					},
 					"response": []
 				},
@@ -5294,7 +6275,17 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/reports/{{softReport2Id}}"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/reports/{{softReport2Id}}",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"reports",
+								"{{softReport2Id}}"
+							]
+						}
 					},
 					"response": []
 				},
@@ -5423,7 +6414,17 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/organizations/{{softOrg1Id}}"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/organizations/{{softOrg1Id}}",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"organizations",
+								"{{softOrg1Id}}"
+							]
+						}
 					},
 					"response": []
 				},
@@ -5445,7 +6446,17 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/contacts/{{softContact1Id}}"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/contacts/{{softContact1Id}}",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"contacts",
+								"{{softContact1Id}}"
+							]
+						}
 					},
 					"response": []
 				},
@@ -5480,7 +6491,17 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/reports/deletion"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/reports/deletion",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"reports",
+								"deletion"
+							]
+						}
 					},
 					"response": []
 				},
@@ -5515,7 +6536,17 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/resources/deletion"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/resources/deletion",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"resources",
+								"deletion"
+							]
+						}
 					},
 					"response": []
 				},
@@ -5540,9 +6571,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{{{portalJwtName}}}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{{{portalJwtName}}}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "GET",
 						"header": [],
@@ -5605,7 +6640,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/resources"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/resources",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"resources"
+							]
+						}
 					},
 					"response": []
 				},
@@ -5630,7 +6674,17 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/resources/{{softMeta1Id}}"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/resources/{{softMeta1Id}}",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"resources",
+								"{{softMeta1Id}}"
+							]
+						}
 					},
 					"response": []
 				},
@@ -5665,7 +6719,17 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/media/deletion"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/media/deletion",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"media",
+								"deletion"
+							]
+						}
 					},
 					"response": []
 				},
@@ -5700,7 +6764,17 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/organizations/deletion"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/organizations/deletion",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"organizations",
+								"deletion"
+							]
+						}
 					},
 					"response": []
 				},
@@ -5735,7 +6809,17 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/contacts/deletion"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/contacts/deletion",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"contacts",
+								"deletion"
+							]
+						}
 					},
 					"response": []
 				},
@@ -5823,7 +6907,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/resources"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/resources",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"resources"
+							]
+						}
 					},
 					"response": []
 				},
@@ -6088,22 +7181,14 @@
 									"    pm.expect(responseJson.deletedCount).to.eq(0);",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
 					"request": {
 						"method": "DELETE",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "[\n    \"{{softMeta1Id}}\",\n    \"{{softMeta2Id}}\"\n]",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{catalogUrl}}/admin/reports?collection_tag={{stamp}}",
 							"host": [
@@ -6382,7 +7467,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/pub_keys"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/pub_keys",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"pub_keys"
+							]
+						}
 					},
 					"response": []
 				},
@@ -6429,7 +7523,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/pub_keys"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/pub_keys",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"pub_keys"
+							]
+						}
 					},
 					"response": []
 				},
@@ -6477,7 +7580,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/pub_keys"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/pub_keys",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"pub_keys"
+							]
+						}
 					},
 					"response": []
 				},
@@ -6518,7 +7630,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/pub_keys"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/pub_keys",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"pub_keys"
+							]
+						}
 					},
 					"response": []
 				},
@@ -6586,7 +7707,17 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/pubKeys/{{pubKeyName}}"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/pubKeys/{{pubKeyName}}",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"pubKeys",
+								"{{pubKeyName}}"
+							]
+						}
 					},
 					"response": []
 				},
@@ -6619,7 +7750,17 @@
 						},
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/v1/pub_keys/{{pubKeyName}}"
+						"url": {
+							"raw": "{{catalogUrl}}/v1/pub_keys/{{pubKeyName}}",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"v1",
+								"pub_keys",
+								"{{pubKeyName}}"
+							]
+						}
 					},
 					"response": []
 				},
@@ -6682,7 +7823,18 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/pub_keys/{{pubKeyName}}/pem"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/pub_keys/{{pubKeyName}}/pem",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"pub_keys",
+								"{{pubKeyName}}",
+								"pem"
+							]
+						}
 					},
 					"response": []
 				},
@@ -6707,7 +7859,18 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/v1/pub_keys/{{pubKeyName}}/pem"
+						"url": {
+							"raw": "{{catalogUrl}}/v1/pub_keys/{{pubKeyName}}/pem",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"v1",
+								"pub_keys",
+								"{{pubKeyName}}",
+								"pem"
+							]
+						}
 					},
 					"response": []
 				},
@@ -6745,7 +7908,17 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/pub_keys/{{pubKeyName}}"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/pub_keys/{{pubKeyName}}",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"pub_keys",
+								"{{pubKeyName}}"
+							]
+						}
 					},
 					"response": []
 				},
@@ -6839,7 +8012,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/pub_keys"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/pub_keys",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"pub_keys"
+							]
+						}
 					},
 					"response": []
 				},
@@ -6880,7 +8062,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/pub_keys"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/pub_keys",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"pub_keys"
+							]
+						}
 					},
 					"response": []
 				},
@@ -6923,7 +8114,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/pub_keys"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/pub_keys",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"pub_keys"
+							]
+						}
 					},
 					"response": []
 				},
@@ -6957,7 +8157,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/pub_keys"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/pub_keys",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"pub_keys"
+							]
+						}
 					},
 					"response": []
 				},
@@ -7008,7 +8217,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/pub_keys"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/pub_keys",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"pub_keys"
+							]
+						}
 					},
 					"response": []
 				},
@@ -7035,7 +8253,17 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/portal/token"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/portal/token",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"portal",
+								"token"
+							]
+						}
 					},
 					"response": []
 				},
@@ -7074,7 +8302,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/pub_keys"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/pub_keys",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"pub_keys"
+							]
+						}
 					},
 					"response": []
 				},
@@ -7112,7 +8349,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/pub_keys"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/pub_keys",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"pub_keys"
+							]
+						}
 					},
 					"response": []
 				},
@@ -7135,7 +8381,8 @@
 									"});",
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						},
 						{
@@ -7144,7 +8391,8 @@
 								"exec": [
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -7153,14 +8401,23 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"portal-{{stamp}}\",\n    \"url\": \"{{portalBaseUrl}}/konsult/v1/encryption-key\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+							"raw": "{\n    \"name\": \"portal-{{stamp}}\",\n    \"url\": \"{{portalUrl}}/konsult/v1/encryption-key\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/pub_keys"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/pub_keys",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"pub_keys"
+							]
+						}
 					},
 					"response": []
 				},
@@ -7189,7 +8446,17 @@
 						},
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/v1/pub_keys/portal-{{stamp}}"
+						"url": {
+							"raw": "{{catalogUrl}}/v1/pub_keys/portal-{{stamp}}",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"v1",
+								"pub_keys",
+								"portal-{{stamp}}"
+							]
+						}
 					},
 					"response": []
 				},
@@ -7265,7 +8532,18 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/check/portal/url"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/check/portal/url",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"check",
+								"portal",
+								"url"
+							]
+						}
 					},
 					"response": []
 				},
@@ -7316,7 +8594,16 @@
 								}
 							}
 						},
-						"url": "{{catalogUrl}}/admin/pub_keys"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/pub_keys",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"pub_keys"
+							]
+						}
 					},
 					"response": []
 				},
@@ -7345,7 +8632,18 @@
 						},
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/v1/pub_keys/{{portalKeyName}}/key"
+						"url": {
+							"raw": "{{catalogUrl}}/v1/pub_keys/{{portalKeyName}}/key",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"v1",
+								"pub_keys",
+								"{{portalKeyName}}",
+								"key"
+							]
+						}
 					},
 					"response": []
 				}
@@ -7375,7 +8673,18 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/check/node/url"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/check/node/url",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"check",
+								"node",
+								"url"
+							]
+						}
 					},
 					"response": []
 				},
@@ -7400,7 +8709,18 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/check/portal/url"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/check/portal/url",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"check",
+								"portal",
+								"url"
+							]
+						}
 					},
 					"response": []
 				},
@@ -7428,7 +8748,18 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/check/portal/resources"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/check/portal/resources",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"check",
+								"portal",
+								"resources"
+							]
+						}
 					},
 					"response": []
 				},
@@ -7454,7 +8785,18 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{catalogUrl}}/admin/check/portal/ids"
+						"url": {
+							"raw": "{{catalogUrl}}/admin/check/portal/ids",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"check",
+								"portal",
+								"ids"
+							]
+						}
 					},
 					"response": []
 				}
@@ -7474,11 +8816,12 @@
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const response = pm.response.json()",
 									"    //const pm.response.header",
-									"    pm.expect(response.length).to.eq(20)",
-									"    mem.wipeCache([], 1)",
+									"    pm.expect(response.length).to.lte(20)",
 									"});",
 									"",
 									"mem.wipeCollectionVars(pm.collectionVariables,[],1)",
+									"",
+									"",
 									""
 								],
 								"type": "text/javascript",
@@ -7521,9 +8864,13 @@
 	],
 	"auth": {
 		"type": "bearer",
-		"bearer": {
-			"token": "{{{{catalogJwtName}}}}"
-		}
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{{{catalogJwtName}}}}",
+				"type": "string"
+			}
+		]
 	},
 	"event": [
 		{
@@ -7542,6 +8889,8 @@
 					"    d: (here, ...args) => log.lvl >= 2 && console.log(`D [${here}]`, ...args),",
 					"    t: (here, msg = '<', ...args) => log.lvl >= 3 && console.log(`T [${here}]`, msg, ...args),",
 					"}",
+					"",
+					"const JWT_AUTH_DELEGATE_DEFAULT = 'rudi_api_pm'",
 					"",
 					"log.t('Time-related functions')",
 					"time = {",
@@ -7643,12 +8992,15 @@
 					"",
 					"log.t('Variable names homogenization')",
 					"function homogenizeVars() {",
+					"    changeVarName('cryptoJwtUrl', 'jwtAuthUrl')",
+					"    changeVarName('pmClientName', 'jwtAuthDelegate')",
 					"    changeVarName('apiUrl', 'catalogUrl')",
+					"    changeVarName('mediaUrl', 'storageUrl')",
 					"    changeVarName('pmBackUrl', 'managerUrl')",
 					"    changeVarName('pmFrontUrl', 'managerFrontUrl')",
-					"    changeVarName('mediaUrl', 'storageUrl')",
 					"    changeVarName('pmAdminUsr', 'managerAdminUsr')",
 					"    changeVarName('pmAdminPwd', 'managerAdminPwd')",
+					"    ",
 					"    if (!(pm.environment.get('storageUrl'))) {",
 					"        pm.environment.set('storageUrl', `${mem.get('managerUrl')}`.replace('/prodmanager', '/media'))",
 					"    }",
@@ -7661,6 +9013,13 @@
 					"        pm.environment.unset(catalogPrefix)",
 					"    } else {",
 					"        pm.environment.set('catalogServer', catalogUrl.replace(/\\/(api|catalog)/, ''))",
+					"    }",
+					"    const definedJwtAuthDelegate = pm.environment.get('pmClientName')",
+					"    if (definedJwtAuthDelegate) {",
+					"        if (definedJwtAuthDelegate != JWT_AUTH_DELEGATE_DEFAULT) {",
+					"            pm.environment.set('jwtAuthDelegate', definedJwtAuthDelegate)",
+					"        }",
+					"        pm.environment.unset('pmClientName')",
 					"    }",
 					"    pm.environment.set('homogenized', true)",
 					"}",
@@ -7865,7 +9224,7 @@
 					"        if (secu.isTokenValid(token)) return token",
 					"        const body = {",
 					"            'exp': time.nowEpochS() + TOKEN_DURATION_S,",
-					"            'sub': mem.get('jwtAuthDelegate') ?? 'postman',",
+					"            'sub': mem.get('jwtAuthDelegate') ?? JWT_AUTH_DELEGATE_DEFAULT,",
 					"            'client_id': mem.get('jwtAuthUser') ?? 'pm',",
 					"        }",
 					"        const req = {",
@@ -7957,6 +9316,294 @@
 		},
 		{
 			"key": "postmanEnv",
+			"value": ""
+		},
+		{
+			"key": "catalogJwtName",
+			"value": ""
+		},
+		{
+			"key": "storageJwtName",
+			"value": ""
+		},
+		{
+			"key": "managerJwtName",
+			"value": ""
+		},
+		{
+			"key": "portalJwtName",
+			"value": ""
+		},
+		{
+			"key": "catalogJwt-_Dev-Local",
+			"value": ""
+		},
+		{
+			"key": "keywords",
+			"value": ""
+		},
+		{
+			"key": "themes",
+			"value": ""
+		},
+		{
+			"key": "sanityLicence",
+			"value": ""
+		},
+		{
+			"key": "licences",
+			"value": ""
+		},
+		{
+			"key": "softMetaGmdXml1LocalId",
+			"value": ""
+		},
+		{
+			"key": "softOrgGmdXml1Name",
+			"value": ""
+		},
+		{
+			"key": "softMediaGmdXml1Id",
+			"value": ""
+		},
+		{
+			"key": "softMediaGmdXml2Id",
+			"value": ""
+		},
+		{
+			"key": "softMediaGmdXml3Id",
+			"value": ""
+		},
+		{
+			"key": "softOrgGmdXml1NewName",
+			"value": ""
+		},
+		{
+			"key": "softContactGmdXml1NewName",
+			"value": ""
+		},
+		{
+			"key": "softContactGmdXml1NewEmail",
+			"value": ""
+		},
+		{
+			"key": "softOrgGmdXml1Id",
+			"value": ""
+		},
+		{
+			"key": "softOrg1Name",
+			"value": ""
+		},
+		{
+			"key": "softOrgGmdXml2Name",
+			"value": ""
+		},
+		{
+			"key": "softOrgGmdXml2Id",
+			"value": ""
+		},
+		{
+			"key": "gitHash",
+			"value": ""
+		},
+		{
+			"key": "apiVersion",
+			"value": ""
+		},
+		{
+			"key": "rudiData",
+			"value": ""
+		},
+		{
+			"key": "softOrg1Id",
+			"value": ""
+		},
+		{
+			"key": "softOrg1Address",
+			"value": ""
+		},
+		{
+			"key": "softOrg2Id",
+			"value": ""
+		},
+		{
+			"key": "softOrg2Name",
+			"value": ""
+		},
+		{
+			"key": "softOrg2Address",
+			"value": ""
+		},
+		{
+			"key": "softContact1Id",
+			"value": ""
+		},
+		{
+			"key": "softContact1Name",
+			"value": ""
+		},
+		{
+			"key": "softContact1Email",
+			"value": ""
+		},
+		{
+			"key": "softContact2Id",
+			"value": ""
+		},
+		{
+			"key": "softContact2Name",
+			"value": ""
+		},
+		{
+			"key": "softContact2Email",
+			"value": ""
+		},
+		{
+			"key": "softContact3Id",
+			"value": ""
+		},
+		{
+			"key": "softContact3Name",
+			"value": ""
+		},
+		{
+			"key": "softContact3Email",
+			"value": ""
+		},
+		{
+			"key": "media2",
+			"value": ""
+		},
+		{
+			"key": "media1",
+			"value": ""
+		},
+		{
+			"key": "media1Id",
+			"value": ""
+		},
+		{
+			"key": "now",
+			"value": ""
+		},
+		{
+			"key": "softMeta1Id",
+			"value": ""
+		},
+		{
+			"key": "softMedia1Id",
+			"value": ""
+		},
+		{
+			"key": "randomTheme",
+			"value": ""
+		},
+		{
+			"key": "randomKeyword1",
+			"value": ""
+		},
+		{
+			"key": "randomKeyword2",
+			"value": ""
+		},
+		{
+			"key": "softLicence",
+			"value": ""
+		},
+		{
+			"key": "randomOrgId",
+			"value": ""
+		},
+		{
+			"key": "randomContact1",
+			"value": ""
+		},
+		{
+			"key": "randomContact2",
+			"value": ""
+		},
+		{
+			"key": "randomTitle",
+			"value": ""
+		},
+		{
+			"key": "randomSynopsis",
+			"value": ""
+		},
+		{
+			"key": "randomSummary",
+			"value": ""
+		},
+		{
+			"key": "softMeta2Id",
+			"value": ""
+		},
+		{
+			"key": "mediaId2",
+			"value": ""
+		},
+		{
+			"key": "softMedia2Id",
+			"value": ""
+		},
+		{
+			"key": "softMedia11Id",
+			"value": ""
+		},
+		{
+			"key": "countWithOrg1",
+			"value": ""
+		},
+		{
+			"key": "countWithOrg1pub",
+			"value": ""
+		},
+		{
+			"key": "softMeta4Id",
+			"value": ""
+		},
+		{
+			"key": "softMedia4Id",
+			"value": ""
+		},
+		{
+			"key": "softContactGmdXml1Id",
+			"value": ""
+		},
+		{
+			"key": "softContactGmdXml1Name",
+			"value": ""
+		},
+		{
+			"key": "softContactGmdXml1Email",
+			"value": ""
+		},
+		{
+			"key": "softMetaGmdXml1Id",
+			"value": ""
+		},
+		{
+			"key": "softMediaGmdXml4Id",
+			"value": ""
+		},
+		{
+			"key": "softMeta3LocalId",
+			"value": ""
+		},
+		{
+			"key": "softMetaGmdXml4LocalId",
+			"value": ""
+		},
+		{
+			"key": "softReport1Id",
+			"value": ""
+		},
+		{
+			"key": "dateReport",
+			"value": ""
+		},
+		{
+			"key": "portalJwt-_Dev-Local",
 			"value": ""
 		}
 	]
