@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "c1ba81ce-1c1e-49ef-9ac8-3a93df3ad225",
+		"_postman_id": "b6428778-e342-40d9-83c7-fd3613c4e549",
 		"name": "01. Catalog",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
 		"_exporter_id": "33400273"
@@ -4523,18 +4523,7 @@
 									"    pm.collectionVariables.set('softMetaGmdXml1Id', responseJson.global_id);",
 									"    const media1Id = pm.variables.get('softMediaGmdXml1Id');",
 									"    const media2Id = pm.variables.get('softMediaGmdXml2Id');",
-									"    const media3Id = pm.variables.get('softMediaGmdXml3Id');",
-									"",
-									"    const addedMediaIDs = [media1Id, media2Id, media3Id];",
-									"    const mediaList = responseJson.available_formats;",
-									"    let mediaServiceLinkOldMeta;",
-									"    mediaList.forEach((media)=>{",
-									"        const mediaId = media.media_id",
-									"        if (!addedMediaIDs.includes(mediaId)) {",
-									"            mediaServiceLinkOldMeta = mediaId",
-									"        }",
-									"    });",
-									"    pm.collectionVariables.set('softMediaGmdXml4Id', mediaServiceLinkOldMeta);",
+									"    const media3Id = pm.variables.get('softMediaGmdXml3Id')",
 									"});"
 								],
 								"type": "text/javascript",
@@ -4845,7 +4834,7 @@
 									"    const responseJson = pm.response.json();",
 									"    // pm.expect(responseJson.n).to.eq(2);",
 									"    // pm.expect(responseJson.ok).to.eq(1);",
-									"    pm.expect(responseJson.deletedCount).to.eq(4);",
+									"    pm.expect(responseJson.deletedCount).to.eq(3);",
 									"});"
 								],
 								"type": "text/javascript",
@@ -4858,7 +4847,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n    \"{{softMediaGmdXml1Id}}\",\n    \"{{softMediaGmdXml2Id}}\",\n    \"{{softMediaGmdXml3Id}}\",\n    \"{{softMediaGmdXml4Id}}\"\n]",
+							"raw": "[\n    \"{{softMediaGmdXml1Id}}\",\n    \"{{softMediaGmdXml2Id}}\",\n    \"{{softMediaGmdXml3Id}}\"\n]",
 							"options": {
 								"raw": {
 									"language": "json"

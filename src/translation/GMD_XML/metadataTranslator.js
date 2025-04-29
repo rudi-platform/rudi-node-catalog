@@ -298,7 +298,7 @@ const translateAvailableFormats = async (inputObject, path, args) => {
     //   },
     // }
 
-    result.push(customMediaService)
+    // result.push(customMediaService)
     return result
   } catch (e) {
     throw RudiError.treatError(mod, fun, e)
