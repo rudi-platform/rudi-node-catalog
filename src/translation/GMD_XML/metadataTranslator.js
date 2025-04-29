@@ -25,19 +25,13 @@ import {
   API_LICENCE,
   API_LICENCE_LABEL,
   API_LICENCE_TYPE,
-  API_MEDIA_CAPTION,
-  API_MEDIA_CONNECTOR,
-  API_MEDIA_ID,
-  API_MEDIA_NAME,
   API_MEDIA_PROPERTY,
-  API_MEDIA_TYPE,
   API_METADATA_ID,
   API_METADATA_LOCAL_ID,
   API_METAINFO_CONTACTS_PROPERTY,
   API_METAINFO_PROPERTY,
   API_METAINFO_SOURCE_PROPERTY,
   API_METAINFO_VERSION_PROPERTY,
-  API_PUB_URL,
   API_STORAGE_STATUS,
   API_THEME_PROPERTY,
   DICT_LANG,
@@ -57,7 +51,6 @@ import {
 import { API_VERSION, OBJ_METADATA } from '../../config/constApi.js'
 import { getLicenceLabels } from '../../controllers/licenceController.js'
 import { getObject } from '../../db/dbQueries.js'
-import { MediaTypes } from '../../definitions/models/Media.js'
 import { get as getLanguages } from '../../definitions/thesaurus/Languages.js'
 import { StorageStatus } from '../../definitions/thesaurus/StorageStatus.js'
 import { BadRequestError, RudiError } from '../../utils/errors.js'
@@ -78,7 +71,7 @@ import {
   translateStraightFromXmlParam,
 } from './genericTranslationFunctions.js'
 import { GmdXmlToRudiGeoTranslator } from './geographyTranslator.js'
-import { GmdXmlToRudiMediaTranslator, findMediaIdWithURL } from './mediaTranslator.js'
+import { GmdXmlToRudiMediaTranslator } from './mediaTranslator.js'
 import { GmdXmlToRudiOrgaTranslator } from './organizationTranslator.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -280,18 +273,18 @@ const translateAvailableFormats = async (inputObject, path, args) => {
       )
     }
 
-    const mediaURLOldMetadata = getFirstElementWithPath(inputObject, args.pathToSourceMetadata)
-    const mediaId = await findMediaIdWithURL(mediaURLOldMetadata)
-    const customMediaService = {
-      [API_MEDIA_ID]: mediaId,
-      [API_MEDIA_TYPE]: MediaTypes.Service,
-      [API_MEDIA_NAME]: 'Link to source metadata',
-      [API_MEDIA_CAPTION]:
-        'Link to the metadata that was translated in RUDI format. Contains more informations.',
-      [API_MEDIA_CONNECTOR]: { [API_PUB_URL]: mediaURLOldMetadata },
-    }
-
-    result.push(customMediaService)
+    // Deprecated : used to keep track of source metadata, replace by metadata_source field.
+    // const mediaURLOldMetadata = getFirstElementWithPath(inputObject, args.pathToSourceMetadata)
+    // const mediaId = await findMediaIdWithURL(mediaURLOldMetadata)
+    // let customMediaService = {
+    //   [API_MEDIA_ID]: mediaId,
+    //   [API_MEDIA_TYPE]: MediaTypes.Service,
+    //   [API_MEDIA_NAME]: 'Link to source metadata',
+    //   [API_MEDIA_CAPTION]:
+    //     'Link to the metadata that was translated in RUDI format. Contains more informations.',
+    //   [API_MEDIA_CONNECTOR]: { [API_PUB_URL]: mediaURLOldMetadata },
+    // }
+    // result.push(customMediaService)
     return result
   } catch (e) {
     throw RudiError.treatError(mod, fun, e)
