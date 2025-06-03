@@ -1066,7 +1066,7 @@ export const overwriteDbObject = async (objectType, updateData) => {
     const filter = { [idField]: rudiId }
 
     const existingObject = await ObjModel.findOne(filter)
-    logD(mod, fun, beautify(existingObject))
+    // logD(mod, fun, beautify(existingObject))
     if (existingObject) {
       // document exists in DB, we preserve the creation date
       updateData[DB_CREATED_AT] = existingObject[DB_CREATED_AT]
@@ -1079,17 +1079,16 @@ export const overwriteDbObject = async (objectType, updateData) => {
       returnDocument: 'after',
       upsert: true, // creates the document if it wasn't found
     }
-    logD(mod, fun, `filter: ${beautify(filter)}`)
-    logD(mod, fun, `updateOpts: ${beautify(updateOpts)}`)
-    logD(mod, fun, `updateData: ${beautify(updateData)}`)
+    // logD(mod, fun, `filter: ${beautify(filter)}`)
+    // logD(mod, fun, `updateOpts: ${beautify(updateOpts)}`)
+    // logD(mod, fun, `updateData: ${beautify(updateData)}`)
     mongoose.set('debug', true)
     await (existingObject
       ? ObjModel.replaceOne(filter, updateData, updateOpts)
       : ObjModel.create(updateData))
 
     const dbObject = ObjModel.findOne(filter)
-    logD(mod, fun, `dbObject: ${beautify(dbObject)}`)
-
+    // logD(mod, fun, `dbObject: ${beautify(dbObject)}`)
     // await dbObject.save()
     return dbObject
   } catch (err) {
