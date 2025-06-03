@@ -255,7 +255,7 @@ const FileSchema = new mongoose.Schema(
 
     // Size of the file, in bytes
     [API_FILE_SIZE]: {
-      type: Int32,
+      type: Number,
       required: true,
     },
 
