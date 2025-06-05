@@ -495,7 +495,6 @@ const isMetadataSendableToPortal = async (metadataId) => {
       logD(mod, fun, `Waiting for other media to get uploaded: ${metadataId}`)
       return false
     }
-
     //--- Checking the waiting room for
     //      - metadatas waiting for an integration report for too long to get purged from the list
     //      - the same metadata if it has already been sent to portal
@@ -538,10 +537,12 @@ const isMetadataSendableToPortal = async (metadataId) => {
     //--- Updating the DB metadata status
     setMetadataStatusToSent(dbMetadata)
     await dbMetadata.save()
+
     logV(mod, `${fun}.metadata_status saved`, dbMetadata[API_STATUS_PROPERTY])
     portalReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES][API_DATES_PUBLISHED] = nowISO()
     return { portalReadyMetadata, waitIndex }
   } catch (err) {
+    logW(mod, fun, err)
     throw RudiError.treatError(mod, fun, err)
   }
 }

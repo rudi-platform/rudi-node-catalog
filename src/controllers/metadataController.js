@@ -690,13 +690,13 @@ export const overwriteMetadata = async (incomingRudiMetadata) => {
     logT(mod, fun)
 
     if (!incomingRudiMetadata) throw new ParameterExpectedError('incomingRudiMetadata', mod, fun)
-    // logD(mod, fun, `edited metadata: ${beautify(incomingRudiMetadata)}\n`)
 
     const dbReadyEditedMetadata = await rudiToDbFormat(incomingRudiMetadata, true)
     const dbMetadata = await overwriteDbObject(OBJ_METADATA, dbReadyEditedMetadata)
 
     const { metadata: finalMetadata, areAllMediaAvailable } =
       await updateMetadataStorageState(dbMetadata)
+
     if (areAllMediaAvailable && !isPortalConnectionDisabled()) sendToPortal(finalMetadata)
 
     return finalMetadata
