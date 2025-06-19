@@ -1082,9 +1082,9 @@ export const overwriteDbObject = async (objectType, updateData) => {
     // logD(mod, fun, `updateOpts: ${beautify(updateOpts)}`)
     // logD(mod, fun, `updateData: ${beautify(updateData)}`)
     // mongoose.set('debug', true)
-    const dbObject1 = await getObject(objectType, filter)
-    logD(mod, fun, `dbObject before: ${beautify(dbObject1)}`)
-    logD(mod, fun, `to be updated with: ${beautify(updateData)}`)
+    // const dbObject1 = await getObject(objectType, filter)
+    // logD(mod, fun, `dbObject before: ${beautify(dbObject1)}`)
+    // logD(mod, fun, `to be updated with: ${beautify(updateData)}`)
 
     if (objectType == OBJ_METADATA) {
       logD(mod, fun, `findOneAndUpdate`)

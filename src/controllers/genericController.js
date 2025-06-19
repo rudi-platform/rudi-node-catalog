@@ -234,9 +234,9 @@ function overrideFilter(filterList, field, value) {
   filterList.$and.findIndex((val, i, ara) => {
     if (Object.keys(val).indexOf(field) !== -1) ara.splice(i, 1)
   })
-  logD(mod, fun, beautify(filterList))
+  // logD(mod, fun, beautify(filterList))
   filterList.$and.push(newFilter)
-  logD(mod, fun, beautify(filterList))
+  // logD(mod, fun, beautify(filterList))
   return filterList
 }
 
