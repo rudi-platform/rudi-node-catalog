@@ -84,13 +84,7 @@ import {
 } from '../../db/dbFields.js'
 
 import { Latitude, Longitude } from '../schemas/GpsCoordinates.js'
-import {
-  ALT_MIME_MARKDOWN,
-  get as getFileTypes,
-  MIME_MARKDOWN,
-  MIME_YAML,
-  MIME_YAML_ALT,
-} from '../thesaurus/FileTypes.js'
+import { get as getFileTypes, MIME_YAML, MIME_YAML_ALT } from '../thesaurus/FileTypes.js'
 
 // -------------------------------------------------------------------------------------------------
 // Validators
@@ -508,14 +502,15 @@ const MetadataSchema = new mongoose.Schema(
 // -------------------------------------------------------------------------------------------------
 // Validation
 // -------------------------------------------------------------------------------------------------
-// eslint-disable-next-line unused-imports/no-unused-vars
-async function checkMetadataSource(metadata) {
-  const fun = 'checkMetadataSource'
+
+const forgeMetadataSource = (metadata) =>
+  getPublicUrl(`${URL_PREFIX_PUBLIC}/${OBJ_METADATA}/${metadata[API_METADATA_ID]}`)
+
+const ensureMetadataSource = (metadata) => {
+  const fun = 'ensureMetadataSource'
   try {
     if (!metadata[API_METAINFO_PROPERTY][API_METAINFO_SOURCE_PROPERTY])
-      metadata[API_METAINFO_PROPERTY][API_METAINFO_SOURCE_PROPERTY] = getPublicUrl(
-        `${URL_PREFIX_PUBLIC}/${OBJ_METADATA}/${metadata[API_METADATA_ID]}`
-      )
+      metadata[API_METAINFO_PROPERTY][API_METAINFO_SOURCE_PROPERTY] = forgeMetadataSource(metadata)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
@@ -787,9 +782,9 @@ export const toRudiPortalJSON = (metadata) => {
       delete media[API_FILE_STORAGE_STATUS]
       delete media[API_FILE_STATUS_UPDATE]
       if (media[API_MEDIA_TYPE] == MediaTypes.File) {
-        if (media[API_FILE_MIME] == MIME_MARKDOWN || media[API_FILE_MIME] == ALT_MIME_MARKDOWN)
-          media[API_FILE_MIME] = 'text/plain'
-        else if (!isMimeTypePortalCompatible(media)) {
+        // if (media[API_FILE_MIME] == MIME_MARKDOWN || media[API_FILE_MIME] == ALT_MIME_MARKDOWN)
+        //   media[API_FILE_MIME] = 'text/plain'
+        if (!isMimeTypePortalCompatible(media)) {
           throw new BadRequestError(
             `This MIME type is not accepted by the RUDI portal: '${media[API_FILE_MIME]}' (file ${media[API_MEDIA_ID]} in metadata ${metadata[API_METADATA_ID]})`
           )
@@ -804,7 +799,7 @@ export const toRudiPortalJSON = (metadata) => {
     //--- Removing metadata fields that are node specific (e.g. virtual properties)
     delete portalReadyMetadata[API_INTEGRATION_ERROR_ID]
     delete portalReadyMetadata[API_STATUS_PROPERTY]
-    delete portalReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_SOURCE_PROPERTY]
+    // delete portalReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_SOURCE_PROPERTY]
     delete portalReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES][API_DATES_PUBLISHED]
     delete portalReadyMetadata[API_RESTRICTED_ACCESS]
 
@@ -956,7 +951,7 @@ MetadataSchema.pre('save', async function () {
     await checkFileTypes(metadata)
 
     await checkGDPR(metadata)
-    // await checkMetadataSource(metadata)
+    ensureMetadataSource(metadata)
     // await checkMedia(metadata)
 
     updateMetadataStatus(metadata)

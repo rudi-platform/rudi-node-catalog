@@ -1,5 +1,6 @@
 const mod = 'confPortal'
 
+import { MIME_MARKDOWN } from '../definitions/thesaurus/FileTypes.js'
 import { readIniFile } from '../utils/fileActions.js'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
@@ -204,7 +205,7 @@ export const PORTAL_MIMES = [
   'text/css',
   'text/csv',
   'text/html',
-  'text/markdown',
+  MIME_MARKDOWN,
   'text/php',
   'text/plain',
   'text/x-yaml',
@@ -241,7 +242,7 @@ export const PORTAL_MIMES = [
   'text/css+crypt',
   'text/csv+crypt',
   'text/html+crypt',
-  'text/markdown+crypt',
+  `${MIME_MARKDOWN}+crypt`,
   'text/php+crypt',
   'text/plain+crypt',
   'text/x-yaml+crypt',

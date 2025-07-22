@@ -101,7 +101,7 @@ export const getServerPort = () => LISTENING_PORT
 export const getHost = (suffix) =>
   pathJoin(`http://${LISTENING_ADDR}:${LISTENING_PORT}`, CATALOG_PREFIX, suffix)
 
-export const getPublicUrl = (suffix) => pathJoin(PUBLIC_URL, suffix)
+export const getPublicUrl = (...suffix) => pathJoin(PUBLIC_URL, ...suffix)
 
 // ----- App environment
 const NODE_ENV = getCliEnvOpt(OPT_NODE_ENV) ?? 'dev'
