@@ -199,7 +199,7 @@ export class RudiError extends Error {
       // logD(mod, fun, `B) ${error} -> ${beautify(transmittedError)}`)
       return transmittedError
     } catch (err) {
-      logW(mod, fun, err)
+      logW(mod, fun, beautify(err))
       throw err
     }
   }

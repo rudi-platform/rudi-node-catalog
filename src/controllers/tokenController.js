@@ -160,7 +160,7 @@ const getPubKey = (subject) => {
     }
     return CACHED_PUB_KEYS[subject]
   } catch (err) {
-    logW(mod, fun, err)
+    logW(mod, fun, beautify(err))
     throw RudiError.treatError(mod, fun, err)
   }
 }
@@ -205,7 +205,7 @@ export const verifyRudiCatalogToken = async (token, reqMethod, reqUrl) => {
     return { subject, clientId }
   } catch (e) {
     logW(mod, fun, `The JWT could not be validated: ${token}`)
-    logW(mod, fun, e)
+    logW(mod, fun, beautify(e))
     const error = new ForbiddenError(`The JWT could not be validated`)
     throw RudiError.treatError(mod, fun, error)
   }

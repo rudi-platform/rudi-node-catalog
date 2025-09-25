@@ -779,8 +779,6 @@ export const toRudiPortalJSON = (metadata) => {
 
     //--- Removing media fields that are node specific
     portalReadyMetadata[API_MEDIA_PROPERTY].forEach((media) => {
-      delete media[API_FILE_STORAGE_STATUS]
-      delete media[API_FILE_STATUS_UPDATE]
       if (media[API_MEDIA_TYPE] == MediaTypes.File) {
         // if (media[API_FILE_MIME] == MIME_MARKDOWN || media[API_FILE_MIME] == ALT_MIME_MARKDOWN)
         //   media[API_FILE_MIME] = 'text/plain'
@@ -792,6 +790,8 @@ export const toRudiPortalJSON = (metadata) => {
       } else {
         if (media[API_FILE_MIME]) delete media[API_FILE_MIME]
       }
+      delete media[API_FILE_STORAGE_STATUS]
+      delete media[API_FILE_STATUS_UPDATE]
       // delete media[API_MEDIA_THUMBNAIL]
       // delete media[API_MEDIA_SATELLITES]
     })
@@ -812,6 +812,7 @@ export const toRudiPortalJSON = (metadata) => {
     }
     return portalReadyMetadata
   } catch (err) {
+    logW(mod, fun, err)
     throw RudiError.treatError(mod, fun, err)
   }
 }
