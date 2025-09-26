@@ -133,7 +133,7 @@ export const httpPut = async (destUrl, dataToSend, authorizationToken) => {
   }
 }
 const REQ_TIMEOUT_MS = 1000
-const MAX_RETRIES = 8
+const MAX_RETRIES = 5
 const INITIAL_DELAY_MS = 100
 
 /**
