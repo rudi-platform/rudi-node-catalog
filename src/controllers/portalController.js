@@ -395,7 +395,7 @@ export const verifyPortalTokenSign = async (jwt) => {
     logT(mod, fun, `JWT signed with key ID: ${keyId}`)
 
     const portalPubKey = await getPortalJwtPubKey(keyId)
-    if (portalPubKey) logV(mod, fun, `portalPubKey: ${beautify(portalPubKey)}`)
+    if (portalPubKey) logV(mod, fun, `portalPubKey: ${!!portalPubKey}`)
     else {
       logW(
         mod,
