@@ -90,6 +90,11 @@ import { getLicenceCodes } from './licenceController.js'
 // -------------------------------------------------------------------------------------------------
 // Data models
 // -------------------------------------------------------------------------------------------------
+import {
+  getPortalExtensions,
+  getPortalMimes,
+  isPortalConnectionDisabled,
+} from '../config/confPortal.js'
 import { InterfaceContract } from '../definitions/models/Media.js'
 import SkosConcept from '../definitions/models/SkosConcept.js'
 import SkosScheme from '../definitions/models/SkosScheme.js'
@@ -236,7 +241,7 @@ export const createConceptHierarchy = async (listConcepts, schemeDbId, parentCon
             // logD(mod, fun, `dbConcept[API_CONCEPT_PARENTS_PROPERTY]: ${beautify(dbConcept[API_CONCEPT_PARENTS_PROPERTY])}`)
             dbConcept[API_CONCEPT_PARENTS_PROPERTY] = []
           }
-          if (parents.indexOf(parentConcept) === -1) {
+          if (!parents.includes(parentConcept)) {
             dbConcept[API_CONCEPT_PARENTS_PROPERTY].push(parentConcept)
           }
         }
@@ -486,8 +491,8 @@ export const getThesaurusList = async (lang) => {
 
     const thesauri = {
       encodings: getEncodings(),
-      fileextensions: getExtensions(),
-      filetypes: getFileTypes(),
+      fileextensions: isPortalConnectionDisabled() ? getExtensions() : getPortalExtensions(),
+      filetypes: isPortalConnectionDisabled() ? getFileTypes() : getPortalMimes(),
       hashalgorithms: getHashAlgorithms(),
       interfacecontracts: Object.values(InterfaceContract),
       keywords: keywords,

@@ -1,6 +1,6 @@
 const mod = 'confPortal'
 
-import { MIME_MARKDOWN } from '../definitions/thesaurus/FileTypes.js'
+import { Extensions } from '../definitions/thesaurus/FileTypes.js'
 import { readIniFile } from '../utils/fileActions.js'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
@@ -205,7 +205,7 @@ export const PORTAL_MIMES = [
   'text/css',
   'text/csv',
   'text/html',
-  MIME_MARKDOWN,
+  'text/markdown',
   'text/php',
   'text/plain',
   'text/x-yaml',
@@ -243,11 +243,18 @@ export const PORTAL_MIMES = [
   'text/css+crypt',
   'text/csv+crypt',
   'text/html+crypt',
-  `${MIME_MARKDOWN}+crypt`,
+  'text/markdown+crypt',
   'text/php+crypt',
   'text/plain+crypt',
   'text/x-yaml+crypt',
   'text/xml+crypt',
 ]
+export const isPortalMime = (mimeType) => PORTAL_MIMES.includes(mimeType)
 
-export const isPortalMime = (mimeType) => PORTAL_MIMES.indexOf(mimeType) > -1
+const PORTAL_EXTENSIONS = {}
+for (const [ext, mime] of Object.entries(Extensions)) {
+  if (PORTAL_MIMES.includes(mime)) PORTAL_EXTENSIONS[ext] = mime
+}
+
+export const getPortalMimes = () => PORTAL_MIMES
+export const getPortalExtensions = () => PORTAL_EXTENSIONS
