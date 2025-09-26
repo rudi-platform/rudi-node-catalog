@@ -210,6 +210,7 @@ export const PORTAL_MIMES = [
   'text/plain',
   'text/x-yaml',
   'text/xml',
+  'application/geo+json+crypt',
   'application/graphql+crypt',
   'application/javascript+crypt',
   'application/json+crypt',
