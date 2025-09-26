@@ -20,7 +20,7 @@ import { USER_AGENT } from '../config/constApi.js'
 import { beautify, isNotEmptyArray } from './jsUtils.js'
 // import { getEnvironment } from '../controllers/sysController.js'
 import { BadRequestError, RudiError } from './errors.js'
-import { logD, logT } from './logging.js'
+import { logD, logT, logW } from './logging.js'
 
 // -------------------------------------------------------------------------------------------------
 // Functions: header treatments
@@ -60,6 +60,9 @@ export const getUrlParameters = (reqUrl) => {
 // -------------------------------------------------------------------------------------------------
 // Functions: http requests
 // -------------------------------------------------------------------------------------------------
+const REQ_TIMEOUT_MS = 4000
+const MAX_RETRIES = 3
+const INITIAL_DELAY_MS = 900
 
 export const httpGet = async (destUrl, authorizationToken) => {
   const fun = 'httpGet'
@@ -156,46 +159,49 @@ export const httpPut = async (destUrl, dataToSend, authorizationToken) => {
   }
 }
 
-export const directGet = async (destUrl, reqOpts) => {
-  const fun = 'directGet'
-  try {
-    logT(mod, fun)
+/**
+ * Generic Axios request with retry and exponential backoff
+ */
+const axiosWithRetry = async (axiosCall, retries = MAX_RETRIES, delay = INITIAL_DELAY_MS) => {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await axiosCall()
+    } catch (err) {
+      const shouldRetry =
+        err.code === 'ECONNABORTED' || (err.response && err.response.status >= 500)
 
-    const answer = await axios.get(destUrl, reqOpts)
+      if (!shouldRetry || attempt === retries) throw err
 
-    // logHttpAnswer(mod, fun, answer)
-    return answer
-  } catch (err) {
-    throw RudiError.treatCommunicationError(mod, fun, err)
+      const backoff = delay * 2 ** attempt
+      console.warn(`Request failed (attempt ${attempt + 1}). Retrying in ${backoff}ms...`)
+      await new Promise((res) => setTimeout(res, backoff))
+    }
   }
 }
 
-export const directPost = async (destUrl, dataToSend, reqOpts) => {
-  const fun = 'directPost'
+/**
+ * Minimal wrapper for GET, POST, PUT
+ */
+const httpRequest = async (method, url, data = null, reqOpts = {}) => {
+  const fun = `direct${method.charAt(0).toUpperCase() + method.slice(1)}`
   logT(mod, fun)
 
   try {
-    const answer = await axios.post(destUrl, dataToSend, reqOpts)
+    const axiosCall = () => axios({ method, url, data, timeout: REQ_TIMEOUT_MS, ...reqOpts })
+
+    const answer = await axiosWithRetry(axiosCall)
     // logHttpAnswer(mod, fun, answer)
     return answer
   } catch (err) {
-    // logW(mod, fun, beautify(err) || err)
+    logW(mod, fun, beautify(err))
     throw RudiError.treatCommunicationError(mod, fun, err)
   }
 }
 
-export const directPut = async (destUrl, dataToSend, reqOpts) => {
-  const fun = 'directPut'
-  logT(mod, fun)
-  try {
-    const answer = await axios.put(destUrl, dataToSend, reqOpts)
-    // logHttpAnswer(mod, fun, answer)
-    return answer
-  } catch (err) {
-    // logW(mod, fun, beautify(err) || err)
-    throw RudiError.treatCommunicationError(mod, fun, err)
-  }
-}
+// Export minimal functions
+export const directGet = (url, reqOpts) => httpRequest('get', url, null, reqOpts)
+export const directPost = (url, data, reqOpts) => httpRequest('post', url, data, reqOpts)
+export const directPut = (url, data, reqOpts) => httpRequest('put', url, data, reqOpts)
 
 // -------------------------------------------------------------------------------------------------
 // IP Redirections display
