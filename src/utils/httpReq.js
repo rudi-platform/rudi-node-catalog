@@ -20,7 +20,7 @@ import { USER_AGENT } from '../config/constApi.js'
 import { beautify, isNotEmptyArray } from './jsUtils.js'
 // import { getEnvironment } from '../controllers/sysController.js'
 import { BadRequestError, RudiError } from './errors.js'
-import { logD, logT, logW } from './logging.js'
+import { logD, logT } from './logging.js'
 
 // -------------------------------------------------------------------------------------------------
 // Functions: header treatments
@@ -60,7 +60,7 @@ export const getUrlParameters = (reqUrl) => {
 // -------------------------------------------------------------------------------------------------
 // Functions: http requests
 // -------------------------------------------------------------------------------------------------
-const REQ_TIMEOUT_MS = 4000
+const REQ_TIMEOUT_MS = 10000
 const MAX_RETRIES = 3
 const INITIAL_DELAY_MS = 900
 
@@ -193,7 +193,7 @@ const httpRequest = async (method, url, data = null, reqOpts = {}) => {
     // logHttpAnswer(mod, fun, answer)
     return answer
   } catch (err) {
-    logW(mod, fun, beautify(err))
+    // logW(mod, fun, beautify(err))
     throw RudiError.treatCommunicationError(mod, fun, err)
   }
 }
