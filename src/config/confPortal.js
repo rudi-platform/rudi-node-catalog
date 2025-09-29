@@ -167,10 +167,10 @@ if (isPortalConnectionDisabled()) {
 } else {
   logD(mod, '', `Portal - Data: '${API_PORTAL_URL}'`)
 
-  logD(mod, '', `jwt_get: ${AUTH_GET}`)
-  logD(mod, '', `jwt_chk: ${AUTH_CHK}`)
-  logD(mod, '', `jwt_pub: ${JWT_PUB_KEY_URL}`)
-  logD(mod, '', `enc_pub: ${CRYPT_PUB_KEY_URL}`)
+  logD(mod, '', `jwt_get: '${AUTH_GET}'`)
+  logD(mod, '', `jwt_chk: '${AUTH_CHK}'`)
+  logD(mod, '', `jwt_pub: '${JWT_PUB_KEY_URL}'`)
+  logD(mod, '', `enc_pub: '${CRYPT_PUB_KEY_URL}'`)
 }
 
 // -------------------------------------------------------------------------------------------------
