@@ -43,7 +43,7 @@ const PORTAL_DEFT_CONF_FILE = `${INI_DIR}/portal_conf_default.ini`
 if (!portalConfUserFile) {
   consoleErr(
     mod,
-    'Extract portal conf file path',
+    'readUsrConf',
     'No path has been given for this conf file, check your configuration!' +
       ` Now loading file from path '${PORTAL_CUSTOM_CONF_FILE}'`
   )
@@ -166,6 +166,11 @@ if (isPortalConnectionDisabled()) {
   logD(mod, '', NO_PORTAL_MSG)
 } else {
   logD(mod, '', `Portal - Data: '${API_PORTAL_URL}'`)
+
+  logD(mod, '', `jwt_get: ${AUTH_GET}`)
+  logD(mod, '', `jwt_chk: ${AUTH_CHK}`)
+  logD(mod, '', `jwt_pub: ${JWT_PUB_KEY_URL}`)
+  logD(mod, '', `enc_pub: ${CRYPT_PUB_KEY_URL}`)
 }
 
 // -------------------------------------------------------------------------------------------------
