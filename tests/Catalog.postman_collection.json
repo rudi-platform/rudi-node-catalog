@@ -21,7 +21,8 @@
 									""
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						},
 						{
@@ -35,7 +36,8 @@
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -212,7 +214,8 @@
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -1393,13 +1396,14 @@
 									"    const listEnums = Object.keys(responseJson);",
 									"    pm.expect(listEnums.length).to.eq(12);",
 									"    pm.expect(Object.keys(responseJson.fileextensions).length).to.gt(0)",
-									"    pm.expect(responseJson.fileextensions.aac).to.eq(\"audio/aac\")",
-									"    const themeKeys = Object.keys(responseJson.themes)",
+									"    pm.expect(responseJson.fileextensions.gif).to.eq(\"image/gif\")",
+									"    // const themeKeys = Object.keys(responseJson.themes)",
 									"    pm.expect(responseJson.themes.environment).to.eq('Environnement')",
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -1544,7 +1548,9 @@
 									"    pm.expect(typeof responseJson[0]).to.eq('string')",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -1552,14 +1558,50 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/admin/enum/Themes",
+							"raw": "{{catalogUrl}}/admin/enum/FileTypes",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
 								"admin",
 								"enum",
-								"Themes"
+								"FileTypes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get file extensions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"File extensions received\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200)",
+									"    const responseJson = pm.response.json()",
+									"    pm.expect(responseJson['md'] == 'text/markdown').to.be.true",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{catalogUrl}}/admin/enum/FileExtensions",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"enum",
+								"FileExtensions"
 							]
 						}
 					},
@@ -1942,7 +1984,9 @@
 									"    pm.expect(orgList.length).to.gte(2);",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						},
 						{
@@ -1951,7 +1995,9 @@
 								"exec": [
 									"time.wait(1000)"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -2505,6 +2551,10 @@
 								"exec": [
 									"pm.test(\"Creation of a new media\", () => {",
 									"    pm.expect(pm.response.code).to.eq(200)",
+									"    res = pm.response.json()",
+									"    pm.expect(!!match.uuid(res.media_id)).to.be.true",
+									"    pm.expect(pm.response.json().media_dates?.created.startsWith('20')).to.be.true",
+									"    pm.collectionVariables.set(\"mediaId1\",res.media_id)",
 									"})"
 								],
 								"type": "text/javascript",
@@ -2515,11 +2565,6 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"const media1 = pm.variables.get('media1')",
-									"console.log('media1:', media1)",
-									"const media2 = { ...media1, media_id: rand.uuid(), collection_tag: pm.variables.get('stamp') }",
-									"console.log(media2)",
-									"pm.collectionVariables.set('media2', JSON.stringify(media2))",
 									""
 								],
 								"type": "text/javascript",
@@ -2561,6 +2606,9 @@
 								"exec": [
 									"pm.test(\"Creation of a new media\", () => {",
 									"    pm.expect(pm.response.code).to.eq(200)",
+									"    res = pm.response.json()",
+									"    pm.expect(!!match.uuid(res.media_id)).to.be.true",
+									"    pm.expect(pm.response.json().media_dates?.created.startsWith('20')).to.be.true",
 									"})"
 								],
 								"type": "text/javascript",
@@ -2571,11 +2619,6 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"const media1 = pm.variables.get('media1')",
-									"console.log('media1:', media1)",
-									"const media2 = { ...media1, media_id: rand.uuid(), collection_tag: pm.variables.get('stamp') }",
-									"console.log(media2)",
-									"pm.collectionVariables.set('media2', JSON.stringify(media2))",
 									""
 								],
 								"type": "text/javascript",
@@ -2617,6 +2660,8 @@
 								"exec": [
 									"pm.test(\"Creation of a new media\", () => {",
 									"    pm.expect(pm.response.code).to.eq(200)",
+									"    res = pm.response.json()",
+									"    pm.expect(!!match.uuid(res.media_id)).to.be.true",
 									"    pm.expect(pm.response.json().media_dates?.created.startsWith('20')).to.be.true",
 									"})"
 								],
@@ -2628,11 +2673,6 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"const media1 = pm.variables.get('media1')",
-									"console.log('media1:', media1)",
-									"const media2 = { ...media1, media_id: rand.uuid(), collection_tag: pm.variables.get('stamp') }",
-									"console.log(media2)",
-									"pm.collectionVariables.set('media2', JSON.stringify(media2))",
 									""
 								],
 								"type": "text/javascript",
@@ -2675,8 +2715,7 @@
 									"pm.test(\"List of existing media\", () => {",
 									"    const mediaList = pm.response.json()",
 									"    pm.expect(Array.isArray(mediaList))",
-									"    pm.collectionVariables.set('media1', JSON.stringify(mediaList[0]))",
-									"    pm.collectionVariables.set('media1Id', mediaList[0]['media_id'])",
+									"    console.log(mediaList.length)",
 									"})"
 								],
 								"type": "text/javascript",
@@ -2698,13 +2737,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{catalogUrl}}/admin/media",
+							"raw": "{{catalogUrl}}/admin/media/",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
 								"admin",
-								"media"
+								"media",
+								""
 							]
 						}
 					},
@@ -2750,14 +2790,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/admin/media/{{media1Id}}/commit",
+							"raw": "{{catalogUrl}}/admin/media/{{mediaId1}}/commit",
 							"host": [
 								"{{catalogUrl}}"
 							],
 							"path": [
 								"admin",
 								"media",
-								"{{media1Id}}",
+								"{{mediaId1}}",
 								"commit"
 							]
 						}
@@ -2845,7 +2885,8 @@
 									"// log.d('Description', 'randomSummary', pm.variables.get('randomSummary'))"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						},
 						{
@@ -2868,7 +2909,8 @@
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -3470,6 +3512,74 @@
 					"response": []
 				},
 				{
+					"name": "Edit meta 1",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set('softMedia11Id', rand.get('{{$randomUUID}}'));",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Metadata 1 edited\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    const metaId = pm.variables.get('softMeta1Id');",
+									"    const orgId1 = pm.variables.get('softOrg1Id');",
+									"    const orgId2 = pm.variables.get('orgId2');",
+									"    const contId1 = pm.variables.get('contId1');",
+									"    const contId2 = pm.variables.get('contId2');",
+									"",
+									"    pm.expect(responseJson.global_id).to.eq(metaId);",
+									"    pm.expect(responseJson.producer.organization_id).to.eq(orgId1);",
+									"    pm.expect(!!match.uuid(responseJson.contacts[0]));",
+									"",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"global_id\": \"{{softMeta1Id}}\",\n    \"local_id\": \"testingID {{softMeta1Id}}\",\n    \"doi\": \"10.1007/s00223-003-0070-444/{{softMeta1Id}}\",\n    \"resource_title\": \"Test de RUDI en local {{softMeta1Id}}\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 4444\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 4\"\n        }\n    ],\n    \"collection_tag\": \"{{stamp}}\",\n    \"purpose\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{stamp}}\"\n        }\n    ],\n    \"theme\": \"energyNetworks\",\n    \"keywords\": [\n        \"energy_consommation\",\n        \"electricity\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{softOrg1Id}}\",\n        \"collection_tag\": \"{{stamp}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{softContact1Id}}\",\n            \"collection_tag\": \"{{stamp}}\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_provider\": {\n            \"organization_id\": \"{{softOrg2Id}}\",\n            \"collection_tag\": \"{{stamp}}\"\n        },\n        \"metadata_contacts\": [\n            {\n                \"contact_id\": \"{{softContact2Id}}\",\n                \"collection_tag\": \"{{stamp}}\"\n            }\n        ]\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"licence_label\": \"{{softLicence}}\"\n        }\n    },\n    \"available_formats\": [\n        {\n            \"media_type\": \"SERVICE\",\n            \"media_id\": \"{{softMedia11Id}}\",\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER\"\n            },\n            \"collection_tag\": \"{{stamp}}\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{catalogUrl}}/admin/resources",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"resources"
+							],
+							"query": [
+								{
+									"key": "global_id",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get theme values in data",
 					"event": [
 						{
@@ -3513,7 +3623,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"2 metadata created\", () => {",
+									"pm.test(\"Resources can be sorted without JWT\", () => {",
 									"    if (!mem.get(mem.get('portalJwtName')) == 'No portal connected') {",
 									"        pm.expect(pm.response.code).to.eql(400);",
 									"        return",
@@ -3525,7 +3635,8 @@
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -3573,7 +3684,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"2 metadata created\", () => {",
+									"pm.test(\"Metadata can be accessed with filters without JWT\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const metadataList = pm.response.json();",
 									"    const publicMetadataList = pm.response.json();",
@@ -3581,7 +3692,8 @@
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -3625,7 +3737,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"2 metadata created\", () => {",
+									"pm.test(\"Resources can be accedded without JWT\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const metadataList = pm.response.json();",
 									"    const publicMetadataList = pm.response.json();",
@@ -3633,13 +3745,60 @@
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
 					"request": {
 						"auth": {
 							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{catalogUrl}}/v1/resources",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"v1",
+								"resources"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[PUB] Get all metadata unfiltered bad jwt",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Public resources can be accessed with a bad JWT\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const metadataList = pm.response.json();",
+									"    const publicMetadataList = pm.response.json();",
+									"    pm.expect(publicMetadataList.total).to.gte(1);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhbm9ueW1vdXMiLCJpc3MiOiJSdWRpIyIsImNvbm5lY3RlZFVzZXIiOiJ7XCJsb2dpblwiOlwiYW5vbnltb3VzXCIsXCJ0eXBlXCI6XCJQRVJTT05cIixcImZpcnN0bmFtZVwiOlwiYW5vbnltb3VzXCIsXCJsYXN0bmFtZVwiOlwiYW5vbnltb3VzXCIsXCJlbWFpbFwiOm51bGwsXCJvcmdhbml6YXRpb25cIjpcInJ1ZGlcIixcInJvbGVzXCI6W1wiQU5PTllNT1VTXCJdLFwiZGF0YVwiOm51bGx9IiwiZXhwIjoxNzQyMjkzODYwLCJpYXQiOjE3NDIyOTMyNjAsImp0aSI6IlJ1ZGkyMDIxIn0.MC06wy3srFubuHtUY0_K2mrz5hXJnkWto3QJAzOtkw1ls3oFLX-4TBV9JfPhxMV0cI1Hbpi-lVTNIlOdB7svvg",
+									"type": "string"
+								}
+							]
 						},
 						"method": "GET",
 						"header": [],
@@ -3713,7 +3872,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Testing URL with slashes\", () => {",
+									"pm.test(\"Last updated metadata date can be accessed without JWT\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const metadataList = pm.response.json();",
 									"    // console.log(metadataList.length)",
@@ -3722,7 +3881,8 @@
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -3818,7 +3978,8 @@
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -3846,74 +4007,6 @@
 								{
 									"key": "collection_tag",
 									"value": "{{stamp}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Edit meta 1",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"pm.collectionVariables.set('softMedia11Id', rand.get('{{$randomUUID}}'));",
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Metadata 1 edited\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const responseJson = pm.response.json();",
-									"    const metaId = pm.variables.get('softMeta1Id');",
-									"    const orgId1 = pm.variables.get('softOrg1Id');",
-									"    const orgId2 = pm.variables.get('orgId2');",
-									"    const contId1 = pm.variables.get('contId1');",
-									"    const contId2 = pm.variables.get('contId2');",
-									"",
-									"    pm.expect(responseJson.global_id).to.eq(metaId);",
-									"    pm.expect(responseJson.producer.organization_id).to.eq(orgId1);",
-									"    pm.expect(!!match.uuid(responseJson.contacts[0]));",
-									"",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"global_id\": \"{{softMeta1Id}}\",\n    \"local_id\": \"testingID {{softMeta1Id}}\",\n    \"doi\": \"10.1007/s00223-003-0070-444/{{softMeta1Id}}\",\n    \"resource_title\": \"Test de RUDI en local {{softMeta1Id}}\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Courte description de RUDI en local 4444\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Mon résumé chg 4\"\n        }\n    ],\n    \"collection_tag\": \"{{stamp}}\",\n    \"purpose\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"{{stamp}}\"\n        }\n    ],\n    \"theme\": \"energyNetworks\",\n    \"keywords\": [\n        \"energy_consommation\",\n        \"electricity\"\n    ],\n    \"geography\": {\n        \"bounding_box\": {\n            \"west_longitude\": -1.677803,\n            \"east_longitude\": -1.677803,\n            \"north_latitude\": 48.112834,\n            \"south_latitude\": 48.112834\n        }\n    },\n    \"temporal_spread\": {\n        \"start_date\": \"2021-02-12T10:33:15Z\"\n    },\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{softOrg1Id}}\",\n        \"collection_tag\": \"{{stamp}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{softContact1Id}}\",\n            \"collection_tag\": \"{{stamp}}\"\n        }\n    ],\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_provider\": {\n            \"organization_id\": \"{{softOrg2Id}}\",\n            \"collection_tag\": \"{{stamp}}\"\n        },\n        \"metadata_contacts\": [\n            {\n                \"contact_id\": \"{{softContact2Id}}\",\n                \"collection_tag\": \"{{stamp}}\"\n            }\n        ]\n    },\n    \"dataset_dates\": {\n        \"created\": \"{{now}}\",\n        \"published\": \"{{now}}\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"licence_label\": \"{{softLicence}}\"\n        }\n    },\n    \"available_formats\": [\n        {\n            \"media_type\": \"SERVICE\",\n            \"media_id\": \"{{softMedia11Id}}\",\n            \"connector\": {\n                \"url\": \"https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER\"\n            },\n            \"collection_tag\": \"{{stamp}}\"\n        }\n    ]\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{catalogUrl}}/admin/resources",
-							"host": [
-								"{{catalogUrl}}"
-							],
-							"path": [
-								"admin",
-								"resources"
-							],
-							"query": [
-								{
-									"key": "global_id",
-									"value": "",
-									"disabled": true
 								}
 							]
 						}
@@ -3978,6 +4071,116 @@
 								{
 									"key": "collection_tag",
 									"value": "{{stamp}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all metadata sorted",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"2 metadata created\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const metadataList = pm.response.json();",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"time.wait(1000)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{catalogUrl}}/admin/resources?sort_by=-updatedAt&fields=resource_title,global_id,createdAt,updatedAt,collection_tag,available_formats",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"resources"
+							],
+							"query": [
+								{
+									"key": "sort_by",
+									"value": "-updatedAt"
+								},
+								{
+									"key": "fields",
+									"value": "resource_title,global_id,createdAt,updatedAt,collection_tag,available_formats"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get last metadata update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"2 metadata created\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const metadataList = pm.response.json();",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"time.wait(1000)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{catalogUrl}}/admin/resources?sort_by=-updatedAt&fields=resource_title,global_id,createdAt,updatedAt,collection_tag,available_formats&limit=1",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"resources"
+							],
+							"query": [
+								{
+									"key": "sort_by",
+									"value": "-updatedAt"
+								},
+								{
+									"key": "fields",
+									"value": "resource_title,global_id,createdAt,updatedAt,collection_tag,available_formats"
+								},
+								{
+									"key": "limit",
+									"value": "1"
 								}
 							]
 						}
@@ -5878,7 +6081,8 @@
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						},
 						{
@@ -5887,10 +6091,14 @@
 								"exec": [
 									"pm.collectionVariables.set('softReport1Id', rand.get('{{$randomUUID}}'));",
 									"pm.collectionVariables.set('dateReport', time.now());",
+									"catalogUrl = pm.variables.get('catalogUrl')",
+									"nodeUrl = catalogUrl.replace(/\\/(catalog|api)/, '')",
+									"pm.collectionVariables.set('nodeUrl', nodeUrl + '/catalog');",
 									""
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -5917,9 +6125,9 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogServer}}/resources/{{softMeta1Id}}/report",
+							"raw": "{{nodeUrl}}/resources/{{softMeta1Id}}/report",
 							"host": [
-								"{{catalogServer}}"
+								"{{nodeUrl}}"
 							],
 							"path": [
 								"resources",
@@ -5949,7 +6157,8 @@
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						},
 						{
@@ -5961,7 +6170,8 @@
 									""
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -5988,9 +6198,9 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogServer}}/resources/{{softMeta1Id}}/report",
+							"raw": "{{nodeUrl}}/resources/{{softMeta1Id}}/report",
 							"host": [
-								"{{catalogServer}}"
+								"{{nodeUrl}}"
 							],
 							"path": [
 								"resources",
@@ -6021,7 +6231,8 @@
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						},
 						{
@@ -6034,7 +6245,8 @@
 									""
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -6061,9 +6273,9 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogServer}}/resources/{{unkownMetaId}}/report",
+							"raw": "{{nodeUrl}}/resources/{{unkownMetaId}}/report",
 							"host": [
-								"{{catalogServer}}"
+								"{{nodeUrl}}"
 							],
 							"path": [
 								"resources",
@@ -6087,7 +6299,23 @@
 									"    pm.expect(reportList.length).to.eq(2);",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"catalogUrl = pm.variables.get('catalogUrl')",
+									"nodeApiUrl = catalogUrl.replace('catalog','api')",
+									"pm.collectionVariables.set('nodeApiUrl', nodeApiUrl);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -6117,12 +6345,83 @@
 							}
 						},
 						"url": {
-							"raw": "{{catalogUrl}}/v1/resources/{{softMeta1Id}}/report",
+							"raw": "{{nodeUrl}}/resources/{{softMeta1Id}}/report",
 							"host": [
-								"{{catalogUrl}}"
+								"{{nodeUrl}}"
 							],
 							"path": [
-								"v1",
+								"resources",
+								"{{softMeta1Id}}",
+								"report"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[PUB] Get all reports (meta 1)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"2 integration reports created for metadata 1\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const reportList = pm.response.json();",
+									"    pm.expect(reportList.length).to.eq(2);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"catalogUrl = pm.variables.get('catalogUrl')",
+									"nodeApiUrl = catalogUrl.replace('catalog','api')",
+									"pm.collectionVariables.set('nodeApiUrl', nodeApiUrl);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{{{portalJwtName}}}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{nodeUrl}}/resources/{{softMeta1Id}}/report",
+							"host": [
+								"{{nodeUrl}}"
+							],
+							"path": [
 								"resources",
 								"{{softMeta1Id}}",
 								"report"
@@ -6203,7 +6502,9 @@
 									"    pm.expect(responseJson.version).to.eq(apiVersion);",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -6236,6 +6537,73 @@
 							"raw": "{{catalogUrl}}/v1/resources/{{softMeta1Id}}/report/{{softReport2Id}}",
 							"host": [
 								"{{catalogUrl}}"
+							],
+							"path": [
+								"v1",
+								"resources",
+								"{{softMeta1Id}}",
+								"report",
+								"{{softReport2Id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[PUB] Get report 2 (meta 1)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Edition of integration report 2 saved (access from metadata 1)\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    // console.log(responseJson);",
+									"    const metaId = pm.variables.get('softMeta1Id');",
+									"    const reportId = pm.variables.get('softReport2Id');",
+									"    const apiVersion = pm.variables.get('apiVersion');",
+									"    pm.expect(responseJson.report_id).to.eq(reportId);",
+									"    pm.expect(responseJson.resource_id).to.eq(metaId);",
+									"    pm.expect(responseJson.integration_status).to.eq(\"OK\");",
+									"    pm.expect(responseJson.version).to.eq(apiVersion);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{{{portalJwtName}}}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{nodeApiUrl}}/v1/resources/{{softMeta1Id}}/report/{{softReport2Id}}",
+							"host": [
+								"{{nodeApiUrl}}"
 							],
 							"path": [
 								"v1",
@@ -6353,7 +6721,9 @@
 									"    pm.expect(reportList.length).to.gte(2);",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -7182,7 +7552,8 @@
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -8519,13 +8890,16 @@
 								"exec": [
 									"pm.test(\"Get portal URL\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    const portalUrl = pm.response.text()",
+									"    let portalUrl = pm.response.text()",
+									"    if (portalUrl.endsWith('/')) portalUrl = portalUrl.slice(0, -1)",
 									"    pm.expect(portalUrl == 'https://rudi.bzh' || portalUrl == 'https://rudi-qualif.open-groupe.com' || portalUrl == pm.variables.get('noPortalMsg')).to.be.true",
 									"    pm.collectionVariables.set('portalUrl', portalUrl)",
 									"});",
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -8819,13 +9193,12 @@
 									"    pm.expect(response.length).to.lte(20)",
 									"});",
 									"",
-									"mem.wipeCollectionVars(pm.collectionVariables,[],1)",
-									"",
 									"",
 									""
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -8858,6 +9231,57 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "getLogs full",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Accessing logs\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const response = pm.response.json()",
+									"    //const pm.response.header",
+									"    pm.expect(response.length).to.gte(20)",
+									"});",
+									"",
+									"mem.wipeCollectionVars(pm.collectionVariables,[],1)",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{catalogUrl}}/admin/logs?limit=2000&sort_by=-updatedAt",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"logs"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "2000"
+								},
+								{
+									"key": "sort_by",
+									"value": "-updatedAt"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
@@ -8878,6 +9302,7 @@
 			"script": {
 				"type": "text/javascript",
 				"packages": {},
+				"requests": {},
 				"exec": [
 					"// --------------------------------------------------------------------------------------------------------------",
 					"// Libs",
@@ -9002,18 +9427,24 @@
 					"    changeVarName('pmAdminPwd', 'managerAdminPwd')",
 					"    ",
 					"    if (!(pm.environment.get('storageUrl'))) {",
-					"        pm.environment.set('storageUrl', `${mem.get('managerUrl')}`.replace('/prodmanager', '/media'))",
+					"        pm.environment.set('storageUrl', `${mem.get('managerUrl')}`.replace('/prodmanager', '/storage'))",
 					"    }",
-					"    const catalogUrl = pm.environment.get('catalogUrl')",
-					"    if (!(catalogUrl.endsWith('api') || catalogUrl.endsWith('catalog'))) {",
+					"    ",
+					"    if ((pm.environment.get('managerUrl')?.endsWith('/prodmanager'))) {",
+					"    pm.environment.set('catalogUrl', `${mem.get('managerUrl')}`.replace('/prodmanager', '/catalog'))",
+					"    pm.environment.set('managerUrl', `${mem.get('managerUrl')}`.replace('/prodmanager', '/manager'))",
+					"    }",
+					"    // const catalogUrl = pm.environment.get('catalogUrl')",
+					"    // if (!(catalogUrl.endsWith('api') || catalogUrl.endsWith('catalog'))) {",
 					"",
-					"        const catalogPrefix = mem.get('catalogPrefix') ?? 'api'",
-					"        pm.environment.set('catalogServer', catalogUrl)",
-					"        pm.environment.set('catalogUrl', pathJoin(catalogUrl, catalogPrefix))",
-					"        pm.environment.unset(catalogPrefix)",
-					"    } else {",
-					"        pm.environment.set('catalogServer', catalogUrl.replace(/\\/(api|catalog)/, ''))",
-					"    }",
+					"    //    const catalogPrefix = mem.get('catalogPrefix') ?? 'api'",
+					"        // pm.environment.set('catalogServer', catalogUrl)",
+					"    //    pm.environment.set('catalogUrl', pathJoin(catalogUrl, catalogPrefix))",
+					"    //    pm.environment.unset(catalogPrefix)",
+					"    // } ",
+					"    // else {",
+					"    //      pm.environment.set('catalogServer', catalogUrl.replace(/\\/(api|catalog)/, ''))",
+					"    // }",
 					"    const definedJwtAuthDelegate = pm.environment.get('pmClientName')",
 					"    if (definedJwtAuthDelegate) {",
 					"        if (definedJwtAuthDelegate != JWT_AUTH_DELEGATE_DEFAULT) {",
@@ -9159,7 +9590,7 @@
 					"        for (const cookie in res['Set-Cookie']) {",
 					"            log.d(here, 'cookie', cookie)",
 					"            if (cookie.startsWith(cookieName + '='))",
-					"                return cookie.slice(cookieName.length() + 1)",
+					"                return cookie.slice(cookieName.length + 1)",
 					"        }",
 					"        return 'OK'",
 					"    },",
@@ -9298,6 +9729,7 @@
 			"script": {
 				"type": "text/javascript",
 				"packages": {},
+				"requests": {},
 				"exec": [
 					""
 				]
@@ -9307,8 +9739,7 @@
 	"variable": [
 		{
 			"key": "stamp",
-			"value": "catalog-tests",
-			"type": "string"
+			"value": "catalog-tests"
 		},
 		{
 			"key": "dateUpdate",
@@ -9339,271 +9770,7 @@
 			"value": ""
 		},
 		{
-			"key": "keywords",
-			"value": ""
-		},
-		{
-			"key": "themes",
-			"value": ""
-		},
-		{
-			"key": "sanityLicence",
-			"value": ""
-		},
-		{
-			"key": "licences",
-			"value": ""
-		},
-		{
-			"key": "softMetaGmdXml1LocalId",
-			"value": ""
-		},
-		{
-			"key": "softOrgGmdXml1Name",
-			"value": ""
-		},
-		{
-			"key": "softMediaGmdXml1Id",
-			"value": ""
-		},
-		{
-			"key": "softMediaGmdXml2Id",
-			"value": ""
-		},
-		{
-			"key": "softMediaGmdXml3Id",
-			"value": ""
-		},
-		{
-			"key": "softOrgGmdXml1NewName",
-			"value": ""
-		},
-		{
-			"key": "softContactGmdXml1NewName",
-			"value": ""
-		},
-		{
-			"key": "softContactGmdXml1NewEmail",
-			"value": ""
-		},
-		{
-			"key": "softOrgGmdXml1Id",
-			"value": ""
-		},
-		{
-			"key": "softOrg1Name",
-			"value": ""
-		},
-		{
-			"key": "softOrgGmdXml2Name",
-			"value": ""
-		},
-		{
-			"key": "softOrgGmdXml2Id",
-			"value": ""
-		},
-		{
-			"key": "gitHash",
-			"value": ""
-		},
-		{
-			"key": "apiVersion",
-			"value": ""
-		},
-		{
-			"key": "rudiData",
-			"value": ""
-		},
-		{
-			"key": "softOrg1Id",
-			"value": ""
-		},
-		{
-			"key": "softOrg1Address",
-			"value": ""
-		},
-		{
-			"key": "softOrg2Id",
-			"value": ""
-		},
-		{
-			"key": "softOrg2Name",
-			"value": ""
-		},
-		{
-			"key": "softOrg2Address",
-			"value": ""
-		},
-		{
-			"key": "softContact1Id",
-			"value": ""
-		},
-		{
-			"key": "softContact1Name",
-			"value": ""
-		},
-		{
-			"key": "softContact1Email",
-			"value": ""
-		},
-		{
-			"key": "softContact2Id",
-			"value": ""
-		},
-		{
-			"key": "softContact2Name",
-			"value": ""
-		},
-		{
-			"key": "softContact2Email",
-			"value": ""
-		},
-		{
-			"key": "softContact3Id",
-			"value": ""
-		},
-		{
-			"key": "softContact3Name",
-			"value": ""
-		},
-		{
-			"key": "softContact3Email",
-			"value": ""
-		},
-		{
-			"key": "media2",
-			"value": ""
-		},
-		{
-			"key": "media1",
-			"value": ""
-		},
-		{
-			"key": "media1Id",
-			"value": ""
-		},
-		{
-			"key": "now",
-			"value": ""
-		},
-		{
-			"key": "softMeta1Id",
-			"value": ""
-		},
-		{
-			"key": "softMedia1Id",
-			"value": ""
-		},
-		{
-			"key": "randomTheme",
-			"value": ""
-		},
-		{
-			"key": "randomKeyword1",
-			"value": ""
-		},
-		{
-			"key": "randomKeyword2",
-			"value": ""
-		},
-		{
-			"key": "softLicence",
-			"value": ""
-		},
-		{
-			"key": "randomOrgId",
-			"value": ""
-		},
-		{
-			"key": "randomContact1",
-			"value": ""
-		},
-		{
-			"key": "randomContact2",
-			"value": ""
-		},
-		{
-			"key": "randomTitle",
-			"value": ""
-		},
-		{
-			"key": "randomSynopsis",
-			"value": ""
-		},
-		{
-			"key": "randomSummary",
-			"value": ""
-		},
-		{
-			"key": "softMeta2Id",
-			"value": ""
-		},
-		{
-			"key": "mediaId2",
-			"value": ""
-		},
-		{
-			"key": "softMedia2Id",
-			"value": ""
-		},
-		{
-			"key": "softMedia11Id",
-			"value": ""
-		},
-		{
-			"key": "countWithOrg1",
-			"value": ""
-		},
-		{
-			"key": "countWithOrg1pub",
-			"value": ""
-		},
-		{
-			"key": "softMeta4Id",
-			"value": ""
-		},
-		{
-			"key": "softMedia4Id",
-			"value": ""
-		},
-		{
-			"key": "softContactGmdXml1Id",
-			"value": ""
-		},
-		{
-			"key": "softContactGmdXml1Name",
-			"value": ""
-		},
-		{
-			"key": "softContactGmdXml1Email",
-			"value": ""
-		},
-		{
-			"key": "softMetaGmdXml1Id",
-			"value": ""
-		},
-		{
-			"key": "softMediaGmdXml4Id",
-			"value": ""
-		},
-		{
-			"key": "softMeta3LocalId",
-			"value": ""
-		},
-		{
-			"key": "softMetaGmdXml4LocalId",
-			"value": ""
-		},
-		{
-			"key": "softReport1Id",
-			"value": ""
-		},
-		{
-			"key": "dateReport",
-			"value": ""
-		},
-		{
-			"key": "portalJwt-_Dev-Local",
+			"key": "portalUrl",
 			"value": ""
 		}
 	]
