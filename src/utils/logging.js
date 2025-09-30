@@ -94,11 +94,7 @@ const Colors = {
 // -------------------------------------------------------------------------------------------------
 export const logLine = (logLevel, srcMod, srcFun, msg, shouldAddLogEntry = true) => {
   try {
-    if (
-      typeof msg != 'string' &&
-      (`${msg}` === '[Object]: Object' || `${msg}` === '[object Object]')
-    )
-      msg = JSON.stringify(msg)
+    msg = beautify(msg)
     if (SHOULD_LOG_CONSOLE)
       wLogger.log({ level: logLevel, message: displayStr(srcMod, srcFun, msg) })
     // console.log(displayStr(srcMod, srcFun, msg))
