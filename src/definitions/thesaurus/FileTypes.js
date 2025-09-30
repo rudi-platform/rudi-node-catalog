@@ -17,11 +17,12 @@ import { parameterExpected } from '../../utils/msg.js'
 export const MIME_YAML = 'text/x-yaml'
 export const MIME_YAML_ALT = 'application/x-yaml'
 export const MIME_MARKDOWN = 'text/markdown'
-export const ALT_MIME_MARKDOWN = 'text/x-markdown'
+export const MIME_MARKDOWN_ALT = 'text/x-markdown'
 
 export const FileTypes = [
   'application/epub+zip', // (.epub)
   'application/geo+json', // (.geojson)
+  'application/geopackage+sqlite3', // (.gpkg)
   'application/graphql',
   'application/gzip', // (.gz, .gzip, .tar.gz, .tgz)
   'application/javascript',
@@ -47,7 +48,7 @@ export const FileTypes = [
   'application/x-tar', //(.tar)
   'application/x-www-form-urlencoded',
   'application/xml', // (.xml)
-  MIME_YAML, // (.yaml, .yml)
+  'text/x-yaml', // (.yaml, .yml)
   'application/zip', // (.zip)
   'application/zstd', // (.zst)
   'audio/aac', // (.aac)
@@ -72,8 +73,7 @@ export const FileTypes = [
   'text/css', // (.css)
   'text/csv', // (.csv)
   'text/html', // (.htm, .html)
-  MIME_MARKDOWN, // (.md)
-  ALT_MIME_MARKDOWN, // (.md)
+  'text/markdown', // (.md)
   'text/php', // (.php)
   'text/plain', // (.txt)
   'text/xml', // (.xml)
@@ -88,7 +88,7 @@ export const FileTypes = [
   'video/x-msvideo', // (.avi)
 ]
 
-const FileTypesAndEncrypted = FileTypes
+const FileTypesAndEncrypted = Array.from(FileTypes)
 FileTypes.forEach((mime) => FileTypesAndEncrypted.push(`${mime}+crypt`))
 
 export const Extensions = {
@@ -110,6 +110,7 @@ export const Extensions = {
   exe: 'application/x-executable',
   flif: 'image/flif',
   geojson: 'application/geo+json',
+  gpkg: 'application/geopackage+sqlite3',
   gif: 'image/gif',
   gz: 'application/gzip',
   gzip: 'application/gzip',
@@ -122,7 +123,7 @@ export const Extensions = {
   json: 'application/json',
   jsonld: 'application/ld+json',
   m4a: 'audio/m4a',
-  md: MIME_MARKDOWN,
+  md: 'text/markdown',
   mkv: 'video/x-matroska',
   mng: 'image/x-mng',
   mov: 'video/quicktime',
@@ -160,8 +161,8 @@ export const Extensions = {
   xls: 'application/vnd.ms-excel',
   xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   xml: 'text/xml',
-  yaml: MIME_YAML,
-  yml: MIME_YAML,
+  yaml: 'text/x-yaml',
+  yml: 'text/x-yaml',
   zip: 'application/zip',
   zst: 'application/zstd',
 }

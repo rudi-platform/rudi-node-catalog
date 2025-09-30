@@ -385,15 +385,23 @@ export const verifyPortalTokenSign = async (jwt) => {
     const { header } = tokenStringToJwtObject(jwt)
     keyId = header?.kid
     if (!keyId) {
-      logW(mod, fun, `Cannot verify JWT sign! Unexpected portal JWT headers: ${beautify(header)}`)
+      logW(
+        mod,
+        fun,
+        `Cannot verify JWT sign! Unexpected portal JWT headers: ${beautify(header)} in jwt ${jwt}`
+      )
       return false
     }
     logT(mod, fun, `JWT signed with key ID: ${keyId}`)
 
     const portalPubKey = await getPortalJwtPubKey(keyId)
-    if (portalPubKey) logV(mod, fun, `portalPubKey: ${beautify(portalPubKey)}`)
+    if (portalPubKey) logV(mod, fun, `portalPubKey: ${!!portalPubKey}`)
     else {
-      logW(mod, fun, `Cannot verify JWT sign! No portal JWT sign pub key found for ID ${keyId}`)
+      logW(
+        mod,
+        fun,
+        `Cannot verify JWT sign! No portal JWT sign pub key found for ID ${keyId} in jwt ${jwt}`
+      )
       return false
     }
     const { payload } = verifyToken(portalPubKey, jwt)
@@ -532,7 +540,15 @@ const isMetadataSendableToPortal = async (metadataId) => {
     // if( metadata[API_RESTRICTED_ACCESS]&&metadata[API_MEDIA_PROPERTY][0][API_MEDIA_CONNECTOR]
 
     //--- Ensuring we respect the format the Portal accepts
-    const portalReadyMetadata = dbMetadata.toRudiPortalJSON()
+    let portalReadyMetadata
+    try {
+      portalReadyMetadata = dbMetadata.toRudiPortalJSON()
+    } catch (e) {
+      logE(mod, `${fun}.portalReadyMetadata`, e)
+      dbMetadata[API_STATUS_PROPERTY] = MetadataStatus.Refused
+      await dbMetadata.save()
+      throw e
+    }
 
     //--- Updating the DB metadata status
     setMetadataStatusToSent(dbMetadata)

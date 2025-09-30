@@ -147,6 +147,8 @@ export class RudiError extends Error {
           return new NotAcceptableError(message, ctxMod, ctxFun)
         case 501:
           return new NotImplementedError(message, ctxMod, ctxFun)
+        case 504:
+          return new GatewayTimeoutError(message, ctxMod, ctxFun)
         case 500:
         default:
           return new InternalServerError(message, ctxMod, ctxFun)
@@ -199,7 +201,7 @@ export class RudiError extends Error {
       // logD(mod, fun, `B) ${error} -> ${beautify(transmittedError)}`)
       return transmittedError
     } catch (err) {
-      logW(mod, fun, err)
+      logW(mod, fun, beautify(err))
       throw err
     }
   }
@@ -416,6 +418,20 @@ export class InternalServerError extends RudiError {
       500,
       'Internal Server Error',
       'Internal Server Error',
+      undefined,
+      ctxMod,
+      ctxFun
+    )
+  }
+}
+
+export class GatewayTimeoutError extends RudiError {
+  constructor(errMessage, ctxMod, ctxFun) {
+    super(
+      errMessage,
+      504,
+      'Gateway Timeout',
+      'Cannot reach a secondary server',
       undefined,
       ctxMod,
       ctxFun

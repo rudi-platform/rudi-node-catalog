@@ -4,6 +4,7 @@ const mod = 'http'
 // External dependencies
 // -------------------------------------------------------------------------------------------------
 import axios from 'axios'
+import { randomUUID } from 'crypto'
 
 // -------------------------------------------------------------------------------------------------
 // Debug axios
@@ -20,7 +21,7 @@ import { USER_AGENT } from '../config/constApi.js'
 import { beautify, isNotEmptyArray } from './jsUtils.js'
 // import { getEnvironment } from '../controllers/sysController.js'
 import { BadRequestError, RudiError } from './errors.js'
-import { logD, logT } from './logging.js'
+import { logD, logI, logT, logW } from './logging.js'
 
 // -------------------------------------------------------------------------------------------------
 // Functions: header treatments
@@ -60,20 +61,22 @@ export const getUrlParameters = (reqUrl) => {
 // -------------------------------------------------------------------------------------------------
 // Functions: http requests
 // -------------------------------------------------------------------------------------------------
+const HEADERS = {
+  'User-Agent': USER_AGENT,
+  'Content-Type': 'application/json',
+}
+const getHeaders = (jwt) => ({
+  headers: {
+    ...HEADERS,
+    ...(jwt ? { Authorization: `Bearer ${jwt}` } : {}),
+  },
+})
 
 export const httpGet = async (destUrl, authorizationToken) => {
   const fun = 'httpGet'
   logT(mod, fun)
   try {
-    const reqOpts = {
-      headers: {
-        'User-Agent': USER_AGENT,
-        'Content-Type': 'application/json',
-      },
-    }
-    if (authorizationToken) reqOpts.headers.Authorization = `Bearer ${authorizationToken}`
-
-    const answer = await directGet(destUrl, reqOpts)
+    const answer = await directGet(destUrl, getHeaders(authorizationToken))
     // logD(mod, fun, `answer: ${beautify(answer.data)}`)
     return answer.data
   } catch (err) {
@@ -85,16 +88,7 @@ export const httpDelete = async (destUrl, authorizationToken) => {
   const fun = 'httpDelete'
   try {
     logT(mod, fun)
-
-    const reqOpts = {
-      headers: {
-        'User-Agent': USER_AGENT,
-        'Content-Type': 'application/json',
-      },
-    }
-    if (authorizationToken) reqOpts.headers.Authorization = `Bearer ${authorizationToken}`
-
-    const answer = await axios.delete(destUrl, reqOpts)
+    const answer = await axios.delete(destUrl, getHeaders(authorizationToken))
     logD(mod, fun, `answer: ${beautify(answer.data)}`)
     return answer.data
   } catch (err) {
@@ -118,15 +112,7 @@ export const httpPost = async (destUrl, dataToSend, authorizationToken) => {
   const fun = 'httpPost'
   try {
     logT(mod, fun)
-    const reqOpts = {
-      headers: {
-        'User-Agent': USER_AGENT,
-        'Content-Type': 'application/json',
-      },
-    }
-    if (authorizationToken) reqOpts.headers.Authorization = `Bearer ${authorizationToken}`
-
-    const answer = await directPost(destUrl, dataToSend, reqOpts)
+    const answer = await directPost(destUrl, dataToSend, getHeaders(authorizationToken))
 
     logD(mod, fun, `answer: ${beautify(answer.data)}`)
     return answer.data
@@ -139,63 +125,104 @@ export const httpPut = async (destUrl, dataToSend, authorizationToken) => {
   const fun = 'httpPut'
   try {
     logT(mod, fun)
-    const reqOpts = {
-      headers: {
-        'User-Agent': USER_AGENT,
-        'Content-Type': 'application/json',
-      },
-    }
-    if (authorizationToken) reqOpts.headers.Authorization = `Bearer ${authorizationToken}`
-
-    const answer = await directPut(destUrl, dataToSend, reqOpts)
-
+    const answer = await directPut(destUrl, dataToSend, getHeaders(authorizationToken))
     logD(mod, fun, `answer: ${beautify(answer.data)}`)
     return answer.data
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
 }
+const REQ_TIMEOUT_MS = 1000
+const MAX_RETRIES = 5
+const INITIAL_DELAY_MS = 100
 
-export const directGet = async (destUrl, reqOpts) => {
-  const fun = 'directGet'
-  try {
-    logT(mod, fun)
+/**
+ * Generic Axios request with retry and exponential backoff
+ * Only handles retries, backoff, and timeout scaling.
+ */
+const axiosWithRetry = async (
+  axiosConf,
+  reqTimeout = REQ_TIMEOUT_MS,
+  retries = MAX_RETRIES,
+  delay = INITIAL_DELAY_MS,
+  idempotencyKey
+) => {
+  const fun = 'axiosWithRetry'
 
-    const answer = await axios.get(destUrl, reqOpts)
+  const headers = {
+    ...axiosConf.headers,
+    ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
+  }
 
-    // logHttpAnswer(mod, fun, answer)
-    return answer
-  } catch (err) {
-    throw RudiError.treatCommunicationError(mod, fun, err)
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const attemptTimeout = (Number(reqTimeout) || REQ_TIMEOUT_MS) * (attempt + 1)
+
+    // Exponential backoff with jitter
+    const baseBackoff = (Number(delay) || INITIAL_DELAY_MS) * 2 ** attempt
+    const jitter = Math.floor(Math.random() * baseBackoff * 0.5) // 0–50% random jitter
+    const backoff = baseBackoff + jitter
+
+    logI(
+      mod,
+      fun,
+      `Attempt ${attempt + 1} for ${axiosConf.method?.toUpperCase()} ${axiosConf.url}` +
+        ` (timeout: ${(attemptTimeout / 1000).toFixed(2)}s, backoff: ${backoff}ms, idempotency: ${idempotencyKey || 'N/A'})`
+    )
+
+    try {
+      return await axios({ ...axiosConf, timeout: attemptTimeout, headers })
+    } catch (err) {
+      const status = err.response?.status
+      const shouldRetry = err.code === 'ECONNABORTED' || (status && status >= 500)
+
+      if (!shouldRetry || attempt === retries) throw err
+
+      logI(
+        mod,
+        fun,
+        `Request to ${axiosConf.url} failed${status ? ` with status: ${status}` : ''}. Retrying in ${(backoff / 1000).toFixed(2)}s...`
+      )
+      await new Promise((res) => setTimeout(res, backoff))
+    }
   }
 }
 
-export const directPost = async (destUrl, dataToSend, reqOpts) => {
-  const fun = 'directPost'
+/**
+ * Minimal wrapper for GET, POST, PUT
+ * reqOpts can contain:
+ *   - timeout
+ *   - retries
+ *   - delay
+ *   - idempotencyKey
+ *   - any other Axios options (headers, params, etc.)
+ */
+const httpRequest = async (method, url, data = null, reqOpts = {}) => {
+  const fun = `direct${method.charAt(0).toUpperCase() + method.slice(1)}`
   logT(mod, fun)
 
+  const {
+    timeout = REQ_TIMEOUT_MS,
+    retries = MAX_RETRIES,
+    delay = INITIAL_DELAY_MS,
+    idempotencyKey = ['post', 'put', 'patch'].includes(method.toLowerCase())
+      ? randomUUID()
+      : undefined,
+    ...axiosOptions
+  } = reqOpts
+
   try {
-    const answer = await axios.post(destUrl, dataToSend, reqOpts)
-    // logHttpAnswer(mod, fun, answer)
-    return answer
+    const axiosConfig = { method, url, data, ...axiosOptions }
+    return await axiosWithRetry(axiosConfig, timeout, retries, delay, idempotencyKey)
   } catch (err) {
-    // logW(mod, fun, beautify(err) || err)
+    logW(mod, fun, `ERR on ${method} ${url}`)
     throw RudiError.treatCommunicationError(mod, fun, err)
   }
 }
 
-export const directPut = async (destUrl, dataToSend, reqOpts) => {
-  const fun = 'directPut'
-  logT(mod, fun)
-  try {
-    const answer = await axios.put(destUrl, dataToSend, reqOpts)
-    // logHttpAnswer(mod, fun, answer)
-    return answer
-  } catch (err) {
-    // logW(mod, fun, beautify(err) || err)
-    throw RudiError.treatCommunicationError(mod, fun, err)
-  }
-}
+// Minimal exported functions
+export const directGet = (url, reqOpts) => httpRequest('get', url, null, reqOpts)
+export const directPost = (url, data, reqOpts) => httpRequest('post', url, data, reqOpts)
+export const directPut = (url, data, reqOpts) => httpRequest('put', url, data, reqOpts)
 
 // -------------------------------------------------------------------------------------------------
 // IP Redirections display

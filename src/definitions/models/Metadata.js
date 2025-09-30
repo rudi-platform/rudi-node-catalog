@@ -84,7 +84,13 @@ import {
 } from '../../db/dbFields.js'
 
 import { Latitude, Longitude } from '../schemas/GpsCoordinates.js'
-import { get as getFileTypes, MIME_YAML, MIME_YAML_ALT } from '../thesaurus/FileTypes.js'
+import {
+  get as getFileTypes,
+  MIME_MARKDOWN,
+  MIME_MARKDOWN_ALT,
+  MIME_YAML,
+  MIME_YAML_ALT,
+} from '../thesaurus/FileTypes.js'
 
 // -------------------------------------------------------------------------------------------------
 // Validators
@@ -100,7 +106,7 @@ const validArrayNotNull = {
 // -------------------------------------------------------------------------------------------------
 import { beautify, isNotEmptyArray, isNothing, multiSplit } from '../../utils/jsUtils.js'
 
-import { logD, logE, logT, logV } from '../../utils/logging.js'
+import { logD, logE, logT, logV, logW } from '../../utils/logging.js'
 
 import { makeSearchable } from '../../db/dbActions.js'
 import { BadRequestError, NotFoundError, RudiError } from '../../utils/errors.js'
@@ -617,6 +623,10 @@ async function checkFileTypes(metadata) {
         media[API_FILE_MIME] = MIME_YAML + encrypted
         return true
       }
+      if (mimeType === MIME_MARKDOWN_ALT) {
+        media[API_FILE_MIME] = MIME_MARKDOWN + encrypted
+        return true
+      }
       const fileTypes = getFileTypes()
       // logT(mod, fun + ' fileTypes', beautify(fileTypes))
       if (fileTypes.indexOf(mimeType) == -1)
@@ -779,11 +789,7 @@ export const toRudiPortalJSON = (metadata) => {
 
     //--- Removing media fields that are node specific
     portalReadyMetadata[API_MEDIA_PROPERTY].forEach((media) => {
-      delete media[API_FILE_STORAGE_STATUS]
-      delete media[API_FILE_STATUS_UPDATE]
       if (media[API_MEDIA_TYPE] == MediaTypes.File) {
-        // if (media[API_FILE_MIME] == MIME_MARKDOWN || media[API_FILE_MIME] == ALT_MIME_MARKDOWN)
-        //   media[API_FILE_MIME] = 'text/plain'
         if (!isMimeTypePortalCompatible(media)) {
           throw new BadRequestError(
             `This MIME type is not accepted by the RUDI portal: '${media[API_FILE_MIME]}' (file ${media[API_MEDIA_ID]} in metadata ${metadata[API_METADATA_ID]})`
@@ -792,6 +798,8 @@ export const toRudiPortalJSON = (metadata) => {
       } else {
         if (media[API_FILE_MIME]) delete media[API_FILE_MIME]
       }
+      delete media[API_FILE_STORAGE_STATUS]
+      delete media[API_FILE_STATUS_UPDATE]
       // delete media[API_MEDIA_THUMBNAIL]
       // delete media[API_MEDIA_SATELLITES]
     })
@@ -812,6 +820,7 @@ export const toRudiPortalJSON = (metadata) => {
     }
     return portalReadyMetadata
   } catch (err) {
+    logW(mod, fun, err)
     throw RudiError.treatError(mod, fun, err)
   }
 }

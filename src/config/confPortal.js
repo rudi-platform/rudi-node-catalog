@@ -1,6 +1,6 @@
 const mod = 'confPortal'
 
-import { MIME_MARKDOWN } from '../definitions/thesaurus/FileTypes.js'
+import { Extensions } from '../definitions/thesaurus/FileTypes.js'
 import { readIniFile } from '../utils/fileActions.js'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
@@ -43,7 +43,7 @@ const PORTAL_DEFT_CONF_FILE = `${INI_DIR}/portal_conf_default.ini`
 if (!portalConfUserFile) {
   consoleErr(
     mod,
-    'Extract portal conf file path',
+    'readUsrConf',
     'No path has been given for this conf file, check your configuration!' +
       ` Now loading file from path '${PORTAL_CUSTOM_CONF_FILE}'`
   )
@@ -166,6 +166,11 @@ if (isPortalConnectionDisabled()) {
   logD(mod, '', NO_PORTAL_MSG)
 } else {
   logD(mod, '', `Portal - Data: '${API_PORTAL_URL}'`)
+
+  logD(mod, '', `jwt_get: '${AUTH_GET}'`)
+  logD(mod, '', `jwt_chk: '${AUTH_CHK}'`)
+  logD(mod, '', `jwt_pub: '${JWT_PUB_KEY_URL}'`)
+  logD(mod, '', `enc_pub: '${CRYPT_PUB_KEY_URL}'`)
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -205,11 +210,12 @@ export const PORTAL_MIMES = [
   'text/css',
   'text/csv',
   'text/html',
-  MIME_MARKDOWN,
+  'text/markdown',
   'text/php',
   'text/plain',
   'text/x-yaml',
   'text/xml',
+  'application/geo+json+crypt',
   'application/graphql+crypt',
   'application/javascript+crypt',
   'application/json+crypt',
@@ -242,11 +248,18 @@ export const PORTAL_MIMES = [
   'text/css+crypt',
   'text/csv+crypt',
   'text/html+crypt',
-  `${MIME_MARKDOWN}+crypt`,
+  'text/markdown+crypt',
   'text/php+crypt',
   'text/plain+crypt',
   'text/x-yaml+crypt',
   'text/xml+crypt',
 ]
+export const isPortalMime = (mimeType) => PORTAL_MIMES.includes(mimeType)
 
-export const isPortalMime = (mimeType) => PORTAL_MIMES.indexOf(mimeType) > -1
+const PORTAL_EXTENSIONS = {}
+for (const [ext, mime] of Object.entries(Extensions)) {
+  if (PORTAL_MIMES.includes(mime)) PORTAL_EXTENSIONS[ext] = mime
+}
+
+export const getPortalMimes = () => PORTAL_MIMES
+export const getPortalExtensions = () => PORTAL_EXTENSIONS

@@ -80,7 +80,7 @@ const SERVER_SECTION = 'server'
 const APP_NAME = getConf(SERVER_SECTION, 'app_name')
 const LISTENING_ADDR = removeTrailingSlash(getConf(SERVER_SECTION, 'listening_address'))
 const LISTENING_PORT = getCliEnvOpt(OPT_PORT) ?? getConf(SERVER_SECTION, 'listening_port')
-const CATALOG_PREFIX = removeTrailingSlash(getConf(SERVER_SECTION, 'server_prefix') ?? 'api')
+export const CATALOG_PREFIX = removeTrailingSlash(getConf(SERVER_SECTION, 'server_prefix') ?? 'api')
 
 export const getCatalog = (...url) => pathJoin('', CATALOG_PREFIX, ...url)
 export const getPrivatePath = (...url) => getCatalog('admin', ...url)
