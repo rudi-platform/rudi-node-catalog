@@ -34,7 +34,7 @@ import {
 // -------------------------------------------------------------------------------------------------
 import { JWT_EXP, REQ_MTD } from '../config/constJwt.js'
 import { beautify, dateEpochSToIso, nowISO, sleepMs, timeEpochS } from '../utils/jsUtils.js'
-import { logD, logE, logI, logT, logV, logW } from '../utils/logging.js'
+import { addLogEntry, logD, logE, logI, logT, logV, logW } from '../utils/logging.js'
 
 import {
   FIELD_TOKEN,
@@ -283,6 +283,11 @@ const getNewTokenFromPortal = async () => {
 
     const [basicAuthHeaders, portalRequestBody] = getPortalAuthCredentials()
     const portalAuthUrl = getUrlPortalAuthGet()
+    await Promise.all([
+      addLogEntry('T', 'portalJwt', 'head', beautify(basicAuthHeaders)),
+      addLogEntry('T', 'portalJwt', 'body', portalRequestBody),
+      addLogEntry('T', 'portalJwt', 'url', portalAuthUrl),
+    ])
     let portalAnswer
     try {
       portalAnswer = await directPost(portalAuthUrl, portalRequestBody, basicAuthHeaders)
