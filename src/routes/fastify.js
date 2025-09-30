@@ -56,15 +56,7 @@ import { createIpsMsg } from '../utils/httpReq.js'
 import { getRestApi, onPrivateRoute } from './routes_secu.js'
 
 // const fastifyLogger = new FFLogger('warn')
-const catalogApp = fastify({
-  // logger: fastifyLogger,
-  // logger: initFFLogger(),
-  // logger: {
-  //    level: 'warn',
-  //    file: sys.OUT_LOG,
-  // },
-  ignoreTrailingSlash: true,
-})
+const catalogApp = fastify({ routerOptions: { ignoreTrailingSlash: true } })
 
 // -------------------------------------------------------------------------------------------------
 // Constants

@@ -205,13 +205,14 @@ export const publicRoutes = [
       reply.code(308).redirect(getPublicPath(OBJ_METADATA))
     },
   },
+
   {
-    description: `Redirection: GET /${OBJ_METADATA}/* -> GET ${getPublicPath(OBJ_METADATA)}/*`,
+    description: `Redirection: GET ${getCatalog(OBJ_METADATA, '*')} -> GET ${getPublicPath(OBJ_METADATA)}/*`,
     method: 'GET',
-    url: `/${OBJ_METADATA}/*`,
+    url: getCatalog(OBJ_METADATA, '*'),
     config: { [ROUTE_NAME]: 'redirect_get_data' },
     handler: function (req, reply) {
-      const newRoute = getPublicPath(req.url)
+      const newRoute = req.url.replace(getCatalog(), getPublicPath())
       logD(mod, `redirect`, `${req.method} ${newRoute}`)
       reply.code(308).redirect(newRoute)
     },
@@ -224,6 +225,13 @@ export const publicRoutes = [
     description: 'Get current API version',
     method: 'GET',
     url: getCatalog('version'),
+    handler: getApiVersion,
+    config: { [ROUTE_NAME]: 'pub_get_api_version' },
+  },
+  {
+    description: 'Get current API version',
+    method: 'GET',
+    url: getPublicPath('version'),
     handler: getApiVersion,
     config: { [ROUTE_NAME]: 'pub_get_api_version' },
   },
@@ -384,6 +392,17 @@ export const portalRoutes = [
     config: { [ROUTE_NAME]: 'redirect_put_plus' },
     handler: (req, reply) => {
       const newRoute = getPublicPath(req.url)
+      logD(mod, `redirect`, `${req.method} ${newRoute}`)
+      reply.code(308).redirect(newRoute)
+    },
+  },
+  {
+    description: `Redirection: PUT ${getCatalog(OBJ_METADATA, '*')} -> GET ${getPublicPath(OBJ_METADATA)}/*`,
+    method: 'PUT',
+    url: getCatalog(OBJ_METADATA, '*'),
+    config: { [ROUTE_NAME]: 'redirect_put_data' },
+    handler: function (req, reply) {
+      const newRoute = req.url.replace(getCatalog(), getPublicPath())
       logD(mod, `redirect`, `${req.method} ${newRoute}`)
       reply.code(308).redirect(newRoute)
     },
