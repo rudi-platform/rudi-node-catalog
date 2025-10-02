@@ -329,12 +329,12 @@ if (getCatalog() !== getLegacyApiPath()) {
   // Deal with the legacy
   for (const method of ['DELETE', 'POST', 'PUT', 'GET'])
     publicRoutes.unshift({
-      description: `Redirection: ${method} /api -> ${method} ${getCatalog()}`,
+      description: `Redirection: ${method} ${getLegacyApiPath('*')} -> ${method} ${getCatalog()}`,
       method,
-      url: '/api/*',
+      url: getLegacyApiPath('*'),
       config: { [ROUTE_NAME]: `redirect_${method.toLowerCase()}_data` },
       handler: function (req, reply) {
-        const newRoute = req.url.replace('/api', getCatalog())
+        const newRoute = req.url.replace(getLegacyApiPath(), getCatalog())
         logD(mod, `redirect`, `${req.method} ${req.url}`)
         reply.code(308).redirect(newRoute)
       },
