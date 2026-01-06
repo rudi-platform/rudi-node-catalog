@@ -29,6 +29,7 @@ export const FileTypes = [
   'application/json', // (.json)
   'application/ld+json', // (.jsonld)
   'application/msword', // (.doc)
+  'application/netcdf', // (.nc, .cdf)
   'application/octet-stream', // (.bin)
   'application/pdf', // (.pdf)
   'application/sql', // (.sql)
@@ -48,7 +49,6 @@ export const FileTypes = [
   'application/x-tar', //(.tar)
   'application/x-www-form-urlencoded',
   'application/xml', // (.xml)
-  'text/x-yaml', // (.yaml, .yml)
   'application/zip', // (.zip)
   'application/zstd', // (.zst)
   'audio/aac', // (.aac)
@@ -76,6 +76,7 @@ export const FileTypes = [
   'text/markdown', // (.md)
   'text/php', // (.php)
   'text/plain', // (.txt)
+  'text/x-yaml', // (.yaml, .yml)
   'text/xml', // (.xml)
   'video/3gpp', // (.3gp, .3gpp)
   'video/mp4', // (.mp4)
@@ -102,6 +103,7 @@ export const Extensions = {
   bmp: 'image/bmp',
   bz: 'application/x-bzip',
   bz2: 'application/x-bzip2',
+  cdf: 'application/netcdf',
   css: 'text/css',
   csv: 'text/csv',
   doc: 'application/msword',
@@ -110,8 +112,8 @@ export const Extensions = {
   exe: 'application/x-executable',
   flif: 'image/flif',
   geojson: 'application/geo+json',
-  gpkg: 'application/geopackage+sqlite3',
   gif: 'image/gif',
+  gpkg: 'application/geopackage+sqlite3',
   gz: 'application/gzip',
   gzip: 'application/gzip',
   htm: 'text/html',
@@ -131,6 +133,7 @@ export const Extensions = {
   mp4: 'video/mp4',
   mpeg: 'video/mpeg',
   mpg: 'video/mpeg',
+  nc: 'application/netcdf',
   odp: 'application/vnd.oasis.opendocument.presentation',
   ods: 'application/vnd.oasis.opendocument.spreadsheet',
   odt: 'application/vnd.oasis.opendocument.text',

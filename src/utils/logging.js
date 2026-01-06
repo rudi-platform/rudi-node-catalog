@@ -92,7 +92,7 @@ const Colors = {
 // -------------------------------------------------------------------------------------------------
 // Logging functions
 // -------------------------------------------------------------------------------------------------
-export const logLine = (logLevel, srcMod, srcFun, msg, shouldAddLogEntry = true) => {
+export const logLine = (logLevel, srcMod, srcFun, msg = '<-', shouldAddLogEntry = true) => {
   try {
     msg = beautify(msg)
     if (SHOULD_LOG_CONSOLE)
