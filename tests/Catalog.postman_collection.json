@@ -1502,6 +1502,43 @@
 					"response": []
 				},
 				{
+					"name": "Get update frequencies",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Keywords received\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200)",
+									"    const res = pm.response.json()",
+									"    pm.expect(res[\"asNeeded\"]==\"Les données sont mises à jour si nécessaire\").to.be.true",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{catalogUrl}}/admin/enum/updatefrequencies/fr",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"enum",
+								"updatefrequencies",
+								"fr"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get themes",
 					"event": [
 						{
@@ -9898,6 +9935,10 @@
 			"value": ""
 		},
 		{
+			"key": "portalJwt-_Dev-Local",
+			"value": ""
+		},
+		{
 			"key": "gitHash",
 			"value": ""
 		},
@@ -9907,6 +9948,22 @@
 		},
 		{
 			"key": "rudiData",
+			"value": ""
+		},
+		{
+			"key": "keywords",
+			"value": ""
+		},
+		{
+			"key": "themes",
+			"value": ""
+		},
+		{
+			"key": "sanityLicence",
+			"value": ""
+		},
+		{
+			"key": "licences",
 			"value": ""
 		},
 		{
@@ -9982,23 +10039,175 @@
 			"value": ""
 		},
 		{
-			"key": "mediaId1",
+			"key": "randomTheme",
 			"value": ""
 		},
 		{
-			"key": "keywords",
+			"key": "randomKeyword1",
 			"value": ""
 		},
 		{
-			"key": "themes",
+			"key": "randomKeyword2",
 			"value": ""
 		},
 		{
-			"key": "sanityLicence",
+			"key": "softLicence",
 			"value": ""
 		},
 		{
-			"key": "licences",
+			"key": "randomOrgId",
+			"value": ""
+		},
+		{
+			"key": "randomContact1",
+			"value": ""
+		},
+		{
+			"key": "randomContact2",
+			"value": ""
+		},
+		{
+			"key": "randomTitle",
+			"value": ""
+		},
+		{
+			"key": "randomSynopsis",
+			"value": ""
+		},
+		{
+			"key": "randomSummary",
+			"value": ""
+		},
+		{
+			"key": "softMeta2Id",
+			"value": ""
+		},
+		{
+			"key": "mediaId2",
+			"value": ""
+		},
+		{
+			"key": "softMedia2Id",
+			"value": ""
+		},
+		{
+			"key": "softMedia11Id",
+			"value": ""
+		},
+		{
+			"key": "countWithOrg1",
+			"value": ""
+		},
+		{
+			"key": "countWithOrg1pub",
+			"value": ""
+		},
+		{
+			"key": "softMeta4Id",
+			"value": ""
+		},
+		{
+			"key": "softMedia4Id",
+			"value": ""
+		},
+		{
+			"key": "softOrgGmdXml1Id",
+			"value": ""
+		},
+		{
+			"key": "softOrgGmdXml1Name",
+			"value": ""
+		},
+		{
+			"key": "softOrgGmdXml1NewName",
+			"value": ""
+		},
+		{
+			"key": "softOrgGmdXml2Name",
+			"value": ""
+		},
+		{
+			"key": "softOrgGmdXml2Id",
+			"value": ""
+		},
+		{
+			"key": "softContactGmdXml1Id",
+			"value": ""
+		},
+		{
+			"key": "softContactGmdXml1Name",
+			"value": ""
+		},
+		{
+			"key": "softContactGmdXml1Email",
+			"value": ""
+		},
+		{
+			"key": "softContactGmdXml1NewName",
+			"value": ""
+		},
+		{
+			"key": "softContactGmdXml1NewEmail",
+			"value": ""
+		},
+		{
+			"key": "softMetaGmdXml1LocalId",
+			"value": ""
+		},
+		{
+			"key": "softMediaGmdXml1Id",
+			"value": ""
+		},
+		{
+			"key": "softMediaGmdXml2Id",
+			"value": ""
+		},
+		{
+			"key": "softMediaGmdXml3Id",
+			"value": ""
+		},
+		{
+			"key": "softMetaGmdXml1Id",
+			"value": ""
+		},
+		{
+			"key": "softMediaGmdXml4Id",
+			"value": ""
+		},
+		{
+			"key": "softMeta3LocalId",
+			"value": ""
+		},
+		{
+			"key": "softMetaGmdXml4LocalId",
+			"value": ""
+		},
+		{
+			"key": "softReport1Id",
+			"value": ""
+		},
+		{
+			"key": "dateReport",
+			"value": ""
+		},
+		{
+			"key": "nodeUrl",
+			"value": ""
+		},
+		{
+			"key": "softReport2Id",
+			"value": ""
+		},
+		{
+			"key": "unkownMetaId",
+			"value": ""
+		},
+		{
+			"key": "softReport3Id",
+			"value": ""
+		},
+		{
+			"key": "nodeApiUrl",
 			"value": ""
 		}
 	]
