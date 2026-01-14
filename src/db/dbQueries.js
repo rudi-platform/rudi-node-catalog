@@ -63,7 +63,9 @@ import {
   API_METAINFO_DATES,
   API_METAINFO_PROPERTY,
   API_METAINFO_PROVIDER_PROPERTY,
+  API_ORGANIZATION_ATTACHMENT_STATUS,
   API_ORGANIZATION_ID,
+  API_ORGANIZATION_VALIDATION_STATUS,
   API_PUB_NAME,
   API_REPORT_ID,
   API_SKOS_CONCEPT_ID,
@@ -1089,6 +1091,7 @@ export const overwriteDbObject = async (objectType, updateData) => {
     if (objectType == OBJ_METADATA) {
       logD(mod, fun, `findOneAndUpdate`)
       const dbObject = await ObjModel.findOneAndUpdate(filter, updateData, updateOpts)
+      // logD(mod, fun, beautify(dbObject, 2))
       await dbObject.save()
       return dbObject
     }
@@ -1343,7 +1346,13 @@ export const getEnsuredOrganizationDbIdWithJson = (organizationJson) =>
 export const getOrganizationDbIdWithJson = (organizationJson) =>
   getDbIdWithJson(OBJ_ORGANIZATIONS, organizationJson)
 
-export const getAllOrganizations = () => Organization.find({})
+export const searchOrganziations = (organizationStatus, linkedProducerStatus) => {
+  const filter = {
+    [API_ORGANIZATION_VALIDATION_STATUS]: organizationStatus,
+    [API_ORGANIZATION_ATTACHMENT_STATUS]: linkedProducerStatus,
+  }
+  return Organization.find(filter)
+}
 
 export const updateOrganization = async (jsonOrganization) => {
   const fun = `updateOrganization`

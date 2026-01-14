@@ -1,3 +1,5 @@
+import { LinkedProducerStatus, OrganizationStatus } from '../definitions/models/Organization.js'
+
 const mod = 'repCtrl'
 /*
  * This file describes the different steps followed for each
@@ -21,6 +23,7 @@ import {
   API_VERSION,
   DEFAULT_QUERY_LIMIT,
   OBJ_METADATA,
+  OBJ_ORGANIZATIONS,
   OBJ_REPORTS,
   PARAM_ID,
   PARAM_OBJECT,
@@ -35,6 +38,7 @@ import {
   QUERY_UPDATED_BEFORE,
   QUERY_UPDATED_BEFORE_CAML,
   URL_PUB_METADATA,
+  URL_PUB_ORGA,
   URL_PV_OBJECT_GENERIC,
 } from '../config/constApi.js'
 import {
@@ -58,6 +62,8 @@ import {
   LOCAL_REPORT_ERROR,
   LOCAL_REPORT_ERROR_MSG,
   LOCAL_REPORT_ERROR_TYPE,
+  API_ORGANIZATION_VALIDATION_STATUS,
+  API_ORGANIZATION_ATTACHMENT_STATUS,
 } from '../db/dbFields.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -94,7 +100,7 @@ import { objectAlreadyExists, parametersMismatch } from '../utils/msg.js'
 // -------------------------------------------------------------------------------------------------
 // Data models
 // -------------------------------------------------------------------------------------------------
-import { IntegrationStatus, Report } from '../definitions/models/Report.js'
+import { IntegrationStatus, Report, ReportMethods } from '../definitions/models/Report.js'
 
 import { setFlagIntegrationKO } from './metadataController.js'
 import { removeMetadataFromWaitingList } from './portalController.js'
@@ -214,6 +220,12 @@ export const addOrEditSingleReportForMetadata = async (req, reply) => {
   return await addOrEditSingleReport(OBJ_METADATA, req, reply)
 }
 
+export const addOrEditSingleReportForOrganization = async (req, reply) => {
+  const fun = 'addOrEditSingleReportForOrganization'
+  logT(mod, fun, `< PUT ${URL_PUB_ORGA}/${PARAM_ID}/${ACT_REPORT}`)
+  return await addOrEditSingleReport(OBJ_ORGANIZATIONS, req, reply)
+}
+
 // Update an existing report for one object integration (private)
 export const addOrEditSingleReportForObject = async (req, reply) => {
   const fun = 'addOrEditSingleReportForObject'
@@ -236,7 +248,12 @@ export const addOrEditSingleReport = async (objectType, req, reply) => {
     // retrieve body parameters: object id, report id
     const reportId = accessProperty(reportBody, API_REPORT_ID)
     const bodyObjectId = accessProperty(reportBody, API_REPORT_RESOURCE_ID)
-    removeMetadataFromWaitingList(urlObjectId, reportId)
+
+    if (objectType === OBJ_METADATA) {
+      removeMetadataFromWaitingList(urlObjectId, reportId)
+    } else if (objectType === OBJ_ORGANIZATIONS) {
+      await treatOrgnizationsReports(objectType, urlObjectId, reportBody)
+    }
 
     // ensure url object id and body object id match
     if (urlObjectId !== bodyObjectId)
@@ -534,4 +551,34 @@ export const putReport = async (reportBody) => {
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
+}
+
+export const treatOrgnizationsReports = async (objectType, urlObjectId, reportBody) => {
+  const fun = 'treatOrgnizationsReports'
+  logT(mod, fun)
+
+  const dbObject = await getObjectWithRudiId(objectType, urlObjectId)
+  switch (reportBody[API_REPORT_METHOD]) {
+    case ReportMethods.POST:
+      dbObject[API_ORGANIZATION_VALIDATION_STATUS] =
+        reportBody[API_REPORT_STATUS] === IntegrationStatus.OK
+          ? OrganizationStatus.VALIDATED
+          : OrganizationStatus.CANCELLED
+      break
+    case ReportMethods.ATTACH:
+      dbObject[API_ORGANIZATION_ATTACHMENT_STATUS] =
+        reportBody[API_REPORT_STATUS] === IntegrationStatus.OK
+          ? LinkedProducerStatus.VALIDATED
+          : LinkedProducerStatus.CANCELLED
+      break
+    case ReportMethods.DETACH:
+      dbObject[API_ORGANIZATION_ATTACHMENT_STATUS] =
+        reportBody[API_REPORT_STATUS] === IntegrationStatus.KO
+          ? LinkedProducerStatus.DISENGAGED
+          : LinkedProducerStatus.VALIDATED
+      break
+    default:
+      logW(mod, fun, `Not implemented yet:  ${objectType} > ${reportBody[API_REPORT_METHOD]}`)
+  }
+  dbObject.save()
 }

@@ -509,7 +509,6 @@ export const rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) 
     // Avoid dates manipulation
     stripTimestamps(dbReadyMetadata)
 
-    // logD(mod, fun, `dbReadyMetadata: ${beautify(dbReadyMetadata, 2)}`)
     return dbReadyMetadata
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -570,11 +569,11 @@ function toMDBLanguage(metadata, field) {
  */
 export const setGeography = (metadata) => {
   const fun = 'setGeography'
-  // logT(mod, fun)
+  logT(mod, fun)
   const geography = metadata[API_GEOGRAPHY]
   if (isNothing(geography)) {
     // No 'geography' property => exit
-    // logD(mod, fun, `No '${API_GEOGRAPHY_PROPERTY}' property was set`)
+    logD(mod, fun, `Property '${API_GEOGRAPHY}' is not set (and it's OK)`)
     return
   }
 
@@ -618,7 +617,7 @@ export const setGeography = (metadata) => {
     return
   }
 
-  // logD(mod, fun, `Extracting '${API_GEO_GEOJSON_PROPERTY}' from '${API_GEO_BBOX_PROPERTY}'`)
+  logD(mod, fun, `Extracting '${API_GEO_GEOJSON_PROPERTY}' from '${API_GEO_BBOX_PROPERTY}'`)
 
   // No GeoJSON but 'bounding_box' property is set => extract GeoJSON from bbox property
 

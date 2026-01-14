@@ -1,3 +1,5 @@
+import { isPortalConnectionDisabled } from '../config/confPortal.js'
+
 const mod = 'genCtrl'
 /*
  * In this file are made the different steps followed for each
@@ -126,8 +128,8 @@ import {
 } from '../db/dbFields.js'
 import Contact from '../definitions/models/Contact.js'
 import { Media } from '../definitions/models/Media.js'
-import Organization from '../definitions/models/Organization.js'
-import { deletePortalMetadata } from './portalController.js'
+import Organization, { OrganizationStatus } from '../definitions/models/Organization.js'
+import { createPortalOrganization, deletePortalMetadata } from './portalController.js'
 
 // -------------------------------------------------------------------------------------------------
 // Specific object type helper functions
@@ -191,10 +193,21 @@ async function newObject(objectType, objectData) {
     throw RudiError.treatError(mod, fun, err)
   }
 }
+
 async function newRudiObject(Model, objectData) {
   const fun = 'newRudiObject'
   try {
     const dbObject = new Model(objectData)
+
+    // On envoie la demande de création de l'organisation au portail si celui-ci est lié
+    if (!isPortalConnectionDisabled()) {
+      let organizationId = await createPortalOrganization(dbObject)
+      if (organizationId) {
+        dbObject['organization_id'] = organizationId
+        dbObject['organization_status'] = OrganizationStatus.DRAFT
+      }
+    }
+
     await dbObject.save()
     return dbObject
   } catch (err) {
@@ -669,24 +682,30 @@ async function upsertSingleObject(inputObject, objectType, objectStandard, objec
 
   let rudiObject
   try {
-    if (objectFormat === DEFAULT_OBJECT_FORMAT && objectStandard === DEFAULT_OBJECT_STANDARD) {
-      rudiObject = inputObject
-      logT(
-        mod,
-        fun,
-        `Standard ${objectFormat.toUpperCase()} ${objectStandard.toUpperCase()} object`
-      )
+    // Désactive la modification des objets de type Organisation
+    // En attend le workflow de modification d'une organization côté Portail RUDI-5672
+    if (!isPortalConnectionDisabled() && OBJ_ORGANIZATIONS === objectType) {
+      throw new NotImplementedError('Update of Organizations is temporarily deactivated')
     } else {
-      logT(mod, fun, `Translation needed for ${objectFormat} ${objectStandard} object`)
-      const objectTranslator = getTranslator(objectType, objectStandard, objectFormat)
-      if (!objectTranslator) {
-        throw new NotImplementedError(
-          `Object of type ${objectType}, at standard ${objectStandard} and format ${objectFormat} can not yet be uploaded.`
+      if (objectFormat === DEFAULT_OBJECT_FORMAT && objectStandard === DEFAULT_OBJECT_STANDARD) {
+        rudiObject = inputObject
+        logT(
+          mod,
+          fun,
+          `Standard ${objectFormat.toUpperCase()} ${objectStandard.toUpperCase()} object`
         )
+      } else {
+        logT(mod, fun, `Translation needed for ${objectFormat} ${objectStandard} object`)
+        const objectTranslator = getTranslator(objectType, objectStandard, objectFormat)
+        if (!objectTranslator) {
+          throw new NotImplementedError(
+            `Object of type ${objectType}, at standard ${objectStandard} and format ${objectFormat} can not yet be uploaded.`
+          )
+        }
+        rudiObject = await objectTranslator.translateInputObject(inputObject, true)
       }
-      rudiObject = await objectTranslator.translateInputObject(inputObject, true)
+      return await upsertSingleRudiObject(rudiObject, objectType, context)
     }
-    return await upsertSingleRudiObject(rudiObject, objectType, context)
   } catch (e) {
     throw RudiError.treatError(mod, fun, e)
   }

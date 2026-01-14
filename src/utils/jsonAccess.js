@@ -71,7 +71,7 @@ export const requireSubProperty = (obj, prop, subProp, enumProp, enumVal) => {
   }
   const objProp = obj[prop]
 
-  // logD(mod, fun, `${prop}: ${beautify(propObj)}`)
+  logD(mod, fun, `${prop}: ${beautify(objProp)}`)
   // logD(mod, fun, `${prop}.${subProp}: ${beautify(propObj[subProp])}`)
   if (!enumVal) {
     // Regular check: if prop is defined, subProp must be defined !

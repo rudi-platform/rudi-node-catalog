@@ -81,6 +81,7 @@ import { get as getLanguages } from '../definitions/thesaurus/Languages.js'
 import { get as getProjections } from '../definitions/thesaurus/Projections.js'
 import { get as getStorageStatus } from '../definitions/thesaurus/StorageStatus.js'
 import Themes from '../definitions/thesaurus/Themes.js'
+import UpdateFrequencies from '../definitions/thesaurus/UpdateFrequencies.js'
 
 // -------------------------------------------------------------------------------------------------
 // Controllers
@@ -488,6 +489,7 @@ export const getThesaurusList = async (lang) => {
     const keywords = Keywords.get(lang)
     const themes = Themes.get(lang)
     const licences = await getLicenceCodes()
+    const updateFrequencies = UpdateFrequencies.get(lang)
 
     const thesauri = {
       encodings: getEncodings(),
@@ -495,13 +497,14 @@ export const getThesaurusList = async (lang) => {
       filetypes: isPortalConnectionDisabled() ? getFileTypes() : getPortalMimes(),
       hashalgorithms: getHashAlgorithms(),
       interfacecontracts: Object.values(InterfaceContract),
-      keywords: keywords,
+      keywords,
       languages: getLanguages(),
-      licences: licences,
+      licences,
       licencetypes: Object.values(LicenceTypes),
       projections: getProjections(),
       storagestatus: getStorageStatus(),
-      themes: themes,
+      themes,
+      updatefrequencies: updateFrequencies,
     }
 
     return thesauri
@@ -519,6 +522,7 @@ export const getThesaurus = async (thesaurusCode) => {
     if (code === 'themes') return Themes.get()
     if (code === 'licences') return await getLicenceCodes()
     if (code === 'interfacecontracts') return Object.values(InterfaceContract)
+    if (code === 'updatefrequencies') return UpdateFrequencies.get()
 
     switch (code) {
       case 'encodings':
@@ -547,6 +551,7 @@ export const getThesaurusLabel = async (thesaurusCode, lang) => {
     const code = thesaurusCode.toLowerCase()
 
     if (code === 'themes') return Themes.getLabels(lang)
+    if (code === 'updatefrequencies') return UpdateFrequencies.get(lang)
 
     return await getThesaurus(thesaurusCode)
   } catch (err) {

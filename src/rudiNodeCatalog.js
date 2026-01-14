@@ -20,7 +20,8 @@ import {
 // 3. Log conf
 import './config/confLogs.js'
 
-// 4. Anything, now
+// 4. migration
+import { runMigrations } from '../migrations/runMigration.js'
 
 // -------------------------------------------------------------------------------------------------
 // External dependencies
@@ -43,6 +44,7 @@ import { launchRouteListener, shutDownListener } from './routes/fastify.js'
 import { addLogEntry, logE, logI, logT, logW, sysAlert, sysCrit, sysInfo } from './utils/logging.js'
 
 import './config/confPortal.js'
+import UpdateFrequencies from './definitions/thesaurus/UpdateFrequencies.js'
 import { RudiError } from './utils/errors.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -184,6 +186,7 @@ const start = async () => {
     separateLogs('Thesauri init', true) ////////////////////////////////////////////////////////////
     await Keywords.initialize()
     await Themes.initialize()
+    await UpdateFrequencies.initialize()
     await getLicenceCodes()
 
     separateLogs('Start', true) ////////////////////////////////////////////////////////////////////
@@ -223,9 +226,16 @@ async function shutDown(signal) {
 // -------------------------------------------------------------------------------------------------
 // RUN SERVER
 // -------------------------------------------------------------------------------------------------
-export const runRudiCatalog = () =>
-  start().catch((err) => {
+export const runRudiCatalog = async () => {
+  try {
+    const migrated = await runMigrations()
+    if (!migrated) {
+      throw new Error('Migration execution aborted')
+    }
+    await start()
+  } catch (err) {
     logE(mod, 'server', `Crashed: ${err}`)
     sysCrit(`Server crashed: ${err}`, 'rudiServer.running', {}, { error: err })
     process.exit(1)
-  })
+  }
+}

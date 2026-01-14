@@ -8,12 +8,13 @@ import axios from 'axios'
 import https from 'node:https'
 
 import _ from 'lodash'
+
 const { pick } = _
 
 // -------------------------------------------------------------------------------------------------
 // Constants
 // -------------------------------------------------------------------------------------------------
-import { OBJ_METADATA, PARAM_ID, USER_AGENT } from '../config/constApi.js'
+import { OBJ_METADATA, OBJ_ORGANIZATIONS, PARAM_ID, USER_AGENT } from '../config/constApi.js'
 import {
   API_COLLECTION_TAG,
   API_DATA_NAME_PROPERTY,
@@ -41,10 +42,12 @@ import {
   getPortalAuthCredentials,
   getPortalAuthHeaders,
   getPortalMetaUrl,
+  getPortalOrganizationUrl,
   getUrlPortalAuthCheck,
   getUrlPortalAuthGet,
   getUrlPortalAuthPub,
   getUrlPortalEncryptPub,
+  isOrganizationAttachedUrl,
   isPortalConnectionDisabled,
   JWT_USER,
   NO_PORTAL_MSG,
@@ -92,6 +95,101 @@ export const getPortalAuthHeaderBearer = async (httpsAgent) => {
 // -------------------------------------------------------------------------------------------------
 // Controllers
 // -------------------------------------------------------------------------------------------------
+
+export const updateOrganizationFromPortal = async (req, reply) => {
+  const fun = 'getPortalOrganization'
+  logT(mod, fun)
+
+  try {
+    // Si le portail n'est pas configuré, on ne fait pas d'appel
+    if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
+
+    let portalOrganization = await getPortalOrganization(req, reply)
+    let isAttached = await isOrganizationAttached(req, reply)
+
+    logT(mod, fun, portalOrganization)
+
+    if (portalOrganization) {
+      let organization = await getObjectWithRudiId(OBJ_ORGANIZATIONS, req.params[PARAM_ID])
+      logT(mod, fun, portalOrganization, organization)
+      if (organization) {
+        updateOrganization(organization, portalOrganization, isAttached)
+
+        organization.save()
+      }
+    }
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+export const getPortalOrganization = async (req, reply) => {
+  const fun = 'getPortalOrganizationAsync'
+  logT(mod, fun)
+
+  const token = await getPortalToken()
+
+  try {
+    if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
+    let organizationId = req.params[PARAM_ID]
+    if (organizationId && !isUUID(organizationId)) organizationId = undefined
+    if (organizationId) logD(mod, fun, `organizationId: ${organizationId}`)
+    logI(mod, fun, `organizationId: ${organizationId}`)
+    const additionalParameters = req.url?.split('?')[1]
+    return await httpGet(getPortalOrganizationUrl(organizationId, additionalParameters), token)
+  } catch (err) {
+    // if (err.statusCode == 404) return null
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+export const createPortalOrganization = async (organization) => {
+  const fun = 'createPortalOrganization'
+  logT(mod, fun)
+
+  if (!organization) {
+    return organization
+  }
+
+  const token = await getPortalToken()
+
+  try {
+    if (isPortalConnectionDisabled()) {
+      return NO_PORTAL_MSG
+    }
+
+    return await httpPost(getPortalOrganizationUrl(), organization, token)
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
+export const isOrganizationAttached = async (req, reply) => {
+  const fun = 'isOrganizationAttached'
+  logT(mod, fun)
+
+  const token = await getPortalToken()
+
+  try {
+    if (isPortalConnectionDisabled()) {
+      return NO_PORTAL_MSG
+    }
+
+    let organizationId = req.params[PARAM_ID]
+    if (organizationId && !isUUID(organizationId)) {
+      organizationId = undefined
+    }
+    if (organizationId) {
+      logD(mod, fun, `organizationId: ${organizationId}`)
+    }
+
+    logI(mod, fun, `organizationId: ${organizationId}`)
+    return await httpGet(isOrganizationAttachedUrl(organizationId), token)
+  } catch (err) {
+    // if (err.statusCode == 404) return null
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
 
 export const getMetadata = async (req, reply) => {
   const fun = 'getMetadata'
@@ -722,4 +820,25 @@ export const exposedCheckPortalToken = async (req, reply) => {
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
+}
+
+function updateOrganization(organization, portalOrganziation, isAttached) {
+  organization.organization_status = portalOrganziation.organization_status
+  organization.linked_producer_status = isAttached ? 'VALIDATED' : undefined
+
+  if (
+    Date.parse(organization.updatedAt) <
+    Date.parse(portalOrganziation?.organization_dates?.modified)
+  ) {
+    organization.organization_name = portalOrganziation.organization_name
+
+    if (portalOrganziation.organization_summary) {
+      organization.organization_summary = portalOrganziation.organization_summary
+    }
+    if (portalOrganziation.organization_address) {
+      organization.organization_address = portalOrganziation.organization_address
+    }
+  }
+
+  return organization
 }

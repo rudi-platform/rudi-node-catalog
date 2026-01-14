@@ -6,7 +6,7 @@ const mod = 'logDb'
 import mongoose from 'mongoose'
 const { Schema, model } = mongoose
 
-import datetime from 'date-and-time'
+import { format } from 'date-and-time'
 import { v4 } from 'uuid'
 
 // -------------------------------------------------------------------------------------------------
@@ -138,9 +138,8 @@ export function makeLogInfo(logLvl, mod, fun, msg) {
 }
 
 export const logLineToString = (logLine) =>
-  `${datetime.format(logLine[DB_CREATED_AT], LOG_DATE_FORMAT)} ${logLine.time} ${
-    logLine.log_level
-  } ` + `[ ${logLine.location_module} . ${logLine.location_function} ] ${logLine.message}`
+  `${format(logLine[DB_CREATED_AT], LOG_DATE_FORMAT)} ${logLine.time} ${logLine.log_level} ` +
+  `[ ${logLine.location_module} . ${logLine.location_function} ] ${logLine.message}`
 
 // -------------------------------------------------------------------------------------------------
 // Exports

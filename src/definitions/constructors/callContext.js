@@ -92,9 +92,9 @@ export const CallContext = class CallContext {
   constructor(authDetails, opDetails, rawDetails) {
     const fun = 'CallContext()'
     try {
-      const msg = `${authDetails ? beautify(authDetails) : ''}, ${
-        opDetails ? beautify(opDetails) : ''
-      }, ${rawDetails ? beautify(rawDetails) : ''}`
+      // const msg = `${authDetails ? beautify(authDetails) : ''}, ${
+      //   opDetails ? beautify(opDetails) : ''
+      // }, ${rawDetails ? beautify(rawDetails) : ''}`
       // if (ACTIVATE_LOG) logT(mod, fun, msg)
 
       this[AUTH] = !authDetails ? {} : authDetails

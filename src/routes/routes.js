@@ -51,6 +51,8 @@ import {
 // -------------------------------------------------------------------------------------------------
 import { logD } from '../utils/logging.js'
 
+import { searchOrganizations } from '../controllers/organizationController.js'
+
 // -------------------------------------------------------------------------------------------------
 // Swagger documentation
 // -------------------------------------------------------------------------------------------------
@@ -86,6 +88,7 @@ import {
 import {
   addOrEditSingleReportForMetadata,
   addOrEditSingleReportForObject,
+  addOrEditSingleReportForOrganization,
   addSingleReportForObject,
   deleteEveryReportForObject,
   deleteManyReportForObject,
@@ -145,6 +148,7 @@ import {
   getMetadata,
   sendAllMetadataToPortal,
   sendMetadata,
+  updateOrganizationFromPortal,
 } from '../controllers/portalController.js'
 import { getSinglePubKey } from '../controllers/publicKeyController.js'
 import {
@@ -152,7 +156,7 @@ import {
   getPortalMetadataFields,
 } from '../controllers/stateController.js'
 import { test } from '../controllers/testController.js'
-import { getAllContacts, getAllOrganizations } from '../db/dbQueries.js'
+import { getAllContacts } from '../db/dbQueries.js'
 import {
   onPortalRoute,
   onPrivateRoute,
@@ -205,14 +209,13 @@ export const publicRoutes = [
       reply.code(308).redirect(getPublicPath(OBJ_METADATA))
     },
   },
-
   {
-    description: `Redirection: GET ${getCatalog(OBJ_METADATA, '*')} -> GET ${getPublicPath(OBJ_METADATA)}/*`,
+    description: `Redirection: GET /${OBJ_METADATA}/* -> GET ${getPublicPath(OBJ_METADATA)}/*`,
     method: 'GET',
-    url: getCatalog(OBJ_METADATA, '*'),
+    url: `/${OBJ_METADATA}/*`,
     config: { [ROUTE_NAME]: 'redirect_get_data' },
     handler: function (req, reply) {
-      const newRoute = req.url.replace(getCatalog(), getPublicPath())
+      const newRoute = getPublicPath(req.url)
       logD(mod, `redirect`, `${req.method} ${newRoute}`)
       reply.code(308).redirect(newRoute)
     },
@@ -225,13 +228,6 @@ export const publicRoutes = [
     description: 'Get current API version',
     method: 'GET',
     url: getCatalog('version'),
-    handler: getApiVersion,
-    config: { [ROUTE_NAME]: 'pub_get_api_version' },
-  },
-  {
-    description: 'Get current API version',
-    method: 'GET',
-    url: getPublicPath('version'),
     handler: getApiVersion,
     config: { [ROUTE_NAME]: 'pub_get_api_version' },
   },
@@ -256,7 +252,7 @@ export const publicRoutes = [
     description: 'Access all organizations created on the RUDI producer node',
     method: 'GET',
     url: getPublicPath(OBJ_ORGANIZATIONS),
-    handler: getAllOrganizations,
+    handler: searchOrganizations,
     config: { [ROUTE_NAME]: 'pub_get_all_metadata' },
   },
   {
@@ -329,12 +325,12 @@ if (getCatalog() !== getLegacyApiPath()) {
   // Deal with the legacy
   for (const method of ['DELETE', 'POST', 'PUT', 'GET'])
     publicRoutes.unshift({
-      description: `Redirection: ${method} ${getLegacyApiPath('*')} -> ${method} ${getCatalog()}`,
+      description: `Redirection: ${method} /api -> ${method} ${getCatalog()}`,
       method,
-      url: getLegacyApiPath('*'),
+      url: '/api/*',
       config: { [ROUTE_NAME]: `redirect_${method.toLowerCase()}_data` },
       handler: function (req, reply) {
-        const newRoute = req.url.replace(getLegacyApiPath(), getCatalog())
+        const newRoute = req.url.replace('/api', getCatalog())
         logD(mod, `redirect`, `${req.method} ${req.url}`)
         reply.code(308).redirect(newRoute)
       },
@@ -366,6 +362,14 @@ export const portalRoutes = [
     handler: addOrEditSingleReportForMetadata,
     config: { [ROUTE_NAME]: 'portal_upsert_one_report' },
   },
+  //Add/edit 1 report for one organization integration
+  {
+    description: 'Add/edit 1 report for one organization integration',
+    method: 'PUT',
+    url: getPublicPath(OBJ_ORGANIZATIONS, `:${PARAM_ID}`, `${ACT_REPORT}`),
+    handler: addOrEditSingleReportForOrganization,
+    config: { [ROUTE_NAME]: 'portal_put_org_report' },
+  },
 
   // Get all reports for one object integration
   {
@@ -392,17 +396,6 @@ export const portalRoutes = [
     config: { [ROUTE_NAME]: 'redirect_put_plus' },
     handler: (req, reply) => {
       const newRoute = getPublicPath(req.url)
-      logD(mod, `redirect`, `${req.method} ${newRoute}`)
-      reply.code(308).redirect(newRoute)
-    },
-  },
-  {
-    description: `Redirection: PUT ${getCatalog(OBJ_METADATA, '*')} -> GET ${getPublicPath(OBJ_METADATA)}/*`,
-    method: 'PUT',
-    url: getCatalog(OBJ_METADATA, '*'),
-    config: { [ROUTE_NAME]: 'redirect_put_data' },
-    handler: function (req, reply) {
-      const newRoute = req.url.replace(getCatalog(), getPublicPath())
       logD(mod, `redirect`, `${req.method} ${newRoute}`)
       reply.code(308).redirect(newRoute)
     },
@@ -935,6 +928,13 @@ export const devRoutes = [
     url: getPrivatePath(ACT_CHECK, URL_SUFFIX_PORTAL, 'ids'),
     handler: getPortalMetadataFields,
     config: { [ROUTE_NAME]: 'prv_check_portal_metadata_ids' },
+  },
+  {
+    description: 'Get organization from the Portal',
+    method: 'GET',
+    url: getPrivatePath(URL_SUFFIX_PORTAL, OBJ_ORGANIZATIONS, `:${PARAM_ID}`),
+    handler: updateOrganizationFromPortal,
+    config: { [ROUTE_NAME]: 'get_portal_organization' },
   },
   // -----------------------------------------------------------------------------------------------
   //  Monitoring/control checks on metadata/data

@@ -4,6 +4,7 @@ const mod = 'orgSch'
 // -------------------------------------------------------------------------------------------------
 import _ from 'lodash'
 import mongoose from 'mongoose'
+
 const { omit } = _
 
 // -------------------------------------------------------------------------------------------------
@@ -12,11 +13,13 @@ const { omit } = _
 import {
   API_COLLECTION_TAG,
   API_ORGANIZATION_ADDRESS,
+  API_ORGANIZATION_ATTACHMENT_STATUS,
   API_ORGANIZATION_CAPTION,
   API_ORGANIZATION_COORDINATES,
   API_ORGANIZATION_ID,
   API_ORGANIZATION_NAME,
   API_ORGANIZATION_SUMMARY,
+  API_ORGANIZATION_VALIDATION_STATUS,
   DB_PUBLISHED_AT,
   FIELDS_TO_SKIP,
 } from '../../db/dbFields.js'
@@ -28,6 +31,21 @@ import { makeSearchable } from '../../db/dbActions.js'
 import { RudiError } from '../../utils/errors.js'
 import { GpsCoordinatesSchema } from '../schemas/GpsCoordinates.js'
 import { UuidV4Schema } from '../schemas/Identifiers.js'
+
+export const OrganizationStatus = {
+  DRAFT: 'DRAFT',
+  IN_PROGRESS: 'IN_PROGRESS',
+  CANCELLED: 'CANCELLED',
+  VALIDATED: 'VALIDATED',
+  DISENGAGED: 'DISENGAGED',
+}
+export const LinkedProducerStatus = {
+  DRAFT: 'DRAFT',
+  IN_PROGRESS: 'IN_PROGRESS',
+  CANCELLED: 'CANCELLED',
+  VALIDATED: 'VALIDATED',
+  DISENGAGED: 'DISENGAGED',
+}
 
 // -------------------------------------------------------------------------------------------------
 // Custom schema definition
@@ -60,6 +78,18 @@ const OrganizationSchema = new mongoose.Schema(
 
     /** Tag for identifying a collection of resources */
     [API_COLLECTION_TAG]: String,
+
+    /** Status of the organization on portal */
+    [API_ORGANIZATION_VALIDATION_STATUS]: {
+      type: String,
+      enum: Object.values(OrganizationStatus),
+    },
+
+    /** Status of the organization attachement to this node on Portal */
+    [API_ORGANIZATION_ATTACHMENT_STATUS]: {
+      type: String,
+      enum: Object.values(LinkedProducerStatus),
+    },
 
     /** Time when this organization was succesfully published on RUDI portal */
     [DB_PUBLISHED_AT]: Date,

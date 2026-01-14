@@ -1,3 +1,5 @@
+import { accessReqParam } from '../utils/jsonAccess.js'
+
 const mod = 'orgCtrl'
 /*
  * This file describes the steps followed for each
@@ -17,9 +19,14 @@ import { logT } from '../utils/logging.js'
 // -------------------------------------------------------------------------------------------------
 // Data models
 // -------------------------------------------------------------------------------------------------
-import { getOrganizationWithJson } from '../db/dbQueries.js'
+import { getOrganizationWithJson, searchOrganziations } from '../db/dbQueries.js'
 import { Organization } from '../definitions/models/Organization.js'
 import { RudiError } from '../utils/errors.js'
+import {
+  API_ORGANIZATION_ATTACHMENT_STATUS,
+  API_ORGANIZATION_VALIDATION_STATUS,
+} from '../db/dbFields.js'
+import { isPortalConnectionDisabled } from '../config/confPortal.js'
 // import cache from '../db/dbCache'
 
 // -------------------------------------------------------------------------------------------------
@@ -38,4 +45,16 @@ export const newOrganization = async (orgJson) => {
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
+}
+
+export const searchOrganizations = async (req, reply) => {
+  const fun = 'searchOrganizations'
+  logT(mod, fun)
+
+  // If no portal is provided, then status not used
+  if (isPortalConnectionDisabled()) return searchOrganziations()
+
+  let organizationStatus = accessReqParam(req, API_ORGANIZATION_VALIDATION_STATUS)
+  let linkedProducerStatus = accessReqParam(req, API_ORGANIZATION_ATTACHMENT_STATUS)
+  return searchOrganziations(organizationStatus, linkedProducerStatus)
 }

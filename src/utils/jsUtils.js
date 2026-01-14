@@ -358,8 +358,9 @@ export const isNothing = (prop) => {
  */
 export const beautify = (jsonObject, option) => {
   try {
-    if (typeof jsonObject == 'string') return jsonObject
-    return `${JSON.stringify(jsonObject, null, option).replace(/\\"/g, '"')}${option != null ? '\n' : ''}`
+    return isString(jsonObject)
+      ? jsonObject
+      : `${JSON.stringify(jsonObject, null, option).replace(/\\"/g, '"')}${option != null ? '\n' : ''}`
   } catch {
     return `${jsonToString(jsonObject, false)}`
   }

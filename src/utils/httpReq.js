@@ -170,6 +170,7 @@ const axiosWithRetry = async (
     )
 
     try {
+      // eslint-disable-next-line no-await-in-loop
       return await axios({ ...axiosConf, timeout: attemptTimeout, headers })
     } catch (err) {
       const status = err.response?.status
@@ -182,6 +183,7 @@ const axiosWithRetry = async (
         fun,
         `Request to ${axiosConf.url} failed${status ? ` with status: ${status}` : ''}. Retrying in ${(backoff / 1000).toFixed(2)}s...`
       )
+      // eslint-disable-next-line no-await-in-loop
       await new Promise((res) => setTimeout(res, backoff))
     }
   }

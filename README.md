@@ -206,6 +206,13 @@ The
 
 ---
 
+## Migration
+ 
+A migration tool is added to migrate the database from the old version to the new one. 
+By default, the migration script runs automatically at application startup: it checks pending migrations, creates a backup, and applies them if needed. 
+For detailed behavior, configuration, and manual execution, see the migration [documentation](./migrations/MIGRATION.md).
+
+---
 ## Getting started locally
 
 To get started locally with the catalog, follow these instructions. You'll need `node` and `npm` installed.

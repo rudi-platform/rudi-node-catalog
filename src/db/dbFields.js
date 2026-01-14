@@ -82,6 +82,7 @@ export const API_STORAGE_STATUS = 'storage_status'
 export const API_PERIOD_PROPERTY = 'temporal_spread'
 export const API_START_DATE_PROPERTY = 'start_date'
 export const API_END_DATE_PROPERTY = 'end_date'
+export const API_UPDATE_FREQUENCY = 'dataset_update_frequency'
 
 // -------------------------------------------------------------------------------------------------
 // Metadata properties: access condition / licence
@@ -169,6 +170,8 @@ export const API_ORGANIZATION_ADDRESS = 'organization_address'
 export const API_ORGANIZATION_COORDINATES = 'organization_coordinates'
 export const API_ORGANIZATION_CAPTION = 'organization_caption'
 export const API_ORGANIZATION_SUMMARY = 'organization_summary'
+export const API_ORGANIZATION_VALIDATION_STATUS = 'organization_status'
+export const API_ORGANIZATION_ATTACHMENT_STATUS = 'linked_producer_status'
 
 // -------------------------------------------------------------------------------------------------
 // Contact properties

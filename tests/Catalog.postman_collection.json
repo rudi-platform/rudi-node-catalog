@@ -4,7 +4,7 @@
 		"name": "01. Catalog",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "13557783",
-		"_collection_link": "https://rudirisa.postman.co/workspace/ce1a24e7-e510-4854-8451-d9ba84797044/collection/13557783-aec3de11-cc9e-4c67-b9c3-5cdbc2811e5f?action=share&source=collection_link&creator=13557783"
+		"_collection_link": "https://rudirisa.postman.co/workspace/RUDI-Workspace~ce1a24e7-e510-4854-8451-d9ba84797044/collection/13557783-aec3de11-cc9e-4c67-b9c3-5cdbc2811e5f?action=share&source=collection_link&creator=13557783"
 	},
 	"item": [
 		{
@@ -1354,7 +1354,7 @@
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    const listEnums = Object.keys(responseJson);",
-									"    pm.expect(listEnums.length).to.eq(12);",
+									"    pm.expect(listEnums.length).to.eq(13);",
 									"    pm.expect(typeof responseJson.themes[0]).to.eq('string')",
 									"",
 									"    pm.collectionVariables.set('keywords', responseJson.keywords);",
@@ -1363,7 +1363,9 @@
 									"    pm.collectionVariables.set('licences', responseJson.licences)",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -1394,7 +1396,7 @@
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    const listEnums = Object.keys(responseJson);",
-									"    pm.expect(listEnums.length).to.eq(12);",
+									"    pm.expect(listEnums.length).to.eq(13);",
 									"    pm.expect(Object.keys(responseJson.fileextensions).length).to.gt(0)",
 									"    pm.expect(responseJson.fileextensions.gif).to.eq(\"image/gif\")",
 									"    // const themeKeys = Object.keys(responseJson.themes)",
@@ -1730,13 +1732,16 @@
 								"exec": [
 									"pm.test(\"Producer 1 created\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
+									"    console.log(\"text\", pm.response.text())",
+									"    console.log(\"json\", pm.response.json())",
 									"    const responseJson = pm.response.json();",
 									"    const orgId = pm.variables.get('softOrg1Id');",
 									"    pm.expect(responseJson.organization_id).to.eq(orgId);",
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						},
 						{
@@ -1750,7 +1755,8 @@
 									""
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -4700,6 +4706,61 @@
 					"response": []
 				},
 				{
+					"name": "[PUB] Filter by producer Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Filter by producer\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    ",
+									"    const countWithOrg1 = pm.variables.get('countWithOrg1pub')",
+									"",
+									"    const publicMetadataList = pm.response.json();",
+									"    pm.expect(publicMetadataList.total).to.eq(countWithOrg1);",
+									"    pm.expect(publicMetadataList.items.length).to.eq(countWithOrg1);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{catalogUrl}}/v1/resources?producer.organization_id=\"{{softOrg1Id}}\"&fields=global_id,resource_title,collection_tag,producer&collection_tag={{stamp}}",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"v1",
+								"resources"
+							],
+							"query": [
+								{
+									"key": "producer.organization_id",
+									"value": "\"{{softOrg1Id}}\""
+								},
+								{
+									"key": "fields",
+									"value": "global_id,resource_title,collection_tag,producer"
+								},
+								{
+									"key": "collection_tag",
+									"value": "{{stamp}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Group by producer",
 					"event": [
 						{
@@ -6034,14 +6095,29 @@
 								"exec": [
 									"pm.test(\"Testing portal connection\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
-									"    if(pm.response.text() === pm.globals.get('noPortalMsg')) return true",
+									"    if (pm.response.text() === pm.globals.get('noPortalMsg')) {",
+									"        pm.collectionVariables.set('skipPortalConnection', true)",
+									"        return true",
+									"    }",
 									"    const token = pm.response.json().access_token",
-									"    pm.expect(!!match.jwt(token)).to.be.true       ",
-									"    pm.collectionVariables.set(pm.variables.get('portalJwtName'),token)",
+									"    pm.expect(!!match.jwt(token)).to.be.true",
+									"    pm.collectionVariables.set(pm.variables.get('portalJwtName'), token)",
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -6069,7 +6145,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"",
 									"pm.test(\"Create Integration report 1 for metadata 1\", () => {",
+									"    if (pm.collectionVariables.get('skipPortalConnection')) {",
+									"        pm.expect(pm.response.code).to.eql(400);",
+									"        return",
+									"    }",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    // console.log(responseJson);",
@@ -6146,6 +6227,10 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Create Integration report 2 for metadata 1\", () => {",
+									"    if (pm.collectionVariables.get('skipPortalConnection')) {",
+									"        pm.expect(pm.response.code).to.eql(400);",
+									"        return",
+									"    }",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    // console.log(responseJson);",
@@ -6219,7 +6304,10 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Create Integration report for unkown metadata\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
+									"    if (pm.collectionVariables.get('skipPortalConnection')) {",
+									"        pm.expect(pm.response.code).to.eql(400);",
+									"        return",
+									"    } pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    // console.log(responseJson);",
 									"    const metaId = pm.variables.get('unkownMetaId');",
@@ -6294,6 +6382,10 @@
 							"script": {
 								"exec": [
 									"pm.test(\"2 integration reports created for metadata 1\", () => {",
+									"    if (pm.collectionVariables.get('skipPortalConnection')) {",
+									"        pm.expect(pm.response.code).to.eql(400);",
+									"        return",
+									"    }",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const reportList = pm.response.json();",
 									"    pm.expect(reportList.length).to.eq(2);",
@@ -6308,9 +6400,6 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"catalogUrl = pm.variables.get('catalogUrl')",
-									"nodeApiUrl = catalogUrl.replace('catalog','api')",
-									"pm.collectionVariables.set('nodeApiUrl', nodeApiUrl);",
 									""
 								],
 								"type": "text/javascript",
@@ -6366,6 +6455,10 @@
 							"script": {
 								"exec": [
 									"pm.test(\"2 integration reports created for metadata 1\", () => {",
+									"    if (pm.collectionVariables.get('skipPortalConnection')) {",
+									"        pm.expect(pm.response.code).to.eql(400);",
+									"        return",
+									"    }",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const reportList = pm.response.json();",
 									"    pm.expect(reportList.length).to.eq(2);",
@@ -6438,6 +6531,10 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Edit integration report 2 for metadata 1\", () => {",
+									"    if (pm.collectionVariables.get('skipPortalConnection')) {",
+									"        pm.expect(pm.response.code).to.eql(200);",
+									"        return",
+									"    } ",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    // console.log(responseJson);",
@@ -6451,7 +6548,8 @@
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -6490,6 +6588,10 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Edition of integration report 2 saved (access from metadata 1)\", () => {",
+									"    if (pm.collectionVariables.get('skipPortalConnection')) {",
+									"        pm.expect(pm.response.code).to.eql(400);",
+									"        return",
+									"    }",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    // console.log(responseJson);",
@@ -6557,6 +6659,10 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Edition of integration report 2 saved (access from metadata 1)\", () => {",
+									"    if (pm.collectionVariables.get('skipPortalConnection')) {",
+									"        pm.expect(pm.response.code).to.eql(400);",
+									"        return",
+									"    }",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
 									"    // console.log(responseJson);",
@@ -6636,7 +6742,9 @@
 									"    pm.expect(responseJson.version).to.eq(apiVersion);",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -6665,12 +6773,18 @@
 							"script": {
 								"exec": [
 									"pm.test(\"2 integration reports created in total\", () => {",
-									"    pm.expect(pm.response.code).to.eql(200);",
+									"    if (pm.collectionVariables.get('skipPortalConnection')) {",
+									"        pm.expect(pm.response.code).to.eql(200);",
+									"        return",
+									"    }",
+									"     pm.expect(pm.response.code).to.eql(200);",
 									"    const reportList = pm.response.json();",
 									"    pm.expect(reportList.length).to.gte(2);",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -6716,6 +6830,10 @@
 							"script": {
 								"exec": [
 									"pm.test(\"2 integration reports created in total\", () => {",
+									"     if (pm.collectionVariables.get('skipPortalConnection')) {",
+									"        pm.expect(pm.response.code).to.eql(200);",
+									"        return",
+									"    }",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const reportList = pm.response.json();",
 									"    pm.expect(reportList.length).to.gte(2);",
@@ -6839,13 +6957,17 @@
 								"exec": [
 									"pm.test(\"Delete report 1 & 2\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
+									"    if (pm.collectionVariables.get('skipPortalConnection')) return",
+									"",
 									"    const responseJson = pm.response.json();",
 									"    // pm.expect(responseJson.n).to.eq(3);",
 									"    // pm.expect(responseJson.ok).to.eq(1);",
 									"    pm.expect(responseJson.deletedCount).to.eq(3);",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -6929,12 +7051,18 @@
 								"exec": [
 									"const stamp = pm.variables.get('stamp')",
 									"pm.test(`No metadata left with '${stamp}' stamp'`, () => {",
+									"    if (pm.collectionVariables.get('skipPortalConnection')) {",
+									"        pm.expect(pm.response.code).to.eql(400);",
+									"        return",
+									"    }",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const publicMetadataList = pm.response.json();",
 									"    pm.expect(publicMetadataList.total).to.eq(0);",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -9770,7 +9898,107 @@
 			"value": ""
 		},
 		{
-			"key": "portalUrl",
+			"key": "gitHash",
+			"value": ""
+		},
+		{
+			"key": "apiVersion",
+			"value": ""
+		},
+		{
+			"key": "rudiData",
+			"value": ""
+		},
+		{
+			"key": "softOrg1Id",
+			"value": ""
+		},
+		{
+			"key": "softOrg1Name",
+			"value": ""
+		},
+		{
+			"key": "softOrg1Address",
+			"value": ""
+		},
+		{
+			"key": "softOrg2Id",
+			"value": ""
+		},
+		{
+			"key": "softOrg2Name",
+			"value": ""
+		},
+		{
+			"key": "softOrg2Address",
+			"value": ""
+		},
+		{
+			"key": "softContact1Id",
+			"value": ""
+		},
+		{
+			"key": "softContact1Name",
+			"value": ""
+		},
+		{
+			"key": "softContact1Email",
+			"value": ""
+		},
+		{
+			"key": "softContact2Id",
+			"value": ""
+		},
+		{
+			"key": "softContact2Name",
+			"value": ""
+		},
+		{
+			"key": "softContact2Email",
+			"value": ""
+		},
+		{
+			"key": "softContact3Id",
+			"value": ""
+		},
+		{
+			"key": "softContact3Name",
+			"value": ""
+		},
+		{
+			"key": "softContact3Email",
+			"value": ""
+		},
+		{
+			"key": "now",
+			"value": ""
+		},
+		{
+			"key": "softMeta1Id",
+			"value": ""
+		},
+		{
+			"key": "softMedia1Id",
+			"value": ""
+		},
+		{
+			"key": "mediaId1",
+			"value": ""
+		},
+		{
+			"key": "keywords",
+			"value": ""
+		},
+		{
+			"key": "themes",
+			"value": ""
+		},
+		{
+			"key": "sanityLicence",
+			"value": ""
+		},
+		{
+			"key": "licences",
 			"value": ""
 		}
 	]

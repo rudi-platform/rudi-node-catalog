@@ -10,7 +10,6 @@ const { omit } = _
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 
-import { HTTP_METHODS } from '../../config/constApi.js'
 import { UuidSchema, UuidV4Schema } from '../schemas/Identifiers.js'
 
 import { makeSearchable } from '../../db/dbActions.js'
@@ -44,6 +43,15 @@ export const IntegrationStatus = {
   KO: 'KO',
 }
 
+export const ReportMethods = {
+  GET: 'GET',
+  POST: 'POST',
+  PUT: 'PUT',
+  DELETE: 'DELETE',
+  ATTACH: 'ATTACH',
+  DETACH: 'DETACH',
+}
+
 // -------------------------------------------------------------------------------------------------
 // Custom schema definition: Report
 // -------------------------------------------------------------------------------------------------
@@ -73,7 +81,7 @@ const ReportSchema = new mongoose.Schema(
     /** Method used for the integration request by the Producer */
     [API_REPORT_METHOD]: {
       type: String,
-      enum: Object.values(HTTP_METHODS),
+      enum: Object.values(ReportMethods),
     },
 
     /** Version number of the integration contract used for the file */
