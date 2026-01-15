@@ -1,17 +1,16 @@
-import { RudiError } from '../../src/utils/errors.js'
-
 const mod = 'migrationsSchema'
 
-import mongoose from 'mongoose'
-import { FIELDS_TO_SKIP } from '../../src/db/dbFields.js'
 import _ from 'lodash'
+import mongoose from 'mongoose'
+const { omit } = _
+
 import { makeSearchable } from '../../src/db/dbActions.js'
+import { FIELDS_TO_SKIP } from '../../src/db/dbFields.js'
+import { RudiError } from '../../src/utils/errors.js'
 
 const VERSION = 'version'
 const DATE = 'date'
 const FILE = 'file'
-
-const { omit } = _
 
 const MigrationSchema = new mongoose.Schema(
   {

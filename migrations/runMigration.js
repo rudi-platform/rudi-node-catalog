@@ -1,4 +1,4 @@
-const mod = 'runMigrations'
+const mod = 'migration'
 
 import fs from 'fs/promises'
 import mongoose from 'mongoose'
@@ -14,7 +14,7 @@ const AUTO_UPDATE_SCHEMAS = getConf(MIGRATION_SECTION, 'auto_update_schema', tru
 const DISABLE_DB_LOGGING = true
 const MIGRATIONS_DIR = './migrations/scripts'
 const BACKUPS_DIR = getConf(MIGRATION_SECTION, 'backups_dir', './migrations/backups')
-const MONGODB_URI = getDbFullUri()
+const MONGODB_URI = process.env.MONGODB || getDbFullUri()
 
 // Logger that disables log writing in the database to avoid noise during migrations
 const logNoDB = {
@@ -127,14 +127,12 @@ async function restoreDatabase(backupPath) {
  */
 function needMigration(files, lastVersion) {
   const fun = 'needMigration'
-
-  let scriptsLastVersion = parseInt(files[files.length - 1].substring(0, 3))
+  const scriptsLastVersion = parseInt(files[files.length - 1].substring(0, 3))
   logNoDB.debug(
     mod,
     fun,
     `scriptsLastVersion: ${scriptsLastVersion}, databaseLastVersion: ${lastVersion}`
   )
-
   return scriptsLastVersion > lastVersion
 }
 
@@ -257,34 +255,40 @@ async function runMigration(filename, version) {
  */
 export async function runMigrations(isDirect = false) {
   const fun = 'runMigrations'
-  let dbBackupPath = null
+  let dbBackupPath
   try {
     await migrationConnection.openUri(MONGODB_URI)
-    logNoDB.debug(mod, fun, 'Connected to MongoDB')
+    logNoDB.debug(mod, fun, `Connected to MongoDB at ${MONGODB_URI}`)
+
+    const lastVersion = await getLastMigrationVersion()
+    logNoDB.info(mod, fun, `Last executed version: ${lastVersion}`)
 
     const migrationFiles = await getMigrationFiles()
-    const lastVersion = await getLastMigrationVersion()
-
-    logNoDB.info(mod, fun, `Last executed version: ${lastVersion}`)
     logNoDB.info(mod, fun, `Total number of migration files: ${migrationFiles?.length || 0}`)
 
     if (!migrationFiles || migrationFiles.length === 0) {
       logNoDB.info(mod, fun, 'No migration file found')
       return true
     }
+    if (!needMigration(migrationFiles, lastVersion)) {
+      logNoDB.info(mod, fun, `No migration needed`)
+      return true
+    }
 
-    if (needMigration(migrationFiles, lastVersion)) {
-      logNoDB.info(mod, fun, `Migration files need to be executed`)
-      if (AUTO_UPDATE_SCHEMAS || isDirect) {
-        // dump database before any migration
-        dbBackupPath = await dumpDatabase()
-
-        await migrateFiles(migrationFiles, lastVersion)
-      }
-
+    logNoDB.info(mod, fun, `Migration is required`)
+    if (!AUTO_UPDATE_SCHEMAS && !isDirect) {
       logNoDB.error(mod, fun, `The application cannot start; schemas must be updated beforehand.`)
       process.exit(-1)
     }
+    logNoDB.info(mod, fun, `Launching migration process`)
+
+    // dump database before any migration
+    dbBackupPath = await dumpDatabase()
+    logNoDB.info(mod, fun, `DB dumped at '${dbBackupPath}'`)
+
+    await migrateFiles(migrationFiles, lastVersion)
+    logNoDB.info(mod, fun, `All migration files were executed.`)
+
     return true
   } catch (error) {
     logNoDB.error(mod, fun, `Error while running migrations ${error.message}:`)
@@ -347,29 +351,36 @@ async function executeMigrations(isDirect = false) {
   }
 }
 
-// If run directly via `node ./migrations/runMigration.js`, execute executeMigrations()
-// If imported by the app (rudiNodeCatalog.js), do not call executeMigrations() and let the app manage the lifecycle
-if (import.meta?.url && typeof process !== 'undefined') {
-  // Défine import logic
-  const isImported = typeof require === 'undefined'
+async function checkMigration() {
+  const fun = 'checkMigration'
+  // If run directly via `node ./migrations/runMigration.js`, execute executeMigrations()
+  // If imported by the app (rudiNodeCatalog.js), do not call executeMigrations() and let the app manage the lifecycle
+  if (import.meta?.url && typeof process !== 'undefined') {
+    logNoDB.debug(mod, fun, '')
+    // Défine import logic
+    const isImported = typeof require === 'undefined'
+    logNoDB.info(mod, fun, `isImported: ${isImported}`)
+    const isDirectByRequire = !isImported && require.main === module
+    logNoDB.info(mod, fun, `isDirectByRequire: ${isDirectByRequire}`)
 
-  const isDirectByImport =
-    isImported &&
-    process.argv[1] &&
-    new URL(import.meta.url).pathname.endsWith(process.argv[1].split(/[\\/]/).pop())
-  const isDirectByRequire = !isImported && require.main === module
+    const isDirectByImport =
+      isImported &&
+      process.argv[1] &&
+      new URL(import.meta.url).pathname.endsWith(process.argv[1].split(/[\\/]/).pop())
+    logNoDB.info(mod, fun, `isDirectByImport: ${isDirectByImport}`)
 
-  const isDirect = isDirectByImport || isDirectByRequire
+    const isDirect = isDirectByImport || isDirectByRequire
+    logNoDB.info(mod, fun, `isDirect: ${isDirect}`)
 
-  logNoDB.info(
-    mod,
-    'executeMigrationsDirect',
-    `isDirect: ${isDirect} - isImported: ${isImported} - isDirectByImport: ${isDirectByImport} - isDirectByRequire: ${isDirectByRequire}`
-  )
-
-  if (isDirect) {
-    await executeMigrations(isDirect)
+    if (isDirect) {
+      await executeMigrations(isDirect)
+    }
+    // Else this file is only imported or required by the app, so do not execute migrations here
+    // The app will manage the lifecycle and call runMigrations() when needed
   }
-  // Else this file is only imported or required by the app, so do not execute migrations here
-  // The app will manage the lifecycle and call runMigrations() when needed
 }
+
+checkMigration().then(
+  () => logNoDB.info(mod, 'checkMigration', 'Execution OK'),
+  (err) => logNoDB.error(mod, 'checkMigration', `Execution KO: ${err}`)
+)

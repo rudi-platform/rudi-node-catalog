@@ -1,4 +1,4 @@
-const mod = 'migration_organizations_status'
+const mod = '001__migration_organization_status'
 
 import { logI, logT } from '../../src/utils/logging.js'
 
