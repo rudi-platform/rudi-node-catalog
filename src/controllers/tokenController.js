@@ -151,16 +151,17 @@ const getPubKey = (subject) => {
   try {
     if (!CACHED_PUB_KEYS[subject]) {
       const subjProfile = getProfile(subject)
-      // logD(mod, fun + ' profile:', beautify(subjProfile))
+      logD(mod, fun + ' profile:', beautify(subjProfile))
       const keyFile = subjProfile[PUB_KEY]
       if (!keyFile)
         throw new ForbiddenError(`Wrong configuration, public key path not found for '${subject}'`)
-      CACHED_PUB_KEYS[subject] = readPublicKeyFile(keyFile)
       logD(mod, fun, `Key found for '${subject}'`)
+      CACHED_PUB_KEYS[subject] = readPublicKeyFile(keyFile)
+      logD(mod, fun, `Key correctly read for '${subject}'`)
     }
     return CACHED_PUB_KEYS[subject]
   } catch (err) {
-    logW(mod, fun, beautify(err))
+    logW(mod, fun, `Error while getting key for '${subject}': ${beautify(err)}`)
     throw RudiError.treatError(mod, fun, err)
   }
 }

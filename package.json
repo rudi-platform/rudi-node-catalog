@@ -44,7 +44,7 @@
     "lodash": "^4.17.21",
     "markdown-table": "^3.0.4",
     "minimist": "^1.2.8",
-    "mongoose": "8.20.4",
+    "mongoose": "8.15.1",
     "mongoose-geojson-schema": "^3.1.1",
     "mongoose-int32": "^0.6.0",
     "nanoid": "^5.1.6",

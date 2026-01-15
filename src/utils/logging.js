@@ -137,7 +137,7 @@ const dumpInitLogs = () => {
   for (const logLine of getConsoleLogs()) sysDebug(logLine, 'init')
 }
 
-const sysLog = (level, msg, location, context, cid, info) => {
+const sysLog = (level, msg = '<-', location, context, cid, info) => {
   try {
     if (initDump) {
       initDump = false
@@ -146,7 +146,7 @@ const sysLog = (level, msg, location, context, cid, info) => {
     if (SHOULD_SYSLOG) {
       if (level == 'verbose') level = 'info'
       if (level == ERR_LEVEL_TRACE || !level) level = 'debug'
-      let msg_str = `${msg}`
+      let msg_str = typeof msg == 'string' ? msg : `${msg}`
       if (msg_str === '[Object]: Object' || msg_str === '[object Object]')
         msg_str = JSON.stringify(msg)
       sysLogger[level](msg_str, location, context, cid || context?.id, info || context?.detailsStr)

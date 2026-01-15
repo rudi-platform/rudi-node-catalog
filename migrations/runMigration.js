@@ -1,13 +1,12 @@
 const mod = 'runMigrations'
 
-import { getConf } from '../src/config/appOptions.js'
-
-import mongoose from 'mongoose'
-
 import fs from 'fs/promises'
+import mongoose from 'mongoose'
 import path from 'path'
-import { logD, logE, logI } from '../src/utils/logging.js'
+
+import { getConf } from '../src/config/appOptions.js'
 import { getDbFullUri } from '../src/config/confSystem.js'
+import { logD, logE, logI } from '../src/utils/logging.js'
 import { Migration } from './model/migrationSchema.js'
 
 const MIGRATION_SECTION = 'migration'
@@ -18,7 +17,7 @@ const BACKUPS_DIR = getConf(MIGRATION_SECTION, 'backups_dir', './migrations/back
 const MONGODB_URI = getDbFullUri()
 
 // Logger that disables log writing in the database to avoid noise during migrations
-const logWithoutDB = {
+const logNoDB = {
   debug: (mod, fun, msg) => logD(mod, fun, msg, !DISABLE_DB_LOGGING),
   info: (mod, fun, msg) => logI(mod, fun, msg, !DISABLE_DB_LOGGING),
   error: (mod, fun, msg) => logE(mod, fun, msg, !DISABLE_DB_LOGGING),
@@ -45,7 +44,7 @@ async function createBackupFile(name, payload) {
   const backupPath = path.join(BACKUPS_DIR, filename)
   await fs.mkdir(BACKUPS_DIR, { recursive: true })
   await fs.writeFile(backupPath, JSON.stringify(payload, null, 2), 'utf8')
-  logWithoutDB.debug(mod, fun, `Backup created: ${backupPath}`)
+  logNoDB.debug(mod, fun, `Backup created: ${backupPath}`)
   return backupPath
 }
 
@@ -57,7 +56,7 @@ async function createBackupFile(name, payload) {
  */
 async function dumpDatabase() {
   const fun = 'dumpDatabase'
-  logWithoutDB.info(mod, fun, 'Full database dump...')
+  logNoDB.info(mod, fun, 'Full database dump...')
   const db = migrationConnection.db
   const collections = await db.listCollections().toArray()
   const dump = {}
@@ -85,7 +84,7 @@ async function dumpDatabase() {
  */
 async function restoreDatabase(backupPath) {
   const fun = 'restoreDatabase'
-  logWithoutDB.error(mod, fun, `Restoring from ${backupPath}...`)
+  logNoDB.error(mod, fun, `Restoring from ${backupPath}...`)
   const db = migrationConnection.db
   const snapshot = JSON.parse(await fs.readFile(backupPath, 'utf8'))
 
@@ -109,13 +108,13 @@ async function restoreDatabase(backupPath) {
         // eslint-disable-next-line no-await-in-loop
         await db.collection(name).insertMany(docs)
       }
-      logWithoutDB.debug(mod, fun, `Collection restored: ${name} (${docs?.length || 0} docs)`)
+      logNoDB.debug(mod, fun, `Collection restored: ${name} (${docs?.length || 0} docs)`)
     } catch (e) {
-      logWithoutDB.error(mod, fun, `Collection restore error '${name}': ${e.message}`)
+      logNoDB.error(mod, fun, `Collection restore error '${name}': ${e.message}`)
       throw e
     }
   }
-  logWithoutDB.info(mod, fun, 'Restore completed')
+  logNoDB.info(mod, fun, 'Restore completed')
 }
 
 /**
@@ -130,7 +129,7 @@ function needMigration(files, lastVersion) {
   const fun = 'needMigration'
 
   let scriptsLastVersion = parseInt(files[files.length - 1].substring(0, 3))
-  logWithoutDB.debug(
+  logNoDB.debug(
     mod,
     fun,
     `scriptsLastVersion: ${scriptsLastVersion}, databaseLastVersion: ${lastVersion}`
@@ -150,15 +149,15 @@ function needMigration(files, lastVersion) {
 async function getMigrationFiles() {
   const fun = 'getMigrationFiles'
 
-  logWithoutDB.debug(mod, fun, `Getting migration files... ${MIGRATIONS_DIR}`)
+  logNoDB.debug(mod, fun, `Getting migration files... ${MIGRATIONS_DIR}`)
 
   try {
     const files = await fs.readdir(MIGRATIONS_DIR)
-    logWithoutDB.debug(mod, fun, `Files found: ${files.join(', ')}`)
+    logNoDB.debug(mod, fun, `Files found: ${files.join(', ')}`)
     // Filter: 3 digits + double underscore + .js, lexicographic ascending sort
     return files.filter((file) => file.match(/^\d{3}__.*\.js$/)).sort((a, b) => a.localeCompare(b))
   } catch (err) {
-    logWithoutDB.error(mod, fun, `ERROR - could not get migration files: ${err.message}`)
+    logNoDB.error(mod, fun, `ERROR - could not get migration files: ${err.message}`)
     throw err // Propagate the error to the upper level
   }
 }
@@ -171,12 +170,12 @@ async function getMigrationFiles() {
  */
 async function getLastMigrationVersion() {
   const fun = 'getLastMigrationVersion'
-  logWithoutDB.debug(mod, fun, 'Getting last migration version from database...')
+  logNoDB.debug(mod, fun, 'Getting last migration version from database...')
   try {
     const lastMigration = await MigrationModel.findOne({}).sort({ version: -1 })
     return lastMigration ? lastMigration.version : 0
   } catch (err) {
-    logWithoutDB.error(mod, fun, `ERROR - could not get last migration version: ${err.message}`)
+    logNoDB.error(mod, fun, `ERROR - could not get last migration version: ${err.message}`)
     throw err // Propagate the error to the upper level
   }
 }
@@ -191,11 +190,7 @@ async function getLastMigrationVersion() {
  */
 async function recordMigration(filename, version) {
   const fun = 'recordMigration'
-  logWithoutDB.debug(
-    mod,
-    fun,
-    `Recording migration ${filename} with version ${version} in database...`
-  )
+  logNoDB.debug(mod, fun, `Recording migration ${filename} with version ${version} in database...`)
   await MigrationModel.create({
     version: version,
     file: filename,
@@ -211,14 +206,14 @@ async function recordMigration(filename, version) {
  */
 async function importMigrationFile(filename) {
   const fun = 'importMigrationFile'
-  logWithoutDB.debug(mod, fun, `Importing migration file ${filename}`)
+  logNoDB.debug(mod, fun, `Importing migration file ${filename}`)
   try {
     const migrationPath = path.join(process.cwd(), MIGRATIONS_DIR, filename)
     const fileUrl = new URL(`file://${migrationPath.replace(/\\/g, '/')}`)
     const module = await import(fileUrl)
     return { module }
   } catch (error) {
-    logWithoutDB.error(mod, fun, `Error while importing file ${filename}: ${error.message}`)
+    logNoDB.error(mod, fun, `Error while importing file ${filename}: ${error.message}`)
     throw error
   }
 }
@@ -234,7 +229,7 @@ async function importMigrationFile(filename) {
  */
 async function runMigration(filename, version) {
   const fun = 'runMigration'
-  logWithoutDB.info(mod, fun, `Running migration: ${filename}`)
+  logNoDB.info(mod, fun, `Running migration: ${filename}`)
   try {
     const { module: migrationModule } = await importMigrationFile(filename)
 
@@ -244,10 +239,10 @@ async function runMigration(filename, version) {
 
     await migrationModule.migrate({ connection: migrationConnection })
     await recordMigration(filename, version)
-    logWithoutDB.info(mod, fun, `Migration ${filename} completed successfully`)
+    logNoDB.info(mod, fun, `Migration ${filename} completed successfully`)
     return true
   } catch (error) {
-    logWithoutDB.error(mod, fun, `Error during migration ${filename}: ${error.message}`)
+    logNoDB.error(mod, fun, `Error during migration ${filename}: ${error.message}`)
     throw error
   }
 }
@@ -260,50 +255,46 @@ async function runMigration(filename, version) {
  * @return {Promise<boolean>} A promise that resolves to true if all migrations are successfully executed
  *                            or no migrations are required; throws an error otherwise.
  */
-export async function runMigrations() {
+export async function runMigrations(isDirect = false) {
   const fun = 'runMigrations'
   let dbBackupPath = null
   try {
     await migrationConnection.openUri(MONGODB_URI)
-    logWithoutDB.debug(mod, fun, 'Connected to MongoDB')
+    logNoDB.debug(mod, fun, 'Connected to MongoDB')
 
     const migrationFiles = await getMigrationFiles()
     const lastVersion = await getLastMigrationVersion()
 
-    logWithoutDB.info(mod, fun, `Last executed version: ${lastVersion}`)
-    logWithoutDB.info(mod, fun, `Total number of migration files: ${migrationFiles?.length || 0}`)
+    logNoDB.info(mod, fun, `Last executed version: ${lastVersion}`)
+    logNoDB.info(mod, fun, `Total number of migration files: ${migrationFiles?.length || 0}`)
 
     if (!migrationFiles || migrationFiles.length === 0) {
-      logWithoutDB.info(mod, fun, 'No migration file found')
+      logNoDB.info(mod, fun, 'No migration file found')
       return true
     }
 
     if (needMigration(migrationFiles, lastVersion)) {
-      logWithoutDB.info(mod, fun, `Migration files need to be executed`)
-      if (AUTO_UPDATE_SCHEMAS) {
+      logNoDB.info(mod, fun, `Migration files need to be executed`)
+      if (AUTO_UPDATE_SCHEMAS || isDirect) {
         // dump database before any migration
         dbBackupPath = await dumpDatabase()
 
         await migrateFiles(migrationFiles, lastVersion)
       }
 
-      logWithoutDB.error(
-        mod,
-        fun,
-        `The application cannot start; schemas must be updated beforehand.`
-      )
+      logNoDB.error(mod, fun, `The application cannot start; schemas must be updated beforehand.`)
       process.exit(-1)
     }
     return true
   } catch (error) {
-    logWithoutDB.error(mod, fun, `Error while running migrations ${error.message}:`)
+    logNoDB.error(mod, fun, `Error while running migrations ${error.message}:`)
     // if something went wrong, try to restore the database
     if (dbBackupPath) {
       try {
         await restoreDatabase(dbBackupPath)
-        logWithoutDB.info(mod, fun, 'Database restored after migration failure')
+        logNoDB.info(mod, fun, 'Database restored after migration failure')
       } catch (restoreErr) {
-        logWithoutDB.error(mod, fun, `Restore failed: ${restoreErr.message}`)
+        logNoDB.error(mod, fun, `Restore failed: ${restoreErr.message}`)
       }
     }
     return false
@@ -313,12 +304,12 @@ export async function runMigrations() {
 async function migrateFiles(migrationFiles, lastVersion) {
   const fun = 'migrateFiles'
   for (const file of migrationFiles) {
-    logWithoutDB.info(mod, fun, 'Migration files: ' + migrationFiles.join(','))
-    logWithoutDB.info(mod, fun, 'Selected file: ' + file)
+    logNoDB.info(mod, fun, 'Migration files: ' + migrationFiles.join(','))
+    logNoDB.info(mod, fun, 'Selected file: ' + file)
 
     const currentVersion = Number.parseInt(file.substring(0, 3))
     if (currentVersion <= lastVersion) {
-      logWithoutDB.debug(mod, fun, `Migration ${file} already executed, skipping`)
+      logNoDB.debug(mod, fun, `Migration ${file} already executed, skipping`)
       continue
     }
 
@@ -326,7 +317,7 @@ async function migrateFiles(migrationFiles, lastVersion) {
     await runMigration(file, currentVersion)
   }
 
-  logWithoutDB.info(mod, fun, 'All migrations executed successfully')
+  logNoDB.info(mod, fun, 'All migrations executed successfully')
   return true
 }
 
@@ -339,18 +330,18 @@ async function closeGracefully() {
       await mongoose.connection.close(false)
     }
   } catch (e) {
-    logWithoutDB.error(mod, fun, `Error closing Mongoose connection: ${e.message}`)
+    logNoDB.error(mod, fun, `Error closing Mongoose connection: ${e.message}`)
   }
 }
 
 // --- Standalone launcher ---
-async function executeMigrations() {
+async function executeMigrations(isDirect = false) {
   const fun = 'executeMigrations'
-  const ok = await runMigrations()
-  logWithoutDB.info(mod, fun, `Migration process ended with status ${ok ? 'OK' : 'ERROR'}`)
+  const ok = await runMigrations(isDirect)
+  logNoDB.info(mod, fun, `Migration process ended with status ${ok ? 'OK' : 'ERROR'}`)
   try {
     await closeGracefully()
-    logWithoutDB.info(mod, fun, 'Mongoose connection closed')
+    logNoDB.info(mod, fun, 'Mongoose connection closed')
   } finally {
     process.exit(ok ? 0 : 1)
   }
@@ -370,14 +361,14 @@ if (import.meta?.url && typeof process !== 'undefined') {
 
   const isDirect = isDirectByImport || isDirectByRequire
 
-  logWithoutDB.info(
+  logNoDB.info(
     mod,
-    'executeMigrations',
+    'executeMigrationsDirect',
     `isDirect: ${isDirect} - isImported: ${isImported} - isDirectByImport: ${isDirectByImport} - isDirectByRequire: ${isDirectByRequire}`
   )
 
   if (isDirect) {
-    await executeMigrations()
+    await executeMigrations(isDirect)
   }
   // Else this file is only imported or required by the app, so do not execute migrations here
   // The app will manage the lifecycle and call runMigrations() when needed
