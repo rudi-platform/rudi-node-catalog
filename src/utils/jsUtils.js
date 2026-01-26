@@ -340,10 +340,8 @@ export const isDefined = (val) => typeof val !== 'undefined'
 
 export const isPropDefined = (obj, prop) => obj?.hasOwnProperty(prop)
 
-export const isEmpty = (prop) => {
-  const strProp = JSON.stringify(prop)
-  return prop == '' || prop == '{}' || prop == '[]' || strProp == '{}' || strProp == '[]'
-}
+export const isEmpty = (prop) =>
+  ['', '{}', '[]'].includes(prop) || ['null', '{}', '[]'].includes(JSON.stringify(prop))
 
 export const isNothing = (prop) => {
   return !prop || isEmpty(prop)
@@ -399,6 +397,7 @@ export const setNullForMissingLeaves = (source, destination) => {
   }
   return destination
 }
+
 export const deepCompareAndSetNull = (source, destination) => {
   // Create a deep copy of objB to avoid mutating the original object
   const updatedDestination = JSON.parse(JSON.stringify(destination))

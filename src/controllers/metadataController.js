@@ -570,17 +570,18 @@ function toMDBLanguage(metadata, field) {
 export const setGeography = (metadata) => {
   const fun = 'setGeography'
   logT(mod, fun)
-  const geography = metadata[API_GEOGRAPHY]
-  if (isNothing(geography)) {
+  const geography = metadata?.[API_GEOGRAPHY]
+  if (!geography || isNothing(geography)) {
     // No 'geography' property => exit
     logD(mod, fun, `Property '${API_GEOGRAPHY}' is not set (and it's OK)`)
+    delete metadata[API_GEOGRAPHY]
     return
   }
 
   const bbox = geography[API_GEO_BBOX_PROPERTY]
   const geojson = geography[API_GEO_GEOJSON_PROPERTY]
-  // logD(mod, fun, `bbox: ${beautify(bbox)}`)
-  // logD(mod, fun, `geojson: ${beautify(geojson)}`)
+  logD(mod, fun, `bbox: ${beautify(bbox)}`)
+  logD(mod, fun, `geojson: ${beautify(geojson)}`)
 
   if (isNothing(bbox)) {
     // No 'bounding_box' property

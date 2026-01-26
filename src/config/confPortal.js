@@ -111,7 +111,7 @@ export const getPortalAuthCredentials = () => [
 ]
 
 // ----- API
-export const getPortalBaseUrl = () => API_PORTAL_URL ?? NO_PORTAL_MSG
+export const getPortalBaseUrl = () => API_PORTAL_URL || NO_PORTAL_MSG
 
 const API_GET_META_URL = getPortalConf('get_meta_url')
 const API_SEND_META_URL = getPortalConf('put_meta_url')

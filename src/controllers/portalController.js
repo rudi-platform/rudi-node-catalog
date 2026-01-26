@@ -191,8 +191,8 @@ export const isOrganizationAttached = async (req, reply) => {
   }
 }
 
-export const getMetadata = async (req, reply) => {
-  const fun = 'getMetadata'
+export const getPortalMetadata = async (req, reply) => {
+  const fun = 'getPortalMetadata'
   logT(mod, fun)
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG

@@ -4,7 +4,7 @@
 **/.env*
 
 # Generated
-*-lock.json
+# *-lock.json
 *-lock.y*ml
 *.lock
 **/node_modules

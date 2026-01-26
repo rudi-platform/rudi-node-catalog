@@ -107,7 +107,7 @@ const validArrayNotNull = {
 // -------------------------------------------------------------------------------------------------
 import { beautify, isNotEmptyArray, isNothing, multiSplit } from '../../utils/jsUtils.js'
 
-import { logD, logE, logT, logV, logW } from '../../utils/logging.js'
+import { logD, logE, logI, logT, logV, logW } from '../../utils/logging.js'
 
 import { makeSearchable } from '../../db/dbActions.js'
 import { BadRequestError, NotFoundError, RudiError } from '../../utils/errors.js'
@@ -349,53 +349,57 @@ const MetadataSchema = new mongoose.Schema(
      * Particularly relevant in the case of located sensors.
      */
     [API_GEOGRAPHY]: {
-      /**
-       * 'bounding_box': Geographic distribution of the data as a rectangle.
-       * The 4 parameters are given as decimal as described in the norm ISO 6709
-       */
-      [API_GEO_BBOX_PROPERTY]: {
-        type: {
-          // Custom validation in pre-save hook: required if 'geography' is defined !
+      type: {
+        /**
+         * 'bounding_box': Geographic distribution of the data as a rectangle.
+         * The 4 parameters are given as decimal as described in the norm ISO 6709
+         */
+        [API_GEO_BBOX_PROPERTY]: {
+          type: {
+            // Custom validation in pre-save hook: required if 'geography' is defined !
 
-          /** 'west_longitude': Westernmost longitude given as a decimal number */
-          [API_GEO_BBOX_WEST]: Longitude,
-          /* 'east_longitude': Easternmost longitude given as a decimal number */
-          [API_GEO_BBOX_EAST]: Longitude,
-          /** 'south_latitude': Southernmost latitude given as a decimal number */
-          [API_GEO_BBOX_SOUTH]: Latitude,
-          /** 'north_latitude': Northernmost latitude given as a decimal number */
-          [API_GEO_BBOX_NORTH]: Latitude,
+            /** 'west_longitude': Westernmost longitude given as a decimal number */
+            [API_GEO_BBOX_WEST]: Longitude,
+            /* 'east_longitude': Easternmost longitude given as a decimal number */
+            [API_GEO_BBOX_EAST]: Longitude,
+            /** 'south_latitude': Southernmost latitude given as a decimal number */
+            [API_GEO_BBOX_SOUTH]: Latitude,
+            /** 'north_latitude': Northernmost latitude given as a decimal number */
+            [API_GEO_BBOX_NORTH]: Latitude,
+          },
+          _id: false,
+          default: undefined,
         },
-        _id: false,
-        default: undefined,
+
+        /**
+         * 'geographic_distribution': Precise geographic distribution of the data
+         *
+         * Precisions: GeoJSON uses a geographic coordinate reference system,
+         * World Geodetic System 1984, and units of decimal degrees.
+         * The first two elements are longitude and latitude, or easting and
+         * northing, precisely in that order and using decimal numbers.
+         * Altitude or elevation MAY be included as an optional third element.
+         *
+         * Source: https://tools.ietf.org/html/rfc7946#section-3.1.1
+         */
+        [API_GEO_GEOJSON_PROPERTY]: { type: GeoJSON, _id: false, default: undefined },
+
+        /**
+         * 'projection': Cartographic projection used to describe the data
+         */
+        [API_GEO_PROJECTION_PROPERTY]: {
+          type: String,
+          // default: 'WGS 84 (EPSG:4326)',
+          // ,enum: Object.values(Projections)
+        },
+
+        /**
+         * Data topology
+         */
+        spatial_representation: String,
       },
-
-      /**
-       * 'geographic_distribution': Precise geographic distribution of the data
-       *
-       * Precisions: GeoJSON uses a geographic coordinate reference system,
-       * World Geodetic System 1984, and units of decimal degrees.
-       * The first two elements are longitude and latitude, or easting and
-       * northing, precisely in that order and using decimal numbers.
-       * Altitude or elevation MAY be included as an optional third element.
-       *
-       * Source: https://tools.ietf.org/html/rfc7946#section-3.1.1
-       */
-      [API_GEO_GEOJSON_PROPERTY]: { type: GeoJSON, default: undefined },
-
-      /**
-       * 'projection': Cartographic projection used to describe the data
-       */
-      [API_GEO_PROJECTION_PROPERTY]: {
-        type: String,
-        // default: 'WGS 84 (EPSG:4326)',
-        // ,enum: Object.values(Projections)
-      },
-
-      /**
-       * Data topology
-       */
-      spatial_representation: String,
+      _id: false,
+      default: undefined,
     },
 
     /**
@@ -737,9 +741,8 @@ async function checkThesaurus(metadata) {
       }
     }
 
-    logT(mod, fun, `geography`)
     const geography = metadata[API_GEOGRAPHY]
-    // logI(mod, fun, `geography: ${beautify(geography)}`)
+    logI(mod, fun, `geography: ${beautify(metadata[API_GEOGRAPHY])}`)
     if (geography) {
       const projection = geography[API_GEO_PROJECTION_PROPERTY]
       if (projection) {
@@ -753,6 +756,7 @@ async function checkThesaurus(metadata) {
           )
       }
     }
+    // logI(mod, fun, `GeoJson (post): ${beautify(metadata[API_GEOGRAPHY])}`)
 
     logT(mod, fun, `is storage status valid`)
     if (!isStorageStatusValid(metadata[API_STORAGE_STATUS], shouldInit)) {
@@ -764,8 +768,11 @@ async function checkThesaurus(metadata) {
       )
     }
 
-    // logT(mod, fun, `is dataset update freq valid`)
-    if (!isUpdateFrequenciesValid(metadata[API_UPDATE_FREQUENCY]))
+    logT(mod, fun, `is dataset update freq valid`)
+    if (
+      !metadata[API_UPDATE_FREQUENCY] ||
+      !isUpdateFrequenciesValid(metadata[API_UPDATE_FREQUENCY])
+    )
       metadata[API_UPDATE_FREQUENCY] = undefined
 
     return true
@@ -859,6 +866,12 @@ export const setMetadataStatusToSent = (metadata) => {
 // -------------------------------------------------------------------------------------------------
 // Schema refinements
 // -------------------------------------------------------------------------------------------------
+function stripNulls(obj) {
+  Object.keys(obj).forEach((key) => {
+    if (obj[key] === null) delete obj[key]
+  })
+  return obj
+}
 
 /**
  * toJSON cleanup
@@ -866,7 +879,7 @@ export const setMetadataStatusToSent = (metadata) => {
  */
 MetadataSchema.methods.toJSON = function () {
   // logT(mod, 'MetadataSchema.toJSON')
-  return omit(this.toObject(), FIELDS_TO_SKIP)
+  return stripNulls(omit(this.toObject(), FIELDS_TO_SKIP))
 }
 
 /**
@@ -874,7 +887,7 @@ MetadataSchema.methods.toJSON = function () {
  */
 MetadataSchema.methods.toRudiPortalJSON = function () {
   logT(mod, 'MetadataSchema.toRudiPortalJSON')
-  return toRudiPortalJSON(this)
+  return stripNulls(toRudiPortalJSON(this))
 }
 
 /**
@@ -919,7 +932,7 @@ MetadataSchema.pre('save', async function () {
     logT(mod, fun)
     const metadata = this
     logT(mod, fun, `checking ${API_GEOGRAPHY}`)
-    logT(mod, fun, metadata[API_GEOGRAPHY])
+    // logT(mod, fun, metadata[API_GEOGRAPHY])
     // If 'geography' field is defined, the field 'geography.bbox' is required
     // if (
     //   !metadata[API_GEOGRAPHY]?.[API_GEO_GEOJSON_PROPERTY] &&

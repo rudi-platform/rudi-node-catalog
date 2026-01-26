@@ -36,16 +36,16 @@
     "@aqmo.org/jwt-lib": "^1.1.14",
     "@aqmo.org/rudi_logger": "^1.1.6",
     "@fastify/compress": "^8.3.1",
-    "@fastify/multipart": "^9.3.0",
+    "@fastify/multipart": "^9.4.0",
     "axios": "^1.13.2",
-    "date-and-time": "^4.1.2",
-    "fastify": "^5.6.2",
+    "date-and-time": "^4.2.0",
+    "fastify": "^5.7.1",
     "ini": "^6.0.0",
     "lodash": "^4.17.21",
     "markdown-table": "^3.0.4",
     "minimist": "^1.2.8",
     "mongoose": "8.15.1",
-    "mongoose-geojson-schema": "^3.1.1",
+    "mongoose-geojson-schema": "^2.2.5",
     "mongoose-int32": "^0.6.0",
     "nanoid": "^5.1.6",
     "object-path": "^0.11.8",
@@ -57,16 +57,16 @@
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.28.5",
-    "@babel/eslint-parser": "^7.28.5",
-    "@babel/preset-env": "^7.28.5",
+    "@babel/core": "^7.28.6",
+    "@babel/eslint-parser": "^7.28.6",
+    "@babel/preset-env": "^7.28.6",
     "braces": "^3.0.3",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-unused-imports": "^4.3.0",
     "nodemon": "^3.1.11",
-    "prettier": "^3.7.4"
+    "prettier": "^3.8.0"
   },
   "overrides": {
     "braces": "$braces"

@@ -1077,7 +1077,6 @@ export const overwriteDbObject = async (objectType, updateData) => {
     }
     const updateOpts = {
       new: true, // returns the updated document
-      returnDocument: 'after',
       upsert: true, // creates the document if it wasn't found
     }
     // logD(mod, fun, `filter: ${beautify(filter)}`)
@@ -1089,10 +1088,11 @@ export const overwriteDbObject = async (objectType, updateData) => {
     // logD(mod, fun, `to be updated with: ${beautify(updateData)}`)
 
     if (objectType == OBJ_METADATA) {
-      logD(mod, fun, `findOneAndUpdate`)
+      // logD(mod, fun, beautify(updateData))
       const dbObject = await ObjModel.findOneAndUpdate(filter, updateData, updateOpts)
-      // logD(mod, fun, beautify(dbObject, 2))
+      if (updateData.geography) dbObject.markModified('geography')
       await dbObject.save()
+      // logD(mod, fun, beautify(dbObject, 2))
       return dbObject
     }
 
