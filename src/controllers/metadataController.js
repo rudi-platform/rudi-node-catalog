@@ -237,7 +237,8 @@ export const mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFo
   try {
     logT(mod, fun)
     // logD(mod, fun, `rudiMediaList: ${beautify(rudiMediaList)}`)
-    if (!rudiMediaList) throw new ParameterExpectedError('rudiMediaList', mod, fun)
+    if (!rudiMediaList) return []
+    // throw new ParameterExpectedError('rudiMediaList', mod, fun)
 
     const mediaDbIds = []
     await Promise.all(
@@ -345,7 +346,8 @@ export const mediaListDbToRudiFormat = async (mediaDbIds) => {
   const fun = 'mediaListDbToRudiFormat'
   logT(mod, fun)
   logD(mod, fun, `mediaDbIds: ${beautify(mediaDbIds)}`)
-  if (!mediaDbIds) throw new ParameterExpectedError('mediaDbIds', mod, fun)
+  if (!mediaDbIds) return []
+  // throw new ParameterExpectedError('mediaDbIds', mod, fun)
 
   const mediaList = []
   await Promise.all(
@@ -432,18 +434,19 @@ export const rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) 
     // TODO[VALIDATE]: The contact info already in database is not updated with possible new data,
     //                 and only the contact RUDI id is really necessary in the request body
     let mediaList
-    if (shouldBeStrict) {
-      mediaList = accessProperty(dbReadyMetadata, API_MEDIA_PROPERTY)
-      if (!isNotEmptyArray(mediaList))
-        throw new BadRequestError(
-          `${missingObjectProperty(dbReadyMetadata, API_MEDIA_PROPERTY)}`,
-          mod,
-          fun,
-          [API_MEDIA_PROPERTY]
-        )
-    } else {
-      mediaList = dbReadyMetadata[API_MEDIA_PROPERTY]
-    }
+    // if (shouldBeStrict) {
+    //   mediaList = accessProperty(dbReadyMetadata, API_MEDIA_PROPERTY)
+    //   if (!isNotEmptyArray(mediaList))
+    //     throw new BadRequestError(
+    //       `${missingObjectProperty(dbReadyMetadata, API_MEDIA_PROPERTY)}`,
+    //       mod,
+    //       fun,
+    //       [API_MEDIA_PROPERTY]
+    //     )
+    // } else {
+    mediaList = dbReadyMetadata[API_MEDIA_PROPERTY]
+    logD(mod, fun, `media list: ${beautify(dbReadyMetadata[API_MEDIA_PROPERTY])}`)
+    // }
     // logD(mod, fun, `mediaList: ${beautify(mediaList)}`)
     if (isNotEmptyArray(mediaList)) {
       dbReadyMetadata[API_MEDIA_PROPERTY] = await mediaListRudiToDbFormat(

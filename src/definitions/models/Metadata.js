@@ -98,14 +98,14 @@ import {
 // -------------------------------------------------------------------------------------------------
 
 const validArrayNotNull = {
-  validator: isNotEmptyArray,
+  validator: isArray,
   message: `'{PATH}' property should not be empty`,
 }
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { beautify, isNotEmptyArray, isNothing, multiSplit } from '../../utils/jsUtils.js'
+import { beautify, isArray, isNothing, multiSplit } from '../../utils/jsUtils.js'
 
 import { logD, logE, logI, logT, logV, logW } from '../../utils/logging.js'
 
@@ -171,9 +171,10 @@ export const METADATA_FIELDS_TO_POPULATE = [
  * @return {Array} The list of media that are still not available
  */
 export const listMissingMedia = (rudiMetadata) => {
-  const metadataMediaList = rudiMetadata[API_MEDIA_PROPERTY]
+  const mediaList = rudiMetadata[API_MEDIA_PROPERTY]
+  if (!mediaList) return null
   const missingMediaList = []
-  metadataMediaList.map((media) => {
+  mediaList.map((media) => {
     if (media[API_MEDIA_TYPE] === MediaTypes.File && isMediaMissing(media))
       missingMediaList.push(media[API_MEDIA_ID])
   })
@@ -184,7 +185,9 @@ export const isEveryMediaAvailable = (rudiMetadata) => {
   const fun = 'isEveryMediaAvailable'
   try {
     logT(mod, fun)
-    for (const media of rudiMetadata[API_MEDIA_PROPERTY]) if (isMediaMissing(media)) return false
+    const mediaList = rudiMetadata[API_MEDIA_PROPERTY]
+    if (!mediaList) return true
+    for (const media of mediaList) if (isMediaMissing(media)) return false
     return true
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -314,8 +317,11 @@ const MetadataSchema = new mongoose.Schema(
           ref: 'Media',
         },
       ],
-      required: true,
-      validate: validArrayNotNull,
+      required: false,
+      validate: {
+        validator: (media_list) => !media_list || isArray(media_list),
+        message: `'{PATH}' property should be a list of RudiMedia`,
+      },
     },
 
     // ---------------------------
@@ -628,8 +634,9 @@ async function checkFileTypes(metadata) {
   const fun = 'checkFileTypes'
   try {
     logT(mod, fun)
-    const medias = metadata[API_MEDIA_PROPERTY]
-    medias.map((media, i) => {
+    const mediaList = metadata[API_MEDIA_PROPERTY]
+    if (!mediaList) return
+    mediaList.map((media, i) => {
       if (media[API_MEDIA_TYPE] !== MediaTypes.File) return
 
       const [mimeType, encrypted] = /^(.*?)(\+crypt)?$/.exec(media[API_FILE_MIME])
