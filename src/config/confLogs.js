@@ -81,7 +81,8 @@ const SYSLOG_SECTION = 'syslog'
 
 const SYSLOG_APP_NAME = getConf(SYSLOG_SECTION, 'app_name', LOG_APP_NAME)
 
-const SYSLOG_LVL = getConf(SYSLOG_SECTION, 'log_level', 'info')
+const SYSLOG_LVL =
+  getConf(SYSLOG_SECTION, 'syslog_level') || getConf(SYSLOG_SECTION, 'log_level', 'info')
 // const SYSLOG_NODE_NAME = getConf(SYSLOG_SECTION, 'syslog_node_name')
 export const SYSLOG_PROTOCOL = getConf(SYSLOG_SECTION, 'syslog_protocol', 'unix')
 
