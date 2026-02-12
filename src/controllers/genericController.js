@@ -160,7 +160,7 @@ function checkIsUrlObject(objectType) {
 
 async function newObject(objectType, objectData) {
   const fun = 'newObject'
-  logT(mod, fun)
+  logT(mod, fun, objectType)
   try {
     // checkIsUrlObject(objectType)
     switch (objectType) {
@@ -200,8 +200,8 @@ async function newRudiObject(Model, objectData) {
     const dbObject = new Model(objectData)
 
     // On envoie la demande de création de l'organisation au portail si celui-ci est lié
-    if (!isPortalConnectionDisabled()) {
-      let organizationId = await createPortalOrganization(dbObject)
+    if (Model == Organization && !isPortalConnectionDisabled()) {
+      const organizationId = await createPortalOrganization(dbObject)
       if (organizationId) {
         dbObject['organization_id'] = organizationId
         dbObject['organization_status'] = OrganizationStatus.DRAFT
@@ -259,7 +259,7 @@ function overrideFilter(filterList, field, value) {
  */
 async function addSingleRudiObject(rudiObject, objectType, context) {
   const fun = 'addSingleRudiObject'
-  logT(mod, fun)
+  logT(mod, fun, objectType)
   try {
     // get the rudiId field for this object type
     const idField = getObjectIdField(objectType)
