@@ -203,7 +203,7 @@ async function newRudiObject(Model, objectData) {
     if (Model == Organization && !isPortalConnectionDisabled()) {
       const organizationId = await createPortalOrganization(dbObject)
       if (organizationId) {
-        dbObject['organization_id'] = organizationId
+        // dbObject['organization_id'] = organizationId
         dbObject['organization_status'] = OrganizationStatus.DRAFT
       }
     }
