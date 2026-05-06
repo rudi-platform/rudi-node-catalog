@@ -33,7 +33,7 @@
   "homepage": "https://app.swaggerhub.com/apis/OlivierMartineau/RUDI-PRODUCER",
   "license": "EUPL-1.2",
   "dependencies": {
-    "@aqmo.org/jwt-lib": "^1.1.14",
+    "@aqmo.org/jwt-lib": "^1.1.15",
     "@aqmo.org/rudi_logger": "^1.1.6",
     "@fastify/compress": "^8.3.1",
     "@fastify/multipart": "^9.4.0",
@@ -51,7 +51,7 @@
     "object-path": "^0.11.8",
     "sanitize-filename": "^1.6.4",
     "sshpk": "^1.18.0",
-    "uuid": "^13.0.2",
+    "uuid": "^14.0.0",
     "winston": "^3.19.0",
     "winston-daily-rotate-file": "^5.0.0",
     "xml2js": "^0.6.2"
