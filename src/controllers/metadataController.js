@@ -433,20 +433,22 @@ export const rudiToDbFormat = async (rudiMetadata, shouldBeStrict, shouldClone) 
     // ----- Updating media field with db instead of incoming data
     // TODO[VALIDATE]: The contact info already in database is not updated with possible new data,
     //                 and only the contact RUDI id is really necessary in the request body
-    let mediaList
-    // if (shouldBeStrict) {
-    //   mediaList = accessProperty(dbReadyMetadata, API_MEDIA_PROPERTY)
-    //   if (!isNotEmptyArray(mediaList))
-    //     throw new BadRequestError(
-    //       `${missingObjectProperty(dbReadyMetadata, API_MEDIA_PROPERTY)}`,
-    //       mod,
-    //       fun,
-    //       [API_MEDIA_PROPERTY]
-    //     )
-    // } else {
-    mediaList = dbReadyMetadata[API_MEDIA_PROPERTY]
-    logD(mod, fun, `media list: ${beautify(dbReadyMetadata[API_MEDIA_PROPERTY])}`)
-    // }
+    let mediaList = []
+    if (!dbReadyMetadata[API_MEDIA_PROPERTY]) {
+      logD(mod, fun, `No media for input metadata ${rudiMetadata[API_METADATA_ID]}`)
+
+      // if (shouldBeStrict) {
+      //   mediaList = accessProperty(dbReadyMetadata, API_MEDIA_PROPERTY)
+      //   if (!isEmptyArray(mediaList))
+      //     throw new BadRequestError(
+      //       `${missingObjectProperty(dbReadyMetadata, API_MEDIA_PROPERTY)}`,
+      //       mod,
+      //       fun,
+      //       [API_MEDIA_PROPERTY]
+      //     )
+    } else {
+      mediaList = dbReadyMetadata[API_MEDIA_PROPERTY]
+    }
     // logD(mod, fun, `mediaList: ${beautify(mediaList)}`)
     if (isNotEmptyArray(mediaList)) {
       dbReadyMetadata[API_MEDIA_PROPERTY] = await mediaListRudiToDbFormat(

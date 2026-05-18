@@ -768,7 +768,7 @@ export const devRoutes = [
     method: 'GET',
     url: getPrivatePath(URL_SUFFIX_NODE_VERSION),
     handler: getNodeVersion,
-    config: { [ROUTE_NAME]: 'd†ev_get_node_version' },
+    config: { [ROUTE_NAME]: 'dev_get_node_version' },
   },
 
   // -----------------------------------------------------------------------------------------------
