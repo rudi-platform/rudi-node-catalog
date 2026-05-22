@@ -70,6 +70,7 @@
     "prettier": "^3.8.3"
   },
   "overrides": {
-    "braces": "$braces"
+    "braces": "$braces",
+    "uuid": "$uuid"
   }
 }
