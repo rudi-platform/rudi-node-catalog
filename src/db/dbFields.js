@@ -34,6 +34,7 @@ export const API_DATA_DESCRIPTION_PROPERTY = 'summary'
 export const API_DATA_PRODUCER_PROPERTY = 'producer'
 export const API_DATA_CONTACTS_PROPERTY = 'contacts'
 export const API_DATA_DATES_PROPERTY = 'dataset_dates'
+export const API_DATA_UPDATE_FREQUENCY_PROPERTY = 'dataset_update_frequency'
 
 // -------------------------------------------------------------------------------------------------
 // Metadata properties: media
@@ -82,7 +83,6 @@ export const API_STORAGE_STATUS = 'storage_status'
 export const API_PERIOD_PROPERTY = 'temporal_spread'
 export const API_START_DATE_PROPERTY = 'start_date'
 export const API_END_DATE_PROPERTY = 'end_date'
-export const API_UPDATE_FREQUENCY = 'dataset_update_frequency'
 
 // -------------------------------------------------------------------------------------------------
 // Metadata properties: access condition / licence
@@ -231,6 +231,7 @@ export const API_REPORT_COMMENT = 'comment'
 export const API_REPORT_FIELD = 'field_name'
 export const API_REPORT_ERROR_MSG = 'error_message'
 export const API_REPORT_ERROR_CODE = 'error_code'
+export const API_REPORT_OBJECT_TYPE = 'object_type'
 export const LOCAL_REPORT_ERROR = 'report_treatment_error'
 export const LOCAL_REPORT_ERROR_TYPE = 'error_type'
 export const LOCAL_REPORT_ERROR_MSG = 'error_message'
@@ -272,6 +273,9 @@ export const API_CONCEPT_RELATIVE_PROPERTY = 'relative_concepts'
 // Thesaurus: dictionary entries
 export const DICT_LANG = 'lang'
 export const DICT_TEXT = 'text'
+
+// Thesaurus: rich dictionary entries
+export const RICH_DICT_HTML = 'html'
 
 // Licences types
 export const LicenceTypes = {

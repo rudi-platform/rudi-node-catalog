@@ -573,7 +573,7 @@ export const treatOrgnizationsReports = async (objectType, urlObjectId, reportBo
       break
     case ReportMethods.DETACH:
       dbObject[API_ORGANIZATION_ATTACHMENT_STATUS] =
-        reportBody[API_REPORT_STATUS] === IntegrationStatus.KO
+        reportBody[API_REPORT_STATUS] === IntegrationStatus.OK
           ? LinkedProducerStatus.DISENGAGED
           : LinkedProducerStatus.VALIDATED
       break

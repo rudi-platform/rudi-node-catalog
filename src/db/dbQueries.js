@@ -1346,11 +1346,14 @@ export const getEnsuredOrganizationDbIdWithJson = (organizationJson) =>
 export const getOrganizationDbIdWithJson = (organizationJson) =>
   getDbIdWithJson(OBJ_ORGANIZATIONS, organizationJson)
 
-export const searchOrganziations = (organizationStatus, linkedProducerStatus) => {
-  const filter = {
-    [API_ORGANIZATION_VALIDATION_STATUS]: organizationStatus,
-    [API_ORGANIZATION_ATTACHMENT_STATUS]: linkedProducerStatus,
-  }
+export const dbSearchOrganizations = (organizationStatus, linkedProducerStatus) => {
+  const filter = {}
+  if (organizationStatus !== undefined)
+    filter[API_ORGANIZATION_VALIDATION_STATUS] = organizationStatus
+
+  if (linkedProducerStatus !== undefined)
+    filter[API_ORGANIZATION_ATTACHMENT_STATUS] = linkedProducerStatus
+
   return Organization.find(filter)
 }
 

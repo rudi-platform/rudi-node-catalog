@@ -145,6 +145,8 @@ export class RudiError extends Error {
           return new MethodNotAllowedError(message, ctxMod, ctxFun)
         case 406:
           return new NotAcceptableError(message, ctxMod, ctxFun)
+        case 409:
+          return new ConflictError(message, ctxMod, ctxFun)
         case 501:
           return new NotImplementedError(message, ctxMod, ctxFun)
         case 504:
@@ -390,6 +392,20 @@ export class NotAcceptableError extends RudiError {
       406,
       'Not Acceptable',
       'Headers sent in the request are not compatible with the service',
+      undefined,
+      ctxMod,
+      ctxFun
+    )
+  }
+}
+
+export class ConflictError extends RudiError {
+  constructor(errMessage, ctxMod, ctxFun) {
+    super(
+      errMessage,
+      409,
+      'Conflict',
+      'The request conflicts with the current state of the server',
       undefined,
       ctxMod,
       ctxFun

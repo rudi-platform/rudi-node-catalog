@@ -28,6 +28,7 @@ import {
   API_REPORT_FIELD,
   API_REPORT_ID,
   API_REPORT_METHOD,
+  API_REPORT_OBJECT_TYPE,
   API_REPORT_RESOURCE_ID,
   API_REPORT_STATUS,
   API_REPORT_SUBMISSION_DATE,
@@ -50,6 +51,12 @@ export const ReportMethods = {
   DELETE: 'DELETE',
   ATTACH: 'ATTACH',
   DETACH: 'DETACH',
+}
+
+export const ObjectTypes = {
+  DATASET: 'DATASET',
+  ORGANIZATION: 'ORGANIZATION',
+  LINKED_PRODUCER: 'LINKED_PRODUCER',
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -136,6 +143,12 @@ const ReportSchema = new mongoose.Schema(
     /** Tag for identifying a collection of resources */
     [API_COLLECTION_TAG]: {
       type: String,
+    },
+
+    [API_REPORT_OBJECT_TYPE]: {
+      type: String,
+      enum: ObjectTypes,
+      required: false,
     },
   },
   {

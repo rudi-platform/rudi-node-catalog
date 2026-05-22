@@ -237,8 +237,7 @@ export const mediaListRudiToDbFormat = async (rudiMediaList, shouldCreateIfNotFo
   try {
     logT(mod, fun)
     // logD(mod, fun, `rudiMediaList: ${beautify(rudiMediaList)}`)
-    if (!rudiMediaList) return []
-    // throw new ParameterExpectedError('rudiMediaList', mod, fun)
+    if (!rudiMediaList) throw new ParameterExpectedError('rudiMediaList', mod, fun)
 
     const mediaDbIds = []
     await Promise.all(
@@ -346,8 +345,7 @@ export const mediaListDbToRudiFormat = async (mediaDbIds) => {
   const fun = 'mediaListDbToRudiFormat'
   logT(mod, fun)
   logD(mod, fun, `mediaDbIds: ${beautify(mediaDbIds)}`)
-  if (!mediaDbIds) return []
-  // throw new ParameterExpectedError('mediaDbIds', mod, fun)
+  if (!mediaDbIds) throw new ParameterExpectedError('mediaDbIds', mod, fun)
 
   const mediaList = []
   await Promise.all(
@@ -774,7 +772,9 @@ export const commitMedia = async (req, res) => {
     dbMedia[API_FILE_STATUS_UPDATE] = nowISO()
     const savedMedia = await dbMedia.save()
 
-    const filter = { [QUERY_FILTER]: { $and: [{ available_formats: { $in: [savedMedia._id] } }] } }
+    const filter = {
+      [QUERY_FILTER]: { $and: [{ [API_MEDIA_PROPERTY]: { $in: [savedMedia._id] } }] },
+    }
     const dbMetadataList = await getDbObjectList(OBJ_METADATA, filter)
 
     // Updating metadata global storage state

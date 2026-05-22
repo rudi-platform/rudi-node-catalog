@@ -38,6 +38,7 @@ export const OrganizationStatus = {
   CANCELLED: 'CANCELLED',
   VALIDATED: 'VALIDATED',
   DISENGAGED: 'DISENGAGED',
+  ARCHIVE_IN_PROGRESS: 'ARCHIVE_IN_PROGRESS',
 }
 export const LinkedProducerStatus = {
   DRAFT: 'DRAFT',
@@ -45,6 +46,7 @@ export const LinkedProducerStatus = {
   CANCELLED: 'CANCELLED',
   VALIDATED: 'VALIDATED',
   DISENGAGED: 'DISENGAGED',
+  DETACH_IN_PROGRESS: 'DETACH_IN_PROGRESS',
 }
 
 // -------------------------------------------------------------------------------------------------

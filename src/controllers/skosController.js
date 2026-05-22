@@ -489,7 +489,7 @@ export const getThesaurusList = async (lang) => {
     const keywords = Keywords.get(lang)
     const themes = Themes.get(lang)
     const licences = await getLicenceCodes()
-    const updateFrequencies = UpdateFrequencies.get(lang)
+    const updateFrequencies = UpdateFrequencies.get(lang, false)
 
     const thesauri = {
       encodings: getEncodings(),
@@ -551,7 +551,7 @@ export const getThesaurusLabel = async (thesaurusCode, lang) => {
     const code = thesaurusCode.toLowerCase()
 
     if (code === 'themes') return Themes.getLabels(lang)
-    if (code === 'updatefrequencies') return UpdateFrequencies.get(lang)
+    if (code === 'updatefrequencies') return UpdateFrequencies.getLabels(lang, false)
 
     return await getThesaurus(thesaurusCode)
   } catch (err) {

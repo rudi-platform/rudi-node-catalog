@@ -72,11 +72,13 @@ const getHeaders = (jwt) => ({
   },
 })
 
-export const httpGet = async (destUrl, authorizationToken) => {
+export const httpGet = async (destUrl, authorizationToken, reqOpts = {}) => {
   const fun = 'httpGet'
   logT(mod, fun)
   try {
-    const answer = await directGet(destUrl, getHeaders(authorizationToken))
+    const headers = getHeaders(authorizationToken)
+    reqOpts.headers = headers.headers
+    const answer = await directGet(destUrl, reqOpts)
     // logD(mod, fun, `answer: ${beautify(answer.data)}`)
     return answer.data
   } catch (err) {
@@ -84,11 +86,13 @@ export const httpGet = async (destUrl, authorizationToken) => {
   }
 }
 
-export const httpDelete = async (destUrl, authorizationToken) => {
+export const httpDelete = async (destUrl, authorizationToken, reqOpts = {}) => {
   const fun = 'httpDelete'
   try {
     logT(mod, fun)
-    const answer = await axios.delete(destUrl, getHeaders(authorizationToken))
+    const headers = getHeaders(authorizationToken)
+    reqOpts.headers = headers.headers
+    const answer = await axios.delete(destUrl, reqOpts)
     logD(mod, fun, `answer: ${beautify(answer.data)}`)
     return answer.data
   } catch (err) {
@@ -108,11 +112,13 @@ export const getWithOpts = async (options, authorizationToken) => {
   }
 }
 
-export const httpPost = async (destUrl, dataToSend, authorizationToken) => {
+export const httpPost = async (destUrl, dataToSend, authorizationToken, reqOpts = {}) => {
   const fun = 'httpPost'
   try {
     logT(mod, fun)
-    const answer = await directPost(destUrl, dataToSend, getHeaders(authorizationToken))
+    const headers = getHeaders(authorizationToken)
+    reqOpts.headers = headers.headers
+    const answer = await directPost(destUrl, dataToSend, reqOpts)
 
     logD(mod, fun, `answer: ${beautify(answer.data)}`)
     return answer.data
@@ -121,20 +127,23 @@ export const httpPost = async (destUrl, dataToSend, authorizationToken) => {
   }
 }
 
-export const httpPut = async (destUrl, dataToSend, authorizationToken) => {
+export const httpPut = async (destUrl, dataToSend, authorizationToken, reqOpts = {}) => {
   const fun = 'httpPut'
   try {
     logT(mod, fun)
-    const answer = await directPut(destUrl, dataToSend, getHeaders(authorizationToken))
+    const headers = getHeaders(authorizationToken)
+    reqOpts.headers = headers.headers
+    const answer = await directPut(destUrl, dataToSend, reqOpts)
     logD(mod, fun, `answer: ${beautify(answer.data)}`)
     return answer.data
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
 }
-const REQ_TIMEOUT_MS = 1000
+
+const REQ_TIMEOUT_MS = 2000
 const MAX_RETRIES = 5
-const INITIAL_DELAY_MS = 100
+const INITIAL_DELAY_MS = 500
 
 /**
  * Generic Axios request with retry and exponential backoff
@@ -203,9 +212,9 @@ const httpRequest = async (method, url, data = null, reqOpts = {}) => {
   logT(mod, fun)
 
   const {
-    timeout = REQ_TIMEOUT_MS,
-    retries = MAX_RETRIES,
-    delay = INITIAL_DELAY_MS,
+    timeout = reqOpts.timeout ?? REQ_TIMEOUT_MS,
+    retries = reqOpts.retries ?? MAX_RETRIES,
+    delay = reqOpts.delay ?? INITIAL_DELAY_MS,
     idempotencyKey = ['post', 'put', 'patch'].includes(method.toLowerCase())
       ? randomUUID()
       : undefined,

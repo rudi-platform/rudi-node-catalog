@@ -51,8 +51,6 @@ import {
 // -------------------------------------------------------------------------------------------------
 import { logD } from '../utils/logging.js'
 
-import { searchOrganizations } from '../controllers/organizationController.js'
-
 // -------------------------------------------------------------------------------------------------
 // Swagger documentation
 // -------------------------------------------------------------------------------------------------
@@ -141,11 +139,16 @@ import {
   getPublicPath,
   getPublicUrl,
 } from '../config/confSystem.js'
+import { searchOrganizations } from '../controllers/organizationController.js'
 import {
+  attachOrganization,
   deleteMetadata,
+  detachOrganization,
   exposedCheckPortalToken,
   exposedGetPortalToken,
   getPortalMetadata,
+  linkedProducerHasTask,
+  searchOrganizationsInPortal,
   sendAllMetadataToPortal,
   sendMetadata,
   updateOrganizationFromPortal,
@@ -253,14 +256,14 @@ export const publicRoutes = [
     method: 'GET',
     url: getPublicPath(OBJ_ORGANIZATIONS),
     handler: searchOrganizations,
-    config: { [ROUTE_NAME]: 'pub_get_all_metadata' },
+    config: { [ROUTE_NAME]: 'pub_get_all_organizations' },
   },
   {
     description: 'Access all contacts created on the RUDI producer node',
     method: 'GET',
     url: getPublicPath(OBJ_CONTACTS),
     handler: getAllContacts,
-    config: { [ROUTE_NAME]: 'pub_get_all_metadata' },
+    config: { [ROUTE_NAME]: 'pub_get_all_contacts' },
   },
   /*
    * @oas [get] /api/v1/resources/{metaId}
@@ -542,6 +545,7 @@ export const backOfficeRoutes = [
     handler: upsertObjects,
     config: { [ROUTE_NAME]: 'prv_upsert_one' },
   },
+
   // Get all
   {
     description: 'Get all objects',
@@ -935,6 +939,34 @@ export const devRoutes = [
     url: getPrivatePath(URL_SUFFIX_PORTAL, OBJ_ORGANIZATIONS, `:${PARAM_ID}`),
     handler: updateOrganizationFromPortal,
     config: { [ROUTE_NAME]: 'get_portal_organization' },
+  },
+  {
+    description: 'Search organizations in the Portal',
+    method: 'GET',
+    url: getPrivatePath(URL_SUFFIX_PORTAL, OBJ_ORGANIZATIONS),
+    handler: searchOrganizationsInPortal,
+    config: { [ROUTE_NAME]: 'get_portal_organizations' },
+  },
+  {
+    description: 'Request to attach organization to provider',
+    method: 'GET',
+    url: getPrivatePath(URL_SUFFIX_PORTAL, OBJ_ORGANIZATIONS, `:${PARAM_ID}`, 'attach'),
+    handler: attachOrganization,
+    config: { [ROUTE_NAME]: 'post_portal_attach_organization' },
+  },
+  {
+    description: 'Request to detach organization to provider',
+    method: 'GET',
+    url: getPrivatePath(URL_SUFFIX_PORTAL, OBJ_ORGANIZATIONS, `:${PARAM_ID}`, 'detach'),
+    handler: detachOrganization,
+    config: { [ROUTE_NAME]: 'post_portal_detach_organization' },
+  },
+  {
+    description: 'Check if organization has a pending task',
+    method: 'GET',
+    url: getPrivatePath(URL_SUFFIX_PORTAL, OBJ_ORGANIZATIONS, `:${PARAM_ID}`, 'has_task'),
+    handler: linkedProducerHasTask,
+    config: { [ROUTE_NAME]: 'post_portal_has_task_organization' },
   },
   // -----------------------------------------------------------------------------------------------
   //  Monitoring/control checks on metadata/data

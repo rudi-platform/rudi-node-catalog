@@ -101,9 +101,10 @@ export class Thesaurus {
    * If lang is not defined, raw current thesaurus values are delivered
    * It it is, a list of pairs thesaurus {values -> label for this language} is delivered if available.
    * @param {*} lang
+   * @param {*} needsSort default true
    * @returns
    */
-  get(lang) {
+  get(lang, needsSort = true) {
     const fun = 'get'
     try {
       if (!this.#isInit) {
@@ -113,7 +114,7 @@ export class Thesaurus {
       }
       if (!this.#hasLabels) return this.#currentValues.sort()
       if (!lang) return Object.keys(this.#currentValues).sort()
-      return this.getLabels(lang)
+      return this.getLabels(lang, needsSort)
     } catch (err) {
       throw RudiError.treatError(mod, fun, err)
     }
@@ -125,9 +126,10 @@ export class Thesaurus {
    * If labels were provided, but no language is provided, all language labels are returned for every values
    * If a language is provided, the label is given for every value (if a language label exists for this value)
    * @param {*} lang
+   * @param {*} needsSort
    * @returns
    */
-  getLabels(lang) {
+  getLabels(lang, needsSort) {
     const fun = 'getLabels'
     try {
       logT(mod, fun)
@@ -143,11 +145,18 @@ export class Thesaurus {
       // There is a lang labels for each value AND a language is asked
       // logD(mod, fun, beautify(this.#currentValues))
       const langLabels = {}
-      Object.keys(this.#currentValues)
-        .sort()
-        .forEach((key) => {
+      if (needsSort) {
+        Object.keys(this.#currentValues)
+          .sort()
+          .forEach((key) => {
+            langLabels[key] = this.#currentValues[key][lang] ?? key
+          })
+      } else {
+        Object.keys(this.#currentValues).forEach((key) => {
           langLabels[key] = this.#currentValues[key][lang] ?? key
         })
+      }
+
       return langLabels
     } catch (err) {
       throw RudiError.treatError(mod, fun, err)
@@ -206,8 +215,8 @@ export class Thesaurus {
     }
   }
 
-  traduce = (val, lang) => {
-    const list = this.getLabels(lang)
+  traduce = (val, lang, needsSort = true) => {
+    const list = this.getLabels(lang, needsSort)
     return Object.keys(list).find((key) => list[key] === val)
   }
 
