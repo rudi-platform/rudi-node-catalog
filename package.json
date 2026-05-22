@@ -1,6 +1,6 @@
 {
   "name": "rudi-node-catalog",
-  "version": "2.6.0",
+  "version": "2.7.2",
   "private": false,
   "description": "API for RUDI producer node",
   "main": "./run-rudinode-catalog.js",
