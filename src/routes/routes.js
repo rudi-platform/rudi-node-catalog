@@ -30,6 +30,7 @@ import {
   PARAM_REPORT_ID,
   PARAM_THESAURUS_CODE,
   PARAM_THESAURUS_LANG,
+  PORTAL_API_VERSION,
   ROUTE_NAME,
   ROUTE_OPT,
   URL_LICENCE_SUFFIX,
@@ -985,6 +986,13 @@ export const devRoutes = [
     url: getPrivatePath(ACT_CHECK, URL_SUFFIX_PORTAL, 'url'),
     handler: () => getPortalBaseUrl(),
     config: { [ROUTE_NAME]: 'dev_check_portal_url' },
+  },
+  {
+    description: 'Get the API version of the portal associated with this node',
+    method: 'GET',
+    url: getPrivatePath(ACT_CHECK, URL_SUFFIX_PORTAL, 'version'),
+    handler: () => PORTAL_API_VERSION,
+    config: { [ROUTE_NAME]: 'dev_check_portal_version' },
   },
 
   // -----------------------------------------------------------------------------------------------
