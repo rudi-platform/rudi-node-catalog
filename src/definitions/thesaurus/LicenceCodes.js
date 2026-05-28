@@ -4,7 +4,6 @@ const mod = 'lccThes'
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { BadRequestError, RudiError } from '../../utils/errors.js'
-import { isArray } from '../../utils/jsUtils.js'
 import { logT, logW } from '../../utils/logging.js'
 import { parameterExpected } from '../../utils/msg.js'
 
@@ -46,7 +45,7 @@ export const setAll = (newValuesArray) => {
   const fun = 'setAll'
   try {
     logT(mod, fun)
-    if (!newValuesArray || !isArray(newValuesArray)) {
+    if (!newValuesArray || !Array.isArray(newValuesArray)) {
       const errMsg = parameterExpected(fun, 'newValuesArray')
       logW(mod, fun, errMsg)
       throw new BadRequestError(errMsg)

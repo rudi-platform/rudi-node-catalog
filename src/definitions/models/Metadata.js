@@ -320,7 +320,7 @@ const MetadataSchema = new mongoose.Schema(
       required: true,
       default: [],
       validate: {
-        validator: (media_list) => isArray(media_list),
+        validator: (media_list) => Array.isArray(media_list),
         message: `'{PATH}' property should be a list of RudiMedia`,
       },
     },
@@ -776,10 +776,10 @@ async function checkThesaurus(metadata) {
 
     logT(mod, fun, `is dataset update freq valid`)
     if (
-      !metadata[API_UPDATE_FREQUENCY] ||
-      !isUpdateFrequenciesValid(metadata[API_UPDATE_FREQUENCY])
+      !metadata[API_DATA_UPDATE_FREQUENCY_PROPERTY] ||
+      !isUpdateFrequenciesValid(metadata[API_DATA_UPDATE_FREQUENCY_PROPERTY])
     )
-      metadata[API_UPDATE_FREQUENCY] = undefined
+      metadata[API_DATA_UPDATE_FREQUENCY_PROPERTY] = undefined
 
     return true
   } catch (err) {

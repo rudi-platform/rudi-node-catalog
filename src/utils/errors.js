@@ -24,7 +24,7 @@ import {
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { beautify, isArray } from './jsUtils.js'
+import { beautify } from './jsUtils.js'
 import { logD, logT, logW } from './logging.js'
 import { objectNotFound, parameterExpected } from './msg.js'
 
@@ -317,7 +317,7 @@ export class BadRequestError extends RudiError {
       ctxFun,
       pathArray
     )
-    if (pathArray && !isArray(pathArray)) {
+    if (pathArray && !Array.isArray(pathArray)) {
       logW(ctxMod, ctxFun, `BadRequest constructor Error: 4th parameter should be an array`)
       this.path = [pathArray]
     }
