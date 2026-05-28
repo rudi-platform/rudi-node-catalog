@@ -1,3 +1,4 @@
+// src/routes/fastify.js
 const mod = 'fastify'
 
 // -------------------------------------------------------------------------------------------------
@@ -161,7 +162,7 @@ catalogApp.setErrorHandler((error, request, reply) => {
   logT(mod, fun, 'done')
 })
 
-catalogApp.decorate('notFound', (req, reply) => {
+const notFoundLogger = (req, reply) => {
   const fun = 'route404'
   // const ip = req.ip
 
@@ -175,10 +176,11 @@ catalogApp.decorate('notFound', (req, reply) => {
   sysNotice(`Error 404: ${response.message}`, '', CallContext.getReqContext(req))
   // logD(mod, fun, beautify(req))
   reply.isError = true
-  reply.code(404).send(response)
-})
+  reply.code(404).json(response)
+}
 
-catalogApp.setNotFoundHandler(catalogApp.notFound)
+catalogApp.decorate('notFound', notFoundLogger)
+catalogApp.setNotFoundHandler(notFoundLogger)
 
 // -------------------------------------------------------------------------------------------------
 // Fastify hooks: request receive / send

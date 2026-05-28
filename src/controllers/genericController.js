@@ -139,23 +139,27 @@ function getObjectParam(req) {
   const fun = 'getObjectParam'
   try {
     const objectType = accessReqParam(req, PARAM_OBJECT)
-    try {
-      checkIsUrlObject(objectType)
-    } catch {
-      const error = new NotFoundError(`Route '${req.method} ${req.url}' not found `)
-      throw RudiError.treatError(mod, fun, error)
-    }
-    return objectType
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
+  try {
+    checkIsUrlObject(objectType)
+  } catch {
+    const errMsg = `Route '${req.method} ${req.url}' not found`
+    // logW(mod, fun, errMsg)
+    // sysNotice(`Error 404: ${errMsg}`, '', CallContext.getReqContext(req))
+    throw new NotFoundError(errMsg)
+  }
+  return objectType
 }
 
 function checkIsUrlObject(objectType) {
   // const fun = 'checkIsUrlObject'
   // logT(mod, fun, beautify(URL_OBJECTS))
-  if (URL_OBJECTS.indexOf(objectType) === -1)
+  if (URL_OBJECTS.indexOf(objectType) === -1) {
+    // logW(mod, fun, objectTypeNotFound(objectType))
     throw new NotFoundError(objectTypeNotFound(objectType))
+  }
 }
 
 async function newObject(objectType, objectData) {
