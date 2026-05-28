@@ -50,7 +50,7 @@ import {
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { logD } from '../utils/logging.js'
+import { logD, logI } from '../utils/logging.js'
 
 // -------------------------------------------------------------------------------------------------
 // Swagger documentation
@@ -133,12 +133,14 @@ import {
 
 import { getPortalBaseUrl } from '../config/confPortal.js'
 import {
+  CATALOG_PREFIX,
   getCatalog,
   getLegacyApiPath,
   getLegacyPrivatePath,
   getPrivatePath,
   getPublicPath,
   getPublicUrl,
+  LEGACY_PREFIX,
 } from '../config/confSystem.js'
 import { searchOrganizations } from '../controllers/organizationController.js'
 import {
@@ -167,6 +169,8 @@ import {
   onPublicRoute,
   onUnrestrictedPrivateRoute,
 } from './routes_secu.js'
+
+logI('routes', 'PUT report URL =>', getPublicPath(OBJ_METADATA, `:${PARAM_ID}`, ACT_REPORT))
 
 // -------------------------------------------------------------------------------------------------
 // Free routes (no authentification required)
@@ -362,7 +366,7 @@ export const portalRoutes = [
   {
     description: 'Add/edit 1 report for one object integration',
     method: 'PUT',
-    url: getPublicPath(OBJ_METADATA, `:${PARAM_ID}`, `${ACT_REPORT}`),
+    url: getPublicPath(OBJ_METADATA, `:${PARAM_ID}`, ACT_REPORT),
     handler: addOrEditSingleReportForMetadata,
     config: { [ROUTE_NAME]: 'portal_upsert_one_report' },
   },
@@ -370,7 +374,7 @@ export const portalRoutes = [
   {
     description: 'Add/edit 1 report for one organization integration',
     method: 'PUT',
-    url: getPublicPath(OBJ_ORGANIZATIONS, `:${PARAM_ID}`, `${ACT_REPORT}`),
+    url: getPublicPath(OBJ_ORGANIZATIONS, `:${PARAM_ID}`, ACT_REPORT),
     handler: addOrEditSingleReportForOrganization,
     config: { [ROUTE_NAME]: 'portal_put_org_report' },
   },
@@ -379,7 +383,7 @@ export const portalRoutes = [
   {
     description: 'Get all reports for one object integration',
     method: 'GET',
-    url: getPublicPath(OBJ_METADATA, `:${PARAM_ID}`, `${ACT_REPORT}`),
+    url: getPublicPath(OBJ_METADATA, `:${PARAM_ID}`, ACT_REPORT),
     handler: getReportListForMetadata,
     config: { [ROUTE_NAME]: 'portal_get_all_obj_report' },
   },
@@ -387,7 +391,7 @@ export const portalRoutes = [
   {
     description: 'Get 1 report for one object integration',
     method: 'GET',
-    url: getPublicPath(OBJ_METADATA, `:${PARAM_ID}`, `${ACT_REPORT}`, `:${PARAM_REPORT_ID}`),
+    url: getPublicPath(OBJ_METADATA, `:${PARAM_ID}`, ACT_REPORT, `:${PARAM_REPORT_ID}`),
     handler: getSingleReportForMetadata,
     config: { [ROUTE_NAME]: 'portal_get_one_obj_report' },
   },
@@ -400,6 +404,30 @@ export const portalRoutes = [
     config: { [ROUTE_NAME]: 'redirect_put_plus' },
     handler: (req, reply) => {
       const newRoute = getPublicPath(req.url)
+      logD(mod, `redirect`, `${req.method} ${newRoute}`)
+      reply.code(308).redirect(newRoute)
+    },
+  },
+  {
+    description: 'Redirection for adding an integration report',
+    method: 'PUT',
+    url: `/${CATALOG_PREFIX}/${OBJ_METADATA}/*`,
+    config: { [ROUTE_NAME]: 'redirect_put_plus' },
+    handler: (req, reply) => {
+      const splitUrl = `${req.url}`.slice(CATALOG_PREFIX.length + 1)
+      const newRoute = getPublicPath(splitUrl)
+      logD(mod, `redirect`, `${req.method} ${newRoute}`)
+      reply.code(308).redirect(newRoute)
+    },
+  },
+  {
+    description: 'Redirection for adding an integration report',
+    method: 'PUT',
+    url: `/${LEGACY_PREFIX}/${OBJ_METADATA}/*`,
+    config: { [ROUTE_NAME]: 'redirect_put_plus' },
+    handler: (req, reply) => {
+      const splitUrl = `${req.url}`.slice(LEGACY_PREFIX.length + 1)
+      const newRoute = getPublicPath(splitUrl)
       logD(mod, `redirect`, `${req.method} ${newRoute}`)
       reply.code(308).redirect(newRoute)
     },

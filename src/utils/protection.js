@@ -10,7 +10,7 @@ const mod = 'protect'
 const ACTIVATE_LOG = false
 
 import { HD_METHOD, HD_URL } from '../config/constHeaders.js'
-const REQ_AUTH_MAX_LENGTH = 1000
+const REQ_AUTH_MAX_LENGTH = 1500
 const REQ_URL_MAX_LENGTH = 200
 
 export const getUrlMaxLength = () => REQ_URL_MAX_LENGTH
