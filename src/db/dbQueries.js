@@ -673,7 +673,7 @@ export const getDbObjectListAndCount = async (objectType, options) => {
       {
         $facet: {
           [COUNT_LABEL]: [{ $group: { _id: null, count: { $sum: 1 } } }],
-          [LIST_LABEL]: [{ $sort: sortOptions }, { $skip: offset }, { $limit: limit }],
+          [LIST_LABEL]: [{ $sort: sortOptions }, { $skip: offset }, { $Limit: Limit }],
         },
       },
     ]
