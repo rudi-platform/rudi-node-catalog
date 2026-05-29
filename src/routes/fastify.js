@@ -176,7 +176,7 @@ const notFoundLogger = (req, reply) => {
   sysNotice(`Error 404: ${response.message}`, '', CallContext.getReqContext(req))
   // logD(mod, fun, beautify(req))
   reply.isError = true
-  reply.code(404).json(response)
+  reply.status(404).send(response)
 }
 
 catalogApp.decorate('notFound', notFoundLogger)
@@ -185,7 +185,7 @@ catalogApp.setNotFoundHandler(notFoundLogger)
 // -------------------------------------------------------------------------------------------------
 // Fastify hooks: request receive / send
 // -------------------------------------------------------------------------------------------------
-catalogApp.addHook('onRequest', (req, res, next) => {
+catalogApp.addHook('onRequest', (req, reply, next) => {
   const fun = 'onRequest'
   try {
     const context = new CallContext()

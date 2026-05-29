@@ -219,6 +219,18 @@ export const publicRoutes = [
     },
   },
   {
+    description: `Redirection: GET ${getCatalog(OBJ_METADATA, '*')} -> GET ${getPublicPath(OBJ_METADATA)}/*`,
+    method: 'GET',
+    url: getCatalog(OBJ_METADATA, '*'),
+    config: { [ROUTE_NAME]: 'redirect_get_data' },
+    handler: function (req, reply) {
+      const splitUrl = `${req.url}`.slice(CATALOG_PREFIX.length + 1)
+      const newRoute = getPublicPath(splitUrl)
+      logD(mod, `redirect`, `${req.method} ${newRoute}`)
+      reply.code(308).redirect(newRoute)
+    },
+  },
+  {
     description: `Redirection: GET /${OBJ_METADATA}/* -> GET ${getPublicPath(OBJ_METADATA)}/*`,
     method: 'GET',
     url: `/${OBJ_METADATA}/*`,

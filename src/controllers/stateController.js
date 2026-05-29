@@ -43,18 +43,27 @@ import { getPortalMetadataListWithToken, getPortalToken } from './portalControll
 // Cached variables
 // -------------------------------------------------------------------------------------------------
 
-const SLICE = 100
-const DEFAULT_CACHE_PERIOD = 300
+const SLICE = 10
+const DEFAULT_CACHE_PERIOD_S = 300
 
-let cachedPortalMetadataList = {}
-export const getPortalCachedMetadataList = async (maxCacheTimeS = DEFAULT_CACHE_PERIOD) => {
+const cachedPortalMetadataList = {}
+export const getPortalCachedMetadataList = async (req, reply) => {
   const fun = 'getPortalCachedMetadataList'
   try {
     if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
+    const query = req?.query
+    const queryLimit = query?.max || query?.limit
+    logD(mod, fun, `queryLimit: ${queryLimit}`)
+
+    const cacheKey = `${beautify(query)}` || 'all'
+    logD(mod, fun, `cacheKey: ${cacheKey}`)
     // Check cache date
-    if ((cachedPortalMetadataList[TIME_LABEL] || 0) + maxCacheTimeS > timeEpochS())
+    if (
+      cachedPortalMetadataList[cacheKey] &&
+      (cachedPortalMetadataList[cacheKey][TIME_LABEL] || 0) + DEFAULT_CACHE_PERIOD_S > timeEpochS()
+    )
       // Cache still valid, let's return it
-      return cachedPortalMetadataList
+      return cachedPortalMetadataList[cacheKey]
 
     // Cache is too old, we have to retrieve the data from the portal
     // 1. Get a portal token
@@ -63,31 +72,50 @@ export const getPortalCachedMetadataList = async (maxCacheTimeS = DEFAULT_CACHE_
     // 2. Retrieve the number of metadata on the portal
     const portalCheck = await getPortalMetadataListWithToken(token, 'limit=1')
     const portalMetadataNb = portalCheck.total ?? 0
+    const maxMetaRequested = Math.min(queryLimit, portalMetadataNb)
+    logD(mod, fun, `maxMetaRequested: ${maxMetaRequested}`)
 
     // 3. Retrieve all the metadata on the portal
-    const optsArray = []
-    for (let offset = 0; offset < portalMetadataNb; offset += SLICE)
-      optsArray.push(`limit=${SLICE}&offset=${offset}`)
-    const metadataPackets = await Promise.all(
-      optsArray.map((opt) => getPortalMetadataListWithToken(token, opt))
-    )
+    // const optsArray = []
+    // for (let offset = 0; offset < portalMetadataNb; offset += SLICE)
+    //   optsArray.push(`limit=${SLICE}&offset=${offset}`)
+    // const metadataPackets = await Promise.all(
+    //   optsArray.map((opt) => getPortalMetadataListWithToken(token, opt))
+    // )
+
+    const metadataPackets = []
+    if (maxMetaRequested <= SLICE) {
+      metadataPackets.push(await getPortalMetadataListWithToken(token, `limit=${queryLimit}`))
+    } else {
+      let leftRequested = maxMetaRequested
+      for (let offset = 0; offset < maxMetaRequested; offset += SLICE) {
+        metadataPackets.push(
+          await getPortalMetadataListWithToken(
+            token,
+            `limit=${Math.min(SLICE, leftRequested)}&offset=${offset}`
+          )
+        )
+        leftRequested -= SLICE
+      }
+    }
+
     const portalMetadataList = []
     metadataPackets.forEach((packet) => portalMetadataList.push(...packet.items))
     // 4. Recreate the cache of portal metadata
-    cachedPortalMetadataList = {
+    cachedPortalMetadataList[cacheKey] = {
       [TIME_LABEL]: timeEpochS(),
-      [COUNT_LABEL]: portalMetadataNb,
+      [COUNT_LABEL]: maxMetaRequested,
       [LIST_LABEL]: portalMetadataList,
     }
     // logD(mod, fun, cachedPortalMetadataList.items.length)
-    return cachedPortalMetadataList
+    return cachedPortalMetadataList[cacheKey]
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
 }
 
 let cachedNodeMetadataList = {}
-export const getNodeCachedMetadataList = async (maxCacheTimeS = DEFAULT_CACHE_PERIOD) => {
+export const getNodeCachedMetadataList = async (maxCacheTimeS = DEFAULT_CACHE_PERIOD_S) => {
   const fun = 'getNodeCachedMetadataList'
   try {
     // Check cache date
@@ -122,7 +150,7 @@ export const getPortalMetadataFields = async (req, reply, fields = DEFAULT_FIELD
     logD(mod, fun, `options: ${beautify(options)}`)
     const fieldFilter = options[QUERY_FIELDS] ?? fields
     if (fieldFilter.indexOf(API_METADATA_ID) === -1) fieldFilter.unshift(API_METADATA_ID)
-    const nodeMetadata = (await getPortalCachedMetadataList())[LIST_LABEL]
+    const nodeMetadata = (await getPortalCachedMetadataList(req, reply))[LIST_LABEL]
     return nodeMetadata.map((metadata) => pick(metadata, fieldFilter))
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)

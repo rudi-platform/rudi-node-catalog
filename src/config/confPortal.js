@@ -77,9 +77,9 @@ const confPortalUrl = getPortalUserConf('portal_url') || ''
 const API_PORTAL_URL = confPortalUrl?.startsWith('http') ? confPortalUrl : ''
 export const isPortalConnectionDisabled = () => !API_PORTAL_URL
 
-const PORTAL_REQ_TIMEOUT = getPortalUserConf('portal_req_timeout') ?? 1000
-const PORTAL_MAX_RETRIES = getPortalUserConf('portal_max_retries') ?? 0
-const PORTAL_INITIAL_DELAY = getPortalUserConf('portal_initial_delay') ?? 100
+const PORTAL_REQ_TIMEOUT = getPortalUserConf('portal_req_timeout') ?? 2000
+const PORTAL_MAX_RETRIES = getPortalUserConf('portal_max_retries') ?? 3
+const PORTAL_INITIAL_DELAY = getPortalUserConf('portal_initial_delay') ?? 300
 
 // ----- Auth
 const getAuthUrl = (...url) => pathJoin(API_PORTAL_URL, ...url)
@@ -142,9 +142,10 @@ export const defaultPortalRequestOptions = () => ({
 
 export const getPortalOrganizationUrl = (id, additionalParameters) => {
   if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
-  const reqUrl = !id
-    ? pathJoin(API_PORTAL_URL, API_GET_ORG_URL.replace('/{{id}}', ''))
-    : pathJoin(API_PORTAL_URL, API_GET_ORG_URL.replace('{{id}}', id))
+  const reqUrl = pathJoin(
+    API_PORTAL_URL,
+    !id ? API_GET_ORG_URL.replace('/{{id}}', '') : API_GET_ORG_URL.replace('{{id}}', id)
+  )
   const options = additionalParameters ? `?${additionalParameters}` : ''
   return `${reqUrl}${options}`
 }

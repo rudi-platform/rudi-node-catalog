@@ -107,7 +107,7 @@ const DAY_IN_S = 24 * 60 * 60
 const MONTH_IN_S = 30 * DAY_IN_S
 const MONTH_IN_MS = MONTH_IN_S * 1000
 
-export const serveFavicon = (req, res) => {
+export const serveFavicon = (req, reply) => {
   const fun = 'serveFavicon'
   try {
     const favicon = readFileSync('./img/rudi_favicon.png') // read file
@@ -115,12 +115,12 @@ export const serveFavicon = (req, res) => {
     //   'AAABAAEAEBAQAAAAAAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA/4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEREQAAAAAAEAAAEAAAAAEAAAABAAAAEAAAAAAQAAAQAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAEAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAA//8AAP//AAD8HwAA++8AAPf3AADv+wAA7/sAAP//AAD//wAA+98AAP//AAD//wAA//8AAP//AAD//wAA',
     //   'base64'
     // )
-    res.header('Content-Length', favicon.length)
-    res.header('Content-Type', 'image/png')
-    res.header('Cache-Control', `public, max-age=${MONTH_IN_S}`) // expires after a month
-    res.header('Expires', new Date(Date.now() + MONTH_IN_MS).toUTCString())
-    res.statusCode = 200
-    res.send(favicon)
+    reply.header('Content-Length', favicon.length)
+    reply.header('Content-Type', 'image/png')
+    reply.header('Cache-Control', `public, max-age=${MONTH_IN_S}`) // expires after a month
+    reply.header('Expires', new Date(Date.now() + MONTH_IN_MS).toUTCString())
+    reply.statusCode = 200
+    reply.send(favicon)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }

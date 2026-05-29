@@ -215,7 +215,7 @@ const httpRequest = async (method, url, data = null, reqOpts = {}) => {
     timeout = reqOpts.timeout ?? REQ_TIMEOUT_MS,
     retries = reqOpts.retries ?? MAX_RETRIES,
     delay = reqOpts.delay ?? INITIAL_DELAY_MS,
-    idempotencyKey = ['post', 'put', 'patch'].includes(method.toLowerCase())
+    idempotencyKey = ['post', 'put', 'patch', 'get'].includes(method.toLowerCase())
       ? randomUUID()
       : undefined,
     ...axiosOptions

@@ -756,7 +756,7 @@ const updateMetadataStorageState = async (dbMetadata, newState = StorageStatus.O
   }
 }
 
-export const commitMedia = async (req, res) => {
+export const commitMedia = async (req, reply) => {
   const fun = 'commitMedia'
   try {
     logT(mod, fun)
@@ -813,10 +813,10 @@ export const commitMedia = async (req, res) => {
 /**
  * Commits a Media (meaning the Media was successfully stored on "RUDI Media" storage)
  * @param {*} req
- * @param {*} res
+ * @param {*} reply
  * @returns
  */
-export const commitMediaForMetadata = async (req, res) => {
+export const commitMediaForMetadata = async (req, reply) => {
   const fun = 'commitMediaForMetadata'
   try {
     logT(mod, fun)
@@ -855,7 +855,7 @@ export const commitMediaForMetadata = async (req, res) => {
     // If other media are still waiting, we do not send the metadata
     if (!areAllMediaAvailable) {
       logD(mod, fun, `Media commit success: ${beautify(result)}`)
-      return res.code(200).send(result)
+      return reply.code(200).send(result)
     }
 
     // All media are available! Let's send the metadata
@@ -865,7 +865,7 @@ export const commitMediaForMetadata = async (req, res) => {
     logD(mod, fun, `Media commit success : ${beautify(result)}`)
 
     if (!isPortalConnectionDisabled()) sendToPortal(finalMetadata)
-    return res.code(200).send(result)
+    return reply.code(200).send(result)
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
   }
