@@ -137,29 +137,19 @@ import { createPortalOrganization, deletePortalMetadata } from './portalControll
 
 function getObjectParam(req) {
   const fun = 'getObjectParam'
-  try {
-    const objectType = accessReqParam(req, PARAM_OBJECT)
-  } catch (err) {
-    throw RudiError.treatError(mod, fun, err)
-  }
+  const objectType = accessReqParam(req, PARAM_OBJECT)
   try {
     checkIsUrlObject(objectType)
   } catch {
     const errMsg = `Route '${req.method} ${req.url}' not found`
-    // logW(mod, fun, errMsg)
-    // sysNotice(`Error 404: ${errMsg}`, '', CallContext.getReqContext(req))
     throw new NotFoundError(errMsg)
   }
   return objectType
 }
 
 function checkIsUrlObject(objectType) {
-  // const fun = 'checkIsUrlObject'
-  // logT(mod, fun, beautify(URL_OBJECTS))
-  if (URL_OBJECTS.indexOf(objectType) === -1) {
-    // logW(mod, fun, objectTypeNotFound(objectType))
+  if (URL_OBJECTS.indexOf(objectType) === -1)
     throw new NotFoundError(objectTypeNotFound(objectType))
-  }
 }
 
 async function newObject(objectType, objectData) {
