@@ -9666,7 +9666,7 @@
                   "    pm.expect(pm.response.code).to.eql(200);",
                   "    const res = pm.response.json()",
                   "    // pm.expect(res.time).to.be.gt(0)",
-                  "    pm.expect(res.total).to.ge(1)",
+                  "    pm.expect(res.total).to.gt(0)",
                   "    pm.expect(res.elements.length).to.eq(1)",
                   "});",
                   ""
@@ -10289,6 +10289,10 @@
     },
     {
       "key": "catalogJwt-_Dev-Local",
+      "value": ""
+    },
+    {
+      "key": "catalogJwt-__dev/stage",
       "value": ""
     }
   ]

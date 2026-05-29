@@ -513,11 +513,11 @@ export const getManyObjects = async (objectType, req) => {
     let objectList
     if (!countBy && !groupBy) {
       const options = pick(parsedParameters, [
-        QUERY_LIMIT,
-        QUERY_OFFSET,
+        QUERY_FILTER,
         QUERY_SORT_BY,
         QUERY_SORT_BY_CAML,
-        QUERY_FILTER,
+        QUERY_OFFSET,
+        QUERY_LIMIT,
         QUERY_FIELDS,
       ])
       objectList = await getDbObjectList(objectType, options)
@@ -527,24 +527,24 @@ export const getManyObjects = async (objectType, req) => {
         logW(mod, fun, msg)
       }
       const options = pick(parsedParameters, [
-        QUERY_LIMIT,
-        QUERY_OFFSET,
         QUERY_FILTER,
-        QUERY_FIELDS,
         QUERY_SORT_BY,
         QUERY_SORT_BY_CAML,
+        QUERY_LIMIT,
         QUERY_GROUP_LIMIT,
         QUERY_GROUP_LIMIT_CAML,
+        QUERY_OFFSET,
         QUERY_GROUP_OFFSET,
         QUERY_GROUP_OFFSET_CAML,
+        QUERY_FIELDS,
       ])
       objectList = await groupDbObjectList(objectType, groupBy, options)
     } else {
       // if( !!countBy)
       const options = pick(parsedParameters, [
-        QUERY_LIMIT,
-        QUERY_OFFSET,
         QUERY_FILTER,
+        QUERY_OFFSET,
+        QUERY_LIMIT,
         QUERY_FIELDS,
       ])
 
