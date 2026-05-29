@@ -563,12 +563,13 @@ export const getDbObjectList = async (objectType, options) => {
     // logD(mod, fun, `options: ${beautify(options)}`)
 
     // Extract options
-    const limit = getParamValue(options, QUERY_LIMIT, DEFAULT_QUERY_LIMIT, MAX_QUERY_LIMIT)
-    const offset = getParamValue(options, QUERY_OFFSET, DEFAULT_QUERY_OFFSET)
     const filter = getParamValue(options, QUERY_FILTER)
-    const fields = getParamValue(options, QUERY_FIELDS)
     const sortByFields =
       getParamValue(options, QUERY_SORT_BY) || getParamValue(options, QUERY_SORT_BY_CAML)
+
+    const offset = getParamValue(options, QUERY_OFFSET, DEFAULT_QUERY_OFFSET)
+    const limit = getParamValue(options, QUERY_LIMIT, DEFAULT_QUERY_LIMIT, MAX_QUERY_LIMIT)
+    const fields = getParamValue(options, QUERY_FIELDS)
 
     const populateFields = getPopulateFields(objectType)
 
@@ -595,7 +596,7 @@ export const getDbObjectList = async (objectType, options) => {
     const fieldsToKeep = fields ? fields.join(' ') : ``
 
     if (isEmptyArray(populateFields)) {
-      return await ObjModel.find(filter, fieldsToKeep).sort(sortOptions).limit(limit).skip(offset)
+      return await ObjModel.find(filter, fieldsToKeep).sort(sortOptions).skip(offset).limit(limit)
     } else {
       // Populate
       const objectList = await ObjModel.find(filter, fieldsToKeep)
@@ -630,16 +631,15 @@ export const getDbObjectListAndCount = async (objectType, options) => {
     const ObjModel = getObjectModel(objectType)
 
     // Extract options
-    const limit = getParamValue(options, QUERY_LIMIT, DEFAULT_QUERY_LIMIT, MAX_QUERY_LIMIT)
-    const offset = getParamValue(options, QUERY_OFFSET, DEFAULT_QUERY_OFFSET)
+    // logT(mod, fun, `objectType: '${objectType}', options: ${beautify(options)}`)
     const filter = getParamValue(options, QUERY_FILTER, {})
-    const fieldsToKeep = getParamValue(options, QUERY_FIELDS)
     const sortByFields =
       getParamValue(options, QUERY_SORT_BY) || getParamValue(options, QUERY_SORT_BY_CAML)
+    const limit = getParamValue(options, QUERY_LIMIT, DEFAULT_QUERY_LIMIT, MAX_QUERY_LIMIT)
+    const offset = getParamValue(options, QUERY_OFFSET, DEFAULT_QUERY_OFFSET)
+    const fieldsToKeep = getParamValue(options, QUERY_FIELDS)
 
-    logD(mod, fun, `options: ${beautify(options)}`)
-
-    // logD(mod, fun, `filter: ${beautify(filter)}`)
+    // logD(mod, fun, `options: ${beautify(options)}`)
 
     // const [sortOptions] = toMongoSortOptions({}, sortBy, { [idField]: 1 })
     const sortOptions = {}
@@ -673,7 +673,7 @@ export const getDbObjectListAndCount = async (objectType, options) => {
       {
         $facet: {
           [COUNT_LABEL]: [{ $group: { _id: null, count: { $sum: 1 } } }],
-          [LIST_LABEL]: [{ $sort: sortOptions }, { $skip: offset }, { $Limit: Limit }],
+          [LIST_LABEL]: [{ $sort: sortOptions }, { $skip: offset }, { $limit: limit }],
         },
       },
     ]

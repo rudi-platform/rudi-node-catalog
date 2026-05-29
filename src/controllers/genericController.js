@@ -590,10 +590,10 @@ export const getMetadataListAndCount = async (req, reply) => {
     }
     let objectList
     const options = pick(parsedParameters, [
-      QUERY_LIMIT,
-      QUERY_OFFSET,
-      QUERY_SORT_BY,
       QUERY_FILTER,
+      QUERY_SORT_BY,
+      QUERY_OFFSET,
+      QUERY_LIMIT,
       QUERY_FIELDS,
     ])
     // logD(mod, fun, beautify(options[QUERY_FILTER]))
