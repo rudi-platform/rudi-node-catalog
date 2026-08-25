@@ -41,6 +41,7 @@ separateLogs('Loading log conf', true) /////////////////////////////////////////
 const FLAGS_SECTION = 'flags'
 
 export const SHOULD_LOG_CONSOLE = getConf(FLAGS_SECTION, 'should_log_console')
+export const SHOULD_LOG_IN_DB = getConf(FLAGS_SECTION, 'should_log_in_db', true)
 const SHOULD_FILELOG = getConf(FLAGS_SECTION, 'should_log_in_file')
 const SHOULD_SHOW_ERROR_PILE = getConf(FLAGS_SECTION, 'should_show_error_pile')
 const SHOULD_SHOW_ROUTES = getConf(FLAGS_SECTION, 'should_show_routes')
@@ -54,6 +55,7 @@ export const shouldShowRoutes = () => SHOULD_SHOW_ROUTES
 // Log feedback
 const checkOption = (msg, flag) => consoleLog(mod, fun, `[${flag ? 'x' : ' '}] ${msg}`)
 checkOption('Should log on console', SHOULD_LOG_CONSOLE)
+checkOption('Should log in DB', SHOULD_LOG_IN_DB)
 checkOption('Control private requests', shouldControlPrivateRequests())
 checkOption('Control public requests', shouldControlPublicRequests())
 checkOption('Log in file', SHOULD_FILELOG)
