@@ -17,13 +17,13 @@ import {
   API_METADATA_ID,
   API_METAINFO_DATES,
   API_METAINFO_PROPERTY,
+  API_ORGANIZATION_ADDRESS,
+  API_ORGANIZATION_ATTACHMENT_STATUS,
+  API_ORGANIZATION_COORDINATES,
   API_ORGANIZATION_ID,
   API_ORGANIZATION_NAME,
-  API_ORGANIZATION_ADDRESS,
-  API_ORGANIZATION_COORDINATES,
   API_ORGANIZATION_SUMMARY,
   API_ORGANIZATION_VALIDATION_STATUS,
-  API_ORGANIZATION_ATTACHMENT_STATUS,
   API_REPORT_ID,
   API_STATUS_PROPERTY,
   API_STORAGE_STATUS,
@@ -66,11 +66,11 @@ import { getDbObjectList, getObjectWithRudiId } from '../db/dbQueries.js'
 
 import { createPublicKey } from 'node:crypto'
 import { isEveryMediaAvailable, setMetadataStatusToSent } from '../definitions/models/Metadata.js'
-import { ObjectTypes } from '../definitions/models/Report.js'
 import Organization, {
-  OrganizationStatus,
   LinkedProducerStatus,
+  OrganizationStatus,
 } from '../definitions/models/Organization.js'
+import { ObjectTypes } from '../definitions/models/Report.js'
 import {
   BadRequestError,
   ForbiddenError,
@@ -233,7 +233,7 @@ const ensureOrganizationFromPortalData = async (organizationId, portalOrgData) =
     }
 
     // Check whether the organization already exists locally
-    let localOrganization = await getObjectWithRudiId(OBJ_ORGANIZATIONS, organizationId)
+    const localOrganization = await getObjectWithRudiId(OBJ_ORGANIZATIONS, organizationId)
 
     if (localOrganization) {
       // Organization exists: update statuses
