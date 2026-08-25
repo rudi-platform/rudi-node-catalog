@@ -52,6 +52,7 @@ import {
   API_REPORT_ERROR_MSG,
   API_REPORT_ID,
   API_REPORT_METHOD,
+  API_REPORT_OBJECT_TYPE,
   API_REPORT_RESOURCE_ID,
   API_REPORT_STATUS,
   API_REPORT_SUBMISSION_DATE,
@@ -62,6 +63,7 @@ import {
   LOCAL_REPORT_ERROR,
   LOCAL_REPORT_ERROR_MSG,
   LOCAL_REPORT_ERROR_TYPE,
+  API_ORGANIZATION_ID,
   API_ORGANIZATION_VALIDATION_STATUS,
   API_ORGANIZATION_ATTACHMENT_STATUS,
 } from '../db/dbFields.js'
@@ -142,10 +144,10 @@ export const setPublishedFlag = async (dbObject, rudiId) => {
     if (!dbObject) throw new ParameterExpectedError('dbObject', mod, fun)
     if (!dbObject[DB_PUBLISHED_AT]) {
       dbObject[DB_PUBLISHED_AT] = nowISO()
-      await dbObject.save()
       logD(mod, fun, `dbObject published: ${logMetadata(dbObject)}`)
+      await dbObject.save()
     } else {
-      logI(mod, fun, `Data had already been published for id '${rudiId}'`)
+      logI(mod, fun, `Data had already been published for id '${rudiId}', no update needed`)
     }
   } catch (err) {
     throw RudiError.treatError(mod, fun, err)
@@ -249,11 +251,8 @@ export const addOrEditSingleReport = async (objectType, req, reply) => {
     const reportId = accessProperty(reportBody, API_REPORT_ID)
     const bodyObjectId = accessProperty(reportBody, API_REPORT_RESOURCE_ID)
 
-    if (objectType === OBJ_METADATA) {
-      removeMetadataFromWaitingList(urlObjectId, reportId)
-    } else if (objectType === OBJ_ORGANIZATIONS) {
-      await treatOrgnizationsReports(objectType, urlObjectId, reportBody)
-    }
+    // Remove from waiting list as soon as a report arrives (in-memory, no DB dependency)
+    if (objectType === OBJ_METADATA) removeMetadataFromWaitingList(urlObjectId, reportId)
 
     // ensure url object id and body object id match
     if (urlObjectId !== bodyObjectId)
@@ -272,16 +271,15 @@ export const addOrEditSingleReport = async (objectType, req, reply) => {
       }
     }
 
-    const dbReadyReport = putReport(reportBody)
+    // await is required: ensures the report is persisted before updating the object status
+    const dbReadyReport = await putReport(reportBody)
 
     if (dbObject) {
-      if (reportBody[API_REPORT_STATUS] === IntegrationStatus.OK) {
-        await setPublishedFlag(dbObject, urlObjectId)
-      } else {
-        await setFlagIntegrationKO(dbObject, reportBody[API_REPORT_ID])
-        // TODO: IntegrationStatus.KO => flag to set a problem
+      if (objectType === OBJ_METADATA) {
+        await treatMetadataReport(dbObject, urlObjectId, reportBody)
+      } else if (objectType === OBJ_ORGANIZATIONS) {
+        await treatOrgnizationsReports(dbObject, reportBody)
       }
-      // console.debug(`T (${fun}) dbObject:`, dbObject)
     }
 
     return dbReadyReport
@@ -482,7 +480,7 @@ export const getReportListForObjectType = async (req, reply) => {
 export const createErrorReport = async (err, details, shouldUpdateMetadataStatus) => {
   const fun = 'createErrorReport'
   if (!details) throw new InternalServerError('Input details should not be null', mod, fun)
-  const { step, description, method, url, metadata } = details
+  const { step, description, method, url, metadata, objectType } = details
 
   const metaId = metadata?.[API_METADATA_ID]
   const reportId = uuidv4()
@@ -496,6 +494,7 @@ export const createErrorReport = async (err, details, shouldUpdateMetadataStatus
       [API_REPORT_METHOD]: method?.toUpperCase(),
       [API_REPORT_VERSION]: API_VERSION,
       [API_REPORT_STATUS]: IntegrationStatus.KO,
+      [API_REPORT_OBJECT_TYPE]: objectType,
       [API_REPORT_COMMENT]: `While ${step}` + url ? `on ${url}` : '',
       [API_REPORT_ERRORS]: {
         [API_REPORT_ERROR_CODE]: err?.statusCode || 500,
@@ -553,17 +552,28 @@ export const putReport = async (reportBody) => {
   }
 }
 
-export const treatOrgnizationsReports = async (objectType, urlObjectId, reportBody) => {
+const treatMetadataReport = async (dbObject, urlObjectId, reportBody) => {
+  const fun = 'treatMetadataReport'
+  logT(mod, fun)
+  if (reportBody[API_REPORT_STATUS] === IntegrationStatus.OK) {
+    await setPublishedFlag(dbObject, urlObjectId)
+  } else {
+    await setFlagIntegrationKO(dbObject, reportBody[API_REPORT_ID])
+  }
+}
+
+export const treatOrgnizationsReports = async (dbObject, reportBody) => {
   const fun = 'treatOrgnizationsReports'
   logT(mod, fun)
 
-  const dbObject = await getObjectWithRudiId(objectType, urlObjectId)
   switch (reportBody[API_REPORT_METHOD]) {
     case ReportMethods.POST:
       dbObject[API_ORGANIZATION_VALIDATION_STATUS] =
         reportBody[API_REPORT_STATUS] === IntegrationStatus.OK
           ? OrganizationStatus.VALIDATED
           : OrganizationStatus.CANCELLED
+      if (reportBody[API_REPORT_STATUS] === IntegrationStatus.OK)
+        await setPublishedFlag(dbObject, dbObject[API_ORGANIZATION_ID])
       break
     case ReportMethods.ATTACH:
       dbObject[API_ORGANIZATION_ATTACHMENT_STATUS] =
@@ -578,7 +588,7 @@ export const treatOrgnizationsReports = async (objectType, urlObjectId, reportBo
           : LinkedProducerStatus.VALIDATED
       break
     default:
-      logW(mod, fun, `Not implemented yet:  ${objectType} > ${reportBody[API_REPORT_METHOD]}`)
+      logW(mod, fun, `Not implemented yet: ${reportBody[API_REPORT_METHOD]}`)
   }
-  dbObject.save()
+  await dbObject.save()
 }

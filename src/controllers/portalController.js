@@ -17,6 +17,13 @@ import {
   API_METADATA_ID,
   API_METAINFO_DATES,
   API_METAINFO_PROPERTY,
+  API_ORGANIZATION_ID,
+  API_ORGANIZATION_NAME,
+  API_ORGANIZATION_ADDRESS,
+  API_ORGANIZATION_COORDINATES,
+  API_ORGANIZATION_SUMMARY,
+  API_ORGANIZATION_VALIDATION_STATUS,
+  API_ORGANIZATION_ATTACHMENT_STATUS,
   API_REPORT_ID,
   API_STATUS_PROPERTY,
   API_STORAGE_STATUS,
@@ -59,6 +66,11 @@ import { getDbObjectList, getObjectWithRudiId } from '../db/dbQueries.js'
 
 import { createPublicKey } from 'node:crypto'
 import { isEveryMediaAvailable, setMetadataStatusToSent } from '../definitions/models/Metadata.js'
+import { ObjectTypes } from '../definitions/models/Report.js'
+import Organization, {
+  OrganizationStatus,
+  LinkedProducerStatus,
+} from '../definitions/models/Organization.js'
 import {
   BadRequestError,
   ForbiddenError,
@@ -105,7 +117,7 @@ export const updateOrganizationFromPortal = async (req, reply) => {
   if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
 
   try {
-    // Si le portail n'est pas configuré, on ne fait pas d'appel
+    // If Portal is not configured, no request should be made
 
     const portalOrganization = await getPortalOrganization(req, reply)
     const isAttached = await isOrganizationAttached(req, reply)
@@ -173,7 +185,7 @@ export const createPortalOrganization = async (organization) => {
   logT(mod, fun)
   if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
 
-  if (!organization) throw BadRequestError('Input organization should be defined')
+  if (!organization) throw new BadRequestError('Input organization should be defined')
 
   try {
     return await httpPost(
@@ -194,9 +206,9 @@ export const isOrganizationAttached = async (req, reply) => {
 
   try {
     const organizationId = req.params?.[PARAM_ID]
-    if (!organizationId) throw BadRequestError(`Organization UUID is empty`)
+    if (!organizationId) throw new BadRequestError(`Organization UUID is empty`)
     if (!isUUID(organizationId))
-      throw BadRequestError(`Organization UUID is invalid: ${organizationId}`)
+      throw new BadRequestError(`Organization UUID is invalid: ${organizationId}`)
     logI(mod, fun, `organizationId: ${organizationId}`)
 
     return await httpGet(
@@ -210,23 +222,92 @@ export const isOrganizationAttached = async (req, reply) => {
   }
 }
 
+const ensureOrganizationFromPortalData = async (organizationId, portalOrgData) => {
+  const fun = 'ensureOrganizationFromPortalData'
+  logT(mod, fun, `organizationId: ${organizationId}`)
+
+  try {
+    if (!organizationId || !portalOrgData) {
+      logW(mod, fun, `Missing organizationId or portalOrgData`)
+      return null
+    }
+
+    // Check whether the organization already exists locally
+    let localOrganization = await getObjectWithRudiId(OBJ_ORGANIZATIONS, organizationId)
+
+    if (localOrganization) {
+      // Organization exists: update statuses
+      logI(mod, fun, `Organization exists locally. Updating status for ID: ${organizationId}`)
+      localOrganization[API_ORGANIZATION_VALIDATION_STATUS] = OrganizationStatus.VALIDATED
+      localOrganization[API_ORGANIZATION_ATTACHMENT_STATUS] = LinkedProducerStatus.IN_PROGRESS
+      await localOrganization.save()
+      logI(mod, fun, `Organization status updated: ${organizationId}`)
+      return localOrganization
+    }
+
+    // Organization does not exist: create it from Portal data
+    logI(mod, fun, `Creating new organization from Portal data. ID: ${organizationId}`)
+
+    const organizationData = {
+      [API_ORGANIZATION_ID]: organizationId,
+      [API_ORGANIZATION_NAME]: portalOrgData.organization_name,
+      [API_ORGANIZATION_VALIDATION_STATUS]: OrganizationStatus.VALIDATED,
+      [API_ORGANIZATION_ATTACHMENT_STATUS]: LinkedProducerStatus.IN_PROGRESS,
+    }
+
+    // Add optional fields when present
+    if (portalOrgData.organization_summary) {
+      organizationData[API_ORGANIZATION_SUMMARY] = portalOrgData.organization_summary
+    }
+    if (portalOrgData.organization_address) {
+      organizationData[API_ORGANIZATION_ADDRESS] = portalOrgData.organization_address
+    }
+    if (portalOrgData.organization_coordinates) {
+      organizationData[API_ORGANIZATION_COORDINATES] = portalOrgData.organization_coordinates
+    }
+
+    const newOrganization = new Organization(organizationData)
+    await newOrganization.save()
+    logI(mod, fun, `New organization created successfully: ${organizationId}`)
+    return newOrganization
+  } catch (err) {
+    throw RudiError.treatError(mod, fun, err)
+  }
+}
+
 export const attachOrganization = async (req, reply) => {
   const fun = 'attachOrganization'
   logT(mod, fun)
   if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
   try {
     const organizationId = req.params?.[PARAM_ID]
-    if (!organizationId) throw BadRequestError(`Organization UUID is empty`)
+    if (!organizationId) throw new BadRequestError(`Organization UUID is empty`)
     if (!isUUID(organizationId))
-      throw BadRequestError(`Organization UUID is invalid: ${organizationId}`)
+      throw new BadRequestError(`Organization UUID is invalid: ${organizationId}`)
     logI(mod, fun, `organizationId: ${organizationId}`)
 
-    return await httpPost(
+    // Request the attach action on Portal
+    const attachResult = await httpPost(
       organizationAttachRequestUrl(organizationId),
       req.body,
       await getPortalToken(),
       defaultPortalRequestOptions()
     )
+
+    // After a successful attach, fetch organization data from Portal
+    logD(mod, fun, `Fetch organization data from Portal for: ${organizationId}`)
+    const portalOrgData = await httpGet(
+      getPortalOrganizationUrl(organizationId),
+      await getPortalToken(),
+      defaultPortalRequestOptions()
+    )
+
+    // Create or update the local organization
+    if (portalOrgData) {
+      await ensureOrganizationFromPortalData(organizationId, portalOrgData)
+    }
+
+    return attachResult
   } catch (err) {
     // if (err.statusCode == 404) return null
     throw RudiError.treatError(mod, fun, err)
@@ -239,9 +320,9 @@ export const detachOrganization = async (req, reply) => {
   if (isPortalConnectionDisabled()) return NO_PORTAL_MSG
   try {
     const organizationId = req.params?.[PARAM_ID]
-    if (!organizationId) throw BadRequestError(`Organization UUID is empty`)
+    if (!organizationId) throw new BadRequestError(`Organization UUID is empty`)
     if (!isUUID(organizationId))
-      throw BadRequestError(`Organization UUID is invalid: ${organizationId}`)
+      throw new BadRequestError(`Organization UUID is invalid: ${organizationId}`)
     logI(mod, fun, `organizationId: ${organizationId}`)
 
     try {
@@ -480,7 +561,10 @@ const getNewTokenFromPortal = async () => {
     const portalAuthUrl = getUrlPortalAuthGet()
     let portalAnswer
     try {
-      portalAnswer = await directPost(portalAuthUrl, portalRequestBody, basicAuthHeaders)
+      portalAnswer = await directPost(portalAuthUrl, portalRequestBody, {
+        ...defaultPortalRequestOptions(),
+        ...basicAuthHeaders,
+      })
       // logT(mod, fun, 'OK portal answered')
     } catch (err) {
       logE(mod, fun, `ERR GET portal JWT: ${beautify(err)}`)
@@ -761,7 +845,7 @@ const isMetadataSendableToPortal = async (metadataId) => {
 const PORTAL_POST_URL = postPortalMetaUrl()
 export const sendMetadataToPortal = async (metadataId) => {
   const fun = 'sendMetadataToPortal'
-  const report = { step: 'initializing' }
+  const report = { step: 'initializing', metadata: { [API_METADATA_ID]: metadataId } }
 
   try {
     logT(mod, fun)
@@ -801,7 +885,13 @@ export const sendMetadataToPortal = async (metadataId) => {
         portalToken,
         defaultPortalRequestOptions()
       )
-    } catch {
+    } catch (err) {
+      // Only treat 404 as "metadata not found on portal" → POST
+      // Any other error (timeout, network, 5xx…) should be re-thrown
+      if (err?.statusCode !== 404 && err?.response?.status !== 404) {
+        throw err
+      }
+
       report.step = `sending a metadata that is not on the portal: '${metadataId}'`
       report.requestDetails = { method: 'POST', url: PORTAL_POST_URL }
       logD(mod, fun, report.step)
@@ -837,6 +927,7 @@ export const sendMetadataToPortal = async (metadataId) => {
   } catch (err) {
     logW(mod, fun, beautify(err))
     report.description = 'An error occurred while sending the metadata to the Portal'
+    report.objectType = ObjectTypes.DATASET
     await createErrorReport(err, report, 'update metadata status')
     throw RudiError.treatError(mod, fun, err)
   }

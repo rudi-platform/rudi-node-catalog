@@ -81,6 +81,11 @@ const PORTAL_REQ_TIMEOUT = getPortalUserConf('portal_req_timeout') ?? 2000
 const PORTAL_MAX_RETRIES = getPortalUserConf('portal_max_retries') ?? 3
 const PORTAL_INITIAL_DELAY = getPortalUserConf('portal_initial_delay') ?? 300
 
+const REQ_AUTH_MAX_LENGTH = getPortalUserConf('req_auth_max_length') ?? 2048
+const REQ_URL_MAX_LENGTH = getPortalUserConf('req_url_max_length') ?? 200
+export const getReqAuthMaxLength = () => REQ_AUTH_MAX_LENGTH
+export const getReqUrlMaxLength = () => REQ_URL_MAX_LENGTH
+
 // ----- Auth
 const getAuthUrl = (...url) => pathJoin(API_PORTAL_URL, ...url)
 

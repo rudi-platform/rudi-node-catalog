@@ -10,10 +10,9 @@ const mod = 'protect'
 const ACTIVATE_LOG = false
 
 import { HD_METHOD, HD_URL } from '../config/constHeaders.js'
-const REQ_AUTH_MAX_LENGTH = 1500
-const REQ_URL_MAX_LENGTH = 200
+import { getReqAuthMaxLength, getReqUrlMaxLength } from '../config/confPortal.js'
 
-export const getUrlMaxLength = () => REQ_URL_MAX_LENGTH
+export const getUrlMaxLength = () => getReqUrlMaxLength()
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
@@ -42,9 +41,10 @@ export const protectHeaderAuth = (req) => {
     if (ACTIVATE_LOG) logT(mod, fun)
     const auth = req?.headers?.Authorization ?? req?.headers?.authorization
     if (!auth) return
-    if (auth.length > REQ_AUTH_MAX_LENGTH)
+    const authMaxLength = getReqAuthMaxLength()
+    if (auth.length > authMaxLength)
       throw new BadRequestError(
-        `The length of the token in request headers exceeds ${REQ_AUTH_MAX_LENGTH} characters (found ${auth.length})`
+        `The length of the token in request headers exceeds ${authMaxLength} characters (found ${auth.length})`
       )
     if (!validateSchema(auth, REGEX_JWT_AUTH) && !validateSchema(auth, REGEX_BASIC_AUTH))
       throw new BadRequestError(
@@ -60,7 +60,7 @@ export const protectHeaderUrl = (req) => {
   try {
     if (ACTIVATE_LOG) logT(mod, fun)
     const url = accessProperty(req, HD_URL)
-    if (url.length > REQ_URL_MAX_LENGTH)
+    if (url.length > getReqUrlMaxLength())
       throw new BadRequestError(`Request URL is too long (${url.length} characters)`)
     if (validateSchema(url, REGEX_URL_WRONG_CHAR))
       throw new BadRequestError(`Invalid characters detected in the URL`)
