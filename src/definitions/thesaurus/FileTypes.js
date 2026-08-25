@@ -42,6 +42,7 @@ export const FileTypes = [
   'application/vnd.openxmlformats-officedocument.presentationml.presentation', // (.pptx)
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // (.xlsx)
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // (.docx)',
+  'application/vnd.zarr', // (.zarr)
   'application/x-7z-compressed', // (.7z)
   'application/x-bzip', // (.bz, .tar.bz)
   'application/x-bzip2', // (.bz2, .tar.bz2)
@@ -167,6 +168,7 @@ export const Extensions = {
   xml: 'text/xml',
   yaml: 'text/x-yaml',
   yml: 'text/x-yaml',
+  zarr: 'application/vnd.zarr',
   zip: 'application/zip',
   zst: 'application/zstd',
 }
