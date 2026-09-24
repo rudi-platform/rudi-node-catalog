@@ -1,10 +1,10 @@
 {
   "info": {
-    "_postman_id": "aec3de11-cc9e-4c67-b9c3-5cdbc2811e5f",
+    "_postman_id": "ba3709a5-47c2-4a69-82d1-a14a6d3fec4a",
     "name": "01. Catalog",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "13557783",
-    "_collection_link": "https://go.postman.co/collection/13557783-aec3de11-cc9e-4c67-b9c3-5cdbc2811e5f?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/13557783-ba3709a5-47c2-4a69-82d1-a14a6d3fec4a?source=collection_link"
   },
   "item": [
     {
@@ -16,28 +16,19 @@
             {
               "listen": "prerequest",
               "script": {
-                "exec": [
-                  "mem.wipeCollectionVars(pm.collectionVariables,[],1)",
-                  ""
-                ],
                 "type": "text/javascript",
-                "packages": {},
-                "requests": {}
+                "exec": [
+                  "mem.wipeCollectionVars(pm.collectionVariables,[],1)\n"
+                ]
               }
             },
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "pm.test(\"Token loaded\", () => {",
-                  "    pm.expect(pm.response.code).to.eql(200);",
-                  "    const res =  pm.response.text()",
-                  "    pm.expect(secu.isTokenValid(res)).to.be.true",
-                  "});"
-                ],
                 "type": "text/javascript",
-                "packages": {},
-                "requests": {}
+                "exec": [
+                  "pm.test(\"Token loaded\", () => {\n    pm.expect(pm.response.code).to.eql(200);\n    const jwt = pm.response.text()\n    pm.expect(secu.isTokenValid(jwt)).to.be.true\n});"
+                ]
               }
             }
           ],
@@ -132,7 +123,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Check portal URL\", () => {\n    pm.expect(pm.response.code).to.eql(200);\n    const res = pm.response.text()\n    pm.collectionVariables.set('portalUrl', res)\n});\n"
+                  "pm.test(\"Check portal URL\", () => {\n    pm.expect(pm.response.code).to.eql(200);\n    const res = pm.response.text()\n\n    const portalConnected = res.startsWith('http')\n    // portal.setIsConnected(pm.environment, portalConnected)\n    pm.environment.set('isPortalConnected', portalConnected)\n\n    console.log(`Portal is ${portalConnected? '' : 'not '}connected`)\n\n    if (portalConnected) {\n        const portalUrl = res.endsWith('/') ? res.slice(0, -1) : res\n        pm.expect(portalUrl == portal.url.prod || portalUrl == portal.url.qualif).to.be.true\n        pm.environment.set('portalUrl', res)\n    }\n    else\n        pm.expect(res == pm.variables.get('noPortalMsg')).to.be.true\n});\n\n\n"
                 ]
               }
             }
@@ -163,7 +154,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Testing portal connection\", () => {\n    pm.expect(pm.response.code).to.eql(200);\n    const portalJwtName = mem.get('portalJwtName')\n    if (pm.response.text() === pm.variables.get('noPortalMsg')) {\n        pm.collectionVariables.unset(portalJwtName)\n        return true\n    }\n    const token = pm.response.json().access_token\n    pm.expect(!!match.jwt(token)).to.be.true\n    pm.collectionVariables.set(portalJwtName, token)\n});"
+                  "pm.test(\"Testing portal connection\", () => {\n    pm.expect(pm.response.code).to.eql(200);\n    console.log(`Portal is ${portal.isConnected()?'':'not '}connected`)\n\n    const portalJwtName = mem.get('portalJwtName')\n    if (!portal.isConnected()) {\n        pm.collectionVariables.unset(portalJwtName)\n        return true\n    }\n    const token = pm.response.json()?.access_token\n    pm.expect(!!match.jwt(token)).to.be.true\n    pm.collectionVariables.set(portalJwtName, token)\n\n});"
                 ]
               }
             }
@@ -193,7 +184,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Testing portal connection\", () => {\n    pm.expect(pm.response.code).to.eql(200);\n    if (pm.collectionVariables.get('portalUrl') === pm.variables.get('noPortalMsg'))\n        pm.expect(pm.response.text() === pm.variables.get('noPortalMsg')).to.be.true\n    else\n        pm.expect(pm.response.json().active).to.be.true\n})"
+                  "pm.test(\"Testing portal connection\", () => {\n    pm.expect(pm.response.code).to.eql(200);\n    if (portal.isConnected())\n        pm.expect(pm.response.json().active).to.be.true\n    else\n        pm.expect(pm.response.text() === pm.variables.get('noPortalMsg')).to.be.true\n})"
                 ]
               }
             }
@@ -797,17 +788,10 @@
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "",
-                  "pm.test(\"Downloading all the node data\", () => {",
-                  "    pm.expect(pm.response.code).to.eql(200);",
-                  "    //const res = pm.response.stream.toString('utf8')",
-                  "    const res = pm.response.json()",
-                  "    //pm.expect(res.logs).to.be.undefined;",
-                  "});"
-                ],
                 "type": "text/javascript",
-                "packages": {}
+                "exec": [
+                  "\npm.test(\"Downloading all the node data\", () => {\n    pm.expect(pm.response.code).to.eql(200);\n    //const res = pm.response.stream.toString('utf8')\n    const res = pm.response.json()\n    //pm.expect(res.logs).to.be.undefined;\n});"
+                ]
               }
             }
           ],
@@ -815,7 +799,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{catalogUrl}}/admin/db/data?type=all",
+              "raw": "{{catalogUrl}}/admin/db/data?type=skos_schemes",
               "host": [
                 "{{catalogUrl}}"
               ],
@@ -827,7 +811,7 @@
               "query": [
                 {
                   "key": "type",
-                  "value": "all"
+                  "value": "skos_schemes"
                 }
               ]
             }
@@ -926,16 +910,10 @@
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "",
-                  "pm.test(\"Downloading the node data, logs included\", () => {",
-                  "    pm.expect(pm.response.code).to.eql(200);",
-                  "    const res = pm.response.json()",
-                  "    pm.expect(res.logs.length).to.gt(0);",
-                  "});"
-                ],
                 "type": "text/javascript",
-                "packages": {}
+                "exec": [
+                  "// Formerly {{catalogUrl}}/admin/db/data?type=all&logs=yes\npm.test(\"Downloading the node data, logs included\", () => {\n    pm.expect(pm.response.code).to.eql(200);\n    const res = pm.response.json()\n    pm.expect(res.logs.length).to.gt(0);\n});"
+                ]
               }
             }
           ],
@@ -943,7 +921,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{catalogUrl}}/admin/db/data?type=all&logs=true",
+              "raw": "{{catalogUrl}}/admin/db/data?type=logs",
               "host": [
                 "{{catalogUrl}}"
               ],
@@ -955,11 +933,7 @@
               "query": [
                 {
                   "key": "type",
-                  "value": "all"
-                },
-                {
-                  "key": "logs",
-                  "value": "true"
+                  "value": "logs"
                 }
               ]
             }
@@ -1866,7 +1840,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Producer 1 created\", () => {\n    portalUrl = pm.collectionVariables.get('portalUrl')\n    if (portalUrl?.startsWith('http')) {\n        pm.expect(pm.response.code).to.eql(501);\n        return\n    }\n    pm.expect(pm.response.code).to.eql(200);\n    const responseJson = pm.response.json();\n    const orgId = pm.variables.get('softOrg1Id');\n    pm.expect(responseJson.organization_id).to.eq(orgId);\n});"
+                  "pm.test(\"Producer 1 created\", () => {\n    console.log('prod portal url:', portal.url.prod)\n    console.log('isPortalConnected:', portal.isConnected())\n    if (portal.isConnected()) {\n        pm.expect(pm.response.code).to.eql(501);\n        return true\n    }\n    pm.expect(pm.response.code).to.eql(200);\n    const responseJson = pm.response.json();\n    const orgId = pm.variables.get('softOrg1Id');\n    pm.expect(responseJson.organization_id).to.eq(orgId);\n});"
                 ]
               }
             },
@@ -1875,7 +1849,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('softOrg1Id', rand.get('{{$randomUUID}}'))\npm.collectionVariables.set('softOrg1Name', rand.get('{{$randomCompanyName}}'))\nconst orgAddress = `${rand.get('{{$randomStreetAddress}}')}, ${rand.get('{{$randomCity}}')}`\npm.collectionVariables.set('softOrg1Address', orgAddress)\n"
+                  "pm.collectionVariables.set('softOrg1Id', rand.get('{{$randomUUID}}'))\npm.collectionVariables.set('softOrg1Name', rand.get('{{$randomCompanyName}}'))\npm.collectionVariables.set('softOrg1Address', `${rand.get('{{$randomStreetAddress}}')}, ${rand.get('{{$randomCity}}')}`)\n"
                 ]
               }
             }
@@ -1913,7 +1887,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Producer 1 created\", () => {\n    portalUrl = pm.collectionVariables.get('portalUrl')\n    if (!portalUrl?.startsWith('http')) {\n        pm.expect(pm.response.code).to.eql(403);\n        return\n    }\n    pm.expect(pm.response.code).to.eql(200);\n    const responseJson = pm.response.json();\n    const orgId = pm.variables.get('softOrg1Id');\n    pm.expect(responseJson[0].organization_id).to.eq(orgId);\n});"
+                  "pm.test(\"Producer 1 created\", () => {\n    if (!portal.isConnected()) {\n        pm.expect(pm.response.code).to.eql(403);\n        pm.expect(pm.response.json().message.startsWith(\"Un objet de type 'organizations' existe déjà pour l'identifiant '\"))\n        return true\n    }\n    pm.expect(pm.response.code).to.eql(200)\n    const responseJson = pm.response.json()\n    const orgId = pm.variables.get('softOrg1Id')\n    pm.collectionVariables.set('softOrg1Id',responseJson?.organization_id)\n    pm.expect(match.uuid(responseJson?.organization_id))\n});"
                 ]
               }
             }
@@ -1949,18 +1923,10 @@
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "pm.test(\"Producer 1 correctly saved\", () => {",
-                  "    pm.expect(pm.response.code).to.eql(200);",
-                  "    const responseJson = pm.response.json();",
-                  "    const orgId = pm.variables.get('softOrg1Id');",
-                  "    pm.expect(responseJson.organization_id).to.eq(orgId);",
-                  "});",
-                  ""
-                ],
                 "type": "text/javascript",
-                "packages": {},
-                "requests": {}
+                "exec": [
+                  "pm.test(\"Producer 1 correctly saved\", () => {\n    pm.expect(pm.response.code).to.eql(200);\n    const responseJson = pm.response.json();\n    const orgId = pm.variables.get('softOrg1Id');\n    pm.expect(responseJson.organization_id).to.eq(orgId);\n});\n"
+                ]
               }
             }
           ],
@@ -1987,33 +1953,19 @@
             {
               "listen": "test",
               "script": {
+                "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Producer 2 created\", () => {",
-                  "    pm.expect(pm.response.code).to.eql(200);",
-                  "    const responseJson = pm.response.json();",
-                  "    const orgId = pm.variables.get('softOrg2Id');",
-                  "    pm.expect(responseJson.organization_id).to.eq(orgId);",
-                  "});"
-                ],
-                "type": "text/javascript"
+                  "pm.test(\"Producer 2 created\", () => {\n    console.log(\"portal.isConnected:\", portal.isConnected())\n    if (!portal.isConnected()) {\n        pm.expect(pm.response.code).to.eql(200)\n        const res = pm.response.json()\n        pm.expect(match.uuid(res?.organization_id))\n        return true\n    }\n    pm.expect(pm.response.code).to.eql(200)\n    const res = pm.response.json()\n    const orgId = pm.variables.get('softOrg2Id')\n    pm.collectionVariables.set('softOrg2Id', res?.organization_id)\n    pm.expect(match.uuid(res?.organization_id))\n});"
+                ]
               }
             },
             {
               "listen": "prerequest",
               "script": {
+                "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('softOrg2Id', rand.get('{{$randomUUID}}'))",
-                  "let newCompanyName = rand.get('{{$randomCompanyName}}')",
-                  "let previousCompanyName = pm.variables.get('softOrg1Name')",
-                  "while (newCompanyName == previousCompanyName) {",
-                  "    newCompanyName = rand.get('{{$randomCompanyName}}')",
-                  "}",
-                  "pm.collectionVariables.set('softOrg2Name', newCompanyName)",
-                  "const orgAddress = `${rand.get('{{$randomStreetAddress}}')}, ${rand.get('{{$randomCity}}')}`",
-                  "pm.collectionVariables.set('softOrg2Address', orgAddress)",
-                  ""
-                ],
-                "type": "text/javascript"
+                  "pm.collectionVariables.set('softOrg2Id', rand.get('{{$randomUUID}}'))\nlet newCompanyName = rand.get('{{$randomCompanyName}}')\n\nlet previousCompanyName = pm.variables.get('softOrg1Name')\nwhile (newCompanyName == previousCompanyName) {\n    newCompanyName = rand.get('{{$randomCompanyName}}')\n}\npm.collectionVariables.set('softOrg2Name', newCompanyName)\n\nconst orgAddress = `${rand.get('{{$randomStreetAddress}}')}, ${rand.get('{{$randomCity}}')}`\npm.collectionVariables.set('softOrg2Address', orgAddress)\n"
+                ]
               }
             }
           ],
@@ -2050,7 +2002,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Producer 2 edited\", () => {\n    portalUrl = pm.collectionVariables.get('portalUrl')\n    if (portalUrl?.startsWith('http')) {\n        pm.expect(pm.response.code).to.eql(501);\n        return\n    }\n    pm.expect(pm.response.code).to.eql(200);\n    const responseJson = pm.response.json();\n    const orgId = pm.variables.get('softOrg2Id');\n    const orgName = pm.variables.get('softOrg2Name');\n    const orgAddress = pm.variables.get('softOrg2Address');\n\n    pm.expect(responseJson.organization_name).to.eq(orgName);\n    pm.expect(responseJson.organization_address).to.eq(orgAddress);\n});"
+                  "pm.test(\"Producer 2 edited\", () => {\n    if (portal.isConnected()) {\n        pm.expect(pm.response.code).to.eql(501);\n        return\n    }\n    pm.expect(pm.response.code).to.eql(200);\n    const responseJson = pm.response.json();\n    const orgId = pm.variables.get('softOrg2Id');\n    const orgName = pm.variables.get('softOrg2Name');\n    const orgAddress = pm.variables.get('softOrg2Address');\n\n    pm.expect(responseJson.organization_name).to.eq(orgName);\n    pm.expect(responseJson.organization_address).to.eq(orgAddress);\n});"
                 ]
               }
             },
@@ -2137,7 +2089,7 @@
                   "pm.test(\"2 producers created\", () => {",
                   "    pm.expect(pm.response.code).to.eql(200);",
                   "    const orgList = pm.response.json();",
-                  "    pm.expect(orgList.length).to.gte(pm.environment.get('portalUrl') ? 1 : 2);",
+                  "    pm.expect(orgList.length).to.gte(portal.isConnected() ? 1 : 2);",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -2875,25 +2827,10 @@
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "pm.test(\"List of existing media\", () => {",
-                  "    const mediaList = pm.response.json()",
-                  "    pm.expect(Array.isArray(mediaList))",
-                  "    console.log(mediaList.length)",
-                  "})"
-                ],
                 "type": "text/javascript",
-                "packages": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
                 "exec": [
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {}
+                  "pm.test(\"List of existing media\", () => {\n    const mediaList = pm.response.json()\n    pm.expect(Array.isArray(mediaList))\n    pm.expect(mediaList.length)\n})"
+                ]
               }
             }
           ],
@@ -4023,7 +3960,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhbm9ueW1vdXMiLCJpc3MiOiJSdWRpIyIsImNvbm5lY3RlZFVzZXIiOiJ7XCJsb2dpblwiOlwiYW5vbnltb3VzXCIsXCJ0eXBlXCI6XCJQRVJTT05cIixcImZpcnN0bmFtZVwiOlwiYW5vbnltb3VzXCIsXCJsYXN0bmFtZVwiOlwiYW5vbnltb3VzXCIsXCJlbWFpbFwiOm51bGwsXCJvcmdhbml6YXRpb25cIjpcInJ1ZGlcIixcInJvbGVzXCI6W1wiQU5PTllNT1VTXCJdLFwiZGF0YVwiOm51bGx9IiwiZXhwIjoxNzQyMjkzODYwLCJpYXQiOjE3NDIyOTMyNjAsImp0aSI6IlJ1ZGkyMDIxIn0.MC06wy3srFubuHtUY0_K2mrz5hXJnkWto3QJAzOtkw1ls3oFLX-4TBV9JfPhxMV0cI1Hbpi-lVTNIlOdB7svvg",
+                  "value": "",
                   "type": "string"
                 }
               ]
@@ -5404,7 +5341,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Org 1 GMD-XML created\", () => {\n    try {\n        pm.expect(pm.response.code).to.eql(200);\n    } catch (err) {\n        console.error(\"ERR [Org 1 GMD-XML created]\", pm.response)\n        throw err\n    }\n    const responseJson = pm.response.json();\n    const orgId = pm.variables.get('softOrgGmdXml1Id');\n    const orgName = pm.variables.get('softOrgGmdXml1Name')\n    pm.expect(responseJson.organization_id).to.eq(orgId);\n    pm.expect(responseJson.organization_address).to.eq(\"Ancienne adresse, RENNES CEDEX, 35031, France\");\n    pm.expect(responseJson.organization_name).to.eq(orgName)\n});"
+                  "pm.test(\"Org 1 GMD-XML created\", () => {\n    try {\n        pm.expect(pm.response.code).to.eql(200);\n    } catch (err) {\n        console.error(\"ERR [Org 1 GMD-XML created]\", pm.response)\n        throw err\n    }\n    const responseJson = pm.response.json();\n    const orgId = pm.variables.get('softOrgGmdXml1Id');\n    const orgName = pm.variables.get('softOrgGmdXml1Name')\n    if (!portal.isConnected())        pm.expect(responseJson.organization_id).to.eq(orgId);\n    pm.expect(responseJson.organization_address).to.eq(\"Ancienne adresse, RENNES CEDEX, 35031, France\");\n    pm.expect(responseJson.organization_name).to.eq(orgName)\n});"
                 ]
               }
             }
@@ -5470,7 +5407,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Org 1 GMD-XML edited\", () => {\n    portalUrl = pm.collectionVariables.get('portalUrl')\n    if (portalUrl?.startsWith('http')) {\n        pm.expect(pm.response.code).to.eql(501);\n        return\n    }\n\n    pm.expect(pm.response.code).to.eql(200);\n    const responseJson = pm.response.json();\n    const orgId = pm.variables.get('softOrgGmdXml1Id');\n    const orgName = pm.variables.get('softOrgGmdXml1NewName');\n    pm.expect(responseJson.organization_id).to.eq(orgId);\n    pm.expect(responseJson.organization_name).to.eq(orgName);\n    pm.expect(responseJson.organization_address).to.eq(\"Nouvelle adresse, RENNES CEDEX, 35031, France\");\n});"
+                  "pm.test(\"Org 1 GMD-XML edited\", () => {\n    if (portal.isConnected()) {\n        pm.expect(pm.response.code).to.eql(501);\n        return\n    }\n\n    pm.expect(pm.response.code).to.eql(200);\n    const responseJson = pm.response.json();\n    const orgId = pm.variables.get('softOrgGmdXml1Id');\n    const orgName = pm.variables.get('softOrgGmdXml1NewName');\n    pm.expect(responseJson.organization_id).to.eq(orgId);\n    pm.expect(responseJson.organization_name).to.eq(orgName);\n    pm.expect(responseJson.organization_address).to.eq(\"Nouvelle adresse, RENNES CEDEX, 35031, France\");\n});"
                 ]
               }
             }
@@ -6277,37 +6214,15 @@
       "name": "08. Add/edit/get reports",
       "item": [
         {
-          "name": "Check portal connection",
+          "name": "Get portal token",
           "event": [
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "pm.test(\"Testing portal connection\", () => {",
-                  "    pm.expect(pm.response.code).to.eql(200);",
-                  "    if (pm.response.text() === pm.globals.get('noPortalMsg')) {",
-                  "        pm.collectionVariables.set('skipPortalConnection', true)",
-                  "        return true",
-                  "    }",
-                  "    const token = pm.response.json().access_token",
-                  "    pm.expect(!!match.jwt(token)).to.be.true",
-                  "    pm.collectionVariables.set(pm.variables.get('portalJwtName'), token)",
-                  "});"
-                ],
                 "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
                 "exec": [
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
+                  "pm.test(\"Testing portal connection\", () => {\n    pm.expect(pm.response.code).to.eql(200);\n    const portalJwtName = mem.get('portalJwtName')\n    if (!portal.isConnected()) {\n        pm.collectionVariables.unset(portalJwtName)\n        return true\n    }\n    const token = pm.response.json().access_token\n    pm.expect(!!match.jwt(token)).to.be.true\n    pm.collectionVariables.set(portalJwtName, token)\n});"
+                ]
               }
             }
           ],
@@ -6371,42 +6286,19 @@
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "",
-                  "pm.test(\"Create Integration report 1 for metadata 1\", () => {",
-                  "    if (pm.collectionVariables.get('skipPortalConnection')) {",
-                  "        pm.expect(pm.response.code).to.eql(400);",
-                  "        return",
-                  "    }",
-                  "    pm.expect(pm.response.code).to.eql(200);",
-                  "    const responseJson = pm.response.json();",
-                  "    // console.log(responseJson);",
-                  "    const metaId = pm.variables.get('softMeta1Id');",
-                  "    const reportId = pm.variables.get('softReport1Id');",
-                  "    pm.expect(responseJson.report_id).to.eq(reportId);",
-                  "    pm.expect(responseJson.resource_id).to.eq(metaId);",
-                  "    pm.expect(responseJson.integration_status).to.eq(\"KO\");",
-                  "});"
-                ],
                 "type": "text/javascript",
-                "packages": {},
-                "requests": {}
+                "exec": [
+                  "\npm.test(\"Create Integration report 1 for metadata 1\", () => {\n    if (!portal.isConnected()) {\n        pm.expect(pm.response.code).to.eql(400);\n        return\n    }\n    pm.expect(pm.response.code).to.eql(200);\n    const responseJson = pm.response.json();\n    // console.log(responseJson);\n    const metaId = pm.variables.get('softMeta1Id');\n    const reportId = pm.variables.get('softReport1Id');\n    pm.expect(responseJson.report_id).to.eq(reportId);\n    pm.expect(responseJson.resource_id).to.eq(metaId);\n    pm.expect(responseJson.integration_status).to.eq(\"KO\");\n});"
+                ]
               }
             },
             {
               "listen": "prerequest",
               "script": {
-                "exec": [
-                  "pm.collectionVariables.set('softReport1Id', rand.get('{{$randomUUID}}'));",
-                  "pm.collectionVariables.set('dateReport', time.now());",
-                  "catalogUrl = pm.variables.get('catalogUrl')",
-                  "nodeUrl = catalogUrl.replace(/\\/(catalog|api)/, '')",
-                  "pm.collectionVariables.set('nodeUrl', nodeUrl + '/catalog');",
-                  ""
-                ],
                 "type": "text/javascript",
-                "packages": {},
-                "requests": {}
+                "exec": [
+                  "pm.collectionVariables.set('softReport1Id', rand.get('{{$randomUUID}}'));\npm.collectionVariables.set('dateReport', time.now());\ncatalogUrl = pm.variables.get('catalogUrl')\nnodeUrl = catalogUrl.replace(/\\/(catalog|api)/, '')\npm.collectionVariables.set('nodeUrl', nodeUrl + '/catalog');\n"
+                ]
               }
             }
           ],
@@ -6433,9 +6325,9 @@
               }
             },
             "url": {
-              "raw": "{{nodeUrl}}/resources/{{softMeta1Id}}/report",
+              "raw": "{{catalogUrl}}/resources/{{softMeta1Id}}/report",
               "host": [
-                "{{nodeUrl}}"
+                "{{catalogUrl}}"
               ],
               "path": [
                 "resources",
@@ -6454,7 +6346,7 @@
               "script": {
                 "exec": [
                   "pm.test(\"Create Integration report 2 for metadata 1\", () => {",
-                  "    if (pm.collectionVariables.get('skipPortalConnection')) {",
+                  "    if (!portal.isConnected()) {",
                   "        pm.expect(pm.response.code).to.eql(400);",
                   "        return",
                   "    }",
@@ -6531,7 +6423,7 @@
               "script": {
                 "exec": [
                   "pm.test(\"Create Integration report for unkown metadata\", () => {",
-                  "    if (pm.collectionVariables.get('skipPortalConnection')) {",
+                  "    if (!portal.isConnected()) {",
                   "        pm.expect(pm.response.code).to.eql(400);",
                   "        return",
                   "    } pm.expect(pm.response.code).to.eql(200);",
@@ -6609,7 +6501,7 @@
               "script": {
                 "exec": [
                   "pm.test(\"2 integration reports created for metadata 1\", () => {",
-                  "    if (pm.collectionVariables.get('skipPortalConnection')) {",
+                  "    if (!portal.isConnected()) {",
                   "        pm.expect(pm.response.code).to.eql(400);",
                   "        return",
                   "    }",
@@ -6682,7 +6574,7 @@
               "script": {
                 "exec": [
                   "pm.test(\"2 integration reports created for metadata 1\", () => {",
-                  "    if (pm.collectionVariables.get('skipPortalConnection')) {",
+                  "    if (!portal.isConnected()) {",
                   "        pm.expect(pm.response.code).to.eql(400);",
                   "        return",
                   "    }",
@@ -6758,7 +6650,7 @@
               "script": {
                 "exec": [
                   "pm.test(\"Edit integration report 2 for metadata 1\", () => {",
-                  "    if (pm.collectionVariables.get('skipPortalConnection')) {",
+                  "    if (!portal.isConnected()) {",
                   "        pm.expect(pm.response.code).to.eql(200);",
                   "        return",
                   "    } ",
@@ -6815,7 +6707,7 @@
               "script": {
                 "exec": [
                   "pm.test(\"Edition of integration report 2 saved (access from metadata 1)\", () => {",
-                  "    if (pm.collectionVariables.get('skipPortalConnection')) {",
+                  "    if (!portal.isConnected()) {",
                   "        pm.expect(pm.response.code).to.eql(400);",
                   "        return",
                   "    }",
@@ -6886,7 +6778,7 @@
               "script": {
                 "exec": [
                   "pm.test(\"Edition of integration report 2 saved (access from metadata 1)\", () => {",
-                  "    if (pm.collectionVariables.get('skipPortalConnection')) {",
+                  "    if (!portal.isConnected()) {",
                   "        pm.expect(pm.response.code).to.eql(400);",
                   "        return",
                   "    }",
@@ -7000,7 +6892,7 @@
               "script": {
                 "exec": [
                   "pm.test(\"2 integration reports created in total\", () => {",
-                  "    if (pm.collectionVariables.get('skipPortalConnection')) {",
+                  "    if (!portal.isConnected()) {",
                   "        pm.expect(pm.response.code).to.eql(200);",
                   "        return",
                   "    }",
@@ -7057,7 +6949,7 @@
               "script": {
                 "exec": [
                   "pm.test(\"2 integration reports created in total\", () => {",
-                  "     if (pm.collectionVariables.get('skipPortalConnection')) {",
+                  "     if (!portal.isConnected()) {",
                   "        pm.expect(pm.response.code).to.eql(200);",
                   "        return",
                   "    }",
@@ -7186,7 +7078,7 @@
                 "exec": [
                   "pm.test(\"Delete report 1 & 2\", () => {",
                   "    pm.expect(pm.response.code).to.eql(200);",
-                  "    if (pm.collectionVariables.get('skipPortalConnection')) return",
+                  "    if (!portal.isConnected()) return",
                   "",
                   "    const responseJson = pm.response.json();",
                   "    // pm.expect(responseJson.n).to.eq(3);",
@@ -7279,32 +7171,10 @@
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "pm.test(\"Testing portal connection\", () => {",
-                  "    pm.expect(pm.response.code).to.eql(200);",
-                  "    if (pm.response.text() === pm.globals.get('noPortalMsg')) {",
-                  "        pm.collectionVariables.set('skipPortalConnection', true)",
-                  "        return true",
-                  "    }",
-                  "    const token = pm.response.json().access_token",
-                  "    pm.expect(!!match.jwt(token)).to.be.true",
-                  "    pm.collectionVariables.set(pm.variables.get('portalJwtName'), token)",
-                  "});"
-                ],
                 "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
                 "exec": [
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
+                  "pm.test(\"Testing portal connection\", () => {\n    pm.expect(pm.response.code).to.eql(200);\n    if (!portal.isConnected()) return true\n\n    const token = pm.response.json().access_token\n    pm.expect(!!match.jwt(token)).to.be.true\n    pm.collectionVariables.set(pm.variables.get('portalJwtName'), token)\n});"
+                ]
               }
             }
           ],
@@ -7331,21 +7201,55 @@
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "const stamp = pm.variables.get('stamp')",
-                  "pm.test(`No metadata left with '${stamp}' stamp'`, () => {",
-                  "    if (pm.collectionVariables.get('skipPortalConnection')) {",
-                  "        pm.expect(pm.response.code).to.eql(400);",
-                  "        return",
-                  "    }",
-                  "    pm.expect(pm.response.code).to.eql(200);",
-                  "    const publicMetadataList = pm.response.json();",
-                  "    pm.expect(publicMetadataList.total).to.eq(0);",
-                  "});"
-                ],
                 "type": "text/javascript",
-                "packages": {},
-                "requests": {}
+                "exec": [
+                  "const stamp = pm.variables.get('stamp')\npm.test(`No metadata left with '${stamp}' stamp'`, () => {\n    pm.expect(pm.response.code).to.eql(200);\n    const publicMetadataList = pm.response.json();\n    pm.expect(publicMetadataList.total).to.eq(0);\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{catalogUrl}}/v1/resources?collection_tag={{stamp}}",
+              "host": [
+                "{{catalogUrl}}"
+              ],
+              "path": [
+                "v1",
+                "resources"
+              ],
+              "query": [
+                {
+                  "key": "collection_tag",
+                  "value": "{{stamp}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "[PUB] No metadata left +JWT",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const stamp = pm.variables.get('stamp')\npm.test(`No metadata left with '${stamp}' stamp' (+JWT)`, () => {\n    if (!portal.isConnected()) {\n        pm.expect(pm.response.code).to.eql(400);\n        return true\n    }\n    pm.expect(pm.response.code).to.eql(200);\n    const publicMetadataList = pm.response.json();\n    pm.expect(publicMetadataList.total).to.eq(0);\n});"
+                ]
               }
             }
           ],
@@ -7804,17 +7708,10 @@
             {
               "listen": "test",
               "script": {
+                "type": "text/javascript",
                 "exec": [
-                  "const stamp = pm.variables.get('stamp')",
-                  "pm.test(`Delete orgs with '${stamp}' stamp`, () => {",
-                  "    pm.expect(pm.response.code).to.eql(200);",
-                  "    const responseJson = pm.response.json();",
-                  "    // pm.expect(responseJson.n).to.eq(1);",
-                  "    // pm.expect(responseJson.ok).to.eq(1);",
-                  "    pm.expect(responseJson.deletedCount).to.eq(1);",
-                  "});"
-                ],
-                "type": "text/javascript"
+                  "const stamp = pm.variables.get('stamp')\npm.test(`Delete orgs with '${stamp}' stamp`, () => {\n    pm.expect(pm.response.code).to.eql(200)\n    const responseJson = pm.response.json()\n    // pm.expect(responseJson.n).to.eq(1)\n    // pm.expect(responseJson.ok).to.eq(1)\n    pm.expect(responseJson.deletedCount).to.ge(1)\n});"
+                ]
               }
             }
           ],
@@ -9158,7 +9055,7 @@
               "script": {
                 "exec": [
                   "pm.test(\"Creating the Portal key\", () => {",
-                  "    if (pm.variables.get('skipPortalConnection')) return true",
+                  "    if (!portal.isConnected()) return true",
                   "    pm.expect(pm.response.code).to.eql(200);",
                   "    const pubKey = pm.response.json()",
                   "    pm.expect(pubKey.name).to.be.eq('portal-' + pm.variables.get('stamp'))",
@@ -9217,7 +9114,7 @@
               "script": {
                 "exec": [
                   "pm.test(\"Getting a public key property\", () => {",
-                  "    if (pm.variables.get('skipPortalConnection')) return true",
+                  "    if (!portal.isConnected()) return true",
                   "    pm.expect(pm.response.code).to.eql(200);",
                   "    const pem = pm.response.stream.toString('utf8');",
                   "    pm.expect(pem).to.be.not.null",
@@ -9304,19 +9201,10 @@
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "pm.test(\"Get portal URL\", () => {",
-                  "    pm.expect(pm.response.code).to.eql(200);",
-                  "    let portalUrl = pm.response.text()",
-                  "    if (portalUrl.endsWith('/')) portalUrl = portalUrl.slice(0, -1)",
-                  "    pm.expect(portalUrl == 'https://rudi.bzh' || portalUrl == 'https://rudi-qualif.open-groupe.com' || portalUrl == pm.variables.get('noPortalMsg')).to.be.true",
-                  "    pm.collectionVariables.set('portalUrl', portalUrl)",
-                  "});",
-                  ""
-                ],
                 "type": "text/javascript",
-                "packages": {},
-                "requests": {}
+                "exec": [
+                  "pm.test(\"Get portal URL\", () => {\n    pm.expect(pm.response.code).to.eql(200);\n    let portalUrl = pm.response.text()\n    if (!portal.isConnected()) {\n        pm.expect(portalUrl == pm.variables.get('noPortalMsg')).to.be.true\n        return true\n    }\n    if (portalUrl.endsWith('/')) portalUrl = portalUrl.slice(0, -1)\n    console.log(portalUrl)\n    pm.expect(portalUrl == portal.url.prod || portalUrl == portal.url.qualif).to.be.true\n    pm.environment.set('portalUrl', portalUrl)\n});\n"
+                ]
               }
             }
           ],
@@ -9344,32 +9232,19 @@
             {
               "listen": "test",
               "script": {
+                "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Creating the Portal key\", () => {",
-                  "    if (pm.variables.get('skipPortalConnection')) return true",
-                  "    pm.expect(pm.response.code).to.eql(200);",
-                  "    const pubKey = pm.response.json()",
-                  "    pm.expect(pubKey.name).to.be.eq(pm.variables.get('portalKeyName'))",
-                  "    pm.expect(pubKey.url).to.be.not.null",
-                  "    pm.expect(pubKey.pem).to.be.not.null",
-                  "    pm.expect(pubKey.type).to.be.not.null",
-                  "});",
-                  ""
-                ],
-                "type": "text/javascript"
+                  "pm.test(\"Creating the Portal key\", () => {\n    if (!portal.isConnected()) return true\n    pm.expect(pm.response.code).to.eql(200);\n    const pubKey = pm.response.json()\n    pm.expect(pubKey.name).to.be.eq(pm.variables.get('portalKeyName'))\n    pm.expect(pubKey.url).to.be.not.null\n    pm.expect(pubKey.pem).to.be.not.null\n    pm.expect(pubKey.type).to.be.not.null\n});\n"
+                ]
               }
             },
             {
               "listen": "prerequest",
               "script": {
+                "type": "text/javascript",
                 "exec": [
-                  "const portalUrl = pm.variables.get('portalUrl')",
-                  "if (portalUrl === 'https://rudi.bzh')",
-                  "    pm.collectionVariables.set('portalKeyName', 'portail-rudi')",
-                  "else",
-                  "    pm.collectionVariables.set('portalKeyName', 'portail-qualif')"
-                ],
-                "type": "text/javascript"
+                  "const portalUrl = pm.variables.get('portalUrl')\nif(portal.isConnected())\n    pm.collectionVariables.set('portalKeyName',portalUrl === portal.url.prod?'portail-rudi':'portail-qualif')"
+                ]
               }
             }
           ],
@@ -9404,16 +9279,10 @@
             {
               "listen": "test",
               "script": {
+                "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Portal key added\", () => {",
-                  "    if (pm.variables.get('skipPortalConnection')) return true",
-                  "    pm.expect(pm.response.code).to.eql(200);",
-                  "    const pem = pm.response.stream.toString('utf8');",
-                  "    pm.expect(pem).to.be.not.null",
-                  "});",
-                  ""
-                ],
-                "type": "text/javascript"
+                  "pm.test(\"Portal key added\", () => {\n    if (!portal.isConnected()) return true\n    pm.expect(pm.response.code).to.eql(200);\n    const pem = pm.response.stream.toString('utf8');\n    pm.expect(pem).to.be.not.null\n});\n"
+                ]
               }
             }
           ],
@@ -9487,22 +9356,10 @@
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "pm.test(\"Check portal URL\", () => {",
-                  "    pm.expect(pm.response.code).to.eql(200);",
-                  "    const res = pm.response.text()",
-                  "    if (!pm.environment.get('portalUrl')) {",
-                  "        const res = pm.response.text()",
-                  "        pm.expect(res === pm.variables.get('noPortalMsg')).to.be.true",
-                  "        return true",
-                  "    }",
-                  "    pm.expect(res.startsWith('http')).to.be.true",
-                  "});",
-                  ""
-                ],
                 "type": "text/javascript",
-                "packages": {},
-                "requests": {}
+                "exec": [
+                  "pm.test(\"Check portal URL\", () => {\n    pm.expect(pm.response.code).to.eql(200);\n    const res = pm.response.text()\n    if (portal.isConnected()) {\n        const portalUrl = res.endsWith('/') ? res.slice(0, -1) : res\n        pm.expect(portalUrl == portal.url.prod || portalUrl == portal.url.qualif).to.be.true\n    }\n    else\n        pm.expect(res === pm.variables.get('noPortalMsg')).to.be.true\n});\n"
+                ]
               }
             }
           ],
@@ -9530,23 +9387,10 @@
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "pm.test(\"Check portal resources\", () => {",
-                  "    pm.expect(pm.response.code).to.eql(200);",
-                  "    if (!pm.environment.get('portalUrl')) {",
-                  "        const res = pm.response.text()",
-                  "        pm.expect(res === pm.variables.get('noPortalMsg')).to.be.true",
-                  "        return true",
-                  "    } ",
-                  "    const res = pm.response.json()",
-                  "    pm.expect(res.time).to.be.gt(0)",
-                  "    pm.expect(res.total).to.be.gt(0)",
-                  "    pm.expect(res.items?.length).to.be.gt(0)",
-                  "})"
-                ],
                 "type": "text/javascript",
-                "packages": {},
-                "requests": {}
+                "exec": [
+                  "pm.test(\"Check portal resources\", () => {\n    pm.expect(pm.response.code).to.eql(200);\n    if (!portal.isConnected()) {\n        const res = pm.response.text()\n        pm.expect(res === pm.variables.get('noPortalMsg')).to.be.true\n        return true\n    } \n    const res = pm.response.json()\n    pm.expect(res.time).to.be.gt(0)\n    pm.expect(res.total).to.be.gt(0)\n    pm.expect(res.items?.length).to.be.gt(0)\n})"
+                ]
               }
             }
           ],
@@ -9581,22 +9425,10 @@
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "pm.test(\"Check portal resources ids\", () => {",
-                  "    pm.expect(pm.response.code).to.eql(200);",
-                  "    if (!pm.environment.get('portalUrl')) {",
-                  "        const res = pm.response.text()",
-                  "        pm.expect(res === pm.variables.get('noPortalMsg')).to.be.true",
-                  "        return true",
-                  "    }",
-                  "    const res = pm.response.json()",
-                  "    pm.expect(res[0].global_id).to.be.not.undefined",
-                  "});",
-                  ""
-                ],
                 "type": "text/javascript",
-                "packages": {},
-                "requests": {}
+                "exec": [
+                  "pm.test(\"Check portal resources ids\", () => {\n    pm.expect(pm.response.code).to.eql(200);\n    if (!portal.isConnected()) {\n        pm.expect(pm.response.text() === pm.variables.get('noPortalMsg')).to.be.true\n        return true\n    }\n    const res = pm.response.json()\n    pm.expect(res[0].global_id).to.be.not.undefined\n});\n"
+                ]
               }
             }
           ],
@@ -9630,26 +9462,10 @@
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "pm.test(\"Check portal resources\", () => {",
-                  "    pm.expect(pm.response.code).to.eql(200);",
-                  "    if (!pm.environment.get('portalUrl')) {",
-                  "        const res = pm.response.text()",
-                  "        pm.expect(res === pm.variables.get('noPortalMsg')).to.be.true",
-                  "        return true",
-                  "    }",
-                  "",
-                  "    pm.expect(pm.response.code).to.eql(200);",
-                  "    const res = pm.response.json()",
-                  "    // pm.expect(res.time).to.be.gt(0)",
-                  "    pm.expect(res.total).to.gt(0)",
-                  "    pm.expect(res.elements.length).to.eq(1)",
-                  "});",
-                  ""
-                ],
                 "type": "text/javascript",
-                "packages": {},
-                "requests": {}
+                "exec": [
+                  "pm.test(\"Check portal resources\", () => {\n    pm.expect(pm.response.code).to.eql(200);\n    if (!portal.isConnected()) {\n        const res = pm.response.text()\n        pm.expect(res === pm.variables.get('noPortalMsg')).to.be.true\n        return true\n    }\n\n    pm.expect(pm.response.code).to.eql(200);\n    const res = pm.response.json()\n    // pm.expect(res.time).to.be.gt(0)\n    pm.expect(res.total).to.gt(0)\n    pm.expect(res.elements.length).to.eq(1)\n});\n"
+                ]
               }
             }
           ],
@@ -9670,6 +9486,42 @@
                 {
                   "key": "limit",
                   "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get node logs",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\npm.test(\"Downloading the node data, logs included\", () => {\n    pm.expect(pm.response.code).to.eql(200);\n    const res = pm.response.json()\n    pm.expect(res.logs.length).to.gt(0);\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{catalogUrl}}/admin/db/data?type=logs",
+              "host": [
+                "{{catalogUrl}}"
+              ],
+              "path": [
+                "admin",
+                "db",
+                "data"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "logs"
                 }
               ]
             }
@@ -9798,14 +9650,10 @@
     {
       "listen": "prerequest",
       "script": {
-        "type": "text/javascript",
-        "packages": {},
-        "requests": {},
         "exec": [
           "// --------------------------------------------------------------------------------------------------------------",
           "// Libs",
           "// --------------------------------------------------------------------------------------------------------------",
-          "",
           "log = {",
           "    lvl: 1,",
           "    e: (here, ...args) => log.lvl >= 1 && console.error(`E [${here}] ERROR:`, ...args),",
@@ -9876,7 +9724,8 @@
           "        if (keepVals === undefined) keepVals = [CATALOG_JWT_NAME, STORAGE_JWT_NAME, MANAGER_JWT_NAME, PORTAL_TOKEN_NAME]",
           "        keepVals = ['stamp', ...keepVals]",
           "        keepVals.map(key => {",
-          "            const val = collectionVariables.get(key) ?? pm.collectionVariables.get(key)",
+          "            const collectionVar = collectionVariables.get(key)",
+          "            const val = collectionVar == undefined || collectionVar == null ? pm.collectionVariables.get(key) : collectionVar",
           "            if (val) {",
           "                cache[key] = collectionVariables.get(key)",
           "                log.t(here, `Memorizing the protected variable ${key}: ${cache[key]}`)",
@@ -9998,7 +9847,7 @@
           "    }",
           "}",
           "",
-          "log.t('Functions to initialiaze test variables')",
+          "log.t('Functions to initialize test variables')",
           "rand = {",
           "    get: (randName) => pm.collectionVariables.replaceIn(randName),",
           "",
@@ -10068,7 +9917,20 @@
           "const MANAGER_JWT_NAME = `managerJwt-${pm.environment.name}`; mem.set('managerJwtName', MANAGER_JWT_NAME)",
           "const PORTAL_TOKEN_NAME = `portalJwt-${pm.environment.name}`; mem.set('portalJwtName', PORTAL_TOKEN_NAME)",
           "",
-          "if (!pm.environment.get('portalUsr')) mem.set('skipPortalConnection', true)",
+          "// --------------------------------------------------------------------------------------------------------------",
+          "// Portal connection flag",
+          "// (To be initialiazed in early requests)",
+          "// --------------------------------------------------------------------------------------------------------------",
+          "log.t('Portal connection flags and URLs')",
+          "",
+          "portal = {",
+          "    isConnected: () => pm.environment.get('isPortalConnected'),",
+          "    setIsConnected: (env, flag) => env.set('isPortalConnected', flag),",
+          "    url: {",
+          "        prod: 'https://rudi.rennesmetropole.fr/',",
+          "        qualif: 'https://rudi-qualif.open-groupe.com'",
+          "    }",
+          "}",
           "",
           "log.t('Functions for creating JWTs')",
           "secu = {",
@@ -10160,9 +10022,9 @@
           "        const token = mem.get(CATALOG_JWT_NAME)",
           "        if (secu.isTokenValid(token)) return token",
           "        const body = {",
-          "            'exp': time.nowEpochS() + TOKEN_DURATION_S,",
-          "            'sub': mem.get('jwtAuthDelegate') ?? JWT_AUTH_DELEGATE_DEFAULT,",
-          "            'client_id': mem.get('jwtAuthUser') ?? 'pm',",
+          "            exp: time.nowEpochS() + TOKEN_DURATION_S,",
+          "            sub: mem.get('jwtAuthDelegate') ?? JWT_AUTH_DELEGATE_DEFAULT,",
+          "            client_id: mem.get('jwtAuthUser') ?? 'pm',",
           "        }",
           "        const req = {",
           "            url: pathJoin(mem.get('jwtAuthUrl'), 'forge'),",
@@ -10199,8 +10061,8 @@
           "        const token = mem.get(MANAGER_JWT_NAME)",
           "        if (secu.isTokenValid(token)) return token",
           "        const body = {",
-          "            'username': mem.get('managerAdminUsr'),",
-          "            'password': mem.get('managerAdminPwd')",
+          "            username: mem.get('managerAdminUsr'),",
+          "            password: mem.get('managerAdminPwd')",
           "        }",
           "        const req = {",
           "            url: pathJoin(mem.get('managerUrl'), mem.get('managerBack'), '/front/login'),",
@@ -10210,6 +10072,8 @@
           "        return await secu.renewToken(MANAGER_JWT_NAME, req, body, res => secu.getCookie(res, MANAGER_COOKIE_NAME))",
           "    }",
           "}",
+          "",
+          "",
           "",
           "",
           "",
@@ -10227,26 +10091,12 @@
           "init().then(() => log.t('run', 'Init completed'))",
           "time.wait(50, () => log.t('run', 'Pre-request Scripts loaded'))",
           ""
-        ]
-      }
-    },
-    {
-      "listen": "test",
-      "script": {
-        "type": "text/javascript",
-        "packages": {},
-        "requests": {},
-        "exec": [
-          ""
-        ]
+        ],
+        "type": "text/javascript"
       }
     }
   ],
   "variable": [
-    {
-      "key": "stamp",
-      "value": "catalog-tests"
-    },
     {
       "key": "dateUpdate",
       "value": ""

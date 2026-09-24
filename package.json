@@ -36,9 +36,9 @@
     "@aqmo.org/jwt-lib": "^1.1.15",
     "@aqmo.org/rudi_logger": "^1.1.7",
     "@fastify/compress": "^9.2.0",
-    "@fastify/multipart": "^10.1.1",
+    "@fastify/multipart": "^10.1.2",
     "axios": "^1.20.0",
-    "date-and-time": "^4.5.2",
+    "date-and-time": "^4.6.0",
     "fastify": "^5.12.5",
     "ini": "^7.0.0",
     "ip-address": "^10.7.2",
@@ -60,14 +60,14 @@
   "devDependencies": {
     "@babel/core": "^8.0.6",
     "@babel/eslint-parser": "^8.0.6",
-    "@babel/preset-env": "8.0.6",
+    "@babel/preset-env": "^8.0.6",
     "eslint": "^10.11.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.6",
     "eslint-plugin-unused-imports": "^4.4.1",
     "globals": "^17.12.0",
     "nodemon": "^3.1.14",
-    "prettier": "^3.9.8"
+    "prettier": "^3.9.9"
   },
   "overrides": {
     "uuid": "$uuid"
