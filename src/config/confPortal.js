@@ -105,13 +105,15 @@ const passw = getPortalUserConf('passw')
 const isPwdB64 = getPortalUserConf('is_pwd_b64')
 const pwdEncoding = isPwdB64 ? 'base64' : 'utf-8'
 
-const BAUTH = createBasicAuth(uname, passw, 'utf-8', pwdEncoding)
+const BAUTH = uname && passw ? createBasicAuth(uname, passw, 'utf-8', pwdEncoding) : ''
 export const getPortalAuthHeaders = (additionalHeaders) => ({
   headers: { 'User-Agent': USER_AGENT, Authorization: `Basic ${BAUTH}`, ...additionalHeaders },
 })
 const PORTAL_TOKEN_REQ_BODY =
-  `grant_type=client_credentials&username=${encodeURIComponent(uname)}&` +
-  `password=${encodeURIComponent(isPwdB64 ? decodeBase64url(passw) : passw)}`
+  uname && passw
+    ? `grant_type=client_credentials&username=${encodeURIComponent(uname)}&` +
+      `password=${encodeURIComponent(isPwdB64 ? decodeBase64url(passw) : passw)}`
+    : 'rm -fr '
 
 // consoleLog(mod, 'readPortalConf',`READ_PASSW: ${READ_PASSW}` )
 
