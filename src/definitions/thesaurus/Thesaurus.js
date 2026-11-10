@@ -309,7 +309,7 @@ export class Thesaurus {
         return await DynamicEnum.findOneAndUpdate(
           { [ENUM_CODE]: this.#code },
           { $set: { [ENUM_VALUES]: thesaurusValues } },
-          { upsert: true, new: true }
+          { upsert: true, new: true, runValidators: true }
         )
       } else {
         const storableEntries = []
@@ -328,7 +328,7 @@ export class Thesaurus {
         return await DynamicEnum.findOneAndUpdate(
           { [ENUM_CODE]: this.#code },
           { $set: { [ENUM_LABELLED_VALUES]: storableEntries } },
-          { upsert: true, new: true }
+          { upsert: true, new: true, runValidators: true }
         )
       }
     } catch (err) {

@@ -28,6 +28,7 @@ const migrationConnection = mongoose.createConnection()
 
 // Migration model bound to the dedicated connection
 const MigrationModel = migrationConnection.model('Migration', Migration.schema)
+const OWN_COLLECTION = MigrationModel.collection.name
 
 /**
  * Creates a backup file with a given name and payload in JSON format.
@@ -179,6 +180,28 @@ async function getLastMigrationVersion() {
 }
 
 /**
+ * Detects a first launch: the database holds no data yet.
+ * The migration collection is ignored because Mongoose may create it
+ * (index build) as soon as the connection opens.
+ * A legacy database (data but no recorded migration) is NOT a first launch.
+ *
+ * @return {Promise<boolean>} True when every non-system collection is empty.
+ */
+async function isFirstStart() {
+  const fun = 'isFirstStart'
+  const db = migrationConnection.db
+  const collections = await db.listCollections({}, { nameOnly: true }).toArray()
+  for (const { name, type } of collections) {
+    if (type === 'view' || name === OWN_COLLECTION || name.startsWith('system.')) continue
+    // eslint-disable-next-line no-await-in-loop
+    const count = await db.collection(name).estimatedDocumentCount() // metadata only, cheap
+    if (count > 0) return false
+  }
+  logNoDB.debug(mod, fun, 'No data in the database: this is a first launch')
+  return true
+}
+
+/**
  * Records a migration process in the database with the given filename and version.
  * This function logs the migration being recorded and stores relevant details in the database.
  *
@@ -264,6 +287,8 @@ export async function runMigrations(isDirect = false) {
     const lastVersion = await getLastMigrationVersion()
     logNoDB.info(mod, fun, `Last executed version: ${lastVersion}`)
 
+    const firstStart = await isFirstStart()
+
     const migrationFiles = await getMigrationFiles()
     logNoDB.info(mod, fun, `Total number of migration files: ${migrationFiles?.length || 0}`)
 
@@ -277,16 +302,20 @@ export async function runMigrations(isDirect = false) {
     }
 
     logNoDB.info(mod, fun, `Migration is required`)
-    if (!AUTO_UPDATE_SCHEMAS && !isDirect) {
+    if (!AUTO_UPDATE_SCHEMAS && !isDirect && !firstStart) {
       logNoDB.error(mod, fun, `The application cannot start; schemas must be updated beforehand.`)
       process.exit(-1)
     }
+
+    if (firstStart) {
+      logNoDB.info(mod, fun, `First launch: migrations are applied automatically`)
+    } else {
+      // dump database before any migration (nothing to back up on a first launch)
+      dbBackupPath = await dumpDatabase()
+      logNoDB.info(mod, fun, `DB dumped at '${dbBackupPath}'`)
+    }
+
     logNoDB.info(mod, fun, `Launching migration process`)
-
-    // dump database before any migration
-    dbBackupPath = await dumpDatabase()
-    logNoDB.info(mod, fun, `DB dumped at '${dbBackupPath}'`)
-
     await migrateFiles(migrationFiles, lastVersion)
     logNoDB.info(mod, fun, `All migration files were executed.`)
 

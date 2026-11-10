@@ -1011,7 +1011,7 @@ export const updateDbObject = async (objectType, updateData) => {
     const { ObjModel, idField } = getObjectAccesses(objectType)
     const rudiId = accessProperty(updateData, idField)
     const filter = { [idField]: rudiId }
-    const updateOpts = { new: true }
+    const updateOpts = { new: true, runValidators: true }
 
     const populateOptions = getPopulateOptions(objectType)
     return isEmptyArray(populateOptions)
@@ -1077,6 +1077,7 @@ export const overwriteDbObject = async (objectType, updateData) => {
     const updateOpts = {
       new: true, // returns the updated document
       upsert: true, // creates the document if it wasn't found
+      runValidators: true, // ensures fields respect the metadata validators
     }
     // logD(mod, fun, `filter: ${beautify(filter)}`)
     // logD(mod, fun, `updateOpts: ${beautify(updateOpts)}`)
@@ -1089,8 +1090,10 @@ export const overwriteDbObject = async (objectType, updateData) => {
     if (objectType == OBJ_METADATA) {
       // logD(mod, fun, beautify(updateData))
       const dbObject = await ObjModel.findOneAndUpdate(filter, updateData, updateOpts)
-      if (updateData.geography) dbObject.markModified('geography')
-      await dbObject.save()
+      if (updateData.geography) {
+        dbObject.markModified('geography')
+        await dbObject.save()
+      }
       // logD(mod, fun, beautify(dbObject, 2))
       return dbObject
     }

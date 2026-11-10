@@ -20,6 +20,10 @@ It works as follows:
 
 - Automatic execution of missing scripts can be disabled by setting `auto_update_schema=false`.
   - When disabled and the schema is outdated, the application will not start.
+  - Exception: on a **first launch** (the database holds no data yet), pending scripts are applied
+    automatically even when `auto_update_schema=false`, so that a fresh container can create its database.
+    A database that already contains data but has no recorded migration is _not_ a first launch and still
+    requires a manual migration.
 - Backups directory is configurable via `backups_dir` ([see Backups section](#backups)).
 
 #### Exemple :

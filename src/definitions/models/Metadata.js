@@ -38,6 +38,7 @@ import {
   API_DATES_PUBLISHED,
   API_DATES_VALIDATED,
   API_END_DATE_PROPERTY,
+  API_EXTRAS,
   API_FILE_MIME,
   API_FILE_STATUS_UPDATE,
   API_FILE_STORAGE_STATUS,
@@ -134,6 +135,7 @@ import { isValid as isUpdateFrequenciesValid } from '../thesaurus/UpdateFrequenc
 // -------------------------------------------------------------------------------------------------
 import { AccessConditionSchema } from '../schemas/AccessConditions.js'
 import { DictionaryEntrySchema } from '../schemas/DictionaryEntry.js'
+import { ExtrasSchema } from '../schemas/Extras.js'
 import { DoiSchema, UuidSchema, UuidV4Schema } from '../schemas/Identifiers.js'
 import { checkDates, ReferenceDatesSchema } from '../schemas/ReferenceDates.js'
 import { RichDictionaryEntrySchema } from '../schemas/RichDictionaryEntry.js'
@@ -490,6 +492,8 @@ const MetadataSchema = new mongoose.Schema(
         match: VALID_URI,
       },
     },
+    /** 'extras': free-form JSON object for custom metadata (depth-limited, JSON values only) */
+    [API_EXTRAS]: ExtrasSchema,
 
     /** 'publishedAt': Date when the resource has been successfully integrated on Rudi Portal for the first time */
     [DB_PUBLISHED_AT]: Date,
@@ -839,6 +843,7 @@ export const toRudiPortalJSON = (metadata) => {
     // delete portalReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_SOURCE_PROPERTY]
     delete portalReadyMetadata[API_METAINFO_PROPERTY][API_METAINFO_DATES][API_DATES_PUBLISHED]
     delete portalReadyMetadata[API_RESTRICTED_ACCESS]
+    delete portalReadyMetadata[API_EXTRAS]
 
     if (portalReadyMetadata?.[API_ACCESS_CONDITION]?.[API_CONFIDENTIALITY]) {
       if (
@@ -931,6 +936,16 @@ MetadataSchema.virtual(API_RESTRICTED_ACCESS).set(function (isRestricted) {
 // -------------------------------------------------------------------------------------------------
 // Hooks
 // -------------------------------------------------------------------------------------------------
+// 'findOneAndUpdate' bypasses document validation (see 'overwriteDbObject'),
+// so 'extras' has to be checked before the write reaches the database
+// MetadataSchema.pre('findOneAndUpdate', function () {
+//   const fun = 'pre findOneAndUpdate hook'
+//   const update = this.getUpdate()
+//   if (!update || Array.isArray(update)) return
+//   const extras = update[API_EXTRAS] ?? update.$set?.[API_EXTRAS]
+//   if (extras !== undefined) checkExtras(extras, fun)
+// })
+
 MetadataSchema.pre('save', async function () {
   const fun = 'pre save hook'
 
